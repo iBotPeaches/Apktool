@@ -44,8 +44,7 @@ public class ResXmlSerializer extends MXSerializer {
         }
         if (namespace == null || namespace.isEmpty()) {
             return super.attribute(namespace, name,
-//                AndrolibResources.escapeForResXml(value)
-                  value
+                AndrolibResources.escapeForResXml(value)
             );
         }
         String pkgName = RES_NAMESPACE.equals(namespace) ?
