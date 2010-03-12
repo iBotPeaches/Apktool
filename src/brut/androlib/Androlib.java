@@ -33,15 +33,8 @@ import java.io.IOException;
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
 public class Androlib {
-    private final String mAndroidJar;
-    private final AndrolibResources mAndRes;
-    private final AndrolibSmali mSmali;
-
-    public Androlib(String androidJar) {
-        mAndroidJar = androidJar;
-        mAndRes = new AndrolibResources(mAndroidJar);
-        mSmali = new AndrolibSmali();
-    }
+    private final AndrolibResources mAndRes = new AndrolibResources();
+    private final AndrolibSmali mSmali = new AndrolibSmali();
 
     public void decode(String apkFileName, String outDirName)
             throws AndrolibException {

@@ -44,16 +44,6 @@ final public class AndrolibResources {
         Jar.load("/libAndroid.so");
     }
 
-    private final File mAndroidJar;
-
-    public AndrolibResources(String androidJar) {
-        this(new File(androidJar));
-    }
-
-    public AndrolibResources(File androidJar) {
-        this.mAndroidJar = androidJar;
-    }
-
     public ResTable getResTable(File apkFile) throws AndrolibException {
         ResTable resTable = new ResTable();
         loadApk(resTable, getAndroidResourcesFile(), false);
