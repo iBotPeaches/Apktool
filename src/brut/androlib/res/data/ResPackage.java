@@ -1,0 +1,195 @@
+/*
+ *  Copyright 2010 Ryszard Wiśniewski <brut.alll@gmail.com>.
+ * 
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ * 
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *  under the License.
+ */
+
+package brut.androlib.res.data;
+
+import brut.androlib.AndrolibException;
+import brut.androlib.res.data.value.ResFileValue;
+import brut.androlib.res.data.value.ResValue;
+import brut.androlib.res.data.value.ResValueFactory;
+import brut.androlib.res.data.value.ResXmlSerializable;
+import brut.util.Duo;
+import java.util.*;
+
+/**
+ * @author Ryszard Wiśniewski <brut.alll@gmail.com>
+ */
+public class ResPackage {
+    private final ResTable mResTable;
+    private final int mId;
+    private final String mName;
+    private final Map<ResID, ResResSpec> mResSpecs =
+        new LinkedHashMap<ResID, ResResSpec>();
+    private final Map<ResConfigFlags, ResConfig> mConfigs =
+        new LinkedHashMap<ResConfigFlags, ResConfig>();
+    private final Map<String, ResType> mTypes =
+        new LinkedHashMap<String, ResType>();
+    private final Set<ResResource> mFiles = new LinkedHashSet<ResResource>();
+    private final Map<Duo<ResType, ResConfig>, ResValuesFile> mValuesFiles =
+        new LinkedHashMap<Duo<ResType, ResConfig>, ResValuesFile>();
+
+    private ResValueFactory mValueFactory;
+
+    public ResPackage(ResTable resTable, int id, String name) {
+        this.mResTable = resTable;
+        this.mId = id;
+        this.mName = name;
+    }
+
+    public List<ResResSpec> listResSpecs() {
+        return new ArrayList<ResResSpec>(mResSpecs.values());
+    }
+
+    public boolean hasResSpec(ResID resID) {
+        return mResSpecs.containsKey(resID);
+    }
+
+    public ResResSpec getResSpec(ResID resID) throws AndrolibException {
+        ResResSpec spec = mResSpecs.get(resID);
+        if (spec == null) {
+            throw new AndrolibException("Undefined resource spec: " + resID);
+        }
+        return spec;
+    }
+
+    public List<ResConfig> getConfigs() {
+        return new ArrayList<ResConfig>(mConfigs.values());
+    }
+
+    public boolean hasConfig(ResConfigFlags flags) {
+        return mConfigs.containsKey(flags);
+    }
+
+    public ResConfig getConfig(ResConfigFlags flags) throws AndrolibException {
+        ResConfig config = mConfigs.get(flags);
+        if (config == null) {
+            throw new AndrolibException("Undefined config: " + flags);
+        }
+        return config;
+    }
+
+    public List<ResType> listTypes() {
+        return new ArrayList<ResType>(mTypes.values());
+    }
+
+    public boolean hasType(String typeName) {
+        return mTypes.containsKey(typeName);
+    }
+
+    public ResType getType(String typeName) throws AndrolibException {
+        ResType type = mTypes.get(typeName);
+        if (type == null) {
+            throw new AndrolibException("Undefined type: " + typeName);
+        }
+        return type;
+    }
+
+    public Set<ResResource> listFiles() {
+        return mFiles;
+    }
+
+    public Collection<ResValuesFile> listValuesFiles() {
+        return mValuesFiles.values();
+    }
+
+    public ResTable getResTable() {
+        return mResTable;
+    }
+
+    public int getId() {
+        return mId;
+    }
+
+    public String getName() {
+        return mName;
+    }
+
+    public void addResSpec(ResResSpec spec) throws AndrolibException {
+        if (mResSpecs.put(spec.getId(), spec) != null) {
+            throw new AndrolibException("Multiple resource specs: " + spec);
+        }
+    }
+
+    public void addConfig(ResConfig config) throws AndrolibException {
+        if (mConfigs.put(config.getFlags(), config) != null) {
+            throw new AndrolibException("Multiple configs: " + config);
+        }
+    }
+
+    public void addType(ResType type) throws AndrolibException {
+        if (mTypes.put(type.getName(), type) != null) {
+            throw new AndrolibException("Multiple types: " + type);
+        }
+    }
+
+    public void addResource(ResResource res) {
+        ResValue value = res.getValue();
+        if (value instanceof ResFileValue) {
+            mFiles.add(res);
+        }
+        if (value instanceof ResXmlSerializable) {
+            ResType type = res.getResSpec().getType();
+            ResConfig config = res.getConfig();
+            Duo<ResType, ResConfig> key =
+                new Duo<ResType, ResConfig>(type, config);
+            ResValuesFile values = mValuesFiles.get(key);
+            if (values == null) {
+                values = new ResValuesFile(type, config);
+                mValuesFiles.put(key, values);
+            }
+            values.addResource(res);
+        }
+    }
+
+    @Override
+    public String toString() {
+        return mName;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final ResPackage other = (ResPackage) obj;
+        if (this.mResTable != other.mResTable && (this.mResTable == null || !this.mResTable.equals(other.mResTable))) {
+            return false;
+        }
+        if (this.mId != other.mId) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 37 * hash + (this.mResTable != null ? this.mResTable.hashCode() : 0);
+        hash = 37 * hash + this.mId;
+        return hash;
+    }
+
+    public ResValueFactory getValueFactory() {
+        if (mValueFactory == null) {
+            mValueFactory = new ResValueFactory(this);
+        }
+        return mValueFactory;
+    }
+}
