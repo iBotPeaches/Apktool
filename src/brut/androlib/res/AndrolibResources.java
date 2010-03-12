@@ -56,7 +56,7 @@ final public class AndrolibResources {
 
     public ResTable getResTable(File apkFile) throws AndrolibException {
         ResTable resTable = new ResTable();
-        loadApk(resTable, new File(getClass().getProtectionDomain().getCodeSource().getLocation().getPath()), false);
+        loadApk(resTable, getAndroidResourcesFile(), false);
         loadApk(resTable, apkFile, true);
         return resTable;
     }
@@ -112,7 +112,7 @@ final public class AndrolibResources {
         cmd[i++] = "-F";
         cmd[i++] = apkFile.getAbsolutePath();
         cmd[i++] = "-I";
-        cmd[i++] = mAndroidJar.getAbsolutePath();
+        cmd[i++] = getAndroidResourcesFile().getAbsolutePath();
         if (manifest != null) {
             cmd[i++] = "-M";
             cmd[i++] = manifest.getAbsolutePath();
@@ -201,6 +201,11 @@ final public class AndrolibResources {
                 resTable.addPackage(pkg, main);
             }
         }
+    }
+
+    private File getAndroidResourcesFile() {
+        return new File(getClass().getProtectionDomain().getCodeSource()
+            .getLocation().getPath());
     }
 
     public static String escapeForResXml(String value) {
