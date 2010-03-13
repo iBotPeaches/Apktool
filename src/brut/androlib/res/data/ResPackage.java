@@ -17,7 +17,7 @@
 
 package brut.androlib.res.data;
 
-import brut.androlib.err.UndefinedResourceSpec;
+import brut.androlib.err.UndefinedResObject;
 import brut.androlib.AndrolibException;
 import brut.androlib.res.data.value.ResFileValue;
 import brut.androlib.res.data.value.ResValue;
@@ -59,10 +59,10 @@ public class ResPackage {
         return mResSpecs.containsKey(resID);
     }
 
-    public ResResSpec getResSpec(ResID resID) throws UndefinedResourceSpec {
+    public ResResSpec getResSpec(ResID resID) throws UndefinedResObject {
         ResResSpec spec = mResSpecs.get(resID);
         if (spec == null) {
-            throw new UndefinedResourceSpec(resID.toString());
+            throw new UndefinedResObject("resource spec: " + resID.toString());
         }
         return spec;
     }
@@ -78,7 +78,7 @@ public class ResPackage {
     public ResConfig getConfig(ResConfigFlags flags) throws AndrolibException {
         ResConfig config = mConfigs.get(flags);
         if (config == null) {
-            throw new AndrolibException("Undefined config: " + flags);
+            throw new UndefinedResObject("config: " + flags);
         }
         return config;
     }
@@ -94,7 +94,7 @@ public class ResPackage {
     public ResType getType(String typeName) throws AndrolibException {
         ResType type = mTypes.get(typeName);
         if (type == null) {
-            throw new AndrolibException("Undefined type: " + typeName);
+            throw new UndefinedResObject("type: " + typeName);
         }
         return type;
     }

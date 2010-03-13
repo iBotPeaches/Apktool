@@ -18,7 +18,7 @@
 package brut.androlib.res;
 
 import brut.androlib.AndrolibException;
-import brut.androlib.err.UndefinedResourceSpec;
+import brut.androlib.err.UndefinedResObject;
 import brut.androlib.res.data.ResResSpec;
 import brut.androlib.res.data.ResTable;
 import brut.directory.Directory;
@@ -123,7 +123,7 @@ public class ResSmaliUpdater {
                         ResResSpec spec = resTable.getResSpec(resID);
                         out.println(String.format(
                         RES_NAME_FORMAT, spec.getFullName()));
-                    } catch (UndefinedResourceSpec ex) {
+                    } catch (UndefinedResObject ex) {
                         if (! R_FILE_PATTERN.matcher(fileName).matches()) {
                             System.err.println(String.format(
                                 "warning: undefined resource spec in %s: 0x%08x"

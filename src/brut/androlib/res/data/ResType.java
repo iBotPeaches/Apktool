@@ -18,14 +18,8 @@
 package brut.androlib.res.data;
 
 import brut.androlib.AndrolibException;
-import brut.androlib.res.AndrolibResources;
-import brut.androlib.res.decoder.ResFileDecoder;
-import brut.androlib.res.decoder.ResXmlSerializer;
-import brut.directory.Directory;
-import brut.directory.DirectoryException;
-import java.io.IOException;
+import brut.androlib.err.UndefinedResObject;
 import java.util.*;
-import java.util.Map.Entry;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
@@ -57,8 +51,8 @@ public final class ResType {
     public ResResSpec getResSpec(String name) throws AndrolibException {
         ResResSpec spec = mResSpecs.get(name);
         if (spec == null) {
-            throw new AndrolibException(String.format(
-                "Undefined resource spec: %s/%s", getName(), name));
+            throw new UndefinedResObject(String.format(
+                "resource spec: %s/%s", getName(), name));
         }
         return spec;
     }

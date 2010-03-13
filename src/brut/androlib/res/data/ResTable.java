@@ -18,12 +18,10 @@
 package brut.androlib.res.data;
 
 import brut.androlib.AndrolibException;
-import brut.androlib.res.data.value.ResAttr;
+import brut.androlib.err.UndefinedResObject;
 import brut.androlib.res.data.value.ResValue;
-import brut.androlib.res.data.value.ResValueFactory;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -56,8 +54,8 @@ public class ResTable {
     public ResPackage getPackage(int id) throws AndrolibException {
         ResPackage pkg = mPackagesById.get(id);
         if (pkg == null) {
-            throw new AndrolibException(String.format(
-                "Undefined package: id=%d", id));
+            throw new UndefinedResObject(String.format(
+                "package: id=%d", id));
         }
         return pkg;
     }
@@ -65,7 +63,7 @@ public class ResTable {
     public ResPackage getPackage(String name) throws AndrolibException {
         ResPackage pkg = mPackagesByName.get(name);
         if (pkg == null) {
-            throw new AndrolibException("Undefined package: name=" + name);
+            throw new UndefinedResObject("package: name=" + name);
         }
         return pkg;
     }
