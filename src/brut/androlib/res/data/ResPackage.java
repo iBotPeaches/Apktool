@@ -17,6 +17,7 @@
 
 package brut.androlib.res.data;
 
+import brut.androlib.err.UndefinedResourceSpec;
 import brut.androlib.AndrolibException;
 import brut.androlib.res.data.value.ResFileValue;
 import brut.androlib.res.data.value.ResValue;
@@ -58,10 +59,10 @@ public class ResPackage {
         return mResSpecs.containsKey(resID);
     }
 
-    public ResResSpec getResSpec(ResID resID) throws AndrolibException {
+    public ResResSpec getResSpec(ResID resID) throws UndefinedResourceSpec {
         ResResSpec spec = mResSpecs.get(resID);
         if (spec == null) {
-            throw new AndrolibException("Undefined resource spec: " + resID);
+            throw new UndefinedResourceSpec(resID.toString());
         }
         return spec;
     }
