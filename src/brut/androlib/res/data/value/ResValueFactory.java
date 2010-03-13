@@ -170,7 +170,8 @@ public class ResValueFactory {
         return null;
     }
 
-    private final static Pattern decPattern = Pattern.compile("-?\\d+");
+    private final static Pattern decPattern =
+        Pattern.compile("-?(?:[0-2]|)\\d{1,9}");
     private final static Pattern hexPattern =
         Pattern.compile("-?[0-9a-fA-F]{1,8}");
     private final static Pattern resIdPattern =
