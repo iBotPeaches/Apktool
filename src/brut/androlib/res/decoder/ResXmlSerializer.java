@@ -18,11 +18,11 @@
 package brut.androlib.res.decoder;
 
 import brut.androlib.*;
+import brut.androlib.err.UndefinedResObject;
 import brut.androlib.res.AndrolibResources;
 import brut.androlib.res.data.ResPackage;
 import brut.androlib.res.data.value.ResAttr;
 import brut.androlib.res.data.value.ResScalarValue;
-import brut.androlib.res.data.value.ResValue;
 import java.io.IOException;
 import org.xmlpull.mxp1_serializer.MXSerializer;
 import org.xmlpull.v1.XmlSerializer;
@@ -44,24 +44,35 @@ public class ResXmlSerializer extends MXSerializer {
         if (! mDecodingEnabled) {
             return super.attribute(namespace, name, value);
         }
+        String origVal = value;
         
         try {
             ResScalarValue resValue =
                 mCurrentPackage.getValueFactory().factory(value);
+            value = null;
 
-            if (namespace == null || namespace.isEmpty()) {
-                value = resValue.toResXmlFormat();
-            } else {
+            if (namespace != null && ! namespace.isEmpty()) {
                 String pkgName = RES_NAMESPACE.equals(namespace) ?
                     "android" : mCurrentPackage.getName();
-                ResAttr attr = (ResAttr) mCurrentPackage.getResTable()
-                    .getValue(pkgName, "attr", name);
-                value = attr.convertToResXmlFormat(resValue);
+                try {
+                    ResAttr attr = (ResAttr) mCurrentPackage.getResTable()
+                        .getValue(pkgName, "attr", name);
+                    value = attr.convertToResXmlFormat(resValue);
+                } catch (UndefinedResObject ex) {
+                    System.err.println(String.format(
+                        "warning: udefined attr when decoding: " +
+                        "ns=%s, name=%s, value=%s",
+                        namespace, name, origVal));
+                }
+            }
+
+            if (value == null) {
+                value = resValue.toResXmlFormat();
             }
         } catch (AndrolibException ex) {
             throw new IllegalArgumentException(String.format(
                 "could not decode attribute: ns=%s, name=%s, value=%s",
-                namespace, name, value), ex);
+                namespace, name, origVal), ex);
         }
 
         if (value == null) {
