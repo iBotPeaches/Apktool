@@ -21,6 +21,8 @@ import brut.androlib.*;
 import brut.androlib.res.AndrolibResources;
 import brut.androlib.res.data.ResPackage;
 import brut.androlib.res.data.value.ResAttr;
+import brut.androlib.res.data.value.ResScalarValue;
+import brut.androlib.res.data.value.ResValue;
 import java.io.IOException;
 import org.xmlpull.mxp1_serializer.MXSerializer;
 import org.xmlpull.v1.XmlSerializer;
@@ -42,19 +44,20 @@ public class ResXmlSerializer extends MXSerializer {
         if (! mDecodingEnabled) {
             return super.attribute(namespace, name, value);
         }
-        if (namespace == null || namespace.isEmpty()) {
-            return super.attribute(namespace, name,
-                AndrolibResources.escapeForResXml(value)
-            );
-        }
-        String pkgName = RES_NAMESPACE.equals(namespace) ?
-            "android" : mCurrentPackage.getName();
-
+        
         try {
-            ResAttr attr = (ResAttr) mCurrentPackage.getResTable()
-                .getValue(pkgName, "attr", name);
-            value = attr.convertToResXmlFormat(
-                mCurrentPackage.getValueFactory().factory(value));
+            ResScalarValue resValue =
+                mCurrentPackage.getValueFactory().factory(value);
+
+            if (namespace == null || namespace.isEmpty()) {
+                value = resValue.toResXmlFormat();
+            } else {
+                String pkgName = RES_NAMESPACE.equals(namespace) ?
+                    "android" : mCurrentPackage.getName();
+                ResAttr attr = (ResAttr) mCurrentPackage.getResTable()
+                    .getValue(pkgName, "attr", name);
+                value = attr.convertToResXmlFormat(resValue);
+            }
         } catch (AndrolibException ex) {
             throw new IllegalArgumentException(String.format(
                 "could not decode attribute: ns=%s, name=%s, value=%s",
