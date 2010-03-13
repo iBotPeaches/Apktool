@@ -68,10 +68,6 @@ public class ResXmlSerializer extends MXSerializer {
             return this;
         }
 
-//        if ("id".equals(name) && value.startsWith("@id")) {
-        if (value.startsWith("@id")) {
-            value = "@+id" + value.substring(3);
-        }
         return super.attribute(namespace, name, value);
     }
 
