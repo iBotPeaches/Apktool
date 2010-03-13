@@ -25,6 +25,8 @@ import brut.androlib.res.jni.JniBagItem;
 import brut.androlib.res.jni.JniEntry;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
@@ -36,26 +38,42 @@ public class ResValueFactory {
         this.mPackage = pakage_;
     }
 
-    public ResScalarValue factory(String string) {
+    public ResScalarValue factory(String string) throws AndrolibException {
         if (string.isEmpty()) {
             return new ResStringValue(string);
         }
+        Integer i;
+
         char c = string.charAt(0);
-        if (c == '@' || c == '?') {
-            return newReference(
-                Integer.parseInt(string.substring(1)), c == '?');
+        boolean theme = false;
+        if (c == '?') {
+            c = '@';
+            theme = true;
         }
-        if (c == '#') {
-            return new ResColorValue(
-                (int) Long.parseLong(string.substring(1), 16));
-        }
-        try {
-            if (string.startsWith("0x")) {
-                return new ResIntValue(
-                    (int) Long.parseLong(string.substring(2), 16));
+        if (c == '@' || c == '#') {
+            i = parseInt(string.substring(1), true);
+            if (i != null) {
+                switch (c) {
+                    case '@':
+                        return newReference(i, theme);
+                    case '#':
+                        return new ResColorValue(i);
+                }
             }
-            return new ResIntValue(Integer.parseInt(string));
-        } catch (NumberFormatException ex) {}
+            Matcher m = resIdPattern.matcher(string.substring(1));
+            if (m.matches()) {
+                ResPackage pkg = m.group(1) == null ? mPackage
+                    : mPackage.getResTable().getPackage(m.group(1));
+                return newReference(pkg.getType(m.group(2))
+                    .getResSpec(m.group(3)).getId().id, theme);
+            }
+        }
+
+        i = parseInt(string);
+        if (i != null) {
+            return new ResIntValue(i);
+        }
+        
         return new ResStringValue(string);
     }
     
@@ -137,6 +155,29 @@ public class ResValueFactory {
         }
         return items;
     }
+
+    private static Integer parseInt(String s) {
+        return parseInt(s, true);
+    }
+
+    private static Integer parseInt(String s, boolean hex) {
+        if (s.startsWith("0x")) {
+            s = s.substring(2);
+            hex = true;
+        } else if (decPattern.matcher(s).matches()) {
+            return Integer.parseInt(s);
+        }
+        if (hex && hexPattern.matcher(s).matches()) {
+            return (int) Long.parseLong(s, 16);
+        }
+        return null;
+    }
+
+    private final static Pattern decPattern = Pattern.compile("-?\\d+");
+    private final static Pattern hexPattern =
+        Pattern.compile("-?[0-9a-fA-F]{1,8}");
+    private final static Pattern resIdPattern =
+        Pattern.compile("\\+?(?:|(.+?):)(.+?)/(.+?)");
 
     private final static int TYPE_NULL = 0x00;
     private final static int TYPE_REFERENCE = 0x01;
