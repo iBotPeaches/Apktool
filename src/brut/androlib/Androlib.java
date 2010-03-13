@@ -20,14 +20,10 @@ package brut.androlib;
 import brut.androlib.res.AndrolibResources;
 import brut.androlib.res.data.ResTable;
 import brut.common.BrutException;
-import brut.directory.Directory;
-import brut.directory.DirectoryException;
-import brut.directory.FileDirectory;
-import brut.directory.Util;
-import brut.directory.ZipRODirectory;
+import brut.directory.*;
 import brut.util.OS;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import org.apache.commons.io.IOUtils;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
@@ -36,12 +32,12 @@ public class Androlib {
     private final AndrolibResources mAndRes = new AndrolibResources();
     private final AndrolibSmali mSmali = new AndrolibSmali();
 
-    public void decode(String apkFileName, String outDirName)
+    public void decode(String apkFileName, String outDirName, boolean resources)
             throws AndrolibException {
-        decode(new File(apkFileName), new File(outDirName));
+        decode(new File(apkFileName), new File(outDirName), resources);
     }
 
-    public void decode(File apkFile, File outDir)
+    public void decode(File apkFile, File outDir, boolean resources)
             throws AndrolibException {
         try {
             OS.rmdir(outDir);
@@ -49,14 +45,15 @@ public class Androlib {
             throw new AndrolibException(ex);
         }
         outDir.mkdirs();
-        
-        ResTable resTable = mAndRes.getResTable(apkFile);
-
-        mAndRes.decode(resTable, apkFile, outDir);
 
         File smaliDir = new File(outDir.getPath() + "/smali");
         mSmali.baksmali(apkFile, smaliDir);
-        mAndRes.tagSmaliResIDs(resTable, smaliDir);
+
+        if(resources) {
+            ResTable resTable = mAndRes.getResTable(apkFile);
+            mAndRes.decode(resTable, apkFile, outDir);
+            mAndRes.tagSmaliResIDs(resTable, smaliDir);
+        }
 
         try {
             Directory in = new ZipRODirectory(apkFile);
@@ -67,6 +64,15 @@ public class Androlib {
             if (in.containsDir("lib")) {
                 Util.copyFiles(in.getDir("lib"), out.createDir("lib"));
             }
+            if (! resources) {
+                Util.copyFiles(in.getDir("res"), out.createDir("res"));
+                IOUtils.copy(in.getFileInput("resources.arsc"),
+                    out.getFileOutput("resources.arsc"));
+                IOUtils.copy(in.getFileInput("AndroidManifest.xml"),
+                    out.getFileOutput("AndroidManifest.xml"));
+            }
+        } catch (IOException ex) {
+            throw new AndrolibException("Could not decode apk", ex);
         } catch (DirectoryException ex) {
             throw new AndrolibException("Could not decode apk", ex);
         }
@@ -104,6 +110,23 @@ public class Androlib {
     }
 
     public void buildResources() throws AndrolibException {
+        if (new File("resources.arsc").exists()) {
+            try {
+                new File("build/apk/res").mkdirs();
+                Util.copyFiles(new FileDirectory("res"),
+                    new FileDirectory("build/apk/res"));
+                IOUtils.copy(new FileInputStream("resources.arsc"),
+                    new FileOutputStream("build/apk/resources.arsc"));
+                IOUtils.copy(new FileInputStream("AndroidManifest.xml"),
+                    new FileOutputStream("build/apk/AndroidManifest.xml"));
+            } catch (IOException ex) {
+                throw new AndrolibException(ex);
+            } catch (DirectoryException ex) {
+                throw new AndrolibException(ex);
+            }
+            return;
+        }
+
         File apkFile;
         try {
             apkFile = File.createTempFile("APKTOOL", null);
