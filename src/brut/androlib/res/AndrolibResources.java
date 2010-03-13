@@ -178,14 +178,22 @@ final public class AndrolibResources {
             throws AndrolibException {
         JniPackageGroup[] groups =
             nativeGetPackageGroups(apkFile.getAbsolutePath());
-        if (groups.length != 1) {
+        if (groups.length == 0) {
             throw new AndrolibException(
-                "Apk's with multiple or zero package groups not supported");
+                "Apk with zero package groups: " + apkFile.getPath());
+        }
+        if (groups.length > 1) {
+            System.err.println(
+                "warning: apk with multiple package groups: "
+                + apkFile.getPath());
         }
         for (int i = 0; i < groups.length; i++) {
-//            if (groups.length != 1 && i == 0) {
-//                continue;
-//            }
+            if (groups.length != 1 && i == 0
+                    && "android".equals(groups[i].packages[0].name)) {
+                System.err.println(
+                    "warning: skipping \"android\" package group");
+                continue;
+            }
             for (JniPackage jniPkg : groups[i].packages) {
                 ResPackage pkg = new JniPackageDecoder().decode(jniPkg, resTable);
                 resTable.addPackage(pkg, main);
