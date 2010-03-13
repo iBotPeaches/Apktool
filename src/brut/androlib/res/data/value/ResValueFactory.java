@@ -79,9 +79,6 @@ public class ResValueFactory {
     
     public ResValue factory(JniEntry entry)
             throws AndrolibException {
-        if ("id".equals(entry.type)) {
-            return new ResIdValue();
-        }
         switch (entry.valueType) {
             case TYPE_BAG:
                 return bagFactory(entry);
