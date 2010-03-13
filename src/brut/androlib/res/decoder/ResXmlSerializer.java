@@ -61,7 +61,7 @@ public class ResXmlSerializer extends MXSerializer {
         } catch (AndrolibException ex) {
             throw new IllegalArgumentException(String.format(
                 "could not decode attribute: ns=%s, name=%s, value=%s",
-                getPrefix(namespace, false), name, value), ex);
+                namespace, name, value), ex);
         }
 
         if (value == null) {
