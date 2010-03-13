@@ -18,6 +18,7 @@
 package brut.androlib.res;
 
 import brut.androlib.AndrolibException;
+import brut.androlib.err.UndefinedResourceSpec;
 import brut.androlib.res.data.ResResSpec;
 import brut.androlib.res.data.ResTable;
 import brut.directory.Directory;
@@ -46,28 +47,7 @@ public class ResSmaliUpdater {
         }
         for (String fileName : dir.getFiles(true)) {
             try {
-                Iterator<String> it =
-                    IOUtils.readLines(dir.getFileInput(fileName)).iterator();
-                PrintWriter out = new PrintWriter(dir.getFileOutput(fileName));
-                while (it.hasNext()) {
-                    String line = it.next();
-                    if (RES_NAME_PATTERN.matcher(line).matches()) {
-                        out.println(line);
-                        out.println(it.next());
-                        continue;
-                    }
-                    Matcher m = RES_ID_PATTERN.matcher(line);
-                    if (m.matches()) {
-                        int resID = parseResID(m.group(3));
-                        if (resID != -1) {
-                            ResResSpec spec = resTable.getResSpec(resID);
-                            out.println(String.format(
-                                RES_NAME_FORMAT, spec.getFullName()));
-                        }
-                    }
-                    out.println(line);
-                }
-                out.close();
+                tagResIdsForFile(resTable, dir, fileName);
             } catch (IOException ex) {
                 throw new AndrolibException(
                     "Could not tag resIDs for file: " + fileName, ex);
@@ -122,6 +102,41 @@ public class ResSmaliUpdater {
         }
     }
 
+    private void tagResIdsForFile(ResTable resTable, Directory dir,
+            String fileName) throws IOException, DirectoryException,
+            AndrolibException {
+        Iterator<String> it =
+            IOUtils.readLines(dir.getFileInput(fileName)).iterator();
+        PrintWriter out = new PrintWriter(dir.getFileOutput(fileName));
+        while (it.hasNext()) {
+            String line = it.next();
+            if (RES_NAME_PATTERN.matcher(line).matches()) {
+                out.println(line);
+                out.println(it.next());
+                continue;
+            }
+            Matcher m = RES_ID_PATTERN.matcher(line);
+            if (m.matches()) {
+                int resID = parseResID(m.group(3));
+                if (resID != -1) {
+                    try {
+                        ResResSpec spec = resTable.getResSpec(resID);
+                        out.println(String.format(
+                        RES_NAME_FORMAT, spec.getFullName()));
+                    } catch (UndefinedResourceSpec ex) {
+                        if (! R_FILE_PATTERN.matcher(fileName).matches()) {
+                            System.err.println(String.format(
+                                "warning: undefined resource spec in %s: 0x%08x"
+                                , fileName, resID));
+                        }
+                    }
+                }
+            }
+            out.println(line);
+        }
+        out.close();
+    }
+
     private int parseResID(String resIDHex) {
         if (resIDHex.endsWith("ff")) {
             return -1;
@@ -143,4 +158,7 @@ public class ResSmaliUpdater {
         "# APKTOOL/RES_NAME: %s";
     private final static Pattern RES_NAME_PATTERN = Pattern.compile(
         "^# APKTOOL/RES_NAME: ([a-zA-Z0-9.]+):([a-z]+)/([a-zA-Z0-9._]+)$");
+
+    private final static Pattern R_FILE_PATTERN = Pattern.compile(
+        ".*R\\$[a-z]+\\.smali$");
 }
