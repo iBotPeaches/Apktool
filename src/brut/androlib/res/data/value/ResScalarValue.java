@@ -37,8 +37,14 @@ public abstract class ResScalarValue extends ResValue
 
     public void serializeToXml(XmlSerializer serializer, ResResource res)
             throws IOException, AndrolibException {
-        String tagName = res.getResSpec().getType().getName();
+        String type = res.getResSpec().getType().getName();
+        boolean item = ! type.equals(mType);
+        String tagName = item ? "item" : type;
+        
         serializer.startTag(null, tagName);
+        if (item) {
+            serializer.attribute(null, "type", type);
+        }
         serializer.attribute(null, "name", res.getResSpec().getName());
         serializer.text(toResXmlFormat());
         serializer.endTag(null, tagName);
