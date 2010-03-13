@@ -177,7 +177,7 @@ public class ResValueFactory {
     private final static Pattern hexPattern =
         Pattern.compile("-?[0-9a-fA-F]{1,8}");
     private final static Pattern resIdPattern =
-        Pattern.compile("\\+?(?:|(.+?):)(.+?)/(.+?)");
+        Pattern.compile("\\+?(?:(.+?):|)([^:]+?)/(.+?)");
 
     private final static int TYPE_NULL = 0x00;
     private final static int TYPE_REFERENCE = 0x01;
