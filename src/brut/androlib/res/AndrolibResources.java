@@ -201,9 +201,12 @@ final public class AndrolibResources {
         }
     }
 
-    private File getAndroidResourcesFile() {
-        return new File(getClass().getProtectionDomain().getCodeSource()
-            .getLocation().getPath());
+    private File getAndroidResourcesFile() throws AndrolibException {
+        try {
+            return Jar.getResourceAsFile("/brut/androlib/android-framework.jar");
+        } catch (BrutException ex) {
+            throw new AndrolibException(ex);
+        }
     }
 
     public static String escapeForResXml(String value) {
