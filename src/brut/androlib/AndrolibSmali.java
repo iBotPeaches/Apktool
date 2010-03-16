@@ -26,7 +26,7 @@ import org.jf.smali.main;
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
-class AndrolibSmali {
+public class AndrolibSmali {
     public void baksmali(File apkFile, File dir) throws AndrolibException {
         baksmali(apkFile.getAbsolutePath(), dir.getAbsolutePath());
     }
@@ -45,6 +45,6 @@ class AndrolibSmali {
     }
 
     public void smali(String dir, String dexFile) throws AndrolibException {
-        main.main(new String[]{"smali", dir, "-o", dexFile});
+        main.main(new String[]{dir, "-o", dexFile});
     }
 }
