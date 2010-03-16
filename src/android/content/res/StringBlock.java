@@ -26,7 +26,7 @@ import brut.util.Jar;
  */
 final class StringBlock {
     static {
-        Jar.load("/libAndroid.so");
+        Jar.load("/brut/androlib/libAndroid.so");
     }
 
     private final int mNative;

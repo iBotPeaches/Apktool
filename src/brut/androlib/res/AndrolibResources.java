@@ -41,7 +41,7 @@ import java.util.Arrays;
  */
 final public class AndrolibResources {
     static {
-        Jar.load("/libAndroid.so");
+        Jar.load("/brut/androlib/libAndroid.so");
     }
 
     public ResTable getResTable(File apkFile) throws AndrolibException {

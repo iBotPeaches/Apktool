@@ -33,7 +33,7 @@ import java.io.Reader;
  */
 final public class XmlBlock {
     static {
-        Jar.load("/libAndroid.so");
+        Jar.load("/brut/androlib/libAndroid.so");
     }
 
     private static final boolean DEBUG=false;
