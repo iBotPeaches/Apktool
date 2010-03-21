@@ -27,7 +27,11 @@ public class ResStringValue extends ResScalarValue
     private final String mValue;
 
     public ResStringValue(String value) {
-        super("string");
+        this(value, "string");
+    }
+
+    public ResStringValue(String value, String type) {
+        super(type);
         this.mValue = value;
     }
 

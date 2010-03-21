@@ -19,8 +19,6 @@ package brut.androlib.res.data.value;
 
 import brut.androlib.AndrolibException;
 import brut.androlib.res.data.ResPackage;
-import brut.androlib.res.data.ResTable;
-import brut.androlib.res.data.ResType;
 import brut.androlib.res.jni.JniBagItem;
 import brut.androlib.res.jni.JniEntry;
 import java.util.LinkedHashMap;
@@ -103,8 +101,9 @@ public class ResValueFactory {
                     return new ResFileValue(entry.strVal);
                 }
             case TYPE_DIMENSION:
+                return new ResStringValue(entry.strVal, "dimen");
             case TYPE_FRACTION:
-                return new ResStringValue(entry.strVal);
+                return new ResStringValue(entry.strVal, "fraction");
         }
         throw new AndrolibException(String.format(
             "Unknown value type for %s/%s: ",
