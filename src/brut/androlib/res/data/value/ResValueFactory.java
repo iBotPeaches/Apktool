@@ -17,6 +17,7 @@
 
 package brut.androlib.res.data.value;
 
+import android.util.TypedValue;
 import brut.androlib.AndrolibException;
 import brut.androlib.res.data.ResPackage;
 import brut.androlib.res.jni.JniBagItem;
@@ -34,6 +35,35 @@ public class ResValueFactory {
 
     public ResValueFactory(ResPackage pakage_) {
         this.mPackage = pakage_;
+    }
+
+    public ResScalarValue factory(int type, int value)
+            throws AndrolibException {
+        switch (type) {
+            case TypedValue.TYPE_REFERENCE:
+                return newReference(value);
+            case TypedValue.TYPE_ATTRIBUTE:
+                return newReference(value, true);
+            case TypedValue.TYPE_FLOAT:
+                return new ResFloatValue(Float.intBitsToFloat(value));
+            case TypedValue.TYPE_DIMENSION:
+                return new ResDimenValue(value);
+            case TypedValue.TYPE_FRACTION:
+                return new ResFractionValue(value);
+            case TypedValue.TYPE_INT_BOOLEAN:
+                return new ResBoolValue(value != 0);
+        }
+
+        if (type >= TypedValue.TYPE_FIRST_COLOR_INT
+                && type <= TypedValue.TYPE_LAST_COLOR_INT) {
+            return new ResColorValue(value);
+        }
+        if (type >= TypedValue.TYPE_FIRST_INT
+                && type <= TypedValue.TYPE_LAST_INT) {
+            return new ResIntValue(value);
+        }
+
+        throw new AndrolibException("Invalid value type: "+ type);
     }
 
     public ResScalarValue factory(String string) throws AndrolibException {
