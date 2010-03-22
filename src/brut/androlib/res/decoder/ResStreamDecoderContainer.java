@@ -37,7 +37,7 @@ public class ResStreamDecoderContainer {
 
     public ResStreamDecoder getDecoder(String name) throws AndrolibException {
         ResStreamDecoder decoder = mDecoders.get(name);
-        if (decoder== null) {
+        if (decoder == null) {
             throw new AndrolibException("Undefined decoder: " + name);
         }
         return decoder;
