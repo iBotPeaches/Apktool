@@ -110,29 +110,29 @@ public class ResValueFactory {
         switch (entry.valueType) {
             case TYPE_BAG:
                 return bagFactory(entry);
-            case TYPE_REFERENCE:
+            case TypedValue.TYPE_REFERENCE:
                 return newReference(entry.intVal);
-            case TYPE_ATTRIBUTE:
+            case TypedValue.TYPE_ATTRIBUTE:
                 return newReference(entry.intVal, true);
-            case TYPE_INT_BOOLEAN:
+            case TypedValue.TYPE_INT_BOOLEAN:
                 return new ResBoolValue(entry.boolVal);
-            case TYPE_INT_DEC:
-            case TYPE_INT_HEX:
+            case TypedValue.TYPE_INT_DEC:
+            case TypedValue.TYPE_INT_HEX:
                 return new ResIntValue(entry.intVal);
-            case TYPE_FLOAT:
+            case TypedValue.TYPE_FLOAT:
                 return new ResFloatValue(entry.floatVal);
-            case TYPE_INT_COLOR_ARGB4:
-            case TYPE_INT_COLOR_ARGB8:
-            case TYPE_INT_COLOR_RGB4:
-            case TYPE_INT_COLOR_RGB8:
+            case TypedValue.TYPE_INT_COLOR_ARGB4:
+            case TypedValue.TYPE_INT_COLOR_ARGB8:
+            case TypedValue.TYPE_INT_COLOR_RGB4:
+            case TypedValue.TYPE_INT_COLOR_RGB8:
                 return new ResColorValue(entry.intVal);
-            case TYPE_STRING:
+            case TypedValue.TYPE_STRING:
                 if (entry.strVal.startsWith("res/")) {
                     return new ResFileValue(entry.strVal);
                 }
-            case TYPE_DIMENSION:
+            case TypedValue.TYPE_DIMENSION:
                 return new ResStringValue(entry.strVal, "dimen");
-            case TYPE_FRACTION:
+            case TypedValue.TYPE_FRACTION:
                 return new ResStringValue(entry.strVal, "fraction");
         }
         throw new AndrolibException(String.format(
@@ -205,21 +205,6 @@ public class ResValueFactory {
         Pattern.compile("-?[0-9a-fA-F]{1,8}");
     private final static Pattern resIdPattern =
         Pattern.compile("\\+?(?:(.+?):|)([^:]+?)/(.+?)");
-
-    private final static int TYPE_NULL = 0x00;
-    private final static int TYPE_REFERENCE = 0x01;
-    private final static int TYPE_ATTRIBUTE = 0x02;
-    private final static int TYPE_STRING = 0x03;
-    private final static int TYPE_FLOAT = 0x04;
-    private final static int TYPE_DIMENSION = 0x05;
-    private final static int TYPE_FRACTION = 0x06;
-    private final static int TYPE_INT_DEC = 0x10;
-    private final static int TYPE_INT_HEX = 0x11;
-    private final static int TYPE_INT_BOOLEAN = 0x12;
-    private final static int TYPE_INT_COLOR_ARGB8 = 0x1c;
-    private final static int TYPE_INT_COLOR_RGB8 = 0x1d;
-    private final static int TYPE_INT_COLOR_ARGB4 = 0x1e;
-    private final static int TYPE_INT_COLOR_RGB4 = 0x1f;
 
     private final static int TYPE_BAG = -0x01;
 }
