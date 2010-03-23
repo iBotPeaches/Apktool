@@ -17,20 +17,8 @@
 
 package brut.androlib.res.data.value;
 
-import brut.androlib.AndrolibException;
-import brut.androlib.res.data.ResResource;
-import java.io.IOException;
-import org.xmlpull.v1.XmlSerializer;
-
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
 public class ResIdValue extends ResValue {
-    public void serializeToXml(XmlSerializer serializer, ResResource res)
-            throws IOException, AndrolibException {
-        serializer.startTag(null, "item");
-        serializer.attribute(null, "type", "id");
-        serializer.attribute(null, "name", res.getResSpec().getName());
-        serializer.endTag(null, "item");
-    }
 }
