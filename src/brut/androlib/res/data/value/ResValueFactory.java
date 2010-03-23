@@ -65,7 +65,11 @@ public class ResValueFactory {
         throw new AndrolibException("Invalid value type: "+ type);
     }
     
-    public ResValue factory(JniEntry entry)
+    public ResValue factory(JniEntry entry) throws AndrolibException {
+        return factory(entry, false);
+    }
+
+    private ResValue factory(JniEntry entry, boolean bagItem)
             throws AndrolibException {
         switch (entry.valueType) {
             case TYPE_BAG:
@@ -75,6 +79,10 @@ public class ResValueFactory {
             case TypedValue.TYPE_ATTRIBUTE:
                 return newReference(entry.intVal, true);
             case TypedValue.TYPE_INT_BOOLEAN:
+                if (! bagItem && ! "bool".equals(entry.type)
+                        && ! entry.boolVal) {
+                    return new ResIdValue();
+                }
                 return new ResBoolValue(entry.boolVal);
             case TypedValue.TYPE_INT_DEC:
             case TypedValue.TYPE_INT_HEX:
@@ -137,7 +145,7 @@ public class ResValueFactory {
         for (int i = 0; i < jniItems.length; i++) {
             JniBagItem jniItem = jniItems[i];
             items.put(newReference(jniItem.resID),
-                (ResScalarValue) factory(jniItem.entry));
+                (ResScalarValue) factory(jniItem.entry, true));
         }
         return items;
     }
