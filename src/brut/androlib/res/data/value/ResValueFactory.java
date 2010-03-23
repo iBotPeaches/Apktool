@@ -24,7 +24,6 @@ import brut.androlib.res.jni.JniBagItem;
 import brut.androlib.res.jni.JniEntry;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -64,45 +63,6 @@ public class ResValueFactory {
         }
 
         throw new AndrolibException("Invalid value type: "+ type);
-    }
-
-    public ResScalarValue factory(String string) throws AndrolibException {
-        if (string.isEmpty()) {
-            return new ResStringValue(string);
-        }
-        Integer i;
-
-        char c = string.charAt(0);
-        boolean theme = false;
-        if (c == '?') {
-            c = '@';
-            theme = true;
-        }
-        if (c == '@' || c == '#') {
-            i = parseInt(string.substring(1), true);
-            if (i != null) {
-                switch (c) {
-                    case '@':
-                        return newReference(i, theme);
-                    case '#':
-                        return new ResColorValue(i);
-                }
-            }
-            Matcher m = resIdPattern.matcher(string.substring(1));
-            if (m.matches()) {
-                ResPackage pkg = m.group(1) == null ? mPackage
-                    : mPackage.getResTable().getPackage(m.group(1));
-                return newReference(pkg.getType(m.group(2))
-                    .getResSpec(m.group(3)).getId().id, theme);
-            }
-        }
-
-        i = parseInt(string);
-        if (i != null) {
-            return new ResIntValue(i);
-        }
-        
-        return new ResStringValue(string);
     }
     
     public ResValue factory(JniEntry entry)
