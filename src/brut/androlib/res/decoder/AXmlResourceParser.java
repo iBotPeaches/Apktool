@@ -296,7 +296,7 @@ public class AXmlResourceParser implements XmlResourceParser {
             return m_strings.getString(valueString);
         }
         int valueData = m_attributes[offset + ATTRIBUTE_IX_VALUE_DATA];
-        return "";//TypedValue.coerceToString(valueType,valueData);
+        return TypedValue.coerceToString(valueType, valueData);
     }
 
     public boolean getAttributeBooleanValue(int index, boolean defaultValue) {
