@@ -44,9 +44,15 @@ public class ResReferenceValue extends ResIntValue {
             return "@null";
         }
 
+        ResResSpec spec = getReferent();
+        boolean newId =
+            spec.hasDefaultResource() &&
+            spec.getDefaultResource().getValue() instanceof ResIdValue;
+
         return
             (mTheme ? '?' : '@') +
-            getReferent().getFullName(mPackage, mTheme);
+            (newId ? "+" : "") +
+            spec.getFullName(mPackage, mTheme);
     }
 
     public ResResSpec getReferent() throws AndrolibException {
