@@ -22,8 +22,11 @@ import java.io.InputStream;
 import java.io.Reader;
 import org.xmlpull.v1.XmlPullParserException;
 import android.util.TypedValue;
+import brut.androlib.AndrolibException;
 import brut.util.ExtDataInput;
 import com.mindprod.ledatastream.LEDataInputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
@@ -50,6 +53,10 @@ public class AXmlResourceParser implements XmlResourceParser {
     public AXmlResourceParser(InputStream stream) {
         this();
         open(stream);
+    }
+
+    public void setAttrDecoder(ResAttrDecoder attrDecoder) {
+        mAttrDecoder = attrDecoder;
     }
 
     public void open(InputStream stream) {
@@ -296,6 +303,22 @@ public class AXmlResourceParser implements XmlResourceParser {
             return m_strings.getString(valueString);
         }
         int valueData = m_attributes[offset + ATTRIBUTE_IX_VALUE_DATA];
+
+        if (mAttrDecoder != null) {
+            try {
+                return mAttrDecoder.decode(valueType, valueData,
+                    getAttributeNameResource(index));
+            } catch (AndrolibException ex) {
+                Logger.getLogger(AXmlResourceParser.class.getName()).log(
+                    Level.WARNING, String.format(
+                        "Could not decode attr value, using undecoded value " +
+                        "instead: ns=%s, name=%s, value=0x%08x",
+                        getAttributePrefix(index), getAttributeName(index),
+                        valueData
+                    ), ex);
+            }
+        }
+
         return TypedValue.coerceToString(valueType, valueData);
     }
 
@@ -884,6 +907,7 @@ public class AXmlResourceParser implements XmlResourceParser {
      * an index of name in m_strings.
      */
     private ExtDataInput m_reader;
+    private ResAttrDecoder mAttrDecoder;
     private boolean m_operational = false;
     private StringBlock m_strings;
     private int[] m_resourceIDs;
