@@ -43,13 +43,10 @@ public class ResReferenceValue extends ResIntValue {
         if (isNull()) {
             return "@null";
         }
-//        try {
+
         return
             (mTheme ? '?' : '@') +
             getReferent().getFullName(mPackage, mTheme);
-//        } catch (AndrolibException ex) {
-//            return "@" + String.valueOf(mValue);
-//        }
     }
 
     public ResResSpec getReferent() throws AndrolibException {
