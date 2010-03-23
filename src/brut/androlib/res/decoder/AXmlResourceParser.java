@@ -404,7 +404,7 @@ public class AXmlResourceParser implements XmlResourceParser {
 
     /////////////////////////////////// dummies
     public void setInput(InputStream stream, String inputEncoding) throws XmlPullParserException {
-        throw new XmlPullParserException(E_NOT_SUPPORTED);
+        open(stream);
     }
 
     public void setInput(Reader reader) throws XmlPullParserException {
