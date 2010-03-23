@@ -17,7 +17,7 @@
 
 package brut.androlib.res;
 
-import brut.androlib.*;
+import brut.androlib.AndrolibException;
 import brut.androlib.res.data.*;
 import brut.androlib.res.data.value.ResFileValue;
 import brut.androlib.res.data.value.ResXmlSerializable;
@@ -25,16 +25,11 @@ import brut.androlib.res.decoder.*;
 import brut.androlib.res.jni.JniPackage;
 import brut.androlib.res.jni.JniPackageGroup;
 import brut.common.BrutException;
-import brut.directory.Directory;
-import brut.directory.DirectoryException;
-import brut.directory.FileDirectory;
-import brut.directory.ZipRODirectory;
-import brut.util.Jar;
-import brut.util.OS;
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
+import brut.directory.*;
+import brut.util.*;
+import java.io.*;
 import java.util.Arrays;
+import org.xmlpull.v1.XmlSerializer;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
@@ -53,9 +48,11 @@ final public class AndrolibResources {
 
     public void decode(ResTable resTable, File apkFile, File outDir)
             throws AndrolibException {
-        ResXmlSerializer serial = getResXmlSerializer(resTable);
-        ResFileDecoder fileDecoder = getResFileDecoder(serial);
-        serial.setCurrentPackage(
+        Duo<ResFileDecoder, ResAttrDecoder> duo = getResFileDecoder();
+        ResFileDecoder fileDecoder = duo.m1;
+        ResAttrDecoder attrDecoder = duo.m2;
+
+        attrDecoder.setCurrentPackage(
             resTable.listMainPackages().iterator().next());
 
         Directory in, out;
@@ -72,15 +69,16 @@ final public class AndrolibResources {
             throw new AndrolibException(ex);
         }
 
+        ResXmlSerializer xmlSerializer = getResXmlSerializer();
         for (ResPackage pkg : resTable.listMainPackages()) {
-            serial.setCurrentPackage(pkg);
+            attrDecoder.setCurrentPackage(pkg);
             for (ResResource res : pkg.listFiles()) {
                 ResFileValue fileValue = (ResFileValue) res.getValue();
                 fileDecoder.decode(in, fileValue.getStrippedPath(),
                     out, res.getFilePath());
             }
             for (ResValuesFile valuesFile : pkg.listValuesFiles()) {
-                generateValuesFile(valuesFile, out, serial);
+                generateValuesFile(valuesFile, out, xmlSerializer);
             }
         }
     }
@@ -131,27 +129,32 @@ final public class AndrolibResources {
         new ResSmaliUpdater().updateResIDs(resTable, smaliDir);
     }
 
-    public ResFileDecoder getResFileDecoder(ResXmlSerializer serializer) {
+    public Duo<ResFileDecoder, ResAttrDecoder> getResFileDecoder() {
         ResStreamDecoderContainer decoders =
             new ResStreamDecoderContainer();
         decoders.setDecoder("raw", new ResRawStreamDecoder());
+
+        ResAttrDecoder attrDecoder = new ResAttrDecoder();
+        AXmlResourceParser axmlParser = new AXmlResourceParser();
+        axmlParser.setAttrDecoder(attrDecoder);
         decoders.setDecoder("xml",
-            new ResXmlStreamDecoder(serializer));
-        return new ResFileDecoder(decoders);
+            new XmlPullStreamDecoder(axmlParser, getResXmlSerializer()));
+
+        return new Duo<ResFileDecoder, ResAttrDecoder>(
+            new ResFileDecoder(decoders), attrDecoder);
     }
 
-    public ResXmlSerializer getResXmlSerializer(ResTable resTable) {
+    public ResXmlSerializer getResXmlSerializer() {
         ResXmlSerializer serial = new ResXmlSerializer();
         serial.setProperty(serial.PROPERTY_SERIALIZER_INDENTATION, "    ");
         return serial;
     }
 
     private void generateValuesFile(ResValuesFile valuesFile, Directory out,
-            ResXmlSerializer serial) throws AndrolibException {
+            XmlSerializer serial) throws AndrolibException {
         try {
             OutputStream outStream = out.getFileOutput(valuesFile.getPath());
             serial.setOutput((outStream), null);
-            serial.setDecodingEnabled(false);
             serial.startDocument(null, null);
             serial.startTag(null, "resources");
 

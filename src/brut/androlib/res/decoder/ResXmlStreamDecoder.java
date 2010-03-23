@@ -42,7 +42,7 @@ public class ResXmlStreamDecoder implements ResStreamDecoder {
             XmlSerializerWrapper ser =
                 getXmlWrapperFactory().newSerializerWrapper(mSerializer);
             ser.setOutput(out, null);
-            mSerializer.setDecodingEnabled(true);
+//            mSerializer.setDecodingEnabled(true);
 
             while (par.nextToken() != XmlPullParser.END_DOCUMENT) {
                 ser.event(par);
