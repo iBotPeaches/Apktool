@@ -47,6 +47,11 @@ public class AXmlResourceParser implements XmlResourceParser {
         resetEventInfo();
     }
 
+    public AXmlResourceParser(InputStream stream) {
+        this();
+        open(stream);
+    }
+
     public void open(InputStream stream) {
         close();
         if (stream != null) {
