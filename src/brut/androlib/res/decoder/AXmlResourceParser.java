@@ -23,6 +23,7 @@ import java.io.Reader;
 import org.xmlpull.v1.XmlPullParserException;
 import android.util.TypedValue;
 import brut.androlib.AndrolibException;
+import brut.androlib.res.AndrolibResources;
 import brut.util.ExtDataInput;
 import com.mindprod.ledatastream.LEDataInputStream;
 import java.util.logging.Level;
@@ -300,7 +301,8 @@ public class AXmlResourceParser implements XmlResourceParser {
         int valueType = m_attributes[offset + ATTRIBUTE_IX_VALUE_TYPE];
         if (valueType == TypedValue.TYPE_STRING) {
             int valueString = m_attributes[offset + ATTRIBUTE_IX_VALUE_STRING];
-            return m_strings.getString(valueString);
+            return AndrolibResources.escapeForResXml(
+                m_strings.getString(valueString));
         }
         int valueData = m_attributes[offset + ATTRIBUTE_IX_VALUE_DATA];
 
