@@ -889,19 +889,22 @@ public class AXmlResourceParser implements XmlResourceParser {
     private int m_classAttribute;
     private int m_styleAttribute;
     private static final String E_NOT_SUPPORTED = "Method is not supported.";
-    private static final int ATTRIBUTE_IX_NAMESPACE_URI = 0,
-            ATTRIBUTE_IX_NAME = 1,
-            ATTRIBUTE_IX_VALUE_STRING = 2,
-            ATTRIBUTE_IX_VALUE_TYPE = 3,
-            ATTRIBUTE_IX_VALUE_DATA = 4,
-            ATTRIBUTE_LENGHT = 5;
-    private static final int CHUNK_AXML_FILE = 0x00080003,
-            CHUNK_RESOURCEIDS = 0x00080180,
-            CHUNK_XML_FIRST = 0x00100100,
+    private static final int
+            ATTRIBUTE_IX_NAMESPACE_URI =    0,
+            ATTRIBUTE_IX_NAME =             1,
+            ATTRIBUTE_IX_VALUE_STRING =     2,
+            ATTRIBUTE_IX_VALUE_TYPE =       3,
+            ATTRIBUTE_IX_VALUE_DATA =       4,
+            ATTRIBUTE_LENGHT =              5;
+
+    private static final int
+            CHUNK_AXML_FILE =           0x00080003,
+            CHUNK_RESOURCEIDS =         0x00080180,
+            CHUNK_XML_FIRST =           0x00100100,
             CHUNK_XML_START_NAMESPACE = 0x00100100,
-            CHUNK_XML_END_NAMESPACE = 0x00100101,
-            CHUNK_XML_START_TAG = 0x00100102,
-            CHUNK_XML_END_TAG = 0x00100103,
-            CHUNK_XML_TEXT = 0x00100104,
-            CHUNK_XML_LAST = 0x00100104;
+            CHUNK_XML_END_NAMESPACE =   0x00100101,
+            CHUNK_XML_START_TAG =       0x00100102,
+            CHUNK_XML_END_TAG =         0x00100103,
+            CHUNK_XML_TEXT =            0x00100104,
+            CHUNK_XML_LAST =            0x00100104;
 }
