@@ -16,6 +16,7 @@
  */
 package brut.androlib.res.decoder;
 
+import brut.util.ExtDataInput;
 import java.io.IOException;
 
 /**
@@ -34,8 +35,8 @@ public class StringBlock {
      * Reads whole (including chunk type) string block from stream.
      * Stream must be at the chunk type.
      */
-    public static StringBlock read(IntReader reader) throws IOException {
-        ChunkUtil.readCheckType(reader, CHUNK_TYPE);
+    public static StringBlock read(ExtDataInput reader) throws IOException {
+        reader.skipCheckInt(CHUNK_TYPE);
         int chunkSize = reader.readInt();
         int stringCount = reader.readInt();
         int styleOffsetCount = reader.readInt();

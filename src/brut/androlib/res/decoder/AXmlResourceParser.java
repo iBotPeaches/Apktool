@@ -16,11 +16,14 @@
  */
 package brut.androlib.res.decoder;
 
+import android.content.res.XmlResourceParser;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import org.xmlpull.v1.XmlPullParserException;
 import android.util.TypedValue;
+import brut.util.ExtDataInput;
+import com.mindprod.ledatastream.LEDataInputStream;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
@@ -47,7 +50,8 @@ public class AXmlResourceParser implements XmlResourceParser {
     public void open(InputStream stream) {
         close();
         if (stream != null) {
-            m_reader = new IntReader(stream, false);
+            m_reader = new ExtDataInput(
+                    new LEDataInputStream(stream));
         }
     }
 
@@ -56,7 +60,7 @@ public class AXmlResourceParser implements XmlResourceParser {
             return;
         }
         m_operational = false;
-        m_reader.close();
+//        m_reader.close();
         m_reader = null;
         m_strings = null;
         m_resourceIDs = null;
@@ -756,7 +760,7 @@ public class AXmlResourceParser implements XmlResourceParser {
     private final void doNext() throws IOException {
         // Delayed initialization.
         if (m_strings == null) {
-            ChunkUtil.readCheckType(m_reader, CHUNK_AXML_FILE);
+            m_reader.skipCheckInt(CHUNK_AXML_FILE);
             /*chunkSize*/ m_reader.skipInt();
             m_strings = StringBlock.read(m_reader);
             m_namespaces.increaseDepth();
@@ -874,7 +878,7 @@ public class AXmlResourceParser implements XmlResourceParser {
      * All values are essentially indices, e.g. m_name is
      * an index of name in m_strings.
      */
-    private IntReader m_reader;
+    private ExtDataInput m_reader;
     private boolean m_operational = false;
     private StringBlock m_strings;
     private int[] m_resourceIDs;
