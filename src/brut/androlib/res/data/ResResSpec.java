@@ -57,8 +57,20 @@ public class ResResSpec {
         return res;
     }
 
+    public boolean hasResource(ResConfig config) {
+        return hasResource(config.getFlags());
+    }
+
+    private boolean hasResource(ResConfigFlags flags) {
+        return mResources.containsKey(flags);
+    }
+
     public ResResource getDefaultResource() throws AndrolibException {
         return getResource(new ResConfigFlags());
+    }
+
+    public boolean hasDefaultResource() {
+        return mResources.containsKey(new ResConfigFlags());
     }
 
     public String getFullName() {
