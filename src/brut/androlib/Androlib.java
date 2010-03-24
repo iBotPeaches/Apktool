@@ -52,7 +52,7 @@ public class Androlib {
         if(resources) {
             ResTable resTable = mAndRes.getResTable(apkFile);
             mAndRes.decode(resTable, apkFile, outDir);
-            mAndRes.tagSmaliResIDs(resTable, smaliDir);
+//            mAndRes.tagSmaliResIDs(resTable, smaliDir);
         }
 
         try {
@@ -140,8 +140,8 @@ public class Androlib {
             new File("AndroidManifest.xml"),
             new File("res")
         );
-        mAndRes.updateSmaliResIDs(
-            mAndRes.getResTable(apkFile), new File("smali"));
+//        mAndRes.updateSmaliResIDs(
+//            mAndRes.getResTable(apkFile), new File("smali"));
 
         try {
             Util.copyFiles(new ZipRODirectory(apkFile),
