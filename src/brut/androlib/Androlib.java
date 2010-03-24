@@ -158,11 +158,16 @@ public class Androlib {
     }
 
     public void buildPackage() throws AndrolibException {
-        File distDir = new File("dist");
-        if (! distDir.exists()) {
-            distDir.mkdirs();
+        File outApk = new File("dist/out.apk");
+        if (outApk.exists()) {
+            outApk.delete();
+        } else {
+            File outDir = outApk.getParentFile();
+            if (! outDir.exists()) {
+                outDir.mkdirs();
+            }
         }
-        mAndRes.aaptPackage(new File("dist/out.apk"), null, null,
+        mAndRes.aaptPackage(outApk, null, null,
             new File("build/apk"), false);
     }
 }
