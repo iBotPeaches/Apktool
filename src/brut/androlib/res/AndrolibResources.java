@@ -80,6 +80,7 @@ final public class AndrolibResources {
             for (ResValuesFile valuesFile : pkg.listValuesFiles()) {
                 generateValuesFile(valuesFile, out, xmlSerializer);
             }
+            generatePublicXml(pkg, out, xmlSerializer);
         }
     }
 
@@ -174,6 +175,36 @@ final public class AndrolibResources {
         } catch (DirectoryException ex) {
             throw new AndrolibException(
                 "Could not generate: " + valuesFile.getPath(), ex);
+        }
+    }
+
+    private void generatePublicXml(ResPackage pkg, Directory out,
+            XmlSerializer serial) throws AndrolibException {
+        try {
+            OutputStream outStream = out.getFileOutput("values/public.xml");
+            serial.setOutput(outStream, null);
+            serial.startDocument(null, null);
+            serial.startTag(null, "resources");
+
+            for (ResResSpec spec : pkg.listResSpecs()) {
+                serial.startTag(null, "public");
+                serial.attribute(null, "type", spec.getType().getName());
+                serial.attribute(null, "name", spec.getName());
+                serial.attribute(null, "id", String.format(
+                    "0x%08x", spec.getId().id));
+                serial.endTag(null, "public");
+            }
+
+            serial.endTag(null, "resources");
+            serial.endDocument();
+            serial.flush();
+            outStream.close();
+        } catch (IOException ex) {
+            throw new AndrolibException(
+                "Could not generate public.xml file", ex);
+        } catch (DirectoryException ex) {
+            throw new AndrolibException(
+                "Could not generate public.xml file", ex);
         }
     }
 
