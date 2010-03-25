@@ -64,6 +64,13 @@ public class ResValueFactory {
 
         throw new AndrolibException("Invalid value type: "+ type);
     }
+
+    public ResValue factory(String value) {
+        if (value.startsWith("res/")) {
+            return new ResFileValue(value);
+        }
+        return new ResStringValue(value);
+    }
     
     public ResValue factory(JniEntry entry) throws AndrolibException {
         return factory(entry, false);
@@ -108,33 +115,35 @@ public class ResValueFactory {
             entry.type, entry.name, String.valueOf(entry.valueType)));
     }
 
-    private ResValue bagFactory(JniEntry entry)
-            throws AndrolibException {
-        ResReferenceValue parent = newReference(entry.bagParent);
-        Map<ResReferenceValue, ResScalarValue> items =
-            convertItems(entry.bagItems);
-        String type = entry.type;
+    public ResBagValue bagFactory(String type, int parent,
+            Map<ResReferenceValue, ResScalarValue> items) {
+        ResReferenceValue parentVal = newReference(parent);
 
         if ("array".equals(type)) {
-            return new ResArrayValue(parent, items);
+            return new ResArrayValue(parentVal, items);
         }
         if ("style".equals(type)) {
-            return new ResStyleValue(parent, items);
+            return new ResStyleValue(parentVal, items);
         }
         if ("plurals".equals(type)) {
-            return new ResPluralsValue(parent, items);
+            return new ResPluralsValue(parentVal, items);
         }
         if ("attr".equals(type)) {
-            return ResAttrFactory.factory(parent, items);
+            return ResAttrFactory.factory(parentVal, items);
         }
-        return new ResBagValue(parent, items);
+        return new ResBagValue(parentVal, items);
     }
 
-    private ResReferenceValue newReference(int resID) {
+    private ResValue bagFactory(JniEntry entry)
+            throws AndrolibException {
+        return bagFactory(entry.name, entry.bagParent, convertItems(entry.bagItems));
+    }
+
+    public ResReferenceValue newReference(int resID) {
         return newReference(resID, false);
     }
 
-    private ResReferenceValue newReference(int resID, boolean theme) {
+    public ResReferenceValue newReference(int resID, boolean theme) {
         return new ResReferenceValue(mPackage, resID, theme);
     }
 
