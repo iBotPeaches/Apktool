@@ -35,8 +35,8 @@ import org.xmlpull.v1.XmlSerializer;
 final public class AndrolibResources {
     public ResTable getResTable(File apkFile) throws AndrolibException {
         ResTable resTable = new ResTable();
-        loadApk(resTable, getAndroidResourcesFile(), false);
-        loadApk(resTable, apkFile, true);
+        decodeArsc(resTable, getAndroidResourcesFile(), false);
+        decodeArsc(resTable, apkFile, true);
         return resTable;
     }
 
@@ -202,25 +202,29 @@ final public class AndrolibResources {
         }
     }
 
-    private void loadApk(ResTable resTable, File apkFile, boolean main)
+    private void decodeArsc(ResTable resTable, File apkFile, boolean main)
             throws AndrolibException {
-        ResPackage[] groups;
         try {
-            groups = ARSCDecoder.decode(
-                new ZipRODirectory(apkFile).getFileInput("resources.arsc"),
-                resTable);
+            loadArsc(resTable, new ZipRODirectory(apkFile)
+                .getFileInput("resources.arsc"), main);
         } catch (DirectoryException ex) {
-            throw new AndrolibException("Could not decode res table", ex);
+            throw new AndrolibException(
+                "Could not load resources.arsc from file: " + apkFile, ex);
         }
+
+    }
+
+    private void loadArsc(ResTable resTable, InputStream arscStream,
+            boolean main) throws AndrolibException {
+        ResPackage[] groups = ARSCDecoder.decode(arscStream, resTable);
         
         if (groups.length == 0) {
             throw new AndrolibException(
-                "Apk with zero package groups: " + apkFile.getPath());
+                "Arsc file with zero package groups");
         }
         if (groups.length > 1) {
             System.err.println(
-                "warning: apk with multiple package groups: "
-                + apkFile.getPath());
+                "warning: arsc file with multiple package groups");
         }
         for (int i = 0; i < groups.length; i++) {
             if (groups.length != 1 && i == 0
