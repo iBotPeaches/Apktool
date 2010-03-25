@@ -15,7 +15,7 @@
  *  under the License.
  */
 
-package brut.androlib.res.decoder;
+package brut.androlib.res.util;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -24,7 +24,7 @@ import org.xmlpull.mxp1_serializer.MXSerializer;
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
-public class ResXmlSerializer extends MXSerializer {
+public class ExtMXSerializer extends MXSerializer {
     @Override
     public void startDocument(String encoding, Boolean standalone) throws
             IOException, IllegalArgumentException, IllegalStateException {

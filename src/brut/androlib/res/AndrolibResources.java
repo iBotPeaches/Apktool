@@ -22,6 +22,7 @@ import brut.androlib.res.data.*;
 import brut.androlib.res.data.value.ResFileValue;
 import brut.androlib.res.data.value.ResXmlSerializable;
 import brut.androlib.res.decoder.*;
+import brut.androlib.res.util.ExtMXSerializer;
 import brut.common.BrutException;
 import brut.directory.*;
 import brut.util.*;
@@ -63,7 +64,7 @@ final public class AndrolibResources {
             throw new AndrolibException(ex);
         }
 
-        ResXmlSerializer xmlSerializer = getResXmlSerializer();
+        ExtMXSerializer xmlSerializer = getResXmlSerializer();
         for (ResPackage pkg : resTable.listMainPackages()) {
             attrDecoder.setCurrentPackage(pkg);
             for (ResResource res : pkg.listFiles()) {
@@ -139,8 +140,8 @@ final public class AndrolibResources {
             new ResFileDecoder(decoders), attrDecoder);
     }
 
-    public ResXmlSerializer getResXmlSerializer() {
-        ResXmlSerializer serial = new ResXmlSerializer();
+    public ExtMXSerializer getResXmlSerializer() {
+        ExtMXSerializer serial = new ExtMXSerializer();
         serial.setProperty(serial.PROPERTY_SERIALIZER_INDENTATION, "    ");
         serial.setProperty(serial.PROPERTY_SERIALIZER_LINE_SEPARATOR,
             System.getProperty("line.separator"));
