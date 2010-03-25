@@ -24,33 +24,25 @@ import brut.androlib.res.jni.JniConfig;
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
 public class ResConfigFlags {
-    public final int mcc;
-    public final int mnc;
+    public final short mcc;
+    public final short mnc;
 
     public final char[] language;
     public final char[] country;
 
-//    public final Orientation orientation;
-//    public final Touchscreen touchscreen;
-    public final int orientation;
-    public final int touchscreen;
-    public final int density;
+    public final byte orientation;
+    public final byte touchscreen;
+    public final short density;
 
-//    public final Keyboard keyboard;
-//    public final Navigation navigation;
-//    public final Keys keys;
-//    public final Nav nav;
-    public final int keyboard;
-    public final int navigation;
-    public final int inputFlags;
+    public final byte keyboard;
+    public final byte navigation;
+    public final byte inputFlags;
 
-    public final int screenWidth;
-    public final int screenHeight;
-//    public final ScreenSize screenSize;
-//    public final ScreenLong screenLong;
-    public final int screenLayout;
+    public final short screenWidth;
+    public final short screenHeight;
+    public final byte screenLayout;
 
-    public final int sdkVersion;
+    public final short sdkVersion;
 
     private final String mQualifiers;
 
@@ -72,51 +64,43 @@ public class ResConfigFlags {
         mQualifiers = "";
     }
 
-    public ResConfigFlags(JniConfig cfg) throws AndrolibException {
-//        if (cfg.mcc == 0 && mnc != 0) {
-//            throw new AndrolibException(String.format(
-//                "Invalid IMSI: mcc=%3d, mnc=%3d", mcc, mnc));
-//        }
-        mcc = cfg.mcc;
-        mnc = cfg.mnc;
+    public ResConfigFlags(JniConfig cfg) {
+        this(
+            (short) cfg.mcc,
+            (short) cfg.mnc,
+            cfg.language,
+            cfg.country,
+            (byte) cfg.orientation,
+            (byte) cfg.touchscreen,
+            (short) cfg.density,
+            (byte) cfg.keyboard,
+            (byte) cfg.navigation,
+            (byte) cfg.inputFlags,
+            (short) cfg.screenWidth,
+            (short) cfg.screenHeight,
+            (byte) cfg.screenLayout,
+            (short) cfg.sdkVersion
+        );
+    }
 
-//        if (cfg.language.length == 0 && cfg.country.length != 0) {
-//            throw new AndrolibException(String.format(
-//                "Invalid local: language=%s, country=%s",
-//                cfg.language, cfg.country));
-//        }
-        language = cfg.language;
-        country = cfg.country;
-//
-//        switch (cfg.orientation) {
-//            case ORIENTATION_ANY:
-//                orientation = Orientation.ANY;
-//                break;
-//            case ORIENTATION_LAND:
-//                orientation = Orientation.LAND;
-//                break;
-//            case ORIENTATION_PORT:
-//                orientation = Orientation.PORT;
-//                break;
-//            case ORIENTATION_SQUARE:
-//                orientation = Orientation.SQUARE;
-//                break;
-//            default:
-//                throw new AndrolibException(String.format(
-//                    "Invalid orientation: %d", cfg.orientation));
-//        }
-
-        orientation = cfg.orientation;
-        touchscreen = cfg.touchscreen;
-        density = cfg.density;
-        keyboard = cfg.keyboard;
-        navigation = cfg.navigation;
-        inputFlags = cfg.inputFlags;
-        screenWidth = cfg.screenWidth;
-        screenHeight = cfg.screenHeight;
-        screenLayout = cfg.screenLayout;
-        sdkVersion = cfg.sdkVersion;
-
+    public ResConfigFlags(short mcc, short mnc, char[] language, char[] country,
+            byte orientation, byte touchscreen, short density, byte keyboard,
+            byte navigation, byte inputFlags, short screenWidth,
+            short screenHeight, byte screenLayout, short sdkVersion) {
+        this.mcc = mcc;
+        this.mnc = mnc;
+        this.language = language;
+        this.country = country;
+        this.orientation = orientation;
+        this.touchscreen = touchscreen;
+        this.density = density;
+        this.keyboard = keyboard;
+        this.navigation = navigation;
+        this.inputFlags = inputFlags;
+        this.screenWidth = screenWidth;
+        this.screenHeight = screenHeight;
+        this.screenLayout = screenLayout;
+        this.sdkVersion = sdkVersion;
         mQualifiers = generateQualifiers();
     }
 
@@ -282,61 +266,52 @@ public class ResConfigFlags {
         return hash;
     }
 
-//    public enum Orientation {ANY, PORT, LAND, SQUARE}
-//    public enum Touchscreen {ANY, NOTOUCH, STYLUS, FINGER}
-//    public enum Keyboard {ANY, NOKEYS, QWERTY, KEY12}
-//    public enum Navigation {ANY, NONAV, DPAD, TRACKBALL, WHEEL}
-//    public enum Keys {ANY, EXPOSED, HIDDEN, SOFT}
-//    public enum Nav {ANY, EXPOSED, HIDDEN}
-//    public enum ScreenSize {ANY, SMALL, NORMAL, LARGE}
-//    public enum ScreenLong {ANY, LONG, NOTLONG}
+    public final static byte ORIENTATION_ANY  = 0;
+    public final static byte ORIENTATION_PORT = 1;
+    public final static byte ORIENTATION_LAND = 2;
+    public final static byte ORIENTATION_SQUARE = 3;
 
-    public final static int ORIENTATION_ANY  = 0x0000;
-    public final static int ORIENTATION_PORT = 0x0001;
-    public final static int ORIENTATION_LAND = 0x0002;
-    public final static int ORIENTATION_SQUARE = 0x0003;
+    public final static byte TOUCHSCREEN_ANY  = 0;
+    public final static byte TOUCHSCREEN_NOTOUCH  = 1;
+    public final static byte TOUCHSCREEN_STYLUS  = 2;
+    public final static byte TOUCHSCREEN_FINGER  = 3;
 
-    public final static int TOUCHSCREEN_ANY  = 0x0000;
-    public final static int TOUCHSCREEN_NOTOUCH  = 0x0001;
-    public final static int TOUCHSCREEN_STYLUS  = 0x0002;
-    public final static int TOUCHSCREEN_FINGER  = 0x0003;
+    public final static short DENSITY_DEFAULT = 0;
+    public final static short DENSITY_LOW = 120;
+    public final static short DENSITY_MEDIUM = 160;
+    public final static short DENSITY_HIGH = 240;
+    public final static short DENSITY_NONE = -1;
 
-    public final static int DENSITY_DEFAULT = 0;
-    public final static int DENSITY_LOW = 120;
-    public final static int DENSITY_MEDIUM = 160;
-    public final static int DENSITY_HIGH = 240;
-    public final static int DENSITY_NONE = 0xffff;
+    public final static byte KEYBOARD_ANY  = 0;
+    public final static byte KEYBOARD_NOKEYS  = 1;
+    public final static byte KEYBOARD_QWERTY  = 2;
+    public final static byte KEYBOARD_12KEY  = 3;
 
-    public final static int KEYBOARD_ANY  = 0x0000;
-    public final static int KEYBOARD_NOKEYS  = 0x0001;
-    public final static int KEYBOARD_QWERTY  = 0x0002;
-    public final static int KEYBOARD_12KEY  = 0x0003;
+    public final static byte NAVIGATION_ANY  = 0;
+    public final static byte NAVIGATION_NONAV  = 1;
+    public final static byte NAVIGATION_DPAD  = 2;
+    public final static byte NAVIGATION_TRACKBALL  = 3;
+    public final static byte NAVIGATION_WHEEL  = 4;
 
-    public final static int NAVIGATION_ANY  = 0x0000;
-    public final static int NAVIGATION_NONAV  = 0x0001;
-    public final static int NAVIGATION_DPAD  = 0x0002;
-    public final static int NAVIGATION_TRACKBALL  = 0x0003;
-    public final static int NAVIGATION_WHEEL  = 0x0004;
+    public final static byte MASK_KEYSHIDDEN = 0x3;
+    public final static byte KEYSHIDDEN_ANY = 0x0;
+    public final static byte KEYSHIDDEN_NO = 0x1;
+    public final static byte KEYSHIDDEN_YES = 0x2;
+    public final static byte KEYSHIDDEN_SOFT = 0x3;
 
-    public final static int MASK_KEYSHIDDEN = 0x0003;
-    public final static int KEYSHIDDEN_ANY = 0x0000;
-    public final static int KEYSHIDDEN_NO = 0x0001;
-    public final static int KEYSHIDDEN_YES = 0x0002;
-    public final static int KEYSHIDDEN_SOFT = 0x0003;
+    public final static byte MASK_NAVHIDDEN = 0xc;
+    public final static byte NAVHIDDEN_ANY = 0x0;
+    public final static byte NAVHIDDEN_NO = 0x4;
+    public final static byte NAVHIDDEN_YES = 0x8;
 
-    public final static int MASK_NAVHIDDEN = 0x000c;
-    public final static int NAVHIDDEN_ANY = 0x0000;
-    public final static int NAVHIDDEN_NO = 0x0004;
-    public final static int NAVHIDDEN_YES = 0x0008;
+    public final static byte MASK_SCREENSIZE = 0x0f;
+    public final static byte SCREENSIZE_ANY  = 0x00;
+    public final static byte SCREENSIZE_SMALL = 0x01;
+    public final static byte SCREENSIZE_NORMAL = 0x02;
+    public final static byte SCREENSIZE_LARGE = 0x03;
 
-    public final static int MASK_SCREENSIZE = 0x0f;
-    public final static int SCREENSIZE_ANY  = 0x00;
-    public final static int SCREENSIZE_SMALL = 0x01;
-    public final static int SCREENSIZE_NORMAL = 0x02;
-    public final static int SCREENSIZE_LARGE = 0x03;
-
-    public final static int MASK_SCREENLONG = 0x30;
-    public final static int SCREENLONG_ANY = 0x00;
-    public final static int SCREENLONG_NO = 0x10;
-    public final static int SCREENLONG_YES = 0x20;
+    public final static byte MASK_SCREENLONG = 0x30;
+    public final static byte SCREENLONG_ANY = 0x00;
+    public final static byte SCREENLONG_NO = 0x10;
+    public final static byte SCREENLONG_YES = 0x20;
 }
