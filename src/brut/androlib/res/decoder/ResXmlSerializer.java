@@ -18,6 +18,7 @@
 package brut.androlib.res.decoder;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import org.xmlpull.mxp1_serializer.MXSerializer;
 
 /**
@@ -28,6 +29,11 @@ public class ResXmlSerializer extends MXSerializer {
     public void startDocument(String encoding, Boolean standalone) throws
             IOException, IllegalArgumentException, IllegalStateException {
         super.startDocument(encoding != null ? encoding : "UTF-8", standalone);
-        super.out.write("\n");
+        super.out.write(System.getProperty("line.separator"));
+    }
+
+    @Override
+    public void setOutput(OutputStream os, String encoding) throws IOException {
+        super.setOutput(os, encoding != null ? encoding : "UTF-8");
     }
 }

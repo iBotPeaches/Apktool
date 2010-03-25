@@ -142,6 +142,8 @@ final public class AndrolibResources {
     public ResXmlSerializer getResXmlSerializer() {
         ResXmlSerializer serial = new ResXmlSerializer();
         serial.setProperty(serial.PROPERTY_SERIALIZER_INDENTATION, "    ");
+        serial.setProperty(serial.PROPERTY_SERIALIZER_LINE_SEPARATOR,
+            System.getProperty("line.separator"));
         return serial;
     }
 
