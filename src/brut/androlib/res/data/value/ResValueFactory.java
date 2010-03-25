@@ -20,11 +20,7 @@ package brut.androlib.res.data.value;
 import android.util.TypedValue;
 import brut.androlib.AndrolibException;
 import brut.androlib.res.data.ResPackage;
-import brut.androlib.res.jni.JniBagItem;
-import brut.androlib.res.jni.JniEntry;
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
@@ -71,49 +67,6 @@ public class ResValueFactory {
         }
         return new ResStringValue(value);
     }
-    
-    public ResValue factory(JniEntry entry) throws AndrolibException {
-        return factory(entry, false);
-    }
-
-    private ResValue factory(JniEntry entry, boolean bagItem)
-            throws AndrolibException {
-        switch (entry.valueType) {
-            case TYPE_BAG:
-                return bagFactory(entry);
-            case TypedValue.TYPE_REFERENCE:
-                return newReference(entry.intVal);
-            case TypedValue.TYPE_ATTRIBUTE:
-                return newReference(entry.intVal, true);
-            case TypedValue.TYPE_INT_BOOLEAN:
-                if (! bagItem && ! "bool".equals(entry.type)
-                        && ! entry.boolVal) {
-                    return new ResIdValue();
-                }
-                return new ResBoolValue(entry.boolVal);
-            case TypedValue.TYPE_INT_DEC:
-            case TypedValue.TYPE_INT_HEX:
-                return new ResIntValue(entry.intVal);
-            case TypedValue.TYPE_FLOAT:
-                return new ResFloatValue(entry.floatVal);
-            case TypedValue.TYPE_INT_COLOR_ARGB4:
-            case TypedValue.TYPE_INT_COLOR_ARGB8:
-            case TypedValue.TYPE_INT_COLOR_RGB4:
-            case TypedValue.TYPE_INT_COLOR_RGB8:
-                return new ResColorValue(entry.intVal);
-            case TypedValue.TYPE_STRING:
-                if (entry.strVal.startsWith("res/")) {
-                    return new ResFileValue(entry.strVal);
-                }
-            case TypedValue.TYPE_DIMENSION:
-                return new ResStringValue(entry.strVal, "dimen");
-            case TypedValue.TYPE_FRACTION:
-                return new ResStringValue(entry.strVal, "fraction");
-        }
-        throw new AndrolibException(String.format(
-            "Unknown value type for %s/%s: ",
-            entry.type, entry.name, String.valueOf(entry.valueType)));
-    }
 
     public ResBagValue bagFactory(String type, int parent,
             Map<ResReferenceValue, ResScalarValue> items) {
@@ -134,11 +87,6 @@ public class ResValueFactory {
         return new ResBagValue(parentVal, items);
     }
 
-    private ResValue bagFactory(JniEntry entry)
-            throws AndrolibException {
-        return bagFactory(entry.name, entry.bagParent, convertItems(entry.bagItems));
-    }
-
     public ResReferenceValue newReference(int resID) {
         return newReference(resID, false);
     }
@@ -146,42 +94,4 @@ public class ResValueFactory {
     public ResReferenceValue newReference(int resID, boolean theme) {
         return new ResReferenceValue(mPackage, resID, theme);
     }
-
-    private Map<ResReferenceValue, ResScalarValue> convertItems(
-            JniBagItem[] jniItems) throws AndrolibException {
-        Map<ResReferenceValue, ResScalarValue> items =
-            new LinkedHashMap<ResReferenceValue, ResScalarValue>();
-        for (int i = 0; i < jniItems.length; i++) {
-            JniBagItem jniItem = jniItems[i];
-            items.put(newReference(jniItem.resID),
-                (ResScalarValue) factory(jniItem.entry, true));
-        }
-        return items;
-    }
-
-    private static Integer parseInt(String s) {
-        return parseInt(s, true);
-    }
-
-    private static Integer parseInt(String s, boolean hex) {
-        if (s.startsWith("0x")) {
-            s = s.substring(2);
-            hex = true;
-        } else if (decPattern.matcher(s).matches()) {
-            return Integer.parseInt(s);
-        }
-        if (hex && hexPattern.matcher(s).matches()) {
-            return (int) Long.parseLong(s, 16);
-        }
-        return null;
-    }
-
-    private final static Pattern decPattern =
-        Pattern.compile("-?(?:[0-2]|)\\d{1,9}");
-    private final static Pattern hexPattern =
-        Pattern.compile("-?[0-9a-fA-F]{1,8}");
-    private final static Pattern resIdPattern =
-        Pattern.compile("\\+?(?:(.+?):|)([^:]+?)/(.+?)");
-
-    private final static int TYPE_BAG = -0x01;
 }

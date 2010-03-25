@@ -22,8 +22,6 @@ import brut.androlib.res.data.*;
 import brut.androlib.res.data.value.ResFileValue;
 import brut.androlib.res.data.value.ResXmlSerializable;
 import brut.androlib.res.decoder.*;
-import brut.androlib.res.jni.JniPackage;
-import brut.androlib.res.jni.JniPackageGroup;
 import brut.common.BrutException;
 import brut.directory.*;
 import brut.util.*;
@@ -35,10 +33,6 @@ import org.xmlpull.v1.XmlSerializer;
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
 final public class AndrolibResources {
-    static {
-        Jar.load("/brut/androlib/libAndroid.so");
-    }
-
     public ResTable getResTable(File apkFile) throws AndrolibException {
         ResTable resTable = new ResTable();
         loadApk(resTable, getAndroidResourcesFile(), false);
@@ -256,7 +250,4 @@ final public class AndrolibResources {
         }
         return value;
     }
-
-    private static final native JniPackageGroup[] nativeGetPackageGroups(
-        String apkFileName);
 }

@@ -17,9 +17,6 @@
 
 package brut.androlib.res.data;
 
-import brut.androlib.AndrolibException;
-import brut.androlib.res.jni.JniConfig;
-
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
@@ -62,25 +59,6 @@ public class ResConfigFlags {
         screenLayout = SCREENLONG_ANY | SCREENSIZE_ANY;
         sdkVersion = 0;
         mQualifiers = "";
-    }
-
-    public ResConfigFlags(JniConfig cfg) {
-        this(
-            (short) cfg.mcc,
-            (short) cfg.mnc,
-            cfg.language,
-            cfg.country,
-            (byte) cfg.orientation,
-            (byte) cfg.touchscreen,
-            (short) cfg.density,
-            (byte) cfg.keyboard,
-            (byte) cfg.navigation,
-            (byte) cfg.inputFlags,
-            (short) cfg.screenWidth,
-            (short) cfg.screenHeight,
-            (byte) cfg.screenLayout,
-            (short) cfg.sdkVersion
-        );
     }
 
     public ResConfigFlags(short mcc, short mnc, char[] language, char[] country,
