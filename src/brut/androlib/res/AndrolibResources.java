@@ -210,8 +210,15 @@ final public class AndrolibResources {
 
     private void loadApk(ResTable resTable, File apkFile, boolean main)
             throws AndrolibException {
-        JniPackageGroup[] groups =
-            nativeGetPackageGroups(apkFile.getAbsolutePath());
+        ResPackage[] groups;
+        try {
+            groups = ARSCDecoder.decode(
+                new ZipRODirectory(apkFile).getFileInput("resources.arsc"),
+                resTable);
+        } catch (DirectoryException ex) {
+            throw new AndrolibException("Could not decode res table", ex);
+        }
+        
         if (groups.length == 0) {
             throw new AndrolibException(
                 "Apk with zero package groups: " + apkFile.getPath());
@@ -223,15 +230,12 @@ final public class AndrolibResources {
         }
         for (int i = 0; i < groups.length; i++) {
             if (groups.length != 1 && i == 0
-                    && "android".equals(groups[i].packages[0].name)) {
+                    && "android".equals(groups[i].getName())) {
                 System.err.println(
                     "warning: skipping \"android\" package group");
                 continue;
             }
-            for (JniPackage jniPkg : groups[i].packages) {
-                ResPackage pkg = new JniPackageDecoder().decode(jniPkg, resTable);
-                resTable.addPackage(pkg, main);
-            }
+            resTable.addPackage(groups[i], main);
         }
     }
 
