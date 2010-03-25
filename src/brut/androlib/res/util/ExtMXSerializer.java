@@ -28,12 +28,34 @@ public class ExtMXSerializer extends MXSerializer {
     @Override
     public void startDocument(String encoding, Boolean standalone) throws
             IOException, IllegalArgumentException, IllegalStateException {
-        super.startDocument(encoding != null ? encoding : "UTF-8", standalone);
+        super.startDocument(encoding != null ? encoding : mDefaultEncoding,
+            standalone);
         super.out.write(lineSeparator);
     }
 
     @Override
     public void setOutput(OutputStream os, String encoding) throws IOException {
-        super.setOutput(os, encoding != null ? encoding : "UTF-8");
+        super.setOutput(os, encoding != null ? encoding : mDefaultEncoding);
     }
+
+    @Override
+    public Object getProperty(String name) throws IllegalArgumentException {
+        if (PROPERTY_DEFAULT_ENCODING.equals(name)) {
+            return mDefaultEncoding;
+        }
+        return super.getProperty(name);
+    }
+
+    @Override
+    public void setProperty(String name, Object value)
+            throws IllegalArgumentException, IllegalStateException {
+        if (PROPERTY_DEFAULT_ENCODING.equals(name)) {
+            mDefaultEncoding = (String) value;
+        }
+        super.setProperty(name, value);
+    }
+
+    public final static String PROPERTY_DEFAULT_ENCODING = "DEFAULT_ENCODING";
+
+    private String mDefaultEncoding;
 }
