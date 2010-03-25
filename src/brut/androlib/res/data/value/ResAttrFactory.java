@@ -23,7 +23,7 @@ import java.util.Map;
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
 public class ResAttrFactory {
-    static ResValue factory(ResReferenceValue parent,
+    static ResAttr factory(ResReferenceValue parent,
             Map<ResReferenceValue, ResScalarValue> items) {
         int type = ((ResIntValue) items.values().iterator().next()).getValue();
 
