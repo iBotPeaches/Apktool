@@ -29,7 +29,7 @@ public class ExtMXSerializer extends MXSerializer {
     public void startDocument(String encoding, Boolean standalone) throws
             IOException, IllegalArgumentException, IllegalStateException {
         super.startDocument(encoding != null ? encoding : "UTF-8", standalone);
-        super.out.write(System.getProperty("line.separator"));
+        super.out.write(lineSeparator);
     }
 
     @Override
