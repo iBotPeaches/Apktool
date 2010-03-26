@@ -113,7 +113,7 @@ public class Androlib {
         if (new File("resources.arsc").exists()) {
             try {
                 new File("build/apk/res").mkdirs();
-                Util.copyFiles(new FileDirectory("res"),
+                DirUtil.copyToDir(new FileDirectory("res"),
                     new FileDirectory("build/apk/res"));
                 IOUtils.copy(new FileInputStream("resources.arsc"),
                     new FileOutputStream("build/apk/resources.arsc"));
@@ -144,7 +144,7 @@ public class Androlib {
 //            mAndRes.getResTable(apkFile), new File("smali"));
 
         try {
-            Util.copyFiles(new ZipRODirectory(apkFile),
+            DirUtil.copyToDir(new ZipRODirectory(apkFile),
                 new FileDirectory("build/apk"));
         } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
