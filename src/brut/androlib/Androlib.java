@@ -19,10 +19,12 @@ package brut.androlib;
 
 import brut.androlib.res.AndrolibResources;
 import brut.androlib.res.data.ResTable;
+import brut.androlib.res.util.ExtFile;
 import brut.common.BrutException;
 import brut.directory.*;
 import brut.util.OS;
 import java.io.*;
+import java.util.logging.Logger;
 import org.apache.commons.io.IOUtils;
 
 /**
@@ -31,52 +33,6 @@ import org.apache.commons.io.IOUtils;
 public class Androlib {
     private final AndrolibResources mAndRes = new AndrolibResources();
     private final AndrolibSmali mSmali = new AndrolibSmali();
-
-    public void decode(String apkFileName, String outDirName, boolean resources)
-            throws AndrolibException {
-        decode(new File(apkFileName), new File(outDirName), resources);
-    }
-
-    public void decode(File apkFile, File outDir, boolean resources)
-            throws AndrolibException {
-        try {
-            OS.rmdir(outDir);
-        } catch (BrutException ex) {
-            throw new AndrolibException(ex);
-        }
-        outDir.mkdirs();
-
-        File smaliDir = new File(outDir.getPath() + "/smali");
-        mSmali.baksmali(apkFile, smaliDir);
-
-        if(resources) {
-            ResTable resTable = mAndRes.getResTable(apkFile);
-            mAndRes.decode(resTable, apkFile, outDir);
-//            mAndRes.tagSmaliResIDs(resTable, smaliDir);
-        }
-
-        try {
-            Directory in = new ZipRODirectory(apkFile);
-            Directory out = new FileDirectory(outDir);
-            if (in.containsDir("assets")) {
-                Util.copyFiles(in.getDir("assets"), out.createDir("assets"));
-            }
-            if (in.containsDir("lib")) {
-                Util.copyFiles(in.getDir("lib"), out.createDir("lib"));
-            }
-            if (! resources) {
-                Util.copyFiles(in.getDir("res"), out.createDir("res"));
-                IOUtils.copy(in.getFileInput("resources.arsc"),
-                    out.getFileOutput("resources.arsc"));
-                IOUtils.copy(in.getFileInput("AndroidManifest.xml"),
-                    out.getFileOutput("AndroidManifest.xml"));
-            }
-        } catch (IOException ex) {
-            throw new AndrolibException("Could not decode apk", ex);
-        } catch (DirectoryException ex) {
-            throw new AndrolibException("Could not decode apk", ex);
-        }
-    }
 
     public void buildAll() throws AndrolibException {
         clean();
@@ -170,4 +126,70 @@ public class Androlib {
         mAndRes.aaptPackage(outApk, null, null,
             new File("build/apk"), false);
     }
+
+    public ResTable getResTable(ExtFile apkFile) throws AndrolibException {
+        LOGGER.info("Decoding resource table...");
+        return mAndRes.getResTable(apkFile);
+    }
+
+    public void decodeSourcesRaw(ExtFile apkFile, File outDir)
+            throws AndrolibException {
+        LOGGER.info("Copying raw classes.dex file...");
+        try {
+            apkFile.getDirectory().copyToDir(outDir, "classes.dex");
+        } catch (DirectoryException ex) {
+            throw new AndrolibException(ex);
+        }
+    }
+
+    public void decodeSourcesSmali(File apkFile, File outDir)
+            throws AndrolibException {
+        try {
+            File smaliDir = new File(outDir, SMALI_DIRNAME);
+            OS.rmdir(smaliDir);
+            smaliDir.mkdirs();
+            LOGGER.info("Baksmaling...");
+            mSmali.baksmali(apkFile, smaliDir);
+        } catch (BrutException ex) {
+            throw new AndrolibException(ex);
+        }
+    }
+
+    public void decodeResourcesRaw(ExtFile apkFile, File outDir)
+            throws AndrolibException {
+        try {
+            LOGGER.info("Copying raw resources...");
+            apkFile.getDirectory().copyToDir(outDir,
+                new String[]{"AndroidManifest.xml", "resources.arsc", "res"});
+        } catch (DirectoryException ex) {
+            throw new AndrolibException(ex);
+        }
+    }
+
+    public void decodeResourcesFull(File apkFile, File outDir,
+            ResTable resTable) throws AndrolibException {
+        LOGGER.info("Decoding resources...");
+        mAndRes.decode(resTable, apkFile, outDir);
+    }
+
+    public void decodeRawFiles(ExtFile apkFile, File outDir)
+            throws AndrolibException {
+        LOGGER.info("Copying assets and libs...");
+        try {
+            Directory in = apkFile.getDirectory();
+            if (in.containsDir("assets")) {
+                in.copyToDir(outDir, "assets");
+            }
+            if (in.containsDir("lib")) {
+                in.copyToDir(outDir, "lib");
+            }
+        } catch (DirectoryException ex) {
+            throw new AndrolibException(ex);
+        }
+    }
+
+    private final static Logger LOGGER =
+        Logger.getLogger(Androlib.class.getName());
+
+    private final static String SMALI_DIRNAME = "smali";
 }
