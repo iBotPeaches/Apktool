@@ -166,7 +166,7 @@ public class Androlib {
         }
     }
 
-    public void decodeResourcesFull(File apkFile, File outDir,
+    public void decodeResourcesFull(ExtFile apkFile, File outDir,
             ResTable resTable) throws AndrolibException {
         LOGGER.info("Decoding resources...");
         mAndRes.decode(resTable, apkFile, outDir);

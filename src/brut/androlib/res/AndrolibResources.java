@@ -43,7 +43,7 @@ final public class AndrolibResources {
         return resTable;
     }
 
-    public void decode(ResTable resTable, File apkFile, File outDir)
+    public void decode(ResTable resTable, ExtFile apkFile, File outDir)
             throws AndrolibException {
         Duo<ResFileDecoder, ResAttrDecoder> duo = getResFileDecoder();
         ResFileDecoder fileDecoder = duo.m1;
@@ -54,7 +54,7 @@ final public class AndrolibResources {
 
         Directory in, out;
         try {
-            in = new ZipRODirectory(apkFile);
+            in = apkFile.getDirectory();
             out = new FileDirectory(outDir);
 
             fileDecoder.decode(
