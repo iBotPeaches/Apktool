@@ -51,8 +51,9 @@ public class ExtMXSerializer extends MXSerializer {
             throws IllegalArgumentException, IllegalStateException {
         if (PROPERTY_DEFAULT_ENCODING.equals(name)) {
             mDefaultEncoding = (String) value;
+        } else {
+            super.setProperty(name, value);
         }
-        super.setProperty(name, value);
     }
 
     public final static String PROPERTY_DEFAULT_ENCODING = "DEFAULT_ENCODING";
