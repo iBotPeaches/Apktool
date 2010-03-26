@@ -22,6 +22,7 @@ import brut.androlib.res.data.*;
 import brut.androlib.res.data.value.ResFileValue;
 import brut.androlib.res.data.value.ResXmlSerializable;
 import brut.androlib.res.decoder.*;
+import brut.androlib.res.util.ExtFile;
 import brut.androlib.res.util.ExtMXSerializer;
 import brut.common.BrutException;
 import brut.directory.*;
@@ -34,9 +35,9 @@ import org.xmlpull.v1.XmlSerializer;
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
 final public class AndrolibResources {
-    public ResTable getResTable(File apkFile) throws AndrolibException {
+    public ResTable getResTable(ExtFile apkFile) throws AndrolibException {
         ResTable resTable = new ResTable();
-        decodeArsc(resTable, getAndroidResourcesFile(), false);
+        decodeArsc(resTable, new ExtFile(getAndroidResourcesFile()), false);
         decodeArsc(resTable, apkFile, true);
         return resTable;
     }
@@ -206,10 +207,10 @@ final public class AndrolibResources {
         }
     }
 
-    private void decodeArsc(ResTable resTable, File apkFile, boolean main)
+    private void decodeArsc(ResTable resTable, ExtFile apkFile, boolean main)
             throws AndrolibException {
         try {
-            loadArsc(resTable, new ZipRODirectory(apkFile)
+            loadArsc(resTable, apkFile.getDirectory()
                 .getFileInput("resources.arsc"), main);
         } catch (DirectoryException ex) {
             throw new AndrolibException(
