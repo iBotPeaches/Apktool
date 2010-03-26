@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Iterator;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.io.IOUtils;
@@ -125,8 +126,8 @@ public class ResSmaliUpdater {
                         RES_NAME_FORMAT, spec.getFullName()));
                     } catch (UndefinedResObject ex) {
                         if (! R_FILE_PATTERN.matcher(fileName).matches()) {
-                            System.err.println(String.format(
-                                "warning: undefined resource spec in %s: 0x%08x"
+                            LOGGER.warning(String.format(
+                                "Undefined resource spec in %s: 0x%08x"
                                 , fileName, resID));
                         }
                     }
@@ -161,4 +162,7 @@ public class ResSmaliUpdater {
 
     private final static Pattern R_FILE_PATTERN = Pattern.compile(
         ".*R\\$[a-z]+\\.smali$");
+
+    private final static Logger LOGGER =
+        Logger.getLogger(ResSmaliUpdater.class.getName());
 }

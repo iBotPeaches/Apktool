@@ -311,13 +311,12 @@ public class AXmlResourceParser implements XmlResourceParser {
                 return mAttrDecoder.decode(valueType, valueData,
                     getAttributeNameResource(index));
             } catch (AndrolibException ex) {
-                Logger.getLogger(AXmlResourceParser.class.getName()).log(
-                    Level.WARNING, String.format(
-                        "Could not decode attr value, using undecoded value " +
-                        "instead: ns=%s, name=%s, value=0x%08x",
-                        getAttributePrefix(index), getAttributeName(index),
-                        valueData
-                    ), ex);
+                LOGGER.log(Level.WARNING, String.format(
+                    "Could not decode attr value, using undecoded value " +
+                    "instead: ns=%s, name=%s, value=0x%08x",
+                    getAttributePrefix(index), getAttributeName(index),
+                    valueData
+                ), ex);
             }
         }
 
@@ -923,6 +922,9 @@ public class AXmlResourceParser implements XmlResourceParser {
     private int m_idAttribute;
     private int m_classAttribute;
     private int m_styleAttribute;
+
+    private final static Logger LOGGER =
+        Logger.getLogger(AXmlResourceParser.class.getName());
     private static final String E_NOT_SUPPORTED = "Method is not supported.";
     private static final int
             ATTRIBUTE_IX_NAMESPACE_URI =    0,

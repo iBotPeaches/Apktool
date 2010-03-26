@@ -29,6 +29,7 @@ import brut.directory.*;
 import brut.util.*;
 import java.io.*;
 import java.util.Arrays;
+import java.util.logging.Logger;
 import org.xmlpull.v1.XmlSerializer;
 
 /**
@@ -228,14 +229,12 @@ final public class AndrolibResources {
                 "Arsc file with zero package groups");
         }
         if (groups.length > 1) {
-            System.err.println(
-                "warning: arsc file with multiple package groups");
+            LOGGER.warning("Arsc file with multiple package groups");
         }
         for (int i = 0; i < groups.length; i++) {
             if (groups.length != 1 && i == 0
                     && "android".equals(groups[i].getName())) {
-                System.err.println(
-                    "warning: skipping \"android\" package group");
+                LOGGER.warning("Skipping \"android\" package group");
                 continue;
             }
             resTable.addPackage(groups[i], main);
@@ -259,4 +258,7 @@ final public class AndrolibResources {
         }
         return value;
     }
+
+    private final static Logger LOGGER =
+        Logger.getLogger(AndrolibResources.class.getName());
 }

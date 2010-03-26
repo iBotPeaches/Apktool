@@ -51,15 +51,15 @@ public class XmlPullStreamDecoder implements ResStreamDecoder {
             in.close();
             out.close();
         } catch (XmlPullParserException ex) {
-            mLogger.log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            mLogger.log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, null, ex);
         }
     }
 
     private final XmlPullParser mParser;
     private final XmlSerializer mSerial;
 
-    private final static Logger mLogger =
+    private final static Logger LOGGER =
         Logger.getLogger(XmlPullStreamDecoder.class.getName());
 }
