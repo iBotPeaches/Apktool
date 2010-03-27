@@ -199,10 +199,14 @@ public class Androlib {
                 File apkFile = File.createTempFile("APKTOOL", null);
                 apkFile.delete();
 
+                File ninePatch = new File(appDir, "9patch");
+                if (! ninePatch.exists()) {
+                    ninePatch = null;
+                }
                 mAndRes.aaptPackage(
                     apkFile,
                     new File(appDir, "AndroidManifest.xml"),
-                    new File(appDir, "res")
+                    new File(appDir, "res"), ninePatch, null, false
                 );
 
                 new ExtFile(apkFile).getDirectory()

@@ -66,13 +66,12 @@ final public class AndrolibResources {
             throw new AndrolibException(ex);
         }
 
+        File out9PatchDir = new File(outDir, "9patch/res");
         ExtMXSerializer xmlSerializer = getResXmlSerializer();
         for (ResPackage pkg : resTable.listMainPackages()) {
             attrDecoder.setCurrentPackage(pkg);
             for (ResResource res : pkg.listFiles()) {
-                ResFileValue fileValue = (ResFileValue) res.getValue();
-                fileDecoder.decode(in, fileValue.getStrippedPath(),
-                    out, res.getFilePath());
+                decodeFile(res, in, out, fileDecoder, out9PatchDir);
             }
             for (ResValuesFile valuesFile : pkg.listValuesFiles()) {
                 generateValuesFile(valuesFile, out, xmlSerializer);
@@ -154,6 +153,31 @@ final public class AndrolibResources {
             System.getProperty("line.separator"));
         serial.setProperty(ExtMXSerializer.PROPERTY_DEFAULT_ENCODING, "UTF-8");
         return serial;
+    }
+
+    private void decodeFile(ResResource res, Directory in, Directory out,
+            ResFileDecoder fileDecoder, File out9PatchDir)
+            throws AndrolibException {
+        ResFileValue fileValue = (ResFileValue) res.getValue();
+        String inName = fileValue.getStrippedPath();
+        String outName = res.getFilePath();
+
+        fileDecoder.decode(in, inName, out, outName);
+
+        if (inName.endsWith(".9.png")) {
+            File out9PatchFile = new File(
+                out9PatchDir, outName + ".png");
+            out9PatchFile.getParentFile().mkdirs();
+            try {
+                BrutIO.copyAndClose(in.getFileInput(inName),
+                    new FileOutputStream(out9PatchFile));
+            } catch (IOException ex) {
+                throw new AndrolibException(ex);
+            } catch (DirectoryException ex) {
+                throw new AndrolibException(ex);
+            }
+        }
+
     }
 
     private void generateValuesFile(ResValuesFile valuesFile, Directory out,
