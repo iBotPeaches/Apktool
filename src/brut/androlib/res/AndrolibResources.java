@@ -83,12 +83,13 @@ final public class AndrolibResources {
 
     public void aaptPackage(File apkFile, File manifest, File resDir)
             throws AndrolibException {
-        aaptPackage(apkFile, manifest, resDir, null, false);
+        aaptPackage(apkFile, manifest, resDir, null, null, false);
     }
 
     public void aaptPackage(File apkFile, File manifest, File resDir,
-            File rawDir, boolean update) throws AndrolibException {
-        String[] cmd = new String[12];
+            File rawDir, File assetDir, boolean update)
+            throws AndrolibException {
+        String[] cmd = new String[13];
         int i = 0;
         cmd[i++] = "aapt";
         cmd[i++] = "p";
@@ -106,6 +107,10 @@ final public class AndrolibResources {
         if (resDir != null) {
             cmd[i++] = "-S";
             cmd[i++] = resDir.getAbsolutePath();
+        }
+        if (assetDir != null) {
+            cmd[i++] = "-A";
+            cmd[i++] = assetDir.getAbsolutePath();
         }
         if (rawDir != null) {
             cmd[i++] = rawDir.getAbsolutePath();
