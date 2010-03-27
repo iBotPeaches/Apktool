@@ -279,6 +279,9 @@ final public class AndrolibResources {
     }
 
     public static String escapeForResXml(String value) {
+        if (value.isEmpty()) {
+            return value;
+        }
         value = value.replace("'", "\\'");
         value = value.replace("\n", "\\n\n");
         char c = value.charAt(0);
