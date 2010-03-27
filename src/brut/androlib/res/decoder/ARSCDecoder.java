@@ -25,6 +25,7 @@ import com.mindprod.ledatastream.LEDataInputStream;
 import java.io.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
@@ -182,7 +183,12 @@ public class ARSCDecoder {
     }
 
     private ResConfigFlags readConfigFlags() throws IOException, AndrolibException {
-        /*size*/ mIn.skipCheckInt(32);
+        int size = mIn.readInt();
+        if (size < 28) {
+            throw new AndrolibException("Config size < 28");
+        } else if (size > 32) {
+            LOGGER.warning("Config size > 32");
+        }
 
         short mcc = mIn.readShort();
         short mnc = mIn.readShort();
@@ -207,8 +213,15 @@ public class ARSCDecoder {
         short sdkVersion = mIn.readShort();
         mIn.skipBytes(2);
 
-        byte screenLayout = mIn.readByte();
-        mIn.skipBytes(3);
+        byte screenLayout = 0;
+        if (size >= 32) {
+            screenLayout = mIn.readByte();
+            mIn.skipBytes(3);
+        }
+
+        if (size > 32) {
+            mIn.skipBytes(size - 32);
+        }
 
         return new ResConfigFlags(mcc, mnc, language, country, orientation,
             touchscreen, density, keyboard, navigation, inputFlags,
@@ -276,4 +289,7 @@ public class ARSCDecoder {
             TYPE_TYPE = 0x0202,
             TYPE_CONFIG = 0x0201;
     }
+
+    private static final Logger LOGGER =
+        Logger.getLogger(ARSCDecoder.class.getName());
 }
