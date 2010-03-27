@@ -104,6 +104,7 @@ public class Androlib {
         new File(appDir, APK_DIRNAME).mkdirs();
         buildSources(appDir, forceBuildAll);
         buildResources(appDir, forceBuildAll);
+        buildLib(appDir, forceBuildAll);
         buildApk(appDir);
     }
 
@@ -212,6 +213,24 @@ public class Androlib {
             throw new AndrolibException(ex);
         } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
+        }
+    }
+
+    public void buildLib(File appDir, boolean forceBuildAll)
+            throws AndrolibException {
+        File working = new File(appDir, "lib");
+        if (! working.exists()) {
+            return;
+        }
+        File stored = new File(appDir, APK_DIRNAME + "/lib");
+        if (forceBuildAll || isModified(working, stored)) {
+            LOGGER.info("Copying libs...");
+            try {
+                OS.rmdir(stored);
+                OS.cpdir(working, stored);
+            } catch (BrutException ex) {
+                throw new AndrolibException(ex);
+            }
         }
     }
 
