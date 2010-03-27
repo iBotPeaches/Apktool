@@ -49,17 +49,18 @@ public class ApkDecoder {
     }
 
     public void setOutDir(File outDir) throws AndrolibException {
-        try {
-            mOutDir = outDir;
-            OS.rmdir(outDir);
-            outDir.mkdirs();
-        } catch (BrutException ex) {
-            throw new AndrolibException(ex);
-        }
+        mOutDir = outDir;
     }
 
     public void decode() throws AndrolibException {
         File outDir = getOutDir();
+        try {
+            OS.rmdir(outDir);
+        } catch (BrutException ex) {
+            throw new AndrolibException(ex);
+        }
+        outDir.mkdirs();
+
         switch (mDecodeSources) {
             case DECODE_SOURCES_NONE:
                 mAndrolib.decodeSourcesRaw(mApkFile, outDir);
