@@ -54,10 +54,10 @@ public class ResFileDecoder {
             decode(inDir, inFileName, outDir, outResName + ".xml", "xml");
             return;
         }
-        if (inFileName.endsWith(".html")) {
-            decode(inDir, inFileName, outDir, outResName + ".html", "xml");
-            return;
-        }
+//        if (inFileName.endsWith(".html")) {
+//            decode(inDir, inFileName, outDir, outResName + ".html", "xml");
+//            return;
+//        }
 
         decode(inDir, inFileName, outDir, outResName + ext, "raw");
     }
