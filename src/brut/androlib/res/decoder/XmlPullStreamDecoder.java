@@ -51,9 +51,9 @@ public class XmlPullStreamDecoder implements ResStreamDecoder {
             in.close();
             out.close();
         } catch (XmlPullParserException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, "Could not decode XML", ex);
         } catch (IOException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, "Could not decode XML", ex);
         }
     }
 
