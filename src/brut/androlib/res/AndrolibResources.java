@@ -80,13 +80,8 @@ final public class AndrolibResources {
         }
     }
 
-    public void aaptPackage(File apkFile, File manifest, File resDir)
-            throws AndrolibException {
-        aaptPackage(apkFile, manifest, resDir, null, null, false);
-    }
-
     public void aaptPackage(File apkFile, File manifest, File resDir,
-            File rawDir, File assetDir, boolean update)
+            File rawDir, File assetDir, boolean update, boolean framework)
             throws AndrolibException {
         String[] cmd = new String[13];
         int i = 0;
@@ -97,8 +92,14 @@ final public class AndrolibResources {
         }
         cmd[i++] = "-F";
         cmd[i++] = apkFile.getAbsolutePath();
-        cmd[i++] = "-I";
-        cmd[i++] = getAndroidResourcesFile().getAbsolutePath();
+
+        if (framework) {
+            cmd[i++] = "-x";
+        } else {
+            cmd[i++] = "-I";
+            cmd[i++] = getAndroidResourcesFile().getAbsolutePath();
+        }
+
         if (manifest != null) {
             cmd[i++] = "-M";
             cmd[i++] = manifest.getAbsolutePath();

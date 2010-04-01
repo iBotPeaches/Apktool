@@ -213,7 +213,8 @@ public class Androlib {
                 mAndRes.aaptPackage(
                     apkFile,
                     new File(appDir, "AndroidManifest.xml"),
-                    new File(appDir, "res"), ninePatch, null, false
+                    new File(appDir, "res"), ninePatch, null, false,
+                    false
                 );
 
                 new ExtFile(apkFile).getDirectory()
@@ -261,7 +262,7 @@ public class Androlib {
             assetDir = null;
         }
         mAndRes.aaptPackage(outApk, null, null,
-            new File(appDir, APK_DIRNAME), assetDir, false);
+            new File(appDir, APK_DIRNAME), assetDir, false, false);
     }
 
     private boolean isModified(File working, File stored) {
