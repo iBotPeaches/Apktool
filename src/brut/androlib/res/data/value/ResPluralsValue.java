@@ -35,6 +35,7 @@ public class ResPluralsValue extends ResBagValue implements ResXmlSerializable {
         super(parent, items);
     }
 
+    @Override
     public void serializeToXml(XmlSerializer serializer, ResResource res)
             throws IOException, AndrolibException {
         serializer.startTag(null, "plurals");
