@@ -41,9 +41,12 @@ public class Androlib {
 
     public void decodeSourcesRaw(ExtFile apkFile, File outDir)
             throws AndrolibException {
-        LOGGER.info("Copying raw classes.dex file...");
         try {
-            apkFile.getDirectory().copyToDir(outDir, "classes.dex");
+            Directory apk = apkFile.getDirectory();
+            if (apk.containsFile("classes.dex")) {
+                LOGGER.info("Copying raw classes.dex file...");
+                apkFile.getDirectory().copyToDir(outDir, "classes.dex");
+            }
         } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
         }
@@ -65,8 +68,12 @@ public class Androlib {
     public void decodeResourcesRaw(ExtFile apkFile, File outDir)
             throws AndrolibException {
         try {
-            LOGGER.info("Copying raw resources...");
-            apkFile.getDirectory().copyToDir(outDir, APK_RESOURCES_FILENAMES);
+            Directory apk = apkFile.getDirectory();
+            if (apk.containsFile("resources.arsc")) {
+                LOGGER.info("Copying raw resources...");
+                apkFile.getDirectory().copyToDir(
+                    outDir, APK_RESOURCES_FILENAMES);
+            }
         } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
         }
@@ -112,7 +119,7 @@ public class Androlib {
             throws AndrolibException {
         if (! buildSourcesRaw(appDir, forceBuildAll)
                 && ! buildSourcesSmali(appDir, forceBuildAll)) {
-            throw new AndrolibException("Could not find sources");
+            LOGGER.warning("Could not find sources");
         }
     }
 
@@ -157,7 +164,7 @@ public class Androlib {
             throws AndrolibException {
         if (! buildResourcesRaw(appDir, forceBuildAll)
                 && ! buildResourcesFull(appDir, forceBuildAll)) {
-            throw new AndrolibException("Could not find resources");
+            LOGGER.warning("Could not find resources");
         }
     }
 
