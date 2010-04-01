@@ -29,7 +29,9 @@ import brut.directory.*;
 import brut.util.*;
 import java.io.*;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.logging.Logger;
+import org.apache.commons.io.IOUtils;
 import org.xmlpull.v1.XmlSerializer;
 
 /**
@@ -38,8 +40,10 @@ import org.xmlpull.v1.XmlSerializer;
 final public class AndrolibResources {
     public ResTable getResTable(ExtFile apkFile) throws AndrolibException {
         ResTable resTable = new ResTable();
-        decodeArsc(resTable, new ExtFile(getAndroidResourcesFile()), false);
         decodeArsc(resTable, apkFile, true);
+        if (! resTable.hasPackage(1)) {
+            decodeArsc(resTable, new ExtFile(getAndroidResourcesFile()), false);
+        }
         return resTable;
     }
 
@@ -121,6 +125,21 @@ final public class AndrolibResources {
         } catch (BrutException ex) {
             throw new AndrolibException(ex);
         }
+    }
+
+    public boolean detectWhetherAppIsFramework(File appDir)
+            throws AndrolibException {
+        Iterator<String> it;
+        try {
+            it = IOUtils.lineIterator(
+                new FileReader(new File(appDir, "res/values/public.xml")));
+        } catch (FileNotFoundException ex) {
+            throw new AndrolibException(
+                "Could not detect whether app is framework one", ex);
+        }
+        it.next();
+        it.next();
+        return it.next().contains("0x01");
     }
 
     public void tagSmaliResIDs(ResTable resTable, File smaliDir)

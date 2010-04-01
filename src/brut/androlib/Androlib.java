@@ -214,7 +214,7 @@ public class Androlib {
                     apkFile,
                     new File(appDir, "AndroidManifest.xml"),
                     new File(appDir, "res"), ninePatch, null, false,
-                    false
+                    mAndRes.detectWhetherAppIsFramework(appDir)
                 );
 
                 new ExtFile(apkFile).getDirectory()
