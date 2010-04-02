@@ -20,6 +20,7 @@ package brut.androlib.res.data.value;
 import android.util.TypedValue;
 import brut.androlib.AndrolibException;
 import brut.androlib.res.data.ResPackage;
+import brut.util.Duo;
 import java.util.Map;
 
 /**
@@ -68,23 +69,25 @@ public class ResValueFactory {
         return new ResStringValue(value);
     }
 
-    public ResBagValue bagFactory(String type, int parent,
-            Map<ResReferenceValue, ResScalarValue> items) {
+    public ResBagValue bagFactory(int parent,
+            Duo<Integer, ResScalarValue>[] items) throws AndrolibException {
         ResReferenceValue parentVal = newReference(parent);
 
-        if ("array".equals(type)) {
+        if (items.length == 0) {
+            return new ResBagValue(parentVal);
+        }
+        int key = items[0].m1;
+        if (key == ResAttr.BAG_KEY_ATTR_TYPE) {
+            return ResAttr.factory(parentVal, items, this);
+        }
+        if (key == ResArrayValue.BAG_KEY_ARRAY_START) {
             return new ResArrayValue(parentVal, items);
         }
-        if ("style".equals(type)) {
-            return new ResStyleValue(parentVal, items);
-        }
-        if ("plurals".equals(type)) {
+        if (key >= ResPluralsValue.BAG_KEY_PLURALS_START
+                && key <= ResPluralsValue.BAG_KEY_PLURALS_END) {
             return new ResPluralsValue(parentVal, items);
         }
-        if ("attr".equals(type)) {
-            return ResAttrFactory.factory(parentVal, items);
-        }
-        return new ResBagValue(parentVal, items);
+        return new ResStyleValue(parentVal, items, this);
     }
 
     public ResReferenceValue newReference(int resID) {

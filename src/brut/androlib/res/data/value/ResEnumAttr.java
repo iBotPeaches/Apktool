@@ -19,7 +19,10 @@ package brut.androlib.res.data.value;
 
 import brut.androlib.AndrolibException;
 import brut.androlib.res.data.ResResource;
+import brut.util.Duo;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import org.xmlpull.v1.XmlSerializer;
@@ -27,17 +30,22 @@ import org.xmlpull.v1.XmlSerializer;
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
-public class ResEnumAttr extends ResMapAttr {
-    public ResEnumAttr(ResReferenceValue parent,
-            Map<ResReferenceValue, ResScalarValue> items, int type) {
-        super(parent, items, type);
+public class ResEnumAttr extends ResAttr {
+    ResEnumAttr(ResReferenceValue parent, int type, Integer min, Integer max,
+            Boolean l10n, Duo<ResReferenceValue, ResIntValue>[] items) {
+        super(parent, type, min, max, l10n);
+
+        mItems = new LinkedHashMap<Integer, ResReferenceValue>();
+        for (int i = 0; i < items.length; i++) {
+            mItems.put(items[i].m2.getValue(), items[i].m1);
+        }
     }
 
     @Override
     public String convertToResXmlFormat(ResScalarValue value)
             throws AndrolibException {
         if (value instanceof ResIntValue) {
-            String ret = getItemsMap().get(((ResIntValue) value).getValue());
+            String ret = decodeValue(((ResIntValue) value).getValue());
             if (ret != null) {
                 return ret;
             }
@@ -48,11 +56,28 @@ public class ResEnumAttr extends ResMapAttr {
     @Override
     protected void serializeBody(XmlSerializer serializer, ResResource res)
             throws AndrolibException, IOException {
-        for (Entry<Integer, String> entry : getItemsMap().entrySet()) {
+        for (int intVal : mItems.keySet()) {
             serializer.startTag(null, "enum");
-            serializer.attribute(null, "name", entry.getValue());
-            serializer.attribute(null, "value", String.valueOf(entry.getKey()));
+            serializer.attribute(null, "name", decodeValue(intVal));
+            serializer.attribute(null, "value", String.valueOf(intVal));
             serializer.endTag(null, "enum");
         }
     }
+
+    private String decodeValue(int value) throws AndrolibException {
+        String value2 = mItemsCache.get(value);
+        if (value2 == null) {
+            ResReferenceValue ref = mItems.get(value);
+            if (ref != null) {
+                value2 = ref.getReferent().getName();
+                mItemsCache.put(value, value2);
+            }
+        }
+        return value2;
+    }
+
+
+    private final Map<Integer, ResReferenceValue> mItems;
+    private final Map<Integer, String> mItemsCache =
+        new HashMap<Integer, String>();
 }

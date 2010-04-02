@@ -20,20 +20,26 @@ package brut.androlib.res.data.value;
 import brut.androlib.AndrolibException;
 import brut.androlib.res.data.ResResSpec;
 import brut.androlib.res.data.ResResource;
+import brut.util.Duo;
 import java.io.IOException;
-import java.util.Map;
-import java.util.Map.Entry;
 import org.xmlpull.v1.XmlSerializer;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
 public class ResStyleValue extends ResBagValue implements ResXmlSerializable {
-    public ResStyleValue(ResReferenceValue parent,
-            Map<ResReferenceValue, ResScalarValue> items) {
-        super(parent, items);
+    ResStyleValue(ResReferenceValue parent,
+            Duo<Integer, ResScalarValue>[] items, ResValueFactory factory) {
+        super(parent);
+
+        mItems = new Duo[items.length];
+        for (int i = 0; i < items.length; i++) {
+            mItems[i] = new Duo<ResReferenceValue, ResScalarValue>(
+                factory.newReference(items[i].m1), items[i].m2);
+        }
     }
 
+    @Override
     public void serializeToXml(XmlSerializer serializer, ResResource res)
             throws IOException, AndrolibException {
         serializer.startTag(null, "style");
@@ -41,11 +47,10 @@ public class ResStyleValue extends ResBagValue implements ResXmlSerializable {
         if (! mParent.isNull()) {
             serializer.attribute(null, "parent", mParent.toResXmlFormat());
         }
-        for (Entry<ResReferenceValue, ResScalarValue> entry
-                : mItems.entrySet()) {
-            ResResSpec spec = entry.getKey().getReferent();
+        for (int i = 0; i < mItems.length; i++) {
+            ResResSpec spec = mItems[i].m1.getReferent();
             ResAttr attr = (ResAttr) spec.getDefaultResource().getValue();
-            String value = attr.convertToResXmlFormat(entry.getValue());
+            String value = attr.convertToResXmlFormat(mItems[i].m2);
 
             if (value == null) {
                 continue;
@@ -59,4 +64,7 @@ public class ResStyleValue extends ResBagValue implements ResXmlSerializable {
         }
         serializer.endTag(null, "style");
     }
+
+
+    private final Duo<ResReferenceValue, ResScalarValue>[] mItems;
 }

@@ -19,20 +19,30 @@ package brut.androlib.res.data.value;
 
 import brut.androlib.AndrolibException;
 import brut.androlib.res.data.ResResource;
+import brut.util.Duo;
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.Map;
 import org.xmlpull.v1.XmlSerializer;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
 public class ResArrayValue extends ResBagValue implements ResXmlSerializable {
-    public ResArrayValue(ResReferenceValue parent,
-            Map<ResReferenceValue, ResScalarValue> items) {
-        super(parent, items);
+    ResArrayValue(ResReferenceValue parent,
+            Duo<Integer, ResScalarValue>[] items) {
+        super(parent);
+
+        mItems = new ResScalarValue[items.length];
+        for (int i = 0; i < items.length; i++) {
+            mItems[i] = items[i].m2;
+        }
     }
 
+    public ResArrayValue(ResReferenceValue parent, ResScalarValue[] items) {
+        super(parent);
+        mItems = items;
+    }
+
+    @Override
     public void serializeToXml(XmlSerializer serializer, ResResource res)
             throws IOException, AndrolibException {
         String type = getType();
@@ -40,26 +50,29 @@ public class ResArrayValue extends ResBagValue implements ResXmlSerializable {
 
         serializer.startTag(null, type);
         serializer.attribute(null, "name", res.getResSpec().getName());
-        for (ResScalarValue item : mItems.values()) {
+        for (int i = 0; i < mItems.length; i++) {
             serializer.startTag(null, "item");
-            serializer.text(item.toResXmlFormat());
+            serializer.text(mItems[i].toResXmlFormat());
             serializer.endTag(null, "item");
         }
         serializer.endTag(null, type);
     }
 
     public String getType() {
-        if (mItems.size() == 0) {
+        String type = mItems[0].getType();
+        if (! "string".equals(type) && ! "integer".equals(type)) {
             return null;
         }
-        Iterator<ResScalarValue> it = mItems.values().iterator();
-        String type = it.next().getType();
-        while (it.hasNext()) {
-            String itemType = it.next().getType();
-            if (! type.equals(itemType)) {
+        for (int i = 1; i < mItems.length; i++) {
+            if (! type.equals(mItems[i].getType())) {
                 return null;
             }
         }
         return type;
     }
+
+    private final ResScalarValue[] mItems;
+
+
+    public static final int BAG_KEY_ARRAY_START = 0x02000000;
 }

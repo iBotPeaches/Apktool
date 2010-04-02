@@ -18,21 +18,29 @@
 package brut.androlib.res.data.value;
 
 import brut.androlib.AndrolibException;
-import brut.androlib.res.AndrolibResources;
 import brut.androlib.res.data.ResResource;
+import brut.util.Duo;
 import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Map.Entry;
 import org.xmlpull.v1.XmlSerializer;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
 public class ResPluralsValue extends ResBagValue implements ResXmlSerializable {
-    public ResPluralsValue(ResReferenceValue parent,
-            Map<ResReferenceValue, ResScalarValue> items) {
-        super(parent, items);
+    ResPluralsValue(ResReferenceValue parent,
+            Duo<Integer, ResScalarValue>[] items) {
+        super(parent);
+
+        mItems = new String[6];
+        for (int i = 0; i < items.length; i++) {
+            mItems[items[i].m1 - BAG_KEY_PLURALS_START] =
+                ((ResStringValue) items[i].m2).getValue();
+        }
+    }
+
+    public ResPluralsValue(ResReferenceValue parent, String[] items) {
+        super(parent);
+        mItems = items;
     }
 
     @Override
@@ -40,37 +48,25 @@ public class ResPluralsValue extends ResBagValue implements ResXmlSerializable {
             throws IOException, AndrolibException {
         serializer.startTag(null, "plurals");
         serializer.attribute(null, "name", res.getResSpec().getName());
-        for (Entry<String, String> entry : getPluralsMap().entrySet()) {
+        for (int i = 0; i < mItems.length; i++) {
+            String item = mItems[i];
+            if (item == null) {
+                continue;
+            }
             serializer.startTag(null, "item");
-            serializer.attribute(null, "quantity", entry.getKey());
-            serializer.text(entry.getValue());
+            serializer.attribute(null, "quantity", QUANTITY_MAP[i]);
+            serializer.text(item);
             serializer.endTag(null, "item");
         }
         serializer.endTag(null, "plurals");
     }
 
-    private Map<String, String> getPluralsMap() {
-        Map<String, String> plurals = new LinkedHashMap<String, String>();
-        for (Entry<ResReferenceValue, ResScalarValue> entry
-                : mItems.entrySet()) {
-            String quantity = getQuantityMap()[
-                (entry.getKey().getValue() & 0xffff) - 4];
-            if (quantity != null) {
-                String value = ((ResStringValue) entry.getValue()).getValue();
-                plurals.put(quantity, AndrolibResources.escapeForResXml(value));
-                    
-            }
-        }
-        return plurals;
-    }
 
-    private static String[] getQuantityMap() {
-        if (quantityMap == null) {
-            quantityMap = new String[]
-                {"other", "zero", "one", "two", "few", "many"};
-        }
-        return quantityMap;
-    }
+    private final String[] mItems;
 
-    private static String[] quantityMap;
+
+    public static final int BAG_KEY_PLURALS_START = 0x01000004;
+    public static final int BAG_KEY_PLURALS_END = 0x01000009;
+    private static final String[] QUANTITY_MAP =
+        new String[] {"other", "zero", "one", "two", "few", "many"};
 }

@@ -20,6 +20,7 @@ import android.util.TypedValue;
 import brut.androlib.AndrolibException;
 import brut.androlib.res.data.*;
 import brut.androlib.res.data.value.*;
+import brut.util.Duo;
 import brut.util.ExtDataInput;
 import com.mindprod.ledatastream.LEDataInputStream;
 import java.io.*;
@@ -160,15 +161,13 @@ public class ARSCDecoder {
         int count = mIn.readInt();
 
         ResValueFactory factory = mPkg.getValueFactory();
-        Map<ResReferenceValue, ResScalarValue> items =
-            new LinkedHashMap<ResReferenceValue, ResScalarValue>();
+        Duo<Integer, ResScalarValue>[] items = new Duo[count];
         for (int i = 0; i < count; i++) {
-            items.put(
-                factory.newReference(mIn.readInt()),
-                (ResScalarValue) readValue());
+            items[i] = new Duo<Integer, ResScalarValue>(
+                mIn.readInt(), (ResScalarValue) readValue());
         }
 
-        return factory.bagFactory(mType.getName(), parent, items);
+        return factory.bagFactory(parent, items);
     }
 
     private ResValue readValue() throws IOException, AndrolibException {

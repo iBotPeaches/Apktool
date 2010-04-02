@@ -19,18 +19,21 @@ package brut.androlib.res.data.value;
 
 import brut.androlib.AndrolibException;
 import brut.androlib.res.data.ResResource;
+import brut.util.Duo;
 import java.io.IOException;
-import java.util.Map;
-import java.util.Map.Entry;
 import org.xmlpull.v1.XmlSerializer;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
-public class ResSetAttr extends ResMapAttr {
-    public ResSetAttr(ResReferenceValue parent,
-            Map<ResReferenceValue, ResScalarValue> items, int type) {
-        super(parent, items, type);
+public class ResFlagsAttr extends ResAttr {
+    ResFlagsAttr(ResReferenceValue parent, int type, Integer min, Integer max, Boolean l10n, Duo<ResReferenceValue, ResIntValue>[] items) {
+        super(parent, type, min, max, l10n);
+
+        mItems = new FlagItem[items.length];
+        for (int i = 0; i < items.length; i++) {
+            mItems[i] = new FlagItem(items[i].m1, items[i].m2.getValue());
+        }
     }
 
     @Override
@@ -41,14 +44,15 @@ public class ResSetAttr extends ResMapAttr {
         }
         int intVal = ((ResIntValue) value).getValue();
         String strVal = "";
-        for (Entry<Integer, String> entry : getItemsMap().entrySet()) {
-            int flag = entry.getKey();
-            if ((intVal & flag) == flag) {
-                strVal += "|" + entry.getValue();
+        for (int i = 0; i < mItems.length; i++) {
+            FlagItem item = mItems[i];
+
+            if ((intVal & item.flag) == item.flag) {
+                strVal += "|" + item.getValue();
             }
         }
         if (strVal.isEmpty()) {
-            return "";
+            return strVal;
         }
         return strVal.substring(1);
     }
@@ -56,12 +60,36 @@ public class ResSetAttr extends ResMapAttr {
     @Override
     protected void serializeBody(XmlSerializer serializer, ResResource res)
             throws AndrolibException, IOException {
-        for (Entry<Integer, String> entry : getItemsMap().entrySet()) {
+        for (int i = 0; i < mItems.length; i++) {
+            FlagItem item = mItems[i];
+
             serializer.startTag(null, "flag");
-            serializer.attribute(null, "name", entry.getValue());
+            serializer.attribute(null, "name", item.getValue());
             serializer.attribute(null, "value",
-                String.format("0x%08x", entry.getKey()));
+                String.format("0x%08x", item.flag));
             serializer.endTag(null, "flag");
+        }
+    }
+
+
+    private final FlagItem[] mItems;
+
+
+    private static class FlagItem {
+        public final ResReferenceValue ref;
+        public final int flag;
+        public String value;
+
+        public FlagItem(ResReferenceValue ref, int flag) {
+            this.ref = ref;
+            this.flag = flag;
+        }
+
+        public String getValue() throws AndrolibException {
+            if (value == null) {
+                value = ref.getReferent().getName();
+            }
+            return value;
         }
     }
 }

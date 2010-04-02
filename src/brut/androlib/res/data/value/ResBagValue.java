@@ -17,26 +17,32 @@
 
 package brut.androlib.res.data.value;
 
+import brut.androlib.AndrolibException;
+import brut.androlib.res.data.ResResource;
+import java.io.IOException;
 import java.util.Map;
+import org.xmlpull.v1.XmlSerializer;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
-public class ResBagValue extends ResValue {
+public class ResBagValue extends ResValue implements ResXmlSerializable {
     protected final ResReferenceValue mParent;
-    protected final Map<ResReferenceValue, ResScalarValue> mItems;
 
-    public ResBagValue(ResReferenceValue parent,
-            Map<ResReferenceValue, ResScalarValue> items) {
+    public ResBagValue(ResReferenceValue parent) {
         this.mParent = parent;
-        this.mItems = items;
+    }
+
+    public void serializeToXml(XmlSerializer serializer, ResResource res)
+            throws IOException, AndrolibException {
+        serializer.startTag(null, "item");
+        serializer.attribute(null, "type",
+            res.getResSpec().getType().getName());
+        serializer.attribute(null, "name", res.getResSpec().getName());
+        serializer.endTag(null, "item");
     }
 
     public ResReferenceValue getParent() {
         return mParent;
-    }
-
-    public Map<ResReferenceValue, ResScalarValue> getItems() {
-        return mItems;
     }
 }
