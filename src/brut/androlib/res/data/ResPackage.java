@@ -42,6 +42,7 @@ public class ResPackage {
     private final Set<ResResource> mFiles = new LinkedHashSet<ResResource>();
     private final Map<Duo<ResType, ResConfig>, ResValuesFile> mValuesFiles =
         new LinkedHashMap<Duo<ResType, ResConfig>, ResValuesFile>();
+    private final Set<ResID> mSynthesizedRes = new HashSet<ResID>();
 
     private ResValueFactory mValueFactory;
 
@@ -119,6 +120,10 @@ public class ResPackage {
         return mName;
     }
 
+    boolean isSynthesized(ResID resId) {
+        return mSynthesizedRes.contains(resId);
+    }
+
     public void addResSpec(ResResSpec spec) throws AndrolibException {
         if (mResSpecs.put(spec.getId(), spec) != null) {
             throw new AndrolibException("Multiple resource specs: " + spec);
@@ -149,11 +154,15 @@ public class ResPackage {
                 new Duo<ResType, ResConfig>(type, config);
             ResValuesFile values = mValuesFiles.get(key);
             if (values == null) {
-                values = new ResValuesFile(type, config);
+                values = new ResValuesFile(this, type, config);
                 mValuesFiles.put(key, values);
             }
             values.addResource(res);
         }
+    }
+
+    public void addSynthesizedRes(int resId) {
+        mSynthesizedRes.add(new ResID(resId));
     }
 
     @Override

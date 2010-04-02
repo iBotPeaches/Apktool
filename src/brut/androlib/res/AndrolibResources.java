@@ -212,7 +212,9 @@ final public class AndrolibResources {
             serial.startTag(null, "resources");
 
             for (ResResource res : valuesFile.listResources()) {
-
+                if (valuesFile.isSynthesized(res)) {
+                    continue;
+                }
                 ((ResXmlSerializable) res.getValue())
                     .serializeToXml(serial, res);
             }

@@ -24,12 +24,14 @@ import java.util.Set;
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
 public class ResValuesFile {
+    private final ResPackage mPackage;
     private final ResType mType;
     private final ResConfig mConfig;
     private final Set<ResResource> mResources =
         new LinkedHashSet<ResResource>();
 
-    public ResValuesFile(ResType type, ResConfig config) {
+    public ResValuesFile(ResPackage pkg, ResType type, ResConfig config) {
+        this.mPackage = pkg;
         this.mType = type;
         this.mConfig = config;
     }
@@ -51,6 +53,10 @@ public class ResValuesFile {
 
     public ResConfig getConfig() {
         return mConfig;
+    }
+
+    public boolean isSynthesized(ResResource res) {
+        return mPackage.isSynthesized(res.getResSpec().getId());
     }
 
     public void addResource(ResResource res) {
