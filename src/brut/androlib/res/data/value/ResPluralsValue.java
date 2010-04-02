@@ -34,7 +34,7 @@ public class ResPluralsValue extends ResBagValue implements ResXmlSerializable {
         mItems = new String[6];
         for (int i = 0; i < items.length; i++) {
             mItems[items[i].m1 - BAG_KEY_PLURALS_START] =
-                ((ResStringValue) items[i].m2).getValue();
+                ((ResStringValue) items[i].m2).toResXmlFormat();
         }
     }
 
