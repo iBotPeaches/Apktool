@@ -303,6 +303,7 @@ final public class AndrolibResources {
             return value;
         }
         value = value.replace("'", "\\'");
+        value = value.replace("\"", "\\\"");
         value = value.replace("\n", "\\n\n");
         char c = value.charAt(0);
         if (c == '@' || c == '#' || c == '?') {
