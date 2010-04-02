@@ -132,6 +132,11 @@ final public class AndrolibResources {
 
     public boolean detectWhetherAppIsFramework(File appDir)
             throws AndrolibException {
+        File publicXml = new File(appDir, "res/values/public.xml");
+        if (! publicXml.exists()) {
+            return false;
+        }
+
         Iterator<String> it;
         try {
             it = IOUtils.lineIterator(

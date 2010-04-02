@@ -196,6 +196,9 @@ public class Androlib {
     public boolean buildResourcesFull(File appDir, boolean forceBuildAll,
             boolean framework) throws AndrolibException {
         try {
+            if (! new File(appDir, "res").exists()) {
+                return false;
+            }
             if (! forceBuildAll) {
                 LOGGER.info("Checking whether resources has changed...");
             }
