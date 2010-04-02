@@ -19,8 +19,8 @@ package brut.androlib.res.data.value;
 
 import brut.androlib.AndrolibException;
 import brut.androlib.res.data.ResResource;
+import brut.util.Duo;
 import java.io.IOException;
-import java.util.Map;
 import org.xmlpull.v1.XmlSerializer;
 
 /**
@@ -35,9 +35,25 @@ public class ResBagValue extends ResValue implements ResXmlSerializable {
 
     public void serializeToXml(XmlSerializer serializer, ResResource res)
             throws IOException, AndrolibException {
+        String type = res.getResSpec().getType().getName();
+        if ("style".equals(type)) {
+            new ResStyleValue(mParent, new Duo[0], null)
+                .serializeToXml(serializer, res);
+            return;
+        }
+        if ("array".equals(type)) {
+            new ResArrayValue(mParent, new Duo[0])
+                .serializeToXml(serializer, res);
+            return;
+        }
+        if ("plurals".equals(type)) {
+            new ResPluralsValue(mParent, new Duo[0])
+                .serializeToXml(serializer, res);
+            return;
+        }
+
         serializer.startTag(null, "item");
-        serializer.attribute(null, "type",
-            res.getResSpec().getType().getName());
+        serializer.attribute(null, "type", type);
         serializer.attribute(null, "name", res.getResSpec().getName());
         serializer.endTag(null, "item");
     }
