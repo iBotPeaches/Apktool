@@ -21,6 +21,8 @@ import brut.androlib.AndrolibException;
 import brut.androlib.res.data.ResResource;
 import brut.util.Duo;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Comparator;
 import org.xmlpull.v1.XmlSerializer;
 
 /**
@@ -42,19 +44,30 @@ public class ResFlagsAttr extends ResAttr {
         if (! (value instanceof ResIntValue)) {
             return super.convertToResXmlFormat(value);
         }
+        loadFlags();
         int intVal = ((ResIntValue) value).getValue();
-        String strVal = "";
-        for (int i = 0; i < mItems.length; i++) {
-            FlagItem item = mItems[i];
 
-            if ((intVal & item.flag) == item.flag) {
-                strVal += "|" + item.getValue();
+        if (intVal == 0) {
+            return renderFlags(mZeroFlags);
+        }
+
+        FlagItem[] flagItems = new FlagItem[mFlags.length];
+        int[] flags = new int[mFlags.length];
+        int flagsCount = 0;
+        for (int i = 0; i < mFlags.length; i++) {
+            FlagItem flagItem = mFlags[i];
+            int flag = flagItem.flag;
+
+            if ((intVal & flag) != flag) {
+                continue;
+            }
+
+            if (! isSubpartOf(flag, flags)) {
+                flags[flagsCount] = flag;
+                flagItems[flagsCount++] = flagItem;
             }
         }
-        if (strVal.isEmpty()) {
-            return strVal;
-        }
-        return strVal.substring(1);
+        return renderFlags(Arrays.copyOf(flagItems, flagsCount));
     }
 
     @Override
@@ -71,8 +84,61 @@ public class ResFlagsAttr extends ResAttr {
         }
     }
 
+    private boolean isSubpartOf(int flag, int[] flags) {
+        for (int i = 0; i < flags.length; i++) {
+            if ((flags[i] & flag) == flag) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private String renderFlags(FlagItem[] flags) throws AndrolibException {
+        String ret = "";
+        for (int i = 0; i < flags.length; i++) {
+            ret += "|" + flags[i].getValue();
+        }
+        if (ret.isEmpty()) {
+            return ret;
+        }
+        return ret.substring(1);
+    }
+
+    private void loadFlags() {
+        if (mFlags != null) {
+            return;
+        }
+
+        FlagItem[] zeroFlags = new FlagItem[mItems.length];
+        int zeroFlagsCount = 0;
+        FlagItem[] flags = new FlagItem[mItems.length];
+        int flagsCount = 0;
+
+        for (int i = 0; i < mItems.length; i++) {
+            FlagItem item = mItems[i];
+            if (item.flag == 0) {
+                zeroFlags[zeroFlagsCount++] = item;
+            } else {
+                flags[flagsCount++] = item;
+            }
+        }
+
+        mZeroFlags = Arrays.copyOf(zeroFlags, zeroFlagsCount);
+        mFlags = Arrays.copyOf(flags, flagsCount);
+
+        Arrays.sort(mFlags, new Comparator<FlagItem>() {
+            public int compare(FlagItem o1, FlagItem o2) {
+                return Integer.valueOf(Integer.bitCount(o2.flag))
+                    .compareTo(Integer.bitCount(o1.flag));
+            }
+        });
+    }
+
 
     private final FlagItem[] mItems;
+
+    private FlagItem[] mZeroFlags;
+    private FlagItem[] mFlags;
 
 
     private static class FlagItem {
