@@ -59,6 +59,9 @@ public class ResArrayValue extends ResBagValue implements ResXmlSerializable {
     }
 
     public String getType() {
+        if (mItems.length == 0) {
+            return null;
+        }
         String type = mItems[0].getType();
         if (! "string".equals(type) && ! "integer".equals(type)) {
             return null;
