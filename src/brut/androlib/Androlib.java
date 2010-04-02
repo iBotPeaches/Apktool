@@ -253,7 +253,7 @@ public class Androlib {
 
     public void buildApk(File appDir, boolean framework)
             throws AndrolibException {
-        LOGGER.info("Building apk file");
+        LOGGER.info("Building apk file...");
         File outApk = new File(appDir, OUT_APK_FILENAME);
         if (outApk.exists()) {
             outApk.delete();
