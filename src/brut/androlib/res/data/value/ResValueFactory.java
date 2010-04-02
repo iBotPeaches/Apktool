@@ -21,7 +21,6 @@ import android.util.TypedValue;
 import brut.androlib.AndrolibException;
 import brut.androlib.res.data.ResPackage;
 import brut.util.Duo;
-import java.util.Map;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
