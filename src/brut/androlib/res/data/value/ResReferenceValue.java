@@ -33,7 +33,7 @@ public class ResReferenceValue extends ResIntValue {
     }
     
     public ResReferenceValue(ResPackage package_, int value, boolean theme) {
-        super(value);
+        super(value, "reference");
         mPackage = package_;
         mTheme = theme;
     }
