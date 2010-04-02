@@ -108,11 +108,13 @@ public class Androlib {
 
     public void build(ExtFile appDir, boolean forceBuildAll)
             throws AndrolibException {
+        boolean framework = mAndRes.detectWhetherAppIsFramework(appDir);
+
         new File(appDir, APK_DIRNAME).mkdirs();
         buildSources(appDir, forceBuildAll);
-        buildResources(appDir, forceBuildAll);
+        buildResources(appDir, forceBuildAll, framework);
         buildLib(appDir, forceBuildAll);
-        buildApk(appDir);
+        buildApk(appDir, framework);
     }
 
     public void buildSources(File appDir, boolean forceBuildAll)
@@ -160,10 +162,10 @@ public class Androlib {
         return true;
     }
 
-    public void buildResources(ExtFile appDir, boolean forceBuildAll)
-            throws AndrolibException {
+    public void buildResources(ExtFile appDir, boolean forceBuildAll,
+            boolean framework) throws AndrolibException {
         if (! buildResourcesRaw(appDir, forceBuildAll)
-                && ! buildResourcesFull(appDir, forceBuildAll)) {
+                && ! buildResourcesFull(appDir, forceBuildAll, framework)) {
             LOGGER.warning("Could not find resources");
         }
     }
@@ -191,8 +193,8 @@ public class Androlib {
         }
     }
 
-    public boolean buildResourcesFull(File appDir, boolean forceBuildAll)
-            throws AndrolibException {
+    public boolean buildResourcesFull(File appDir, boolean forceBuildAll,
+            boolean framework) throws AndrolibException {
         try {
             if (! forceBuildAll) {
                 LOGGER.info("Checking whether resources has changed...");
@@ -213,8 +215,8 @@ public class Androlib {
                 mAndRes.aaptPackage(
                     apkFile,
                     new File(appDir, "AndroidManifest.xml"),
-                    new File(appDir, "res"), ninePatch, null, false,
-                    mAndRes.detectWhetherAppIsFramework(appDir)
+                    new File(appDir, "res"),
+                    ninePatch, null, false, framework
                 );
 
                 new ExtFile(apkFile).getDirectory()
@@ -246,7 +248,8 @@ public class Androlib {
         }
     }
 
-    public void buildApk(File appDir) throws AndrolibException {
+    public void buildApk(File appDir, boolean framework)
+            throws AndrolibException {
         LOGGER.info("Building apk file");
         File outApk = new File(appDir, OUT_APK_FILENAME);
         if (outApk.exists()) {
@@ -262,7 +265,7 @@ public class Androlib {
             assetDir = null;
         }
         mAndRes.aaptPackage(outApk, null, null,
-            new File(appDir, APK_DIRNAME), assetDir, false, false);
+            new File(appDir, APK_DIRNAME), assetDir, false, true);
     }
 
     private boolean isModified(File working, File stored) {
