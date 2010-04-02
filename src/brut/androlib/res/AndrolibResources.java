@@ -307,7 +307,7 @@ final public class AndrolibResources {
         }
         value = value.replace("'", "\\'");
         value = value.replace("\"", "\\\"");
-        value = value.replace("\n", "\\n\n");
+        value = value.replace("\n", "\\n");
         char c = value.charAt(0);
         if (c == '@' || c == '#' || c == '?') {
             return '\\' + value;
