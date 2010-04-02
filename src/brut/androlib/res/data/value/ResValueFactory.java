@@ -77,7 +77,7 @@ public class ResValueFactory {
         }
         int key = items[0].m1;
         if (key == ResAttr.BAG_KEY_ATTR_TYPE) {
-            return ResAttr.factory(parentVal, items, this);
+            return ResAttr.factory(parentVal, items, this, mPackage);
         }
         if (key == ResArrayValue.BAG_KEY_ARRAY_START) {
             return new ResArrayValue(parentVal, items);

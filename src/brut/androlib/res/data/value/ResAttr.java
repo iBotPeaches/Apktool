@@ -18,6 +18,7 @@
 package brut.androlib.res.data.value;
 
 import brut.androlib.AndrolibException;
+import brut.androlib.res.data.ResPackage;
 import brut.androlib.res.data.ResResource;
 import brut.util.Duo;
 import java.io.IOException;
@@ -66,8 +67,8 @@ public class ResAttr extends ResBagValue implements ResXmlSerializable {
 
 
     public static ResAttr factory(ResReferenceValue parent,
-            Duo<Integer, ResScalarValue>[] items, ResValueFactory factory)
-            throws AndrolibException {
+            Duo<Integer, ResScalarValue>[] items, ResValueFactory factory,
+            ResPackage pkg) throws AndrolibException {
 
         int type = ((ResIntValue) items[0].m2).getValue();
         int scalarType = type & 0xffff;
@@ -96,8 +97,10 @@ public class ResAttr extends ResBagValue implements ResXmlSerializable {
             new Duo[items.length - i];
         int j = 0;
         for (; i < items.length; i++) {
+            int resId = items[i].m1;
+            pkg.addSynthesizedRes(resId);
             attrItems[j++] = new Duo<ResReferenceValue, ResIntValue>(
-                factory.newReference(items[i].m1), (ResIntValue) items[i].m2);
+                factory.newReference(resId), (ResIntValue) items[i].m2);
         }
         switch (type & 0xff0000) {
             case TYPE_ENUM:
