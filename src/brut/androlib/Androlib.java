@@ -183,7 +183,7 @@ public class Androlib {
             if (forceBuildAll || isModified(
                     newFiles(APK_RESOURCES_FILENAMES, appDir),
                     newFiles(APK_RESOURCES_FILENAMES, apkDir))) {
-                LOGGER.info("Copying raw resources");
+                LOGGER.info("Copying raw resources...");
                 appDir.getDirectory()
                     .copyToDir(apkDir, APK_RESOURCES_FILENAMES);
             }
