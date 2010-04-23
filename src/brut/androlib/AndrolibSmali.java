@@ -47,7 +47,7 @@ public class AndrolibSmali {
     public void baksmali(String apkFile, String dir) throws AndrolibException {
         try {
             DexFile dexFile = new DexFile(apkFile);
-            baksmali.disassembleDexFile(dexFile, false, dir, new String[]{}, "", false, true, true, true, false, 0, false);
+            baksmali.disassembleDexFile(apkFile, dexFile, false, dir, new String[]{}, "", null, false, true, true, true, false, 0, false, false);
         } catch (IOException ex) {
             throw new AndrolibException(ex);
         }
