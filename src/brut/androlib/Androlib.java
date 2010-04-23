@@ -17,6 +17,7 @@
 
 package brut.androlib;
 
+import brut.androlib.java.AndrolibJava;
 import brut.androlib.res.AndrolibResources;
 import brut.androlib.res.data.ResTable;
 import brut.androlib.res.util.ExtFile;
@@ -63,6 +64,12 @@ public class Androlib {
         } catch (BrutException ex) {
             throw new AndrolibException(ex);
         }
+    }
+
+    public void decodeSourcesJava(ExtFile apkFile, File outDir)
+            throws AndrolibException {
+        LOGGER.info("Decoding Java sources...");
+        new AndrolibJava().decode(apkFile, outDir);
     }
 
     public void decodeResourcesRaw(ExtFile apkFile, File outDir)
@@ -120,7 +127,9 @@ public class Androlib {
     public void buildSources(File appDir, boolean forceBuildAll)
             throws AndrolibException {
         if (! buildSourcesRaw(appDir, forceBuildAll)
-                && ! buildSourcesSmali(appDir, forceBuildAll)) {
+                && ! buildSourcesSmali(appDir, forceBuildAll)
+                && ! buildSourcesJava(appDir, forceBuildAll)
+            ) {
             LOGGER.warning("Could not find sources");
         }
     }
@@ -158,6 +167,24 @@ public class Androlib {
             LOGGER.info("Smaling...");
             dex.delete();
             mSmali.smali(smaliDir, dex);
+        }
+        return true;
+    }
+
+    public boolean buildSourcesJava(File appDir, boolean forceBuildAll)
+            throws AndrolibException {
+        File javaDir = new File(appDir, "src");
+        if (! javaDir.exists()) {
+            return false;
+        }
+        File dex = new File(appDir, APK_DIRNAME + "/classes.dex");
+        if (! forceBuildAll) {
+            LOGGER.info("Checking whether sources has changed...");
+        }
+        if (forceBuildAll || isModified(javaDir, dex)) {
+            LOGGER.info("Building java sources...");
+            dex.delete();
+            new AndrolibJava().build(javaDir, dex);
         }
         return true;
     }

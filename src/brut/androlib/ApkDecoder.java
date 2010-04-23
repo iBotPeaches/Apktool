@@ -68,6 +68,9 @@ public class ApkDecoder {
             case DECODE_SOURCES_SMALI:
                 mAndrolib.decodeSourcesSmali(mApkFile, outDir);
                 break;
+            case DECODE_SOURCES_JAVA:
+                mAndrolib.decodeSourcesJava(mApkFile, outDir);
+                break;
         }
         switch (mDecodeResources) {
             case DECODE_RESOURCES_NONE:
@@ -81,7 +84,8 @@ public class ApkDecoder {
     }
 
     public void setDecodeSources(short mode) throws AndrolibException {
-        if (mode != DECODE_SOURCES_NONE && mode != DECODE_SOURCES_SMALI) {
+        if (mode != DECODE_SOURCES_NONE && mode != DECODE_SOURCES_SMALI
+                && mode != DECODE_SOURCES_JAVA) {
             throw new AndrolibException("Invalid decode sources mode: " + mode);
         }
         mDecodeSources = mode;
@@ -104,6 +108,7 @@ public class ApkDecoder {
 
     public final static short DECODE_SOURCES_NONE = 0x0000;
     public final static short DECODE_SOURCES_SMALI = 0x0001;
+    public final static short DECODE_SOURCES_JAVA = 0x0002;
 
     public final static short DECODE_RESOURCES_NONE = 0x0100;
     public final static short DECODE_RESOURCES_FULL = 0x0101;
