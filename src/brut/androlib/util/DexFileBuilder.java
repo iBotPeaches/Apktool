@@ -32,16 +32,22 @@ import org.jf.smali.*;
 public class DexFileBuilder {
     public void addSmaliFile(File smaliFile) throws AndrolibException {
         try {
-            if (!assembleSmaliFile(smaliFile)) {
+            addSmaliFile(new FileInputStream(smaliFile));
+        } catch (FileNotFoundException ex) {
+            throw new AndrolibException(ex);
+        }
+    }
+
+    public void addSmaliFile(InputStream smaliStream) throws AndrolibException {
+        try {
+            if (!assembleSmaliFile(smaliStream)) {
                 throw new AndrolibException(
-                    "Could not smali file: " + smaliFile);
+                    "Could not smali file: " + smaliStream);
             }
         } catch (IOException ex) {
-            throw new AndrolibException(
-                "Could not smali file: " + smaliFile, ex);
+            throw new AndrolibException(ex);
         } catch (RecognitionException ex) {
-            throw new AndrolibException(
-                "Could not smali file: " + smaliFile, ex);
+            throw new AndrolibException(ex);
         }
     }
 
@@ -74,10 +80,9 @@ public class DexFileBuilder {
         return bytes;
     }
 
-    private boolean assembleSmaliFile(File smaliFile)
+    private boolean assembleSmaliFile(InputStream smaliStream)
             throws IOException, RecognitionException {
-        ANTLRInputStream input = new ANTLRInputStream(new FileInputStream(smaliFile), "UTF8");
-        input.name = smaliFile.getAbsolutePath();
+        ANTLRInputStream input = new ANTLRInputStream(smaliStream, "UTF8");
 
         smaliLexer lexer = new smaliLexer(input);
 
