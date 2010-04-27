@@ -41,9 +41,12 @@ public class Androlib {
         return mAndRes.getResTable(apkFile);
     }
 
-    public void decodeSourcesRaw(ExtFile apkFile, File outDir)
+    public void decodeSourcesRaw(ExtFile apkFile, File outDir, boolean debug)
             throws AndrolibException {
         try {
+            if (debug) {
+                LOGGER.warning("Debug mode not available.");
+            }
             Directory apk = apkFile.getDirectory();
             if (apk.containsFile("classes.dex")) {
                 LOGGER.info("Copying raw classes.dex file...");
@@ -54,20 +57,20 @@ public class Androlib {
         }
     }
 
-    public void decodeSourcesSmali(File apkFile, File outDir)
+    public void decodeSourcesSmali(File apkFile, File outDir, boolean debug)
             throws AndrolibException {
         try {
             File smaliDir = new File(outDir, SMALI_DIRNAME);
             OS.rmdir(smaliDir);
             smaliDir.mkdirs();
             LOGGER.info("Baksmaling...");
-            SmaliDecoder.decode(apkFile, smaliDir, false);
+            SmaliDecoder.decode(apkFile, smaliDir, debug);
         } catch (BrutException ex) {
             throw new AndrolibException(ex);
         }
     }
 
-    public void decodeSourcesJava(ExtFile apkFile, File outDir)
+    public void decodeSourcesJava(ExtFile apkFile, File outDir, boolean debug)
             throws AndrolibException {
         LOGGER.info("Decoding Java sources...");
         new AndrolibJava().decode(apkFile, outDir);
@@ -109,38 +112,41 @@ public class Androlib {
         }
     }
 
-    public void build(File appDir, boolean forceBuildAll)
+    public void build(File appDir, boolean forceBuildAll, boolean debug)
             throws AndrolibException {
-        build(new ExtFile(appDir), forceBuildAll);
+        build(new ExtFile(appDir), forceBuildAll, debug);
     }
 
-    public void build(ExtFile appDir, boolean forceBuildAll)
+    public void build(ExtFile appDir, boolean forceBuildAll, boolean debug)
             throws AndrolibException {
         boolean framework = mAndRes.detectWhetherAppIsFramework(appDir);
 
         new File(appDir, APK_DIRNAME).mkdirs();
-        buildSources(appDir, forceBuildAll);
+        buildSources(appDir, forceBuildAll, debug);
         buildResources(appDir, forceBuildAll, framework);
         buildLib(appDir, forceBuildAll);
         buildApk(appDir, framework);
     }
 
-    public void buildSources(File appDir, boolean forceBuildAll)
+    public void buildSources(File appDir, boolean forceBuildAll, boolean debug)
             throws AndrolibException {
-        if (! buildSourcesRaw(appDir, forceBuildAll)
-                && ! buildSourcesSmali(appDir, forceBuildAll)
-                && ! buildSourcesJava(appDir, forceBuildAll)
+        if (! buildSourcesRaw(appDir, forceBuildAll, debug)
+                && ! buildSourcesSmali(appDir, forceBuildAll, debug)
+                && ! buildSourcesJava(appDir, forceBuildAll, debug)
             ) {
             LOGGER.warning("Could not find sources");
         }
     }
 
-    public boolean buildSourcesRaw(File appDir, boolean forceBuildAll)
-            throws AndrolibException {
+    public boolean buildSourcesRaw(File appDir, boolean forceBuildAll,
+            boolean debug) throws AndrolibException {
         try {
             File working = new File(appDir, "classes.dex");
             if (! working.exists()) {
                 return false;
+            }
+            if (debug) {
+                LOGGER.warning("Debug mode not available.");
             }
             File stored = new File(appDir, APK_DIRNAME + "/classes.dex");
             if (forceBuildAll || isModified(working, stored)) {
@@ -154,8 +160,8 @@ public class Androlib {
         }
     }
 
-    public boolean buildSourcesSmali(File appDir, boolean forceBuildAll)
-            throws AndrolibException {
+    public boolean buildSourcesSmali(File appDir, boolean forceBuildAll,
+            boolean debug) throws AndrolibException {
         ExtFile smaliDir = new ExtFile(appDir, "smali");
         if (! smaliDir.exists()) {
             return false;
@@ -167,13 +173,13 @@ public class Androlib {
         if (forceBuildAll || isModified(smaliDir, dex)) {
             LOGGER.info("Smaling...");
             dex.delete();
-            SmaliBuilder.build(smaliDir, dex, false);
+            SmaliBuilder.build(smaliDir, dex, debug);
         }
         return true;
     }
 
-    public boolean buildSourcesJava(File appDir, boolean forceBuildAll)
-            throws AndrolibException {
+    public boolean buildSourcesJava(File appDir, boolean forceBuildAll,
+            boolean debug) throws AndrolibException {
         File javaDir = new File(appDir, "src");
         if (! javaDir.exists()) {
             return false;

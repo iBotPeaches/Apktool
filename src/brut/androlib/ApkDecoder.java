@@ -63,13 +63,13 @@ public class ApkDecoder {
 
         switch (mDecodeSources) {
             case DECODE_SOURCES_NONE:
-                mAndrolib.decodeSourcesRaw(mApkFile, outDir);
+                mAndrolib.decodeSourcesRaw(mApkFile, outDir, mDebug);
                 break;
             case DECODE_SOURCES_SMALI:
-                mAndrolib.decodeSourcesSmali(mApkFile, outDir);
+                mAndrolib.decodeSourcesSmali(mApkFile, outDir, mDebug);
                 break;
             case DECODE_SOURCES_JAVA:
-                mAndrolib.decodeSourcesJava(mApkFile, outDir);
+                mAndrolib.decodeSourcesJava(mApkFile, outDir, mDebug);
                 break;
         }
         switch (mDecodeResources) {
@@ -96,6 +96,10 @@ public class ApkDecoder {
             throw new AndrolibException("Invalid decode resources mode");
         }
         mDecodeResources = mode;
+    }
+
+    public void setDebugMode(boolean debug) {
+        mDebug = debug;
     }
 
     public ResTable getResTable() throws AndrolibException {
@@ -128,4 +132,5 @@ public class ApkDecoder {
     private ResTable mResTable;
     private short mDecodeSources = DECODE_SOURCES_SMALI;
     private short mDecodeResources = DECODE_RESOURCES_FULL;
+    private boolean mDebug = false;
 }
