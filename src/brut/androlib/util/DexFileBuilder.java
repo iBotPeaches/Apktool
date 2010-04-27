@@ -32,15 +32,17 @@ import org.jf.smali.*;
 public class DexFileBuilder {
     public void addSmaliFile(File smaliFile) throws AndrolibException {
         try {
-            addSmaliFile(new FileInputStream(smaliFile));
+            addSmaliFile(new FileInputStream(smaliFile),
+                smaliFile.getAbsolutePath());
         } catch (FileNotFoundException ex) {
             throw new AndrolibException(ex);
         }
     }
 
-    public void addSmaliFile(InputStream smaliStream) throws AndrolibException {
+    public void addSmaliFile(InputStream smaliStream, String name)
+            throws AndrolibException {
         try {
-            if (!assembleSmaliFile(smaliStream)) {
+            if (!assembleSmaliFile(smaliStream, name)) {
                 throw new AndrolibException(
                     "Could not smali file: " + smaliStream);
             }
@@ -80,9 +82,10 @@ public class DexFileBuilder {
         return bytes;
     }
 
-    private boolean assembleSmaliFile(InputStream smaliStream)
+    private boolean assembleSmaliFile(InputStream smaliStream, String name)
             throws IOException, RecognitionException {
         ANTLRInputStream input = new ANTLRInputStream(smaliStream, "UTF8");
+        input.name = name;
 
         smaliLexer lexer = new smaliLexer(input);
 
