@@ -21,6 +21,8 @@ import brut.androlib.java.AndrolibJava;
 import brut.androlib.res.AndrolibResources;
 import brut.androlib.res.data.ResTable;
 import brut.androlib.res.util.ExtFile;
+import brut.androlib.src.SmaliBuilder;
+import brut.androlib.src.SmaliDecoder;
 import brut.common.BrutException;
 import brut.directory.*;
 import brut.util.BrutIO;
@@ -33,7 +35,6 @@ import java.util.logging.Logger;
  */
 public class Androlib {
     private final AndrolibResources mAndRes = new AndrolibResources();
-    private final AndrolibSmali mSmali = new AndrolibSmali();
 
     public ResTable getResTable(ExtFile apkFile) throws AndrolibException {
         LOGGER.info("Decoding resource table...");
@@ -60,7 +61,7 @@ public class Androlib {
             OS.rmdir(smaliDir);
             smaliDir.mkdirs();
             LOGGER.info("Baksmaling...");
-            mSmali.baksmali(apkFile, smaliDir);
+            SmaliDecoder.decode(apkFile, smaliDir, false);
         } catch (BrutException ex) {
             throw new AndrolibException(ex);
         }
@@ -155,7 +156,7 @@ public class Androlib {
 
     public boolean buildSourcesSmali(File appDir, boolean forceBuildAll)
             throws AndrolibException {
-        File smaliDir = new File(appDir, "smali");
+        ExtFile smaliDir = new ExtFile(appDir, "smali");
         if (! smaliDir.exists()) {
             return false;
         }
@@ -166,7 +167,7 @@ public class Androlib {
         if (forceBuildAll || isModified(smaliDir, dex)) {
             LOGGER.info("Smaling...");
             dex.delete();
-            mSmali.smali(smaliDir, dex);
+            SmaliBuilder.build(smaliDir, dex, false);
         }
         return true;
     }
