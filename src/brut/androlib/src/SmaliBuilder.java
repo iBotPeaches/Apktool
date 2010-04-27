@@ -1,0 +1,109 @@
+/*
+ *  Copyright 2010 Ryszard Wiśniewski <brut.alll@gmail.com>.
+ * 
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ * 
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *  under the License.
+ */
+package brut.androlib.src;
+
+import brut.androlib.AndrolibException;
+import brut.androlib.res.util.ExtFile;
+import brut.androlib.util.DexFileBuilder;
+import brut.directory.DirectoryException;
+import java.io.*;
+import java.util.List;
+import java.util.ListIterator;
+import org.apache.commons.io.IOUtils;
+
+/**
+ * @author Ryszard Wiśniewski <brut.alll@gmail.com>
+ */
+public class SmaliBuilder {
+
+    public static void build(ExtFile smaliDir, File dexFile, boolean debug)
+            throws AndrolibException {
+        new SmaliBuilder(smaliDir, dexFile, debug).build();
+    }
+
+    private SmaliBuilder(ExtFile smaliDir, File dexFile, boolean debug) {
+        mSmaliDir = smaliDir;
+        mDexFile = dexFile;
+        mDebug = debug;
+    }
+
+    private void build() throws AndrolibException {
+        try {
+            mDexBuilder = new DexFileBuilder();
+            for (String fileName : mSmaliDir.getDirectory().getFiles(true)) {
+                buildFile(fileName);
+            }
+            mDexBuilder.writeTo(mDexFile);
+        } catch (IOException ex) {
+            throw new AndrolibException(ex);
+        } catch (DirectoryException ex) {
+            throw new AndrolibException(ex);
+        }
+    }
+
+    private void buildFile(String fileName) throws AndrolibException,
+            IOException {
+        File inFile = new File(mSmaliDir, fileName);
+        InputStream inStream = new FileInputStream(inFile);
+
+        if (fileName.endsWith(".smali")) {
+            mDexBuilder.addSmaliFile(inFile);
+            return;
+        }
+        if (! fileName.endsWith(".java")) {
+            throw new AndrolibException("Unknown file type: " + inFile);
+        }
+
+        StringBuilder out = new StringBuilder();
+        List<String> lines = IOUtils.readLines(inStream);
+
+        if (!mDebug) {
+            final String[] linesArray = lines.toArray(new String[0]);
+            for (int i = 2; i < linesArray.length - 2; i++) {
+                out.append(linesArray[i]).append('\n');
+            }
+        } else {
+            lines.remove(lines.size() - 1);
+            lines.remove(lines.size() - 1);
+            ListIterator<String> it = lines.listIterator(2);
+
+            out.append(".source \"").append(inFile.getName()).append("\"\n");
+            while (it.hasNext()) {
+                String line = it.next().trim();
+                if (line.isEmpty() || line.charAt(0) == '#' ||
+                        line.startsWith(".source")) {
+                    continue;
+                }
+                if (line.startsWith(".method ")) {
+                    it.previous();
+                    DebugInjector.inject(it, out);
+                    continue;
+                }
+
+                out.append(line).append('\n');
+            }
+        }
+        mDexBuilder.addSmaliFile(
+            IOUtils.toInputStream(out.toString()), fileName);
+    }
+
+    private final ExtFile mSmaliDir;
+    private final File mDexFile;
+    private final boolean mDebug;
+
+    private DexFileBuilder mDexBuilder;
+}
