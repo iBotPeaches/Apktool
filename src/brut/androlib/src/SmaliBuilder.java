@@ -18,7 +18,6 @@ package brut.androlib.src;
 
 import brut.androlib.AndrolibException;
 import brut.androlib.res.util.ExtFile;
-import brut.androlib.util.DexFileBuilder;
 import brut.directory.DirectoryException;
 import java.io.*;
 import java.util.List;

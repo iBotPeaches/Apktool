@@ -14,7 +14,7 @@
  *  limitations under the License.
  *  under the License.
  */
-package brut.androlib.util;
+package brut.androlib.src;
 
 import brut.androlib.AndrolibException;
 import java.io.*;
