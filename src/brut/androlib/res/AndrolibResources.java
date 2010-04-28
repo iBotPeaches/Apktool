@@ -365,7 +365,7 @@ final public class AndrolibResources {
             out.append(c);
         }
 
-        if (space) {
+        if (space && out.charAt(out.length() - 1) == ' ') {
             out.deleteCharAt(out.length() - 1);
             out.append("\\u0020");
         }
