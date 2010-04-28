@@ -44,6 +44,9 @@ final public class AndrolibResources {
         if (! resTable.hasPackage(1)) {
             decodeArsc(resTable, new ExtFile(getAndroidResourcesFile()), false);
         }
+        if (! resTable.hasPackage(2)) {
+            decodeArsc(resTable, new ExtFile(getHtcResourcesFile()), false);
+        }
         return resTable;
     }
 
@@ -87,7 +90,7 @@ final public class AndrolibResources {
     public void aaptPackage(File apkFile, File manifest, File resDir,
             File rawDir, File assetDir, boolean update, boolean framework)
             throws AndrolibException {
-        String[] cmd = new String[14];
+        String[] cmd = new String[16];
         int i = 0;
         cmd[i++] = "aapt";
         cmd[i++] = "p";
@@ -103,6 +106,8 @@ final public class AndrolibResources {
             } else {
                 cmd[i++] = "-I";
                 cmd[i++] = getAndroidResourcesFile().getAbsolutePath();
+                cmd[i++] = "-I";
+                cmd[i++] = getHtcResourcesFile().getAbsolutePath();
             }
             cmd[i++] = "-S";
             cmd[i++] = resDir.getAbsolutePath();
@@ -303,6 +308,15 @@ final public class AndrolibResources {
     private File getAndroidResourcesFile() throws AndrolibException {
         try {
             return Jar.getResourceAsFile("/brut/androlib/android-framework.jar");
+        } catch (BrutException ex) {
+            throw new AndrolibException(ex);
+        }
+    }
+
+    private File getHtcResourcesFile() throws AndrolibException {
+        try {
+            return Jar.getResourceAsFile(
+                "/brut/androlib/com.htc.resources.apk");
         } catch (BrutException ex) {
             throw new AndrolibException(ex);
         }
