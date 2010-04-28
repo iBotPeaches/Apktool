@@ -52,7 +52,8 @@ public class ResReferenceValue extends ResIntValue {
         return
             (mTheme ? '?' : '@') +
             (newId ? "+" : "") +
-            spec.getFullName(mPackage, mTheme);
+            spec.getFullName(mPackage,
+                mTheme && spec.getType().getName().equals("attr"));
     }
 
     public ResResSpec getReferent() throws AndrolibException {
