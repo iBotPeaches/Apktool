@@ -24,7 +24,10 @@ import brut.util.Duo;
 import brut.util.ExtDataInput;
 import com.mindprod.ledatastream.LEDataInputStream;
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
+import org.apache.commons.io.input.CountingInputStream;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
@@ -33,13 +36,34 @@ public class ARSCDecoder {
     public static ResPackage[] decode(InputStream arscStream, ResTable resTable)
             throws AndrolibException {
         try {
-            return new ARSCDecoder(arscStream, resTable).readTable();
+            return new ARSCDecoder(arscStream, resTable, false).readTable();
         } catch (IOException ex) {
             throw new AndrolibException("Could not decode arsc file", ex);
         }
     }
 
-    private ARSCDecoder(InputStream arscStream, ResTable resTable) {
+    public static List<FlagsOffset> findFlagsOffsets(InputStream arscStream)
+            throws AndrolibException {
+        try {
+            ResTable resTable = new ResTable();
+            ARSCDecoder decoder = new ARSCDecoder(arscStream, resTable, true);
+            decoder.readTable();
+            return decoder.mFlagsOffsets;
+        } catch (IOException ex) {
+            throw new AndrolibException("Could not decode arsc file", ex);
+        }
+
+    }
+
+    private ARSCDecoder(InputStream arscStream, ResTable resTable,
+            boolean storeFlagsOffsets) {
+        if (storeFlagsOffsets) {
+            arscStream = mCountIn = new CountingInputStream(arscStream);
+            mFlagsOffsets = new ArrayList<FlagsOffset>();
+        } else {
+            mCountIn = null;
+            mFlagsOffsets = null;
+        }
         mIn = new ExtDataInput(new LEDataInputStream(arscStream));
         mResTable = resTable;
     }
@@ -87,6 +111,10 @@ public class ARSCDecoder {
         byte id =  mIn.readByte();
         mIn.skipBytes(3);
         int entryCount = mIn.readInt();
+
+        if (mFlagsOffsets != null) {
+            mFlagsOffsets.add(new FlagsOffset(mCountIn.getCount(), entryCount));
+        }
         /*flags*/ mIn.skipBytes(entryCount * 4);
 
         mResId = (0xff000000 & mResId) | id << 16;
@@ -245,6 +273,8 @@ public class ARSCDecoder {
 
     private final ExtDataInput mIn;
     private final ResTable mResTable;
+    private final CountingInputStream mCountIn;
+    private final List<FlagsOffset> mFlagsOffsets;
 
     private Header mHeader;
     private StringBlock mTableStrings;
@@ -285,6 +315,16 @@ public class ARSCDecoder {
             TYPE_PACKAGE = 0x0200,
             TYPE_TYPE = 0x0202,
             TYPE_CONFIG = 0x0201;
+    }
+
+    public static class FlagsOffset {
+        public final int offset;
+        public final int count;
+
+        public FlagsOffset(int offset, int count) {
+            this.offset = offset;
+            this.count = count;
+        }
     }
 
     private static final Logger LOGGER =
