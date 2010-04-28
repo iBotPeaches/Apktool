@@ -312,14 +312,51 @@ final public class AndrolibResources {
         if (value.isEmpty()) {
             return value;
         }
-        value = value.replace("'", "\\'");
-        value = value.replace("\"", "\\\"");
-        value = value.replace("\n", "\\n");
-        char c = value.charAt(0);
-        if (c == '@' || c == '#' || c == '?') {
-            return '\\' + value;
+
+        StringBuilder out = new StringBuilder(value.length() + 10);
+        char[] chars = value.toCharArray();
+
+        switch (chars[0]) {
+            case '@':
+            case '#':
+            case '?':
+                out.append('\\');
         }
-        return value;
+
+        boolean space = true;
+        for (int i = 0; i < chars.length; i++) {
+            char c = chars[i];
+
+            if (c == ' ') {
+                if (space) {
+                    out.append("\\u0020");
+                } else {
+                    out.append(c);
+                    space = true;
+                }
+                continue;
+            }
+
+            space = false;
+            switch (c) {
+                case '\\':
+                case '\'':
+                case '"':
+                    out.append('\\');
+                    break;
+                case '\n':
+                    out.append("\\n");
+                    continue;
+            }
+            out.append(c);
+        }
+
+        if (space) {
+            out.deleteCharAt(out.length() - 1);
+            out.append("\\u0020");
+        }
+
+        return out.toString();
     }
 
     private final static Logger LOGGER =
