@@ -161,8 +161,9 @@ public class DebugInjector {
         if (
             line2.startsWith("line ") ||
             line2.equals("prologue") ||
+            line2.startsWith("parameter") ||
             line2.startsWith("local ") ||
-            line2.startsWith("parameter")
+            line2.startsWith("end local ")
         ) {
             return false;
         }
