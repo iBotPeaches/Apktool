@@ -22,6 +22,7 @@ import java.io.*;
 import org.jf.baksmali.Adaptors.ClassDefinition;
 import org.jf.baksmali.baksmali;
 import org.jf.dexlib.ClassDefItem;
+import org.jf.dexlib.Code.Analysis.ClassPath;
 import org.jf.dexlib.DexFile;
 
 /**
@@ -44,6 +45,10 @@ public class SmaliDecoder {
         try {
             baksmali.useLocalsDirective = true;
             baksmali.useSequentialLabels = true;
+            if (mDebug) {
+                baksmali.registerInfo = org.jf.baksmali.main.DIFFPRE;
+                ClassPath.dontLoadClassPath = true;
+            }
 
             DexFile dexFile = new DexFile(mApkFile);
             for (ClassDefItem classDefItem :

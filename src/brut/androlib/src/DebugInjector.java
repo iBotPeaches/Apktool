@@ -17,7 +17,10 @@
 package brut.androlib.src;
 
 import brut.androlib.AndrolibException;
-import java.util.ListIterator;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.jf.dexlib.Code.Analysis.RegisterType;
 import org.jf.dexlib.Code.Opcode;
 
 /**
@@ -76,7 +79,7 @@ public class DebugInjector {
 
         switch (line.charAt(0)) {
             case '#':
-                return false;
+                return processComment(line);
             case ':':
                 append(line);
                 return false;
@@ -85,6 +88,72 @@ public class DebugInjector {
             default:
                 return processInstruction(line);
         }
+    }
+
+    private boolean processComment(String line) {
+        if (mFirstInstruction) {
+            return false;
+        }
+
+        Matcher m = REGISTER_INFO_PATTERN.matcher(line);
+
+        while (m.find()) {
+            String localName = m.group(1);
+            String localType = null;
+            switch (RegisterType.Category.valueOf(m.group(2))) {
+                case Reference:
+                case Null:
+                case UninitRef:
+                case UninitThis:
+                    localType = "Ljava/lang/Object;";
+                    break;
+                case Boolean:
+                    localType = "Z";
+                    break;
+                case Integer:
+                case One:
+                case Unknown:
+                    localType = "I";
+                    break;
+                case Uninit:
+                case Conflicted:
+                    if (mInitializedRegisters.remove(localName)) {
+                        mOut.append(".end local ").append(localName)
+                            .append('\n');
+                    }
+                    continue;
+                case Short:
+                case PosShort:
+                    localType = "S";
+                    break;
+                case Byte:
+                case PosByte:
+                    localType = "B";
+                    break;
+                case Char:
+                    localType = "C";
+                    break;
+                case Float:
+                    localType = "F";
+                    break;
+                case LongHi:
+                case LongLo:
+                    localType = "J";
+                    break;
+                case DoubleHi:
+                case DoubleLo:
+                    localType = "D";
+                    break;
+                default:
+                    assert false;
+            }
+
+            mInitializedRegisters.add(localName);
+            mOut.append(".local ").append(localName).append(", ")
+                .append(localName).append(':').append(localType).append('\n');
+        }
+
+        return false;
     }
 
     private boolean processDirective(String line) {
@@ -126,82 +195,7 @@ public class DebugInjector {
         mOut.append(".line ").append(mIt.nextIndex()).append('\n')
             .append(line).append('\n');
 
-        int pos = line.indexOf(' ');
-        if (pos == -1) {
-            return false;
-        }
-        Opcode opcode = Opcode.getOpcodeByName(line.substring(0, pos));
-        if (! opcode.setsRegister()) {
-            return false;
-        }
-
-        int pos2 = line.indexOf(',', pos);
-        String register = pos2 == -1 ? line.substring(pos + 1) :
-            line.substring(pos + 1, pos2);
-
-        mOut.append(".local ").append(register).append(", ").append(register)
-            .append(':').append(getRegisterTypeForOpcode(opcode)).append('\n');
-
         return false;
-    }
-
-    private String getRegisterTypeForOpcode(Opcode opcode) {
-        switch (opcode.value) {
-            case (byte)0x0d: // ?
-            case (byte)0x1a:
-            case (byte)0x1b:
-            case (byte)0x1c: // ?
-            case (byte)0x22:
-            case (byte)0x23: // ?
-            case (byte)0xf4: // ?
-                return "Ljava/lang/Object;";
-            case (byte)0x1f: // ?
-            case (byte)0x20: // ?
-                return "Z";
-            case (byte)0x21: // ?
-                return "I";
-        }
-
-        String name = opcode.name;
-        int pos = name.lastIndexOf('-');
-        if (pos != -1) {
-            int pos2 = name.indexOf('/');
-            String type = pos2 == -1 ? name.substring(pos + 1) :
-                name.substring(pos + 1, pos2);
-
-            if (type.equals("object")) {
-                return "Ljava/lang/Object;";
-            }
-            if (type.equals("int")) {
-                return "I";
-            }
-            if (type.equals("boolean")) {
-                return "Z";
-            }
-            if (type.equals("float")) {
-                return "F";
-            }
-            if (type.equals("double")) {
-                return "D";
-            }
-            if (type.equals("long")) {
-                return "J";
-            }
-            if (type.equals("byte")) {
-                return "B";
-            }
-            if (type.equals("char")) {
-                return "C";
-            }
-            if (type.equals("short")) {
-                return "S";
-            }
-            if (type.equals("long")) {
-                return "J";
-            }
-        }
-
-        return "I";
     }
 
     private String next() {
@@ -222,4 +216,8 @@ public class DebugInjector {
     private final StringBuilder mOut;
 
     private boolean mFirstInstruction = true;
+    private final Set<String> mInitializedRegisters = new HashSet<String>();
+
+    private static final Pattern REGISTER_INFO_PATTERN =
+        Pattern.compile("((?:p|v)\\d+)=\\(([^)]+)\\);");
 }
