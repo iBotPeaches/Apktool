@@ -182,8 +182,13 @@ public class TypeName {
                 internal = internal.substring(1, pos);
 
                 pos = internal.lastIndexOf('/');
-                package_ = internal.substring(0, pos).replace('/', '.');
-                type = internal.substring(pos + 1);
+                if (pos == -1) {
+                    package_ = "";
+                    type = internal;
+                } else {
+                    package_ = internal.substring(0, pos).replace('/', '.');
+                    type = internal.substring(pos + 1);
+                }
 
                 pos = type.indexOf('$');
                 if (pos != -1) {
