@@ -23,6 +23,8 @@ import brut.directory.DirectoryException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
@@ -71,17 +73,20 @@ public class ResFileDecoder {
             in.close();
             out.close();
         } catch (AndrolibException ex) {
-            throw new AndrolibException(String.format(
+            LOGGER.log(Level.SEVERE, String.format(
                 "Could not decode file \"%s\" to \"%s\"",
                 inFileName, outFileName), ex);
         } catch (IOException ex) {
-            throw new AndrolibException(String.format(
+            LOGGER.log(Level.SEVERE, String.format(
                 "Could not decode file \"%s\" to \"%s\"",
                 inFileName, outFileName), ex);
         } catch (DirectoryException ex) {
-            throw new AndrolibException(String.format(
+            LOGGER.log(Level.SEVERE, String.format(
                 "Could not decode file \"%s\" to \"%s\"",
                 inFileName, outFileName), ex);
         }
     }
+
+    private final static Logger LOGGER =
+        Logger.getLogger(ResFileDecoder.class.getName());
 }
