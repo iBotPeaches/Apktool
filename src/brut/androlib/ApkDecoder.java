@@ -19,6 +19,8 @@ package brut.androlib;
 import brut.androlib.res.data.ResTable;
 import brut.androlib.res.util.ExtFile;
 import brut.common.BrutException;
+import brut.directory.Directory;
+import brut.directory.DirectoryException;
 import brut.util.OS;
 import java.io.File;
 
@@ -61,24 +63,36 @@ public class ApkDecoder {
         }
         outDir.mkdirs();
 
-        switch (mDecodeSources) {
-            case DECODE_SOURCES_NONE:
-                mAndrolib.decodeSourcesRaw(mApkFile, outDir, mDebug);
-                break;
-            case DECODE_SOURCES_SMALI:
-                mAndrolib.decodeSourcesSmali(mApkFile, outDir, mDebug);
-                break;
-            case DECODE_SOURCES_JAVA:
-                mAndrolib.decodeSourcesJava(mApkFile, outDir, mDebug);
-                break;
+        Directory apk = null;
+        try {
+            apk = mApkFile.getDirectory();
+        } catch (DirectoryException ex) {
+            throw new AndrolibException(ex);
         }
-        switch (mDecodeResources) {
-            case DECODE_RESOURCES_NONE:
-                mAndrolib.decodeResourcesRaw(mApkFile, outDir);
-                break;
-            case DECODE_RESOURCES_FULL:
-                mAndrolib.decodeResourcesFull(mApkFile, outDir, getResTable());
-                break;
+
+        if (apk.containsFile("classes.dex")) {
+            switch (mDecodeSources) {
+                case DECODE_SOURCES_NONE:
+                    mAndrolib.decodeSourcesRaw(mApkFile, outDir, mDebug);
+                    break;
+                case DECODE_SOURCES_SMALI:
+                    mAndrolib.decodeSourcesSmali(mApkFile, outDir, mDebug);
+                    break;
+                case DECODE_SOURCES_JAVA:
+                    mAndrolib.decodeSourcesJava(mApkFile, outDir, mDebug);
+                    break;
+            }
+        }
+        if (apk.containsFile("resources.arsc")) {
+            switch (mDecodeResources) {
+                case DECODE_RESOURCES_NONE:
+                    mAndrolib.decodeResourcesRaw(mApkFile, outDir);
+                    break;
+                case DECODE_RESOURCES_FULL:
+                    mAndrolib.decodeResourcesFull(mApkFile, outDir,
+                        getResTable());
+                    break;
+            }
         }
         mAndrolib.decodeRawFiles(mApkFile, outDir);
     }

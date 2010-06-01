@@ -53,10 +53,8 @@ public class Androlib {
                 LOGGER.warning("Debug mode not available.");
             }
             Directory apk = apkFile.getDirectory();
-            if (apk.containsFile("classes.dex")) {
-                LOGGER.info("Copying raw classes.dex file...");
-                apkFile.getDirectory().copyToDir(outDir, "classes.dex");
-            }
+            LOGGER.info("Copying raw classes.dex file...");
+            apkFile.getDirectory().copyToDir(outDir, "classes.dex");
         } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
         }
@@ -85,11 +83,8 @@ public class Androlib {
             throws AndrolibException {
         try {
             Directory apk = apkFile.getDirectory();
-            if (apk.containsFile("resources.arsc")) {
-                LOGGER.info("Copying raw resources...");
-                apkFile.getDirectory().copyToDir(
-                    outDir, APK_RESOURCES_FILENAMES);
-            }
+            LOGGER.info("Copying raw resources...");
+            apkFile.getDirectory().copyToDir(outDir, APK_RESOURCES_FILENAMES);
         } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
         }
