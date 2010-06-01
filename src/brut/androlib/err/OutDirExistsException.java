@@ -14,7 +14,9 @@
  *  limitations under the License.
  *  under the License.
  */
-package brut.androlib;
+package brut.androlib.err;
+
+import brut.androlib.AndrolibException;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>

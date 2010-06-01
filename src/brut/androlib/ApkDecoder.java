@@ -16,6 +16,7 @@
  */
 package brut.androlib;
 
+import brut.androlib.err.OutDirExistsException;
 import brut.androlib.res.data.ResTable;
 import brut.androlib.res.util.ExtFile;
 import brut.common.BrutException;
