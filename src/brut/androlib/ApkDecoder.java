@@ -56,6 +56,11 @@ public class ApkDecoder {
 
     public void decode() throws AndrolibException {
         File outDir = getOutDir();
+
+        if (! mForceDelete && outDir.exists()) {
+            throw new OutDirExistsException();
+        }
+
         try {
             OS.rmdir(outDir);
         } catch (BrutException ex) {
@@ -116,6 +121,10 @@ public class ApkDecoder {
         mDebug = debug;
     }
 
+    public void setForceDelete(boolean forceDelete) {
+        mForceDelete = forceDelete;
+    }
+
     public ResTable getResTable() throws AndrolibException {
         if (mResTable == null) {
             mResTable = mAndrolib.getResTable(mApkFile);
@@ -147,4 +156,5 @@ public class ApkDecoder {
     private short mDecodeSources = DECODE_SOURCES_SMALI;
     private short mDecodeResources = DECODE_RESOURCES_FULL;
     private boolean mDebug = false;
+    private boolean mForceDelete = false;
 }
