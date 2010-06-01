@@ -82,8 +82,14 @@ final public class AndrolibResources {
                 "Arsc files with zero or multiple packages");
         }
 
-        resTable.addPackage(pkgs[0], false);
-        return pkgs[0];
+        ResPackage pkg = pkgs[0];
+        if (pkg.getId() != id) {
+            throw new AndrolibException("Expected pkg of id: " +
+                String.valueOf(id) + ", got: " + pkg.getId());
+        }
+
+        resTable.addPackage(pkg, false);
+        return pkg;
     }
 
     public void decode(ResTable resTable, ExtFile apkFile, File outDir)
