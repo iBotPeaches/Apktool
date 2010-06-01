@@ -18,8 +18,11 @@
 package brut.androlib.res.decoder;
 
 import brut.androlib.AndrolibException;
+import brut.androlib.res.data.ResResource;
+import brut.androlib.res.data.value.ResFileValue;
 import brut.directory.Directory;
 import brut.directory.DirectoryException;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -36,32 +39,42 @@ public class ResFileDecoder {
         this.mDecoders = decoders;
     }
 
-    public void decode(Directory inDir, String inFileName, Directory outDir,
-            String outResName) throws AndrolibException {
-        String ext = "";
+    public void decode(ResResource res, Directory inDir, Directory outDir,
+            Directory out9Patch) throws AndrolibException {
+
+        ResFileValue fileValue = (ResFileValue) res.getValue();
+        String inFileName = fileValue.getStrippedPath();
+        String outResName = res.getFilePath();
+        String typeName = res.getResSpec().getType().getName();
+
+        String ext = null;
+        String outFileName;
         int extPos = inFileName.lastIndexOf(".");
-        if (extPos != -1) {
+        if (extPos == -1) {
+            outFileName = outResName;
+        } else {
             ext = inFileName.substring(extPos);
+            outFileName = outResName + ext;
         }
 
-        if (inFileName.startsWith("raw/")) {
-            decode(inDir, inFileName, outDir, outResName + ext, "raw");
+        if (typeName.equals("raw")) {
+            decode(inDir, inFileName, outDir, outFileName, "raw");
             return;
         }
-        if (inFileName.endsWith(".9.png")) {
-            decode(inDir, inFileName, outDir, outResName + ".png", "raw");
-            return;
+        if (typeName.equals("drawable")) {
+            if (inFileName.toLowerCase().endsWith(".9.png")) {
+                outFileName = outResName + ".png";
+                decode(inDir, inFileName, outDir, outFileName, "raw");
+                decode(inDir, inFileName, out9Patch, outFileName, "raw");
+                return;
+            }
+            if (! ext.equals(".xml")) {
+                decode(inDir, inFileName, outDir, outFileName, "raw");
+                return;
+            }
         }
-        if (inFileName.endsWith(".xml")) {
-            decode(inDir, inFileName, outDir, outResName + ".xml", "xml");
-            return;
-        }
-//        if (inFileName.endsWith(".html")) {
-//            decode(inDir, inFileName, outDir, outResName + ".html", "xml");
-//            return;
-//        }
 
-        decode(inDir, inFileName, outDir, outResName + ext, "raw");
+        decode(inDir, inFileName, outDir, outFileName, "xml");
     }
 
     public void decode(Directory inDir, String inFileName, Directory outDir,
