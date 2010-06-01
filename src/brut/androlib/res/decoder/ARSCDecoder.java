@@ -24,8 +24,7 @@ import brut.util.Duo;
 import brut.util.ExtDataInput;
 import com.mindprod.ledatastream.LEDataInputStream;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Logger;
 import org.apache.commons.io.input.CountingInputStream;
 
@@ -112,6 +111,9 @@ public class ARSCDecoder {
         mIn.skipBytes(3);
         int entryCount = mIn.readInt();
 
+        mMissingResSpecs = new boolean[entryCount];
+        Arrays.fill(mMissingResSpecs, true);
+
         if (mFlagsOffsets != null) {
             mFlagsOffsets.add(new FlagsOffset(mCountIn.getCount(), entryCount));
         }
@@ -124,6 +126,8 @@ public class ARSCDecoder {
         while (nextChunk().type == Header.TYPE_CONFIG) {
             readConfig();
         }
+
+        addMissingResSpecs();
 
         return mType;
     }
@@ -148,6 +152,7 @@ public class ARSCDecoder {
 
         for (int i = 0; i < entryOffsets.length; i++) {
             if (entryOffsets[i] != -1) {
+                mMissingResSpecs[i] = false;
                 mResId = (mResId & 0xffff0000) | i;
                 readEntry();
             }
@@ -253,6 +258,28 @@ public class ARSCDecoder {
             screenWidth, screenHeight, screenLayout, sdkVersion);
     }
 
+    private void addMissingResSpecs() throws AndrolibException {
+        int resId = mResId & 0xffff0000;
+
+        for (int i = 0; i < mMissingResSpecs.length; i++) {
+            if (! mMissingResSpecs[i]) {
+                continue;
+            }
+
+            ResResSpec spec = new ResResSpec(new ResID(resId | i),
+                String.format("APKTOOL_DUMMY_%04x", i), mPkg, mType);
+            mPkg.addResSpec(spec);
+            mType.addResSpec(spec);
+
+            ResValue value = new ResBoolValue(false);
+            ResResource res = new ResResource(
+                mPkg.getConfig(new ResConfigFlags()), spec, value);
+            mPkg.addResource(res);
+            mConfig.addResource(res);
+            spec.addResource(res);
+        }
+    }
+
     private Header nextChunk() throws IOException {
         return mHeader = Header.read(mIn);
     }
@@ -284,6 +311,7 @@ public class ARSCDecoder {
     private ResType mType;
     private ResConfig mConfig;
     private int mResId;
+    private boolean[] mMissingResSpecs;
 
 
     private final static short ENTRY_FLAG_COMPLEX = 0x0001;
