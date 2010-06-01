@@ -42,7 +42,6 @@ public class Androlib {
     private final AndrolibResources mAndRes = new AndrolibResources();
 
     public ResTable getResTable(ExtFile apkFile) throws AndrolibException {
-        LOGGER.info("Decoding resource table...");
         return mAndRes.getResTable(apkFile);
     }
 

@@ -125,9 +125,17 @@ public class ApkDecoder {
         mForceDelete = forceDelete;
     }
 
+    public void setFrameworkTag(String tag) {
+        mFrameTag = tag;
+        if (mResTable != null) {
+            mResTable.setFrameTag(tag);
+        }
+    }
+
     public ResTable getResTable() throws AndrolibException {
         if (mResTable == null) {
             mResTable = mAndrolib.getResTable(mApkFile);
+            mResTable.setFrameTag(mFrameTag);
         }
         return mResTable;
     }
@@ -157,4 +165,5 @@ public class ApkDecoder {
     private short mDecodeResources = DECODE_RESOURCES_FULL;
     private boolean mDebug = false;
     private boolean mForceDelete = false;
+    private String mFrameTag;
 }

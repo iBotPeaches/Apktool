@@ -18,6 +18,7 @@
 package brut.androlib.res;
 
 import brut.androlib.AndrolibException;
+import brut.androlib.err.CantFindFrameworkResException;
 import brut.androlib.res.data.*;
 import brut.androlib.res.data.value.ResXmlSerializable;
 import brut.androlib.res.decoder.*;
@@ -27,8 +28,7 @@ import brut.common.BrutException;
 import brut.directory.*;
 import brut.util.*;
 import java.io.*;
-import java.util.Arrays;
-import java.util.Iterator;
+import java.util.*;
 import java.util.logging.Logger;
 import org.apache.commons.io.IOUtils;
 import org.xmlpull.v1.XmlSerializer;
@@ -38,15 +38,52 @@ import org.xmlpull.v1.XmlSerializer;
  */
 final public class AndrolibResources {
     public ResTable getResTable(ExtFile apkFile) throws AndrolibException {
-        ResTable resTable = new ResTable();
-        decodeArsc(resTable, apkFile, true);
-        if (! resTable.hasPackage(1)) {
-            decodeArsc(resTable, new ExtFile(getAndroidResourcesFile()), false);
-        }
-        if (! resTable.hasPackage(2)) {
-            decodeArsc(resTable, new ExtFile(getHtcResourcesFile()), false);
-        }
+        ResTable resTable = new ResTable(this);
+        loadMainPkg(resTable, apkFile);
         return resTable;
+    }
+
+    public ResPackage loadMainPkg(ResTable resTable, ExtFile apkFile)
+            throws AndrolibException {
+        LOGGER.info("Loading resource table...");
+        ResPackage[] pkgs = getResPackagesFromApk(apkFile, resTable);
+        ResPackage pkg = null;
+
+        switch (pkgs.length) {
+            case 1:
+                pkg = pkgs[0];
+                break;
+            case 2:
+                if (pkgs[0].getName().equals("android")) {
+                    LOGGER.warning("Skipping \"android\" package group");
+                    pkg = pkgs[1];
+                }
+                break;
+        }
+
+        if (pkg == null) {
+            throw new AndrolibException(
+                "Arsc files with zero or multiple packages");
+        }
+
+        resTable.addPackage(pkg, true);
+        return pkg;
+    }
+
+    public ResPackage loadFrameworkPkg(ResTable resTable, int id,
+            String frameTag) throws AndrolibException {
+        File apk = getFrameworkApk(id, frameTag);
+
+        LOGGER.info("Loading resource table from file: " + apk);
+        ResPackage[] pkgs = getResPackagesFromApk(new ExtFile(apk), resTable);
+
+        if (pkgs.length != 1) {
+            throw new AndrolibException(
+                "Arsc files with zero or multiple packages");
+        }
+
+        resTable.addPackage(pkgs[0], false);
+        return pkgs[0];
     }
 
     public void decode(ResTable resTable, ExtFile apkFile, File outDir)
@@ -246,37 +283,69 @@ final public class AndrolibResources {
         }
     }
 
-    private void decodeArsc(ResTable resTable, ExtFile apkFile, boolean main)
-            throws AndrolibException {
+    private ResPackage[] getResPackagesFromApk(ExtFile apkFile,
+            ResTable resTable) throws AndrolibException {
         try {
-            loadArsc(resTable, apkFile.getDirectory()
-                .getFileInput("resources.arsc"), main);
+            return ARSCDecoder.decode(
+                apkFile.getDirectory().getFileInput("resources.arsc"),
+                resTable);
         } catch (DirectoryException ex) {
             throw new AndrolibException(
                 "Could not load resources.arsc from file: " + apkFile, ex);
         }
-
     }
 
-    private void loadArsc(ResTable resTable, InputStream arscStream,
-            boolean main) throws AndrolibException {
-        ResPackage[] groups = ARSCDecoder.decode(arscStream, resTable);
-        
-        if (groups.length == 0) {
-            throw new AndrolibException(
-                "Arsc file with zero package groups");
+    private File getFrameworkApk(int id, String frameTag)
+            throws AndrolibException {
+        File dir = getFrameworkDir();
+
+        File apk = new File(dir, String.valueOf(id) + '-' + frameTag + ".apk");
+        if (apk.exists()) {
+            return apk;
         }
-        if (groups.length > 1) {
-            LOGGER.warning("Arsc file with multiple package groups");
+
+        apk = new File(dir, String.valueOf(id) + ".apk");
+        if (apk.exists()) {
+            return apk;
         }
-        for (int i = 0; i < groups.length; i++) {
-            if (groups.length != 1 && i == 0
-                    && "android".equals(groups[i].getName())) {
-                LOGGER.warning("Skipping \"android\" package group");
-                continue;
+
+        if (id == 1) {
+            InputStream in = null;
+            OutputStream out = null;
+            try {
+                in = AndrolibResources.class.getResourceAsStream(
+                    "/brut/androlib/android-framework.jar");
+                out = new FileOutputStream(apk);
+                IOUtils.copy(in, out);
+                return apk;
+            } catch (IOException ex) {
+                throw new AndrolibException(ex);
+            } finally {
+                if (in != null) {
+                    try {
+                        in.close();
+                    } catch (IOException ex) {}
+                }
+                if (out != null) {
+                    try {
+                        out.close();
+                    } catch (IOException ex) {}
+                }
             }
-            resTable.addPackage(groups[i], main);
         }
+
+        throw new CantFindFrameworkResException(id);
+    }
+
+    private File getFrameworkDir() throws AndrolibException {
+        File dir = new File(System.getProperty("user.home") +
+            File.separatorChar + "apktool" + File.separatorChar + "framework");
+        if (! dir.exists()) {
+            if (! dir.mkdirs()) {
+                throw new AndrolibException("Can't create directory: " + dir);
+            }
+        }
+        return dir;
     }
 
     private File getAndroidResourcesFile() throws AndrolibException {

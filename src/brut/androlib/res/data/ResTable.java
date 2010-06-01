@@ -19,16 +19,16 @@ package brut.androlib.res.data;
 
 import brut.androlib.AndrolibException;
 import brut.androlib.err.UndefinedResObject;
+import brut.androlib.res.AndrolibResources;
 import brut.androlib.res.data.value.ResValue;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
 public class ResTable {
+    private final AndrolibResources mAndRes;
+
     private final Map<Integer, ResPackage> mPackagesById =
         new HashMap<Integer, ResPackage>();
     private final Map<String, ResPackage> mPackagesByName =
@@ -36,7 +36,14 @@ public class ResTable {
     private final Set<ResPackage> mMainPackages =
         new LinkedHashSet<ResPackage>();
 
+    private String mFrameTag;
+
     public ResTable() {
+        mAndRes = null;
+    }
+
+    public ResTable(AndrolibResources andRes) {
+        mAndRes = andRes;
     }
 
     public ResResSpec getResSpec(int resID) throws AndrolibException {
@@ -53,11 +60,13 @@ public class ResTable {
 
     public ResPackage getPackage(int id) throws AndrolibException {
         ResPackage pkg = mPackagesById.get(id);
-        if (pkg == null) {
-            throw new UndefinedResObject(String.format(
-                "package: id=%d", id));
+        if (pkg != null) {
+            return pkg;
         }
-        return pkg;
+        if (mAndRes != null) {
+            return mAndRes.loadFrameworkPkg(this, id, mFrameTag);
+        }
+        throw new UndefinedResObject(String.format("package: id=%d", id));
     }
 
     public ResPackage getPackage(String name) throws AndrolibException {
@@ -99,5 +108,9 @@ public class ResTable {
         if (main) {
             mMainPackages.add(pkg);
         }
+    }
+
+    public void setFrameTag(String tag) {
+        mFrameTag = tag;
     }
 }
