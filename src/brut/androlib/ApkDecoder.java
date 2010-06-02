@@ -24,6 +24,8 @@ import brut.directory.Directory;
 import brut.directory.DirectoryException;
 import brut.util.OS;
 import java.io.File;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
@@ -101,6 +103,7 @@ public class ApkDecoder {
             }
         }
         mAndrolib.decodeRawFiles(mApkFile, outDir);
+        writeMetaFile();
     }
 
     public void setDecodeSources(short mode) throws AndrolibException {
@@ -155,6 +158,12 @@ public class ApkDecoder {
             throw new AndrolibException("Out dir not set");
         }
         return mOutDir;
+    }
+
+    private void writeMetaFile() throws AndrolibException {
+        Map<String, Object> meta = new LinkedHashMap<String, Object>();
+        meta.put("version", Androlib.getVersion());
+        mAndrolib.writeMetaFile(mOutDir, meta);
     }
 
     private final Androlib mAndrolib;

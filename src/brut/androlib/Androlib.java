@@ -33,7 +33,10 @@ import java.io.*;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel.MapMode;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.Yaml;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
@@ -111,6 +114,37 @@ public class Androlib {
         }
     }
 
+    public void writeMetaFile(File mOutDir, Map<String, Object> meta)
+            throws AndrolibException {
+        DumperOptions options = new DumperOptions();
+        options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+        options.setIndent(4);
+        Yaml yaml = new Yaml(options);
+        try {
+            yaml.dump(meta, new FileWriter(new File(mOutDir, "apktool.yml")));
+        } catch (IOException ex) {
+            throw new AndrolibException(ex);
+        }
+    }
+
+    public Map<String, Object> readMetaFile(ExtFile appDir)
+            throws AndrolibException {
+        InputStream in = null;
+        try {
+             in = appDir.getDirectory().getFileInput("apktool.yml");
+             Yaml yaml = new Yaml();
+             return (Map<String, Object>) yaml.load(in);
+        } catch (DirectoryException ex) {
+            throw new AndrolibException(ex);
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException ex) {}
+            }
+        }
+    }
+
     public void build(File appDir, boolean forceBuildAll, boolean debug)
             throws AndrolibException {
         build(new ExtFile(appDir), forceBuildAll, debug);
@@ -119,6 +153,7 @@ public class Androlib {
     public void build(ExtFile appDir, boolean forceBuildAll, boolean debug)
             throws AndrolibException {
         boolean framework = mAndRes.detectWhetherAppIsFramework(appDir);
+        Map<String, Object> meta = readMetaFile(appDir);
 
         new File(appDir, APK_DIRNAME).mkdirs();
         buildSources(appDir, forceBuildAll, debug);
