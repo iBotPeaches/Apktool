@@ -163,6 +163,8 @@ public class ApkDecoder {
     private void writeMetaFile() throws AndrolibException {
         Map<String, Object> meta = new LinkedHashMap<String, Object>();
         meta.put("version", Androlib.getVersion());
+        meta.put("isFrameworkApk",
+            Boolean.valueOf(mAndrolib.isFrameworkApk(getResTable())));
         mAndrolib.writeMetaFile(mOutDir, meta);
     }
 

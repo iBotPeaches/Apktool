@@ -19,6 +19,7 @@ package brut.androlib;
 
 import brut.androlib.java.AndrolibJava;
 import brut.androlib.res.AndrolibResources;
+import brut.androlib.res.data.ResPackage;
 import brut.androlib.res.data.ResTable;
 import brut.androlib.res.decoder.ARSCDecoder;
 import brut.androlib.res.decoder.ARSCDecoder.FlagsOffset;
@@ -152,8 +153,8 @@ public class Androlib {
 
     public void build(ExtFile appDir, boolean forceBuildAll, boolean debug)
             throws AndrolibException {
-        boolean framework = mAndRes.detectWhetherAppIsFramework(appDir);
         Map<String, Object> meta = readMetaFile(appDir);
+        boolean framework = (Boolean) meta.get("isFrameworkApk");
 
         new File(appDir, APK_DIRNAME).mkdirs();
         buildSources(appDir, forceBuildAll, debug);
@@ -359,6 +360,15 @@ public class Androlib {
         } catch (IOException ex) {
             throw new AndrolibException(ex);
         }
+    }
+
+    public boolean isFrameworkApk(ResTable resTable) {
+        for (ResPackage pkg : resTable.listMainPackages()) {
+            if (pkg.getId() < 64) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static String getVersion() {
