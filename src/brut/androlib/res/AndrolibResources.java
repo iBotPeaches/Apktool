@@ -304,10 +304,13 @@ final public class AndrolibResources {
     private File getFrameworkApk(int id, String frameTag)
             throws AndrolibException {
         File dir = getFrameworkDir();
+        File apk;
 
-        File apk = new File(dir, String.valueOf(id) + '-' + frameTag + ".apk");
-        if (apk.exists()) {
-            return apk;
+        if (frameTag != null) {
+            apk = new File(dir, String.valueOf(id) + '-' + frameTag + ".apk");
+            if (apk.exists()) {
+                return apk;
+            }
         }
 
         apk = new File(dir, String.valueOf(id) + ".apk");
