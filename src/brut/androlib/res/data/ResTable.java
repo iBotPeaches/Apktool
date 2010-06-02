@@ -35,6 +35,8 @@ public class ResTable {
         new HashMap<String, ResPackage>();
     private final Set<ResPackage> mMainPackages =
         new LinkedHashSet<ResPackage>();
+    private final Set<ResPackage> mFramePackages =
+        new LinkedHashSet<ResPackage>();
 
     private String mFrameTag;
 
@@ -56,6 +58,10 @@ public class ResTable {
 
     public Set<ResPackage> listMainPackages() {
         return mMainPackages;
+    }
+
+    public Set<ResPackage> listFramePackages() {
+        return mFramePackages;
     }
 
     public ResPackage getPackage(int id) throws AndrolibException {
@@ -107,6 +113,8 @@ public class ResTable {
         mPackagesByName.put(name, pkg);
         if (main) {
             mMainPackages.add(pkg);
+        } else {
+            mFramePackages.add(pkg);
         }
     }
 
