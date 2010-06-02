@@ -158,7 +158,8 @@ public class Androlib {
 
         new File(appDir, APK_DIRNAME).mkdirs();
         buildSources(appDir, forceBuildAll, debug);
-        buildResources(appDir, forceBuildAll, framework);
+        buildResources(appDir, forceBuildAll, framework,
+            (Map<String, Object>) meta.get("usesFramework"));
         buildLib(appDir, forceBuildAll);
         buildApk(appDir, framework);
     }
@@ -232,9 +233,11 @@ public class Androlib {
     }
 
     public void buildResources(ExtFile appDir, boolean forceBuildAll,
-            boolean framework) throws AndrolibException {
+            boolean framework, Map<String, Object> usesFramework)
+            throws AndrolibException {
         if (! buildResourcesRaw(appDir, forceBuildAll)
-                && ! buildResourcesFull(appDir, forceBuildAll, framework)) {
+                && ! buildResourcesFull(appDir, forceBuildAll, framework,
+                    usesFramework)) {
             LOGGER.warning("Could not find resources");
         }
     }
@@ -263,7 +266,8 @@ public class Androlib {
     }
 
     public boolean buildResourcesFull(File appDir, boolean forceBuildAll,
-            boolean framework) throws AndrolibException {
+            boolean framework, Map<String, Object> usesFramework)
+            throws AndrolibException {
         try {
             if (! new File(appDir, "res").exists()) {
                 return false;
@@ -288,10 +292,7 @@ public class Androlib {
                     apkFile,
                     new File(appDir, "AndroidManifest.xml"),
                     new File(appDir, "res"),
-                    ninePatch, null,
-                    new File[]{
-                        mAndRes.getAndroidResourcesFile(),
-                        mAndRes.getHtcResourcesFile()},
+                    ninePatch, null, parseUsesFramework(usesFramework),
                     false, framework
                 );
 
@@ -377,6 +378,27 @@ public class Androlib {
 
     public static String getVersion() {
         return VERSION;
+    }
+
+    private File[] parseUsesFramework(Map<String, Object> usesFramework)
+            throws AndrolibException {
+        if (usesFramework == null) {
+            return null;
+        }
+
+        List<Integer> ids = (List<Integer>) usesFramework.get("ids");
+        if (ids == null || ids.isEmpty()) {
+            return null;
+        }
+
+        String tag = (String) usesFramework.get("tag");
+        File[] files = new File[ids.size()];
+        int i = 0;
+        for (int id : ids) {
+            files[i++] = mAndRes.getFrameworkApk(id, tag);
+        }
+
+        return files;
     }
 
     private boolean isModified(File working, File stored) {

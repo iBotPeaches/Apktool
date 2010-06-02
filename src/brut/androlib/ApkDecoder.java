@@ -17,6 +17,7 @@
 package brut.androlib;
 
 import brut.androlib.err.OutDirExistsException;
+import brut.androlib.res.data.ResPackage;
 import brut.androlib.res.data.ResTable;
 import brut.androlib.res.util.ExtFile;
 import brut.common.BrutException;
@@ -24,8 +25,7 @@ import brut.directory.Directory;
 import brut.directory.DirectoryException;
 import brut.util.OS;
 import java.io.File;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
@@ -165,7 +165,30 @@ public class ApkDecoder {
         meta.put("version", Androlib.getVersion());
         meta.put("isFrameworkApk",
             Boolean.valueOf(mAndrolib.isFrameworkApk(getResTable())));
+        putUsesFramework(meta);
         mAndrolib.writeMetaFile(mOutDir, meta);
+    }
+
+    private void putUsesFramework(Map<String, Object> meta) {
+        Set<ResPackage> pkgs = mResTable.listFramePackages();
+        if (pkgs.isEmpty()) {
+            return;
+        }
+
+        Integer[] ids = new Integer[pkgs.size()];
+        int i = 0;
+        for (ResPackage pkg : pkgs) {
+            ids[i++] = pkg.getId();
+        }
+
+        Map<String, Object> uses = new LinkedHashMap<String, Object>();
+        uses.put("ids", ids);
+
+        if (mFrameTag != null) {
+            uses.put("tag", mFrameTag);
+        }
+
+        meta.put("usesFramework", uses);
     }
 
     private final Androlib mAndrolib;

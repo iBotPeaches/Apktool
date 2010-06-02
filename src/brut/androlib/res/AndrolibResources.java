@@ -301,7 +301,7 @@ final public class AndrolibResources {
         }
     }
 
-    private File getFrameworkApk(int id, String frameTag)
+    public File getFrameworkApk(int id, String frameTag)
             throws AndrolibException {
         File dir = getFrameworkDir();
         File apk;
