@@ -326,6 +326,10 @@ public class Androlib {
         }
     }
 
+    public static String getVersion() {
+        return VERSION;
+    }
+
     private boolean isModified(File working, File stored) {
         if (! stored.exists()) {
             return true;
@@ -362,4 +366,5 @@ public class Androlib {
         new String[]{"resources.arsc", "AndroidManifest.xml", "res"};
     private final static String[] APP_RESOURCES_FILENAMES =
         new String[]{"AndroidManifest.xml", "res"};
+    private final static String VERSION = "1.1.1";
 }
