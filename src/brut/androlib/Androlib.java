@@ -288,7 +288,11 @@ public class Androlib {
                     apkFile,
                     new File(appDir, "AndroidManifest.xml"),
                     new File(appDir, "res"),
-                    ninePatch, null, false, framework
+                    ninePatch, null,
+                    new File[]{
+                        mAndRes.getAndroidResourcesFile(),
+                        mAndRes.getHtcResourcesFile()},
+                    false, framework
                 );
 
                 new ExtFile(apkFile).getDirectory()
@@ -337,7 +341,7 @@ public class Androlib {
             assetDir = null;
         }
         mAndRes.aaptPackage(outApk, null, null,
-            new File(appDir, APK_DIRNAME), assetDir, false, true);
+            new File(appDir, APK_DIRNAME), assetDir, null, false, framework);
     }
 
     public void publicizeResources(File arscFile) throws AndrolibException {

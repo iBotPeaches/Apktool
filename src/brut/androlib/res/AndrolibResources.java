@@ -130,8 +130,8 @@ final public class AndrolibResources {
     }
 
     public void aaptPackage(File apkFile, File manifest, File resDir,
-            File rawDir, File assetDir, boolean update, boolean framework)
-            throws AndrolibException {
+            File rawDir, File assetDir, File[] include,
+            boolean update, boolean framework) throws AndrolibException {
         List<String> cmd = new ArrayList<String>();
 
         cmd.add("aapt");
@@ -142,22 +142,22 @@ final public class AndrolibResources {
         cmd.add("-F");
         cmd.add(apkFile.getAbsolutePath());
 
-        if (resDir != null) {
-            if (framework) {
-                cmd.add("-x");
-            } else {
-                cmd.add("-I");
-                cmd.add(getAndroidResourcesFile().getAbsolutePath());
-                cmd.add("-I");
-                cmd.add(getHtcResourcesFile().getAbsolutePath());
-            }
-            cmd.add("-S");
-            cmd.add(resDir.getAbsolutePath());
-        } else if (framework) {
+        if (framework) {
+            cmd.add("-x");
             cmd.add("-0");
             cmd.add("arsc");
         }
 
+        if (include != null) {
+            for (File file : include) {
+                cmd.add("-I");
+                cmd.add(file.getPath());
+            }
+        }
+        if (resDir != null) {
+            cmd.add("-S");
+            cmd.add(resDir.getAbsolutePath());
+        }
         if (manifest != null) {
             cmd.add("-M");
             cmd.add(manifest.getAbsolutePath());
@@ -354,7 +354,7 @@ final public class AndrolibResources {
         return dir;
     }
 
-    private File getAndroidResourcesFile() throws AndrolibException {
+    public File getAndroidResourcesFile() throws AndrolibException {
         try {
             return Jar.getResourceAsFile("/brut/androlib/android-framework.jar");
         } catch (BrutException ex) {
@@ -362,7 +362,7 @@ final public class AndrolibResources {
         }
     }
 
-    private File getHtcResourcesFile() throws AndrolibException {
+    public File getHtcResourcesFile() throws AndrolibException {
         try {
             return Jar.getResourceAsFile(
                 "/brut/androlib/com.htc.resources.apk");
