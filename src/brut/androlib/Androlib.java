@@ -119,7 +119,7 @@ public class Androlib {
             throws AndrolibException {
         DumperOptions options = new DumperOptions();
         options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-        options.setIndent(4);
+//        options.setIndent(4);
         Yaml yaml = new Yaml(options);
         try {
             yaml.dump(meta, new FileWriter(new File(mOutDir, "apktool.yml")));
