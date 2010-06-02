@@ -365,15 +365,6 @@ final public class AndrolibResources {
         }
     }
 
-    public File getHtcResourcesFile() throws AndrolibException {
-        try {
-            return Jar.getResourceAsFile(
-                "/brut/androlib/com.htc.resources.apk");
-        } catch (BrutException ex) {
-            throw new AndrolibException(ex);
-        }
-    }
-
     public static String escapeForResXml(String value) {
         if (value.isEmpty()) {
             return value;
