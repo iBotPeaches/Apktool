@@ -294,8 +294,8 @@ final public class AndrolibResources {
             ResTable resTable) throws AndrolibException {
         try {
             return ARSCDecoder.decode(
-                apkFile.getDirectory().getFileInput("resources.arsc"),
-                resTable);
+                apkFile.getDirectory().getFileInput("resources.arsc"), false,
+                resTable).getPackages();
         } catch (DirectoryException ex) {
             throw new AndrolibException(
                 "Could not load resources.arsc from file: " + apkFile, ex);
@@ -378,7 +378,8 @@ final public class AndrolibResources {
 
     public void publicizeResources(byte[] arsc) throws AndrolibException {
         for (FlagsOffset flags :
-                ARSCDecoder.findFlagsOffsets(new ByteArrayInputStream(arsc))) {
+                ARSCDecoder.decode(new ByteArrayInputStream(arsc), true)
+                .getFlagsOffsets()) {
             int offset = flags.offset + 3;
             int end = offset + 4 * flags.count;
             while(offset < end) {

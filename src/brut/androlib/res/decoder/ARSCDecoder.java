@@ -32,26 +32,26 @@ import org.apache.commons.io.input.CountingInputStream;
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
 public class ARSCDecoder {
-    public static ResPackage[] decode(InputStream arscStream, ResTable resTable)
-            throws AndrolibException {
-        try {
-            return new ARSCDecoder(arscStream, resTable, false).readTable();
-        } catch (IOException ex) {
-            throw new AndrolibException("Could not decode arsc file", ex);
-        }
+    public static ARSCData decode(InputStream arscStream,
+            boolean findFlagsOffsets) throws AndrolibException {
+        return decode(arscStream, findFlagsOffsets, new ResTable());
     }
 
-    public static List<FlagsOffset> findFlagsOffsets(InputStream arscStream)
+    public static ARSCData decode(InputStream arscStream,
+            boolean findFlagsOffsets, ResTable resTable)
             throws AndrolibException {
         try {
-            ResTable resTable = new ResTable();
-            ARSCDecoder decoder = new ARSCDecoder(arscStream, resTable, true);
-            decoder.readTable();
-            return decoder.mFlagsOffsets;
+            ARSCDecoder decoder = new ARSCDecoder(arscStream, resTable,
+                findFlagsOffsets);
+            ResPackage[] pkgs = decoder.readTable();
+            return new ARSCData(
+                pkgs,
+                decoder.mFlagsOffsets == null ? null :
+                    decoder.mFlagsOffsets.toArray(new FlagsOffset[0]),
+                resTable);
         } catch (IOException ex) {
             throw new AndrolibException("Could not decode arsc file", ex);
         }
-
     }
 
     private ARSCDecoder(InputStream arscStream, ResTable resTable,
@@ -357,4 +357,39 @@ public class ARSCDecoder {
 
     private static final Logger LOGGER =
         Logger.getLogger(ARSCDecoder.class.getName());
+
+
+    public static class ARSCData {
+
+        public ARSCData(ResPackage[] packages, FlagsOffset[] flagsOffsets,
+                ResTable resTable) {
+            mPackages = packages;
+            mFlagsOffsets = flagsOffsets;
+            mResTable = resTable;
+        }
+
+        public FlagsOffset[] getFlagsOffsets() {
+            return mFlagsOffsets;
+        }
+
+        public ResPackage[] getPackages() {
+            return mPackages;
+        }
+
+        public ResPackage getOnePackage() throws AndrolibException {
+            if (mPackages.length != 1) {
+                throw new AndrolibException(
+                    "Arsc file contains zero or multiple packages");
+            }
+            return mPackages[0];
+        }
+
+        public ResTable getResTable() {
+            return mResTable;
+        }
+
+        private final ResPackage[] mPackages;
+        private final FlagsOffset[] mFlagsOffsets;
+        private final ResTable mResTable;
+    }
 }
