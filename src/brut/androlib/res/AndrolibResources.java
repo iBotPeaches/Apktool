@@ -132,46 +132,46 @@ final public class AndrolibResources {
     public void aaptPackage(File apkFile, File manifest, File resDir,
             File rawDir, File assetDir, boolean update, boolean framework)
             throws AndrolibException {
-        String[] cmd = new String[16];
-        int i = 0;
-        cmd[i++] = "aapt";
-        cmd[i++] = "p";
+        List<String> cmd = new ArrayList<String>();
+
+        cmd.add("aapt");
+        cmd.add("p");
         if (update) {
-            cmd[i++] = "-u";
+            cmd.add("-u");
         }
-        cmd[i++] = "-F";
-        cmd[i++] = apkFile.getAbsolutePath();
+        cmd.add("-F");
+        cmd.add(apkFile.getAbsolutePath());
 
         if (resDir != null) {
             if (framework) {
-                cmd[i++] = "-x";
+                cmd.add("-x");
             } else {
-                cmd[i++] = "-I";
-                cmd[i++] = getAndroidResourcesFile().getAbsolutePath();
-                cmd[i++] = "-I";
-                cmd[i++] = getHtcResourcesFile().getAbsolutePath();
+                cmd.add("-I");
+                cmd.add(getAndroidResourcesFile().getAbsolutePath());
+                cmd.add("-I");
+                cmd.add(getHtcResourcesFile().getAbsolutePath());
             }
-            cmd[i++] = "-S";
-            cmd[i++] = resDir.getAbsolutePath();
+            cmd.add("-S");
+            cmd.add(resDir.getAbsolutePath());
         } else if (framework) {
-            cmd[i++] = "-0";
-            cmd[i++] = "arsc";
+            cmd.add("-0");
+            cmd.add("arsc");
         }
 
         if (manifest != null) {
-            cmd[i++] = "-M";
-            cmd[i++] = manifest.getAbsolutePath();
+            cmd.add("-M");
+            cmd.add(manifest.getAbsolutePath());
         }
         if (assetDir != null) {
-            cmd[i++] = "-A";
-            cmd[i++] = assetDir.getAbsolutePath();
+            cmd.add("-A");
+            cmd.add(assetDir.getAbsolutePath());
         }
         if (rawDir != null) {
-            cmd[i++] = rawDir.getAbsolutePath();
+            cmd.add(rawDir.getAbsolutePath());
         }
 
         try {
-            OS.exec(Arrays.copyOf(cmd, i));
+            OS.exec(cmd.toArray(new String[0]));
         } catch (BrutException ex) {
             throw new AndrolibException(ex);
         }
