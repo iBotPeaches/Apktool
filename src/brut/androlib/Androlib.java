@@ -21,8 +21,6 @@ import brut.androlib.java.AndrolibJava;
 import brut.androlib.res.AndrolibResources;
 import brut.androlib.res.data.ResPackage;
 import brut.androlib.res.data.ResTable;
-import brut.androlib.res.decoder.ARSCDecoder;
-import brut.androlib.res.decoder.ARSCDecoder.FlagsOffset;
 import brut.androlib.res.util.ExtFile;
 import brut.androlib.src.SmaliBuilder;
 import brut.androlib.src.SmaliDecoder;
@@ -31,8 +29,6 @@ import brut.directory.*;
 import brut.util.BrutIO;
 import brut.util.OS;
 import java.io.*;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel.MapMode;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -346,25 +342,7 @@ public class Androlib {
     }
 
     public void publicizeResources(File arscFile) throws AndrolibException {
-        try {
-            FileInputStream in = new FileInputStream(arscFile);
-            List<FlagsOffset> offsets = ARSCDecoder.findFlagsOffsets(in);
-            in.close();
-
-            RandomAccessFile raf = new RandomAccessFile(arscFile, "rw");
-            MappedByteBuffer buf = raf.getChannel().map(MapMode.READ_WRITE, 0, arscFile.length());
-            for (FlagsOffset flags : offsets) {
-                int offset = flags.offset + 3;
-                int end = offset + 4 * flags.count;
-                while(offset < end) {
-                    buf.put(offset, (byte) (buf.get(offset) | (byte) 0x40));
-                    offset += 4;
-                }
-            }
-            raf.close();
-        } catch (IOException ex) {
-            throw new AndrolibException(ex);
-        }
+        mAndRes.publicizeResources(arscFile);
     }
 
     public boolean isFrameworkApk(ResTable resTable) {

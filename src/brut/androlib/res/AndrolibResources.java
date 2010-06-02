@@ -22,6 +22,7 @@ import brut.androlib.err.CantFindFrameworkResException;
 import brut.androlib.res.data.*;
 import brut.androlib.res.data.value.ResXmlSerializable;
 import brut.androlib.res.decoder.*;
+import brut.androlib.res.decoder.ARSCDecoder.FlagsOffset;
 import brut.androlib.res.util.ExtFile;
 import brut.androlib.res.util.ExtMXSerializer;
 import brut.common.BrutException;
@@ -344,6 +345,47 @@ final public class AndrolibResources {
         }
 
         throw new CantFindFrameworkResException(id);
+    }
+
+    public void publicizeResources(File arscFile) throws AndrolibException {
+        byte[] data = new byte[(int) arscFile.length()];
+
+        InputStream in = null;
+        OutputStream out = null;
+        try {
+            in = new FileInputStream(arscFile);
+            in.read(data);
+
+            publicizeResources(data);
+
+            out = new FileOutputStream(arscFile);
+            out.write(data);
+        } catch (IOException ex) {
+            throw new AndrolibException(ex);
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException ex) {}
+            }
+            if (out != null) {
+                try {
+                    out.close();
+                } catch (IOException ex) {}
+            }
+        }
+    }
+
+    public void publicizeResources(byte[] arsc) throws AndrolibException {
+        for (FlagsOffset flags :
+                ARSCDecoder.findFlagsOffsets(new ByteArrayInputStream(arsc))) {
+            int offset = flags.offset + 3;
+            int end = offset + 4 * flags.count;
+            while(offset < end) {
+                arsc[offset] |= (byte) 0x40;
+                offset += 4;
+            }
+        }
     }
 
     private File getFrameworkDir() throws AndrolibException {
