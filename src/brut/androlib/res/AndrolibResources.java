@@ -22,6 +22,7 @@ import brut.androlib.err.CantFindFrameworkResException;
 import brut.androlib.res.data.*;
 import brut.androlib.res.data.value.ResXmlSerializable;
 import brut.androlib.res.decoder.*;
+import brut.androlib.res.decoder.ARSCDecoder.ARSCData;
 import brut.androlib.res.decoder.ARSCDecoder.FlagsOffset;
 import brut.androlib.res.util.ExtFile;
 import brut.androlib.res.util.ExtMXSerializer;
@@ -31,6 +32,7 @@ import brut.util.*;
 import java.io.*;
 import java.util.*;
 import java.util.logging.Logger;
+import java.util.zip.*;
 import org.apache.commons.io.IOUtils;
 import org.xmlpull.v1.XmlSerializer;
 
@@ -347,6 +349,58 @@ final public class AndrolibResources {
         throw new CantFindFrameworkResException(id);
     }
 
+    public void installFramework(File frameFile, String tag)
+            throws AndrolibException {
+        InputStream in = null;
+        ZipOutputStream out = null;
+        try {
+            ZipFile zip = new ZipFile(frameFile);
+            ZipEntry entry = zip.getEntry("resources.arsc");
+
+            if (entry == null) {
+                throw new AndrolibException("Can't find resources.arsc file");
+            }
+
+            in = zip.getInputStream(entry);
+            byte[] data = IOUtils.toByteArray(in);
+
+            ARSCData arsc = ARSCDecoder.decode(
+                new ByteArrayInputStream(data), true);
+            publicizeResources(data, arsc.getFlagsOffsets());
+
+            File outFile = new File(getFrameworkDir(),
+                String.valueOf(arsc.getOnePackage().getId()) +
+                (tag == null ? "" : '-' + tag) + ".apk");
+
+            out = new ZipOutputStream(new FileOutputStream(outFile));
+            out.setMethod(ZipOutputStream.STORED);
+            CRC32 crc = new CRC32();
+            crc.update(data);
+            entry = new ZipEntry("resources.arsc");
+            entry.setSize(data.length);
+            entry.setCrc(crc.getValue());
+            out.putNextEntry(entry);
+            out.write(data);
+
+            LOGGER.info("Framework installed to: " + outFile);
+        } catch (ZipException ex) {
+            throw new AndrolibException(ex);
+        } catch (IOException ex) {
+            throw new AndrolibException(ex);
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException ex) {}
+            }
+            if (out != null) {
+                try {
+                    out.close();
+                } catch (IOException ex) {}
+            }
+        }
+    }
+
     public void publicizeResources(File arscFile) throws AndrolibException {
         byte[] data = new byte[(int) arscFile.length()];
 
@@ -377,9 +431,14 @@ final public class AndrolibResources {
     }
 
     public void publicizeResources(byte[] arsc) throws AndrolibException {
-        for (FlagsOffset flags :
-                ARSCDecoder.decode(new ByteArrayInputStream(arsc), true)
-                .getFlagsOffsets()) {
+        publicizeResources(arsc,
+            ARSCDecoder.decode(new ByteArrayInputStream(arsc), true)
+            .getFlagsOffsets());
+    }
+
+    public void publicizeResources(byte[] arsc, FlagsOffset[] flagsOffsets)
+            throws AndrolibException {
+        for (FlagsOffset flags : flagsOffsets) {
             int offset = flags.offset + 3;
             int end = offset + 4 * flags.count;
             while(offset < end) {

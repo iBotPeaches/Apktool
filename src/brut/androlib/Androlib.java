@@ -345,6 +345,11 @@ public class Androlib {
         mAndRes.publicizeResources(arscFile);
     }
 
+    public void installFramework(File frameFile, String tag)
+            throws AndrolibException {
+        mAndRes.installFramework(frameFile, tag);
+    }
+
     public boolean isFrameworkApk(ResTable resTable) {
         for (ResPackage pkg : resTable.listMainPackages()) {
             if (pkg.getId() < 64) {
