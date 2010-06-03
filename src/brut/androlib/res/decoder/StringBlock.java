@@ -44,11 +44,12 @@ public class StringBlock {
         int chunkSize = reader.readInt();
         int stringCount = reader.readInt();
         int styleOffsetCount = reader.readInt();
-        /*?*/ reader.readInt();
+        int flags = reader.readInt();
         int stringsOffset = reader.readInt();
         int stylesOffset = reader.readInt();
 
         StringBlock block = new StringBlock();
+        block.m_isUTF8 = (flags & UTF8_FLAG) != 0;
         block.m_stringOffsets = reader.readIntArray(stringCount);
         if (styleOffsetCount != 0) {
             block.m_styleOffsets = reader.readIntArray(styleOffsetCount);
@@ -91,8 +92,18 @@ public class StringBlock {
             return null;
         }
         int offset = m_stringOffsets[index];
-        int length = getShort(m_strings, offset);
-        return decodeString(offset + 2, length * 2);
+        int length;
+
+        if (! m_isUTF8) {
+            length = getShort(m_strings, offset) * 2;
+            offset += 2;
+        } else {
+            offset += getVarint(m_strings, offset)[1];
+            int[] varint = getVarint(m_strings, offset);
+            offset += varint[1];
+            length = varint[0];
+        }
+        return decodeString(offset, length);
     }
 
     /**
@@ -229,7 +240,7 @@ public class StringBlock {
 
     private String decodeString(int offset, int length) {
         try {
-            return UTF16LE_DECODER.decode(
+            return (m_isUTF8 ? UTF8_DECODER : UTF16LE_DECODER).decode(
                 ByteBuffer.wrap(m_strings, offset, length)).toString();
         } catch (CharacterCodingException ex) {
             LOGGER.log(Level.WARNING, null, ex);
@@ -249,13 +260,30 @@ public class StringBlock {
             return (value >>> 16);
         }
     }
+
+    private static final int[] getVarint(byte[] array, int offset) {
+        int val = array[offset];
+        boolean more = (val & 0x80) != 0;
+        val &= 0x7f;
+
+        if (! more) {
+            return new int[]{val, 1};
+        } else {
+            return new int[]{val << 8 | array[offset + 1] & 0xff, 2};
+        }
+    }
+
     private int[] m_stringOffsets;
     private byte[] m_strings;
     private int[] m_styleOffsets;
     private int[] m_styles;
+    private boolean m_isUTF8;
     private static final CharsetDecoder UTF16LE_DECODER =
         Charset.forName("UTF-16LE").newDecoder();
+    private static final CharsetDecoder UTF8_DECODER =
+        Charset.forName("UTF-8").newDecoder();
     private static final Logger LOGGER =
         Logger.getLogger(StringBlock.class.getName());
     private static final int CHUNK_TYPE = 0x001C0001;
+    private static final int UTF8_FLAG = 0x00000100;
 }
