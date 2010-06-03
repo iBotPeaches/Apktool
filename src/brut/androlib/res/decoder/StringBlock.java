@@ -18,6 +18,10 @@ package brut.androlib.res.decoder;
 
 import brut.util.ExtDataInput;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.charset.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
@@ -88,12 +92,7 @@ public class StringBlock {
         }
         int offset = m_stringOffsets[index];
         int length = getShort(m_strings, offset);
-        StringBuilder result = new StringBuilder(length);
-        for (; length != 0; length -= 1) {
-            offset += 2;
-            result.append((char) getShort(m_strings, offset));
-        }
-        return result.toString();
+        return decodeString(offset + 2, length * 2);
     }
 
     /**
@@ -228,6 +227,16 @@ public class StringBlock {
         return style;
     }
 
+    private String decodeString(int offset, int length) {
+        try {
+            return UTF16LE_DECODER.decode(
+                ByteBuffer.wrap(m_strings, offset, length)).toString();
+        } catch (CharacterCodingException ex) {
+            LOGGER.log(Level.WARNING, null, ex);
+            return null;
+        }
+    }
+
     private static final int getShort(byte[] array, int offset) {
         return (array[offset + 1] & 0xff) << 8 | array[offset] & 0xff;
     }
@@ -244,5 +253,9 @@ public class StringBlock {
     private byte[] m_strings;
     private int[] m_styleOffsets;
     private int[] m_styles;
+    private static final CharsetDecoder UTF16LE_DECODER =
+        Charset.forName("UTF-16LE").newDecoder();
+    private static final Logger LOGGER =
+        Logger.getLogger(StringBlock.class.getName());
     private static final int CHUNK_TYPE = 0x001C0001;
 }
