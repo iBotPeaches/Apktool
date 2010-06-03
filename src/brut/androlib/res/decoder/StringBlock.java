@@ -54,7 +54,8 @@ public class StringBlock {
             if ((size % 4) != 0) {
                 throw new IOException("String data size is not multiple of 4 (" + size + ").");
             }
-            block.m_strings = reader.readIntArray(size / 4);
+            block.m_strings = new byte[size];
+            reader.readFully(block.m_strings);
         }
         if (stylesOffset != 0) {
             int size = (chunkSize - stylesOffset);
@@ -227,6 +228,10 @@ public class StringBlock {
         return style;
     }
 
+    private static final int getShort(byte[] array, int offset) {
+        return (array[offset + 1] & 0xff) << 8 | array[offset] & 0xff;
+    }
+
     private static final int getShort(int[] array, int offset) {
         int value = array[offset / 4];
         if ((offset % 4) / 2 == 0) {
@@ -236,7 +241,7 @@ public class StringBlock {
         }
     }
     private int[] m_stringOffsets;
-    private int[] m_strings;
+    private byte[] m_strings;
     private int[] m_styleOffsets;
     private int[] m_styles;
     private static final int CHUNK_TYPE = 0x001C0001;
