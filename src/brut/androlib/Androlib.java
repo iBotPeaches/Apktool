@@ -153,12 +153,16 @@ public class Androlib {
         Object t1 = meta.get("isFrameworkApk");
         boolean framework = t1 == null ? false : (Boolean) t1;
 
+        String outFileName = (String) meta.get("apkFileName");
+        File outFile = new File(appDir, "dist" + File.separator +
+            (outFileName == null ? "out" : outFileName));
+
         new File(appDir, APK_DIRNAME).mkdirs();
         buildSources(appDir, forceBuildAll, debug);
         buildResources(appDir, forceBuildAll, framework,
             (Map<String, Object>) meta.get("usesFramework"));
         buildLib(appDir, forceBuildAll);
-        buildApk(appDir, framework);
+        buildApk(appDir, outFile, framework);
     }
 
     public void buildSources(File appDir, boolean forceBuildAll, boolean debug)
@@ -324,10 +328,9 @@ public class Androlib {
         }
     }
 
-    public void buildApk(File appDir, boolean framework)
+    public void buildApk(File appDir, File outApk, boolean framework)
             throws AndrolibException {
         LOGGER.info("Building apk file...");
-        File outApk = new File(appDir, OUT_APK_FILENAME);
         if (outApk.exists()) {
             outApk.delete();
         } else {
@@ -418,7 +421,6 @@ public class Androlib {
 
     private final static String SMALI_DIRNAME = "smali";
     private final static String APK_DIRNAME = "build/apk";
-    private final static String OUT_APK_FILENAME = "dist/out.apk";
     private final static String[] APK_RESOURCES_FILENAMES =
         new String[]{"resources.arsc", "AndroidManifest.xml", "res"};
     private final static String[] APK_RESOURCES_WITHOUT_RES_FILENAMES =
