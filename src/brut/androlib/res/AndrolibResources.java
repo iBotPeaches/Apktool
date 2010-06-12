@@ -104,15 +104,18 @@ final public class AndrolibResources {
         attrDecoder.setCurrentPackage(
             resTable.listMainPackages().iterator().next());
 
-        Directory in, out;
+        Directory inApk, in = null, out;
         try {
-            in = apkFile.getDirectory();
+            inApk = apkFile.getDirectory();
             out = new FileDirectory(outDir);
 
             fileDecoder.decode(
-                in, "AndroidManifest.xml", out, "AndroidManifest.xml", "xml");
+                inApk, "AndroidManifest.xml", out, "AndroidManifest.xml",
+                "xml");
 
-            in = in.getDir("res");
+            if (inApk.containsDir("res")) {
+                in = inApk.getDir("res");
+            }
             out = out.createDir("res");
         } catch (DirectoryException ex) {
             throw new AndrolibException(ex);

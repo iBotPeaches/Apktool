@@ -292,8 +292,10 @@ public class Androlib {
                     false, framework
                 );
 
-                new ExtFile(apkFile).getDirectory()
-                    .copyToDir(apkDir, APK_RESOURCES_FILENAMES);
+                Directory tmpDir = new ExtFile(apkFile).getDirectory();
+                tmpDir.copyToDir(apkDir,
+                    tmpDir.containsDir("res") ? APK_RESOURCES_FILENAMES :
+                    APK_RESOURCES_WITHOUT_RES_FILENAMES);
             }
             return true;
         } catch (IOException ex) {
@@ -418,6 +420,8 @@ public class Androlib {
     private final static String OUT_APK_FILENAME = "dist/out.apk";
     private final static String[] APK_RESOURCES_FILENAMES =
         new String[]{"resources.arsc", "AndroidManifest.xml", "res"};
+    private final static String[] APK_RESOURCES_WITHOUT_RES_FILENAMES =
+        new String[]{"resources.arsc", "AndroidManifest.xml"};
     private final static String[] APP_RESOURCES_FILENAMES =
         new String[]{"AndroidManifest.xml", "res"};
     private final static String VERSION = "1.2.0";
