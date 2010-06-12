@@ -121,10 +121,10 @@ public class ApkDecoder {
         mForceDelete = forceDelete;
     }
 
-    public void setFrameworkTag(String tag) {
+    public void setFrameworkTag(String tag) throws AndrolibException {
         mFrameTag = tag;
-        if (mResTable != null) {
-            mResTable.setFrameTag(tag);
+        if (hasResources()) {
+            getResTable().setFrameTag(tag);
         }
     }
 
@@ -180,8 +180,9 @@ public class ApkDecoder {
         mAndrolib.writeMetaFile(mOutDir, meta);
     }
 
-    private void putUsesFramework(Map<String, Object> meta) {
-        Set<ResPackage> pkgs = mResTable.listFramePackages();
+    private void putUsesFramework(Map<String, Object> meta)
+            throws AndrolibException {
+        Set<ResPackage> pkgs = getResTable().listFramePackages();
         if (pkgs.isEmpty()) {
             return;
         }
