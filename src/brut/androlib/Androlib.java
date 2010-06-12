@@ -142,20 +142,22 @@ public class Androlib {
         }
     }
 
-    public void build(File appDir, boolean forceBuildAll, boolean debug)
-            throws AndrolibException {
-        build(new ExtFile(appDir), forceBuildAll, debug);
+    public void build(File appDir, File outFile, boolean forceBuildAll,
+            boolean debug) throws AndrolibException {
+        build(new ExtFile(appDir), outFile, forceBuildAll, debug);
     }
 
-    public void build(ExtFile appDir, boolean forceBuildAll, boolean debug)
-            throws AndrolibException {
+    public void build(ExtFile appDir, File outFile, boolean forceBuildAll,
+            boolean debug) throws AndrolibException {
         Map<String, Object> meta = readMetaFile(appDir);
         Object t1 = meta.get("isFrameworkApk");
         boolean framework = t1 == null ? false : (Boolean) t1;
 
-        String outFileName = (String) meta.get("apkFileName");
-        File outFile = new File(appDir, "dist" + File.separator +
-            (outFileName == null ? "out" : outFileName));
+        if (outFile == null) {
+            String outFileName = (String) meta.get("apkFileName");
+            outFile = new File(appDir, "dist" + File.separator +
+                (outFileName == null ? "out" : outFileName));
+        }
 
         new File(appDir, APK_DIRNAME).mkdirs();
         buildSources(appDir, forceBuildAll, debug);
@@ -335,7 +337,7 @@ public class Androlib {
             outApk.delete();
         } else {
             File outDir = outApk.getParentFile();
-            if (! outDir.exists()) {
+            if (outDir != null && ! outDir.exists()) {
                 outDir.mkdirs();
             }
         }
