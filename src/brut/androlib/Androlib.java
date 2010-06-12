@@ -150,7 +150,8 @@ public class Androlib {
     public void build(ExtFile appDir, boolean forceBuildAll, boolean debug)
             throws AndrolibException {
         Map<String, Object> meta = readMetaFile(appDir);
-        boolean framework = (Boolean) meta.get("isFrameworkApk");
+        Object t1 = meta.get("isFrameworkApk");
+        boolean framework = t1 == null ? false : (Boolean) t1;
 
         new File(appDir, APK_DIRNAME).mkdirs();
         buildSources(appDir, forceBuildAll, debug);
