@@ -22,10 +22,7 @@ import brut.androlib.res.data.ResResource;
 import brut.androlib.res.data.value.ResFileValue;
 import brut.directory.Directory;
 import brut.directory.DirectoryException;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,8 +36,8 @@ public class ResFileDecoder {
         this.mDecoders = decoders;
     }
 
-    public void decode(ResResource res, Directory inDir, Directory outDir,
-            Directory out9Patch) throws AndrolibException {
+    public void decode(ResResource res, Directory inDir, Directory outDir)
+            throws AndrolibException {
 
         ResFileValue fileValue = (ResFileValue) res.getValue();
         String inFileName = fileValue.getStrippedPath();
@@ -63,9 +60,8 @@ public class ResFileDecoder {
         }
         if (typeName.equals("drawable")) {
             if (inFileName.toLowerCase().endsWith(".9.png")) {
-                outFileName = outResName + ".png";
-                decode(inDir, inFileName, outDir, outFileName, "raw");
-                decode(inDir, inFileName, out9Patch, outFileName, "raw");
+                outFileName = outResName + ".9" + ext;
+                decode(inDir, inFileName, outDir, outFileName, "9patch");
                 return;
             }
             if (! ext.equals(".xml")) {

@@ -104,7 +104,7 @@ final public class AndrolibResources {
         attrDecoder.setCurrentPackage(
             resTable.listMainPackages().iterator().next());
 
-        Directory in, out, out9Patch;
+        Directory in, out;
         try {
             in = apkFile.getDirectory();
             out = new FileDirectory(outDir);
@@ -112,7 +112,6 @@ final public class AndrolibResources {
             fileDecoder.decode(
                 in, "AndroidManifest.xml", out, "AndroidManifest.xml", "xml");
 
-            out9Patch = out.createDir("9patch/res");
             in = in.getDir("res");
             out = out.createDir("res");
         } catch (DirectoryException ex) {
@@ -123,7 +122,7 @@ final public class AndrolibResources {
         for (ResPackage pkg : resTable.listMainPackages()) {
             attrDecoder.setCurrentPackage(pkg);
             for (ResResource res : pkg.listFiles()) {
-                fileDecoder.decode(res, in, out, out9Patch);
+                fileDecoder.decode(res, in, out);
             }
             for (ResValuesFile valuesFile : pkg.listValuesFiles()) {
                 generateValuesFile(valuesFile, out, xmlSerializer);
@@ -213,6 +212,7 @@ final public class AndrolibResources {
         ResStreamDecoderContainer decoders =
             new ResStreamDecoderContainer();
         decoders.setDecoder("raw", new ResRawStreamDecoder());
+        decoders.setDecoder("9patch", new Res9patchStreamDecoder());
 
         ResAttrDecoder attrDecoder = new ResAttrDecoder();
         AXmlResourceParser axmlParser = new AXmlResourceParser();
