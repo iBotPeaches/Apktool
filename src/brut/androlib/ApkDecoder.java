@@ -21,7 +21,6 @@ import brut.androlib.res.data.ResPackage;
 import brut.androlib.res.data.ResTable;
 import brut.androlib.res.util.ExtFile;
 import brut.common.BrutException;
-import brut.directory.Directory;
 import brut.directory.DirectoryException;
 import brut.util.OS;
 import java.io.File;
@@ -71,14 +70,7 @@ public class ApkDecoder {
         }
         outDir.mkdirs();
 
-        Directory apk = null;
-        try {
-            apk = mApkFile.getDirectory();
-        } catch (DirectoryException ex) {
-            throw new AndrolibException(ex);
-        }
-
-        if (apk.containsFile("classes.dex")) {
+        if (hasSources()) {
             switch (mDecodeSources) {
                 case DECODE_SOURCES_NONE:
                     mAndrolib.decodeSourcesRaw(mApkFile, outDir, mDebug);
@@ -91,7 +83,7 @@ public class ApkDecoder {
                     break;
             }
         }
-        if (apk.containsFile("resources.arsc")) {
+        if (hasResources()) {
             switch (mDecodeResources) {
                 case DECODE_RESOURCES_NONE:
                     mAndrolib.decodeResourcesRaw(mApkFile, outDir);
@@ -138,12 +130,31 @@ public class ApkDecoder {
 
     public ResTable getResTable() throws AndrolibException {
         if (mResTable == null) {
+            if (! hasResources()) {
+                throw new AndrolibException(
+                    "Apk doesn't containt resources.arsc file");
+            }
             mResTable = mAndrolib.getResTable(mApkFile);
             mResTable.setFrameTag(mFrameTag);
         }
         return mResTable;
     }
 
+    public boolean hasSources() throws AndrolibException {
+        try {
+            return mApkFile.getDirectory().containsFile("classes.dex");
+        } catch (DirectoryException ex) {
+            throw new AndrolibException(ex);
+        }
+    }
+
+    public boolean hasResources() throws AndrolibException {
+        try {
+            return mApkFile.getDirectory().containsFile("resources.arsc");
+        } catch (DirectoryException ex) {
+            throw new AndrolibException(ex);
+        }
+    }
 
     public final static short DECODE_SOURCES_NONE = 0x0000;
     public final static short DECODE_SOURCES_SMALI = 0x0001;
