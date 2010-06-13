@@ -123,7 +123,7 @@ public class ApkDecoder {
 
     public void setFrameworkTag(String tag) throws AndrolibException {
         mFrameTag = tag;
-        if (hasResources()) {
+        if (mResTable != null) {
             getResTable().setFrameTag(tag);
         }
     }
