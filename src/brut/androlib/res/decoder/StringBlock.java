@@ -128,10 +128,11 @@ public class StringBlock {
             return escapeForXml(raw);
         }
         StringBuilder html = new StringBuilder(raw.length() + 32);
-        int offset = 0;
+        int[] opened = new int[style.length / 3];
+        int offset = 0, depth = 0;
         while (true) {
-            int i = -1;
-            for (int j = 0; j != style.length; j += 3) {
+            int i = -1, j;
+            for (j = 0; j != style.length; j += 3) {
                 if (style[j + 1] == -1) {
                     continue;
                 }
@@ -140,21 +141,22 @@ public class StringBlock {
                 }
             }
             int start = ((i != -1) ? style[i + 1] : raw.length());
-            for (int j = 0; j != style.length; j += 3) {
-                int end = style[j + 2];
-                if (end == -1 || end >= start) {
-                    continue;
+            for (j = depth - 1; j >= 0; j--) {
+                int last = opened[j];
+                int end = style[last + 2];
+                if (end >= start) {
+                    break;
                 }
                 if (offset <= end) {
                     html.append(escapeForXml(raw.substring(offset, end + 1)));
                     offset = end + 1;
                 }
-                style[j + 2] = -1;
                 html.append('<');
                 html.append('/');
-                html.append(getString(style[j]));
+                html.append(getString(style[last]));
                 html.append('>');
             }
+            depth = j + 1;
             if (offset < start) {
                 html.append(escapeForXml(raw.substring(offset, start)));
                 offset = start;
@@ -166,6 +168,7 @@ public class StringBlock {
             html.append(getString(style[i]));
             html.append('>');
             style[i + 1] = -1;
+            opened[depth++] = i;
         }
         return html.toString();
     }
