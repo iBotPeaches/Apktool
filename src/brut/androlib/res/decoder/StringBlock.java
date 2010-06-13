@@ -125,7 +125,7 @@ public class StringBlock {
         }
         int[] style = getStyle(index);
         if (style == null) {
-            return raw;
+            return escapeForXml(raw);
         }
         StringBuilder html = new StringBuilder(raw.length() + 32);
         int offset = 0;
@@ -146,7 +146,7 @@ public class StringBlock {
                     continue;
                 }
                 if (offset <= end) {
-                    html.append(raw, offset, end + 1);
+                    html.append(escapeForXml(raw.substring(offset, end + 1)));
                     offset = end + 1;
                 }
                 style[j + 2] = -1;
@@ -156,7 +156,7 @@ public class StringBlock {
                 html.append('>');
             }
             if (offset < start) {
-                html.append(raw, offset, start);
+                html.append(escapeForXml(raw.substring(offset, start)));
                 offset = start;
             }
             if (i == -1) {
@@ -168,6 +168,10 @@ public class StringBlock {
             style[i + 1] = -1;
         }
         return html.toString();
+    }
+
+    private String escapeForXml(String txt) {
+        return txt.replace("&", "&amp;").replace("<", "&lt;");
     }
 
     /**
