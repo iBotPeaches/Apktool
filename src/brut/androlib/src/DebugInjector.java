@@ -40,7 +40,10 @@ public class DebugInjector {
 
     private void inject() throws AndrolibException {
         String definition = nextAndAppend();
-        if (definition.contains(" abstract ")) {
+        if (
+            definition.contains(" abstract ") ||
+            definition.contains(" native ")
+        ) {
             nextAndAppend();
             return;
         }
