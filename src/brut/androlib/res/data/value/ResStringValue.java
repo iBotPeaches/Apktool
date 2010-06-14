@@ -41,9 +41,6 @@ public class ResStringValue extends ResScalarValue
 
     @Override
     public String toResXmlFormat() {
-        if (mValue.isEmpty()) {
-            return mValue;
-        }
-        return AndrolibResources.escapeForResXml(mValue);
+        return mValue;
     }
 }

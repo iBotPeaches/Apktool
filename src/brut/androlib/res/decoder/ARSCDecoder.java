@@ -208,7 +208,7 @@ public class ARSCDecoder {
         int data = mIn.readInt();
 
         return type == TypedValue.TYPE_STRING ?
-            mPkg.getValueFactory().factory(mTableStrings.getString(data)) :
+            mPkg.getValueFactory().factory(mTableStrings.getHTML(data)) :
             mPkg.getValueFactory().factory(type, data);
     }
 

@@ -46,7 +46,12 @@ public abstract class ResScalarValue extends ResValue
             serializer.attribute(null, "type", type);
         }
         serializer.attribute(null, "name", res.getResSpec().getName());
-        serializer.text(toResXmlFormat());
+
+        String body = toResXmlFormat();
+        if (! body.isEmpty()) {
+            serializer.ignorableWhitespace(body);
+        }
+
         serializer.endTag(null, tagName);
     }
 
