@@ -301,7 +301,7 @@ public class AXmlResourceParser implements XmlResourceParser {
         int valueType = m_attributes[offset + ATTRIBUTE_IX_VALUE_TYPE];
         if (valueType == TypedValue.TYPE_STRING) {
             int valueString = m_attributes[offset + ATTRIBUTE_IX_VALUE_STRING];
-            return AndrolibResources.escapeForResXml(
+            return AndrolibResources.escapeTextForResXml(
                 m_strings.getString(valueString));
         }
         int valueData = m_attributes[offset + ATTRIBUTE_IX_VALUE_DATA];

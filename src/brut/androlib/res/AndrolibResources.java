@@ -470,9 +470,18 @@ final public class AndrolibResources {
         }
     }
 
-    public static String escapeForResXml(String value) {
+    public static String escapeTextForResXml(String value) {
+        return escapeTextForResXml(value, true);
+    }
+
+    public static String escapeTextForResXml(String value,
+            boolean escapeChars) {
         if (value.isEmpty()) {
             return value;
+        }
+
+        if (escapeChars) {
+            value = escapeCharsForResXml(value);
         }
 
         StringBuilder out = new StringBuilder(value.length() + 10);
@@ -486,9 +495,7 @@ final public class AndrolibResources {
         }
 
         boolean space = true;
-        for (int i = 0; i < chars.length; i++) {
-            char c = chars[i];
-
+        for (char c : chars) {
             if (c == ' ') {
                 if (space) {
                     out.append("\\u0020");
@@ -500,6 +507,24 @@ final public class AndrolibResources {
             }
 
             space = false;
+            out.append(c);
+        }
+
+        if (space && out.charAt(out.length() - 1) == ' ') {
+            out.deleteCharAt(out.length() - 1);
+            out.append("\\u0020");
+        }
+
+        return out.toString();
+    }
+
+    public static String escapeCharsForResXml(String value) {
+        if (value.isEmpty()) {
+            return value;
+        }
+
+        StringBuilder out = new StringBuilder(value.length() + 10);
+        for (char c : value.toCharArray()) {
             switch (c) {
                 case '\\':
                 case '\'':
@@ -509,13 +534,14 @@ final public class AndrolibResources {
                 case '\n':
                     out.append("\\n");
                     continue;
+                case '&':
+                    out.append("&amp;");
+                    continue;
+                case '<':
+                    out.append("&lt;");
+                    continue;
             }
             out.append(c);
-        }
-
-        if (space && out.charAt(out.length() - 1) == ' ') {
-            out.deleteCharAt(out.length() - 1);
-            out.append("\\u0020");
         }
 
         return out.toString();

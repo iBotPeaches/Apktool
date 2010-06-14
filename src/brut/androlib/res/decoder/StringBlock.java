@@ -16,6 +16,7 @@
  */
 package brut.androlib.res.decoder;
 
+import brut.androlib.res.AndrolibResources;
 import brut.util.ExtDataInput;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -125,7 +126,7 @@ public class StringBlock {
         }
         int[] style = getStyle(index);
         if (style == null) {
-            return escapeForXml(raw);
+            return AndrolibResources.escapeTextForResXml(raw);
         }
         StringBuilder html = new StringBuilder(raw.length() + 32);
         int[] opened = new int[style.length / 3];
@@ -148,7 +149,8 @@ public class StringBlock {
                     break;
                 }
                 if (offset <= end) {
-                    html.append(escapeForXml(raw.substring(offset, end + 1)));
+                    html.append(AndrolibResources.escapeCharsForResXml(
+                        raw.substring(offset, end + 1)));
                     offset = end + 1;
                 }
                 html.append('<');
@@ -158,7 +160,8 @@ public class StringBlock {
             }
             depth = j + 1;
             if (offset < start) {
-                html.append(escapeForXml(raw.substring(offset, start)));
+                html.append(AndrolibResources.escapeCharsForResXml(
+                    raw.substring(offset, start)));
                 offset = start;
             }
             if (i == -1) {
@@ -170,11 +173,7 @@ public class StringBlock {
             style[i + 1] = -1;
             opened[depth++] = i;
         }
-        return html.toString();
-    }
-
-    private String escapeForXml(String txt) {
-        return txt.replace("&", "&amp;").replace("<", "&lt;");
+        return AndrolibResources.escapeTextForResXml(html.toString(), false);
     }
 
     /**
