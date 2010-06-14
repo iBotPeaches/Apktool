@@ -153,10 +153,7 @@ public class StringBlock {
                         raw.substring(offset, end + 1)));
                     offset = end + 1;
                 }
-                html.append('<');
-                html.append('/');
-                html.append(getString(style[last]));
-                html.append('>');
+                outputStyleTag(getString(style[last]), html, true);
             }
             depth = j + 1;
             if (offset < start) {
@@ -167,13 +164,46 @@ public class StringBlock {
             if (i == -1) {
                 break;
             }
-            html.append('<');
-            html.append(getString(style[i]));
-            html.append('>');
+            outputStyleTag(getString(style[i]), html, false);
             style[i + 1] = -1;
             opened[depth++] = i;
         }
         return AndrolibResources.escapeTextForResXml(html.toString(), false);
+    }
+
+    private void outputStyleTag(String tag, StringBuilder builder,
+            boolean close) {
+        builder.append('<');
+        if (close) {
+            builder.append('/');
+        }
+
+        int pos = tag.indexOf(';');
+        if (pos == -1) {
+            builder.append(tag);
+        } else {
+            builder.append(tag.substring(0, pos));
+            if (! close) {
+                boolean loop = true;
+                while (loop) {
+                    int pos2 = tag.indexOf('=', pos + 1);
+                    builder.append(' ').append(tag.substring(pos + 1, pos2))
+                        .append("=\"");
+                    pos = tag.indexOf(';', pos2 + 1);
+
+                    String val;
+                    if (pos != -1) {
+                        val = tag.substring(pos2 + 1, pos);
+                    } else {
+                        loop = false;
+                        val = tag.substring(pos2 + 1);
+                    }
+
+                    builder.append(val).append('"');
+                }
+            }
+        }
+        builder.append('>');
     }
 
     /**
