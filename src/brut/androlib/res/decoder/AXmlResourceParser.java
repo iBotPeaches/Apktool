@@ -56,6 +56,10 @@ public class AXmlResourceParser implements XmlResourceParser {
         open(stream);
     }
 
+    public AndrolibException getFirstError() {
+        return mFirstError;
+    }
+
     public ResAttrDecoder getAttrDecoder() {
         return mAttrDecoder;
     }
@@ -315,6 +319,7 @@ public class AXmlResourceParser implements XmlResourceParser {
                 return mAttrDecoder.decode(valueType, valueData,
                     getAttributeNameResource(index));
             } catch (AndrolibException ex) {
+                setFirstError(ex);
                 LOGGER.log(Level.WARNING, String.format(
                     "Could not decode attr value, using undecoded value " +
                     "instead: ns=%s, name=%s, value=0x%08x",
@@ -906,6 +911,13 @@ public class AXmlResourceParser implements XmlResourceParser {
             }
         }
     }
+
+    private void setFirstError(AndrolibException error) {
+        if (mFirstError == null) {
+            mFirstError = error;
+        }
+    }
+
     /////////////////////////////////// data
     /*
      * All values are essentially indices, e.g. m_name is
@@ -913,6 +925,8 @@ public class AXmlResourceParser implements XmlResourceParser {
      */
     private ExtDataInput m_reader;
     private ResAttrDecoder mAttrDecoder;
+    private AndrolibException mFirstError;
+
     private boolean m_operational = false;
     private StringBlock m_strings;
     private int[] m_resourceIDs;
