@@ -132,6 +132,11 @@ final public class AndrolibResources {
             }
             generatePublicXml(pkg, out, xmlSerializer);
         }
+
+        AndrolibException decodeError = duo.m2.getFirstError();
+        if (decodeError != null) {
+            throw decodeError;
+        }
     }
 
     public void aaptPackage(File apkFile, File manifest, File resDir,
