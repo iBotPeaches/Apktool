@@ -56,6 +56,10 @@ public class AXmlResourceParser implements XmlResourceParser {
         open(stream);
     }
 
+    public ResAttrDecoder getAttrDecoder() {
+        return mAttrDecoder;
+    }
+
     public void setAttrDecoder(ResAttrDecoder attrDecoder) {
         mAttrDecoder = attrDecoder;
     }
