@@ -97,9 +97,9 @@ final public class AndrolibResources {
 
     public void decode(ResTable resTable, ExtFile apkFile, File outDir)
             throws AndrolibException {
-        Duo<ResFileDecoder, ResAttrDecoder> duo = getResFileDecoder();
+        Duo<ResFileDecoder, AXmlResourceParser> duo = getResFileDecoder();
         ResFileDecoder fileDecoder = duo.m1;
-        ResAttrDecoder attrDecoder = duo.m2;
+        ResAttrDecoder attrDecoder = duo.m2.getAttrDecoder();
 
         attrDecoder.setCurrentPackage(
             resTable.listMainPackages().iterator().next());
@@ -211,20 +211,19 @@ final public class AndrolibResources {
         new ResSmaliUpdater().updateResIDs(resTable, smaliDir);
     }
 
-    public Duo<ResFileDecoder, ResAttrDecoder> getResFileDecoder() {
+    public Duo<ResFileDecoder, AXmlResourceParser> getResFileDecoder() {
         ResStreamDecoderContainer decoders =
             new ResStreamDecoderContainer();
         decoders.setDecoder("raw", new ResRawStreamDecoder());
         decoders.setDecoder("9patch", new Res9patchStreamDecoder());
 
-        ResAttrDecoder attrDecoder = new ResAttrDecoder();
         AXmlResourceParser axmlParser = new AXmlResourceParser();
-        axmlParser.setAttrDecoder(attrDecoder);
+        axmlParser.setAttrDecoder(new ResAttrDecoder());
         decoders.setDecoder("xml",
             new XmlPullStreamDecoder(axmlParser, getResXmlSerializer()));
 
-        return new Duo<ResFileDecoder, ResAttrDecoder>(
-            new ResFileDecoder(decoders), attrDecoder);
+        return new Duo<ResFileDecoder, AXmlResourceParser>(
+            new ResFileDecoder(decoders), axmlParser);
     }
 
     public ExtMXSerializer getResXmlSerializer() {
