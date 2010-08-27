@@ -77,7 +77,7 @@ public class ResFileDecoder {
                         outFileName = outResName + ext;
                     }
                 }
-                if (! ext.equals(".xml")) {
+                if (! ".xml".equals(ext)) {
                     decode(inDir, inFileName, outDir, outFileName, "raw");
                     return;
                 }
