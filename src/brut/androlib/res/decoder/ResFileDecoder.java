@@ -54,23 +54,29 @@ public class ResFileDecoder {
             outFileName = outResName + ext;
         }
 
-        if (typeName.equals("raw")) {
-            decode(inDir, inFileName, outDir, outFileName, "raw");
-            return;
-        }
-        if (typeName.equals("drawable")) {
-            if (inFileName.toLowerCase().endsWith(".9.png")) {
-                outFileName = outResName + ".9" + ext;
-                decode(inDir, inFileName, outDir, outFileName, "9patch");
-                return;
-            }
-            if (! ext.equals(".xml")) {
+        try {
+            if (typeName.equals("raw")) {
                 decode(inDir, inFileName, outDir, outFileName, "raw");
                 return;
             }
-        }
+            if (typeName.equals("drawable")) {
+                if (inFileName.toLowerCase().endsWith(".9.png")) {
+                    outFileName = outResName + ".9" + ext;
+                    decode(inDir, inFileName, outDir, outFileName, "9patch");
+                    return;
+                }
+                if (! ext.equals(".xml")) {
+                    decode(inDir, inFileName, outDir, outFileName, "raw");
+                    return;
+                }
+            }
 
-        decode(inDir, inFileName, outDir, outFileName, "xml");
+            decode(inDir, inFileName, outDir, outFileName, "xml");
+        } catch (AndrolibException ex) {
+            LOGGER.log(Level.SEVERE, String.format(
+                "Could not decode file \"%s\" to \"%s\"",
+                inFileName, outFileName), ex);
+        }
     }
 
     public void decode(Directory inDir, String inFileName, Directory outDir,
@@ -81,18 +87,10 @@ public class ResFileDecoder {
             mDecoders.decode(in, out, decoder);
             in.close();
             out.close();
-        } catch (AndrolibException ex) {
-            LOGGER.log(Level.SEVERE, String.format(
-                "Could not decode file \"%s\" to \"%s\"",
-                inFileName, outFileName), ex);
         } catch (IOException ex) {
-            LOGGER.log(Level.SEVERE, String.format(
-                "Could not decode file \"%s\" to \"%s\"",
-                inFileName, outFileName), ex);
+            throw new AndrolibException(ex);
         } catch (DirectoryException ex) {
-            LOGGER.log(Level.SEVERE, String.format(
-                "Could not decode file \"%s\" to \"%s\"",
-                inFileName, outFileName), ex);
+            throw new AndrolibException(ex);
         }
     }
 
