@@ -18,6 +18,7 @@
 package brut.androlib.res.decoder;
 
 import brut.androlib.AndrolibException;
+import brut.androlib.err.CantFind9PatchChunk;
 import brut.util.ExtDataInput;
 import java.awt.image.BufferedImage;
 import java.io.*;
@@ -79,7 +80,7 @@ public class Res9patchStreamDecoder implements ResStreamDecoder {
             try {
                 size = di.readInt();
             } catch (IOException ex) {
-                throw new AndrolibException("Cant find nine patch chunk", ex);
+                throw new CantFind9PatchChunk("Cant find nine patch chunk", ex);
             }
             if (di.readInt() == NP_CHUNK_TYPE) {
                 return;

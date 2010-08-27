@@ -18,6 +18,7 @@
 package brut.androlib.res.decoder;
 
 import brut.androlib.AndrolibException;
+import brut.androlib.err.CantFind9PatchChunk;
 import brut.androlib.res.data.ResResource;
 import brut.androlib.res.data.value.ResFileValue;
 import brut.directory.Directory;
@@ -62,8 +63,19 @@ public class ResFileDecoder {
             if (typeName.equals("drawable")) {
                 if (inFileName.toLowerCase().endsWith(".9.png")) {
                     outFileName = outResName + ".9" + ext;
-                    decode(inDir, inFileName, outDir, outFileName, "9patch");
-                    return;
+
+                    try {
+                        decode(
+                            inDir, inFileName, outDir, outFileName, "9patch");
+                        return;
+                    } catch (CantFind9PatchChunk ex) {
+                        LOGGER.log(Level.WARNING, String.format(
+                            "Cant find 9patch chunk in file: \"%s\". Renaming it to *.png.",
+                            inFileName
+                        ), ex);
+                        outDir.removeFile(outFileName);
+                        outFileName = outResName + ext;
+                    }
                 }
                 if (! ext.equals(".xml")) {
                     decode(inDir, inFileName, outDir, outFileName, "raw");
