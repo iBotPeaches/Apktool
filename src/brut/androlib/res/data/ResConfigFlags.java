@@ -37,9 +37,10 @@ public class ResConfigFlags {
 
     public final short screenWidth;
     public final short screenHeight;
-    public final byte screenLayout;
 
     public final short sdkVersion;
+
+    public final byte screenLayout;
 
     private final String mQualifiers;
 
@@ -56,15 +57,15 @@ public class ResConfigFlags {
         inputFlags = KEYSHIDDEN_ANY | NAVHIDDEN_ANY;
         screenWidth = 0;
         screenHeight = 0;
-        screenLayout = SCREENLONG_ANY | SCREENSIZE_ANY;
         sdkVersion = 0;
+        screenLayout = SCREENLONG_ANY | SCREENSIZE_ANY;
         mQualifiers = "";
     }
 
     public ResConfigFlags(short mcc, short mnc, char[] language, char[] country,
             byte orientation, byte touchscreen, short density, byte keyboard,
             byte navigation, byte inputFlags, short screenWidth,
-            short screenHeight, byte screenLayout, short sdkVersion) {
+            short screenHeight, short sdkVersion, byte screenLayout) {
         this.mcc = mcc;
         this.mnc = mnc;
         this.language = language;
@@ -77,8 +78,8 @@ public class ResConfigFlags {
         this.inputFlags = inputFlags;
         this.screenWidth = screenWidth;
         this.screenHeight = screenHeight;
-        this.screenLayout = screenLayout;
         this.sdkVersion = sdkVersion;
+        this.screenLayout = screenLayout;
         mQualifiers = generateQualifiers();
     }
 

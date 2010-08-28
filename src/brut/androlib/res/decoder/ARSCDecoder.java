@@ -255,7 +255,7 @@ public class ARSCDecoder {
 
         return new ResConfigFlags(mcc, mnc, language, country, orientation,
             touchscreen, density, keyboard, navigation, inputFlags,
-            screenWidth, screenHeight, screenLayout, sdkVersion);
+            screenWidth, screenHeight, sdkVersion, screenLayout);
     }
 
     private void addMissingResSpecs() throws AndrolibException {
