@@ -306,12 +306,12 @@ public class AXmlResourceParser implements XmlResourceParser {
 
     public String getAttributeValue(int index) {
         int offset = getAttributeOffset(index);
-        int valueType = m_attributes[offset + ATTRIBUTE_IX_VALUE_TYPE];
-        if (valueType == TypedValue.TYPE_STRING) {
-            int valueString = m_attributes[offset + ATTRIBUTE_IX_VALUE_STRING];
+        int valueString = m_attributes[offset + ATTRIBUTE_IX_VALUE_STRING];
+        if (valueString != -1) {
             return AndrolibResources.escapeTextForResXml(
                 m_strings.getString(valueString));
         }
+        int valueType = m_attributes[offset + ATTRIBUTE_IX_VALUE_TYPE];
         int valueData = m_attributes[offset + ATTRIBUTE_IX_VALUE_DATA];
 
         if (mAttrDecoder != null) {
