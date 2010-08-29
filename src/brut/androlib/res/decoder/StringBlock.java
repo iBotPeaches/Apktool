@@ -199,7 +199,8 @@ public class StringBlock {
                         val = tag.substring(pos2 + 1);
                     }
 
-                    builder.append(val).append('"');
+                    builder.append(AndrolibResources.escapeCharsForResXml(val))
+                        .append('"');
                 }
             }
         }
