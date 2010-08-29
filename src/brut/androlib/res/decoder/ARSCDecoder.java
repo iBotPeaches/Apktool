@@ -24,6 +24,7 @@ import brut.util.Duo;
 import brut.util.ExtDataInput;
 import com.mindprod.ledatastream.LEDataInputStream;
 import java.io.*;
+import java.math.BigInteger;
 import java.util.*;
 import java.util.logging.Logger;
 import org.apache.commons.io.input.CountingInputStream;
@@ -216,8 +217,6 @@ public class ARSCDecoder {
         int size = mIn.readInt();
         if (size < 28) {
             throw new AndrolibException("Config size < 28");
-        } else if (size > 32) {
-            LOGGER.warning("Config size > 32");
         }
 
         short mcc = mIn.readShort();
@@ -251,8 +250,14 @@ public class ARSCDecoder {
             mIn.skipBytes(2);
         }
 
-        if (size > 32) {
-            mIn.skipBytes(size - 32);
+        int unknownBytes = size - KNOWN_CONFIG_BYTES;
+        if (unknownBytes > 0) {
+            byte[] buf = new byte[unknownBytes];
+            mIn.readFully(buf);
+            LOGGER.warning(String.format(
+                "Config size > %d. Omitting exceeding bytes: %0" + (unknownBytes * 2) + "X.",
+                KNOWN_CONFIG_BYTES, new BigInteger(buf)));
+
         }
 
         return new ResConfigFlags(mcc, mnc, language, country, orientation,
@@ -359,6 +364,7 @@ public class ARSCDecoder {
 
     private static final Logger LOGGER =
         Logger.getLogger(ARSCDecoder.class.getName());
+    private static final int KNOWN_CONFIG_BYTES = 32;
 
 
     public static class ARSCData {
