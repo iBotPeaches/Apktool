@@ -154,8 +154,8 @@ final public class AndrolibResources {
 
         if (framework) {
             cmd.add("-x");
-            cmd.add("-0");
-            cmd.add("arsc");
+//            cmd.add("-0");
+//            cmd.add("arsc");
         }
 
         if (include != null) {
