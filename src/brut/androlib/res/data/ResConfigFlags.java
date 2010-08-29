@@ -231,11 +231,26 @@ public class ResConfigFlags {
                 ret.append(String.format("-%dx%d", screenHeight, screenWidth));
             }
         }
-        if (sdkVersion != 0) {
+        if (sdkVersion > getNaturalSdkVersionRequirement()) {
             ret.append("-v").append(sdkVersion);
         }
 
         return ret.toString();
+    }
+
+    private short getNaturalSdkVersionRequirement() {
+        if (
+               (uiMode & (MASK_UI_MODE_TYPE | MASK_UI_MODE_NIGHT)) != 0
+        ) {
+            return 8;
+        }
+        if (
+               (screenLayout & (MASK_SCREENSIZE | MASK_SCREENLONG)) != 0
+            || density != DENSITY_DEFAULT
+        ) {
+            return 4;
+        }
+        return 0;
     }
 
     @Override
