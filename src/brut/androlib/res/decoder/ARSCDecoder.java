@@ -244,9 +244,11 @@ public class ARSCDecoder {
         mIn.skipBytes(2);
 
         byte screenLayout = 0;
+        byte uiMode = 0;
         if (size >= 32) {
             screenLayout = mIn.readByte();
-            mIn.skipBytes(3);
+            uiMode = mIn.readByte();
+            mIn.skipBytes(2);
         }
 
         if (size > 32) {
@@ -255,7 +257,7 @@ public class ARSCDecoder {
 
         return new ResConfigFlags(mcc, mnc, language, country, orientation,
             touchscreen, density, keyboard, navigation, inputFlags,
-            screenWidth, screenHeight, sdkVersion, screenLayout);
+            screenWidth, screenHeight, sdkVersion, screenLayout, uiMode);
     }
 
     private void addMissingResSpecs() throws AndrolibException {

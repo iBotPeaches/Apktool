@@ -41,6 +41,7 @@ public class ResConfigFlags {
     public final short sdkVersion;
 
     public final byte screenLayout;
+    public final byte uiMode;
 
     private final String mQualifiers;
 
@@ -59,13 +60,15 @@ public class ResConfigFlags {
         screenHeight = 0;
         sdkVersion = 0;
         screenLayout = SCREENLONG_ANY | SCREENSIZE_ANY;
+        uiMode = UI_MODE_TYPE_ANY | UI_MODE_NIGHT_ANY;
         mQualifiers = "";
     }
 
     public ResConfigFlags(short mcc, short mnc, char[] language, char[] country,
             byte orientation, byte touchscreen, short density, byte keyboard,
             byte navigation, byte inputFlags, short screenWidth,
-            short screenHeight, short sdkVersion, byte screenLayout) {
+            short screenHeight, short sdkVersion, byte screenLayout,
+            byte uiMode) {
         this.mcc = mcc;
         this.mnc = mnc;
         this.language = language;
@@ -80,6 +83,7 @@ public class ResConfigFlags {
         this.screenHeight = screenHeight;
         this.sdkVersion = sdkVersion;
         this.screenLayout = screenLayout;
+        this.uiMode = uiMode;
         mQualifiers = generateQualifiers();
     }
 
@@ -129,6 +133,22 @@ public class ResConfigFlags {
                 break;
             case ORIENTATION_SQUARE:
                 ret.append("-square");
+                break;
+        }
+        switch (uiMode & MASK_UI_MODE_TYPE) {
+            case UI_MODE_TYPE_CAR:
+                ret.append("-car");
+                break;
+            case UI_MODE_TYPE_DESK:
+                ret.append("-desk");
+                break;
+        }
+        switch (uiMode & MASK_UI_MODE_NIGHT) {
+            case UI_MODE_NIGHT_YES:
+                ret.append("-night");
+                break;
+            case UI_MODE_NIGHT_NO:
+                ret.append("-notnight");
                 break;
         }
         switch (density) {
@@ -293,4 +313,15 @@ public class ResConfigFlags {
     public final static byte SCREENLONG_ANY = 0x00;
     public final static byte SCREENLONG_NO = 0x10;
     public final static byte SCREENLONG_YES = 0x20;
+
+    public final static byte MASK_UI_MODE_TYPE = 0x0f;
+    public final static byte UI_MODE_TYPE_ANY = 0x00;
+    public final static byte UI_MODE_TYPE_NORMAL = 0x01;
+    public final static byte UI_MODE_TYPE_DESK = 0x02;
+    public final static byte UI_MODE_TYPE_CAR = 0x03;
+
+    public final static byte MASK_UI_MODE_NIGHT = 0x30;
+    public final static byte UI_MODE_NIGHT_ANY = 0x00;
+    public final static byte UI_MODE_NIGHT_NO = 0x10;
+    public final static byte UI_MODE_NIGHT_YES = 0x20;
 }
