@@ -22,6 +22,7 @@ import brut.directory.DirectoryException;
 import java.io.*;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.logging.Logger;
 import org.apache.commons.io.IOUtils;
 
 /**
@@ -64,7 +65,8 @@ public class SmaliBuilder {
             return;
         }
         if (! fileName.endsWith(".java")) {
-            throw new AndrolibException("Unknown file type: " + inFile);
+            LOGGER.warning("Unknown file type, ignoring: " + inFile);
+            return;
         }
 
         StringBuilder out = new StringBuilder();
@@ -105,4 +107,8 @@ public class SmaliBuilder {
     private final boolean mDebug;
 
     private DexFileBuilder mDexBuilder;
+
+
+    private final static Logger LOGGER =
+        Logger.getLogger(SmaliBuilder.class.getName());
 }
