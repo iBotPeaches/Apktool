@@ -143,7 +143,11 @@ public class ARSCDecoder {
         int[] entryOffsets = mIn.readIntArray(entryCount);
 
         ResConfig config;
-        if (mPkg.hasConfig(flags)) {
+        if (flags.isInvalid) {
+            config = null;
+            LOGGER.warning(
+                "Invalid config flags detected. Dropping resources: " + mType.getName() + flags.getQualifiers());
+        } else if (mPkg.hasConfig(flags)) {
             config = mPkg.getConfig(flags);
         } else {
             config = new ResConfig(flags);
@@ -167,6 +171,13 @@ public class ARSCDecoder {
         short flags = mIn.readShort();
         int specNamesId = mIn.readInt();
 
+        ResValue value = (flags & ENTRY_FLAG_COMPLEX) == 0 ?
+            readValue() : readComplexEntry();
+
+        if (mConfig == null) {
+            return;
+        }
+
         ResID resId = new ResID(mResId);
         ResResSpec spec;
         if (mPkg.hasResSpec(resId)) {
@@ -177,9 +188,6 @@ public class ARSCDecoder {
             mPkg.addResSpec(spec);
             mType.addResSpec(spec);
         }
-
-        ResValue value = (flags & ENTRY_FLAG_COMPLEX) == 0 ?
-            readValue() : readComplexEntry();
         ResResource res = new ResResource(mConfig, spec, value);
 
         mConfig.addResource(res);
@@ -218,6 +226,8 @@ public class ARSCDecoder {
         if (size < 28) {
             throw new AndrolibException("Config size < 28");
         }
+
+        boolean isInvalid = false;
 
         short mcc = mIn.readShort();
         short mnc = mIn.readShort();
@@ -262,7 +272,8 @@ public class ARSCDecoder {
 
         return new ResConfigFlags(mcc, mnc, language, country, orientation,
             touchscreen, density, keyboard, navigation, inputFlags,
-            screenWidth, screenHeight, sdkVersion, screenLayout, uiMode);
+            screenWidth, screenHeight, sdkVersion, screenLayout, uiMode,
+            isInvalid);
     }
 
     private void addMissingResSpecs() throws AndrolibException {

@@ -43,6 +43,8 @@ public class ResConfigFlags {
     public final byte screenLayout;
     public final byte uiMode;
 
+    public final boolean isInvalid;
+
     private final String mQualifiers;
 
     public ResConfigFlags() {
@@ -61,6 +63,7 @@ public class ResConfigFlags {
         sdkVersion = 0;
         screenLayout = SCREENLONG_ANY | SCREENSIZE_ANY;
         uiMode = UI_MODE_TYPE_ANY | UI_MODE_NIGHT_ANY;
+        isInvalid = false;
         mQualifiers = "";
     }
 
@@ -68,7 +71,7 @@ public class ResConfigFlags {
             byte orientation, byte touchscreen, short density, byte keyboard,
             byte navigation, byte inputFlags, short screenWidth,
             short screenHeight, short sdkVersion, byte screenLayout,
-            byte uiMode) {
+            byte uiMode, boolean isInvalid) {
         this.mcc = mcc;
         this.mnc = mnc;
         this.language = language;
@@ -84,6 +87,7 @@ public class ResConfigFlags {
         this.sdkVersion = sdkVersion;
         this.screenLayout = screenLayout;
         this.uiMode = uiMode;
+        this.isInvalid = isInvalid;
         mQualifiers = generateQualifiers();
     }
 
@@ -233,6 +237,9 @@ public class ResConfigFlags {
         }
         if (sdkVersion > getNaturalSdkVersionRequirement()) {
             ret.append("-v").append(sdkVersion);
+        }
+        if (isInvalid) {
+            ret.append("-[ERR]");
         }
 
         return ret.toString();
