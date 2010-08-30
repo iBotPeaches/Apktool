@@ -260,14 +260,22 @@ public class ARSCDecoder {
             mIn.skipBytes(2);
         }
 
-        int unknownBytes = size - KNOWN_CONFIG_BYTES;
-        if (unknownBytes > 0) {
-            byte[] buf = new byte[unknownBytes];
+        int exceedingSize = size - KNOWN_CONFIG_BYTES;
+        if (exceedingSize > 0) {
+            byte[] buf = new byte[exceedingSize];
             mIn.readFully(buf);
-            LOGGER.warning(String.format(
-                "Config size > %d. Omitting exceeding bytes: %0" + (unknownBytes * 2) + "X.",
-                KNOWN_CONFIG_BYTES, new BigInteger(buf)));
+            BigInteger exceedingBI = new BigInteger(buf);
 
+            if (exceedingBI.equals(BigInteger.ZERO)) {
+                LOGGER.fine(String.format(
+                    "Config flags size > %d, but exceeding bytes are all zero, so it should be ok.",
+                    KNOWN_CONFIG_BYTES));
+            } else {
+                LOGGER.warning(String.format(
+                    "Config flags size > %d. Exceeding bytes: %0" + (exceedingSize * 2) + "X.",
+                    KNOWN_CONFIG_BYTES, exceedingBI));
+                isInvalid = true;
+            }
         }
 
         return new ResConfigFlags(mcc, mnc, language, country, orientation,
