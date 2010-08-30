@@ -17,6 +17,8 @@
 
 package brut.androlib.res.data;
 
+import java.util.logging.Logger;
+
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
@@ -72,6 +74,32 @@ public class ResConfigFlags {
             byte navigation, byte inputFlags, short screenWidth,
             short screenHeight, short sdkVersion, byte screenLayout,
             byte uiMode, boolean isInvalid) {
+        if (orientation < 0 || orientation > 3) {
+            LOGGER.warning("Invalid orientation value: " + orientation);
+            orientation = 0;
+            isInvalid = true;
+        }
+        if (touchscreen < 0 || touchscreen > 3) {
+            LOGGER.warning("Invalid touchscreen value: " + touchscreen);
+            touchscreen = 0;
+            isInvalid = true;
+        }
+        if (density < -1) {
+            LOGGER.warning("Invalid density value: " + density);
+            density = 0;
+            isInvalid = true;
+        }
+        if (keyboard < 0 || keyboard > 3) {
+            LOGGER.warning("Invalid keyboard value: " + keyboard);
+            keyboard = 0;
+            isInvalid = true;
+        }
+        if (navigation < 0 || navigation > 4) {
+            LOGGER.warning("Invalid navigation value: " + navigation);
+            navigation = 0;
+            isInvalid = true;
+        }
+
         this.mcc = mcc;
         this.mnc = mnc;
         this.language = language;
@@ -343,4 +371,8 @@ public class ResConfigFlags {
     public final static byte UI_MODE_NIGHT_ANY = 0x00;
     public final static byte UI_MODE_NIGHT_NO = 0x10;
     public final static byte UI_MODE_NIGHT_YES = 0x20;
+
+
+    private static final Logger LOGGER =
+        Logger.getLogger(ResConfigFlags.class.getName());
 }
