@@ -274,16 +274,13 @@ public class ResConfigFlags {
             return false;
         }
         final ResConfigFlags other = (ResConfigFlags) obj;
-        if ((this.mQualifiers == null) ? (other.mQualifiers != null) : !this.mQualifiers.equals(other.mQualifiers)) {
-            return false;
-        }
-        return true;
+        return this.mQualifiers.equals(other.mQualifiers);
     }
 
     @Override
     public int hashCode() {
         int hash = 3;
-        hash = 97 * hash + (this.mQualifiers != null ? this.mQualifiers.hashCode() : 0);
+        hash = 97 * hash + this.mQualifiers.hashCode();
         return hash;
     }
 
