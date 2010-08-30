@@ -267,7 +267,7 @@ public class ResConfigFlags {
             ret.append("-v").append(sdkVersion);
         }
         if (isInvalid) {
-            ret.append("-[ERR]");
+            ret.append("-ERR" + sErrCounter++);
         }
 
         return ret.toString();
@@ -311,6 +311,12 @@ public class ResConfigFlags {
         hash = 97 * hash + this.mQualifiers.hashCode();
         return hash;
     }
+
+
+    // TODO: Dirty static hack. This counter should be a part of ResPackage,
+    // but it would be hard right now and this feature is very rarely used.
+    private static int sErrCounter = 0;
+
 
     public final static byte ORIENTATION_ANY  = 0;
     public final static byte ORIENTATION_PORT = 1;
