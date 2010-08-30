@@ -17,6 +17,7 @@
 package brut.androlib;
 
 import brut.androlib.err.OutDirExistsException;
+import brut.androlib.res.AndrolibResources;
 import brut.androlib.res.data.ResPackage;
 import brut.androlib.res.data.ResTable;
 import brut.androlib.res.util.ExtFile;
@@ -128,12 +129,17 @@ public class ApkDecoder {
         }
     }
 
+    public void setKeepBrokenResources(boolean keepBrokenResources) {
+        mKeepBrokenResources = keepBrokenResources;
+    }
+
     public ResTable getResTable() throws AndrolibException {
         if (mResTable == null) {
             if (! hasResources()) {
                 throw new AndrolibException(
                     "Apk doesn't containt resources.arsc file");
             }
+            AndrolibResources.sKeepBroken = mKeepBrokenResources;
             mResTable = mAndrolib.getResTable(mApkFile);
             mResTable.setFrameTag(mFrameTag);
         }
@@ -218,4 +224,5 @@ public class ApkDecoder {
     private boolean mDebug = false;
     private boolean mForceDelete = false;
     private String mFrameTag;
+    private boolean mKeepBrokenResources = false;
 }

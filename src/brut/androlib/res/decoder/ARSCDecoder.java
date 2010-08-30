@@ -34,16 +34,17 @@ import org.apache.commons.io.input.CountingInputStream;
  */
 public class ARSCDecoder {
     public static ARSCData decode(InputStream arscStream,
-            boolean findFlagsOffsets) throws AndrolibException {
-        return decode(arscStream, findFlagsOffsets, new ResTable());
+            boolean findFlagsOffsets, boolean keepBroken)
+            throws AndrolibException {
+        return decode(arscStream, findFlagsOffsets, keepBroken, new ResTable());
     }
 
     public static ARSCData decode(InputStream arscStream,
-            boolean findFlagsOffsets, ResTable resTable)
+            boolean findFlagsOffsets, boolean keepBroken, ResTable resTable)
             throws AndrolibException {
         try {
             ARSCDecoder decoder = new ARSCDecoder(arscStream, resTable,
-                findFlagsOffsets);
+                findFlagsOffsets, keepBroken);
             ResPackage[] pkgs = decoder.readTable();
             return new ARSCData(
                 pkgs,
@@ -56,7 +57,7 @@ public class ARSCDecoder {
     }
 
     private ARSCDecoder(InputStream arscStream, ResTable resTable,
-            boolean storeFlagsOffsets) {
+            boolean storeFlagsOffsets, boolean keepBroken) {
         if (storeFlagsOffsets) {
             arscStream = mCountIn = new CountingInputStream(arscStream);
             mFlagsOffsets = new ArrayList<FlagsOffset>();
@@ -66,6 +67,7 @@ public class ARSCDecoder {
         }
         mIn = new ExtDataInput(new LEDataInputStream(arscStream));
         mResTable = resTable;
+        mKeepBroken = keepBroken;
     }
 
     private ResPackage[] readTable() throws IOException, AndrolibException {
@@ -142,11 +144,20 @@ public class ARSCDecoder {
         ResConfigFlags flags = readConfigFlags();
         int[] entryOffsets = mIn.readIntArray(entryCount);
 
-        ResConfig config;
         if (flags.isInvalid) {
+            String resName = mType.getName() + flags.getQualifiers();
+            if (mKeepBroken) {
+                LOGGER.warning(
+                    "Invalid config flags detected: " + resName);
+            } else {
+                LOGGER.warning(
+                    "Invalid config flags detected. Dropping resources: " + resName);
+            }
+        }
+
+        ResConfig config;
+        if (flags.isInvalid && ! mKeepBroken) {
             config = null;
-            LOGGER.warning(
-                "Invalid config flags detected. Dropping resources: " + mType.getName() + flags.getQualifiers());
         } else if (mPkg.hasConfig(flags)) {
             config = mPkg.getConfig(flags);
         } else {
@@ -328,6 +339,7 @@ public class ARSCDecoder {
     private final ResTable mResTable;
     private final CountingInputStream mCountIn;
     private final List<FlagsOffset> mFlagsOffsets;
+    private final boolean mKeepBroken;
 
     private Header mHeader;
     private StringBlock mTableStrings;
