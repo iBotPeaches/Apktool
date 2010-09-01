@@ -56,8 +56,13 @@ public class ResConfig {
 
     public void addResource(ResResource res)
             throws AndrolibException {
+        addResource(res, false);
+    }
+
+    public void addResource(ResResource res, boolean overwrite)
+            throws AndrolibException {
         ResResSpec spec = res.getResSpec();
-        if (mResources.put(spec, res) != null) {
+        if (mResources.put(spec, res) != null && ! overwrite) {
             throw new AndrolibException(String.format(
                 "Multiple resources: spec=%s, config=%s", spec, this));
         }

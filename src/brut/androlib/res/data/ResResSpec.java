@@ -107,8 +107,13 @@ public class ResResSpec {
 
     public void addResource(ResResource res)
             throws AndrolibException {
+        addResource(res, false);
+    }
+
+    public void addResource(ResResource res, boolean overwrite)
+            throws AndrolibException {
         ResConfigFlags flags = res.getConfig().getFlags();
-        if (mResources.put(flags, res) != null) {
+        if (mResources.put(flags, res) != null && ! overwrite) {
             throw new AndrolibException(String.format(
                 "Multiple resources: spec=%s, config=%s", this, flags));
         }
