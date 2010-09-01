@@ -17,6 +17,7 @@
 
 package brut.androlib.res.data;
 
+import brut.androlib.AndrolibException;
 import brut.androlib.res.data.value.ResValue;
 
 /**
@@ -49,6 +50,12 @@ public class ResResource {
 
     public ResValue getValue() {
         return mValue;
+    }
+
+    public void replace(ResValue value) throws AndrolibException {
+        ResResource res = new ResResource(mConfig, mResSpec, value);
+        mConfig.addResource(res, true);
+        mResSpec.addResource(res, true);
     }
 
     @Override
