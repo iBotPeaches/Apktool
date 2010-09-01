@@ -20,6 +20,7 @@ package brut.androlib.res.decoder;
 import brut.androlib.AndrolibException;
 import brut.androlib.err.CantFind9PatchChunk;
 import brut.androlib.res.data.ResResource;
+import brut.androlib.res.data.value.ResBoolValue;
 import brut.androlib.res.data.value.ResFileValue;
 import brut.directory.Directory;
 import brut.directory.DirectoryException;
@@ -86,8 +87,9 @@ public class ResFileDecoder {
             decode(inDir, inFileName, outDir, outFileName, "xml");
         } catch (AndrolibException ex) {
             LOGGER.log(Level.SEVERE, String.format(
-                "Could not decode file \"%s\" to \"%s\"",
+                "Could not decode file, replacing by FALSE value: %s",
                 inFileName, outFileName), ex);
+            res.replace(new ResBoolValue(false));
         }
     }
 
