@@ -39,9 +39,6 @@ public class ResPackage {
         new LinkedHashMap<ResConfigFlags, ResConfig>();
     private final Map<String, ResType> mTypes =
         new LinkedHashMap<String, ResType>();
-    private final Set<ResResource> mFiles = new LinkedHashSet<ResResource>();
-    private final Map<Duo<ResType, ResConfig>, ResValuesFile> mValuesFiles =
-        new LinkedHashMap<Duo<ResType, ResConfig>, ResValuesFile>();
     private final Set<ResID> mSynthesizedRes = new HashSet<ResID>();
 
     private ResValueFactory mValueFactory;
@@ -111,11 +108,37 @@ public class ResPackage {
     }
 
     public Set<ResResource> listFiles() {
-        return mFiles;
+        Set<ResResource> ret = new HashSet<ResResource>();
+        for (ResResSpec spec : mResSpecs.values()) {
+            for (ResResource res : spec.listResources()) {
+                if (res.getValue() instanceof ResFileValue) {
+                    ret.add(res);
+                }
+            }
+        }
+        return ret;
     }
 
     public Collection<ResValuesFile> listValuesFiles() {
-        return mValuesFiles.values();
+        Map<Duo<ResType, ResConfig>, ResValuesFile> ret =
+            new HashMap<Duo<ResType, ResConfig>, ResValuesFile>();
+        for (ResResSpec spec : mResSpecs.values()) {
+            for (ResResource res : spec.listResources()) {
+                if (res.getValue() instanceof ResXmlSerializable) {
+                    ResType type = res.getResSpec().getType();
+                    ResConfig config = res.getConfig();
+                    Duo<ResType, ResConfig> key =
+                        new Duo<ResType, ResConfig>(type, config);
+                    ResValuesFile values = ret.get(key);
+                    if (values == null) {
+                        values = new ResValuesFile(this, type, config);
+                        ret.put(key, values);
+                    }
+                    values.addResource(res);
+                }
+            }
+        }
+        return ret.values();
     }
 
     public ResTable getResTable() {
@@ -153,22 +176,6 @@ public class ResPackage {
     }
 
     public void addResource(ResResource res) {
-        ResValue value = res.getValue();
-        if (value instanceof ResFileValue) {
-            mFiles.add(res);
-        }
-        if (value instanceof ResXmlSerializable) {
-            ResType type = res.getResSpec().getType();
-            ResConfig config = res.getConfig();
-            Duo<ResType, ResConfig> key =
-                new Duo<ResType, ResConfig>(type, config);
-            ResValuesFile values = mValuesFiles.get(key);
-            if (values == null) {
-                values = new ResValuesFile(this, type, config);
-                mValuesFiles.put(key, values);
-            }
-            values.addResource(res);
-        }
     }
 
     public void addSynthesizedRes(int resId) {
