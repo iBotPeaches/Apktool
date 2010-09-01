@@ -84,6 +84,16 @@ public class ResPackage {
         return config;
     }
 
+    public ResConfig getOrCreateConfig(ResConfigFlags flags)
+            throws AndrolibException {
+        ResConfig config = mConfigs.get(flags);
+        if (config == null) {
+            config = new ResConfig(flags);
+            mConfigs.put(flags, config);
+        }
+        return config;
+    }
+
     public List<ResType> listTypes() {
         return new ArrayList<ResType>(mTypes.values());
     }

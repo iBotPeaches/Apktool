@@ -155,16 +155,8 @@ public class ARSCDecoder {
             }
         }
 
-        ResConfig config;
-        if (flags.isInvalid && ! mKeepBroken) {
-            config = null;
-        } else if (mPkg.hasConfig(flags)) {
-            config = mPkg.getConfig(flags);
-        } else {
-            config = new ResConfig(flags);
-            mPkg.addConfig(config);
-        }
-        mConfig = config;
+        mConfig = flags.isInvalid && ! mKeepBroken ?
+            null : mPkg.getOrCreateConfig(flags);
 
         for (int i = 0; i < entryOffsets.length; i++) {
             if (entryOffsets[i] != -1) {
@@ -174,7 +166,7 @@ public class ARSCDecoder {
             }
         }
         
-        return config;
+        return mConfig;
     }
 
     private void readEntry() throws IOException, AndrolibException {
