@@ -14,7 +14,7 @@
  *  limitations under the License.
  *  under the License.
  */
-package brut.androlib.src.mod;
+package brut.androlib.mod;
 
 import java.io.Writer;
 

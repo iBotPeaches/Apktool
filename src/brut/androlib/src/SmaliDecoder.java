@@ -17,7 +17,7 @@
 package brut.androlib.src;
 
 import brut.androlib.AndrolibException;
-import brut.androlib.src.mod.IndentingWriter;
+import brut.androlib.mod.IndentingWriter;
 import java.io.*;
 import org.jf.baksmali.Adaptors.ClassDefinition;
 import org.jf.baksmali.baksmali;
