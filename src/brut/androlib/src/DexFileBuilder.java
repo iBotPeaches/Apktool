@@ -17,14 +17,12 @@
 package brut.androlib.src;
 
 import brut.androlib.AndrolibException;
+import brut.androlib.mod.SmaliMod;
 import java.io.*;
-import org.antlr.runtime.*;
-import org.antlr.runtime.tree.CommonTree;
-import org.antlr.runtime.tree.CommonTreeNodeStream;
+import org.antlr.runtime.RecognitionException;
 import org.jf.dexlib.CodeItem;
 import org.jf.dexlib.DexFile;
 import org.jf.dexlib.Util.ByteArrayAnnotatedOutput;
-import org.jf.smali.*;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
@@ -42,7 +40,8 @@ public class DexFileBuilder {
     public void addSmaliFile(InputStream smaliStream, String name)
             throws AndrolibException {
         try {
-            if (!assembleSmaliFile(smaliStream, name)) {
+            if (! SmaliMod.assembleSmaliFile(
+                    smaliStream, name, mDexFile, false, false, false)) {
                 throw new AndrolibException(
                     "Could not smali file: " + smaliStream);
             }
@@ -80,39 +79,6 @@ public class DexFileBuilder {
         DexFile.calcChecksum(bytes);
 
         return bytes;
-    }
-
-    private boolean assembleSmaliFile(InputStream smaliStream, String name)
-            throws IOException, RecognitionException {
-        ANTLRInputStream input = new ANTLRInputStream(smaliStream, "UTF8");
-        input.name = name;
-
-        smaliLexer lexer = new smaliLexer(input);
-
-        CommonTokenStream tokens = new CommonTokenStream(lexer);
-        smaliParser parser = new smaliParser(tokens);
-
-        smaliParser.smali_file_return result = parser.smali_file();
-
-        if (parser.getNumberOfSyntaxErrors() > 0 || lexer.getNumberOfLexerErrors() > 0) {
-            return false;
-        }
-
-        CommonTree t = (CommonTree) result.getTree();
-
-        CommonTreeNodeStream treeStream = new CommonTreeNodeStream(t);
-        treeStream.setTokenStream(tokens);
-
-        smaliTreeWalker dexGen = new smaliTreeWalker(treeStream);
-
-        dexGen.dexFile = mDexFile;
-        dexGen.smali_file();
-
-        if (dexGen.getNumberOfSyntaxErrors() > 0) {
-            return false;
-        }
-
-        return true;
     }
 
     private final DexFile mDexFile = new DexFile();
