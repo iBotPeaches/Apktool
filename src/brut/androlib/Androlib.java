@@ -429,5 +429,5 @@ public class Androlib {
         new String[]{"resources.arsc", "AndroidManifest.xml"};
     private final static String[] APP_RESOURCES_FILENAMES =
         new String[]{"AndroidManifest.xml", "res"};
-    private final static String VERSION = "1.3.1";
+    private final static String VERSION = "1.3.2";
 }
