@@ -28,9 +28,10 @@ import org.jf.smali.*;
  */
 public class SmaliMod {
 
-    private static boolean assembleSmaliFile(File smaliFile, DexFile dexFile, boolean verboseErrors, boolean oldLexer,
-                                             boolean printTokens)
-            throws Exception {
+    public static boolean assembleSmaliFile(InputStream smaliStream,
+            String name, DexFile dexFile, boolean verboseErrors,
+            boolean oldLexer, boolean printTokens)
+            throws IOException, RecognitionException {
         CommonTokenStream tokens;
 
 
@@ -38,17 +39,16 @@ public class SmaliMod {
         LexerErrorInterface lexer;
 
         if (oldLexer) {
-            ANTLRFileStream input = new ANTLRFileStream(smaliFile.getAbsolutePath(), "UTF-8");
-            input.name = smaliFile.getAbsolutePath();
+            ANTLRInputStream input = new ANTLRInputStream(smaliStream, "UTF-8");
+            input.name = name;
 
             lexer = new smaliLexer(input);
             tokens = new CommonTokenStream((TokenSource)lexer);
         } else {
-            FileInputStream fis = new FileInputStream(smaliFile.getAbsolutePath());
-            InputStreamReader reader = new InputStreamReader(fis, "UTF-8");
+            InputStreamReader reader =
+                new InputStreamReader(smaliStream, "UTF-8");
 
             lexer = new smaliFlexLexer(reader);
-            ((smaliFlexLexer)lexer).setSourceFile(smaliFile);
             tokens = new CommonTokenStream((TokenSource)lexer);
         }
 

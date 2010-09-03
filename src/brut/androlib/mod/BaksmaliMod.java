@@ -16,6 +16,7 @@
  */
 package brut.androlib.mod;
 
+import brut.androlib.src.TypeName;
 import java.io.*;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -32,7 +33,7 @@ import org.jf.dexlib.DexFile;
  */
 public class BaksmaliMod {
 
-    public static void disassembleDexFile(String dexFilePath, DexFile dexFile, boolean deodex, String outputDirectory,
+    public static void disassembleDexFile(boolean debug, String dexFilePath, DexFile dexFile, boolean deodex, String outputDirectory,
                                           String[] classPathDirs, String bootClassPath, String extraBootClassPath,
                                           boolean noParameterRegisters, boolean useLocalsDirective,
                                           boolean useSequentialLabels, boolean outputDebugInfo, boolean addCodeOffsets,
@@ -58,7 +59,10 @@ public class BaksmaliMod {
             };
         }
 
-        if (registerInfo != 0 || deodex || verify) {
+        boolean analyze = ! ClassPath.dontLoadClassPath
+            && (registerInfo != 0 || deodex || verify);
+
+        if (analyze) {
             try {
                 String[] extraBootClassPathArray = null;
                 if (extraBootClassPath != null && extraBootClassPath.length() > 0) {
@@ -121,7 +125,7 @@ public class BaksmaliMod {
              * package name are separated by '/'
              */
 
-            if (registerInfo != 0 || deodex || verify) {
+            if (analyze) {
                 //If we are analyzing the bytecode, make sure that this class is loaded into the ClassPath. If it isn't
                 //then there was some error while loading it, and we should skip it
                 ClassPath.ClassDef classDef = ClassPath.getClassDef(classDefItem.getClassType(), false);
@@ -140,6 +144,12 @@ public class BaksmaliMod {
             }
 
             File smaliFile = fileNameHandler.getUniqueFilenameForClass(classDescriptor);
+
+            if (debug) {
+                String smaliPath = smaliFile.getPath();
+                smaliFile = new File(
+                    smaliPath.substring(0, smaliPath.length() - 6) + ".java");
+            }
 
             //create and initialize the top level string template
             ClassDefinition classDefinition = new ClassDefinition(classDefItem);
@@ -167,7 +177,19 @@ public class BaksmaliMod {
                         new FileOutputStream(smaliFile), "UTF8"));
 
                 writer = new IndentingWriter(bufWriter);
+
+                if (debug) {
+                    TypeName name = TypeName.fromInternalName(
+                        classDefItem.getClassType().getTypeDescriptor());
+                    writer.write("package " + name.package_ + "; class "
+                        + name.getName(true, true) + " {/*\n\n");
+                }
+
                 classDefinition.writeTo((IndentingWriter)writer);
+
+                if (debug) {
+                    writer.write("\n*/}\n");
+                }
             } catch (Exception ex) {
                 System.err.println("\n\nError occured while disassembling class " + classDescriptor.replace('/', '.') + " - skipping class");
                 ex.printStackTrace();
