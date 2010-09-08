@@ -71,6 +71,7 @@ final public class AndrolibResources {
         }
 
         resTable.addPackage(pkg, true);
+        LOGGER.info("Loaded.");
         return pkg;
     }
 
@@ -94,6 +95,7 @@ final public class AndrolibResources {
         }
 
         resTable.addPackage(pkg, false);
+        LOGGER.info("Loaded.");
         return pkg;
     }
 
@@ -126,13 +128,18 @@ final public class AndrolibResources {
         ExtMXSerializer xmlSerializer = getResXmlSerializer();
         for (ResPackage pkg : resTable.listMainPackages()) {
             attrDecoder.setCurrentPackage(pkg);
+
+            LOGGER.info("Decoding file-resources...");
             for (ResResource res : pkg.listFiles()) {
                 fileDecoder.decode(res, in, out);
             }
+
+            LOGGER.info("Decoding values*/* XMLs...");
             for (ResValuesFile valuesFile : pkg.listValuesFiles()) {
                 generateValuesFile(valuesFile, out, xmlSerializer);
             }
             generatePublicXml(pkg, out, xmlSerializer);
+            LOGGER.info("Done.");
         }
 
         AndrolibException decodeError = duo.m2.getFirstError();
