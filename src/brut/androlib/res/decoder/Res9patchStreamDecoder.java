@@ -101,7 +101,7 @@ public class Res9patchStreamDecoder implements ResStreamDecoder {
         }
     }
 
-    private static final int NP_CHUNK_TYPE = 0x6e705463;
+    private static final int NP_CHUNK_TYPE = 0x6e705463; // npTc
     private static final int NP_COLOR = 0xff000000;
 
 
