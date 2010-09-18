@@ -116,10 +116,19 @@ public class Androlib {
         options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
 //        options.setIndent(4);
         Yaml yaml = new Yaml(options);
+
+        FileWriter writer = null;
         try {
-            yaml.dump(meta, new FileWriter(new File(mOutDir, "apktool.yml")));
+            writer = new FileWriter(new File(mOutDir, "apktool.yml"));
+            yaml.dump(meta, writer);
         } catch (IOException ex) {
             throw new AndrolibException(ex);
+        } finally {
+            if (writer != null) {
+                try {
+                    writer.close();
+                } catch (IOException ex) {}
+            }
         }
     }
 
