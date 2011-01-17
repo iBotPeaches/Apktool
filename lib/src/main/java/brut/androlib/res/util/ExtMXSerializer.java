@@ -56,6 +56,11 @@ public class ExtMXSerializer extends MXSerializer {
         }
     }
 
+    public final String EXT_PROPERTY_SERIALIZER_INDENTATION =
+            PROPERTY_SERIALIZER_INDENTATION;
+    public final String EXT_PROPERTY_SERIALIZER_LINE_SEPARATOR =
+            PROPERTY_SERIALIZER_LINE_SEPARATOR;
+
     public final static String PROPERTY_DEFAULT_ENCODING = "DEFAULT_ENCODING";
 
     private String mDefaultEncoding;

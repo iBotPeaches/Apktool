@@ -242,8 +242,8 @@ final public class AndrolibResources {
 
     public ExtMXSerializer getResXmlSerializer() {
         ExtMXSerializer serial = new ExtMXSerializer();
-        serial.setProperty(serial.PROPERTY_SERIALIZER_INDENTATION, "    ");
-        serial.setProperty(serial.PROPERTY_SERIALIZER_LINE_SEPARATOR,
+        serial.setProperty(serial.EXT_PROPERTY_SERIALIZER_INDENTATION, "    ");
+        serial.setProperty(serial.EXT_PROPERTY_SERIALIZER_LINE_SEPARATOR,
             System.getProperty("line.separator"));
         serial.setProperty(ExtMXSerializer.PROPERTY_DEFAULT_ENCODING, "UTF-8");
         return serial;
