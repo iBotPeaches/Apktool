@@ -9,7 +9,7 @@
 
     <parent>
         <groupId>brut.apktool</groupId>
-        <artifactId>apktool-pom</artifactId>
+        <artifactId>apktool-project</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
