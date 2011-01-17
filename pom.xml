@@ -21,7 +21,7 @@
     <build>
         <resources>
             <resource>
-                <directory>${basedir}</directory>
+                <directory>..</directory>
                 <includes>
                     <include>LICENSE</include>
                     <include>NOTICE</include>
