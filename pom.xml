@@ -35,7 +35,7 @@
                 <groupId>com.mycila.maven-license-plugin</groupId>
                 <artifactId>maven-license-plugin</artifactId>
                 <configuration>
-                    <header>src/templates/apache2.0-header.txt</header>
+                    <header>${project.parent.basedir}/src/templates/apache2.0-header.txt</header>
                     <strictCheck>true</strictCheck>
                 </configuration>
                 <executions>
