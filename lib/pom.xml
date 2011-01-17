@@ -15,6 +15,21 @@
 
     <name>apktool library</name>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.mycila.maven-license-plugin</groupId>
+                <artifactId>maven-license-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>src/main/java/com/mindprod/**</exclude>
+                        <exclude>src/main/java/android/**</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
     <dependencies>
         <dependency>
             <groupId>brut.j</groupId>
