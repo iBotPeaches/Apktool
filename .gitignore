@@ -2,4 +2,6 @@
 /build
 /dist
 /build.xml
+/target
+/lib/target
 
