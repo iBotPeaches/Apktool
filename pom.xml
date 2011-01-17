@@ -16,6 +16,7 @@
 
     <modules>
         <module>lib</module>
+        <module>cli</module>
     </modules>
 
     <build>
