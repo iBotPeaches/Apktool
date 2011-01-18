@@ -3,6 +3,6 @@
 /dist
 /build.xml
 /target
-/lib/target
-/cli/target
+/apktool-lib/target
+/apktool-cli/target
 

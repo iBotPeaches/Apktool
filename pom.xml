@@ -15,8 +15,8 @@
     </properties>
 
     <modules>
-        <module>lib</module>
-        <module>cli</module>
+        <module>apktool-lib</module>
+        <module>apktool-cli</module>
     </modules>
 
     <build>
