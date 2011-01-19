@@ -15,6 +15,10 @@
 
     <name>apktool library</name>
 
+    <properties>
+        <smaliVersion>1.2.4-brut1</smaliVersion>
+    </properties>
+
     <build>
         <plugins>
             <plugin>
@@ -49,17 +53,17 @@
         <dependency>
             <groupId>brut.apktool.smali</groupId>
             <artifactId>smali</artifactId>
-            <version>1.2.4-brut1</version>
+            <version>${smaliVersion}</version>
         </dependency>
         <dependency>
             <groupId>brut.apktool.smali</groupId>
             <artifactId>baksmali</artifactId>
-            <version>1.2.4-brut1</version>
+            <version>${smaliVersion}</version>
         </dependency>
         <dependency>
             <groupId>brut.apktool.smali</groupId>
             <artifactId>dexlib</artifactId>
-            <version>1.2.4-brut1</version>
+            <version>${smaliVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.yaml</groupId>
