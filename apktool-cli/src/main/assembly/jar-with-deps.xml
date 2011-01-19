@@ -1,0 +1,23 @@
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
+  <id>jar-with-deps</id>
+  <formats>
+    <format>jar</format>
+  </formats>
+  <includeBaseDirectory>false</includeBaseDirectory>
+  <dependencySets>
+    <dependencySet>
+      <outputDirectory>/</outputDirectory>
+      <unpack>true</unpack>
+      <scope>runtime</scope>
+      <includes>
+          <include>brut.*</include>
+          <include>xpp3:xpp3</include>
+          <include>org.yaml:snakeyaml</include>
+          <include>commons-io:*</include>
+          <include>org.antlr:antlr-runtime</include>
+      </includes>
+    </dependencySet>
+  </dependencySets>
+</assembly>
