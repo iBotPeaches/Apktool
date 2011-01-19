@@ -16,7 +16,7 @@
     <name>apktool library</name>
 
     <properties>
-        <smaliVersion>1.2.4-brut1</smaliVersion>
+        <smaliVersion>1.2.4-brut3</smaliVersion>
     </properties>
 
     <build>
