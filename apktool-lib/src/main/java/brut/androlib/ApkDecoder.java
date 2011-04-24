@@ -16,6 +16,7 @@
 
 package brut.androlib;
 
+import brut.androlib.err.InFileNotFoundException;
 import brut.androlib.err.OutDirExistsException;
 import brut.androlib.res.AndrolibResources;
 import brut.androlib.res.data.ResPackage;
@@ -62,6 +63,10 @@ public class ApkDecoder {
 
         if (! mForceDelete && outDir.exists()) {
             throw new OutDirExistsException();
+        }
+
+        if (! mApkFile.isFile() || ! mApkFile.canRead() ) {
+            throw new InFileNotFoundException();
         }
 
         try {

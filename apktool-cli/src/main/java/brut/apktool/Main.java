@@ -18,6 +18,7 @@ package brut.apktool;
 
 import brut.androlib.*;
 import brut.androlib.err.CantFindFrameworkResException;
+import brut.androlib.err.InFileNotFoundException;
 import brut.androlib.err.OutDirExistsException;
 import java.io.File;
 import java.io.IOException;
@@ -121,6 +122,11 @@ public class Main {
             System.out.println(
                 "Destination directory (" + outDir.getAbsolutePath() + ") " +
                 "already exists. Use -f switch if you want to overwrite it.");
+            System.exit(1);
+        } catch (InFileNotFoundException ex) {
+            System.out.println(
+                "Input file (" + args[i] + ") " +
+                "was not found or was not readable.");
             System.exit(1);
         } catch (CantFindFrameworkResException ex) {
             System.out.println(
