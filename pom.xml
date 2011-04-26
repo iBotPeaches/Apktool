@@ -37,8 +37,14 @@
                 <groupId>com.mycila.maven-license-plugin</groupId>
                 <artifactId>maven-license-plugin</artifactId>
                 <configuration>
-                    <header>${project.parent.basedir}/src/templates/apache2.0-header.txt</header>
+                    <header>${root.basedir}/src/templates/apache2.0-header.txt</header>
                     <strictCheck>true</strictCheck>
+                    <excludes>
+                        <exclude>.gitignore</exclude>
+                        <exclude>LICENSE</exclude>
+                        <exclude>NOTICE</exclude>
+                        <exclude>NOTICE-smali</exclude>
+                    </excludes>
                 </configuration>
                 <executions>
                     <execution>
