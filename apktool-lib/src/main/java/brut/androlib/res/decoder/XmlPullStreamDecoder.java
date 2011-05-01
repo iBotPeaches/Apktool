@@ -46,8 +46,6 @@ public class XmlPullStreamDecoder implements ResStreamDecoder {
                 ser.event(par);
             }
             ser.flush();
-            in.close();
-            out.close();
         } catch (XmlPullParserException ex) {
             throw new AndrolibException("Could not decode XML", ex);
         } catch (IOException ex) {
