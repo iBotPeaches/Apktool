@@ -249,7 +249,7 @@ final public class AndrolibResources {
     }
 
     private void generateValuesFile(ResValuesFile valuesFile, Directory out,
-            XmlSerializer serial) throws AndrolibException {
+            ExtXmlSerializer serial) throws AndrolibException {
         try {
             OutputStream outStream = out.getFileOutput(valuesFile.getPath());
             serial.setOutput((outStream), null);
@@ -265,6 +265,7 @@ final public class AndrolibResources {
             }
             
             serial.endTag(null, "resources");
+            serial.newLine();
             serial.endDocument();
             serial.flush();
             outStream.close();

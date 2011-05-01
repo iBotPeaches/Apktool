@@ -17,8 +17,8 @@
 package brut.androlib.res.decoder;
 
 import brut.androlib.AndrolibException;
+import brut.androlib.res.util.ExtXmlSerializer;
 import java.io.*;
-import java.util.logging.Logger;
 import org.xmlpull.v1.*;
 import org.xmlpull.v1.wrapper.*;
 
@@ -27,7 +27,7 @@ import org.xmlpull.v1.wrapper.*;
  */
 public class XmlPullStreamDecoder implements ResStreamDecoder {
     public XmlPullStreamDecoder(XmlPullParser parser,
-            XmlSerializer serializer) {
+            ExtXmlSerializer serializer) {
         this.mParser = parser;
         this.mSerial = serializer;
     }
@@ -45,6 +45,7 @@ public class XmlPullStreamDecoder implements ResStreamDecoder {
             while (par.nextToken() != XmlPullParser.END_DOCUMENT) {
                 ser.event(par);
             }
+            mSerial.newLine();
             ser.flush();
         } catch (XmlPullParserException ex) {
             throw new AndrolibException("Could not decode XML", ex);
@@ -54,5 +55,5 @@ public class XmlPullStreamDecoder implements ResStreamDecoder {
     }
 
     private final XmlPullParser mParser;
-    private final XmlSerializer mSerial;
+    private final ExtXmlSerializer mSerial;
 }
