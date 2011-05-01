@@ -23,8 +23,7 @@ import brut.androlib.res.data.value.ResXmlSerializable;
 import brut.androlib.res.decoder.*;
 import brut.androlib.res.decoder.ARSCDecoder.ARSCData;
 import brut.androlib.res.decoder.ARSCDecoder.FlagsOffset;
-import brut.androlib.res.util.ExtFile;
-import brut.androlib.res.util.ExtMXSerializer;
+import brut.androlib.res.util.*;
 import brut.common.BrutException;
 import brut.directory.*;
 import brut.util.*;
@@ -241,8 +240,9 @@ final public class AndrolibResources {
 
     public ExtMXSerializer getResXmlSerializer() {
         ExtMXSerializer serial = new ExtMXSerializer();
-        serial.setProperty(serial.EXT_PROPERTY_SERIALIZER_INDENTATION, "    ");
-        serial.setProperty(serial.EXT_PROPERTY_SERIALIZER_LINE_SEPARATOR,
+        serial.setProperty(ExtXmlSerializer.PROPERTY_SERIALIZER_INDENTATION
+                , "    ");
+        serial.setProperty(ExtXmlSerializer.PROPERTY_SERIALIZER_LINE_SEPARATOR,
             System.getProperty("line.separator"));
         serial.setProperty(ExtMXSerializer.PROPERTY_DEFAULT_ENCODING, "UTF-8");
         return serial;

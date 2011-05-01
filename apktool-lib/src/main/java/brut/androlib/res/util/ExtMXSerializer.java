@@ -23,13 +23,13 @@ import org.xmlpull.mxp1_serializer.MXSerializer;
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
-public class ExtMXSerializer extends MXSerializer {
+public class ExtMXSerializer extends MXSerializer implements ExtXmlSerializer {
     @Override
     public void startDocument(String encoding, Boolean standalone) throws
             IOException, IllegalArgumentException, IllegalStateException {
         super.startDocument(encoding != null ? encoding : mDefaultEncoding,
             standalone);
-        super.out.write(lineSeparator);
+        this.newLine();
     }
 
     @Override
@@ -55,12 +55,10 @@ public class ExtMXSerializer extends MXSerializer {
         }
     }
 
-    public final String EXT_PROPERTY_SERIALIZER_INDENTATION =
-            PROPERTY_SERIALIZER_INDENTATION;
-    public final String EXT_PROPERTY_SERIALIZER_LINE_SEPARATOR =
-            PROPERTY_SERIALIZER_LINE_SEPARATOR;
-
-    public final static String PROPERTY_DEFAULT_ENCODING = "DEFAULT_ENCODING";
+    public ExtXmlSerializer newLine() throws IOException {
+        super.out.write(lineSeparator);
+        return this;
+    }
 
     private String mDefaultEncoding;
 }
