@@ -68,6 +68,13 @@ public class BuildAndDecodeTest {
     }
 
     @Test
+    public void crossTypeTest() throws BrutException {
+        compareValuesFiles("values-mcc003/strings.xml");
+        compareValuesFiles("values-mcc003/integers.xml");
+        compareValuesFiles("values-mcc003/bools.xml");
+    }
+
+    @Test
     public void layout1Test() throws BrutException {
         compareXmlFiles("res/layout/layout1.xml");
     }
