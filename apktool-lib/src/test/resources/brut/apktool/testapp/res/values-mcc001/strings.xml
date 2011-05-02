@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <string name="test_literal1"></string>
+    <string name="test_literal2">Lorem ipsum...</string>
+    <string name="test_literal3">\@</string>
+    <string name="test_literal4">\?</string>
+    <string name="test_literal5">&amp;</string>
+</resources>
