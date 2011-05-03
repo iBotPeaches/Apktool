@@ -114,6 +114,12 @@ public class BuildAndDecodeTest {
         compareXmlFiles("res/xml/references.xml");
     }
 
+    @Test
+    public void qualifiersTest() throws BrutException {
+        compareValuesFiles("values-mcc004-mnc4-en-rUS-xlarge-long-land-desk-" +
+                "night-xhdpi-finger-keyssoft-12key-navhidden-dpad/strings.xml");
+    }
+
     private void compareValuesFiles(String path) throws BrutException {
         compareXmlFiles("res/" + path,
                 new ElementNameAndAttributeQualifier("name"));
