@@ -306,15 +306,15 @@ public class AXmlResourceParser implements XmlResourceParser {
 
     public String getAttributeValue(int index) {
         int offset = getAttributeOffset(index);
-        int valueString = m_attributes[offset + ATTRIBUTE_IX_VALUE_STRING];
-        if (valueString != -1) {
-            return AndrolibResources.escapeTextForResXml(
-                m_strings.getString(valueString));
-        }
         int valueType = m_attributes[offset + ATTRIBUTE_IX_VALUE_TYPE];
         int valueData = m_attributes[offset + ATTRIBUTE_IX_VALUE_DATA];
+        int valueString = m_attributes[offset + ATTRIBUTE_IX_VALUE_STRING];
 
-        if (mAttrDecoder != null) {
+        if (mAttrDecoder != null && (
+                valueString == -1
+                || valueType == TypedValue.TYPE_REFERENCE
+                || valueType == TypedValue.TYPE_ATTRIBUTE
+        )) {
             try {
                 return mAttrDecoder.decode(valueType, valueData,
                     getAttributeNameResource(index));
@@ -327,6 +327,11 @@ public class AXmlResourceParser implements XmlResourceParser {
                     valueData
                 ), ex);
             }
+        }
+
+        if (valueString != -1) {
+            return AndrolibResources.escapeTextForResXml(
+                m_strings.getString(valueString));
         }
 
         return TypedValue.coerceToString(valueType, valueData);
