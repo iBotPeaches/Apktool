@@ -542,9 +542,11 @@ final public class AndrolibResources {
             switch (c) {
                 case '\\':
                 case '\'':
-                case '"':
                     out.append('\\');
                     break;
+                case '"':
+                    out.append("\\&quot;");
+                    continue;
                 case '\n':
                     out.append("\\n");
                     continue;
