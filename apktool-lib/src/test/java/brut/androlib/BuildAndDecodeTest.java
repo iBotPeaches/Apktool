@@ -58,12 +58,42 @@ public class BuildAndDecodeTest {
     }
 
     @Test
-    public void literalStringsTest() throws BrutException {
+    public void valuesArraysTest() throws BrutException {
+        compareValuesFiles("values-mcc001/arrays.xml");
+    }
+
+    @Test
+    public void valuesBoolsTest() throws BrutException {
+        compareValuesFiles("values-mcc001/bools.xml");
+    }
+
+    @Test
+    public void valuesColorsTest() throws BrutException {
+        compareValuesFiles("values-mcc001/colors.xml");
+    }
+
+    @Test
+    public void valuesDimensTest() throws BrutException {
+        compareValuesFiles("values-mcc001/dimens.xml");
+    }
+
+    @Test
+    public void valuesIdsTest() throws BrutException {
+        compareValuesFiles("values-mcc001/ids.xml");
+    }
+
+    @Test
+    public void valuesIntegersTest() throws BrutException {
+        compareValuesFiles("values-mcc001/integers.xml");
+    }
+
+    @Test
+    public void valuesStringsTest() throws BrutException {
         compareValuesFiles("values-mcc001/strings.xml");
     }
 
     @Test
-    public void referenceStringsTest() throws BrutException {
+    public void valuesReferencesTest() throws BrutException {
         compareValuesFiles("values-mcc002/strings.xml");
     }
 
@@ -75,8 +105,13 @@ public class BuildAndDecodeTest {
     }
 
     @Test
-    public void layout1Test() throws BrutException {
-        compareXmlFiles("res/layout/layout1.xml");
+    public void xmlLiteralsTest() throws BrutException {
+        compareXmlFiles("res/xml/literals.xml");
+    }
+
+    @Test
+    public void xmlReferencesTest() throws BrutException {
+        compareXmlFiles("res/xml/references.xml");
     }
 
     private void compareValuesFiles(String path) throws BrutException {

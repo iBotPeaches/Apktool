@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="test_dimen1">10.0dip</dimen>
+    <dimen name="test_dimen2">10.0sp</dimen>
+    <dimen name="test_dimen3">10.0pt</dimen>
+    <dimen name="test_dimen4">10.0px</dimen>
+    <dimen name="test_dimen5">10.0mm</dimen>
+    <dimen name="test_dimen6">10.0in</dimen>
+</resources>
