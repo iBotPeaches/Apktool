@@ -314,6 +314,10 @@ public class AXmlResourceParser implements XmlResourceParser {
                 valueString == -1
                 || valueType == TypedValue.TYPE_REFERENCE
                 || valueType == TypedValue.TYPE_ATTRIBUTE
+                || (
+                    valueType >= TypedValue.TYPE_FIRST_COLOR_INT
+                    && valueType <= TypedValue.TYPE_LAST_COLOR_INT
+                )
         )) {
             try {
                 return mAttrDecoder.decode(valueType, valueData,
