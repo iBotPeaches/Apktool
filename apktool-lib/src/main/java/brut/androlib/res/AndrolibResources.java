@@ -27,6 +27,7 @@ import brut.androlib.res.util.*;
 import brut.common.BrutException;
 import brut.directory.*;
 import brut.util.*;
+import java.awt.event.KeyEvent;
 import java.io.*;
 import java.util.*;
 import java.util.logging.Logger;
@@ -561,6 +562,14 @@ final public class AndrolibResources {
         }
 
         return out.toString();
+    }
+
+    public static boolean isPrintableChar(char c) {
+        Character.UnicodeBlock block = Character.UnicodeBlock.of(c);
+        return ! Character.isISOControl(c)
+                && c != KeyEvent.CHAR_UNDEFINED
+                && block != null
+                && block != Character.UnicodeBlock.SPECIALS;
     }
 
 
