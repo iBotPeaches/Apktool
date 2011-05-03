@@ -245,6 +245,7 @@ final public class AndrolibResources {
         serial.setProperty(ExtXmlSerializer.PROPERTY_SERIALIZER_LINE_SEPARATOR,
             System.getProperty("line.separator"));
         serial.setProperty(ExtMXSerializer.PROPERTY_DEFAULT_ENCODING, "utf-8");
+        serial.setDisabledAttrEscape(true);
         return serial;
     }
 
