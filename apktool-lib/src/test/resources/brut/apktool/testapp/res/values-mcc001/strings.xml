@@ -6,4 +6,6 @@
     <string name="test_string4">\?</string>
     <string name="test_string5">\#ff123456</string>
     <string name="test_string6">&amp;</string>
+    <string name="test_string7">\'</string>
+    <string name="test_string8">\&quot;</string>
 </resources>

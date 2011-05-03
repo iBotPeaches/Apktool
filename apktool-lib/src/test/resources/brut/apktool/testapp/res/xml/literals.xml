@@ -4,6 +4,8 @@
     test2="Lorem ipsum"
     test3="\@"
     test4="\?"
-    test5="&amp;"
-    test6="\#"
+    test5="\#ff123456"
+    test6="&amp;"
+    test7="\'"
+    test8="\&quot;"
 />
