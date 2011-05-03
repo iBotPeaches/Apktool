@@ -146,6 +146,9 @@ public class ResConfigFlags {
             case SCREENSIZE_LARGE:
                 ret.append("-large");
                 break;
+            case SCREENSIZE_XLARGE:
+                ret.append("-xlarge");
+                break;
         }
         switch (screenLayout & MASK_SCREENLONG) {
             case SCREENLONG_YES:
@@ -193,6 +196,9 @@ public class ResConfigFlags {
                 break;
             case DENSITY_HIGH:
                 ret.append("-hdpi");
+                break;
+            case DENSITY_XHIGH:
+                ret.append("-xhdpi");
                 break;
             case DENSITY_NONE:
                 ret.append("-nodpi");
@@ -331,6 +337,7 @@ public class ResConfigFlags {
     public final static short DENSITY_LOW = 120;
     public final static short DENSITY_MEDIUM = 160;
     public final static short DENSITY_HIGH = 240;
+    public final static short DENSITY_XHIGH = 320;
     public final static short DENSITY_NONE = -1;
 
     public final static byte KEYBOARD_ANY  = 0;
@@ -360,6 +367,7 @@ public class ResConfigFlags {
     public final static byte SCREENSIZE_SMALL = 0x01;
     public final static byte SCREENSIZE_NORMAL = 0x02;
     public final static byte SCREENSIZE_LARGE = 0x03;
+    public final static byte SCREENSIZE_XLARGE = 0x04;
 
     public final static byte MASK_SCREENLONG = 0x30;
     public final static byte SCREENLONG_ANY = 0x00;
