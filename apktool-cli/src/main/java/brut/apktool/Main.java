@@ -255,8 +255,10 @@ public class Main {
 
     private static void setupLogging(boolean verbose) {
         Logger logger = Logger.getLogger("");
+        for (Handler handler : logger.getHandlers()) {
+            logger.removeHandler(handler);
+        }
         Handler handler = new ConsoleHandler();
-        logger.removeHandler(logger.getHandlers()[0]);
         logger.addHandler(handler);
 
         if (verbose) {
