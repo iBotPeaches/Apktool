@@ -25,6 +25,7 @@ import org.xmlpull.v1.XmlSerializer;
 public interface ExtXmlSerializer extends XmlSerializer {
 
     public ExtXmlSerializer newLine() throws IOException;
+    public void setDisabledAttrEscape(boolean disabled);
 
     public static final String PROPERTY_SERIALIZER_INDENTATION =
             "http://xmlpull.org/v1/doc/properties.html#serializer-indentation";

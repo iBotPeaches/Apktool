@@ -16,8 +16,7 @@
 
 package brut.androlib.res.util;
 
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import org.xmlpull.mxp1_serializer.MXSerializer;
 
 /**
@@ -30,6 +29,16 @@ public class ExtMXSerializer extends MXSerializer implements ExtXmlSerializer {
         super.startDocument(encoding != null ? encoding : mDefaultEncoding,
             standalone);
         this.newLine();
+    }
+
+    @Override
+    protected void writeAttributeValue(String value, Writer out)
+            throws IOException {
+        if (mIsDisabledAttrEscape) {
+            out.write(value);
+            return;
+        }
+        super.writeAttributeValue(value, out);
     }
 
     @Override
@@ -60,5 +69,10 @@ public class ExtMXSerializer extends MXSerializer implements ExtXmlSerializer {
         return this;
     }
 
+    public void setDisabledAttrEscape(boolean disabled) {
+        mIsDisabledAttrEscape = disabled;
+    }
+
     private String mDefaultEncoding;
+    private boolean mIsDisabledAttrEscape = false;
 }
