@@ -557,6 +557,11 @@ final public class AndrolibResources {
                 case '<':
                     out.append("&lt;");
                     continue;
+                default:
+                    if (! isPrintableChar(c)) {
+                        out.append(String.format("\\u%04x", (int)c));
+                        continue;
+                    }
             }
             out.append(c);
         }
