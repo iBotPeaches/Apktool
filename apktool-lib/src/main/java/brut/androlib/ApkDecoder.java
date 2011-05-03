@@ -208,6 +208,7 @@ public class ApkDecoder {
         for (ResPackage pkg : pkgs) {
             ids[i++] = pkg.getId();
         }
+        Arrays.sort(ids);
 
         Map<String, Object> uses = new LinkedHashMap<String, Object>();
         uses.put("ids", ids);
