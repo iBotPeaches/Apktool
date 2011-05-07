@@ -25,7 +25,7 @@ import org.xmlpull.v1.XmlSerializer;
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
 public abstract class ResScalarValue extends ResValue
-        implements ResXmlPrintable, ResXmlSerializable {
+        implements ResXmlPrintable, ResValuesXmlSerializable {
     protected final String mType;
 
     protected ResScalarValue(String type) {
@@ -34,7 +34,7 @@ public abstract class ResScalarValue extends ResValue
 
     public abstract String toResXmlFormat() throws AndrolibException;
 
-    public void serializeToXml(XmlSerializer serializer, ResResource res)
+    public void serializeToResValuesXml(XmlSerializer serializer, ResResource res)
             throws IOException, AndrolibException {
         String type = res.getResSpec().getType().getName();
         boolean item = ! "reference".equals(mType) && ! type.equals(mType);

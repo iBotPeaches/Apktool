@@ -25,7 +25,7 @@ import org.xmlpull.v1.XmlSerializer;
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
-public class ResArrayValue extends ResBagValue implements ResXmlSerializable {
+public class ResArrayValue extends ResBagValue implements ResValuesXmlSerializable {
     ResArrayValue(ResReferenceValue parent,
             Duo<Integer, ResScalarValue>[] items) {
         super(parent);
@@ -42,7 +42,7 @@ public class ResArrayValue extends ResBagValue implements ResXmlSerializable {
     }
 
     @Override
-    public void serializeToXml(XmlSerializer serializer, ResResource res)
+    public void serializeToResValuesXml(XmlSerializer serializer, ResResource res)
             throws IOException, AndrolibException {
         String type = getType();
         type = (type == null ? "" : type + "-") + "array";

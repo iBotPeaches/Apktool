@@ -25,29 +25,29 @@ import org.xmlpull.v1.XmlSerializer;
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
-public class ResBagValue extends ResValue implements ResXmlSerializable {
+public class ResBagValue extends ResValue implements ResValuesXmlSerializable {
     protected final ResReferenceValue mParent;
 
     public ResBagValue(ResReferenceValue parent) {
         this.mParent = parent;
     }
 
-    public void serializeToXml(XmlSerializer serializer, ResResource res)
+    public void serializeToResValuesXml(XmlSerializer serializer, ResResource res)
             throws IOException, AndrolibException {
         String type = res.getResSpec().getType().getName();
         if ("style".equals(type)) {
             new ResStyleValue(mParent, new Duo[0], null)
-                .serializeToXml(serializer, res);
+                .serializeToResValuesXml(serializer, res);
             return;
         }
         if ("array".equals(type)) {
             new ResArrayValue(mParent, new Duo[0])
-                .serializeToXml(serializer, res);
+                .serializeToResValuesXml(serializer, res);
             return;
         }
         if ("plurals".equals(type)) {
             new ResPluralsValue(mParent, new Duo[0])
-                .serializeToXml(serializer, res);
+                .serializeToResValuesXml(serializer, res);
             return;
         }
 

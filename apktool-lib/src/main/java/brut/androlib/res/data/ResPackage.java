@@ -21,7 +21,7 @@ import brut.androlib.AndrolibException;
 import brut.androlib.res.data.value.ResFileValue;
 import brut.androlib.res.data.value.ResValue;
 import brut.androlib.res.data.value.ResValueFactory;
-import brut.androlib.res.data.value.ResXmlSerializable;
+import brut.androlib.res.data.value.ResValuesXmlSerializable;
 import brut.util.Duo;
 import java.util.*;
 
@@ -123,7 +123,7 @@ public class ResPackage {
             new HashMap<Duo<ResType, ResConfig>, ResValuesFile>();
         for (ResResSpec spec : mResSpecs.values()) {
             for (ResResource res : spec.listResources()) {
-                if (res.getValue() instanceof ResXmlSerializable) {
+                if (res.getValue() instanceof ResValuesXmlSerializable) {
                     ResType type = res.getResSpec().getType();
                     ResConfig config = res.getConfig();
                     Duo<ResType, ResConfig> key =

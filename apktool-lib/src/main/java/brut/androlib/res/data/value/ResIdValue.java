@@ -24,8 +24,8 @@ import org.xmlpull.v1.XmlSerializer;
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
-public class ResIdValue extends ResValue implements ResXmlSerializable {
-    public void serializeToXml(XmlSerializer serializer, ResResource res) throws IOException, AndrolibException {
+public class ResIdValue extends ResValue implements ResValuesXmlSerializable {
+    public void serializeToResValuesXml(XmlSerializer serializer, ResResource res) throws IOException, AndrolibException {
         serializer.startTag(null, "item");
         serializer.attribute(null, "type", res.getResSpec().getType().getName());
         serializer.attribute(null, "name", res.getResSpec().getName());

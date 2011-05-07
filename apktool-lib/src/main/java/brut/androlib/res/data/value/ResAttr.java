@@ -26,7 +26,7 @@ import org.xmlpull.v1.XmlSerializer;
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
-public class ResAttr extends ResBagValue implements ResXmlSerializable {
+public class ResAttr extends ResBagValue implements ResValuesXmlSerializable {
     ResAttr(ResReferenceValue parentVal, int type, Integer min, Integer max,
             Boolean l10n) {
         super(parentVal);
@@ -42,7 +42,7 @@ public class ResAttr extends ResBagValue implements ResXmlSerializable {
     }
 
     @Override
-    public void serializeToXml(XmlSerializer serializer, ResResource res)
+    public void serializeToResValuesXml(XmlSerializer serializer, ResResource res)
             throws IOException, AndrolibException {
         String type = getTypeAsString();
 

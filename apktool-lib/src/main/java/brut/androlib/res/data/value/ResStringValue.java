@@ -22,7 +22,7 @@ import brut.androlib.res.AndrolibResources;
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
 public class ResStringValue extends ResScalarValue
-        implements ResXmlSerializable {
+        implements ResValuesXmlSerializable {
     private final String mValue;
 
     public ResStringValue(String value) {

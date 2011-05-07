@@ -26,7 +26,7 @@ import org.xmlpull.v1.XmlSerializer;
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
-public class ResStyleValue extends ResBagValue implements ResXmlSerializable {
+public class ResStyleValue extends ResBagValue implements ResValuesXmlSerializable {
     ResStyleValue(ResReferenceValue parent,
             Duo<Integer, ResScalarValue>[] items, ResValueFactory factory) {
         super(parent);
@@ -39,7 +39,7 @@ public class ResStyleValue extends ResBagValue implements ResXmlSerializable {
     }
 
     @Override
-    public void serializeToXml(XmlSerializer serializer, ResResource res)
+    public void serializeToResValuesXml(XmlSerializer serializer, ResResource res)
             throws IOException, AndrolibException {
         serializer.startTag(null, "style");
         serializer.attribute(null, "name", res.getResSpec().getName());

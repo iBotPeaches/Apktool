@@ -19,7 +19,7 @@ package brut.androlib.res;
 import brut.androlib.AndrolibException;
 import brut.androlib.err.CantFindFrameworkResException;
 import brut.androlib.res.data.*;
-import brut.androlib.res.data.value.ResXmlSerializable;
+import brut.androlib.res.data.value.ResValuesXmlSerializable;
 import brut.androlib.res.decoder.*;
 import brut.androlib.res.decoder.ARSCDecoder.ARSCData;
 import brut.androlib.res.decoder.ARSCDecoder.FlagsOffset;
@@ -262,8 +262,8 @@ final public class AndrolibResources {
                 if (valuesFile.isSynthesized(res)) {
                     continue;
                 }
-                ((ResXmlSerializable) res.getValue())
-                    .serializeToXml(serial, res);
+                ((ResValuesXmlSerializable) res.getValue())
+                    .serializeToResValuesXml(serial, res);
             }
             
             serial.endTag(null, "resources");
