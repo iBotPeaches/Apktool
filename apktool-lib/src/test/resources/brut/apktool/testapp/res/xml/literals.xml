@@ -7,7 +7,7 @@
     test5="#ff123456"
     test6="\#ff123456"
     test7="&amp;"
-    test8="\'"
-    test9="\&quot;"
+    test8="'"
+    test9="&quot;"
     test10="\u0005"
 />
