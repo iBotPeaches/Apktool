@@ -10,4 +10,6 @@
     test8="'"
     test9="&quot;"
     test10="\u0005"
+    test11=" foo  bar   "
+    test12="foo \n bar"
 />

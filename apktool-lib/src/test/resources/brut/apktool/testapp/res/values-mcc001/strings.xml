@@ -9,4 +9,8 @@
     <string name="test_string8">\'</string>
     <string name="test_string9">\"</string>
     <string name="test_string10">\u0005</string>
+    <string name="test_string11">" foo  bar   "</string>
+    <string name="test_string12">foo \n bar</string>
+    <string name="test_string13">foo<b>bar<i>baz</i></b>foo</string>
+    <string name="test_string14">foo<sometag someattr1="someval1" someattr2="someval2">bar</sometag>baz</string>
 </resources>
