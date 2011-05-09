@@ -36,10 +36,16 @@ public abstract class ResScalarValue extends ResValue
     }
 
     public String encodeAsResXmlAttr() throws AndrolibException {
+        if (mRawValue != null) {
+            return mRawValue;
+        }
         return encodeAsResXml();
     }
 
     public String encodeAsResXmlValue() throws AndrolibException {
+        if (mRawValue != null) {
+            return mRawValue;
+        }
         return encodeAsResXml();
     }
 
