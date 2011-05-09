@@ -52,6 +52,10 @@ public class ResStyleValue extends ResBagValue implements ResValuesXmlSerializab
             String value = attr.convertToResXmlFormat(mItems[i].m2);
 
             if (value == null) {
+                value = mItems[i].m2.toResXmlFormat();
+            }
+
+            if (value == null) {
                 continue;
             }
 

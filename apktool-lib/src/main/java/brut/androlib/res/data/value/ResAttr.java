@@ -38,7 +38,7 @@ public class ResAttr extends ResBagValue implements ResValuesXmlSerializable {
 
     public String convertToResXmlFormat(ResScalarValue value)
             throws AndrolibException {
-        return value.toResXmlFormat();
+        return null;
     }
 
     @Override

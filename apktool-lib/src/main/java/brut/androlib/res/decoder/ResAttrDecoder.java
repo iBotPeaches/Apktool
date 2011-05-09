@@ -29,12 +29,15 @@ public class ResAttrDecoder {
             throws AndrolibException {
         ResScalarValue resValue = mCurrentPackage.getValueFactory()
             .factory(type, value, rawValue);
-        if (attrResId == 0) {
-            return resValue.toResXmlFormat();
+
+        String decoded = null;
+        if (attrResId != 0) {
+            ResAttr attr = (ResAttr) getCurrentPackage().getResTable()
+                .getResSpec(attrResId).getDefaultResource().getValue();
+            decoded = attr.convertToResXmlFormat(resValue);
         }
-        ResAttr attr = (ResAttr) getCurrentPackage().getResTable()
-            .getResSpec(attrResId).getDefaultResource().getValue();
-        return attr.convertToResXmlFormat(resValue);
+
+        return decoded != null ? decoded : resValue.toResXmlFormat();
     }
 
     public ResPackage getCurrentPackage() throws AndrolibException {
