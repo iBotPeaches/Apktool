@@ -21,7 +21,7 @@ import brut.androlib.AndrolibException;
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
-public class ResIntValue extends ResScalarValue implements ResValuesXmlSerializable {
+public class ResIntValue extends ResScalarValue {
     protected final int mValue;
 
     public ResIntValue(int value, String rawValue) {

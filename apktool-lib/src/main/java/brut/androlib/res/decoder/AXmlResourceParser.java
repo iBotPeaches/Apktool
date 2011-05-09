@@ -23,7 +23,6 @@ import java.io.Reader;
 import org.xmlpull.v1.XmlPullParserException;
 import android.util.TypedValue;
 import brut.androlib.AndrolibException;
-import brut.androlib.res.AndrolibResources;
 import brut.util.ExtDataInput;
 import com.mindprod.ledatastream.LEDataInputStream;
 import java.util.logging.Level;

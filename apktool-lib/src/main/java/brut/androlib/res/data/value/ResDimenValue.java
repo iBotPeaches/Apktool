@@ -18,9 +18,6 @@ package brut.androlib.res.data.value;
 
 import android.util.TypedValue;
 import brut.androlib.AndrolibException;
-import brut.androlib.res.data.ResResource;
-import java.io.IOException;
-import org.xmlpull.v1.XmlSerializer;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>

@@ -21,9 +21,7 @@ import brut.androlib.res.data.ResResource;
 import brut.util.Duo;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import org.xmlpull.v1.XmlSerializer;
 
 /**

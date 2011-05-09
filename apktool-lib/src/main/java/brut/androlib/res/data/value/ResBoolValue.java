@@ -19,7 +19,7 @@ package brut.androlib.res.data.value;
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
-public class ResBoolValue extends ResScalarValue implements ResValuesXmlSerializable {
+public class ResBoolValue extends ResScalarValue {
     private final boolean mValue;
 
     public ResBoolValue(boolean value, String rawValue) {

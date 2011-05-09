@@ -16,13 +16,11 @@
 
 package brut.androlib.res.data.value;
 
-import brut.androlib.res.AndrolibResources;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
-public class ResStringValue extends ResScalarValue
-        implements ResValuesXmlSerializable {
+public class ResStringValue extends ResScalarValue {
 
     public ResStringValue(String value) {
         this(value, "string");
