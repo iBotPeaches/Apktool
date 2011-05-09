@@ -23,7 +23,6 @@ import brut.androlib.res.AndrolibResources;
  */
 public class ResStringValue extends ResScalarValue
         implements ResValuesXmlSerializable {
-    private final String mValue;
 
     public ResStringValue(String value) {
         this(value, "string");
@@ -31,15 +30,14 @@ public class ResStringValue extends ResScalarValue
 
     public ResStringValue(String value, String type) {
         super(type, value);
-        this.mValue = value;
     }
 
     public String getValue() {
-        return mValue;
+        return mRawValue;
     }
 
     @Override
     public String toResXmlFormat() {
-        return mValue;
+        return mRawValue;
     }
 }
