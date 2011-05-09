@@ -308,20 +308,13 @@ public class AXmlResourceParser implements XmlResourceParser {
         int offset = getAttributeOffset(index);
         int valueType = m_attributes[offset + ATTRIBUTE_IX_VALUE_TYPE];
         int valueData = m_attributes[offset + ATTRIBUTE_IX_VALUE_DATA];
-        int valueString = m_attributes[offset + ATTRIBUTE_IX_VALUE_STRING];
+        int valueRaw = m_attributes[offset + ATTRIBUTE_IX_VALUE_STRING];
 
-        if (mAttrDecoder != null && (
-                valueString == -1
-                || valueType == TypedValue.TYPE_REFERENCE
-                || valueType == TypedValue.TYPE_ATTRIBUTE
-                || (
-                    valueType >= TypedValue.TYPE_FIRST_COLOR_INT
-                    && valueType <= TypedValue.TYPE_LAST_COLOR_INT
-                )
-        )) {
+        if (mAttrDecoder != null) {
             try {
                 return mAttrDecoder.decode(valueType, valueData,
-                    getAttributeNameResource(index));
+                        valueRaw == -1 ? null : m_strings.getString(valueRaw),
+                        getAttributeNameResource(index));
             } catch (AndrolibException ex) {
                 setFirstError(ex);
                 LOGGER.log(Level.WARNING, String.format(
@@ -331,11 +324,6 @@ public class AXmlResourceParser implements XmlResourceParser {
                     valueData
                 ), ex);
             }
-        }
-
-        if (valueString != -1) {
-            return AndrolibResources.escapeTextForResXml(
-                m_strings.getString(valueString));
         }
 
         return TypedValue.coerceToString(valueType, valueData);

@@ -31,30 +31,30 @@ public class ResValueFactory {
         this.mPackage = pakage_;
     }
 
-    public ResScalarValue factory(int type, int value)
+    public ResScalarValue factory(int type, int value, String rawValue)
             throws AndrolibException {
         switch (type) {
             case TypedValue.TYPE_REFERENCE:
-                return newReference(value);
+                return newReference(value, rawValue);
             case TypedValue.TYPE_ATTRIBUTE:
-                return newReference(value, true);
+                return newReference(value, rawValue, true);
             case TypedValue.TYPE_FLOAT:
-                return new ResFloatValue(Float.intBitsToFloat(value));
+                return new ResFloatValue(Float.intBitsToFloat(value), rawValue);
             case TypedValue.TYPE_DIMENSION:
-                return new ResDimenValue(value);
+                return new ResDimenValue(value, rawValue);
             case TypedValue.TYPE_FRACTION:
-                return new ResFractionValue(value);
+                return new ResFractionValue(value, rawValue);
             case TypedValue.TYPE_INT_BOOLEAN:
-                return new ResBoolValue(value != 0);
+                return new ResBoolValue(value != 0, rawValue);
         }
 
         if (type >= TypedValue.TYPE_FIRST_COLOR_INT
                 && type <= TypedValue.TYPE_LAST_COLOR_INT) {
-            return new ResColorValue(value);
+            return new ResColorValue(value, rawValue);
         }
         if (type >= TypedValue.TYPE_FIRST_INT
                 && type <= TypedValue.TYPE_LAST_INT) {
-            return new ResIntValue(value);
+            return new ResIntValue(value, rawValue);
         }
 
         throw new AndrolibException("Invalid value type: "+ type);
@@ -69,7 +69,7 @@ public class ResValueFactory {
 
     public ResBagValue bagFactory(int parent,
             Duo<Integer, ResScalarValue>[] items) throws AndrolibException {
-        ResReferenceValue parentVal = newReference(parent);
+        ResReferenceValue parentVal = newReference(parent, null);
 
         if (items.length == 0) {
             return new ResBagValue(parentVal);
@@ -88,11 +88,12 @@ public class ResValueFactory {
         return new ResStyleValue(parentVal, items, this);
     }
 
-    public ResReferenceValue newReference(int resID) {
-        return newReference(resID, false);
+    public ResReferenceValue newReference(int resID, String rawValue) {
+        return newReference(resID, rawValue, false);
     }
 
-    public ResReferenceValue newReference(int resID, boolean theme) {
-        return new ResReferenceValue(mPackage, resID, theme);
+    public ResReferenceValue newReference(int resID, String rawValue,
+            boolean theme) {
+        return new ResReferenceValue(mPackage, resID, rawValue, theme);
     }
 }

@@ -20,8 +20,8 @@ package brut.androlib.res.data.value;
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
 public class ResColorValue extends ResIntValue {
-    public ResColorValue(int value) {
-        super(value, "color");
+    public ResColorValue(int value, String rawValue) {
+        super(value, rawValue, "color");
     }
 
     @Override

@@ -28,9 +28,11 @@ import org.xmlpull.v1.XmlSerializer;
 public abstract class ResScalarValue extends ResValue
         implements ResXmlEncodable, ResValuesXmlSerializable {
     protected final String mType;
+    protected final String mRawValue;
 
-    protected ResScalarValue(String type) {
+    protected ResScalarValue(String type, String rawValue) {
         mType = type;
+        mRawValue = rawValue;
     }
 
     public abstract String toResXmlFormat() throws AndrolibException;

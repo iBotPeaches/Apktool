@@ -22,8 +22,8 @@ package brut.androlib.res.data.value;
 public class ResBoolValue extends ResScalarValue implements ResValuesXmlSerializable {
     private final boolean mValue;
 
-    public ResBoolValue(boolean value) {
-        super("bool");
+    public ResBoolValue(boolean value, String rawValue) {
+        super("bool", rawValue);
         this.mValue = value;
     }
 

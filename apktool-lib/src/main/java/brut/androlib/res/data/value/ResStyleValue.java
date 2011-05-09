@@ -34,7 +34,7 @@ public class ResStyleValue extends ResBagValue implements ResValuesXmlSerializab
         mItems = new Duo[items.length];
         for (int i = 0; i < items.length; i++) {
             mItems[i] = new Duo<ResReferenceValue, ResScalarValue>(
-                factory.newReference(items[i].m1), items[i].m2);
+                factory.newReference(items[i].m1, null), items[i].m2);
         }
     }
 

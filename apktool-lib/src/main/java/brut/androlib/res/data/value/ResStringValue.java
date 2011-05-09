@@ -30,7 +30,7 @@ public class ResStringValue extends ResScalarValue
     }
 
     public ResStringValue(String value, String type) {
-        super(type);
+        super(type, value);
         this.mValue = value;
     }
 

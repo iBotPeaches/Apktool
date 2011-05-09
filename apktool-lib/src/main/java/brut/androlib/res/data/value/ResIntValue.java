@@ -24,12 +24,12 @@ import brut.androlib.AndrolibException;
 public class ResIntValue extends ResScalarValue implements ResValuesXmlSerializable {
     protected final int mValue;
 
-    public ResIntValue(int value) {
-        this(value, "integer");
+    public ResIntValue(int value, String rawValue) {
+        this(value, rawValue, "integer");
     }
 
-    public ResIntValue(int value, String type) {
-        super(type);
+    public ResIntValue(int value, String rawValue, String type) {
+        super(type, rawValue);
         this.mValue = value;
     }
 

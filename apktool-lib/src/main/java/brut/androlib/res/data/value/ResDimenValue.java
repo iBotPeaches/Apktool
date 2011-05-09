@@ -26,8 +26,8 @@ import org.xmlpull.v1.XmlSerializer;
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
 public class ResDimenValue extends ResIntValue {
-    public ResDimenValue(int value) {
-        super(value, "dimen");
+    public ResDimenValue(int value, String rawValue) {
+        super(value, rawValue, "dimen");
     }
 
     @Override

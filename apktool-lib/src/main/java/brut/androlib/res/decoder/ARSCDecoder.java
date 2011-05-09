@@ -221,7 +221,7 @@ public class ARSCDecoder {
 
         return type == TypedValue.TYPE_STRING ?
             mPkg.getValueFactory().factory(mTableStrings.getHTML(data)) :
-            mPkg.getValueFactory().factory(type, data);
+            mPkg.getValueFactory().factory(type, data, null);
     }
 
     private ResConfigFlags readConfigFlags() throws IOException, AndrolibException {
@@ -300,7 +300,7 @@ public class ARSCDecoder {
             mPkg.addResSpec(spec);
             mType.addResSpec(spec);
 
-            ResValue value = new ResBoolValue(false);
+            ResValue value = new ResBoolValue(false, null);
             ResResource res = new ResResource(
                 mPkg.getOrCreateConfig(new ResConfigFlags()), spec, value);
             mPkg.addResource(res);

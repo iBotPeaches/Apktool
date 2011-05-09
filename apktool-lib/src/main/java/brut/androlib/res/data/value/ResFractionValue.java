@@ -23,8 +23,8 @@ import brut.androlib.AndrolibException;
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
 public class ResFractionValue extends ResIntValue {
-    public ResFractionValue(int value) {
-        super(value, "fraction");
+    public ResFractionValue(int value, String rawValue) {
+        super(value, rawValue, "fraction");
     }
 
     @Override
