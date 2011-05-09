@@ -38,6 +38,8 @@ public class ResValueFactory {
                 return newReference(value, rawValue);
             case TypedValue.TYPE_ATTRIBUTE:
                 return newReference(value, rawValue, true);
+            case TypedValue.TYPE_STRING:
+                return new ResStringValue(rawValue);
             case TypedValue.TYPE_FLOAT:
                 return new ResFloatValue(Float.intBitsToFloat(value), rawValue);
             case TypedValue.TYPE_DIMENSION:
