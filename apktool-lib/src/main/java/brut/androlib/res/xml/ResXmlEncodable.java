@@ -14,13 +14,13 @@
  *  limitations under the License.
  */
 
-package brut.androlib.res.data.value;
+package brut.androlib.res.xml;
 
 import brut.androlib.AndrolibException;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
-public interface ResXmlPrintable {
+public interface ResXmlEncodable {
     public String toResXmlFormat() throws AndrolibException;
 }
