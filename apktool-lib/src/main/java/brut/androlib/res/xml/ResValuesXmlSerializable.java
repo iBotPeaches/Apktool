@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package brut.androlib.res.data.value;
+package brut.androlib.res.xml;
 
 import brut.androlib.AndrolibException;
 import brut.androlib.res.data.ResResource;

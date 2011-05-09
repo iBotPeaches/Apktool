@@ -21,7 +21,7 @@ import brut.androlib.AndrolibException;
 import brut.androlib.res.data.value.ResFileValue;
 import brut.androlib.res.data.value.ResValue;
 import brut.androlib.res.data.value.ResValueFactory;
-import brut.androlib.res.data.value.ResValuesXmlSerializable;
+import brut.androlib.res.xml.ResValuesXmlSerializable;
 import brut.util.Duo;
 import java.util.*;
 

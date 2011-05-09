@@ -16,6 +16,7 @@
 
 package brut.androlib.res.data.value;
 
+import brut.androlib.res.xml.ResValuesXmlSerializable;
 import brut.androlib.AndrolibException;
 import brut.androlib.res.data.ResResSpec;
 import brut.androlib.res.data.ResResource;

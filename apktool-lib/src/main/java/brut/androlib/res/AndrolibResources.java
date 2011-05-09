@@ -19,7 +19,7 @@ package brut.androlib.res;
 import brut.androlib.AndrolibException;
 import brut.androlib.err.CantFindFrameworkResException;
 import brut.androlib.res.data.*;
-import brut.androlib.res.data.value.ResValuesXmlSerializable;
+import brut.androlib.res.xml.ResValuesXmlSerializable;
 import brut.androlib.res.decoder.*;
 import brut.androlib.res.decoder.ARSCDecoder.ARSCData;
 import brut.androlib.res.decoder.ARSCDecoder.FlagsOffset;
