@@ -31,8 +31,7 @@ public class ResFloatValue extends ResScalarValue {
         return mValue;
     }
 
-    @Override
-    public String toResXmlFormat() {
+    protected String encodeAsResXml() {
         return String.valueOf(mValue);
     }
 }

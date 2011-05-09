@@ -31,8 +31,7 @@ public class ResBoolValue extends ResScalarValue {
         return mValue;
     }
 
-    @Override
-    public String toResXmlFormat() {
+    protected String encodeAsResXml() {
         return mValue ? "true" : "false";
     }
 }

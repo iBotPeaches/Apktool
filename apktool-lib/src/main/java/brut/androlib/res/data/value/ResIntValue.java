@@ -37,8 +37,7 @@ public class ResIntValue extends ResScalarValue {
         return mValue;
     }
 
-    @Override
-    public String toResXmlFormat() throws AndrolibException {
+    protected String encodeAsResXml() throws AndrolibException {
         return String.valueOf(mValue);
     }
 }

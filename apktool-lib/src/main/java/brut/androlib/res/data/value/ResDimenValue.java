@@ -28,7 +28,7 @@ public class ResDimenValue extends ResIntValue {
     }
 
     @Override
-    public String toResXmlFormat() throws AndrolibException {
+    protected String encodeAsResXml() throws AndrolibException {
         return TypedValue.coerceToString(TypedValue.TYPE_DIMENSION, mValue);
     }
 }

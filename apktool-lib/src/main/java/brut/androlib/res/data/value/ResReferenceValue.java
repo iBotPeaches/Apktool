@@ -38,8 +38,7 @@ public class ResReferenceValue extends ResIntValue {
         mTheme = theme;
     }
 
-    @Override
-    public String toResXmlFormat() throws AndrolibException {
+    protected String encodeAsResXml() throws AndrolibException {
         if (isNull()) {
             return "@null";
         }

@@ -35,7 +35,13 @@ public abstract class ResScalarValue extends ResValue
         mRawValue = rawValue;
     }
 
-    public abstract String toResXmlFormat() throws AndrolibException;
+    public String encodeAsResXmlAttr() throws AndrolibException {
+        return encodeAsResXml();
+    }
+
+    public String encodeAsResXmlValue() throws AndrolibException {
+        return encodeAsResXml();
+    }
 
     public void serializeToResValuesXml(XmlSerializer serializer, ResResource res)
             throws IOException, AndrolibException {
@@ -49,7 +55,7 @@ public abstract class ResScalarValue extends ResValue
         }
         serializer.attribute(null, "name", res.getResSpec().getName());
 
-        String body = toResXmlFormat();
+        String body = encodeAsResXmlValue();
         if (! body.isEmpty()) {
             serializer.ignorableWhitespace(body);
         }
@@ -60,4 +66,6 @@ public abstract class ResScalarValue extends ResValue
     public String getType() {
         return mType;
     }
+
+    protected abstract String encodeAsResXml() throws AndrolibException;
 }

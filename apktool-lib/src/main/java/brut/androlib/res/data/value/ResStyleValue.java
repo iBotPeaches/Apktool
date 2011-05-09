@@ -44,7 +44,7 @@ public class ResStyleValue extends ResBagValue implements ResValuesXmlSerializab
         serializer.startTag(null, "style");
         serializer.attribute(null, "name", res.getResSpec().getName());
         if (! mParent.isNull()) {
-            serializer.attribute(null, "parent", mParent.toResXmlFormat());
+            serializer.attribute(null, "parent", mParent.encodeAsResXmlAttr());
         }
         for (int i = 0; i < mItems.length; i++) {
             ResResSpec spec = mItems[i].m1.getReferent();
@@ -52,7 +52,7 @@ public class ResStyleValue extends ResBagValue implements ResValuesXmlSerializab
             String value = attr.convertToResXmlFormat(mItems[i].m2);
 
             if (value == null) {
-                value = mItems[i].m2.toResXmlFormat();
+                value = mItems[i].m2.encodeAsResXmlValue();
             }
 
             if (value == null) {

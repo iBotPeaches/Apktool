@@ -37,7 +37,7 @@ public class ResAttrDecoder {
             decoded = attr.convertToResXmlFormat(resValue);
         }
 
-        return decoded != null ? decoded : resValue.toResXmlFormat();
+        return decoded != null ? decoded : resValue.encodeAsResXmlAttr();
     }
 
     public ResPackage getCurrentPackage() throws AndrolibException {

@@ -25,7 +25,7 @@ public class ResColorValue extends ResIntValue {
     }
 
     @Override
-    public String toResXmlFormat() {
+    protected String encodeAsResXml() {
         return String.format("#%08x", mValue);
     }
 }
