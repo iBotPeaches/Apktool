@@ -17,6 +17,7 @@
 package brut.androlib.res.decoder;
 
 import brut.androlib.res.AndrolibResources;
+import brut.androlib.res.xml.ResXmlEncoders;
 import brut.util.ExtDataInput;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -126,7 +127,7 @@ public class StringBlock {
         }
         int[] style = getStyle(index);
         if (style == null) {
-            return AndrolibResources.escapeTextForResXml(raw);
+            return ResXmlEncoders.escapeXmlChars(raw);
         }
         StringBuilder html = new StringBuilder(raw.length() + 32);
         int[] opened = new int[style.length / 3];
@@ -149,7 +150,7 @@ public class StringBlock {
                     break;
                 }
                 if (offset <= end) {
-                    html.append(AndrolibResources.escapeCharsForResXml(
+                    html.append(ResXmlEncoders.escapeXmlChars(
                         raw.substring(offset, end + 1)));
                     offset = end + 1;
                 }
@@ -157,7 +158,7 @@ public class StringBlock {
             }
             depth = j + 1;
             if (offset < start) {
-                html.append(AndrolibResources.escapeCharsForResXml(
+                html.append(ResXmlEncoders.escapeXmlChars(
                     raw.substring(offset, start)));
                 offset = start;
             }
@@ -168,7 +169,7 @@ public class StringBlock {
             style[i + 1] = -1;
             opened[depth++] = i;
         }
-        return AndrolibResources.escapeTextForResXml(html.toString(), false);
+        return html.toString();
     }
 
     private void outputStyleTag(String tag, StringBuilder builder,
@@ -199,7 +200,7 @@ public class StringBlock {
                         val = tag.substring(pos2 + 1);
                     }
 
-                    builder.append(AndrolibResources.escapeCharsForResXml(val))
+                    builder.append(ResXmlEncoders.escapeXmlChars(val))
                         .append('"');
                 }
             }

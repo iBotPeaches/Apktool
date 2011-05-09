@@ -27,7 +27,6 @@ import brut.androlib.res.util.*;
 import brut.common.BrutException;
 import brut.directory.*;
 import brut.util.*;
-import java.awt.event.KeyEvent;
 import java.io.*;
 import java.util.*;
 import java.util.logging.Logger;
@@ -483,98 +482,6 @@ final public class AndrolibResources {
         } catch (BrutException ex) {
             throw new AndrolibException(ex);
         }
-    }
-
-    public static String escapeTextForResXml(String value) {
-        return escapeTextForResXml(value, true);
-    }
-
-    public static String escapeTextForResXml(String value,
-            boolean escapeChars) {
-        if (value.isEmpty()) {
-            return value;
-        }
-
-        if (escapeChars) {
-            value = escapeCharsForResXml(value);
-        }
-
-        StringBuilder out = new StringBuilder(value.length() + 10);
-        char[] chars = value.toCharArray();
-
-        switch (chars[0]) {
-            case '@':
-            case '#':
-            case '?':
-                out.append('\\');
-        }
-
-        boolean space = true;
-        for (char c : chars) {
-            if (c == ' ') {
-                if (space) {
-                    out.append("\\u0020");
-                } else {
-                    out.append(c);
-                    space = true;
-                }
-                continue;
-            }
-
-            space = false;
-            out.append(c);
-        }
-
-        if (space && out.charAt(out.length() - 1) == ' ') {
-            out.deleteCharAt(out.length() - 1);
-            out.append("\\u0020");
-        }
-
-        return out.toString();
-    }
-
-    public static String escapeCharsForResXml(String value) {
-        if (value.isEmpty()) {
-            return value;
-        }
-
-        StringBuilder out = new StringBuilder(value.length() + 10);
-        for (char c : value.toCharArray()) {
-            switch (c) {
-                case '\\':
-                case '\'':
-                    out.append('\\');
-                    break;
-                case '"':
-                    out.append("\\&quot;");
-                    continue;
-                case '\n':
-                    out.append("\\n");
-                    continue;
-                case '&':
-                    out.append("&amp;");
-                    continue;
-                case '<':
-                    out.append("&lt;");
-                    continue;
-                default:
-                    if (! isPrintableChar(c)) {
-                        out.append(String.format("\\u%04x", (int)c));
-                        continue;
-                    }
-            }
-            out.append(c);
-        }
-
-        return out.toString();
-    }
-
-    public static boolean isPrintableChar(char c) {
-        Character.UnicodeBlock block = Character.UnicodeBlock.of(c);
-        return ! Character.isISOControl(c)
-                && c != KeyEvent.CHAR_UNDEFINED
-                && block != null
-                && block != Character.UnicodeBlock.SPECIALS;
     }
 
 

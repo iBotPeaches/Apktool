@@ -17,6 +17,7 @@
 package brut.androlib.res.data.value;
 
 import brut.androlib.AndrolibException;
+import brut.androlib.res.xml.ResXmlEncoders;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
@@ -33,12 +34,12 @@ public class ResStringValue extends ResScalarValue {
 
     @Override
     public String encodeAsResXmlAttr() {
-        return mRawValue;
+        return ResXmlEncoders.encodeAsResXmlAttr(mRawValue);
     }
 
     @Override
     public String encodeAsResXmlValue() {
-        return mRawValue;
+        return ResXmlEncoders.encodeAsXmlValue(mRawValue);
     }
 
     @Override
