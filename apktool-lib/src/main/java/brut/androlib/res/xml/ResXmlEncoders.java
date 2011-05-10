@@ -81,12 +81,16 @@ public final class ResXmlEncoders {
         }
 
         boolean isInStyleTag = false;
+        int startPos = 0;
         boolean enclose = false;
         boolean wasSpace = true;
         for (char c : chars) {
             if (isInStyleTag) {
                 if (c == '>') {
                     isInStyleTag = false;
+                    startPos = out.length() + 1;
+                    enclose = false;
+                    wasSpace = true;
                 }
             } else if (c == ' ') {
                 if (wasSpace) {
@@ -108,6 +112,9 @@ public final class ResXmlEncoders {
                         break;
                     case '<':
                         isInStyleTag = true;
+                        if (enclose || wasSpace) {
+                            out.insert(startPos, '"').append('"');
+                        }
                         break;
                     default:
                         if (!isPrintableChar(c)) {
