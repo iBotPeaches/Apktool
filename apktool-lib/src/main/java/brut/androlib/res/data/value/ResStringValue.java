@@ -17,7 +17,10 @@
 package brut.androlib.res.data.value;
 
 import brut.androlib.AndrolibException;
+import brut.androlib.res.data.ResResource;
 import brut.androlib.res.xml.ResXmlEncoders;
+import java.io.IOException;
+import org.xmlpull.v1.XmlSerializer;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
@@ -45,5 +48,20 @@ public class ResStringValue extends ResScalarValue {
     @Override
     protected String encodeAsResXml() throws AndrolibException {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    protected void serializeExtraXmlAttrs(XmlSerializer serializer,
+            ResResource res) throws IOException {
+        int pos = 0;
+        int count = 0;
+        while((pos = mRawValue.indexOf('%', pos)) != -1) {
+            if (mRawValue.charAt(pos + 1) != '%') {
+                if (++count >= 2) {
+                    serializer.attribute(null, "formatted", "false");
+                    return;
+                }
+            }
+        }
     }
 }
