@@ -62,6 +62,8 @@ public abstract class ResScalarValue extends ResValue
         }
         serializer.attribute(null, "name", res.getResSpec().getName());
 
+        serializeExtraXmlAttrs(serializer, res);
+
         String body = encodeAsResXmlValue();
         if (! body.isEmpty()) {
             serializer.ignorableWhitespace(body);
@@ -72,6 +74,10 @@ public abstract class ResScalarValue extends ResValue
 
     public String getType() {
         return mType;
+    }
+
+    protected void serializeExtraXmlAttrs(XmlSerializer serializer,
+            ResResource res) throws IOException {
     }
 
     protected abstract String encodeAsResXml() throws AndrolibException;
