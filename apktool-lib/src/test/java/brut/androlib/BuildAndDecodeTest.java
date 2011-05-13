@@ -54,7 +54,7 @@ public class BuildAndDecodeTest {
 
     @AfterClass
     public static void afterClass() throws BrutException {
-        //OS.rmdir(sTmpDir);
+        OS.rmdir(sTmpDir);
     }
 
     @Test
