@@ -60,7 +60,7 @@ public class ResFileDecoder {
                 decode(inDir, inFileName, outDir, outFileName, "raw");
                 return;
             }
-            if (typeName.equals("drawable")) {
+            if (typeName.equals("drawable") || typeName.equals("mipmap")) {
                 if (inFileName.toLowerCase().endsWith(".9.png")) {
                     outFileName = outResName + ".9" + ext;
 
