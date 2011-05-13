@@ -21,7 +21,7 @@ import java.io.Writer;
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
-public class IndentingWriter extends org.jf.baksmali.IndentingWriter {
+public class IndentingWriter extends org.jf.util.IndentingWriter {
 
     public IndentingWriter(Writer writer) {
         super(writer);

@@ -23,7 +23,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.jf.baksmali.Adaptors.ClassDefinition;
 import org.jf.baksmali.baksmali;
-import org.jf.baksmali.fileNameHandler;
+import org.jf.util.ClassFileNameHandler;
 import org.jf.dexlib.ClassDefItem;
 import org.jf.dexlib.Code.Analysis.ClassPath;
 import org.jf.dexlib.DexFile;
@@ -114,7 +114,7 @@ public class BaksmaliMod {
             }
         });
 
-        fileNameHandler fileNameHandler = new fileNameHandler(outputDirectoryFile);
+        ClassFileNameHandler fileNameHandler = new ClassFileNameHandler(outputDirectoryFile, ".smali");
 
         for (ClassDefItem classDefItem: classDefItems) {
             /**

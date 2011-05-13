@@ -16,7 +16,7 @@
     <name>apktool library</name>
 
     <properties>
-        <smaliVersion>1.2.4-brut3</smaliVersion>
+        <smaliVersion>1.2.6-brut5</smaliVersion>
         <root.basedir>${project.parent.basedir}</root.basedir>
     </properties>
 
@@ -69,7 +69,7 @@
         </dependency>
         <dependency>
             <groupId>brut.apktool.smali</groupId>
-            <artifactId>dexlib</artifactId>
+            <artifactId>util</artifactId>
             <version>${smaliVersion}</version>
         </dependency>
         <dependency>
