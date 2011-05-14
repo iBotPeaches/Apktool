@@ -12,7 +12,7 @@
     <string name="test_string11">" foo  bar   "</string>
     <string name="test_string12">"foo
 bar"</string>
-    <string name="test_string13">foo<b>bar<i>baz</i></b>foo</string>
+    <string name="test_string13">" foo"<b>bar <i> baz </i></b> <u>foo</u></string>
     <string name="test_string14">foo<sometag someattr1="someval1" someattr2="someval2">bar</sometag>baz</string>
     <string name="test_string16">foo<b>bar<i>"b
         az"</i></b>foo</string>
