@@ -133,6 +133,38 @@ public final class ResXmlEncoders {
         return out.toString();
     }
 
+    public static boolean hasMultipleNonPositionalSubstitutions(String str) {
+        int pos = 0;
+        int count = 0;
+        while((pos = str.indexOf('%', pos)) != -1) {
+            if (str.charAt(pos + 1) != '%') {
+                if (++count >= 2) {
+                    return true;
+                }
+            }
+            pos += 2;
+        }
+
+        return false;
+    }
+
+    public static String enumerateNonPositionalSubstitutions(String str) {
+        StringBuilder out = new StringBuilder(str);
+        int pos = 0;
+        int count = 0;
+        int offset = 0;
+        while((pos = str.indexOf('%', pos)) != -1) {
+            if (str.charAt(pos + 1) != '%') {
+                count++;
+                out.insert(pos + offset + 1, String.valueOf(count) + "$");
+                offset += 2;
+            }
+            pos += 2;
+        }
+
+        return out.toString();
+    }
+
     private static boolean isPrintableChar(char c) {
         Character.UnicodeBlock block = Character.UnicodeBlock.of(c);
         return !Character.isISOControl(c)
