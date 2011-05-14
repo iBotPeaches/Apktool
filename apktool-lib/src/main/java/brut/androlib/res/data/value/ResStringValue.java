@@ -42,12 +42,19 @@ public class ResStringValue extends ResScalarValue {
 
     @Override
     public String encodeAsResXmlValue() {
-        return ResXmlEncoders.encodeAsXmlValue(mRawValue);
+        return ResXmlEncoders.enumerateNonPositionalSubstitutions(
+                ResXmlEncoders.encodeAsXmlValue(mRawValue));
     }
 
     @Override
     protected String encodeAsResXml() throws AndrolibException {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    protected String serializeXmlBody(XmlSerializer serializer, ResResource res)
+            throws IOException, AndrolibException {
+        return ResXmlEncoders.encodeAsXmlValue(mRawValue);
     }
 
     @Override
