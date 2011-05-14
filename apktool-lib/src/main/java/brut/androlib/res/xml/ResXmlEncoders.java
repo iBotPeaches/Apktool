@@ -17,6 +17,8 @@
 package brut.androlib.res.xml;
 
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
@@ -134,35 +136,43 @@ public final class ResXmlEncoders {
     }
 
     public static boolean hasMultipleNonPositionalSubstitutions(String str) {
+        return findNonPositionalSubstitutions(str, 2).size() > 1;
+    }
+
+    public static String enumerateNonPositionalSubstitutions(String str) {
+        List<Integer> subs = findNonPositionalSubstitutions(str, -1);
+        if (subs.size() < 2) {
+            return str;
+        }
+
+        StringBuilder out = new StringBuilder();
         int pos = 0;
         int count = 0;
+        for (Integer sub : subs) {
+            out.append(str.substring(pos, ++sub)).append(++count).append('$');
+            pos = sub;
+        }
+        out.append(str.substring(pos));
+
+        return out.toString();
+    }
+
+    private static List<Integer> findNonPositionalSubstitutions(String str,
+            int max) {
+        int pos = 0;
+        int count = 0;
+        List<Integer> ret = new ArrayList<Integer>();
         while((pos = str.indexOf('%', pos)) != -1) {
             if (str.charAt(pos + 1) != '%') {
-                if (++count >= 2) {
-                    return true;
+                ret.add(pos);
+                if (max != -1 && ++count >= max) {
+                    break;
                 }
             }
             pos += 2;
         }
 
-        return false;
-    }
-
-    public static String enumerateNonPositionalSubstitutions(String str) {
-        StringBuilder out = new StringBuilder(str);
-        int pos = 0;
-        int count = 0;
-        int offset = 0;
-        while((pos = str.indexOf('%', pos)) != -1) {
-            if (str.charAt(pos + 1) != '%') {
-                count++;
-                out.insert(pos + offset + 1, String.valueOf(count) + "$");
-                offset += 2;
-            }
-            pos += 2;
-        }
-
-        return out.toString();
+        return ret;
     }
 
     private static boolean isPrintableChar(char c) {
