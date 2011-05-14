@@ -92,7 +92,6 @@ public final class ResXmlEncoders {
                     isInStyleTag = false;
                     startPos = out.length() + 1;
                     enclose = false;
-                    wasSpace = true;
                 }
             } else if (c == ' ') {
                 if (wasSpace) {
@@ -114,7 +113,7 @@ public final class ResXmlEncoders {
                         break;
                     case '<':
                         isInStyleTag = true;
-                        if (enclose || wasSpace) {
+                        if (enclose) {
                             out.insert(startPos, '"').append('"');
                         }
                         break;
@@ -129,7 +128,7 @@ public final class ResXmlEncoders {
         }
 
         if (enclose || wasSpace) {
-            out.insert(0, '"').append('"');
+            out.insert(startPos, '"').append('"');
         }
 
         return out.toString();
