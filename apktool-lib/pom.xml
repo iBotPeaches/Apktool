@@ -29,6 +29,7 @@
                     <excludes>
                         <exclude>src/main/java/com/mindprod/**</exclude>
                         <exclude>src/main/java/android/**</exclude>
+                        <exclude>src/main/resources/brut/androlib/apktool.properties</exclude>
                         <exclude>src/test/resources/brut/apktool/testapp/**</exclude>
                     </excludes>
                 </configuration>
