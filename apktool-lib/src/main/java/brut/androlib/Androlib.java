@@ -375,7 +375,7 @@ public class Androlib {
     }
 
     public static String getVersion() {
-        return VERSION;
+        return ApktoolProperties.get("aversion");
     }
 
     private File[] parseUsesFramework(Map<String, Object> usesFramework)
@@ -436,5 +436,4 @@ public class Androlib {
         new String[]{"resources.arsc", "AndroidManifest.xml"};
     private final static String[] APP_RESOURCES_FILENAMES =
         new String[]{"AndroidManifest.xml", "res"};
-    private final static String VERSION = "1.3.2";
 }
