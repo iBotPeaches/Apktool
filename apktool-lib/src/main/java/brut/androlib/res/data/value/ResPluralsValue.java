@@ -31,10 +31,10 @@ public class ResPluralsValue extends ResBagValue implements ResValuesXmlSerializ
             Duo<Integer, ResScalarValue>[] items) {
         super(parent);
 
-        mItems = new ResStringValue[6];
+        mItems = new ResScalarValue[6];
         for (int i = 0; i < items.length; i++) {
             mItems[items[i].m1 - BAG_KEY_PLURALS_START] =
-                    (ResStringValue) items[i].m2;
+                    (ResScalarValue) items[i].m2;
         }
     }
 
@@ -44,7 +44,7 @@ public class ResPluralsValue extends ResBagValue implements ResValuesXmlSerializ
         serializer.startTag(null, "plurals");
         serializer.attribute(null, "name", res.getResSpec().getName());
         for (int i = 0; i < mItems.length; i++) {
-            ResStringValue item = mItems[i];
+            ResScalarValue item = mItems[i];
             if (item == null) {
                 continue;
             }
@@ -57,7 +57,7 @@ public class ResPluralsValue extends ResBagValue implements ResValuesXmlSerializ
     }
 
 
-    private final ResStringValue[] mItems;
+    private final ResScalarValue[] mItems;
 
 
     public static final int BAG_KEY_PLURALS_START = 0x01000004;
