@@ -49,6 +49,18 @@
                     </excludes>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>pl.project13.maven</groupId>
+                <artifactId>git-commit-id-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>revision</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
@@ -104,4 +116,12 @@
             <version>1.3</version>
         </dependency>
     </dependencies>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>sonatype-releases</id>
+            <name>Sonatype Releases</name>
+            <url>https://oss.sonatype.org/content/repositories/releases/</url>
+        </pluginRepository>
+    </pluginRepositories>
 </project>
