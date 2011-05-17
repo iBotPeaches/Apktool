@@ -160,8 +160,12 @@ public final class ResXmlEncoders {
             int max) {
         int pos = 0;
         int count = 0;
+        int length = str.length();
         List<Integer> ret = new ArrayList<Integer>();
         while((pos = str.indexOf('%', pos)) != -1) {
+            if (pos + 1 == length) {
+                break;
+            }
             if (str.charAt(pos + 1) != '%') {
                 ret.add(pos);
                 if (max != -1 && ++count >= max) {
