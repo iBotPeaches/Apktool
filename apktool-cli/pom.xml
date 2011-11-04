@@ -4,7 +4,7 @@
 
     <groupId>brut.apktool</groupId>
     <artifactId>apktool-cli</artifactId>
-    <version>${aversion}</version>
+    <version>1.4.2-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <parent>
@@ -47,9 +47,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>brut.apktool</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>apktool-lib</artifactId>
-            <version>${aversion}</version>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 </project>

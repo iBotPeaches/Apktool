@@ -375,7 +375,7 @@ public class Androlib {
     }
 
     public static String getVersion() {
-        String version = ApktoolProperties.get("aversion");
+        String version = ApktoolProperties.get("version");
         return version.endsWith("-SNAPSHOT") ?
                 version.substring(0, version.length() - 9) + '.' +
                     ApktoolProperties.get("git.commit.id.abbrev")
