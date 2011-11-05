@@ -267,7 +267,7 @@ public class ARSCDecoder {
         if (exceedingSize > 0) {
             byte[] buf = new byte[exceedingSize];
             mIn.readFully(buf);
-            BigInteger exceedingBI = new BigInteger(buf);
+            BigInteger exceedingBI = new BigInteger(1, buf);
 
             if (exceedingBI.equals(BigInteger.ZERO)) {
                 LOGGER.fine(String.format(
@@ -275,7 +275,7 @@ public class ARSCDecoder {
                     KNOWN_CONFIG_BYTES));
             } else {
                 LOGGER.warning(String.format(
-                    "Config flags size > %d. Exceeding bytes: %0" + (exceedingSize * 2) + "X.",
+                    "Config flags size > %d. Exceeding bytes: 0x%X.",
                     KNOWN_CONFIG_BYTES, exceedingBI));
                 isInvalid = true;
             }
