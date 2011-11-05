@@ -1,8 +1,7 @@
-/nbproject
-/build
-/dist
-/build.xml
+/nb*
 /target
+/apktool-lib/nb*
 /apktool-lib/target
+/apktool-cli/nb*
 /apktool-cli/target
 
