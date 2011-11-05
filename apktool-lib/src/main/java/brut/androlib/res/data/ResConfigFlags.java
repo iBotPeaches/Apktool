@@ -196,6 +196,9 @@ public class ResConfigFlags {
             case UI_MODE_TYPE_DESK:
                 ret.append("-desk");
                 break;
+            case UI_MODE_TYPE_TELEVISION:
+                ret.append("-television");
+                break;
         }
         switch (uiMode & MASK_UI_MODE_NIGHT) {
             case UI_MODE_NIGHT_YES:
@@ -405,6 +408,7 @@ public class ResConfigFlags {
     public final static byte UI_MODE_TYPE_NORMAL = 0x01;
     public final static byte UI_MODE_TYPE_DESK = 0x02;
     public final static byte UI_MODE_TYPE_CAR = 0x03;
+    public final static byte UI_MODE_TYPE_TELEVISION = 0x04;
 
     public final static byte MASK_UI_MODE_NIGHT = 0x30;
     public final static byte UI_MODE_NIGHT_ANY = 0x00;
