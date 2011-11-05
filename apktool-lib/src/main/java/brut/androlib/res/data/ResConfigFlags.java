@@ -43,6 +43,10 @@ public class ResConfigFlags {
 
     public final byte screenLayout;
     public final byte uiMode;
+    public final short smallestScreenWidthDp;
+
+    public final short screenWidthDp;
+    public final short screenHeightDp;
 
     public final boolean isInvalid;
 
@@ -64,6 +68,9 @@ public class ResConfigFlags {
         sdkVersion = 0;
         screenLayout = SCREENLONG_ANY | SCREENSIZE_ANY;
         uiMode = UI_MODE_TYPE_ANY | UI_MODE_NIGHT_ANY;
+        smallestScreenWidthDp = 0;
+        screenWidthDp = 0;
+        screenHeightDp = 0;
         isInvalid = false;
         mQualifiers = "";
     }
@@ -72,7 +79,8 @@ public class ResConfigFlags {
             byte orientation, byte touchscreen, short density, byte keyboard,
             byte navigation, byte inputFlags, short screenWidth,
             short screenHeight, short sdkVersion, byte screenLayout,
-            byte uiMode, boolean isInvalid) {
+            byte uiMode, short smallestScreenWidthDp, short screenWidthDp,
+            short screenHeightDp, boolean isInvalid) {
         if (orientation < 0 || orientation > 3) {
             LOGGER.warning("Invalid orientation value: " + orientation);
             orientation = 0;
@@ -114,6 +122,9 @@ public class ResConfigFlags {
         this.sdkVersion = sdkVersion;
         this.screenLayout = screenLayout;
         this.uiMode = uiMode;
+        this.smallestScreenWidthDp = smallestScreenWidthDp;
+        this.screenWidthDp = screenWidthDp;
+        this.screenHeightDp = screenHeightDp;
         this.isInvalid = isInvalid;
         mQualifiers = generateQualifiers();
     }
@@ -135,6 +146,15 @@ public class ResConfigFlags {
             if (country[0] != '\00') {
                 ret.append("-r").append(country);
             }
+        }
+        if (smallestScreenWidthDp != 0) {
+            ret.append("-sw").append(smallestScreenWidthDp).append("dp");
+        }
+        if (screenWidthDp != 0) {
+            ret.append("-w").append(screenWidthDp).append("dp");
+        }
+        if (screenHeightDp != 0) {
+            ret.append("-h").append(screenHeightDp).append("dp");
         }
         switch (screenLayout & MASK_SCREENSIZE) {
             case SCREENSIZE_SMALL:
@@ -279,6 +299,12 @@ public class ResConfigFlags {
     }
 
     private short getNaturalSdkVersionRequirement() {
+        if (
+                   smallestScreenWidthDp != 0 || screenWidthDp != 0
+                || screenHeightDp != 0
+        ) {
+            return 13;
+        }
         if (
                (uiMode & (MASK_UI_MODE_TYPE | MASK_UI_MODE_NIGHT)) != 0
         ) {
