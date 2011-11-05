@@ -32,7 +32,7 @@ public class Main {
     public static void main(String[] args)
             throws IOException, AndrolibException, InterruptedException {
         try {
-            boolean verbose = false;
+            Verbosity verbosity = Verbosity.NORMAL;
             int i;
             for (i = 0; i < args.length; i++) {
                 String opt = args[i];
@@ -40,12 +40,20 @@ public class Main {
                     break;
                 }
                 if ("-v".equals(opt) || "--verbose".equals(opt)) {
-                    verbose = true;
+                    if (verbosity != Verbosity.NORMAL) {
+                        throw new InvalidArgsError();
+                    }
+                    verbosity = Verbosity.VERBOSE;
+                } else if ("-q".equals(opt) || "--quiet".equals(opt)) {
+                    if (verbosity != Verbosity.NORMAL) {
+                        throw new InvalidArgsError();
+                    }
+                    verbosity = Verbosity.QUIET;
                 } else {
                     throw new InvalidArgsError();
                 }
             }
-            setupLogging(verbose);
+            setupLogging(verbosity);
 
             if (args.length <= i) {
                 throw new InvalidArgsError();
@@ -204,7 +212,7 @@ public class Main {
             "Copyright 2010 Ryszard Wiśniewski <brut.alll@gmail.com>\n" +
             "Apache License 2.0 (http://www.apache.org/licenses/LICENSE-2.0)\n" +
             "\n" +
-            "Usage: apktool [-v|--verbose] COMMAND [...]\n" +
+            "Usage: apktool [-q|--quiet OR -v|--verbose] COMMAND [...]\n" +
             "\n" +
             "COMMANDs are:\n" +
             "\n" +
@@ -253,15 +261,19 @@ public class Main {
         );
     }
 
-    private static void setupLogging(boolean verbose) {
+    private static void setupLogging(Verbosity verbosity) {
         Logger logger = Logger.getLogger("");
         for (Handler handler : logger.getHandlers()) {
             logger.removeHandler(handler);
         }
+        if (verbosity == Verbosity.QUIET) {
+            return;
+        }
+
         Handler handler = new ConsoleHandler();
         logger.addHandler(handler);
 
-        if (verbose) {
+        if (verbosity == Verbosity.VERBOSE) {
             handler.setLevel(Level.ALL);
             logger.setLevel(Level.ALL);
         } else {
@@ -274,6 +286,10 @@ public class Main {
                 }
             });
         }
+    }
+
+    private static enum Verbosity {
+        NORMAL, VERBOSE, QUIET;
     }
 
     static class InvalidArgsError extends AndrolibException {
