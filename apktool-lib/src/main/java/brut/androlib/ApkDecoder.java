@@ -187,7 +187,7 @@ public class ApkDecoder {
         meta.put("version", Androlib.getVersion());
         meta.put("apkFileName", mApkFile.getName());
 
-        if (hasResources()) {
+        if (mDecodeResources != DECODE_RESOURCES_NONE && hasResources()) {
             meta.put("isFrameworkApk",
                 Boolean.valueOf(mAndrolib.isFrameworkApk(getResTable())));
             putUsesFramework(meta);
