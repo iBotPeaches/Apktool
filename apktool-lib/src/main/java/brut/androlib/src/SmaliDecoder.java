@@ -17,10 +17,10 @@
 package brut.androlib.src;
 
 import brut.androlib.AndrolibException;
-import brut.androlib.mod.BaksmaliMod;
 import java.io.File;
 import java.io.IOException;
-import org.jf.dexlib.Code.Analysis.ClassPath;
+import org.jf.baksmali.baksmali;
+import org.jf.baksmali.main;
 import org.jf.dexlib.DexFile;
 
 /**
@@ -40,15 +40,11 @@ public class SmaliDecoder {
     }
 
     private void decode() throws AndrolibException {
-        if (mDebug) {
-            ClassPath.dontLoadClassPath = true;
-        }
-
         try {
-            BaksmaliMod.disassembleDexFile(mDebug, mApkFile.getAbsolutePath(),
-                new DexFile(mApkFile), false, mOutDir.getAbsolutePath(),
-                null, null, null, false, true, true, true, false,
-                mDebug ? org.jf.baksmali.main.DIFFPRE : 0, false, false);
+            baksmali.disassembleDexFile(mApkFile.getAbsolutePath(),
+                new DexFile(mApkFile), false, mOutDir.getAbsolutePath(), null,
+                null, null, false, true, true, true, false, false, 
+                mDebug ? main.DIFFPRE : 0, false, false, null);
         } catch (IOException ex) {
             throw new AndrolibException(ex);
         }

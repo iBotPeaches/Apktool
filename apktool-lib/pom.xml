@@ -16,7 +16,7 @@
     <name>apktool library</name>
 
     <properties>
-        <smaliVersion>1.2.6-brut5</smaliVersion>
+        <smaliVersion>1.3.0-brut6</smaliVersion>
         <root.basedir>${project.parent.basedir}</root.basedir>
     </properties>
 
