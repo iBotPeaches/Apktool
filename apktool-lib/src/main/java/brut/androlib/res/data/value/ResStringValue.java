@@ -52,12 +52,6 @@ public class ResStringValue extends ResScalarValue {
     }
 
     @Override
-    protected String serializeXmlBody(XmlSerializer serializer, ResResource res)
-            throws IOException, AndrolibException {
-        return ResXmlEncoders.encodeAsXmlValue(mRawValue);
-    }
-
-    @Override
     protected void serializeExtraXmlAttrs(XmlSerializer serializer,
             ResResource res) throws IOException {
         if (ResXmlEncoders.hasMultipleNonPositionalSubstitutions(mRawValue)) {
