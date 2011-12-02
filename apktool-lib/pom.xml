@@ -4,7 +4,7 @@
 
     <groupId>brut.apktool</groupId>
     <artifactId>apktool-lib</artifactId>
-    <version>1.4.2-SNAPSHOT</version>
+    <version>1.4.2</version>
     <packaging>jar</packaging>
 
     <parent>
