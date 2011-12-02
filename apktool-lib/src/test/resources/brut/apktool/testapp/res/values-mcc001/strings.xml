@@ -18,4 +18,5 @@ bar"</string>
         az"</i></b>foo</string>
     <string name="test_string17" formatted="false">%d of %d</string>
     <string name="test_string18">foo %d bar %</string>
+    <string name="test_string19">%2$s foo %1$d</string>
 </resources>

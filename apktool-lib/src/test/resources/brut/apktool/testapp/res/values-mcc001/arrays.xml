@@ -4,6 +4,7 @@
         <item>TEST1</item>
         <item>TEST2</item>
         <item>TEST3</item>
+        <item>%2$s foo %1$d</item>
     </string-array>
     <integer-array name="test_array2">
         <item>-1</item>
