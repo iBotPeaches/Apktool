@@ -166,7 +166,8 @@ public final class ResXmlEncoders {
             if (pos + 1 == length) {
                 break;
             }
-            if (str.charAt(pos + 1) != '%') {
+            char c = str.charAt(pos + 1);
+            if (c >= 'a' && c <= 'z') {
                 ret.add(pos);
                 if (max != -1 && ++count >= max) {
                     break;
