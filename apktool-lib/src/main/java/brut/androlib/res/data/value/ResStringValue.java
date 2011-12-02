@@ -41,6 +41,12 @@ public class ResStringValue extends ResScalarValue {
     }
 
     @Override
+    public String encodeAsResXmlItemValue() {
+        return ResXmlEncoders.enumerateNonPositionalSubstitutions(
+                ResXmlEncoders.encodeAsXmlValue(mRawValue));
+    }
+
+    @Override
     public String encodeAsResXmlValue() {
         return ResXmlEncoders.encodeAsXmlValue(mRawValue);
     }
