@@ -16,6 +16,10 @@
     </properties>
 
     <modules>
+        <module>../brut.apktool.smali</module>
+        <module>../brut.j.dir</module>
+        <module>../brut.j.common</module>
+        <module>../brut.j.util</module>
         <module>apktool-lib</module>
         <module>apktool-cli</module>
     </modules>

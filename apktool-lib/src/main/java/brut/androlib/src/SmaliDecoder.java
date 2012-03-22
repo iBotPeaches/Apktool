@@ -19,7 +19,8 @@ package brut.androlib.src;
 import brut.androlib.AndrolibException;
 import java.io.File;
 import java.io.IOException;
-import org.jf.baksmali.*;
+import org.jf.baksmali.baksmali;
+import org.jf.baksmali.main;
 import org.jf.dexlib.DexFile;
 
 /**
@@ -43,7 +44,7 @@ public class SmaliDecoder {
             baksmali.disassembleDexFile(mApkFile.getAbsolutePath(),
                 new DexFile(mApkFile), false, mOutDir.getAbsolutePath(), null,
                 null, null, false, true, true, true, false, false, 
-                mDebug ? main.DIFFPRE : 0, false, false, null);
+                mDebug ? main.FULLMERGE : 0, false, false, null);
         } catch (IOException ex) {
             throw new AndrolibException(ex);
         }

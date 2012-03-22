@@ -30,6 +30,7 @@
       <unpack>true</unpack>
       <scope>runtime</scope>
       <includes>
+          <include>org.jf.*</include>
           <include>brut.*</include>
           <include>xpp3:xpp3</include>
           <include>org.yaml:snakeyaml</include>
