@@ -19,11 +19,19 @@ package brut.androlib;
 import brut.androlib.res.util.ExtFile;
 import brut.common.BrutException;
 import brut.util.OS;
-import java.io.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
 import java.util.logging.Logger;
-import org.custommonkey.xmlunit.*;
-import org.junit.*;
-import static org.junit.Assert.*;
+import org.custommonkey.xmlunit.DetailedDiff;
+import org.custommonkey.xmlunit.Diff;
+import org.custommonkey.xmlunit.ElementNameAndAttributeQualifier;
+import org.custommonkey.xmlunit.ElementQualifier;
+import org.junit.AfterClass;
+import static org.junit.Assert.assertTrue;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.xml.sax.SAXException;
 
 
@@ -116,9 +124,7 @@ public class BuildAndDecodeTest {
 
     @Test
     public void qualifiersTest() throws BrutException {
-        compareValuesFiles("values-mcc004-mnc4-en-rUS-sw100dp-w200dp-h300dp" +
-                "-xlarge-long-land-television-night-xhdpi-finger-keyssoft-12key" +
-                "-navhidden-dpad/strings.xml");
+        compareValuesFiles("values-mcc004/strings.xml");
     }
 
     private void compareValuesFiles(String path) throws BrutException {

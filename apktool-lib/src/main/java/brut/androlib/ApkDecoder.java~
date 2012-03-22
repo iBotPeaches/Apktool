@@ -26,10 +26,7 @@ import brut.common.BrutException;
 import brut.directory.DirectoryException;
 import brut.util.OS;
 import java.io.File;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>

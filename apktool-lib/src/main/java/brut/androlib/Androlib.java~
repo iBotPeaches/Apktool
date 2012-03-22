@@ -24,8 +24,7 @@ import brut.androlib.res.util.ExtFile;
 import brut.androlib.src.SmaliBuilder;
 import brut.androlib.src.SmaliDecoder;
 import brut.common.BrutException;
-import brut.directory.Directory;
-import brut.directory.DirectoryException;
+import brut.directory.*;
 import brut.util.BrutIO;
 import brut.util.OS;
 import java.io.*;
@@ -316,7 +315,7 @@ public class Androlib {
         } catch (IOException ex) {
             throw new AndrolibException(ex);
         } catch (DirectoryException ex) {
-            throw new AndrolibException(ex);
+            //throw new AndrolibException(ex);
         }
     }
 

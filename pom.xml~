@@ -72,22 +72,4 @@
             </extension>
         </extensions>
     </build>
-
-    <repositories>
-        <repository>
-            <id>android-apktool.googlecode.com</id>
-            <url>http://apktool2.googlecode.com/svn/m2-releases</url>
-        </repository>
-    </repositories>
-
-    <distributionManagement>
-        <repository>
-            <id>android-apktool.googlecode.com</id>
-            <url>dav:https://apktool2.googlecode.com/svn/m2-releases</url>
-        </repository>
-        <snapshotRepository>
-            <id>android-apktool.googlecode.com</id>
-            <url>dav:https://apktool2.googlecode.com/svn/m2-snapshots</url>
-        </snapshotRepository>
-    </distributionManagement>
 </project>

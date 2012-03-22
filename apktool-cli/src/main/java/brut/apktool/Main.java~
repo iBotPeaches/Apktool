@@ -16,9 +16,7 @@
 
 package brut.apktool;
 
-import brut.androlib.Androlib;
-import brut.androlib.AndrolibException;
-import brut.androlib.ApkDecoder;
+import brut.androlib.*;
 import brut.androlib.err.CantFindFrameworkResException;
 import brut.androlib.err.InFileNotFoundException;
 import brut.androlib.err.OutDirExistsException;
@@ -211,7 +209,7 @@ public class Main {
     private static void usage() {
         System.out.println(
             "Apktool v" + Androlib.getVersion() + " - a tool for reengineering Android apk files\n" +
-            "Edited by iBotPeaches (@iBotPeaches) \n" +
+            "Edited by iBotPeachs of http://miuiandroid.com\n" +
             "Copyright 2010 Ryszard Wiśniewski <brut.alll@gmail.com>\n" +
             "Apache License 2.0 (http://www.apache.org/licenses/LICENSE-2.0)\n" +
             "\n" +
@@ -239,7 +237,7 @@ public class Main {
             "            \"Invalid config flags detected. Dropping resources\", but you\n" +
             "            want to decode them anyway, even with errors. You will have to\n" +
             "            fix them manually before building." +
-            "\n\n" +
+            "\n" +
             "    b[uild] [OPTS] [<app_path>] [<out_file>]\n" +
             "        Build an apk from already decoded application located in <app_path>.\n" +
             "\n" +

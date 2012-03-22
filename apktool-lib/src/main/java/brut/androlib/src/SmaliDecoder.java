@@ -19,8 +19,7 @@ package brut.androlib.src;
 import brut.androlib.AndrolibException;
 import java.io.File;
 import java.io.IOException;
-import org.jf.baksmali.baksmali;
-import org.jf.baksmali.main;
+import org.jf.baksmali.*;
 import org.jf.dexlib.DexFile;
 
 /**
