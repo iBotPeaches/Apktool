@@ -57,5 +57,11 @@
             <version>1.3.3-dev</version>
             <type>jar</type>
         </dependency>
+                <dependency>
+            <groupId>org.jf</groupId>
+            <artifactId>util</artifactId>
+            <version>1.3.3-dev</version>
+            <type>jar</type>
+        </dependency>
     </dependencies>
 </project>

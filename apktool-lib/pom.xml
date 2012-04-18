@@ -80,7 +80,7 @@
             <artifactId>common</artifactId>
             <version>1.0</version>
         </dependency>
-        <dependency>
+             <dependency>
             <groupId>brut.apktool.smali</groupId>
             <artifactId>smali</artifactId>
             <version>${smaliVersion}</version>
@@ -88,13 +88,12 @@
         <dependency>
             <groupId>brut.apktool.smali</groupId>
             <artifactId>baksmali</artifactId>
-            <version>1.3.3-ibot7</version>
-            <type>jar</type>
+            <version>${smaliVersion}</version>
         </dependency>
         <dependency>
             <groupId>brut.apktool.smali</groupId>
             <artifactId>util</artifactId>
-            <version>1.3.3-ibot7</version>
+            <version>1.3.3-ibot7-SNAPSHOT</version>
             <type>jar</type>
         </dependency>
         <dependency>
@@ -120,7 +119,7 @@
         <dependency>
             <groupId>org.jf</groupId>
             <artifactId>util</artifactId>
-            <version>1.3.3-dev</version>
+            <version>1.3.3-ibot7</version>
             <type>jar</type>
         </dependency>
     </dependencies>

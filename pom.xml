@@ -8,7 +8,7 @@
     <packaging>pom</packaging>
 
     <name>apktool</name>
-    <url>http://github.com/brutall/brut.apktool</url>
+    <url>http://github.com/ibotpeaches/brut.apktool</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
