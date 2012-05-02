@@ -19,6 +19,7 @@ package brut.androlib.res.data.value;
 import brut.androlib.res.xml.ResValuesXmlSerializable;
 import brut.androlib.AndrolibException;
 import brut.androlib.res.data.ResResource;
+import brut.androlib.res.xml.ResXmlEncoders;
 import brut.util.Duo;
 import java.io.IOException;
 import org.xmlpull.v1.XmlSerializer;
@@ -50,13 +51,22 @@ public class ResPluralsValue extends ResBagValue implements ResValuesXmlSerializ
             }
             serializer.startTag(null, "item");
             serializer.attribute(null, "quantity", QUANTITY_MAP[i]);
-            serializer.text(item.encodeAsResXmlValue());
+
+            String item2 = item.encodeAsResXmlValue();
+            
+            /*
+             * peaches fix regarding formatted=false
+             */
+            if (ResXmlEncoders.hasMultipleNonPositionalSubstitutions(item2)) {
+                serializer.attribute(null, "formatted", "false");
+            }
+            serializer.text(item2);
+            
             serializer.endTag(null, "item");
         }
         serializer.endTag(null, "plurals");
     }
-
-
+    
     private final ResScalarValue[] mItems;
 
 
