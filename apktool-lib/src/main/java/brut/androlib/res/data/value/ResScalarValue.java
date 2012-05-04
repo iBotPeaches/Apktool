@@ -58,6 +58,15 @@ public abstract class ResScalarValue extends ResValue
             throws IOException, AndrolibException {
         String type = res.getResSpec().getType().getName();
         boolean item = ! "reference".equals(mType) && ! type.equals(mType);
+        
+        String body = encodeAsResXmlValue();
+        
+        /* check for resource reference */
+        if (body.contains("@")){
+            item = true;
+        }
+        
+        /* check for using attrib as node or item */
         String tagName = item ? "item" : type;
         
         serializer.startTag(null, tagName);
@@ -68,7 +77,6 @@ public abstract class ResScalarValue extends ResValue
 
         serializeExtraXmlAttrs(serializer, res);
 
-        String body = encodeAsResXmlValue();
         if (! body.isEmpty()) {
             serializer.ignorableWhitespace(body);
         }
