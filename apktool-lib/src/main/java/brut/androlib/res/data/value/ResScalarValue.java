@@ -61,9 +61,11 @@ public abstract class ResScalarValue extends ResValue
         
         String body = encodeAsResXmlValue();
         
+        
         /* check for resource reference */
         if (body.contains("@")){
-            item = true;
+           // item = true; 
+           // messes up strings with @, need to check if strings.xml ignore
         }
         
         /* check for using attrib as node or item */
