@@ -16,6 +16,7 @@
 
 package brut.androlib.res.data;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -82,27 +83,27 @@ public class ResConfigFlags {
             byte uiMode, short smallestScreenWidthDp, short screenWidthDp,
             short screenHeightDp, boolean isInvalid) {
         if (orientation < 0 || orientation > 3) {
-            LOGGER.warning("Invalid orientation value: " + orientation);
+            LOGGER.log(Level.WARNING, "Invalid orientation value: {0}", orientation);
             orientation = 0;
             isInvalid = true;
         }
         if (touchscreen < 0 || touchscreen > 3) {
-            LOGGER.warning("Invalid touchscreen value: " + touchscreen);
+            LOGGER.log(Level.WARNING, "Invalid touchscreen value: {0}", touchscreen);
             touchscreen = 0;
             isInvalid = true;
         }
         if (density < -1) {
-            LOGGER.warning("Invalid density value: " + density);
+            LOGGER.log(Level.WARNING, "Invalid density value: {0}", density);
             density = 0;
             isInvalid = true;
         }
         if (keyboard < 0 || keyboard > 3) {
-            LOGGER.warning("Invalid keyboard value: " + keyboard);
+            LOGGER.log(Level.WARNING, "Invalid keyboard value: {0}", keyboard);
             keyboard = 0;
             isInvalid = true;
         }
         if (navigation < 0 || navigation > 4) {
-            LOGGER.warning("Invalid navigation value: " + navigation);
+            LOGGER.log(Level.WARNING, "Invalid navigation value: {0}", navigation);
             navigation = 0;
             isInvalid = true;
         }

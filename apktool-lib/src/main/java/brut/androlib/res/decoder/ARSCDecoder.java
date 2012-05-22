@@ -139,7 +139,8 @@ public class ARSCDecoder {
         checkChunkType(Header.TYPE_CONFIG);
         /*typeId*/ mIn.skipInt();
         int entryCount = mIn.readInt();
-        /*entriesStart*/ mIn.skipInt();
+        /*entriesStart*/ 
+        mIn.skipInt();
 
         ResConfigFlags flags = readConfigFlags();
         int[] entryOffsets = mIn.readIntArray(entryCount);
