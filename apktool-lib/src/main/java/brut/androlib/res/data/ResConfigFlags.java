@@ -196,9 +196,6 @@ public class ResConfigFlags {
             case UI_MODE_TYPE_DESK:
                 ret.append("-desk");
                 break;
-            case UI_MODE_TYPE_TELEVISION:
-                ret.append("-television");
-                break;
         }
         switch (uiMode & MASK_UI_MODE_NIGHT) {
             case UI_MODE_NIGHT_YES:
@@ -219,6 +216,9 @@ public class ResConfigFlags {
                 break;
             case DENSITY_HIGH:
                 ret.append("-hdpi");
+                break;
+            case DENSITY_TV:
+                ret.append("-tvdpi");
                 break;
             case DENSITY_XHIGH:
                 ret.append("-xhdpi");
@@ -365,6 +365,7 @@ public class ResConfigFlags {
     public final static short DENSITY_DEFAULT = 0;
     public final static short DENSITY_LOW = 120;
     public final static short DENSITY_MEDIUM = 160;
+    public final static short DENSITY_TV = 213;
     public final static short DENSITY_HIGH = 240;
     public final static short DENSITY_XHIGH = 320;
     public final static short DENSITY_NONE = -1;
