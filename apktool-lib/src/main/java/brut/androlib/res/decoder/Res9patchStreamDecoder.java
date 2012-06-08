@@ -20,6 +20,8 @@ import brut.androlib.AndrolibException;
 import brut.androlib.err.CantFind9PatchChunk;
 import brut.util.ExtDataInput;
 import java.awt.image.BufferedImage;
+import java.awt.image.Raster;
+import java.awt.image.WritableRaster;
 import java.io.*;
 import javax.imageio.ImageIO;
 import org.apache.commons.io.IOUtils;
@@ -36,15 +38,31 @@ public class Res9patchStreamDecoder implements ResStreamDecoder {
             BufferedImage im = ImageIO.read(new ByteArrayInputStream(data));
             int w = im.getWidth(), h = im.getHeight();
 
-            BufferedImage im2 = new BufferedImage(
-                w + 2, h + 2, BufferedImage.TYPE_4BYTE_ABGR);
-            if (im.getType() == BufferedImage.TYPE_4BYTE_ABGR) {
-                im2.getRaster().setRect(1, 1, im.getRaster());
+            BufferedImage im2 = new BufferedImage(w + 2, h + 2, BufferedImage.TYPE_4BYTE_ABGR);
+            Raster src = im.getRaster();
+            
+            NinePatch np = getNinePatch(data);
+            WritableRaster dst = im2.getRaster();
+            int nbands = im.getSampleModel().getNumBands();
+            int[] bands = new int[4];
+            if (nbands == 2) {
+                bands[0] = bands[1] = bands[2] = 0;
+                bands[3] = 1;
             } else {
-                im2.getGraphics().drawImage(im, 1, 1, null);
+                bands[0] = 0;
+                bands[1] = 1;
+                bands[2] = 2;
+                bands[3] = 3;
+            }
+            int[] band = null;
+            for (int y = 0; y < h; y++) {
+                for (int bi = 0; bi < 4; bi++) {
+                    band = src.getSamples(0, y, w, 1, bands[bi], band);
+                    dst.setSamples(1, y + 1, w, 1, bi, band);
+                }
             }
 
-            NinePatch np = getNinePatch(data);
+            
             drawHLine(im2, h + 1, np.padLeft + 1, w - np.padRight);
             drawVLine(im2, w + 1, np.padTop + 1, h - np.padBottom);
 

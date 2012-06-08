@@ -16,7 +16,6 @@
 
 package brut.androlib.res.data;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -83,27 +82,27 @@ public class ResConfigFlags {
             byte uiMode, short smallestScreenWidthDp, short screenWidthDp,
             short screenHeightDp, boolean isInvalid) {
         if (orientation < 0 || orientation > 3) {
-            LOGGER.log(Level.WARNING, "Invalid orientation value: {0}", orientation);
+            LOGGER.warning("Invalid orientation value: " + orientation);
             orientation = 0;
             isInvalid = true;
         }
         if (touchscreen < 0 || touchscreen > 3) {
-            LOGGER.log(Level.WARNING, "Invalid touchscreen value: {0}", touchscreen);
+            LOGGER.warning("Invalid touchscreen value: " + touchscreen);
             touchscreen = 0;
             isInvalid = true;
         }
         if (density < -1) {
-            LOGGER.log(Level.WARNING, "Invalid density value: {0}", density);
+            LOGGER.warning("Invalid density value: " + density);
             density = 0;
             isInvalid = true;
         }
         if (keyboard < 0 || keyboard > 3) {
-            LOGGER.log(Level.WARNING, "Invalid keyboard value: {0}", keyboard);
+            LOGGER.warning("Invalid keyboard value: " + keyboard);
             keyboard = 0;
             isInvalid = true;
         }
         if (navigation < 0 || navigation > 4) {
-            LOGGER.log(Level.WARNING, "Invalid navigation value: {0}", navigation);
+            LOGGER.warning("Invalid navigation value: " + navigation);
             navigation = 0;
             isInvalid = true;
         }
@@ -197,6 +196,9 @@ public class ResConfigFlags {
             case UI_MODE_TYPE_DESK:
                 ret.append("-desk");
                 break;
+            case UI_MODE_TYPE_TELEVISION:
+                ret.append("-television");
+                break;
         }
         switch (uiMode & MASK_UI_MODE_NIGHT) {
             case UI_MODE_NIGHT_YES:
@@ -212,8 +214,8 @@ public class ResConfigFlags {
             case DENSITY_LOW:
                 ret.append("-ldpi");
                 break;
-            case DENSITY_TV:
-                ret.append("-tvdpi");
+            case DENSITY_MEDIUM:
+                ret.append("-mdpi");
                 break;
             case DENSITY_HIGH:
                 ret.append("-hdpi");
@@ -360,12 +362,11 @@ public class ResConfigFlags {
     public final static byte TOUCHSCREEN_STYLUS  = 2;
     public final static byte TOUCHSCREEN_FINGER  = 3;
 
-    public final static short DENSITY_DEFAULT = 160;
+    public final static short DENSITY_DEFAULT = 0;
     public final static short DENSITY_LOW = 120;
     public final static short DENSITY_MEDIUM = 160;
     public final static short DENSITY_HIGH = 240;
     public final static short DENSITY_XHIGH = 320;
-    public final static short DENSITY_TV = 213;
     public final static short DENSITY_NONE = -1;
 
     public final static byte KEYBOARD_ANY  = 0;
