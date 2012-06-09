@@ -43,6 +43,8 @@ public class TypedValue {
     /** The <var>data</var> field holds a complex number encoding a fraction
      *  of a container. */
     public static final int TYPE_FRACTION = 0x06;
+    
+    public static final int TYPE_LAYOUT = 0x07;
 
     /** Identifies the start of plain integer values.  Any type value
      *  from this to {@link #TYPE_LAST_INT} means the
