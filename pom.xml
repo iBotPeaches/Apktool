@@ -8,7 +8,7 @@
     <packaging>pom</packaging>
 
     <name>apktool</name>
-    <url>http://github.com/ibotpeaches/brut.apktool</url>
+    <url>http://github.com/iBotPeaches/brut.apktool</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -16,10 +16,6 @@
     </properties>
 
     <modules>
-        <module>../brut.apktool.smali</module>
-        <module>../brut.j.dir</module>
-        <module>../brut.j.common</module>
-        <module>../brut.j.util</module>
         <module>apktool-lib</module>
         <module>apktool-cli</module>
     </modules>
@@ -80,18 +76,18 @@
     <repositories>
         <repository>
             <id>android-apktool.googlecode.com</id>
-            <url>http://apktool2.googlecode.com/svn/m2-releases</url>
+            <url>http://apktool2.googlecode.com/git/m2-releases</url>
         </repository>
     </repositories>
 
     <distributionManagement>
         <repository>
             <id>android-apktool.googlecode.com</id>
-            <url>dav:https://apktool2.googlecode.com/svn/m2-releases</url>
+            <url>dav:https://apktool2.googlecode.com/git/m2-releases</url>
         </repository>
         <snapshotRepository>
             <id>android-apktool.googlecode.com</id>
-            <url>dav:https://apktool2.googlecode.com/svn/m2-snapshots</url>
+            <url>dav:https://apktool2.googlecode.com/git/m2-snapshots</url>
         </snapshotRepository>
     </distributionManagement>
 </project>

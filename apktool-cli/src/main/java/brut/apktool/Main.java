@@ -207,7 +207,7 @@ public class Main {
     }
 
     private static void usage() {
-        String smaliVersion = "1.3.3-dev";
+        String smaliVersion = "1.3.4-dev";
         System.out.println(
             "Apktool v" + Androlib.getVersion() + " - a tool for reengineering Android apk files\n" +
             "Copyright 2010 Ryszard Wiśniewski <brut.alll@gmail.com>\n" +
