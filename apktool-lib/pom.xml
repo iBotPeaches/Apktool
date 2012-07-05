@@ -1,4 +1,3 @@
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
@@ -72,19 +71,28 @@
         </dependency>
         <dependency>
             <groupId>brut.j</groupId>
+            <artifactId>util</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>brut.j</groupId>
             <artifactId>common</artifactId>
             <version>1.0</version>
         </dependency>
-           <dependency>
+        <dependency>
             <groupId>brut.apktool.smali</groupId>
             <artifactId>smali</artifactId>
             <version>${smaliVersion}</version>
         </dependency>
         <dependency>
             <groupId>brut.apktool.smali</groupId>
+            <artifactId>baksmali</artifactId>
+            <version>${smaliVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>brut.apktool.smali</groupId>
             <artifactId>util</artifactId>
-            <version>1.3.4-ibot7</version>
-            <type>jar</type>
+            <version>${smaliVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.yaml</groupId>
@@ -105,12 +113,6 @@
             <groupId>xmlunit</groupId>
             <artifactId>xmlunit</artifactId>
             <version>1.3</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jf</groupId>
-            <artifactId>util</artifactId>
-            <version>1.3.4-ibot7</version>
-            <type>jar</type>
         </dependency>
     </dependencies>
 
