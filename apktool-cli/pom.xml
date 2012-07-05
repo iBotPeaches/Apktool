@@ -50,5 +50,11 @@
             <artifactId>apktool-lib</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <artifactId>common</artifactId>
+            <groupId>brut.j</groupId>
+            <type>jar</type>
+            <version>1.0</version>
+        </dependency>
     </dependencies>
 </project>

@@ -93,13 +93,14 @@
         <dependency>
             <groupId>brut.apktool.smali</groupId>
             <artifactId>baksmali</artifactId>
-            <version>${smaliVersion}</version>
+            <version>1.3.4-ibot7</version>
             <exclusions>
                 <exclusion>
                     <artifactId>dexlib</artifactId>
                     <groupId>brut.apktool.smali</groupId>
                 </exclusion>
             </exclusions>
+            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>brut.apktool.smali</groupId>
@@ -136,6 +137,12 @@
             <groupId>brut.apktool.smali</groupId>
             <artifactId>dexlib</artifactId>
             <version>1.3.4-ibot7</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>com.google.collections</groupId>
+            <artifactId>google-collections</artifactId>
+            <version>1.0</version>
         </dependency>
     </dependencies>
 
