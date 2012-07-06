@@ -128,9 +128,10 @@
             <type>jar</type>
         </dependency>
         <dependency>
-            <groupId>com.google.collections</groupId>
-            <artifactId>google-collections</artifactId>
-            <version>1.0</version>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>12.0</version>
+            <type>jar</type>
         </dependency>
     </dependencies>
 

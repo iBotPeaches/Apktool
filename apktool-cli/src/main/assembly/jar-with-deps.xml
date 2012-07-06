@@ -36,7 +36,7 @@
           <include>org.yaml:snakeyaml</include>
           <include>commons-io:*</include>
           <include>org.antlr:antlr-runtime</include>
-          <include>com.google.collections</include>
+          <include>com.google.*</include>
       </includes>
     </dependencySet>
   </dependencySets>
