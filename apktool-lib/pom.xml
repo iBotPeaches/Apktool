@@ -83,23 +83,11 @@
             <groupId>brut.apktool.smali</groupId>
             <artifactId>smali</artifactId>
             <version>${smaliVersion}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>dexlib</artifactId>
-                    <groupId>brut.apktool.smali</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>brut.apktool.smali</groupId>
             <artifactId>baksmali</artifactId>
             <version>1.3.4-ibot7</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>dexlib</artifactId>
-                    <groupId>brut.apktool.smali</groupId>
-                </exclusion>
-            </exclusions>
             <type>jar</type>
         </dependency>
         <dependency>
