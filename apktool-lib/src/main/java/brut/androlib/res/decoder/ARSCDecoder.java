@@ -139,8 +139,7 @@ public class ARSCDecoder {
         checkChunkType(Header.TYPE_CONFIG);
         /*typeId*/ mIn.skipInt();
         int entryCount = mIn.readInt();
-        /*entriesStart*/ 
-        mIn.skipInt();
+        /*entriesStart*/ mIn.skipInt();
 
         ResConfigFlags flags = readConfigFlags();
         int[] entryOffsets = mIn.readIntArray(entryCount);
@@ -248,13 +247,13 @@ public class ARSCDecoder {
         byte keyboard = mIn.readByte();
         byte navigation = mIn.readByte();
         byte inputFlags = mIn.readByte();
-        mIn.skipBytes(1);
+        /*inputPad0*/ mIn.skipBytes(1);
 
         short screenWidth = mIn.readShort();
         short screenHeight = mIn.readShort();
 
         short sdkVersion = mIn.readShort();
-        mIn.skipBytes(2);
+        /*minorVersion, now must always be 0*/ mIn.skipBytes(2);
 
         byte screenLayout = 0;
         byte uiMode = 0;

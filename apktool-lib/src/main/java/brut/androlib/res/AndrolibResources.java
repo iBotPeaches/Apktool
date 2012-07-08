@@ -124,9 +124,8 @@ final public class AndrolibResources {
             out = new FileDirectory(outDir);
 
             LOGGER.info("Decoding AndroidManifest.xml with only framework resources...");
-            fileDecoder.decode(
-                inApk, "AndroidManifest.xml", out, "AndroidManifest.xml",
-                "xml");
+            fileDecoder.decodeManifest(
+                inApk, "AndroidManifest.xml", out, "AndroidManifest.xml");
 
         } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
@@ -148,9 +147,9 @@ final public class AndrolibResources {
             out = new FileDirectory(outDir);
 
             LOGGER.info("Decoding AndroidManifest.xml with resources...");
-            fileDecoder.decode(
-                inApk, "AndroidManifest.xml", out, "AndroidManifest.xml",
-                "xml");
+
+            fileDecoder.decodeManifest(
+                inApk, "AndroidManifest.xml", out, "AndroidManifest.xml");
 
             if (inApk.containsDir("res")) {
                 in = inApk.getDir("res");
@@ -183,6 +182,14 @@ final public class AndrolibResources {
         }
     }
 
+    public void setSdkInfo(Map<String, String> map) {
+        if(map != null) {
+            mMinSdkVersion = map.get("minSdkVersion");
+            mTargetSdkVersion = map.get("targetSdkVersion");
+            mMaxSdkVersion = map.get("maxSdkVersion");
+        }
+    }
+
     public void aaptPackage(File apkFile, File manifest, File resDir,
             File rawDir, File assetDir, File[] include,
             boolean update, boolean framework) throws AndrolibException {
@@ -192,6 +199,18 @@ final public class AndrolibResources {
         cmd.add("p");
         if (update) {
             cmd.add("-u");
+        }
+        if (mMinSdkVersion != null) {
+            cmd.add("--min-sdk-version");
+            cmd.add(mMinSdkVersion);
+        }
+        if (mTargetSdkVersion != null) {
+            cmd.add("--target-sdk-version");
+            cmd.add(mTargetSdkVersion);
+        }
+        if (mMaxSdkVersion != null) {
+            cmd.add("--max-sdk-version");
+            cmd.add(mMaxSdkVersion);
         }
         cmd.add("-F");
         cmd.add(apkFile.getAbsolutePath());
@@ -541,4 +560,9 @@ final public class AndrolibResources {
 
     private final static Logger LOGGER =
         Logger.getLogger(AndrolibResources.class.getName());
+
+    private String mMinSdkVersion = null;
+    private String mMaxSdkVersion = null;
+    private String mTargetSdkVersion = null;
+
 }

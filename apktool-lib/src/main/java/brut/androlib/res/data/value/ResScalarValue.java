@@ -18,9 +18,9 @@ package brut.androlib.res.data.value;
 
 import brut.androlib.res.xml.ResValuesXmlSerializable;
 import brut.androlib.res.xml.ResXmlEncodable;
+import brut.androlib.res.xml.ResXmlEncoders;
 import brut.androlib.AndrolibException;
 import brut.androlib.res.data.ResResource;
-import brut.androlib.res.xml.ResXmlEncoders;
 import java.io.IOException;
 import org.xmlpull.v1.XmlSerializer;
 
@@ -54,7 +54,7 @@ public abstract class ResScalarValue extends ResValue
         }
         return encodeAsResXml();
     }
-    
+
     public String encodeAsResXmlValueExt() throws AndrolibException {
         String rawValue = mRawValue;
         if (rawValue != null) {

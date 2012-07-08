@@ -196,7 +196,9 @@ public class ResConfigFlags {
             case UI_MODE_TYPE_DESK:
                 ret.append("-desk");
                 break;
-
+            case UI_MODE_TYPE_TELEVISION:
+                ret.append("-television");
+                break;
             case UI_MODE_TYPE_APPLIANCE:
                 ret.append("-appliance");
                 break;

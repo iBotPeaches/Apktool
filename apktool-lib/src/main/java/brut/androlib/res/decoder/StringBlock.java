@@ -22,6 +22,7 @@ import brut.util.ExtDataInput;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.*;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -53,6 +54,10 @@ public class StringBlock {
         StringBlock block = new StringBlock();
         block.m_isUTF8 = (flags & UTF8_FLAG) != 0;
         block.m_stringOffsets = reader.readIntArray(stringCount);
+        block.m_stringOwns = new int[stringCount];
+        for (int i=0;i<stringCount;i++) {
+            block.m_stringOwns[i] = -1;
+        }
         if (styleOffsetCount != 0) {
             block.m_styleOffsets = reader.readIntArray(styleOffsetCount);
         }
@@ -311,11 +316,28 @@ public class StringBlock {
         }
     }
 
+    public boolean touch(int index, int own) {
+        if (index < 0
+                || m_stringOwns == null
+                || index >= m_stringOwns.length) {
+            return false;
+        }
+        if(m_stringOwns[index] == -1) {
+            m_stringOwns[index] = own;
+            return true;
+        } else if (m_stringOwns[index] == own) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     private int[] m_stringOffsets;
     private byte[] m_strings;
     private int[] m_styleOffsets;
     private int[] m_styles;
     private boolean m_isUTF8;
+    private int[] m_stringOwns;
     private static final CharsetDecoder UTF16LE_DECODER =
         Charset.forName("UTF-16LE").newDecoder();
     private static final CharsetDecoder UTF8_DECODER =

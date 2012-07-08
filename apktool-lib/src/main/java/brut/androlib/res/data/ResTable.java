@@ -39,6 +39,8 @@ public class ResTable {
 
     private String mFrameTag;
 
+    private Map<String, String> mSdkInfo = new LinkedHashMap<String, String>();
+
     public ResTable() {
         mAndRes = null;
     }
@@ -119,5 +121,17 @@ public class ResTable {
 
     public void setFrameTag(String tag) {
         mFrameTag = tag;
+    }
+
+    public Map<String, String> getSdkInfo() {
+        return mSdkInfo;
+    }
+
+    public void addSdkInfo(String key, String value) {
+        mSdkInfo.put(key, value);
+    }
+
+    public void clearSdkInfo() {
+        mSdkInfo.clear();
     }
 }
