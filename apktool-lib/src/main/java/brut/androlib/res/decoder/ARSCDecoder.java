@@ -247,13 +247,13 @@ public class ARSCDecoder {
         byte keyboard = mIn.readByte();
         byte navigation = mIn.readByte();
         byte inputFlags = mIn.readByte();
-        /*inputPad0*/ mIn.skipBytes(1);
+        mIn.skipBytes(1);
 
         short screenWidth = mIn.readShort();
         short screenHeight = mIn.readShort();
 
         short sdkVersion = mIn.readShort();
-        /*minorVersion, now must always be 0*/ mIn.skipBytes(2);
+        mIn.skipBytes(2);
 
         byte screenLayout = 0;
         byte uiMode = 0;

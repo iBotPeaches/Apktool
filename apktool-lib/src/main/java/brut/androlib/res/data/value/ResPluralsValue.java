@@ -51,15 +51,7 @@ public class ResPluralsValue extends ResBagValue implements ResValuesXmlSerializ
             }
             serializer.startTag(null, "item");
             serializer.attribute(null, "quantity", QUANTITY_MAP[i]);
-
-            String rawValue = item.encodeAsResXmlValueExt();
-            //AAPT don`t parse formatted for item tag(only for string and string-array tag),
-            // so adding "formatted='fasle'" is useless.
-            /*if (ResXmlEncoders.hasMultipleNonPositionalSubstitutions(rawValue)) {
-                serializer.attribute(null, "formatted", "false");
-            }*/
-            serializer.text(rawValue);
-
+            serializer.text(item.encodeAsResXmlValue());
             serializer.endTag(null, "item");
         }
         serializer.endTag(null, "plurals");

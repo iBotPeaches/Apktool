@@ -52,7 +52,7 @@ public abstract class ResScalarValue extends ResValue
         if (mRawValue != null) {
             return mRawValue;
         }
-        return encodeAsResXml();
+        return encodeAsResXmlValueExt();
     }
 
     public String encodeAsResXmlValueExt() throws AndrolibException {
@@ -60,7 +60,7 @@ public abstract class ResScalarValue extends ResValue
         if (rawValue != null) {
             if (ResXmlEncoders.hasMultipleNonPositionalSubstitutions(rawValue)) {
                 int count = 1;
-                StringBuffer result = new StringBuffer();
+                StringBuilder result = new StringBuilder();
                 String tmp1[] = rawValue.split("%%", -1);
                 int tmp1_sz = tmp1.length;
                 for(int i=0;i<tmp1_sz;i++) {

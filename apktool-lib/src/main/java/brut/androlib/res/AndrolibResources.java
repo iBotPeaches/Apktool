@@ -149,10 +149,9 @@ final public class AndrolibResources {
             inApk = apkFile.getDirectory();
             out = new FileDirectory(outDir);
 
-            LOGGER.info("Decoding AndroidManifest.xml with resources...");
-
-            fileDecoder.decodeManifest(
-                inApk, "AndroidManifest.xml", out, "AndroidManifest.xml");
+            fileDecoder.decode(
+                inApk, "AndroidManifest.xml", out, "AndroidManifest.xml",
+                "xml");
 
             if (inApk.containsDir("res")) {
                 in = inApk.getDir("res");
