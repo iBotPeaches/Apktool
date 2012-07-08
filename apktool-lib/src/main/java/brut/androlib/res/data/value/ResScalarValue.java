@@ -20,6 +20,7 @@ import brut.androlib.res.xml.ResValuesXmlSerializable;
 import brut.androlib.res.xml.ResXmlEncodable;
 import brut.androlib.AndrolibException;
 import brut.androlib.res.data.ResResource;
+import brut.androlib.res.xml.ResXmlEncoders;
 import java.io.IOException;
 import org.xmlpull.v1.XmlSerializer;
 
@@ -53,6 +54,38 @@ public abstract class ResScalarValue extends ResValue
         }
         return encodeAsResXml();
     }
+    
+    public String encodeAsResXmlValueExt() throws AndrolibException {
+        String rawValue = mRawValue;
+        if (rawValue != null) {
+            if (ResXmlEncoders.hasMultipleNonPositionalSubstitutions(rawValue)) {
+                int count = 1;
+                StringBuffer result = new StringBuffer();
+                String tmp1[] = rawValue.split("%%", -1);
+                int tmp1_sz = tmp1.length;
+                for(int i=0;i<tmp1_sz;i++) {
+                    String cur1 = tmp1[i];
+                    String tmp2[] = cur1.split("%", -1);
+                    int tmp2_sz = tmp2.length;
+                    for(int j=0;j<tmp2_sz;j++) {
+                        String cur2 = tmp2[j];
+                        result.append(cur2);
+                        if(j != (tmp2_sz-1)) {
+                            result.append('%').append(count).append('$');
+                            count++;
+                        }
+                    }
+                    if(i != (tmp1_sz-1)) {
+                        result.append("%%");
+                    }
+                }
+                rawValue = result.toString();
+            }
+            return rawValue;
+        }
+        return encodeAsResXml();
+    }
+
 
     public void serializeToResValuesXml(XmlSerializer serializer, ResResource res)
             throws IOException, AndrolibException {

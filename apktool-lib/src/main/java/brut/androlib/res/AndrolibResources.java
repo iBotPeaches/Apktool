@@ -39,8 +39,14 @@ import org.xmlpull.v1.XmlSerializer;
  */
 final public class AndrolibResources {
     public ResTable getResTable(ExtFile apkFile) throws AndrolibException {
+        return getResTable(apkFile, true);
+    }
+
+    public ResTable getResTable(ExtFile apkFile, boolean loadMainPkg) throws AndrolibException {
         ResTable resTable = new ResTable(this);
-        loadMainPkg(resTable, apkFile);
+        if (loadMainPkg) {
+            loadMainPkg(resTable, apkFile);
+        }
         return resTable;
     }
 
@@ -97,6 +103,36 @@ final public class AndrolibResources {
         return pkg;
     }
 
+    public void decodeManifest(ResTable resTable, ExtFile apkFile, File outDir)
+            throws AndrolibException {
+
+        Duo<ResFileDecoder, AXmlResourceParser> duo = getManifestFileDecoder();
+        ResFileDecoder fileDecoder = duo.m1;
+
+
+        // Set ResAttrDecoder
+
+        duo.m2.setAttrDecoder(new ResAttrDecoder());
+
+        ResAttrDecoder attrDecoder = duo.m2.getAttrDecoder();
+        // Fake ResPackage
+        attrDecoder.setCurrentPackage(new ResPackage(resTable, 0, null));
+
+        Directory inApk, out;
+        try {
+            inApk = apkFile.getDirectory();
+            out = new FileDirectory(outDir);
+
+            LOGGER.info("Decoding AndroidManifest.xml with only framework resources...");
+            fileDecoder.decode(
+                inApk, "AndroidManifest.xml", out, "AndroidManifest.xml",
+                "xml");
+
+        } catch (DirectoryException ex) {
+            throw new AndrolibException(ex);
+        }
+    }
+
     public void decode(ResTable resTable, ExtFile apkFile, File outDir)
             throws AndrolibException {
         Duo<ResFileDecoder, AXmlResourceParser> duo = getResFileDecoder();
@@ -111,6 +147,7 @@ final public class AndrolibResources {
             inApk = apkFile.getDirectory();
             out = new FileDirectory(outDir);
 
+            LOGGER.info("Decoding AndroidManifest.xml with resources...");
             fileDecoder.decode(
                 inApk, "AndroidManifest.xml", out, "AndroidManifest.xml",
                 "xml");
@@ -231,6 +268,19 @@ final public class AndrolibResources {
 
         AXmlResourceParser axmlParser = new AXmlResourceParser();
         axmlParser.setAttrDecoder(new ResAttrDecoder());
+        decoders.setDecoder("xml",
+            new XmlPullStreamDecoder(axmlParser, getResXmlSerializer()));
+
+        return new Duo<ResFileDecoder, AXmlResourceParser>(
+            new ResFileDecoder(decoders), axmlParser);
+    }
+
+    public Duo<ResFileDecoder, AXmlResourceParser> getManifestFileDecoder() {
+        ResStreamDecoderContainer decoders =
+            new ResStreamDecoderContainer();
+
+        AXmlResourceParser axmlParser = new AXmlResourceParser();
+
         decoders.setDecoder("xml",
             new XmlPullStreamDecoder(axmlParser, getResXmlSerializer()));
 

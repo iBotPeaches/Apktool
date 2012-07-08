@@ -52,11 +52,11 @@ public class ResValueFactory {
 
         if (type >= TypedValue.TYPE_FIRST_COLOR_INT
                 && type <= TypedValue.TYPE_LAST_COLOR_INT) {
-            return new ResColorValue(value, rawValue);
+            return new ResColorValue(value, rawValue, type);
         }
         if (type >= TypedValue.TYPE_FIRST_INT
                 && type <= TypedValue.TYPE_LAST_INT) {
-            return new ResIntValue(value, rawValue);
+            return new ResIntValue(value, rawValue, type);
         }
 
         throw new AndrolibException("Invalid value type: "+ type);

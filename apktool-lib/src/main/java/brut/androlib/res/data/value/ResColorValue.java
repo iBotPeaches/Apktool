@@ -16,16 +16,22 @@
 
 package brut.androlib.res.data.value;
 
+import android.util.TypedValue;
+
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
 public class ResColorValue extends ResIntValue {
-    public ResColorValue(int value, String rawValue) {
+    private int type;
+
+    public ResColorValue(int value, String rawValue, int type) {
         super(value, rawValue, "color");
+        this.type = type;
     }
+
 
     @Override
     protected String encodeAsResXml() {
-        return String.format("#%08x", mValue);
+        return TypedValue.coerceToString(type, mValue);
     }
 }

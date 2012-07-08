@@ -16,6 +16,7 @@
 
 package brut.androlib.res.data.value;
 
+import android.util.TypedValue;
 import brut.androlib.AndrolibException;
 
 /**
@@ -23,9 +24,11 @@ import brut.androlib.AndrolibException;
  */
 public class ResIntValue extends ResScalarValue {
     protected final int mValue;
+    private int type;
 
-    public ResIntValue(int value, String rawValue) {
+    public ResIntValue(int value, String rawValue, int type) {
         this(value, rawValue, "integer");
+        this.type = type;
     }
 
     public ResIntValue(int value, String rawValue, String type) {
@@ -38,6 +41,6 @@ public class ResIntValue extends ResScalarValue {
     }
 
     protected String encodeAsResXml() throws AndrolibException {
-        return String.valueOf(mValue);
+        return TypedValue.coerceToString(type, mValue);
     }
 }

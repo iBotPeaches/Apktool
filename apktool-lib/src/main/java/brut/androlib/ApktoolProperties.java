@@ -21,6 +21,9 @@ import java.io.InputStream;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import org.jf.baksmali.baksmali;
+import org.jf.smali.main;
+
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
@@ -46,6 +49,25 @@ public class ApktoolProperties {
         } catch (IOException ex) {
             LOGGER.warning("Can't load properties.");
         }
+
+        InputStream templateStream = baksmali.class.getClassLoader().getResourceAsStream("baksmali.properties");
+        Properties properties = new Properties();
+        String version = "(unknown)";
+        try {
+            properties.load(templateStream);
+            version = properties.getProperty("application.version");
+        } catch (IOException ex) {
+        }
+        sProps.put("baksmaliVersion", version);
+        templateStream = main.class.getClassLoader().getResourceAsStream("smali.properties");
+        properties = new Properties();
+        version = "(unknown)";
+        try {
+            properties.load(templateStream);
+            version = properties.getProperty("application.version");
+        } catch (IOException ex) {
+        }
+        sProps.put("smaliVersion", version);
     }
     
     private static Properties sProps;

@@ -94,16 +94,25 @@ public class ResFileDecoder {
 
     public void decode(Directory inDir, String inFileName, Directory outDir,
             String outFileName, String decoder) throws AndrolibException {
+        InputStream in = null;
+        OutputStream out = null;
         try {
-            InputStream in = inDir.getFileInput(inFileName);
-            OutputStream out = outDir.getFileOutput(outFileName);
+            in = inDir.getFileInput(inFileName);
+            out = outDir.getFileOutput(outFileName);
             mDecoders.decode(in, out, decoder);
-            in.close();
-            out.close();
-        } catch (IOException ex) {
-            throw new AndrolibException(ex);
         } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
+        } finally {
+            try{
+                if (in != null) {
+                    in.close();
+                }
+                if (out != null) {
+                    out.close();
+                }
+            } catch (IOException ex) {
+                throw new AndrolibException(ex);
+            }
         }
     }
 

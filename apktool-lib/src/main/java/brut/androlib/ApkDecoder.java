@@ -26,10 +26,7 @@ import brut.common.BrutException;
 import brut.directory.DirectoryException;
 import brut.util.OS;
 import java.io.File;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
@@ -92,6 +89,7 @@ public class ApkDecoder {
                     break;
             }
         }
+
         if (hasResources()) {
             switch (mDecodeResources) {
                 case DECODE_RESOURCES_NONE:
@@ -102,7 +100,22 @@ public class ApkDecoder {
                         getResTable());
                     break;
             }
+        } else {
+            // if there's no resources.asrc, decode the manifest without looking up
+            // attribute references
+            if (hasManifest()) {
+                switch (mDecodeResources) {
+                case DECODE_RESOURCES_NONE:
+                    mAndrolib.decodeManifestRaw(mApkFile, outDir);
+                    break;
+                case DECODE_RESOURCES_FULL:
+                    mAndrolib.decodeManifestFull(mApkFile, outDir,
+                            getResTable());
+                    break;
+                }
+            }
         }
+
         mAndrolib.decodeRawFiles(mApkFile, outDir);
         writeMetaFile();
     }
@@ -143,12 +156,14 @@ public class ApkDecoder {
 
     public ResTable getResTable() throws AndrolibException {
         if (mResTable == null) {
-            if (! hasResources()) {
+            boolean hasResources = hasResources();
+            boolean hasManifest = hasManifest();
+            if (! (hasManifest || hasResources)) {
                 throw new AndrolibException(
-                    "Apk doesn't containt resources.arsc file");
+                    "Apk doesn't contain either AndroidManifest.xml file or resources.arsc file");
             }
             AndrolibResources.sKeepBroken = mKeepBrokenResources;
-            mResTable = mAndrolib.getResTable(mApkFile);
+            mResTable = mAndrolib.getResTable(mApkFile, hasResources);
             mResTable.setFrameTag(mFrameTag);
         }
         return mResTable;
@@ -157,6 +172,14 @@ public class ApkDecoder {
     public boolean hasSources() throws AndrolibException {
         try {
             return mApkFile.getDirectory().containsFile("classes.dex");
+        } catch (DirectoryException ex) {
+            throw new AndrolibException(ex);
+        }
+    }
+
+    public boolean hasManifest() throws AndrolibException {
+        try {
+            return mApkFile.getDirectory().containsFile("AndroidManifest.xml");
         } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
         }
@@ -190,7 +213,7 @@ public class ApkDecoder {
         meta.put("version", Androlib.getVersion());
         meta.put("apkFileName", mApkFile.getName());
 
-        if (mDecodeResources != DECODE_RESOURCES_NONE && hasResources()) {
+        if (mDecodeResources != DECODE_RESOURCES_NONE && (hasManifest() || hasResources())) {
             meta.put("isFrameworkApk",
                 Boolean.valueOf(mAndrolib.isFrameworkApk(getResTable())));
             putUsesFramework(meta);

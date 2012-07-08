@@ -211,8 +211,9 @@ public class Main {
         System.out.println(
             "Apktool v" + Androlib.getVersion() + " - a tool for reengineering Android apk files\n" +
             "Copyright 2010 Ryszard Wiśniewski <brut.alll@gmail.com>\n" +
-            "with baksmali/smali " + smaliVersion + " (http://smali.googlecode.com)\n" +
-            "Updated by iBotPeaches (@iBotPeaches) \n" +
+            "with smali v" + ApktoolProperties.get("smaliVersion") +
+            ", and baksmali v" + ApktoolProperties.get("baksmaliVersion") + "\n" +
+            "Updated by iBotPeaches (@iBotPeaches) and yyj \n" +
             "Apache License 2.0 (http://www.apache.org/licenses/LICENSE-2.0)\n" +
             "\n" +
             "Usage: apktool [-q|--quiet OR -v|--verbose] COMMAND [...]\n" +
