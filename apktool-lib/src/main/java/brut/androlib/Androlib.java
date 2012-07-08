@@ -179,6 +179,7 @@ public class Androlib {
         Map<String, Object> meta = readMetaFile(appDir);
         Object t1 = meta.get("isFrameworkApk");
         boolean framework = t1 == null ? false : (Boolean) t1;
+        mAndRes.setSdkInfo((Map<String, String>) meta.get("sdkInfo"));
 
         if (outFile == null) {
             String outFileName = (String) meta.get("apkFileName");
