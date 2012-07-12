@@ -156,24 +156,37 @@ public final class ResXmlEncoders {
         return out.toString();
     }
 
-private static List<Integer> findNonPositionalSubstitutions(String str,
+    /**
+     * It searches for "%", but not "%%" nor "%(\d)+\$"
+     */
+    private static List<Integer> findNonPositionalSubstitutions(String str,
             int max) {
         int pos = 0;
+        int pos2 = 0;
         int count = 0;
         int length = str.length();
         List<Integer> ret = new ArrayList<Integer>();
-        while((pos = str.indexOf('%', pos)) != -1) {
-            if (pos + 1 == length) {
+        while((pos2 = (pos = str.indexOf('%', pos2)) + 1) != 0) {
+            if (pos2 == length) {
                 break;
             }
-            char c = str.charAt(pos + 1);
-            if (c >= 'a' && c <= 'z') {
-                ret.add(pos);
-                if (max != -1 && ++count >= max) {
-                    break;
+            char c = str.charAt(pos2++);
+            if (c == '%') {
+                continue;
+            }
+            if (c >= '0' && c <= '9' && pos2 < length) {
+                do {
+                    c = str.charAt(pos2++);
+                } while (c >= '0' && c <= '9' && pos2 < length);
+                if (c == '$') {
+                    continue;
                 }
             }
-            pos += 2;
+
+            ret.add(pos);
+            if (max != -1 && ++count >= max) {
+                break;
+            }
         }
 
         return ret;

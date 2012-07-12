@@ -52,7 +52,7 @@ public abstract class ResScalarValue extends ResValue
         if (mRawValue != null) {
             return mRawValue;
         }
-        return encodeAsResXmlValueExt();
+         return encodeAsResXml();
     }
 
     public String encodeAsResXmlValueExt() throws AndrolibException {
