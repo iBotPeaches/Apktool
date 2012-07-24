@@ -229,6 +229,9 @@ public class ResConfigFlags {
             case DENSITY_XHIGH:
                 ret.append("-xhdpi");
                 break;
+	    case DENSITY_XXHIGH:
+		ret.append("-xxhdpi");
+		break;
             case DENSITY_NONE:
                 ret.append("-nodpi");
                 break;
@@ -374,6 +377,7 @@ public class ResConfigFlags {
     public final static short DENSITY_TV = 213;
     public final static short DENSITY_HIGH = 240;
     public final static short DENSITY_XHIGH = 320;
+    public final static short DENSITY_XXHIGH = 480;
     public final static short DENSITY_NONE = -1;
 
     public final static byte KEYBOARD_ANY  = 0;
