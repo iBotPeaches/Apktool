@@ -22,7 +22,7 @@ import brut.androlib.res.xml.ResValuesXmlSerializable;
 import brut.androlib.res.xml.ResXmlEncoders;
 import brut.util.Duo;
 import java.io.IOException;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.xmlpull.v1.XmlSerializer;
 
 /**

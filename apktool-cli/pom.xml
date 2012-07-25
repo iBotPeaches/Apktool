@@ -54,6 +54,10 @@
                     <artifactId>commons-lang3</artifactId>
                     <groupId>org.apache.commons</groupId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>commons-lang</artifactId>
+                    <groupId>commons-lang</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -66,12 +70,6 @@
             <groupId>brut.apktool.smali</groupId>
             <artifactId>dexlib</artifactId>
             <version>1.3.4-ibot7</version>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-            <version>2.4</version>
             <type>jar</type>
         </dependency>
     </dependencies>
