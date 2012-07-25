@@ -199,6 +199,18 @@ public class ResConfigFlags {
             case UI_MODE_TYPE_TELEVISION:
                 ret.append("-television");
                 break;
+            case UI_MODE_TYPE_SMALLUI:
+                ret.append("-smallui");
+                break;
+            case UI_MODE_TYPE_MEDIUMUI:
+                ret.append("-mediumui");
+                break;
+            case UI_MODE_TYPE_LARGEUI:
+                ret.append("-largeui");
+                break;
+            case UI_MODE_TYPE_HUGEUI:
+                ret.append("-hugeui");
+                break;
             case UI_MODE_TYPE_APPLIANCE:
                 ret.append("-appliance");
                 break;
@@ -229,9 +241,9 @@ public class ResConfigFlags {
             case DENSITY_XHIGH:
                 ret.append("-xhdpi");
                 break;
-	    case DENSITY_XXHIGH:
-		ret.append("-xxhdpi");
-		break;
+            case DENSITY_XXHIGH:
+                ret.append("-xxhdpi");
+                break;
             case DENSITY_NONE:
                 ret.append("-nodpi");
                 break;
@@ -311,21 +323,15 @@ public class ResConfigFlags {
     }
 
     private short getNaturalSdkVersionRequirement() {
-        if (
-                   smallestScreenWidthDp != 0 || screenWidthDp != 0
-                || screenHeightDp != 0
-        ) {
+        if (smallestScreenWidthDp != 0 || screenWidthDp != 0
+                || screenHeightDp != 0) {
             return 13;
         }
-        if (
-               (uiMode & (MASK_UI_MODE_TYPE | MASK_UI_MODE_NIGHT)) != 0
-        ) {
+        if ((uiMode & (MASK_UI_MODE_TYPE | MASK_UI_MODE_NIGHT)) != 0) {
             return 8;
         }
-        if (
-               (screenLayout & (MASK_SCREENSIZE | MASK_SCREENLONG)) != 0
-            || density != DENSITY_DEFAULT
-        ) {
+        if ((screenLayout & (MASK_SCREENSIZE | MASK_SCREENLONG)) != 0
+                || density != DENSITY_DEFAULT) {
             return 4;
         }
         return 0;
@@ -421,6 +427,10 @@ public class ResConfigFlags {
     public final static byte UI_MODE_TYPE_CAR = 0x03;
     public final static byte UI_MODE_TYPE_TELEVISION = 0x04;
     public final static byte UI_MODE_TYPE_APPLIANCE = 0x05;
+    public final static byte UI_MODE_TYPE_SMALLUI = 0x0c;
+    public final static byte UI_MODE_TYPE_MEDIUMUI = 0x0d;
+    public final static byte UI_MODE_TYPE_LARGEUI = 0x0e;
+    public final static byte UI_MODE_TYPE_HUGEUI = 0x0f;
 
     public final static byte MASK_UI_MODE_NIGHT = 0x30;
     public final static byte UI_MODE_NIGHT_ANY = 0x00;
