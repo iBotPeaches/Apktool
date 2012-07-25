@@ -141,7 +141,6 @@
             <type>jar</type>
         </dependency>
     </dependencies>
-
     <pluginRepositories>
         <pluginRepository>
             <id>sonatype-releases</id>

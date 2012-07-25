@@ -49,16 +49,6 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>apktool-lib</artifactId>
             <version>${project.version}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>commons-lang3</artifactId>
-                    <groupId>org.apache.commons</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>commons-lang</artifactId>
-                    <groupId>commons-lang</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <artifactId>common</artifactId>
@@ -70,6 +60,12 @@
             <groupId>brut.apktool.smali</groupId>
             <artifactId>dexlib</artifactId>
             <version>1.3.4-ibot7</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.1</version>
             <type>jar</type>
         </dependency>
     </dependencies>
