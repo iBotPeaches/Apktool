@@ -202,6 +202,18 @@ public class ResConfigFlags {
             case UI_MODE_TYPE_APPLIANCE:
                 ret.append("-appliance");
                 break;
+            case UI_MODE_TYPE_SMALLUI:
+                ret.append("-smallui");
+                break;
+            case UI_MODE_TYPE_MEDIUMUI:
+                ret.append("-mediumui");
+                break;
+            case UI_MODE_TYPE_LARGEUI:
+                ret.append("-largeui");
+                break;
+            case UI_MODE_TYPE_HUGEUI:
+                ret.append("-hugeui");
+                break;
         }
         switch (uiMode & MASK_UI_MODE_NIGHT) {
             case UI_MODE_NIGHT_YES:
@@ -229,9 +241,9 @@ public class ResConfigFlags {
             case DENSITY_XHIGH:
                 ret.append("-xhdpi");
                 break;
-	    case DENSITY_XXHIGH:
-		ret.append("-xxhdpi");
-		break;
+	        case DENSITY_XXHIGH:
+		        ret.append("-xxhdpi");
+		        break;
             case DENSITY_NONE:
                 ret.append("-nodpi");
                 break;
@@ -421,6 +433,10 @@ public class ResConfigFlags {
     public final static byte UI_MODE_TYPE_CAR = 0x03;
     public final static byte UI_MODE_TYPE_TELEVISION = 0x04;
     public final static byte UI_MODE_TYPE_APPLIANCE = 0x05;
+    public final static byte UI_MODE_TYPE_SMALLUI = 0x12;
+    public final static byte UI_MODE_TYPE_MEDIUMUI = 0x13;
+    public final static byte UI_MODE_TYPE_LARGEUI = 0x14;
+    public final static byte UI_MODE_TYPE_HUGEUI = 0x15;
 
     public final static byte MASK_UI_MODE_NIGHT = 0x30;
     public final static byte UI_MODE_NIGHT_ANY = 0x00;

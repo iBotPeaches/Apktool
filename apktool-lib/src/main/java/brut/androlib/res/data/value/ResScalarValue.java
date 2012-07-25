@@ -52,7 +52,7 @@ public abstract class ResScalarValue extends ResValue
         if (mRawValue != null) {
             return mRawValue;
         }
-         return encodeAsResXml();
+         return encodeAsResXmlValueExt();
     }
 
     public String encodeAsResXmlValueExt() throws AndrolibException {
@@ -90,17 +90,18 @@ public abstract class ResScalarValue extends ResValue
     public void serializeToResValuesXml(XmlSerializer serializer, ResResource res)
             throws IOException, AndrolibException {
         String type = res.getResSpec().getType().getName();
-        boolean item = ! "reference".equals(mType) && ! type.equals(mType);
+        boolean item = !"reference".equals(mType) && !type.equals(mType);
         
         String body = encodeAsResXmlValue();
         
         
         /* check for resource reference */
         if (body.contains("@")){
-           // item = true; 
+           //
+           //
+           if(!res.getFilePath().contains("string")) item = true;
            // messes up strings with @, need to check if strings.xml ignore
         }
-        
         /* check for using attrib as node or item */
         String tagName = item ? "item" : type;
         
