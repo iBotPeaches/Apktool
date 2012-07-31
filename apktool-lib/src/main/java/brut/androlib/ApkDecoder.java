@@ -105,14 +105,13 @@ public class ApkDecoder {
             // attribute references
             if (hasManifest()) {
                 switch (mDecodeResources) {
-                case DECODE_RESOURCES_FULL:
                 case DECODE_RESOURCES_NONE:
                     mAndrolib.decodeManifestRaw(mApkFile, outDir);
                     break;
-              //  case DECODE_RESOURCES_FULL:
-                //    mAndrolib.decodeManifestFull(mApkFile, outDir,
-                         //   getResTable());
-                //    break;
+                case DECODE_RESOURCES_FULL:
+                    mAndrolib.decodeManifestFull(mApkFile, outDir,
+                            getResTable());
+                    break;
                 }
             }
         }

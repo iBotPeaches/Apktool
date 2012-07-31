@@ -94,13 +94,7 @@ public class Androlib {
 
     public void decodeManifestFull(ExtFile apkFile, File outDir,
             ResTable resTable) throws AndrolibException {
-               try {
-            Directory apk = apkFile.getDirectory();
-            LOGGER.info("Copying raw manifest...");
-            apkFile.getDirectory().copyToDir(outDir, APK_MANIFEST_FILENAMES);
-        } catch (DirectoryException ex) {
-            throw new AndrolibException(ex);
-        }
+        mAndRes.decodeManifest(resTable, apkFile, outDir);
     }
 
     public void decodeResourcesRaw(ExtFile apkFile, File outDir)
