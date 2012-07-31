@@ -16,7 +16,10 @@
 
 package brut.apktool;
 
-import brut.androlib.*;
+import brut.androlib.Androlib;
+import brut.androlib.AndrolibException;
+import brut.androlib.ApkDecoder;
+import brut.androlib.ApktoolProperties;
 import brut.androlib.err.CantFindFrameworkResException;
 import brut.androlib.err.InFileNotFoundException;
 import brut.androlib.err.OutDirExistsException;
