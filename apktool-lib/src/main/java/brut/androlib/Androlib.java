@@ -33,7 +33,6 @@ import java.util.Map;
 import java.util.logging.Logger;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
@@ -95,7 +94,13 @@ public class Androlib {
 
     public void decodeManifestFull(ExtFile apkFile, File outDir,
             ResTable resTable) throws AndrolibException {
-        mAndRes.decodeManifest(resTable, apkFile, outDir);
+               try {
+            Directory apk = apkFile.getDirectory();
+            LOGGER.info("Copying raw manifest...");
+            apkFile.getDirectory().copyToDir(outDir, APK_MANIFEST_FILENAMES);
+        } catch (DirectoryException ex) {
+            throw new AndrolibException(ex);
+        }
     }
 
     public void decodeResourcesRaw(ExtFile apkFile, File outDir)
