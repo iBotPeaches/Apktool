@@ -109,7 +109,8 @@ public class XmlPullStreamDecoder implements ResStreamDecoder {
                     }
                     return true;
                 }
-            };//factory.newSerializerWrapper(mSerial);
+            };
+	//factory.newSerializerWrapper(mSerial);
 
             par.setInput(in, null);
             ser.setOutput(out, null);

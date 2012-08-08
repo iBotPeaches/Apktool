@@ -20,8 +20,6 @@ import brut.androlib.AndrolibException;
 import brut.androlib.err.CantFind9PatchChunk;
 import brut.util.ExtDataInput;
 import java.awt.image.BufferedImage;
-import java.awt.image.Raster;
-import java.awt.image.WritableRaster;
 import java.io.*;
 import javax.imageio.ImageIO;
 import org.apache.commons.io.IOUtils;
@@ -30,7 +28,7 @@ import org.apache.commons.io.IOUtils;
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
 public class Res9patchStreamDecoder implements ResStreamDecoder {
-       public void decode(InputStream in, OutputStream out)
+    public void decode(InputStream in, OutputStream out)
             throws AndrolibException {
         try {
             byte[] data = IOUtils.toByteArray(in);

@@ -26,8 +26,6 @@ public interface ExtXmlSerializer extends XmlSerializer {
 
     public ExtXmlSerializer newLine() throws IOException;
     public void setDisabledAttrEscape(boolean disabled);
-    public ExtXmlSerializer setLineNumber(int newLine, int event) throws IOException;
-	public ExtXmlSerializer dbg(String str) throws IOException;
 
     public static final String PROPERTY_SERIALIZER_INDENTATION =
             "http://xmlpull.org/v1/doc/properties.html#serializer-indentation";

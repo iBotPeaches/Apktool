@@ -16,22 +16,19 @@
 package brut.androlib.res.decoder;
 
 import android.content.res.XmlResourceParser;
-
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.Writer;
-
-import org.xmlpull.v1.XmlPullParserException;
 import android.util.TypedValue;
 import brut.androlib.AndrolibException;
 import brut.androlib.res.xml.ResXmlEncoders;
 import brut.util.ExtDataInput;
 import com.mindprod.ledatastream.LEDataInputStream;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.xmlpull.v1.XmlPullParserException;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
@@ -812,9 +809,7 @@ public class AXmlResourceParser implements XmlResourceParser {
         }
 
         int event = m_event;
-        if (event != START_DOCUMENT) {//keep m_lineNumber 
-            resetEventInfo();
-        }
+        resetEventInfo();
 
         while (true) {
             if (m_decreaseDepth) {
@@ -836,64 +831,52 @@ public class AXmlResourceParser implements XmlResourceParser {
                 chunkType = CHUNK_XML_START_TAG;
             } else {
                 chunkType = m_reader.readInt();
-
-                if (chunkType == CHUNK_RESOURCEIDS) {
-                    int chunkSize = m_reader.readInt();
-                    if (chunkSize < 8 || (chunkSize % 4) != 0) {
-                        throw new IOException("Invalid resource ids size (" + chunkSize + ").");
-                    }
-                    m_resourceIDs = m_reader.readIntArray(chunkSize / 4 - 2);
-                    continue;
-                }
-
-                if (chunkType < CHUNK_XML_FIRST || chunkType > CHUNK_XML_LAST) {
-                    throw new IOException("Invalid chunk type (" + chunkType + ").");
-                }
-
-                // Common header.
-                /*
-                 * chunkSize
-                 */ m_reader.skipInt();
-                int lineNumber = m_reader.readInt();
-                /*
-                 * 0xFFFFFFFF
-                 */ m_reader.skipInt();
-
-                // Fake START_DOCUMENT event.
-                if (chunkType == CHUNK_XML_START_TAG && event == -1) {
-                    m_event = START_DOCUMENT;
-                    m_lineNumber = lineNumber;
-                    break;
-                }
-
-                if (chunkType == CHUNK_XML_START_NAMESPACE
-                        || chunkType == CHUNK_XML_END_NAMESPACE) {
-                    if (chunkType == CHUNK_XML_START_NAMESPACE) {
-                        int prefix = m_reader.readInt();
-                        int uri = m_reader.readInt();
-                        m_namespaces.push(prefix, uri);
-                    } else {
-                        /*
-                         * prefix
-                         */ m_reader.skipInt();
-                        /*
-                         * uri
-                         */ m_reader.skipInt();
-                        m_namespaces.pop();
-                    }
-                    continue;
-                }
-
-                m_lineNumber = lineNumber;
             }
 
+            if (chunkType == CHUNK_RESOURCEIDS) {
+                int chunkSize = m_reader.readInt();
+                if (chunkSize < 8 || (chunkSize % 4) != 0) {
+                    throw new IOException("Invalid resource ids size (" + chunkSize + ").");
+                }
+                m_resourceIDs = m_reader.readIntArray(chunkSize / 4 - 2);
+                continue;
+            }
+
+            if (chunkType < CHUNK_XML_FIRST || chunkType > CHUNK_XML_LAST) {
+                throw new IOException("Invalid chunk type (" + chunkType + ").");
+            }
+
+            // Fake START_DOCUMENT event.
+            if (chunkType == CHUNK_XML_START_TAG && event == -1) {
+                m_event = START_DOCUMENT;
+                break;
+            }
+
+            // Common header.
+			/*chunkSize*/ m_reader.skipInt();
+            int lineNumber = m_reader.readInt();
+            /*0xFFFFFFFF*/ m_reader.skipInt();
+
+            if (chunkType == CHUNK_XML_START_NAMESPACE
+                    || chunkType == CHUNK_XML_END_NAMESPACE) {
+                if (chunkType == CHUNK_XML_START_NAMESPACE) {
+                    int prefix = m_reader.readInt();
+                    int uri = m_reader.readInt();
+                    m_namespaces.push(prefix, uri);
+                } else {
+                    /*prefix*/ m_reader.skipInt();
+                    /*uri*/ m_reader.skipInt();
+                    m_namespaces.pop();
+                }
+                continue;
+            }
+
+            m_lineNumber = lineNumber;
 
             if (chunkType == CHUNK_XML_START_TAG) {
                 m_namespaceUri = m_reader.readInt();
                 m_name = m_reader.readInt();
-                /*
-                 * flags?
-                 */ m_reader.skipInt();
+                /*flags?*/ m_reader.skipInt();
                 int attributeCount = m_reader.readInt();
                 m_idAttribute = (attributeCount >>> 16) - 1;
                 attributeCount &= 0xFFFF;
@@ -907,13 +890,6 @@ public class AXmlResourceParser implements XmlResourceParser {
                 }
                 m_namespaces.increaseDepth();
                 m_event = START_TAG;
-                m_strings.touch(m_name, m_name);
-                for (int i = 0; i < attributeCount; i++) {
-                    m_strings.touch(m_attributes[ATTRIBUTE_IX_NAME], m_name);
-                    m_strings.touch(m_attributes[ATTRIBUTE_IX_VALUE_STRING], m_name);
-                }
-                m_strings.touch(m_name, m_name);
-                sortAttrs();
                 break;
             }
 
@@ -927,12 +903,8 @@ public class AXmlResourceParser implements XmlResourceParser {
 
             if (chunkType == CHUNK_XML_TEXT) {
                 m_name = m_reader.readInt();
-                /*
-                 * ?
-                 */ m_reader.skipInt();
-                /*
-                 * ?
-                 */ m_reader.skipInt();
+                /*?*/ m_reader.skipInt();
+                /*?*/ m_reader.skipInt();
                 m_event = TEXT;
                 break;
             }
@@ -989,60 +961,22 @@ public class AXmlResourceParser implements XmlResourceParser {
         }
     }
 
-    private void sortAttrs() {
-        int attributeCount = m_attributes.length / ATTRIBUTE_LENGHT;
-        int tmp1[][] = new int[attributeCount][];
-        int tmp2[] = null;
-        for (int i = 0; i < attributeCount; i++) {
-            tmp1[i] = new int[ATTRIBUTE_LENGHT + 1];
-            for (int j = 0; j < ATTRIBUTE_LENGHT; j++) {
-                tmp1[i][j] = m_attributes[i * ATTRIBUTE_LENGHT + j];
-            }
-            tmp1[i][ATTRIBUTE_LENGHT] = i;
-            if (DBG) {
-                try {
-                    if (dbgOut == null) {
-                        dbgOut = new BufferedWriter(new FileWriter("C:\\res.log", false));
-                    }
-                    dbgOut.write("Namespace: " + getAttributeNamespace(i)
-                            + ", Name: " + getAttributeName(i)
-                            + ", Value: " + getAttributeValue(i) + ", Array: "
-                            + formatArray(tmp1[i], 0, ATTRIBUTE_LENGHT) + "\n");
-                    dbgOut.flush();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        for (int j = 1; j < attributeCount; j++) {
-            for (int i = 1; i < attributeCount; i++) {
-                if (compareAttr(tmp1[i], tmp1[i - 1])) {
-                    tmp2 = tmp1[i - 1];
-                    tmp1[i - 1] = tmp1[i];
-                    tmp1[i] = tmp2;
-                }
-            }
-        }
-        for (int i = 0; i < attributeCount; i++) {
-            for (int j = 0; j < ATTRIBUTE_LENGHT; j++) {
-                m_attributes[i * ATTRIBUTE_LENGHT + j] = tmp1[i][j];
-            }
-        }
-    }
 
     private void setFirstError(AndrolibException error) {
         if (mFirstError == null) {
             mFirstError = error;
         }
     }
+
     /////////////////////////////////// data
     /*
-     * All values are essentially indices, e.g. m_name is an index of name in
-     * m_strings.
+     * All values are essentially indices, e.g. m_name is
+     * an index of name in m_strings.
      */
     private ExtDataInput m_reader;
     private ResAttrDecoder mAttrDecoder;
     private AndrolibException mFirstError;
+
     private boolean m_operational = false;
     private StringBlock m_strings;
     private int[] m_resourceIDs;
@@ -1056,24 +990,26 @@ public class AXmlResourceParser implements XmlResourceParser {
     private int m_idAttribute;
     private int m_classAttribute;
     private int m_styleAttribute;
+
     private final static Logger LOGGER =
-            Logger.getLogger(AXmlResourceParser.class.getName());
+        Logger.getLogger(AXmlResourceParser.class.getName());
     private static final String E_NOT_SUPPORTED = "Method is not supported.";
-    private static final int ATTRIBUTE_IX_NAMESPACE_URI = 0,
-            ATTRIBUTE_IX_NAME = 1,
-            ATTRIBUTE_IX_VALUE_STRING = 2,
-            ATTRIBUTE_IX_VALUE_TYPE = 3,
-            ATTRIBUTE_IX_VALUE_DATA = 4,
-            ATTRIBUTE_LENGHT = 5;
-    private static final int CHUNK_AXML_FILE = 0x00080003,
-            CHUNK_RESOURCEIDS = 0x00080180,
-            CHUNK_XML_FIRST = 0x00100100,
+    private static final int
+            ATTRIBUTE_IX_NAMESPACE_URI =    0,
+            ATTRIBUTE_IX_NAME =             1,
+            ATTRIBUTE_IX_VALUE_STRING =     2,
+            ATTRIBUTE_IX_VALUE_TYPE =       3,
+            ATTRIBUTE_IX_VALUE_DATA =       4,
+            ATTRIBUTE_LENGHT =              5;
+
+    private static final int
+            CHUNK_AXML_FILE =           0x00080003,
+            CHUNK_RESOURCEIDS =         0x00080180,
+            CHUNK_XML_FIRST =           0x00100100,
             CHUNK_XML_START_NAMESPACE = 0x00100100,
-            CHUNK_XML_END_NAMESPACE = 0x00100101,
-            CHUNK_XML_START_TAG = 0x00100102,
-            CHUNK_XML_END_TAG = 0x00100103,
-            CHUNK_XML_TEXT = 0x00100104,
-            CHUNK_XML_LAST = 0x00100104;
-    private Writer dbgOut = null;
-    private final static boolean DBG = false;
+            CHUNK_XML_END_NAMESPACE =   0x00100101,
+            CHUNK_XML_START_TAG =       0x00100102,
+            CHUNK_XML_END_TAG =         0x00100103,
+            CHUNK_XML_TEXT =            0x00100104,
+            CHUNK_XML_LAST =            0x00100104;
 }
