@@ -114,10 +114,9 @@ final public class AndrolibResources {
 
 
         // Set ResAttrDecoder
-
         duo.m2.setAttrDecoder(new ResAttrDecoder());
-
         ResAttrDecoder attrDecoder = duo.m2.getAttrDecoder();
+        
         // Fake ResPackage
         attrDecoder.setCurrentPackage(new ResPackage(resTable, 0, null));
 
