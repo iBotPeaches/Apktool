@@ -18,6 +18,8 @@ package brut.androlib.res.data;
 
 import brut.androlib.AndrolibException;
 import brut.androlib.err.UndefinedResObject;
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.*;
 
 /**
@@ -93,7 +95,7 @@ public class ResResSpec {
     }
 
     public String getName() {
-        return mName;
+        return StringUtils.replace(mName, "\"", "q");
     }
 
     public ResPackage getPackage() {
@@ -113,8 +115,7 @@ public class ResResSpec {
             throws AndrolibException {
         ResConfigFlags flags = res.getConfig().getFlags();
         if (mResources.put(flags, res) != null && ! overwrite) {
-            throw new AndrolibException(String.format(
-                "Multiple resources: spec=%s, config=%s", this, flags));
+            throw new AndrolibException(String.format("Multiple resources: spec=%s, config=%s", this, flags));
         }
     }
 
