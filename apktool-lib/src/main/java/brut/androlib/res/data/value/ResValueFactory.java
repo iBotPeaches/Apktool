@@ -52,7 +52,7 @@ public class ResValueFactory {
 
         if (type >= TypedValue.TYPE_FIRST_COLOR_INT
                 && type <= TypedValue.TYPE_LAST_COLOR_INT) {
-            return new ResColorValue(value, rawValue, type);
+            return new ResColorValue(value, rawValue);
         }
         if (type >= TypedValue.TYPE_FIRST_INT
                 && type <= TypedValue.TYPE_LAST_INT) {
