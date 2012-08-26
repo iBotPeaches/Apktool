@@ -16,13 +16,11 @@
 
 package brut.androlib.res.decoder;
 
-import brut.androlib.res.AndrolibResources;
 import brut.androlib.res.xml.ResXmlEncoders;
 import brut.util.ExtDataInput;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.*;
-import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

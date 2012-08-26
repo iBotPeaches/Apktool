@@ -481,7 +481,6 @@ public class Androlib {
         for (int id : ids) {
             files[i++] = mAndRes.getFrameworkApk(id, tag);
         }
-
         return files;
     }
 

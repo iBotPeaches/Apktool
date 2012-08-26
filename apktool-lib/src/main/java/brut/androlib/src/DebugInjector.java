@@ -21,7 +21,6 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.jf.dexlib.Code.Analysis.RegisterType;
-import org.jf.dexlib.Code.Opcode;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>

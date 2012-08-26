@@ -20,7 +20,6 @@ import brut.androlib.AndrolibException;
 import brut.androlib.res.util.ExtXmlSerializer;
 import java.io.*;
 import java.util.logging.Logger;
-
 import org.xmlpull.v1.*;
 import org.xmlpull.v1.wrapper.*;
 

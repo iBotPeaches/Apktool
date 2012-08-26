@@ -16,8 +16,8 @@
 
 package brut.androlib.res.data;
 
-import brut.androlib.err.UndefinedResObject;
 import brut.androlib.AndrolibException;
+import brut.androlib.err.UndefinedResObject;
 import brut.androlib.res.data.value.ResFileValue;
 import brut.androlib.res.data.value.ResValueFactory;
 import brut.androlib.res.xml.ResValuesXmlSerializable;
