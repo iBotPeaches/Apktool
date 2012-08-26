@@ -170,7 +170,7 @@ final public class AndrolibResources {
                 fileDecoder.decode(res, in, out);
             }
 
-            LOGGER.info("Decoding values*/* XMLs...");
+            LOGGER.info("Decoding values */* XMLs...");
             for (ResValuesFile valuesFile : pkg.listValuesFiles()) {
                 generateValuesFile(valuesFile, out, xmlSerializer);
             }
