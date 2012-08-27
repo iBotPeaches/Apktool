@@ -65,11 +65,15 @@ public class ResArrayValue extends ResBagValue implements ResValuesXmlSerializab
             return null;
         }
         String type = mItems[0].getType();
-        if (!"string".equals(type) && !"integer".equals(type)) {
-            return null;
-        }
         for (int i = 1; i < mItems.length; i++) {
-            if (! type.equals(mItems[i].getType())) {
+            
+            if (mItems[i].encodeAsResXmlItemValue().startsWith("@string")) {
+                return "string";
+            } else if (mItems[i].encodeAsResXmlItemValue().startsWith("@drawable")) {
+                return null;
+            } else if (!"string".equals(type) && !"integer".equals(type)) {
+                return null;
+            } else if (!type.equals(mItems[i].getType())) {
                 return null;
             }
         }
