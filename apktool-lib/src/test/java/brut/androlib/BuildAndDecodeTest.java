@@ -60,6 +60,7 @@ public class BuildAndDecodeTest {
     @Test
     public void valuesArraysTest() throws BrutException {
         compareValuesFiles("values-mcc001/arrays.xml");
+        compareValuesFiles("values-mcc002/arrays.xml");
     }
 
     @Test

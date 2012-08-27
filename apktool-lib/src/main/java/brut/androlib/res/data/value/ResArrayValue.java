@@ -68,18 +68,11 @@ public class ResArrayValue extends ResBagValue implements ResValuesXmlSerializab
         if (!"string".equals(type) && !"integer".equals(type)) {
             return null;
         }
-
         for (int i = 1; i < mItems.length; i++) {
-
-            if (StringUtils.containsIgnoreCase("@string", mItems[i].encodeAsResXmlItemValue()) || mItems[i].getType().equalsIgnoreCase("string")) {
-                return "string";
-            }
-
-            if (!type.equals(mItems[i].getType())) {
+            if (! type.equals(mItems[i].getType())) {
                 return null;
             }
         }
-
         return type;
     }
 
