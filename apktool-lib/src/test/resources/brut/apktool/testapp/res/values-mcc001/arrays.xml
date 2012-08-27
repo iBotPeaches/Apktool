@@ -20,4 +20,8 @@
         <item>10.0sp</item>
         <item>#ff123456</item>
     </array>
+    <string-array name="test_array4">
+        <item>@string/test_string1</item>
+        <item>@string/test_string2</item>
+    </string-array>
 </resources>

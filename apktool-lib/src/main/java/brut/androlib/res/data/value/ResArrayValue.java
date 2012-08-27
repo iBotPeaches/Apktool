@@ -22,11 +22,13 @@ import brut.androlib.res.xml.ResValuesXmlSerializable;
 import brut.util.Duo;
 import java.io.IOException;
 import org.xmlpull.v1.XmlSerializer;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
 public class ResArrayValue extends ResBagValue implements ResValuesXmlSerializable {
+    private String mRawItems;
     ResArrayValue(ResReferenceValue parent,
             Duo<Integer, ResScalarValue>[] items) {
         super(parent);
@@ -58,32 +60,26 @@ public class ResArrayValue extends ResBagValue implements ResValuesXmlSerializab
         serializer.endTag(null, type);
     }
 
-    public String getType() {
+    public String getType() throws AndrolibException {
         if (mItems.length == 0) {
             return null;
         }
         String type = mItems[0].getType();
-        if (! "string".equals(type) && ! "integer".equals(type)) {
+        if (!"string".equals(type) && !"integer".equals(type)) {
             return null;
         }
-        
-        boolean hasDifferentTypeItem = false;
-        
+
         for (int i = 1; i < mItems.length; i++) {
-        	String itemType = mItems[i].getType();
-        	
-            if (itemType.equals("string")) {
-            	//If there is at least one string item in mixed bag, it must be string-array.
-            	return "string";
-            } else if (!type.equals(itemType)) {
-                hasDifferentTypeItem = true;
+
+            if (StringUtils.containsIgnoreCase("@string", mItems[i].encodeAsResXmlItemValue()) || mItems[i].getType().equalsIgnoreCase("string")) {
+                return "string";
+            }
+
+            if (!type.equals(mItems[i].getType())) {
+                return null;
             }
         }
-        
-        if (hasDifferentTypeItem) {
-        	return null;
-        }
-        
+
         return type;
     }
 
