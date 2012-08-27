@@ -66,11 +66,24 @@ public class ResArrayValue extends ResBagValue implements ResValuesXmlSerializab
         if (! "string".equals(type) && ! "integer".equals(type)) {
             return null;
         }
+        
+        boolean hasDifferentTypeItem = false;
+        
         for (int i = 1; i < mItems.length; i++) {
-            if (! type.equals(mItems[i].getType())) {
-                return null;
+        	String itemType = mItems[i].getType();
+        	
+            if (itemType.equals("string")) {
+            	//If there is at least one string item in mixed bag, it must be string-array.
+            	return "string";
+            } else if (!type.equals(itemType)) {
+                hasDifferentTypeItem = true;
             }
         }
+        
+        if (hasDifferentTypeItem) {
+        	return null;
+        }
+        
         return type;
     }
 
