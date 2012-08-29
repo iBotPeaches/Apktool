@@ -49,12 +49,6 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>apktool-lib</artifactId>
             <version>${project.version}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>baksmali</artifactId>
-                    <groupId>brut.apktool.smali</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <artifactId>common</artifactId>
