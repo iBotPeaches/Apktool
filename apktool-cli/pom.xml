@@ -49,6 +49,12 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>apktool-lib</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>baksmali</artifactId>
+                    <groupId>brut.apktool.smali</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <artifactId>common</artifactId>
@@ -61,6 +67,11 @@
             <artifactId>dexlib</artifactId>
             <version>1.3.4-ibot7</version>
             <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>brut.apktool.smali</groupId>
+            <artifactId>baksmali</artifactId>
+            <version>1.3.4-ibot8</version>
         </dependency>
     </dependencies>
 </project>

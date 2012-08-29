@@ -263,7 +263,7 @@ public class Main {
             "    if|install-framework <framework.apk> [<tag>]\n" +
             "        Install framework file to your system.\n" +
             "\n" +
-            "For additional info, see: http://code.google.com/p/android-apktool/"
+            "For additional info, see: https://github.com/iBotPeaches/brut.apktool"
         );
     }
 
