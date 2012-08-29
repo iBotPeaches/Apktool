@@ -75,4 +75,5 @@ public class ExtMXSerializer extends MXSerializer implements ExtXmlSerializer {
 
     private String mDefaultEncoding;
     private boolean mIsDisabledAttrEscape = false;
+    
 }
