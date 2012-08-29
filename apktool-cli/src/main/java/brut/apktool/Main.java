@@ -215,7 +215,7 @@ public class Main {
             "Copyright 2010 Ryszard Wiśniewski <brut.alll@gmail.com>\n" +
             "with smali v" + ApktoolProperties.get("smaliVersion") +
             ", and baksmali v" + ApktoolProperties.get("baksmaliVersion") + "\n" +
-            "Updated by iBotPeaches (@iBotPeaches) and yyj \n" +
+            "Updated by iBotPeaches (@iBotPeaches)\n" +
             "Apache License 2.0 (http://www.apache.org/licenses/LICENSE-2.0)\n" +
             "\n" +
             "Usage: apktool [-q|--quiet OR -v|--verbose] COMMAND [...]\n" +

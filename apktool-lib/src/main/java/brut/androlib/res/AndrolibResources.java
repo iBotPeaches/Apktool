@@ -200,6 +200,7 @@ final public class AndrolibResources {
         cmd.add("aapt");
         cmd.add("p");
         cmd.add("-v"); //mega debug mode.@todo REMOVE ON FINAL
+        
         if (update) {
             cmd.add("-u");
         }

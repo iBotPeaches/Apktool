@@ -173,7 +173,7 @@ public class ARSCDecoder {
         /*size*/ mIn.skipBytes(2);
         short flags = mIn.readShort();
         int specNamesId = mIn.readInt();
-
+        
         ResValue value = (flags & ENTRY_FLAG_COMPLEX) == 0 ?
             readValue() : readComplexEntry();
 
@@ -214,8 +214,8 @@ public class ARSCDecoder {
     }
 
     private ResValue readValue() throws IOException, AndrolibException {
-        /*size*/ mIn.skipCheckShort((short) 8);
-        /*zero*/ mIn.skipCheckByte((byte) 0);
+       /*size*/ mIn.skipCheckShort((short) 8);
+       /*zero*/ mIn.skipCheckByte((byte) 0);
         byte type = mIn.readByte();
         int data = mIn.readInt();
 
@@ -247,13 +247,13 @@ public class ARSCDecoder {
         byte keyboard = mIn.readByte();
         byte navigation = mIn.readByte();
         byte inputFlags = mIn.readByte();
-        mIn.skipBytes(1);
+       mIn.skipBytes(1);
 
         short screenWidth = mIn.readShort();
         short screenHeight = mIn.readShort();
 
         short sdkVersion = mIn.readShort();
-        mIn.skipBytes(2);
+       mIn.skipBytes(2);
 
         byte screenLayout = 0;
         byte uiMode = 0;
@@ -266,9 +266,14 @@ public class ARSCDecoder {
 
         short screenWidthDp = 0;
         short screenHeightDp = 0;
+        
         if (size >= 36) {
             screenWidthDp = mIn.readShort();
             screenHeightDp = mIn.readShort();
+        }
+        
+        if (size >= 40) {
+            mIn.skipBytes(2);
         }
 
         int exceedingSize = size - KNOWN_CONFIG_BYTES;
