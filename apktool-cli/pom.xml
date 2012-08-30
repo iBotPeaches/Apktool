@@ -26,7 +26,7 @@
                     <descriptors>
                         <descriptor>src/main/assembly/jar-with-deps.xml</descriptor>
                     </descriptors>
-                    <archive>
+                    <archive>soc
                         <manifest>
                             <mainClass>brut.apktool.Main</mainClass>
                         </manifest>
@@ -59,7 +59,7 @@
         <dependency>
             <groupId>brut.apktool.smali</groupId>
             <artifactId>dexlib</artifactId>
-            <version>1.3.4-ibot7</version>
+            <version>1.3.4-ibot8</version>
             <type>jar</type>
         </dependency>
         <dependency>
