@@ -152,6 +152,7 @@ public class Main {
             AndrolibException {
         boolean forceBuildAll = false;
         boolean debug = false;
+        boolean verbose = false;
         int i;
         for (i = 0; i < args.length; i++) {
             String opt = args[i];
@@ -162,6 +163,8 @@ public class Main {
                 forceBuildAll = true;
             } else if ("-d".equals(opt) || "--debug".equals(opt)) {
                 debug = true;
+            } else if ("-v".equals(opt) || "--verbose".equals(opt)) {
+                verbose = true;
             } else {
                 throw new InvalidArgsError();
             }
@@ -183,7 +186,7 @@ public class Main {
         }
 
         new Androlib().build(new File(appDirName), outFile, forceBuildAll,
-            debug);
+            debug, verbose);
     }
 
     private static void cmdInstallFramework(String[] args)

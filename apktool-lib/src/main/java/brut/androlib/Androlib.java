@@ -170,12 +170,12 @@ public class Androlib {
     }
 
     public void build(File appDir, File outFile, boolean forceBuildAll,
-            boolean debug) throws AndrolibException {
-        build(new ExtFile(appDir), outFile, forceBuildAll, debug);
+            boolean debug, boolean verbose) throws AndrolibException {
+        build(new ExtFile(appDir), outFile, forceBuildAll, debug, verbose);
     }
 
     public void build(ExtFile appDir, File outFile, boolean forceBuildAll,
-            boolean debug) throws AndrolibException {
+            boolean debug, boolean verbose) throws AndrolibException {
         Map<String, Object> meta = readMetaFile(appDir);
         Object t1 = meta.get("isFrameworkApk");
         boolean framework = t1 == null ? false : (Boolean) t1;
@@ -192,7 +192,7 @@ public class Androlib {
         buildResources(appDir, forceBuildAll, framework,
             (Map<String, Object>) meta.get("usesFramework"));
         buildLib(appDir, forceBuildAll);
-        buildApk(appDir, outFile, framework);
+        buildApk(appDir, outFile, framework, verbose);
     }
 
     public void buildSources(File appDir, boolean forceBuildAll, boolean debug)
@@ -326,7 +326,7 @@ public class Androlib {
                     new File(appDir, "AndroidManifest.xml"),
                     new File(appDir, "res"),
                     ninePatch, null, parseUsesFramework(usesFramework),
-                    false, framework
+                    false, framework, false
                 );
 
                 Directory tmpDir = new ExtFile(apkFile).getDirectory();
@@ -384,7 +384,7 @@ public class Androlib {
                     new File(appDir, "AndroidManifest.xml"),
                     null,
                     ninePatch, null, parseUsesFramework(usesFramework),
-                    false, framework
+                    false, framework, false
                 );
 
                 Directory tmpDir = new ExtFile(apkFile).getDirectory();
@@ -419,7 +419,7 @@ public class Androlib {
         }
     }
 
-    public void buildApk(File appDir, File outApk, boolean framework)
+    public void buildApk(File appDir, File outApk, boolean framework, boolean verbose)
             throws AndrolibException {
         LOGGER.info("Building apk file...");
         if (outApk.exists()) {
@@ -435,7 +435,7 @@ public class Androlib {
             assetDir = null;
         }
         mAndRes.aaptPackage(outApk, null, null,
-            new File(appDir, APK_DIRNAME), assetDir, null, false, framework);
+            new File(appDir, APK_DIRNAME), assetDir, null, false, framework, verbose);
     }
 
     public void publicizeResources(File arscFile) throws AndrolibException {

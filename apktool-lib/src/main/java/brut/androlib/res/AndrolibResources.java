@@ -193,12 +193,15 @@ final public class AndrolibResources {
 
     public void aaptPackage(File apkFile, File manifest, File resDir,
             File rawDir, File assetDir, File[] include,
-            boolean update, boolean framework) throws AndrolibException {
+            boolean update, boolean framework, boolean verbose) throws AndrolibException {
         List<String> cmd = new ArrayList<String>();
 
         cmd.add("aapt");
         cmd.add("p");
-        cmd.add("-v"); //mega debug mode.@todo REMOVE ON FINAL
+        
+        if (verbose) {
+            cmd.add("-v");
+        }
         
         if (update) {
             cmd.add("-u");
