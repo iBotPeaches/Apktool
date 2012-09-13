@@ -205,9 +205,9 @@ public class ResPackage {
 
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 37 * hash + (this.mResTable != null ? this.mResTable.hashCode() : 0);
-        hash = 37 * hash + this.mId;
+        int hash = 17;
+        hash = 31 * hash + (this.mResTable != null ? this.mResTable.hashCode() : 0);
+        hash = 31 * hash + this.mId;
         return hash;
     }
 

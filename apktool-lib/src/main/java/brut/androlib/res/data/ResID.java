@@ -48,8 +48,8 @@ public class ResID {
 
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 59 * hash + this.id;
+        int hash = 17;
+        hash = 31 * hash + this.id;
         return hash;
     }
 

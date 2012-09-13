@@ -356,8 +356,8 @@ public class ResConfigFlags {
 
     @Override
     public int hashCode() {
-        int hash = 3;
-        hash = 97 * hash + this.mQualifiers.hashCode();
+        int hash = 17;
+        hash = 31 * hash + this.mQualifiers.hashCode();
         return hash;
     }
 

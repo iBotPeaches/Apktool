@@ -82,9 +82,9 @@ public class ResValuesFile {
 
     @Override
     public int hashCode() {
-        int hash = 5;
-        hash = 37 * hash + (this.mType != null ? this.mType.hashCode() : 0);
-        hash = 37 * hash + (this.mConfig != null ? this.mConfig.hashCode() : 0);
+        int hash = 17;
+        hash = 31 * hash + (this.mType != null ? this.mType.hashCode() : 0);
+        hash = 31 * hash + (this.mConfig != null ? this.mConfig.hashCode() : 0);
         return hash;
     }
 }
