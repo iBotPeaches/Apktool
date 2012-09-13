@@ -948,11 +948,7 @@ public class MXSerializer implements XmlSerializer {
                     seenBracket = true;
                 }
             } else {
-                if(ch == '&') {
-                    if(i > pos) out.write(text.substring(pos, i));
-                    out.write("&amp;");
-                    pos = i + 1;
-                } else if(ch == '<') {
+                if(ch == '<') {
                     if(i > pos) out.write(text.substring(pos, i));
                     out.write("&lt;");
                     pos = i + 1;
