@@ -95,6 +95,8 @@ public class Main {
                 decoder.setDecodeSources(ApkDecoder.DECODE_SOURCES_NONE);
             } else if ("-d".equals(opt) || "--debug".equals(opt)) {
                 decoder.setDebugMode(true);
+            } else if ("-b".equals(opt) || "--no-debug-info".equals(opt)) {
+                decoder.setBaksmaliDebugMode(false);
             } else if ("-t".equals(opt) || "--frame-tag".equals(opt)) {
                 i++;
                 if (i >= args.length) {
@@ -236,6 +238,8 @@ public class Main {
             "            Do not decode resources.\n" +
             "        -d, --debug\n" +
             "            Decode in debug mode. Check project page for more info.\n" +
+            "        -b, --no-debug-info\n" +
+            "            Baksmali -- don't write out debug info (.local, .param, .line, etc.).\n" +
             "        -f, --force\n" +
             "            Force delete destination directory.\n" +
             "        -t <tag>, --frame-tag <tag>\n" +

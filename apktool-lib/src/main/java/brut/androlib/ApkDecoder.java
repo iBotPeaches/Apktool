@@ -82,7 +82,7 @@ public class ApkDecoder {
                     mAndrolib.decodeSourcesRaw(mApkFile, outDir, mDebug);
                     break;
                 case DECODE_SOURCES_SMALI:
-                    mAndrolib.decodeSourcesSmali(mApkFile, outDir, mDebug);
+                    mAndrolib.decodeSourcesSmali(mApkFile, outDir, mDebug, mBakDeb);
                     break;
                 case DECODE_SOURCES_JAVA:
                     mAndrolib.decodeSourcesJava(mApkFile, outDir, mDebug);
@@ -137,6 +137,10 @@ public class ApkDecoder {
 
     public void setDebugMode(boolean debug) {
         mDebug = debug;
+    }
+
+    public void setBaksmaliDebugMode(boolean bakdeb) {
+        mBakDeb = bakdeb;
     }
 
     public void setForceDelete(boolean forceDelete) {
@@ -267,4 +271,5 @@ public class ApkDecoder {
     private boolean mForceDelete = false;
     private String mFrameTag;
     private boolean mKeepBrokenResources = false;
+    private boolean mBakDeb = true;
 }
