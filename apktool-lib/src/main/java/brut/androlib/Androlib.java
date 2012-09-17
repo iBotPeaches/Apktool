@@ -16,6 +16,7 @@
 
 package brut.androlib;
 
+import brut.androlib.err.InFileNotFoundException;
 import brut.androlib.java.AndrolibJava;
 import brut.androlib.res.AndrolibResources;
 import brut.androlib.res.data.ResPackage;
@@ -435,6 +436,13 @@ public class Androlib {
         }
         mAndRes.aaptPackage(outApk, null, null,
             new File(appDir, APK_DIRNAME), assetDir, null, flags);
+        
+        /* check for re-insert */
+        if (flags.get("injectOriginal")) {
+          //  if (!mApkFile.isFile() || !mApkFile.canRead()) {
+           //     throw new InFileNotFoundException();
+            //}
+        }
     }
 
     public void publicizeResources(File arscFile) throws AndrolibException {
@@ -508,7 +516,14 @@ public class Androlib {
         }
         return files;
     }
+    
+    public void setApkFile(File apkFile) {
+        mOrigApkFile = new ExtFile(apkFile);
+    }
+        
 
+    private ExtFile mOrigApkFile;
+    
     private final static Logger LOGGER =
         Logger.getLogger(Androlib.class.getName());
 

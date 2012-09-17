@@ -164,19 +164,27 @@ public class Main {
         flags.put("update", false);
         
         int i;
+        int skip = 0;
+        File  mOrigApk = null;
         for (i = 0; i < args.length; i++) {
             String opt = args[i];
             if (! opt.startsWith("-")) {
                 break;
             }
             if ("-f".equals(opt) || "--force-all".equals(opt)) {
-               flags.put("forceBuildA", true);
+                flags.put("forceBuildAll", true);
             } else if ("-d".equals(opt) || "--debug".equals(opt)) {
                 flags.put("debug", true);
             } else if ("-v".equals(opt) || "--verbose".equals(opt)) {
                 flags.put("verbose", true);
-            } else if("-o".equals(opt) || "--original".equals(opt)) {
-                flags.put("injectOriginal", true);
+            } else if ("-o".equals(opt) || "--original".equals(opt)) {
+                if (args.length >= 4) {
+                    throw new InvalidArgsError();
+                } else {
+                    flags.put("injectOriginal", true);
+                    mOrigApk = new File(args[i + 1]);
+                    skip = 1;
+                }
             } else {
                 throw new InvalidArgsError();
             }
@@ -184,19 +192,19 @@ public class Main {
 
         String appDirName;
         File outFile = null;
-        switch (args.length - i) {
+        switch (args.length - i - skip) {
             case 0:
                 appDirName = ".";
                 break;
             case 2:
-                outFile = new File(args[i + 1]);
+                outFile = new File(args[i + 1 + skip]);
             case 1:
-                appDirName = args[i];
+                appDirName = args[i + skip];
                 break;
             default:
                 throw new InvalidArgsError();
         }
-
+        
         new Androlib().build(new File(appDirName), outFile, flags);
     }
 

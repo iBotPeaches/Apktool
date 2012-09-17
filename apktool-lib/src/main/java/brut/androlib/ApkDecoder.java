@@ -53,7 +53,7 @@ public class ApkDecoder {
         mApkFile = new ExtFile(apkFile);
         mResTable = null;
     }
-
+    
     public void setOutDir(File outDir) throws AndrolibException {
         mOutDir = outDir;
     }
