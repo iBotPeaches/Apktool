@@ -28,6 +28,7 @@ import brut.directory.*;
 import brut.util.BrutIO;
 import brut.util.OS;
 import java.io.*;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -169,16 +170,16 @@ public class Androlib {
         }
     }
 
-    public void build(File appDir, File outFile, boolean forceBuildAll,
-            boolean debug, boolean verbose) throws AndrolibException {
-        build(new ExtFile(appDir), outFile, forceBuildAll, debug, verbose);
+    public void build(File appDir, File outFile, 
+            HashMap<String, Boolean> flags) throws AndrolibException {
+        build(new ExtFile(appDir), outFile, flags);
     }
 
-    public void build(ExtFile appDir, File outFile, boolean forceBuildAll,
-            boolean debug, boolean verbose) throws AndrolibException {
+    public void build(ExtFile appDir, File outFile, 
+            HashMap<String, Boolean> flags) throws AndrolibException {
         Map<String, Object> meta = readMetaFile(appDir);
         Object t1 = meta.get("isFrameworkApk");
-        boolean framework = t1 == null ? false : (Boolean) t1;
+        flags.put("framework", t1 == null ? false : (Boolean) t1);
         mAndRes.setSdkInfo((Map<String, String>) meta.get("sdkInfo"));
 
         if (outFile == null) {
@@ -188,35 +189,35 @@ public class Androlib {
         }
 
         new File(appDir, APK_DIRNAME).mkdirs();
-        buildSources(appDir, forceBuildAll, debug);
-        buildResources(appDir, forceBuildAll, framework,
+        buildSources(appDir, flags);
+        buildResources(appDir, flags,
             (Map<String, Object>) meta.get("usesFramework"));
-        buildLib(appDir, forceBuildAll);
-        buildApk(appDir, outFile, framework, verbose);
+        buildLib(appDir, flags);
+        buildApk(appDir, outFile,flags);
     }
 
-    public void buildSources(File appDir, boolean forceBuildAll, boolean debug)
+    public void buildSources(File appDir,  HashMap<String, Boolean> flags)
             throws AndrolibException {
-        if (! buildSourcesRaw(appDir, forceBuildAll, debug)
-                && ! buildSourcesSmali(appDir, forceBuildAll, debug)
-                && ! buildSourcesJava(appDir, forceBuildAll, debug)
+        if (! buildSourcesRaw(appDir, flags)
+                && ! buildSourcesSmali(appDir, flags)
+                && ! buildSourcesJava(appDir, flags)
             ) {
             LOGGER.warning("Could not find sources");
         }
     }
 
-    public boolean buildSourcesRaw(File appDir, boolean forceBuildAll,
-            boolean debug) throws AndrolibException {
+    public boolean buildSourcesRaw(File appDir,
+            HashMap<String, Boolean> flags) throws AndrolibException {
         try {
             File working = new File(appDir, "classes.dex");
             if (! working.exists()) {
                 return false;
             }
-            if (debug) {
+            if (flags.get("debug")) {
                 LOGGER.warning("Debug mode not available.");
             }
             File stored = new File(appDir, APK_DIRNAME + "/classes.dex");
-            if (forceBuildAll || isModified(working, stored)) {
+            if (flags.get("forceBuildAll") || isModified(working, stored)) {
                 LOGGER.info("Copying classes.dex file...");
                 BrutIO.copyAndClose(new FileInputStream(working),
                     new FileOutputStream(stored));
@@ -227,35 +228,35 @@ public class Androlib {
         }
     }
 
-    public boolean buildSourcesSmali(File appDir, boolean forceBuildAll,
-            boolean debug) throws AndrolibException {
+    public boolean buildSourcesSmali(File appDir, 
+            HashMap<String, Boolean> flags) throws AndrolibException {
         ExtFile smaliDir = new ExtFile(appDir, "smali");
         if (! smaliDir.exists()) {
             return false;
         }
         File dex = new File(appDir, APK_DIRNAME + "/classes.dex");
-        if (! forceBuildAll) {
+        if (! flags.get("forceBuildAll")) {
             LOGGER.info("Checking whether sources has changed...");
         }
-        if (forceBuildAll || isModified(smaliDir, dex)) {
+        if (flags.get("forceBuildAll") || isModified(smaliDir, dex)) {
             LOGGER.info("Smaling...");
             dex.delete();
-            SmaliBuilder.build(smaliDir, dex, debug);
+            SmaliBuilder.build(smaliDir, dex, flags);
         }
         return true;
     }
 
-    public boolean buildSourcesJava(File appDir, boolean forceBuildAll,
-            boolean debug) throws AndrolibException {
+    public boolean buildSourcesJava(File appDir,
+            HashMap<String, Boolean> flags) throws AndrolibException {
         File javaDir = new File(appDir, "src");
         if (! javaDir.exists()) {
             return false;
         }
         File dex = new File(appDir, APK_DIRNAME + "/classes.dex");
-        if (! forceBuildAll) {
+        if (! flags.get("forceBuildAll")) {
             LOGGER.info("Checking whether sources has changed...");
         }
-        if (forceBuildAll || isModified(javaDir, dex)) {
+        if (flags.get("forceBuildAll") || isModified(javaDir, dex)) {
             LOGGER.info("Building java sources...");
             dex.delete();
             new AndrolibJava().build(javaDir, dex);
@@ -263,29 +264,27 @@ public class Androlib {
         return true;
     }
 
-    public void buildResources(ExtFile appDir, boolean forceBuildAll,
-            boolean framework, Map<String, Object> usesFramework)
+    public void buildResources(ExtFile appDir,  HashMap<String, Boolean> flags,
+            Map<String, Object> usesFramework)
             throws AndrolibException {
-        if (! buildResourcesRaw(appDir, forceBuildAll)
-                && ! buildResourcesFull(appDir, forceBuildAll, framework,
-                    usesFramework) 
-                && ! buildManifest(appDir, forceBuildAll, framework,
-                    usesFramework)) {
+        if (! buildResourcesRaw(appDir, flags)
+                && ! buildResourcesFull(appDir, flags, usesFramework) 
+                && ! buildManifest(appDir, flags, usesFramework)) {
             LOGGER.warning("Could not find resources");
         }
     }
 
-    public boolean buildResourcesRaw(ExtFile appDir, boolean forceBuildAll)
+    public boolean buildResourcesRaw(ExtFile appDir,  HashMap<String, Boolean> flags)
             throws AndrolibException {
         try {
             if (! new File(appDir, "resources.arsc").exists()) {
                 return false;
             }
             File apkDir = new File(appDir, APK_DIRNAME);
-            if (! forceBuildAll) {
+            if (! flags.get("forceBuildAll")) {
                 LOGGER.info("Checking whether resources has changed...");
             }
-            if (forceBuildAll || isModified(
+            if (flags.get("forceBuildAll") || isModified(
                     newFiles(APK_RESOURCES_FILENAMES, appDir),
                     newFiles(APK_RESOURCES_FILENAMES, apkDir))) {
                 LOGGER.info("Copying raw resources...");
@@ -298,18 +297,18 @@ public class Androlib {
         }
     }
 
-    public boolean buildResourcesFull(File appDir, boolean forceBuildAll,
-            boolean framework, Map<String, Object> usesFramework)
+    public boolean buildResourcesFull(File appDir,  HashMap<String, Boolean> flags,
+            Map<String, Object> usesFramework)
             throws AndrolibException {
         try {
             if (! new File(appDir, "res").exists()) {
                 return false;
             }
-            if (! forceBuildAll) {
+            if (! flags.get("forceBuildAll")) {
                 LOGGER.info("Checking whether resources has changed...");
             }
             File apkDir = new File(appDir, APK_DIRNAME);
-            if (forceBuildAll || isModified(
+            if (flags.get("forceBuildAll") || isModified(
                     newFiles(APP_RESOURCES_FILENAMES, appDir),
                     newFiles(APK_RESOURCES_FILENAMES, apkDir))) {
                 LOGGER.info("Building resources...");
@@ -326,7 +325,7 @@ public class Androlib {
                     new File(appDir, "AndroidManifest.xml"),
                     new File(appDir, "res"),
                     ninePatch, null, parseUsesFramework(usesFramework),
-                    false, framework, false
+                    flags
                 );
 
                 Directory tmpDir = new ExtFile(apkFile).getDirectory();
@@ -342,7 +341,7 @@ public class Androlib {
         }
     }
 
-    public boolean buildManifestRaw(ExtFile appDir, boolean forceBuildAll)
+    public boolean buildManifestRaw(ExtFile appDir,  HashMap<String, Boolean> flags)
             throws AndrolibException {
         try {
             File apkDir = new File(appDir, APK_DIRNAME);
@@ -355,18 +354,18 @@ public class Androlib {
         }
     }
 
-    public boolean buildManifest(ExtFile appDir, boolean forceBuildAll,
-            boolean framework, Map<String, Object> usesFramework)
+    public boolean buildManifest(ExtFile appDir,  HashMap<String, Boolean> flags,
+            Map<String, Object> usesFramework)
             throws AndrolibException {
         try {
             if (! new File(appDir, "AndroidManifest.xml").exists()) {
                 return false;
             }
-            if (! forceBuildAll) {
+            if (! flags.get("forceBuildAll")) {
                 LOGGER.info("Checking whether resources has changed...");
             }
             File apkDir = new File(appDir, APK_DIRNAME);
-            if (forceBuildAll || isModified(
+            if (flags.get("forceBuildAll") || isModified(
                     newFiles(APK_MANIFEST_FILENAMES, appDir),
                     newFiles(APK_MANIFEST_FILENAMES, apkDir))) {
                 LOGGER.info("Building AndroidManifest.xml...");
@@ -384,7 +383,7 @@ public class Androlib {
                     new File(appDir, "AndroidManifest.xml"),
                     null,
                     ninePatch, null, parseUsesFramework(usesFramework),
-                    false, framework, false
+                   flags
                 );
 
                 Directory tmpDir = new ExtFile(apkFile).getDirectory();
@@ -397,18 +396,18 @@ public class Androlib {
             throw new AndrolibException(ex);
         } catch (AndrolibException ex) {
             LOGGER.warning("Parse AndroidManifest.xml failed, treat it as raw file.");
-            return buildManifestRaw(appDir, forceBuildAll);
+            return buildManifestRaw(appDir, flags);
         }
     }
 
-    public void buildLib(File appDir, boolean forceBuildAll)
+    public void buildLib(File appDir, HashMap<String, Boolean> flags)
             throws AndrolibException {
         File working = new File(appDir, "lib");
         if (! working.exists()) {
             return;
         }
         File stored = new File(appDir, APK_DIRNAME + "/lib");
-        if (forceBuildAll || isModified(working, stored)) {
+        if (flags.get("forceBuildAll") || isModified(working, stored)) {
             LOGGER.info("Copying libs...");
             try {
                 OS.rmdir(stored);
@@ -419,7 +418,7 @@ public class Androlib {
         }
     }
 
-    public void buildApk(File appDir, File outApk, boolean framework, boolean verbose)
+    public void buildApk(File appDir, File outApk,  HashMap<String, Boolean> flags)
             throws AndrolibException {
         LOGGER.info("Building apk file...");
         if (outApk.exists()) {
@@ -435,7 +434,7 @@ public class Androlib {
             assetDir = null;
         }
         mAndRes.aaptPackage(outApk, null, null,
-            new File(appDir, APK_DIRNAME), assetDir, null, false, framework, verbose);
+            new File(appDir, APK_DIRNAME), assetDir, null, flags);
     }
 
     public void publicizeResources(File arscFile) throws AndrolibException {

@@ -20,6 +20,7 @@ import brut.androlib.res.util.ExtFile;
 import brut.common.BrutException;
 import brut.util.OS;
 import java.io.*;
+import java.util.HashMap;
 import java.util.logging.Logger;
 import org.custommonkey.xmlunit.*;
 import org.junit.*;
@@ -44,7 +45,7 @@ public class BuildAndDecodeTest {
                 "brut/apktool/testapp/", sTestOrigDir);
 
         LOGGER.info("Building testapp.apk...");
-        new Androlib().build(sTestOrigDir, testApk, false, false, false);
+        new Androlib().build(sTestOrigDir, testApk, BuildAndDecodeTest.returnStock());
 
         LOGGER.info("Decoding testapp.apk...");
         ApkDecoder apkDecoder = new ApkDecoder(testApk);
@@ -153,11 +154,23 @@ public class BuildAndDecodeTest {
         assertTrue(path + ": " +
                 diff.getAllDifferences().toString(), diff.similar());
     }
+        
+    private static HashMap<String, Boolean> returnStock() throws BrutException {
+        HashMap<String, Boolean>  tmp = new HashMap<String, Boolean>();
+        tmp.put("forceBuildAll", false);
+        tmp.put("debug", false);
+        tmp.put("verbose", false);
+        tmp.put("injectOriginal", false);
+        tmp.put("framework", false);
+        tmp.put("update", false);
+        
+        return tmp;
+    }
 
     private static ExtFile sTmpDir;
     private static ExtFile sTestOrigDir;
     private static ExtFile sTestNewDir;
-
+    
     private final static Logger LOGGER =
             Logger.getLogger(BuildAndDecodeTest.class.getName());
 }

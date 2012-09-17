@@ -20,6 +20,7 @@ import brut.androlib.AndrolibException;
 import brut.androlib.res.util.ExtFile;
 import brut.directory.DirectoryException;
 import java.io.*;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.logging.Logger;
@@ -30,15 +31,16 @@ import org.apache.commons.io.IOUtils;
  */
 public class SmaliBuilder {
 
-    public static void build(ExtFile smaliDir, File dexFile, boolean debug)
+    public static void build(ExtFile smaliDir, File dexFile, 
+            HashMap<String, Boolean> flags)
             throws AndrolibException {
-        new SmaliBuilder(smaliDir, dexFile, debug).build();
+        new SmaliBuilder(smaliDir, dexFile, flags).build();
     }
 
-    private SmaliBuilder(ExtFile smaliDir, File dexFile, boolean debug) {
+    private SmaliBuilder(ExtFile smaliDir, File dexFile, HashMap<String, Boolean> flags) {
         mSmaliDir = smaliDir;
         mDexFile = dexFile;
-        mDebug = debug;
+        mFlags = flags;
     }
 
     private void build() throws AndrolibException {
@@ -72,7 +74,7 @@ public class SmaliBuilder {
         StringBuilder out = new StringBuilder();
         List<String> lines = IOUtils.readLines(inStream);
 
-        if (!mDebug) {
+        if (!mFlags.containsKey("debug")) {
             final String[] linesArray = lines.toArray(new String[0]);
             for (int i = 2; i < linesArray.length - 2; i++) {
                 out.append(linesArray[i]).append('\n');
@@ -104,7 +106,7 @@ public class SmaliBuilder {
 
     private final ExtFile mSmaliDir;
     private final File mDexFile;
-    private final boolean mDebug;
+    private final HashMap<String, Boolean>  mFlags;
 
     private DexFileBuilder mDexBuilder;
 

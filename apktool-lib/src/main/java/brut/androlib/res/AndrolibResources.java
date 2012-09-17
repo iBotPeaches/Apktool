@@ -192,18 +192,18 @@ final public class AndrolibResources {
     }
 
     public void aaptPackage(File apkFile, File manifest, File resDir,
-            File rawDir, File assetDir, File[] include,
-            boolean update, boolean framework, boolean verbose) throws AndrolibException {
+            File rawDir, File assetDir, File[] include, HashMap<String, Boolean> flags) 
+            throws AndrolibException {
         List<String> cmd = new ArrayList<String>();
 
         cmd.add("aapt");
         cmd.add("p");
         
-        if (verbose) {
+        if (flags.get("verbose")) {
             cmd.add("-v");
         }
         
-        if (update) {
+        if (flags.get("update")) {
             cmd.add("-u");
         }
         if (mMinSdkVersion != null) {
@@ -221,7 +221,7 @@ final public class AndrolibResources {
         cmd.add("-F");
         cmd.add(apkFile.getAbsolutePath());
 
-        if (framework) {
+        if (flags.get("framework")) {
             cmd.add("-x");
 //            cmd.add("-0");
 //            cmd.add("arsc");

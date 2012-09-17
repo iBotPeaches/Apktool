@@ -26,6 +26,7 @@ import brut.androlib.err.OutDirExistsException;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.logging.*;
 
 /**
@@ -152,9 +153,16 @@ public class Main {
 
     private static void cmdBuild(String[] args) throws InvalidArgsError,
             AndrolibException {
-        boolean forceBuildAll = false;
-        boolean debug = false;
-        boolean verbose = false;
+        
+        // hold all the fields
+        HashMap<String, Boolean> flags = new HashMap<String, Boolean>();
+        flags.put("forceBuildAll", false);
+        flags.put("debug", false);
+        flags.put("verbose", false);
+        flags.put("injectOriginal", false);
+        flags.put("framework", false);
+        flags.put("update", false);
+        
         int i;
         for (i = 0; i < args.length; i++) {
             String opt = args[i];
@@ -162,11 +170,13 @@ public class Main {
                 break;
             }
             if ("-f".equals(opt) || "--force-all".equals(opt)) {
-                forceBuildAll = true;
+               flags.put("forceBuildA", true);
             } else if ("-d".equals(opt) || "--debug".equals(opt)) {
-                debug = true;
+                flags.put("debug", true);
             } else if ("-v".equals(opt) || "--verbose".equals(opt)) {
-                verbose = true;
+                flags.put("verbose", true);
+            } else if("-o".equals(opt) || "--original".equals(opt)) {
+                flags.put("injectOriginal", true);
             } else {
                 throw new InvalidArgsError();
             }
@@ -187,8 +197,7 @@ public class Main {
                 throw new InvalidArgsError();
         }
 
-        new Androlib().build(new File(appDirName), outFile, forceBuildAll,
-            debug, verbose);
+        new Androlib().build(new File(appDirName), outFile, flags);
     }
 
     private static void cmdInstallFramework(String[] args)
@@ -239,7 +248,7 @@ public class Main {
             "        -d, --debug\n" +
             "            Decode in debug mode. Check project page for more info.\n" +
             "        -b, --no-debug-info\n" +
-            "            Baksmali -- don't write out debug info (.local, .param, .line, etc.).\n" +
+            "            Baksmali -- don't write out debug info (.local, .param, .line, etc.)\n" +
             "        -f, --force\n" +
             "            Force delete destination directory.\n" +
             "        -t <tag>, --frame-tag <tag>\n" +
@@ -266,6 +275,8 @@ public class Main {
             "            Skip changes detection and build all files.\n" +
             "        -d, --debug\n" +
             "            Build in debug mode. Check project page for more info.\n" +
+            "        -o, --original\n" +
+            "            Build resources into original APK. Retains signature." +
             "\n" +
             "    if|install-framework <framework.apk> [<tag>]\n" +
             "        Install framework file to your system.\n" +
