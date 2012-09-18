@@ -467,17 +467,16 @@ public class Androlib {
                 editOrig.addFolder(new File(appDir,  APK_DIRNAME + "/res").getAbsolutePath(), parameters);
                 
                 // add assets, if there
-                if (assetDir.exists()) {
+                if (assetDir != null) {
                     //editOrig.addFolder(new File(appDir, APK_DIRNAME + "/assets").getAbsolutePath(), parameters);
                 }
                 
                 // add resources.arsc
                 parameters.setFileNameInZip("resources.arsc");
                // editOrig.addFile(new File(appDir, "resources.arsc"), parameters);
-            } catch(ZipException e) {
-                LOGGER.warning(e.getMessage());
+            } catch(ZipException ex) {
+                throw new AndrolibException(ex);
             }
-            
         }
     }
 
