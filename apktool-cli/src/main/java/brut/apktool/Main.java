@@ -23,6 +23,7 @@ import brut.androlib.ApktoolProperties;
 import brut.androlib.err.CantFindFrameworkResException;
 import brut.androlib.err.InFileNotFoundException;
 import brut.androlib.err.OutDirExistsException;
+import brut.androlib.res.util.ExtFile;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -165,7 +166,7 @@ public class Main {
         
         int i;
         int skip = 0;
-        File  mOrigApk = null;
+        ExtFile mOrigApk = null;
         for (i = 0; i < args.length; i++) {
             String opt = args[i];
             if (! opt.startsWith("-")) {
@@ -182,7 +183,7 @@ public class Main {
                     throw new InvalidArgsError();
                 } else {
                     flags.put("injectOriginal", true);
-                    mOrigApk = new File(args[i + 1]);
+                    mOrigApk = new ExtFile(args[i + 1]);
                     skip = 1;
                 }
             } else {
@@ -205,7 +206,7 @@ public class Main {
                 throw new InvalidArgsError();
         }
         
-        new Androlib().build(new File(appDirName), outFile, flags);
+        new Androlib().build(new File(appDirName), outFile, flags, mOrigApk);
     }
 
     private static void cmdInstallFramework(String[] args)

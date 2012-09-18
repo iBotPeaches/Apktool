@@ -33,6 +33,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.model.ZipParameters;
+import net.lingala.zip4j.util.Zip4jConstants;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
@@ -172,16 +176,25 @@ public class Androlib {
     }
 
     public void build(File appDir, File outFile, 
-            HashMap<String, Boolean> flags) throws AndrolibException {
-        build(new ExtFile(appDir), outFile, flags);
+            HashMap<String, Boolean> flags, ExtFile origApk) throws AndrolibException {
+        build(new ExtFile(appDir), outFile, flags, origApk);
     }
 
     public void build(ExtFile appDir, File outFile, 
-            HashMap<String, Boolean> flags) throws AndrolibException {
+            HashMap<String, Boolean> flags, ExtFile origApk) throws AndrolibException {
         Map<String, Object> meta = readMetaFile(appDir);
         Object t1 = meta.get("isFrameworkApk");
         flags.put("framework", t1 == null ? false : (Boolean) t1);
         mAndRes.setSdkInfo((Map<String, String>) meta.get("sdkInfo"));
+        
+        // check the orig apk
+        if (flags.get("injectOriginal")) {
+            if (!origApk.isFile() || !origApk.canRead()) {
+                throw new InFileNotFoundException();
+            } else {
+                mOrigApkFile = origApk;
+            }
+        }
 
         if (outFile == null) {
             String outFileName = (String) meta.get("apkFileName");
@@ -439,9 +452,32 @@ public class Androlib {
         
         /* check for re-insert */
         if (flags.get("injectOriginal")) {
-          //  if (!mApkFile.isFile() || !mApkFile.canRead()) {
-           //     throw new InFileNotFoundException();
-            //}
+            try {
+                LOGGER.info("Building resources into original apk file...");
+                ZipFile editOrig = new ZipFile(mOrigApkFile.getAbsoluteFile());
+                
+                // no compression levels, paras
+                ZipParameters parameters = new ZipParameters();
+                parameters.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);
+                parameters.setCompressionLevel(0);
+                parameters.setIncludeRootFolder(true);
+                parameters.setRootFolderInZip("/");
+                
+                // add res folder
+                editOrig.addFolder(new File(appDir,  APK_DIRNAME + "/res").getAbsolutePath(), parameters);
+                
+                // add assets, if there
+                if (assetDir.exists()) {
+                    //editOrig.addFolder(new File(appDir, APK_DIRNAME + "/assets").getAbsolutePath(), parameters);
+                }
+                
+                // add resources.arsc
+                parameters.setFileNameInZip("resources.arsc");
+               // editOrig.addFile(new File(appDir, "resources.arsc"), parameters);
+            } catch(ZipException e) {
+                LOGGER.warning(e.getMessage());
+            }
+            
         }
     }
 
@@ -522,7 +558,7 @@ public class Androlib {
     }
         
 
-    private ExtFile mOrigApkFile;
+    private ExtFile mOrigApkFile = null;
     
     private final static Logger LOGGER =
         Logger.getLogger(Androlib.class.getName());

@@ -45,7 +45,8 @@ public class BuildAndDecodeTest {
                 "brut/apktool/testapp/", sTestOrigDir);
 
         LOGGER.info("Building testapp.apk...");
-        new Androlib().build(sTestOrigDir, testApk, BuildAndDecodeTest.returnStock());
+        ExtFile blank = null;
+        new Androlib().build(sTestOrigDir, testApk, BuildAndDecodeTest.returnStock(),blank);
 
         LOGGER.info("Decoding testapp.apk...");
         ApkDecoder apkDecoder = new ApkDecoder(testApk);

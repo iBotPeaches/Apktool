@@ -38,6 +38,7 @@
           <include>org.antlr:antlr-runtime</include>
           <include>com.google.*</include>
           <include>org.apache.*</include>
+          <include>net.lingala.*</include>
       </includes>
     </dependencySet>
   </dependencySets>
