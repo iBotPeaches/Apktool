@@ -458,7 +458,7 @@ public class Androlib {
                 
                 // no compression levels, paras
                 ZipParameters parameters = new ZipParameters();
-                parameters.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);
+                parameters.setCompressionMethod(Zip4jConstants.COMP_STORE);
                 parameters.setCompressionLevel(0);
                 parameters.setIncludeRootFolder(true);
                 parameters.setRootFolderInZip("/");
