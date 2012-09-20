@@ -1,0 +1,436 @@
+group baksmali;
+
+smaliFile(AccessFlags, ClassType, SuperType, SourceFile, Interfaces, Annotations, StaticFields,
+          InstanceFields, DirectMethods, VirtualMethods) ::=
+<<
+.class <AccessFlags: {<it> }><ClassType>
+<if(SuperType)>
+.super <SuperType>
+<endif>
+<if(SourceFile)>
+
+.source "<SourceFile>"
+
+
+<endif>
+<if(Interfaces)>
+
+# interfaces
+<Interfaces: implement(it); separator="\n">
+
+<endif>
+<if(Annotations)>
+
+
+# annotations
+<Annotations; separator="\n\n">
+
+<endif>
+<if(StaticFields)>
+
+
+# static fields
+<StaticFields; separator="\n">
+
+<endif>
+<if(InstanceFields)>
+
+
+# instance fields
+<InstanceFields; separator="\n">
+
+<endif>
+<if(DirectMethods)>
+
+
+# direct methods
+<DirectMethods; separator="\n\n">
+
+<endif>
+<if(VirtualMethods)>
+
+
+# virtual methods
+<VirtualMethods; separator="\n\n">
+
+<endif>
+>>
+
+
+
+
+implement(interface) ::=
+<<
+.implements <interface>
+>>
+
+
+annotation(Visibility, AnnotationType, Elements) ::=
+<<
+.annotation <Visibility> <AnnotationType>
+<if(Elements)>
+    <Elements; separator="\n">
+<endif>
+<if(Elements)>
+
+
+<endif>
+.end annotation
+>>
+
+
+
+field(AccessFlags, FieldName, FieldType, Annotations, InitialValue, Comments) ::=
+<<
+<if(Comments)><Comments: {#<it>} ; separator="\n">
+
+<endif>
+.field <AccessFlags: {<it> }><FieldName>:<FieldType><if(InitialValue)> = <InitialValue><endif>
+<if(Annotations)>
+    <Annotations; separator="\n\n">
+.end field
+
+<endif>
+>>
+
+
+method(AccessFlags, MethodName, Prototype, HasCode, RegistersDirective, RegisterCount, Parameters, Annotations,
+    MethodItems) ::=
+<<
+.method <AccessFlags: {<it> }><MethodName><Prototype>
+<if(HasCode)>
+    <RegistersDirective> <RegisterCount>
+  <if(Parameters)>
+    <Parameters; separator="\n">
+  <endif>
+  <if(Annotations)>
+    <Annotations; separator="\n\n">
+  <endif>
+
+    <MethodItems; separator="\n">
+<elseif(Annotations)>
+    <Annotations; separator="\n\n">
+<endif>
+.end method
+>>
+
+Parameter(ParameterName, Annotations) ::=
+<<
+.parameter<if(ParameterName)> "<ParameterName>"<endif><if(Annotations)>
+
+    <Annotations; separator="\n\n">
+.end parameter
+<endif>
+>>
+
+Format10t(Opcode, TargetLabel) ::=
+<<
+<Opcode> <TargetLabel>
+>>
+
+Format10x(Opcode) ::=
+<<
+<Opcode>
+>>
+
+Format11n(Opcode, RegisterA, Literal) ::=
+<<
+<Opcode> <RegisterA>, <Literal>
+>>
+
+Format11x(Opcode, RegisterA) ::=
+<<
+<Opcode> <RegisterA>
+>>
+
+Format12x(Opcode, RegisterA, RegisterB) ::=
+<<
+<Opcode> <RegisterA>, <RegisterB>
+>>
+
+Format20t(Opcode, TargetLabel) ::=
+<<
+<Opcode> <TargetLabel>
+>>
+
+Format21c(Opcode, RegisterA, Reference) ::=
+<<
+<Opcode> <RegisterA>, <Reference>
+>>
+
+Format21h(Opcode, RegisterA, Literal) ::=
+<<
+<Opcode> <RegisterA>, <Literal>
+>>
+
+Format21s(Opcode, RegisterA, Literal) ::=
+<<
+<Opcode> <RegisterA>, <Literal>
+>>
+
+Format21t(Opcode, RegisterA, TargetLabel) ::=
+<<
+<Opcode> <RegisterA>, <TargetLabel>
+>>
+
+Format22b(Opcode, RegisterA, RegisterB, Literal) ::=
+<<
+<Opcode> <RegisterA>, <RegisterB>, <Literal>
+>>
+
+Format22c(Opcode, RegisterA, RegisterB, Reference) ::=
+<<
+<Opcode> <RegisterA>, <RegisterB>, <Reference>
+>>
+
+Format22cs(Opcode, RegisterA, RegisterB, FieldOffset) ::=
+<<
+<Opcode> <RegisterA>, <RegisterB>, field@<FieldOffset>
+>>
+
+Format22s(Opcode, RegisterA, RegisterB, Literal) ::=
+<<
+<Opcode> <RegisterA>, <RegisterB>, <Literal>
+>>
+
+Format22t(Opcode, RegisterA, RegisterB, TargetLabel) ::=
+<<
+<Opcode> <RegisterA>, <RegisterB>, <TargetLabel>
+>>
+
+Format22x(Opcode, RegisterA, RegisterB) ::=
+<<
+<Opcode> <RegisterA>, <RegisterB>
+>>
+
+Format23x(Opcode, RegisterA, RegisterB, RegisterC) ::=
+<<
+<Opcode> <RegisterA>, <RegisterB>, <RegisterC>
+>>
+
+Format30t(Opcode, TargetLabel) ::=
+<<
+<Opcode> <TargetLabel>
+>>
+
+Format31c(Opcode, RegisterA, Reference) ::=
+<<
+<Opcode> <RegisterA>, <Reference>
+>>
+
+Format31i(Opcode, RegisterA, Literal) ::=
+<<
+<Opcode> <RegisterA>, <Literal>
+>>
+
+Format31t(Opcode, RegisterA, TargetLabel) ::=
+<<
+<Opcode> <RegisterA>, <TargetLabel>
+>>
+
+Format32x(Opcode, RegisterA, RegisterB) ::=
+<<
+<Opcode> <RegisterA>, <RegisterB>
+>>
+
+Format35c(Opcode, Registers, Reference) ::=
+<<
+<Opcode> {<Registers; separator=", ">}, <Reference>
+>>
+
+Format35s(Opcode, Registers, Reference) ::=
+<<
+<Opcode> {<Registers; separator=", ">}, <Reference>
+>>
+
+Format35ms(Opcode, Registers, MethodIndex) ::=
+<<
+<Opcode> {<Registers; separator=", ">}, vtable@<MethodIndex>
+>>
+
+Format3rc(Opcode, StartRegister, LastRegister, Reference) ::=
+<<
+<Opcode> {<StartRegister> .. <LastRegister>}, <Reference>
+>>
+
+Format3rms(Opcode, StartRegister, LastRegister, MethodIndex) ::=
+<<
+<Opcode> {<StartRegister> .. <LastRegister>}, vtable@<MethodIndex>
+>>
+
+Format51l(Opcode, RegisterA, Literal) ::=
+<<
+<Opcode> <RegisterA>, <Literal>
+>>
+
+CommentedOutMethodItem(MethodItem) ::=
+<<
+#<MethodItem>
+>>
+
+UnresolvedNullReference(Opcode, Register, UseInvokeRange, AddGoto) ::=
+<<
+<if(UseInvokeRange)>
+#Replaced unresolvable optimized invoke-*-range-quick instruction
+#with a generic method call that will throw a NullPointerException
+invoke-virtual/range {<Register> .. <Register>}, Ljava/lang/Object;->hashCode()I
+<if(AddGoto)>goto/32 0<endif>
+<else>
+#Replaced unresolvable optimized instruction with a throw
+throw <Register>
+<endif>
+>>
+
+
+ArrayData(Opcode, ElementWidth, Values, Dead) ::=
+<<
+<if(Dead)>#<endif>.array-data <ElementWidth>
+<if(Dead)>
+<Values:  {#    <it>}; separator="\n">
+<else>
+<Values:  {     <it>}; separator="\n">
+<endif>
+
+<if(Dead)>#<endif>.end array-data
+>>
+
+ArrayElement(Bytes) ::=
+<<
+<Bytes; format="unsigned",separator=" ">
+>>
+
+PackedSwitchData(Opcode, FirstKey, Targets, Dead) ::=
+<<
+<if(Dead)>#<endif>.packed-switch <FirstKey>
+<if(Dead)>
+<Targets:  {#   <it>}; separator="\n">
+<else>
+<Targets:  {    <it>}; separator="\n">
+<endif>
+
+<if(Dead)>#<endif>.end packed-switch
+>>
+
+SparseSwitchData(Opcode, Targets, Dead) ::=
+<<
+<if(Dead)>#<endif>.sparse-switch
+<if(Dead)>
+<Targets:  {#   <it.Key> -> <it.Target>}; separator="\n">
+<else>
+<Targets:  {    <it.Key> -> <it.Target>}; separator="\n">
+<endif>
+
+<if(Dead)>#<endif>.end sparse-switch
+>>
+
+
+Label(Prefix, Suffix) ::=
+<<
+:<Prefix><Suffix>
+>>
+
+Line(Line) ::=
+<<
+.line <Line; format="decimal">
+>>
+
+EndPrologue(Prologue) ::=
+<<
+.prologue
+>>
+
+StartEpilogue(Epilogue) ::=
+<<
+.epilogue
+>>
+
+StartLocal(Register, Name, Type, Signature) ::=
+<<
+.local <Register>, <Name>:<Type><if(Signature)>,"<Signature>"<endif>
+>>
+
+EndLocal(Register, Name, Type, Signature) ::=
+<<
+.end local <Register>       <if(Name)>#<Name>:<Type>,<if(Signature)>, "<Signature>"<endif><endif>
+>>
+
+RestartLocal(Register, Name, Type, Signature) ::=
+<<
+.restart local <Register>       <if(Name)>#<Name>:<Type>,<if(Signature)>, "<Signature>"<endif><endif>
+>>
+
+SetFile(FileName) ::=
+<<
+.source "<FileName>"
+>>
+
+Blank(Blank) ::=
+<<
+
+>>
+
+Catch(ExceptionType, StartLabel, EndLabel, HandlerLabel) ::=
+<<
+<if(ExceptionType)>.catch <ExceptionType><else>.catchall<endif> {<StartLabel> .. <EndLabel>} <HandlerLabel>
+>>
+
+
+StringReference(EscapedValue) ::=
+<<
+"<EscapedValue>"
+>>
+
+FieldReference(ContainingClass, FieldName, FieldType) ::=
+<<
+<ContainingClass>-><FieldName>:<FieldType>
+>>
+
+MethodReference(ContainingClass, MethodName, Prototype) ::=
+<<
+<ContainingClass>-><MethodName><Prototype>
+>>
+
+TypeReference(TypeDescriptor) ::=
+<<
+<TypeDescriptor>
+>>
+
+
+SimpleEncodedValue(Value) ::=
+<<
+<Value>
+>>
+
+EncodedIndexedItemReference(Value) ::=
+<<
+<Value>
+>>
+
+ArrayEncodedValue(Value) ::=
+<<
+{
+    <Value; separator=",\n">
+}
+>>
+
+EnumEncodedValue(Value) ::=
+<<
+.enum <Value>
+>>
+
+AnnotationEncodedValue(AnnotationType, Elements) ::=
+<<
+.subannotation <AnnotationType>
+    <Elements; separator="\n">
+.end subannotation
+>>
+
+AnnotationElement(Name, Value) ::=
+<<
+<Name> = <Value>
+>>
+
+Comment(Comment) ::=
+<<
+#<Comment>
+>>

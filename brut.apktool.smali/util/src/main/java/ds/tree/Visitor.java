@@ -1,0 +1,56 @@
+/*
+The MIT License
+
+Copyright (c) 2008 Tahseen Ur Rehman, Javid Jamae
+
+http://code.google.com/p/radixtree/
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+*/
+
+package ds.tree;
+
+/**
+ * The visitor interface that is used by {@link RadixTreeImpl} for perfroming
+ * task on a searched node.
+ *
+ * @author Tahseen Ur Rehman (tahseen.ur.rehman {at.spam.me.not} gmail.com)
+ * @author Javid Jamae
+ * @author Dennis Heidsiek
+ * @param <T,R>
+ */
+public interface Visitor<T, R> {
+    /**
+     * This method gets called by {@link RadixTreeImpl#visit(String, Visitor) visit}
+     * when it finds a node matching the key given to it.
+     *
+     * @param key The key that matched the node
+     * @param parent The parent of the node being visited
+     * @param node The node that is being visited
+     */
+    public void visit(String key, RadixTreeNode<T> parent, RadixTreeNode<T> node);
+
+    /**
+     * The visitor can store any type of result object, depending on the context of
+     * what it is being used for.
+     *
+     * @return The result captured by the visitor.
+     */
+    public R getResult();
+}
