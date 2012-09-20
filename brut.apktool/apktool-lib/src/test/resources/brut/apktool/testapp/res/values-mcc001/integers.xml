@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="test_integer1">-1</integer>
+    <integer name="test_integer2">0</integer>
+    <integer name="test_integer3">1</integer>
+</resources>

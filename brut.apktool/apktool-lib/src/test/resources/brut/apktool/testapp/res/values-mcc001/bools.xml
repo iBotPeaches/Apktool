@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <bool name="test_bool1">false</bool>
+    <bool name="test_bool2">true</bool>
+</resources>

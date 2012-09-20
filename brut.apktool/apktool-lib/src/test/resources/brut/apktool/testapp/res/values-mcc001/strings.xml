@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="test_string1"></string>
+    <string name="test_string2">Lorem ipsum...</string>
+    <string name="test_string3">\@</string>
+    <string name="test_string4">\?</string>
+    <string name="test_string5">\#ff123456</string>
+    <string name="test_string7">&amp;</string>
+    <string name="test_string8">"'"</string>
+    <string name="test_string9">\"</string>
+    <string name="test_string10">\u0005</string>
+    <string name="test_string11">" foo  bar   "</string>
+    <string name="test_string12">"foo
+bar"</string>
+    <string name="test_string13">" foo"<b>bar <i> baz </i></b> <u>foo</u></string>
+    <string name="test_string14">foo<sometag someattr1="someval1" someattr2="someval2">bar</sometag>baz</string>
+    <string name="test_string16">foo<b>bar<i>"b
+        az"</i></b>foo</string>
+    <string name="test_string17" formatted="false">%d of %d</string>
+    <string name="test_string18">foo %d bar %</string>
+    <string name="test_string19">%2$s foo %1$d</string>
+    <string name="test_string20" formatted="false">%-e foo %,d</string>
+    <string name="test_string21">%2$-e foo %1$,d</string>
+    <string name="test_string22" formatted="false">%02d foo %01d</string>
+    <string name="test_string23" formatted="false">%d foo %1</string>
+    <string name="test_string24" formatted="false">%1% foo %2%</string>
+</resources>
