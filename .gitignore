@@ -8,7 +8,8 @@ brut.apktool/apktool-cli/build*
 brut.apktool/apktool-lib/build*
 brut.apktool/build*
 build*
-*~
+
+
 /brut.apktool/nbproject/private/
 /brut.apktool.smali/baksmali/nbproject/private/
 /brut.apktool.smali/dexlib/nbproject/private/
@@ -19,3 +20,5 @@ build*
 /brut.apktool/apktool-lib/nbproject/private/
 /brut.apktool/apktool-cli/nbproject/private/
 *.kate-swp
+*~
+*.project

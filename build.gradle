@@ -6,6 +6,17 @@ repositories {
   mavenCentral()
 }
 
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
+
+class Compatibility {
+  String version
+  Compatibility(String versionValue) {
+    def matcher = (versionValue =~ /Java (\d)/)
+    version = matcher[0][1]
+  }
+  String toString() { version }
+}
 dependencies {
 }
 
