@@ -417,8 +417,7 @@ final public class AndrolibResources {
             InputStream in = null;
             OutputStream out = null;
             try {
-                in = AndrolibResources.class.getResourceAsStream(
-                    "/brut/androlib/android-framework.jar");
+                in = AndrolibResources.class.getResourceAsStream("brut/androlib/android-framework.jar");
                 out = new FileOutputStream(apk);
                 IOUtils.copy(in, out);
                 return apk;

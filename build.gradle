@@ -1,5 +1,6 @@
 apply plugin: 'java'
 apply plugin: 'maven'
+apply plugin: 'license'
 
 repositories {
   mavenCentral()
@@ -12,10 +13,27 @@ task wrapper(type: Wrapper) {
     gradleVersion = '1.2'
 }
 
+buildscript {
+        repositories {
+            mavenCentral()
+        }
+        dependencies {
+            classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.5.0'
+        }
+}
+
 subprojects {
     apply plugin: 'java'
     apply plugin: 'maven'
     apply plugin: 'idea'
+
+    gradle.taskGraph.whenReady {
+      ext.version = '1.5.1'
+
+        jar {
+            
+        }
+    }
 
     repositories {
        mavenCentral()
@@ -61,33 +79,6 @@ subprojects {
 	}
     }
     project(':brut.apktool:apktool-lib') {
-      ext.baseVersion = '1.5.1'
-      ext.jarVersion = baseVersion
-
-	      def versionSuffix
-	      try {
-		  def git = org.eclipse.jgit.api.Git.open(file('.'))
-		  def head = git.getRepository().getRef("HEAD")
-		  versionSuffix = head.getObjectId().abbreviate(8).name()
-
-		  if (!git.status().call().clean) {
-		      versionSuffix += '-dirty'
-		  }
-	      } catch (Exception) {
-		  // In case we can't get the commit for some reason,
-		  // just use -dev
-		  versionSuffix = 'SNAPSHOT'
-	      }
-
-	      version = baseVersion + '-' + versionSuffix
-
-	      // use <version>-dev for the jar name, rather than the
-	      // full commit+dirty string
-	      jarVersion = baseVersion + '-dev'
-
-	  jar {
-	      version = jarVersion
-	  }
 	dependencies {
 	    compile ("junit:junit:4.10") {
 			exclude(module: 'hamcrest-core')
