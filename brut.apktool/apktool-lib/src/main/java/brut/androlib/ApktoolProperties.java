@@ -39,7 +39,7 @@ public class ApktoolProperties {
     }
 
     private static void loadProps() {
-        InputStream in = main.class.getResourceAsStream("/properties/apktool.properties");
+        InputStream in = ApktoolProperties.class.getResourceAsStream("/properties/apktool.properties");
         sProps = new Properties();
         try {
             sProps.load(in);
@@ -48,7 +48,7 @@ public class ApktoolProperties {
             LOGGER.warning("Can't load properties.");
         }
 
-        InputStream templateStream = main.class.getClassLoader().getResourceAsStream("/properties/baksmali.properties");
+        InputStream templateStream = ApktoolProperties.class.getResourceAsStream("/properties/baksmali.properties");
         Properties properties = new Properties();
         String version = "(unknown)";
         try {
@@ -57,7 +57,7 @@ public class ApktoolProperties {
         } catch (IOException ex) {
         }
         sProps.put("baksmaliVersion", version);
-        templateStream = main.class.getClassLoader().getResourceAsStream("/properties/smali.properties");
+        templateStream = ApktoolProperties.class.getResourceAsStream("/properties/smali.properties");
         properties = new Properties();
         version = "(unknown)";
         try {
