@@ -1,6 +1,7 @@
 apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'license'
+ext.apktoolversion = '1.5.1-SNAPSHOT'
 
 repositories {
   mavenCentral()
@@ -90,6 +91,11 @@ subprojects {
 	}
     }
     project(':brut.apktool:apktool-lib') {
+	processResources {
+		ext.fullrev = ''
+		ant.loadfile(srcFile: "../../.git/refs/heads/master", property: ext.fullrev)
+		filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: [version: apktoolversion, gitrev: ant.properties[ext.fullrev].substring(0,10)])
+	}
 	dependencies {
 	    compile ("junit:junit:4.10") {
 			exclude(module: 'hamcrest-core')
@@ -101,6 +107,8 @@ subprojects {
 	}
     }
     project(':brut.apktool:apktool-cli') {
+    version = apktoolversion
+
 	gradle.taskGraph.whenReady {
 	    // build a jar containing all dependencies
 	    jar {
