@@ -39,14 +39,6 @@ subprojects {
     apply plugin: 'maven'
     apply plugin: 'idea'
 
-    gradle.taskGraph.whenReady {
-      ext.version = '1.5.1'
-
-        jar {
-            
-        }
-    }
-
     repositories {
        mavenCentral()
     }
@@ -61,7 +53,7 @@ subprojects {
     }
     project(':brut.j.util') {
 	dependencies {
-	  compile project(':brut.j.common'), "commons-io:commons-io:1.4"
+	  compile project(':brut.j.common'), "commons-io:commons-io:2.4"
 	  testCompile "junit:junit:3.8.1"
 	}
     }
@@ -91,6 +83,13 @@ subprojects {
 	}
     }
     project(':brut.apktool:apktool-lib') {
+        gradle.taskGraph.whenReady {
+              task copy <<  {
+                from 'src/main/resources'
+		into 'build/resources/main'
+		include '**/*.jar'
+          }
+        }
 	processResources {
 		ext.fullrev = ''
 		ant.loadfile(srcFile: "../../.git/refs/heads/master", property: ext.fullrev)
@@ -110,7 +109,6 @@ subprojects {
     version = apktoolversion
 
 	gradle.taskGraph.whenReady {
-	    // build a jar containing all dependencies
 	    jar {
 		from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
 
