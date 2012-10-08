@@ -770,7 +770,7 @@ public class AXmlResourceParser implements XmlResourceParser {
         int uri = (namespace != null)
                 ? m_strings.find(namespace)
                 : -1;
-        for (int o = 0; o != m_attributes.length; ++o) {
+        for (int o = 0; o != m_attributes.length; o+=ATTRIBUTE_LENGHT) {
             if (name == m_attributes[o + ATTRIBUTE_IX_NAME]
                     && (uri == -1 || uri == m_attributes[o + ATTRIBUTE_IX_NAMESPACE_URI])) {
                 return o / ATTRIBUTE_LENGHT;
