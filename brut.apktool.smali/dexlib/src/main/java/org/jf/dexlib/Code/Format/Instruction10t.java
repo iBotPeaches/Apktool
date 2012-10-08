@@ -34,7 +34,7 @@ import org.jf.dexlib.Code.Opcode;
 import org.jf.dexlib.DexFile;
 import org.jf.dexlib.Util.AnnotatedOutput;
 
-public class Instruction10t extends Instruction implements OffsetInstruction {
+public class Instruction10t extends OffsetInstruction {
     public static final InstructionFactory Factory = new Factory();
     private int targetAddressOffset;
 

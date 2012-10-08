@@ -36,7 +36,7 @@ import org.jf.dexlib.DexFile;
 import org.jf.dexlib.Util.AnnotatedOutput;
 import org.jf.dexlib.Util.NumberUtils;
 
-public class Instruction31t extends Instruction implements OffsetInstruction, SingleRegisterInstruction {
+public class Instruction31t extends OffsetInstruction implements SingleRegisterInstruction {
     public static final Instruction.InstructionFactory Factory = new Factory();
     private byte regA;
     private int targetAddressOffset;

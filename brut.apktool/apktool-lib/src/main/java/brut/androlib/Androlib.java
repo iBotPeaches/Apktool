@@ -465,6 +465,7 @@ public class Androlib {
                 
                 // add res folder
                 editOrig.addFolder(new File(appDir,  APK_DIRNAME + "/res").getAbsolutePath(), parameters);
+                System.out.println("file: " + new File(appDir,  APK_DIRNAME + "/res").getAbsolutePath());
                 
                 // add assets, if there
                 if (assetDir != null) {

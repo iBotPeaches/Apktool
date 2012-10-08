@@ -31,19 +31,17 @@ package org.jf.baksmali.Adaptors.Format;
 import org.jf.baksmali.Adaptors.LabelMethodItem;
 import org.jf.baksmali.Adaptors.MethodDefinition;
 import org.jf.util.IndentingWriter;
-import org.jf.dexlib.Code.Instruction;
 import org.jf.dexlib.Code.OffsetInstruction;
 import org.jf.dexlib.Code.Opcode;
 import org.jf.dexlib.CodeItem;
 
 import java.io.IOException;
 
-public class OffsetInstructionFormatMethodItem<T extends Instruction & OffsetInstruction>
-        extends InstructionMethodItem<T> {
+public class OffsetInstructionFormatMethodItem extends InstructionMethodItem<OffsetInstruction> {
     protected LabelMethodItem label;
 
     public OffsetInstructionFormatMethodItem(MethodDefinition.LabelCache labelCache, CodeItem codeItem, int codeAddress,
-                                             T instruction) {
+                                             OffsetInstruction instruction) {
         super(codeItem, codeAddress, instruction);
 
         label = new LabelMethodItem(codeAddress + instruction.getTargetAddressOffset(), getLabelPrefix());

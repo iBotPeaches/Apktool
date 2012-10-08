@@ -262,7 +262,7 @@ public class ClassDefinition {
                         classDefItem.getClassType().getTypeDescriptor(), field.field.getShortFieldString()));
             }
 
-			FieldDefinition.writeTo(fieldWriter, field, null, fieldAnnotations, false);
+            FieldDefinition.writeTo(fieldWriter, field, null, fieldAnnotations, false);
         }
     }
 

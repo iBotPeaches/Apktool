@@ -103,7 +103,6 @@ public class main {
         boolean fixJumbo = true;
         boolean fixGoto = true;
         boolean verboseErrors = false;
-        boolean oldLexer = false;
         boolean printTokens = false;
 
         boolean apiSet = false;
@@ -158,9 +157,6 @@ public class main {
                 case 'V':
                     verboseErrors = true;
                     break;
-                case 'L':
-                    oldLexer = true;
-                    break;
                 case 'T':
                     printTokens = true;
                     break;
@@ -202,7 +198,7 @@ public class main {
             boolean errors = false;
 
             for (File file: filesToProcess) {
-                if (!assembleSmaliFile(file, dexFile, verboseErrors, oldLexer, printTokens, allowOdex, apiLevel)) {
+                if (!assembleSmaliFile(file, dexFile, verboseErrors, printTokens, allowOdex, apiLevel)) {
                     errors = true;
                 }
             }
@@ -276,7 +272,7 @@ public class main {
         }
     }
 
-    private static boolean assembleSmaliFile(File smaliFile, DexFile dexFile, boolean verboseErrors, boolean oldLexer,
+    private static boolean assembleSmaliFile(File smaliFile, DexFile dexFile, boolean verboseErrors,
                                              boolean printTokens, boolean allowOdex, int apiLevel)
             throws Exception {
         CommonTokenStream tokens;
@@ -285,27 +281,19 @@ public class main {
         boolean lexerErrors = false;
         LexerErrorInterface lexer;
 
-        if (oldLexer) {
-            ANTLRFileStream input = new ANTLRFileStream(smaliFile.getAbsolutePath(), "UTF-8");
-            input.name = smaliFile.getAbsolutePath();
+        FileInputStream fis = new FileInputStream(smaliFile.getAbsolutePath());
+        InputStreamReader reader = new InputStreamReader(fis, "UTF-8");
 
-            lexer = new smaliLexer(input);
-            tokens = new CommonTokenStream((TokenSource)lexer);
-        } else {
-            FileInputStream fis = new FileInputStream(smaliFile.getAbsolutePath());
-            InputStreamReader reader = new InputStreamReader(fis, "UTF-8");
-
-            lexer = new smaliFlexLexer(reader);
-            ((smaliFlexLexer)lexer).setSourceFile(smaliFile);
-            tokens = new CommonTokenStream((TokenSource)lexer);
-        }
+        lexer = new smaliFlexLexer(reader);
+        ((smaliFlexLexer)lexer).setSourceFile(smaliFile);
+        tokens = new CommonTokenStream((TokenSource)lexer);
 
         if (printTokens) {
             tokens.getTokens();
             
             for (int i=0; i<tokens.size(); i++) {
                 Token token = tokens.get(i);
-                if (token.getChannel() == smaliLexer.HIDDEN) {
+                if (token.getChannel() == smaliParser.HIDDEN) {
                     continue;
                 }
 
@@ -330,7 +318,7 @@ public class main {
         treeStream.setTokenStream(tokens);
 
         smaliTreeWalker dexGen = new smaliTreeWalker(treeStream);
-
+        dexGen.setVerboseErrors(verboseErrors);
         dexGen.dexFile = dexFile;
         dexGen.smali_file();
 
@@ -423,10 +411,6 @@ public class main {
                 .withDescription("Generate verbose error messages")
                 .create("V");
 
-        Option oldLexerOption = OptionBuilder.withLongOpt("old-lexer")
-                .withDescription("Use the old lexer")
-                .create("L");
-
         Option printTokensOption = OptionBuilder.withLongOpt("print-tokens")
                 .withDescription("Print the name and text of each token")
                 .create("T");
@@ -442,7 +426,6 @@ public class main {
         debugOptions.addOption(noFixJumboOption);
         debugOptions.addOption(noFixGotoOption);
         debugOptions.addOption(verboseErrorsOption);
-        debugOptions.addOption(oldLexerOption);
         debugOptions.addOption(printTokensOption);
 
         for (Object option: basicOptions.getOptions()) {

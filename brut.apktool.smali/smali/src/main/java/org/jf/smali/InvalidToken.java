@@ -28,7 +28,6 @@
 
 package org.jf.smali;
 
-import org.antlr.runtime.CharStream;
 import org.antlr.runtime.CommonToken;
 
 public class InvalidToken extends CommonToken {
@@ -37,13 +36,13 @@ public class InvalidToken extends CommonToken {
     public InvalidToken(String message) {
         super(smaliParser.INVALID_TOKEN);
         this.message = message;
-        this.channel = smaliLexer.ERROR_CHANNEL;
+        this.channel = smaliParser.ERROR_CHANNEL;
     }
 
     public InvalidToken(String message, String text) {
         super(smaliParser.INVALID_TOKEN, text);
         this.message = message;
-        this.channel = smaliLexer.ERROR_CHANNEL;
+        this.channel = smaliParser.ERROR_CHANNEL;
     }
 
     public String getMessage() {

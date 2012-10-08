@@ -85,19 +85,19 @@ class RadixTreeNode<T> {
         this.childern = childern;
     }
 
-	public int getNumberOfMatchingCharacters(String key) {
-		int numberOfMatchingCharacters = 0;
+    public int getNumberOfMatchingCharacters(String key) {
+        int numberOfMatchingCharacters = 0;
         while (numberOfMatchingCharacters < key.length() && numberOfMatchingCharacters < this.getKey().length()) {
             if (key.charAt(numberOfMatchingCharacters) != this.getKey().charAt(numberOfMatchingCharacters)) {
                 break;
             }
             numberOfMatchingCharacters++;
         }
-		return numberOfMatchingCharacters;
-	}
+        return numberOfMatchingCharacters;
+    }
 
     @Override
     public String toString() {
-		return key;
+        return key;
     }
 }

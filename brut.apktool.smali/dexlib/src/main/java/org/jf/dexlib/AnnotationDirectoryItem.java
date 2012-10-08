@@ -49,16 +49,6 @@ public class AnnotationDirectoryItem extends Item<AnnotationDirectoryItem> {
     private ParameterAnnotation[] parameterAnnotations;
 
     /**
-     * typically each AnnotationDirectoryItem will have a distinct parent. The only case that isn't true is when
-     * the AnnotationDirectoryItem *only* contains class annotations, with no other type of annotation. In that
-     * case, the same AnnotationDirectoryItem could be referenced from multiple classes.
-     * This isn't a problem though, because this field is only used in compareTo to determine the sort order, which
-     * which knows it should handle a null value as a special case
-     */
-    @Nullable
-    private ClassDefItem parent = null;
-
-    /**
      * Creates a new uninitialized <code>AnnotationDirectoryItem</code>
      * @param dexFile The <code>DexFile</code> that this item belongs to
      */
@@ -211,8 +201,9 @@ public class AnnotationDirectoryItem extends Item<AnnotationDirectoryItem> {
     /** {@inheritDoc} */
     protected void writeItem(AnnotatedOutput out) {
         if (out.annotates()) {
-            if (!isInternable() && parent != null) {
-                out.annotate(0, parent.getClassType().getTypeDescriptor());
+            TypeIdItem parentType = getParentType();
+            if (parentType != null) {
+                out.annotate(0, parentType.getTypeDescriptor());
             }
             if (classAnnotations != null) {
                 out.annotate(4, "class_annotations_off: 0x" + Integer.toHexString(classAnnotations.getOffset()));
@@ -303,29 +294,60 @@ public class AnnotationDirectoryItem extends Item<AnnotationDirectoryItem> {
 
     /** {@inheritDoc} */
     public String getConciseIdentity() {
-        if (parent == null) {
+        TypeIdItem parentType = getParentType();
+        if (parentType == null) {
             return "annotation_directory_item @0x" + Integer.toHexString(getOffset());
         }
-        return "annotation_directory_item @0x" + Integer.toHexString(getOffset()) + " (" + parent.getClassType() + ")";
+        return "annotation_directory_item @0x" + Integer.toHexString(getOffset()) +
+               " (" + parentType.getTypeDescriptor() + ")";
     }
 
     /** {@inheritDoc} */
     public int compareTo(AnnotationDirectoryItem o) {
         Preconditions.checkNotNull(o);
-        if (!isInternable()) {
-            if (!o.isInternable()) {
-                Preconditions.checkState(parent != null && o.parent != null,
-                        "Must call setParent before comparing AnnotationDirectoryItem instances");
-                return parent.compareTo(o.parent);
+
+        TypeIdItem parentType = getParentType();
+        TypeIdItem otherParentType = o.getParentType();
+        if (parentType != null) {
+            if (otherParentType != null) {
+                return parentType.compareTo(otherParentType);
             }
+            return 1;
+        }
+        if (otherParentType != null) {
             return -1;
         }
 
-        if (!o.isInternable()) {
+        if (classAnnotations != null) {
+            if (o.classAnnotations != null) {
+                return classAnnotations.compareTo(o.classAnnotations);
+            }
             return 1;
         }
+        return -1;
+    }
 
-        return classAnnotations.compareTo(o.classAnnotations);
+    /**
+     * Returns the parent type for an AnnotationDirectoryItem that is guaranteed to have a single parent, or null
+     * for one that may be referenced by multiple classes.
+     *
+     * Specifically, the AnnotationDirectoryItem may be referenced by multiple classes if it has only class annotations,
+     * but not field/method/parameter annotations.
+     *
+     * @return The parent type for this AnnotationDirectoryItem, or null if it may have multiple parents
+     */
+    @Nullable
+    public TypeIdItem getParentType() {
+        if (fieldAnnotations != null && fieldAnnotations.length > 0) {
+            return fieldAnnotations[0].field.getContainingClass();
+        }
+        if (methodAnnotations != null && methodAnnotations.length > 0) {
+            return methodAnnotations[0].method.getContainingClass();
+        }
+        if (parameterAnnotations != null && parameterAnnotations.length > 0) {
+            return parameterAnnotations[0].method.getContainingClass();
+        }
+        return null;
     }
 
     /**
@@ -426,6 +448,17 @@ public class AnnotationDirectoryItem extends Item<AnnotationDirectoryItem> {
     }
 
     /**
+     *
+     */
+    public int getClassAnnotationCount() {
+        if (classAnnotations == null) {
+            return 0;
+        }
+        AnnotationItem[] annotations = classAnnotations.getAnnotations();
+        return annotations.length;
+    }
+
+    /**
      * @return The number of field annotations in this <code>AnnotationDirectoryItem</code>
      */
     public int getFieldAnnotationCount() {
@@ -455,40 +488,17 @@ public class AnnotationDirectoryItem extends Item<AnnotationDirectoryItem> {
         return parameterAnnotations.length;
     }
 
-    /**
-     * @return true if this <code>AnnotationDirectoryItem</code> is internable. It is only internable if it has
-     * only class annotations, but no field, method or parameter annotations
-     */
-    private boolean isInternable() {
-        return classAnnotations != null &&
-               (fieldAnnotations == null || fieldAnnotations.length == 0) &&
-               (methodAnnotations == null || methodAnnotations.length == 0) &&
-               (parameterAnnotations == null || parameterAnnotations.length == 0);
-    }
-
-    /**
-     * Sets the <code>ClassDefItem</code> that this <code>AnnotationDirectoryItem</code> is associated with.
-     *
-     * @param classDefItem the <code>ClassDefItem</code> that this <code>AnnotationDirectoryItem</code> is associated
-     * with.
-     */
-    protected void setParent(ClassDefItem classDefItem) {
-        // If this AnnotationDirectoryItem is internable, then setParent may be called multiple times, because it is
-        // reused for multiple classes. In this case, the parent field isn't used, so it doesn't matter if we overwrite
-        // it.
-        // If, on the other hand, it is not internable, we want to make sure that only a single parent is set. parent
-        // should either be null, or be equal to the new parent
-        Preconditions.checkState(this.isInternable() || (parent == null || parent.equals(classDefItem)));
-        this.parent = classDefItem;
-    }
-
     @Override
     public int hashCode() {
-        // An instance is internable only if it has only class annotations, but no other type of annotation
-        if (!isInternable()) {
-            return super.hashCode();
+        // If the item has a single parent, we can use the re-use the identity (hash) of that parent
+        TypeIdItem parentType = getParentType();
+        if (parentType != null) {
+            return parentType.hashCode();
         }
-        return classAnnotations.hashCode();
+        if (classAnnotations != null) {
+            return classAnnotations.hashCode();
+        }
+        return 0;
     }
 
     @Override

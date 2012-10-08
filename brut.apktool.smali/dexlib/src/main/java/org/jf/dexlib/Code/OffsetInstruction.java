@@ -28,7 +28,11 @@
 
 package org.jf.dexlib.Code;
 
-public interface OffsetInstruction {
-    public int getTargetAddressOffset();
-    public void updateTargetAddressOffset(int targetAddressOffset);
+public abstract class OffsetInstruction extends Instruction {
+    protected OffsetInstruction(Opcode opcode) {
+        super(opcode);
+    }
+
+    public abstract int getTargetAddressOffset();
+    public abstract void updateTargetAddressOffset(int targetAddressOffset);
 }

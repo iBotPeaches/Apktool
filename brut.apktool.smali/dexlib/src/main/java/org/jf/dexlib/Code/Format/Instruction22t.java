@@ -36,7 +36,7 @@ import org.jf.dexlib.DexFile;
 import org.jf.dexlib.Util.AnnotatedOutput;
 import org.jf.dexlib.Util.NumberUtils;
 
-public class Instruction22t extends Instruction implements OffsetInstruction, TwoRegisterInstruction {
+public class Instruction22t extends OffsetInstruction implements TwoRegisterInstruction {
     public static final Instruction.InstructionFactory Factory = new Factory();
     private byte regA;
     private byte regB;

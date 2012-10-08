@@ -28,6 +28,9 @@
 
 package org.jf.smali;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class LiteralTools
 {
     public static byte parseByte(String byteLiteral)
@@ -302,6 +305,42 @@ public class LiteralTools
         } else {
             return result;
         }
+    }
+
+    private static Pattern specialFloatRegex = Pattern.compile("((-)?infinityf)|(nanf)", Pattern.CASE_INSENSITIVE);
+    public static float parseFloat(String floatString) {
+        Matcher m = specialFloatRegex.matcher(floatString);
+        if (m.matches()) {
+            //got an infinity
+            if (m.start(1) != -1) {
+                if (m.start(2) != -1) {
+                    return Float.NEGATIVE_INFINITY;
+                } else {
+                    return Float.POSITIVE_INFINITY;
+                }
+            } else {
+                return Float.NaN;
+            }
+        }
+        return Float.parseFloat(floatString);
+    }
+
+    private static Pattern specialDoubleRegex = Pattern.compile("((-)?infinityd?)|(nand?)", Pattern.CASE_INSENSITIVE);
+    public static double parseDouble(String doubleString) {
+        Matcher m = specialDoubleRegex.matcher(doubleString);
+        if (m.matches()) {
+            //got an infinity
+            if (m.start(1) != -1) {
+                if (m.start(2) != -1) {
+                    return Double.NEGATIVE_INFINITY;
+                } else {
+                    return Double.POSITIVE_INFINITY;
+                }
+            } else {
+                return Double.NaN;
+            }
+        }
+        return Double.parseDouble(doubleString);
     }
 
     public static byte[] longToBytes(long value) {

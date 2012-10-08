@@ -45,9 +45,6 @@ public class ClassDataItem extends Item<ClassDataItem> {
     @Nullable
     private EncodedMethod[] virtualMethods = null;
 
-    @Nullable
-    private ClassDefItem parent = null;
-
     /**
      * Creates a new uninitialized <code>ClassDataItem</code>
      * @param dexFile The <code>DexFile</code> that this item belongs to
@@ -384,14 +381,17 @@ public class ClassDataItem extends Item<ClassDataItem> {
 
     /** {@inheritDoc} */
     public String getConciseIdentity() {
-        if (parent == null) {
+        TypeIdItem parentType = getParentType();
+        if (parentType == null) {
             return "class_data_item @0x" + Integer.toHexString(getOffset());
         }
-        return "class_data_item @0x" + Integer.toHexString(getOffset()) + " (" + parent.getClassType() +")";
+        return "class_data_item @0x" + Integer.toHexString(getOffset()) + " (" + parentType.getTypeDescriptor() +")";
     }
 
     /** {@inheritDoc} */
     public int compareTo(ClassDataItem other) {
+        Preconditions.checkNotNull(other);
+
         // An empty CodeDataItem may be shared by multiple ClassDefItems, so we can't use parent in this case
         if (isEmpty()) {
             if (other.isEmpty()) {
@@ -403,25 +403,54 @@ public class ClassDataItem extends Item<ClassDataItem> {
             return 1;
         }
 
-        if (parent == null) {
-            if (other.parent == null) {
+        TypeIdItem parentType = getParentType();
+        TypeIdItem otherParentType= other.getParentType();
+        if (parentType == null) {
+            if (otherParentType == null) {
                 return 0;
             }
             return -1;
         }
-        if (other.parent == null) {
+        if (otherParentType == null) {
             return 1;
         }
-        return parent.compareTo(other.parent);
+        return parentType.compareTo(otherParentType);
+    }
+
+    @Override
+    public int hashCode() {
+        // If the item has a single parent, we can use the re-use the identity (hash) of that parent
+        TypeIdItem parentType = getParentType();
+        if (parentType != null) {
+            return parentType.hashCode();
+        }
+        return 0;
     }
 
     /**
-     * Sets the <code>ClassDefItem</code> that this <code>ClassDataItem</code> is associated with
-     * @param classDefItem the <code>ClassDefItem</code> that this <code>ClassDataItem</code> is associated with
+     * Returns the parent type for a non-empty ClassDataItem, or null for an empty one (which could be referenced by
+     * multiple ClassDefItem parents)
+     *
+     * Specifically, the AnnotationDirectoryItem may be referenced by multiple classes if it has only class annotations,
+     * but not field/method/parameter annotations.
+     *
+     * @return The parent type for this AnnotationDirectoryItem, or null if it may have multiple parents
      */
-    protected void setParent(ClassDefItem classDefItem) {
-        Preconditions.checkState(parent == null || parent.compareTo(classDefItem) == 0 || isEmpty());
-        parent = classDefItem;
+    @Nullable
+    public TypeIdItem getParentType() {
+        if (staticFields != null && staticFields.length > 0) {
+            return staticFields[0].field.getContainingClass();
+        }
+        if (instanceFields != null && instanceFields.length > 0) {
+            return instanceFields[0].field.getContainingClass();
+        }
+        if (directMethods != null && directMethods.length > 0) {
+            return directMethods[0].method.getContainingClass();
+        }
+        if (virtualMethods != null && virtualMethods.length > 0) {
+            return virtualMethods[0].method.getContainingClass();
+        }
+        return null;
     }
 
     /**

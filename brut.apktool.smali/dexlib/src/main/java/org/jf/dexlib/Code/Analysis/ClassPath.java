@@ -408,7 +408,13 @@ public class ClassPath {
         //if the two arrays have the same number of dimensions, then we should return an array class with the
         //same number of dimensions, for the common superclass of the 2 element classes
         if (class1.arrayDimensions == class2.arrayDimensions) {
-            ClassDef commonElementClass = getCommonSuperclass(class1.elementClass, class2.elementClass);
+            ClassDef commonElementClass;
+            if (class1.elementClass instanceof UnresolvedClassDef ||
+                class2.elementClass instanceof UnresolvedClassDef) {
+                commonElementClass = ClassPath.getUnresolvedObjectClassDef();
+            } else {
+                commonElementClass = getCommonSuperclass(class1.elementClass, class2.elementClass);
+            }
             return getArrayClassDefByElementClassAndDimension(commonElementClass, class1.arrayDimensions);
         }
 

@@ -28,7 +28,6 @@
 
 package org.jf.dexlib;
 
-import com.google.common.base.Preconditions;
 import org.jf.dexlib.EncodedValue.ArrayEncodedSubValue;
 import org.jf.dexlib.EncodedValue.EncodedValue;
 import org.jf.dexlib.Util.AccessFlags;
@@ -88,13 +87,6 @@ public class ClassDefItem extends Item<ClassDefItem> {
         this.annotations = annotations;
         this.classData = classData;
         this.staticFieldInitializers = staticFieldInitializers;
-
-        if (classData != null) {
-            classData.setParent(this);
-        }
-        if (annotations != null) {
-            annotations.setParent(this);
-        }
     }
 
     /**
@@ -145,13 +137,6 @@ public class ClassDefItem extends Item<ClassDefItem> {
         classData = (ClassDataItem)readContext.getOptionalOffsettedItemByOffset(ItemType.TYPE_CLASS_DATA_ITEM, in.readInt());
         staticFieldInitializers = (EncodedArrayItem)readContext.getOptionalOffsettedItemByOffset(
                 ItemType.TYPE_ENCODED_ARRAY_ITEM, in.readInt());
-
-        if (classData != null) {
-            classData.setParent(this);
-        }
-        if (annotations != null) {
-            annotations.setParent(this);
-        }
     }
 
     /** {@inheritDoc} */
@@ -344,7 +329,7 @@ public class ClassDefItem extends Item<ClassDefItem> {
      */
     private static EncodedArrayItem makeStaticFieldInitializersItem(DexFile dexFile,
             @Nonnull List<StaticFieldInitializer> staticFieldInitializers) {
-        if (staticFieldInitializers == null || staticFieldInitializers.size() == 0) {
+        if (staticFieldInitializers.size() == 0) {
             return null;
         }
 

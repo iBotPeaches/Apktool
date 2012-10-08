@@ -74,6 +74,9 @@ import static org.jf.smali.smaliParser.*;
     }
 
     public String getSourceName() {
+        if (sourceFile == null) {
+            return "";
+        }
         try {
             return  PathUtil.getRelativeFile(new File("."), sourceFile).getPath();
         } catch (IOException ex) {
@@ -267,7 +270,8 @@ Type = {PrimitiveType} | {ClassDescriptor} | {ArrayDescriptor}
 
 /*Literals*/
 <YYINITIAL> {
-    -? {Integer} { return newToken(INTEGER_LITERAL); }
+    {Integer} { return newToken(POSITIVE_INTEGER_LITERAL); }
+    - {Integer} { return newToken(NEGATIVE_INTEGER_LITERAL); }
     -? {Integer} [lL] { return newToken(LONG_LITERAL); }
     -? {Integer} [sS] { return newToken(SHORT_LITERAL); }
     -? {Integer} [tT] { return newToken(BYTE_LITERAL); }

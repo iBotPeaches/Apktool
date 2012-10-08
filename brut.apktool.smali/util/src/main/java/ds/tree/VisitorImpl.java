@@ -11,17 +11,17 @@ public abstract class VisitorImpl<T, R> implements Visitor<T, R> {
 
     protected R result;
 
-	public VisitorImpl() {
-		this.result = null;
-	}
+    public VisitorImpl() {
+        this.result = null;
+    }
 
-	public VisitorImpl(R initialValue) {
-		this.result = initialValue;
-	}
+    public VisitorImpl(R initialValue) {
+        this.result = initialValue;
+    }
 
-	public R getResult() {
-		return result;
-	}
+    public R getResult() {
+        return result;
+    }
 
-	abstract public void visit(String key, RadixTreeNode<T> parent, RadixTreeNode<T> node);
+    abstract public void visit(String key, RadixTreeNode<T> parent, RadixTreeNode<T> node);
 }

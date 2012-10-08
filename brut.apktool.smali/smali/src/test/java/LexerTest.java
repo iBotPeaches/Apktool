@@ -165,7 +165,7 @@ public class LexerTest {
         for (int i=0; i<tokens.size(); i++) {
             token = (CommonToken)tokens.get(i);
 
-            if (discardHiddenTokens && token.getChannel() == smaliLexer.HIDDEN) {
+            if (discardHiddenTokens && token.getChannel() == smaliParser.HIDDEN) {
                 continue;
             }
 
@@ -175,7 +175,7 @@ public class LexerTest {
 
             if (token.getType() == smaliParser.INVALID_TOKEN) {
                 Assert.assertTrue("Encountered an INVALID_TOKEN not on the error channel",
-                        token.getChannel() == smaliLexer.ERROR_CHANNEL);
+                        token.getChannel() == smaliParser.ERROR_CHANNEL);
             }
 
             ExpectedToken expectedToken = expectedTokens.get(expectedTokenIndex++);

@@ -38,13 +38,11 @@ public class InstructionMethodItemFactory {
     private InstructionMethodItemFactory() {
     }
 
-    public static InstructionMethodItem makeInstructionFormatMethodItem(MethodDefinition methodDefinition,
-                                                                              CodeItem codeItem,
-                                                                              int codeAddress,
-                                                                              Instruction instruction) {
+    public static InstructionMethodItem makeInstructionFormatMethodItem(
+            MethodDefinition methodDefinition, CodeItem codeItem, int codeAddress, Instruction instruction) {
         if (instruction instanceof OffsetInstruction) {
-            return new OffsetInstructionFormatMethodItem(methodDefinition.getLabelCache(), codeItem, codeAddress,
-                    instruction);
+            return new OffsetInstructionFormatMethodItem(methodDefinition.getLabelCache(), codeItem,
+                    codeAddress, (OffsetInstruction)instruction);
         }
 
         switch (instruction.getFormat()) {
@@ -61,7 +59,7 @@ public class InstructionMethodItemFactory {
                 return new UnresolvedOdexInstructionMethodItem(codeItem, codeAddress,
                         (UnresolvedOdexInstruction)instruction);
             default:
-                return new InstructionMethodItem(codeItem, codeAddress, instruction);
+                return new InstructionMethodItem<Instruction>(codeItem, codeAddress, instruction);
         }
     }
 }
