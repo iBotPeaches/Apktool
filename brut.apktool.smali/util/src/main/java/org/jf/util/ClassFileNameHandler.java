@@ -114,7 +114,7 @@ public class ClassFileNameHandler {
 
         try {
             FileWriter writer = new FileWriter(f);
-            writer.write("test");
+//            writer.write("test");
             writer.flush();
             writer.close();
             f.delete(); //doesn't throw IOException
