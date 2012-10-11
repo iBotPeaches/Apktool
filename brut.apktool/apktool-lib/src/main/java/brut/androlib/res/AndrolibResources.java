@@ -546,7 +546,7 @@ final public class AndrolibResources {
         /* store in user-home, for Mac OS X */
         if (System.getProperty("os.name").equals("Mac OS X")) {
            path = System.getProperty("user.home") + File.separatorChar +
-                "Library/Application Support/apktool/framework"; }
+                "Library/apktool/framework"; }
         else {
             path = System.getProperty("user.home") + File.separatorChar +	
                 "apktool" + File.separatorChar + "framework";
