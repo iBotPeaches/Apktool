@@ -58,7 +58,8 @@ public abstract class ResScalarValue extends ResValue
     public String encodeAsResXmlValueExt() throws AndrolibException {
         String rawValue = mRawValue;
         if (rawValue != null) {
-            if (ResXmlEncoders.hasMultipleNonPositionalSubstitutions(rawValue)) {
+//            if (ResXmlEncoders.hasMultipleNonPositionalSubstitutions(rawValue)) {
+            if (ResXmlEncoders.hasMNPS(rawValue)) {
                 int count = 1;
                 StringBuilder result = new StringBuilder();
                 String tmp1[] = rawValue.split("%%", -1);
