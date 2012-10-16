@@ -111,7 +111,10 @@ public abstract class ResScalarValue extends ResValue
         }
         serializer.attribute(null, "name", res.getResSpec().getName());
 
-        serializeExtraXmlAttrs(serializer, res);
+//        serializeExtraXmlAttrs(serializer, res);
+        if (ResXmlEncoders.hasMNPS(mBody)) {            
+            serializer.attribute(null, "formatted", "false");
+        }
 
         if (! body.isEmpty()) {
             serializer.ignorableWhitespace(body);
