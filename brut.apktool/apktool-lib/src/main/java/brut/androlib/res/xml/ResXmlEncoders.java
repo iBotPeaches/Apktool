@@ -138,6 +138,93 @@ public final class ResXmlEncoders {
         return findNonPositionalSubstitutions(str, 2).size() > 1;
     }
 
+    public static boolean hasMNPS(String str) {
+
+        boolean nonpositional = false;
+        int argCount = 0; 
+        int p = 0;
+        int end = str.length();
+        
+        while (p < end) {
+            if (str.charAt(p) == '%' && p + 1 < end) {
+                p++;
+                // A literal percent sign represented by %%
+                if (str.charAt(p) == '%') {
+                    p++;
+                    continue;
+                }
+                argCount++;
+                if (str.charAt(p) >= '0' && str.charAt(p) <= '9') {
+                    do {
+                        p++;
+                    } while (str.charAt(p) >= '0' && str.charAt(p) <= '9');
+                    if (str.charAt(p) != '$') {
+                        // This must be a size specification instead of position.
+                        nonpositional = true;
+                    }
+                } else if (str.charAt(p) == '<') {
+                    // Reusing last argument; bad idea since it can be re-arranged.
+                    nonpositional = true;
+                    p++;
+                    // Optionally '$' can be specified at the end.
+                    if (p < end && str.charAt(p) == '$') {
+                        p++;
+                    }
+                } else {
+                    nonpositional = true;
+                }
+                // Ignore flags and widths
+         /*       while (p < end && (c == '-' ||
+                        c == '#' ||
+                        c == '+' ||
+                        c == ' ' ||
+                        c == ',' ||
+                        c == '(' ||
+                        (c >= '0' && c <= '9'))) {
+                    p++;
+                }*/
+
+                /*
+                 * This is a shortcut to detect strings that are going to Time.format()
+                 * instead of String.format()
+                 *
+                 * Comparison of String.format() and Time.format() args:
+                 *
+                 * String: ABC E GH  ST X abcdefgh  nost x
+                 *   Time:    DEFGHKMS W Za  d   hkm  s w yz
+                 *
+                 * Therefore we know it's definitely Time if we have:
+                 *     DFKMWZkmwyz
+                 */
+                if (p < end) {
+                    switch (str.charAt(p)) {
+                    case 'D':
+                    case 'F':
+                    case 'K':
+                    case 'M':
+                    case 'W':
+                    case 'Z':
+                    case 'k':
+                    case 'm':
+                    case 'w':
+                    case 'y':
+                    case 'z':
+                        return false;
+                    }
+                }
+            }
+            p++;
+        }
+    /*
+     * If we have more than one substitution in this string and any of them
+     * are not in positional form, give the user an error.
+     */
+        if (argCount > 1 && nonpositional) {
+            return true;
+        }
+            return false;           
+    }
+
     public static String enumerateNonPositionalSubstitutions(String str) {
         List<Integer> subs = findNonPositionalSubstitutions(str, -1);
         if (subs.size() < 2) {
