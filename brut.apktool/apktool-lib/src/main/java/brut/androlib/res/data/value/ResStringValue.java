@@ -56,11 +56,4 @@ public class ResStringValue extends ResScalarValue {
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    protected void serializeExtraXmlAttrs(XmlSerializer serializer,
-            ResResource res) throws IOException {
-        if (ResXmlEncoders.hasMultipleNonPositionalSubstitutions(mRawValue)) {
-            serializer.attribute(null, "formatted", "false");
-        }
-    }
 }
