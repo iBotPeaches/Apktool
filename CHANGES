@@ -1,0 +1,55 @@
+v1.5.1 (TBA)
+-Updated smali/baksmali to v1.4.0
+-Removed maven in favor of gradle
+-Removed Maven REPOs that were used if local projects didn’t exist.
+-Merged brut.j.dir,brut.j.common,brut.j.util & brut.apktool.smali (Fork of JesusFreke’s smali) into one repo.
+-Fix –verbose mode to actually work
+-Don’t decompile public.xml (have aapt regenerate it based on resources).
+-Added -o / –original flag to retain system APK signature and inject contents into APK
+
+v1.5.0 (Released September 2 – 2012 ) Codename : Pikmin
+-Fix for colours being decompiled with improper hex colours
+-Fix for <string-array> being treated as array on occasion
+-Support for Mac OS X user:home, instead of dumping frames into /home
+-Updated internal framework.jar to API16
+-Added <user-sdk> reading to insert into apktool.yml to help with aapt building
+-Supported -d mode
+-Added –verbose mode to output contents of AAPT (note this is a HUGE output). Only used for debugging.
+-Ignore bootclasspath on debug mode. (Causes some classes in smali to be fail decompile)
+
+v1.4.10 (Released August 21 – 2012) Codename: KOJAN
+-Fix bad whitespace in manifest.xml
+-Fix for bad decompilation of some APKs (Thanks KOJAN)
+
+v1.4.9 (Released July 28 – 2012) Codename: russia
+-Fix for plurals.xml (Thanks @miuirussia)
+-Added xxhdpi
+-Added uimodes for MIUI built roms
+-Fixed problems resulting with bad ‘ and what not
+
+v1.4.8 (Beta – Released July 8th – 2012) Codename: yyj
+-Fixes for HTC Sense 4.0.4 apks that have an extra com.htc package
+-Fixes merged from yyj (https://github.com/yyjdelete)
+-Reverted 9patch fix due to errors
+
+v1.4.7 ( Release on July 5th)
+-Fixes from (Unreleased v1.4.6)
+-New smali/baksmali v1.3.3
+-Fix for grayscaled images (Thanks Charles)
+-On-going logging code for HTC One Frameworks
+-Changes from adjusted API 13 for localization
+
+v1.4.6 ( Private Release )
+-Fixed missing formatted=”false” due to mis-reading of xlif data.
+-Fixed <item> being replaced by attribute when reference is used instead of string
+-apktool.yml fixes for undefined frameworks
+-Regex changed to identify folders with sw###-port etc
+
+v1.4.5 (January 7, 2012)
+-Updated included framework to API 15
+-Updated include baksmali and smali to v1.3.3-dev
+
+v1.4.4 (December 11, 2011)
+-Updated included baksmali and smali to v1.3.3
+
+prior to v1.4.4 - http://code.google.com/p/android-apktool/wiki/Changelog
