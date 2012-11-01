@@ -49,6 +49,11 @@ public class ResStyleValue extends ResBagValue implements ResValuesXmlSerializab
         }
         for (int i = 0; i < mItems.length; i++) {
             ResResSpec spec = mItems[i].m1.getReferent();
+            
+            // hacky-fix remove bad ReferenceVars
+            if (spec.getDefaultResource().getValue().toString().contains("ResReferenceValue@")) {
+            	continue;
+            }
             ResAttr attr = (ResAttr) spec.getDefaultResource().getValue();
             String value = attr.convertToResXmlFormat(mItems[i].m2);
 

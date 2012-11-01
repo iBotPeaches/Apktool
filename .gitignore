@@ -22,3 +22,7 @@ build*
 *.kate-swp
 *~
 *.project
+*.classpath
+*.settings
+*.setting
+bin/

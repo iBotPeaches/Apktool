@@ -102,7 +102,7 @@ public class ResResSpec {
     }
 
     public ResType getType() {
-        return mType;
+        return getmType();
     }
 
     public void addResource(ResResource res)
@@ -120,6 +120,10 @@ public class ResResSpec {
 
     @Override
     public String toString() {
-        return mId.toString() + " " + mType.toString() + "/" + mName;
+        return mId.toString() + " " + getmType().toString() + "/" + mName;
     }
+
+	public ResType getmType() {
+		return mType;
+	}
 }
