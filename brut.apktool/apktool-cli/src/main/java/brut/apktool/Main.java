@@ -238,7 +238,7 @@ public class Main {
             "Copyright 2010 Ryszard Wiśniewski <brut.alll@gmail.com>\n" +
             "with smali v" + ApktoolProperties.get("smaliVersion") +
             ", and baksmali v" + ApktoolProperties.get("baksmaliVersion") + "\n" +
-            "Updated by iBotPeaches <connor.tumbleson@gmail.com> \n" +
+            "Updated by @iBotPeaches <connor.tumbleson@gmail.com> \n" +
             "Apache License 2.0 (http://www.apache.org/licenses/LICENSE-2.0)\n" +
             "\n" +
             "Usage: apktool [-q|--quiet OR -v|--verbose] COMMAND [...]\n" +
@@ -284,13 +284,13 @@ public class Main {
             "            Skip changes detection and build all files.\n" +
             "        -d, --debug\n" +
             "            Build in debug mode. Check project page for more info.\n" +
-            "        -o, --original\n" +
-            "            Build resources into original APK. Retains signature." +
+           // "        -o, --original\n" +
+           // "            Build resources into original APK. Retains signature." +
             "\n" +
             "    if|install-framework <framework.apk> [<tag>]\n" +
             "        Install framework file to your system.\n" +
             "\n" +
-            "For additional info, see: https://github.com/iBotPeaches/brut.apktool" +
+            "For additional info, see: https://github.com/iBotPeaches/Apktool" +
             "\n" +
             "For smali/baksmali info, see: http://code.google.com/p/smali/"
         );
