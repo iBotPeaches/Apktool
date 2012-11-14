@@ -6,6 +6,7 @@ v1.5.1 (TBA)
 -Removed Maven REPOs that were used if local projects didn’t exist.
 -Merged brut.j.dir,brut.j.common,brut.j.util & brut.apktool.smali (Fork of JesusFreke’s smali) into one repo.
 -Fix –verbose mode to actually work
+-Added SDK API 17 framework
 -Don’t decompile public.xml (have aapt regenerate it based on resources). - REMOVED
 -Added -o / –original flag to retain system APK signature and inject contents into APK - DELAYED
 
