@@ -49,6 +49,11 @@ public class XmlPullStreamDecoder implements ResStreamDecoder {
                     int type = pp.getEventType();
                     
                         if (type == XmlPullParser.START_TAG) {
+                        	if ("packages".equalsIgnoreCase(pp.getName())) {
+                        		try {
+									boolean test = parseAttr(pp);
+								} catch (AndrolibException e) {}
+                        	}
                             if ("uses-sdk".equalsIgnoreCase(pp.getName())) {
                                 try {
                                     hideSdkInfo = parseAttr(pp);

@@ -190,21 +190,41 @@ final public class AndrolibResources {
             mMaxSdkVersion = map.get("maxSdkVersion");
         }
     }
+    
+    public void prepPath() throws AndrolibException {
+    	List<String> cmd = new ArrayList<String>();
+    	
+    	// check for win vs linux
+    	if (System.getProperty("os.name").indexOf("win") >= 0) {
+    		cmd.add("set PATH=%PATH%;" + System.getProperty("user.dir"));
+    	} else {
+    		cmd.add("export PATH=$PATH:" + System.getProperty("user.dir"));
+    	}
+    	
+        try {
+            OS.exec(cmd.toArray(new String[0]));
+        } catch (BrutException ex) {
+            throw new AndrolibException(ex);
+        }
+    }
 
     public void aaptPackage(File apkFile, File manifest, File resDir,
             File rawDir, File assetDir, File[] include, HashMap<String, Boolean> flags) 
             throws AndrolibException {
+    	   	
         List<String> cmd = new ArrayList<String>();
 
         cmd.add("aapt");
         cmd.add("p");
         
-        if (flags.get("verbose")) {
+        if (flags.get("verbose")) { //output aapt verbose
             cmd.add("-v");
         }
-        
         if (flags.get("update")) {
             cmd.add("-u");
+        }
+        if (flags.get("debug")) { //inject debuggable="true" into manifest
+        	cmd.add("--debug-mode");
         }
         if (mMinSdkVersion != null) {
             cmd.add("--min-sdk-version");
@@ -473,6 +493,7 @@ final public class AndrolibResources {
             entry.setCrc(crc.getValue());
             out.putNextEntry(entry);
             out.write(data);
+            zip.close();
 
             LOGGER.info("Framework installed to: " + outFile);
         } catch (ZipException ex) {

@@ -229,7 +229,7 @@ public class ARSCDecoder {
         int size = mIn.readInt();
         if (size < 28) {
             throw new AndrolibException("Config size < 28");
-        }
+        }   
 
         boolean isInvalid = false;
 
@@ -240,7 +240,7 @@ public class ARSCDecoder {
             (char) mIn.readByte(), (char) mIn.readByte()};
         char[] country = new char[]{
             (char) mIn.readByte(), (char) mIn.readByte()};
-
+        
         byte orientation = mIn.readByte();
         byte touchscreen = mIn.readByte();
         short density = mIn.readShort();
@@ -273,10 +273,11 @@ public class ARSCDecoder {
             screenHeightDp = mIn.readShort();
         }
         
-        if (size >= 40) {
-           // mIn.skipBytes(2);
+        short layoutDirection = 0;
+        if (size >= 38 && !this.mPkg.getName().equalsIgnoreCase("com.htc")) {
+        	layoutDirection = mIn.readShort();
         }
-
+               
         int exceedingSize = size - KNOWN_CONFIG_BYTES;
         if (exceedingSize > 0) {
             byte[] buf = new byte[exceedingSize];
@@ -295,7 +296,7 @@ public class ARSCDecoder {
             }
         }
 
-        return new ResConfigFlags(mcc, mnc, language, country, orientation,
+        return new ResConfigFlags(mcc, mnc, language, country, layoutDirection, orientation,
             touchscreen, density, keyboard, navigation, inputFlags,
             screenWidth, screenHeight, sdkVersion, screenLayout, uiMode,
             smallestScreenWidthDp, screenWidthDp, screenHeightDp, isInvalid);
