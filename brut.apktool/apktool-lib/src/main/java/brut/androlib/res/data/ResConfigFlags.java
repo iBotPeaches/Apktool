@@ -190,6 +190,12 @@ public class ResConfigFlags {
                 ret.append("-notlong");
                 break;
         }
+
+	switch (screenLayout & MASK_LAYOUTDIR)	{
+	    case LAYOUTDIR_RTL:
+		ret.append("-ldrtl");
+		break;
+	}
         switch (orientation) {
             case ORIENTATION_PORT:
                 ret.append("-port");
@@ -437,6 +443,9 @@ public class ResConfigFlags {
     public final static byte SCREENLONG_ANY = 0x00;
     public final static byte SCREENLONG_NO = 0x10;
     public final static byte SCREENLONG_YES = 0x20;
+
+    public final static int MASK_LAYOUTDIR = 0xC0;
+    public final static int LAYOUTDIR_RTL = 0x80;
 
     public final static byte MASK_UI_MODE_TYPE = 0x0f;
     public final static byte UI_MODE_TYPE_ANY = 0x00;
