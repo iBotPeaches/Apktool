@@ -27,6 +27,8 @@ public class ResConfigFlags {
 
     public final char[] language;
     public final char[] country;
+    
+    public final short layoutDirection;
 
     public final byte orientation;
     public final byte touchscreen;
@@ -57,6 +59,7 @@ public class ResConfigFlags {
         mnc = 0;
         language = new char[]{'\00', '\00'};
         country = new char[]{'\00', '\00'};
+        layoutDirection = SCREENLAYOUT_LAYOUTDIR_UNDEFINED;
         orientation = ORIENTATION_ANY;
         touchscreen = TOUCHSCREEN_ANY;
         density = DENSITY_DEFAULT;
@@ -76,9 +79,9 @@ public class ResConfigFlags {
     }
 
     public ResConfigFlags(short mcc, short mnc, char[] language, char[] country,
-            byte orientation, byte touchscreen, short density, byte keyboard,
-            byte navigation, byte inputFlags, short screenWidth,
-            short screenHeight, short sdkVersion, byte screenLayout,
+            short layoutDirection, byte orientation, byte touchscreen, 
+            short density, byte keyboard, byte navigation, byte inputFlags, 
+            short screenWidth, short screenHeight, short sdkVersion, byte screenLayout,
             byte uiMode, short smallestScreenWidthDp, short screenWidthDp,
             short screenHeightDp, boolean isInvalid) {
         if (orientation < 0 || orientation > 3) {
@@ -111,6 +114,7 @@ public class ResConfigFlags {
         this.mnc = mnc;
         this.language = language;
         this.country = country;
+        this.layoutDirection = layoutDirection;
         this.orientation = orientation;
         this.touchscreen = touchscreen;
         this.density = density;
@@ -147,6 +151,14 @@ public class ResConfigFlags {
                 ret.append("-r").append(country);
             }
         }
+		switch (screenLayout & MASK_LAYOUTDIR) {
+			case SCREENLAYOUT_LAYOUTDIR_RTL:
+				ret.append("-ldrtl");
+				break;
+			case SCREENLAYOUT_LAYOUTDIR_LTR:
+				ret.append("-ldltr");
+				break;
+		}
         if (smallestScreenWidthDp != 0) {
             ret.append("-sw").append(smallestScreenWidthDp).append("dp");
         }
@@ -385,6 +397,12 @@ public class ResConfigFlags {
     public final static short DENSITY_XHIGH = 320;
     public final static short DENSITY_XXHIGH = 480;
     public final static short DENSITY_NONE = -1;
+    
+    public final static short MASK_LAYOUTDIR = 0xc0;
+    public final static short SCREENLAYOUT_LAYOUTDIR_LTR = 0x40;
+    public final static short SCREENLAYOUT_LAYOUTDIR_RTL = 0x80;
+    public final static short SCREENLAYOUT_LAYOUTDIR_SHIFT = 0x06;
+    public final static short SCREENLAYOUT_LAYOUTDIR_UNDEFINED = 0x00;
 
     public final static byte KEYBOARD_ANY  = 0;
     public final static byte KEYBOARD_NOKEYS  = 1;
@@ -414,7 +432,7 @@ public class ResConfigFlags {
     public final static byte SCREENSIZE_NORMAL = 0x02;
     public final static byte SCREENSIZE_LARGE = 0x03;
     public final static byte SCREENSIZE_XLARGE = 0x04;
-
+   
     public final static byte MASK_SCREENLONG = 0x30;
     public final static byte SCREENLONG_ANY = 0x00;
     public final static byte SCREENLONG_NO = 0x10;

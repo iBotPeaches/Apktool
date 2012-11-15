@@ -241,6 +241,10 @@ public class ARSCDecoder {
         char[] country = new char[]{
             (char) mIn.readByte(), (char) mIn.readByte()};
 
+        short layoutDirection = 0;
+        if (size >= 36) {
+        	layoutDirection = mIn.readShort();
+        }
         byte orientation = mIn.readByte();
         byte touchscreen = mIn.readByte();
         short density = mIn.readShort();
@@ -295,7 +299,7 @@ public class ARSCDecoder {
             }
         }
 
-        return new ResConfigFlags(mcc, mnc, language, country, orientation,
+        return new ResConfigFlags(mcc, mnc, language, country, layoutDirection, orientation,
             touchscreen, density, keyboard, navigation, inputFlags,
             screenWidth, screenHeight, sdkVersion, screenLayout, uiMode,
             smallestScreenWidthDp, screenWidthDp, screenHeightDp, isInvalid);
