@@ -62,7 +62,7 @@ public class baksmali {
                                           boolean noParameterRegisters, boolean useLocalsDirective,
                                           boolean useSequentialLabels, boolean outputDebugInfo, boolean addCodeOffsets,
                                           boolean noAccessorComments, int registerInfo, boolean verify,
-                                          boolean ignoreErrors, String inlineTable)
+                                          boolean ignoreErrors, String inlineTable, boolean checkPackagePrivateAccess)
     {
         baksmali.noParameterRegisters = noParameterRegisters;
         baksmali.useLocalsDirective = useLocalsDirective;
@@ -91,14 +91,15 @@ public class baksmali {
                     if (extraBootClassPathArray == null && isExtJar(dexFilePath)) {
                         extraBootClassPathArray = new String[] {"framework.jar"};
                     }
-                    ClassPath.InitializeClassPathFromOdex(classPathDirs, extraBootClassPathArray, dexFilePath, dexFile);
+                    ClassPath.InitializeClassPathFromOdex(classPathDirs, extraBootClassPathArray, dexFilePath, dexFile,
+                            checkPackagePrivateAccess);
                 } else {
                     String[] bootClassPathArray = null;
                     if (bootClassPath != null) {
                         bootClassPathArray = bootClassPath.split(":");
                     }
                     ClassPath.InitializeClassPath(classPathDirs, bootClassPathArray, extraBootClassPathArray,
-                            dexFilePath, dexFile);
+                            dexFilePath, dexFile, checkPackagePrivateAccess);
                 }
 
                 if (inlineTable != null) {

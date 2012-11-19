@@ -135,7 +135,14 @@ public abstract class InlineMethodResolver {
                 new DeodexUtil.InlineMethod(Static, "Ljava/lang/Float;", "intBitsToFloat", "I", "F"),
                 new DeodexUtil.InlineMethod(Static, "Ljava/lang/Double;", "doubleToLongBits", "D", "J"),
                 new DeodexUtil.InlineMethod(Static, "Ljava/lang/Double;", "doubleToRawLongBits", "D", "J"),
-                new DeodexUtil.InlineMethod(Static, "Ljava/lang/Double;", "longBitsToDouble", "J", "D")
+                new DeodexUtil.InlineMethod(Static, "Ljava/lang/Double;", "longBitsToDouble", "J", "D"),
+                new DeodexUtil.InlineMethod(Static, "Ljava/lang/StrictMath;", "abs", "I", "I"),
+                new DeodexUtil.InlineMethod(Static, "Ljava/lang/StrictMath;", "abs", "J", "J"),
+                new DeodexUtil.InlineMethod(Static, "Ljava/lang/StrictMath;", "abs", "F", "F"),
+                new DeodexUtil.InlineMethod(Static, "Ljava/lang/StrictMath;", "abs", "D", "D"),
+                new DeodexUtil.InlineMethod(Static, "Ljava/lang/StrictMath;", "min", "II", "I"),
+                new DeodexUtil.InlineMethod(Static, "Ljava/lang/StrictMath;", "max", "II", "I"),
+                new DeodexUtil.InlineMethod(Static, "Ljava/lang/StrictMath;", "sqrt", "D", "D"),
             };
         }
 

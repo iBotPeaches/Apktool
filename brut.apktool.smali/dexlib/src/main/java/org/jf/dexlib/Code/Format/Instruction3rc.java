@@ -41,7 +41,8 @@ import org.jf.dexlib.Util.NumberUtils;
 
 import static org.jf.dexlib.Code.Opcode.*;
 
-public class Instruction3rc extends InstructionWithReference implements RegisterRangeInstruction {
+public class Instruction3rc extends InstructionWithReference implements RegisterRangeInstruction,
+        InstructionWithJumboVariant {
     public static final Instruction.InstructionFactory Factory = new Factory();
     private byte regCount;
     private short startReg;
@@ -128,6 +129,15 @@ public class Instruction3rc extends InstructionWithReference implements Register
                 throw new RuntimeException("regCount does not match the number of arguments of the method");
             }
         }
+    }
+
+    public Instruction makeJumbo() {
+        Opcode jumboOpcode = opcode.getJumboOpcode();
+        if (jumboOpcode == null) {
+            return null;
+        }
+
+        return new Instruction5rc(jumboOpcode, getRegCount(), getStartRegister(), getReferencedItem());
     }
 
     private static class Factory implements Instruction.InstructionFactory {

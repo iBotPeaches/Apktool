@@ -34,6 +34,7 @@ import org.jf.util.IndentingWriter;
 import org.jf.dexlib.*;
 import org.jf.dexlib.Code.Analysis.ValidationException;
 import org.jf.dexlib.Code.Format.Instruction21c;
+import org.jf.dexlib.Code.Format.Instruction41c;
 import org.jf.dexlib.Code.Instruction;
 import org.jf.dexlib.EncodedValue.EncodedValue;
 import org.jf.dexlib.Util.AccessFlags;
@@ -82,6 +83,18 @@ public class ClassDefinition {
                         case SPUT_SHORT:
                         case SPUT_WIDE: {
                             Instruction21c ins = (Instruction21c)instruction;
+                            FieldIdItem fieldIdItem = (FieldIdItem)ins.getReferencedItem();
+                            fieldsSetInStaticConstructor.put(fieldIdItem.getIndex(), fieldIdItem);
+                            break;
+                        }
+                        case SPUT_JUMBO:
+                        case SPUT_BOOLEAN_JUMBO:
+                        case SPUT_BYTE_JUMBO:
+                        case SPUT_CHAR_JUMBO:
+                        case SPUT_OBJECT_JUMBO:
+                        case SPUT_SHORT_JUMBO:
+                        case SPUT_WIDE_JUMBO: {
+                            Instruction41c ins = (Instruction41c)instruction;
                             FieldIdItem fieldIdItem = (FieldIdItem)ins.getReferencedItem();
                             fieldsSetInStaticConstructor.put(fieldIdItem.getIndex(), fieldIdItem);
                             break;

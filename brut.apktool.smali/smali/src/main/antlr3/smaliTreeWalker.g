@@ -938,7 +938,13 @@ instruction[int totalMethodRegisters, int methodParameterRegisters, List<Instruc
   | insn_format35c_type[$totalMethodRegisters, $methodParameterRegisters, $instructions] { $outRegisters = $insn_format35c_type.outRegisters; }
   | insn_format3rc_method[$totalMethodRegisters, $methodParameterRegisters, $instructions] { $outRegisters = $insn_format3rc_method.outRegisters; }
   | insn_format3rc_type[$totalMethodRegisters, $methodParameterRegisters, $instructions] { $outRegisters = $insn_format3rc_type.outRegisters; }
+  | insn_format41c_type[$totalMethodRegisters, $methodParameterRegisters, $instructions] { $outRegisters = $insn_format41c_type.outRegisters; }
+  | insn_format41c_field[$totalMethodRegisters, $methodParameterRegisters, $instructions] { $outRegisters = $insn_format41c_field.outRegisters; }
   | insn_format51l_type[$totalMethodRegisters, $methodParameterRegisters, $instructions] { $outRegisters = $insn_format51l_type.outRegisters; }
+  | insn_format52c_type[$totalMethodRegisters, $methodParameterRegisters, $instructions] { $outRegisters = $insn_format52c_type.outRegisters; }
+  | insn_format52c_field[$totalMethodRegisters, $methodParameterRegisters, $instructions] { $outRegisters = $insn_format52c_field.outRegisters; }
+  | insn_format5rc_method[$totalMethodRegisters, $methodParameterRegisters, $instructions] { $outRegisters = $insn_format5rc_method.outRegisters; }
+  | insn_format5rc_type[$totalMethodRegisters, $methodParameterRegisters, $instructions] { $outRegisters = $insn_format5rc_type.outRegisters; }
   | insn_array_data_directive[$totalMethodRegisters, $methodParameterRegisters, $instructions] { $outRegisters = $insn_array_data_directive.outRegisters; }
   | insn_packed_switch_directive[$totalMethodRegisters, $methodParameterRegisters, $instructions] { $outRegisters = $insn_packed_switch_directive.outRegisters; }
   | insn_sparse_switch_directive[$totalMethodRegisters, $methodParameterRegisters, $instructions] { $outRegisters = $insn_sparse_switch_directive.outRegisters; };
@@ -1320,6 +1326,30 @@ insn_format3rc_type[int totalMethodRegisters, int methodParameterRegisters, List
       $instructions.add(new Instruction3rc(opcode, (short)registerCount, startRegister, typeIdItem));
     };
 
+insn_format41c_type[int totalMethodRegisters, int methodParameterRegisters, List<Instruction> instructions] returns[int outRegisters]
+  : //e.g. const-class/jumbo v2, org/jf/HelloWorld2/HelloWorld2
+    ^(I_STATEMENT_FORMAT41c_TYPE INSTRUCTION_FORMAT41c_TYPE REGISTER reference_type_descriptor)
+    {
+      Opcode opcode = Opcode.getOpcodeByName($INSTRUCTION_FORMAT41c_TYPE.text);
+      int regA = parseRegister_short($REGISTER.text, $totalMethodRegisters, $methodParameterRegisters);
+
+      TypeIdItem typeIdItem = $reference_type_descriptor.type;
+
+      $instructions.add(new Instruction41c(opcode, regA, typeIdItem));
+    };
+
+insn_format41c_field[int totalMethodRegisters, int methodParameterRegisters, List<Instruction> instructions] returns[int outRegisters]
+  : //e.g. sget-object/jumbo v0, Ljava/lang/System;->out:LJava/io/PrintStream;
+    ^(I_STATEMENT_FORMAT41c_FIELD INSTRUCTION_FORMAT41c_FIELD REGISTER fully_qualified_field)
+    {
+      Opcode opcode = Opcode.getOpcodeByName($INSTRUCTION_FORMAT41c_FIELD.text);
+      int regA = parseRegister_short($REGISTER.text, $totalMethodRegisters, $methodParameterRegisters);
+
+      FieldIdItem fieldIdItem = $fully_qualified_field.fieldIdItem;
+
+      $instructions.add(new Instruction41c(opcode, regA, fieldIdItem));
+    };
+
 insn_format51l_type[int totalMethodRegisters, int methodParameterRegisters, List<Instruction> instructions] returns[int outRegisters]
   : //e.g. const-wide v0, 5000000000L
     ^(I_STATEMENT_FORMAT51l INSTRUCTION_FORMAT51l REGISTER fixed_64bit_literal)
@@ -1330,6 +1360,64 @@ insn_format51l_type[int totalMethodRegisters, int methodParameterRegisters, List
       long litB = $fixed_64bit_literal.value;
 
       $instructions.add(new Instruction51l(opcode, regA, litB));
+    };
+
+insn_format52c_type[int totalMethodRegisters, int methodParameterRegisters, List<Instruction> instructions] returns[int outRegisters]
+  : //e.g. instance-of/jumbo v0, v1, Ljava/lang/String;
+    ^(I_STATEMENT_FORMAT52c_TYPE INSTRUCTION_FORMAT52c_TYPE registerA=REGISTER registerB=REGISTER nonvoid_type_descriptor)
+    {
+      Opcode opcode = Opcode.getOpcodeByName($INSTRUCTION_FORMAT52c_TYPE.text);
+      int regA = parseRegister_short($registerA.text, $totalMethodRegisters, $methodParameterRegisters);
+      int regB = parseRegister_short($registerB.text, $totalMethodRegisters, $methodParameterRegisters);
+
+      TypeIdItem typeIdItem = $nonvoid_type_descriptor.type;
+
+      $instructions.add(new Instruction52c(opcode, regA, regB, typeIdItem));
+    };
+
+insn_format52c_field[int totalMethodRegisters, int methodParameterRegisters, List<Instruction> instructions] returns[int outRegisters]
+  : //e.g. iput-object/jumbo v1, v0, Lorg/jf/HelloWorld2/HelloWorld2;->helloWorld:Ljava/lang/String;
+    ^(I_STATEMENT_FORMAT52c_FIELD INSTRUCTION_FORMAT52c_FIELD registerA=REGISTER registerB=REGISTER fully_qualified_field)
+    {
+      Opcode opcode = Opcode.getOpcodeByName($INSTRUCTION_FORMAT52c_FIELD.text);
+      int regA = parseRegister_short($registerA.text, $totalMethodRegisters, $methodParameterRegisters);
+      int regB = parseRegister_short($registerB.text, $totalMethodRegisters, $methodParameterRegisters);
+
+      FieldIdItem fieldIdItem = $fully_qualified_field.fieldIdItem;
+
+      $instructions.add(new Instruction52c(opcode, regA, regB, fieldIdItem));
+    };
+
+insn_format5rc_method[int totalMethodRegisters, int methodParameterRegisters, List<Instruction> instructions] returns[int outRegisters]
+  : //e.g. invoke-virtual/jumbo {v25..v26} java/lang/StringBuilder/append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+    ^(I_STATEMENT_FORMAT5rc_METHOD INSTRUCTION_FORMAT5rc_METHOD register_range[$totalMethodRegisters, $methodParameterRegisters] fully_qualified_method)
+    {
+      Opcode opcode = Opcode.getOpcodeByName($INSTRUCTION_FORMAT5rc_METHOD.text);
+      int startRegister = $register_range.startRegister;
+      int endRegister = $register_range.endRegister;
+
+      int registerCount = endRegister-startRegister+1;
+      $outRegisters = registerCount;
+
+      MethodIdItem methodIdItem = $fully_qualified_method.methodIdItem;
+
+      $instructions.add(new Instruction5rc(opcode, registerCount, startRegister, methodIdItem));
+    };
+
+insn_format5rc_type[int totalMethodRegisters, int methodParameterRegisters, List<Instruction> instructions] returns[int outRegisters]
+  : //e.g. filled-new-array/jumbo {v0..v6} I
+    ^(I_STATEMENT_FORMAT5rc_TYPE INSTRUCTION_FORMAT5rc_TYPE register_range[$totalMethodRegisters, $methodParameterRegisters] nonvoid_type_descriptor)
+    {
+      Opcode opcode = Opcode.getOpcodeByName($INSTRUCTION_FORMAT5rc_TYPE.text);
+      int startRegister = $register_range.startRegister;
+      int endRegister = $register_range.endRegister;
+
+      int registerCount = endRegister-startRegister+1;
+      $outRegisters = registerCount;
+
+      TypeIdItem typeIdItem = $nonvoid_type_descriptor.type;
+
+      $instructions.add(new Instruction5rc(opcode, registerCount, startRegister, typeIdItem));
     };
 
 insn_array_data_directive[int totalMethodRegisters, int methodParameterRegisters, List<Instruction> instructions] returns[int outRegisters]
