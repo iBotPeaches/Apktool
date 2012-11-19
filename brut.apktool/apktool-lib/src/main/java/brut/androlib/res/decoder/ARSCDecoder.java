@@ -274,7 +274,7 @@ public class ARSCDecoder {
         }
         
         short layoutDirection = 0;
-        if (size >= 38 && !this.mPkg.getName().equalsIgnoreCase("com.htc")) {
+        if (size >= 38 && sdkVersion >= 17 && !this.mPkg.getName().equalsIgnoreCase("com.htc")) {
         	layoutDirection = mIn.readShort();
         }
                
