@@ -49,7 +49,7 @@ public class SmaliDecoder {
             baksmali.disassembleDexFile(mApkFile.getAbsolutePath(),
                 new DexFile(mApkFile), false, mOutDir.getAbsolutePath(), null,
                 null, null, false, true, true, mBakDeb, false, false, 
-                mDebug ? main.DIFFPRE: 0, false, false, null);
+                mDebug ? main.DIFFPRE: 0, false, false, null, false);
         } catch (IOException ex) {
             throw new AndrolibException(ex);
         }

@@ -1,8 +1,8 @@
 # Apktool #
 
 Links
-- Wiki https://github.com/iBotPeaches/Apktool/wiki
-- Bug Reports https://github.com/iBotPeaches/Apktool/issues
-- Changelog/Information http://connortumbleson.com/apktool-v1-4-5-a-tool-for-reverse-engineering-apk-files/
+- Wiki http://code.google.com/p/android-apktool/w/list
+- Bug Reports http://code.google.com/p/android-apktool/issues/list
+- Changelog/Information http://code.google.com/p/android-apktool/wiki/Changelog
 - XDA Post http://forum.xda-developers.com/showthread.php?p=28366939
 
