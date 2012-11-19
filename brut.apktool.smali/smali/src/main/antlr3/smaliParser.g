@@ -253,7 +253,13 @@ tokens {
   I_STATEMENT_FORMAT35c_TYPE;
   I_STATEMENT_FORMAT3rc_METHOD;
   I_STATEMENT_FORMAT3rc_TYPE;
+  I_STATEMENT_FORMAT41c_TYPE;
+  I_STATEMENT_FORMAT41c_FIELD;
   I_STATEMENT_FORMAT51l;
+  I_STATEMENT_FORMAT52c_TYPE;
+  I_STATEMENT_FORMAT52c_FIELD;
+  I_STATEMENT_FORMAT5rc_METHOD;
+  I_STATEMENT_FORMAT5rc_TYPE;
   I_STATEMENT_ARRAY_DATA;
   I_STATEMENT_PACKED_SWITCH;
   I_STATEMENT_SPARSE_SWITCH;
@@ -858,7 +864,16 @@ instruction returns [int size]
   | insn_format3rc_type { $size = $insn_format3rc_type.size; }
   | insn_format3rmi_method { $size = $insn_format3rmi_method.size; }
   | insn_format3rms_method { $size = $insn_format3rms_method.size; }
+  | insn_format41c_type { $size = $insn_format41c_type.size; }
+  | insn_format41c_field { $size = $insn_format41c_field.size; }
+  | insn_format41c_field_odex { $size = $insn_format41c_field_odex.size; }
   | insn_format51l { $size = $insn_format51l.size; }
+  | insn_format52c_type { $size = $insn_format52c_type.size; }
+  |  insn_format52c_field { $size = $insn_format52c_field.size; }
+  |  insn_format52c_field_odex { $size = $insn_format52c_field_odex.size; }
+  |  insn_format5rc_method { $size = $insn_format5rc_method.size; }
+  |  insn_format5rc_method_odex { $size = $insn_format5rc_method_odex.size; }
+  |  insn_format5rc_type { $size = $insn_format5rc_type.size; }
   | insn_array_data_directive { $size = $insn_array_data_directive.size; }
   | insn_packed_switch_directive { $size = $insn_packed_switch_directive.size; }
   | insn_sparse_switch_directive { $size = $insn_sparse_switch_directive.size; };
@@ -1106,10 +1121,61 @@ insn_format3rms_method returns [int size]
       throwOdexedInstructionException(input, $INSTRUCTION_FORMAT3rms_METHOD.text);
     };
 
+insn_format41c_type returns [int size]
+  : //e.g. const-class/jumbo v2, Lorg/jf/HelloWorld2/HelloWorld2;
+    INSTRUCTION_FORMAT41c_TYPE REGISTER COMMA reference_type_descriptor {$size = Format.Format41c.size;}
+    -> ^(I_STATEMENT_FORMAT41c_TYPE[$start, "I_STATEMENT_FORMAT41c"] INSTRUCTION_FORMAT41c_TYPE REGISTER reference_type_descriptor);
+
+insn_format41c_field returns [int size]
+  : //e.g. sget-object/jumbo v0, Ljava/lang/System;->out:Ljava/io/PrintStream;
+    INSTRUCTION_FORMAT41c_FIELD REGISTER COMMA fully_qualified_field {$size = Format.Format41c.size;}
+    -> ^(I_STATEMENT_FORMAT41c_FIELD[$start, "I_STATEMENT_FORMAT41c_FIELD"] INSTRUCTION_FORMAT41c_FIELD REGISTER fully_qualified_field);
+
+insn_format41c_field_odex returns [int size]
+  : //e.g. sget-object-volatile/jumbo v0, Ljava/lang/System;->out:Ljava/io/PrintStream;
+    INSTRUCTION_FORMAT41c_FIELD_ODEX REGISTER COMMA fully_qualified_field {$size = Format.Format41c.size;}
+    {
+      throwOdexedInstructionException(input, $INSTRUCTION_FORMAT41c_FIELD_ODEX.text);
+    };
+
 insn_format51l returns [int size]
   : //e.g. const-wide v0, 5000000000L
     INSTRUCTION_FORMAT51l REGISTER COMMA fixed_literal {$size = Format.Format51l.size;}
     -> ^(I_STATEMENT_FORMAT51l[$start, "I_STATEMENT_FORMAT51l"] INSTRUCTION_FORMAT51l REGISTER fixed_literal);
+
+insn_format52c_type returns [int size]
+  : //e.g. instance-of/jumbo v0, v1, Ljava/lang/String;
+    INSTRUCTION_FORMAT52c_TYPE REGISTER COMMA REGISTER COMMA nonvoid_type_descriptor {$size = Format.Format52c.size;}
+    -> ^(I_STATEMENT_FORMAT52c_TYPE[$start, "I_STATEMENT_FORMAT52c_TYPE"] INSTRUCTION_FORMAT52c_TYPE REGISTER REGISTER nonvoid_type_descriptor);
+
+insn_format52c_field returns [int size]
+  : //e.g. iput-object/jumbo v1, v0 Lorg/jf/HelloWorld2/HelloWorld2;->helloWorld:Ljava/lang/String;
+    INSTRUCTION_FORMAT52c_FIELD REGISTER COMMA REGISTER COMMA fully_qualified_field {$size = Format.Format52c.size;}
+    -> ^(I_STATEMENT_FORMAT52c_FIELD[$start, "I_STATEMENT_FORMAT52c_FIELD"] INSTRUCTION_FORMAT52c_FIELD REGISTER REGISTER fully_qualified_field);
+
+insn_format52c_field_odex returns [int size]
+  : //e.g. iput-object-volatile/jumbo v1, v0 Lorg/jf/HelloWorld2/HelloWorld2;->helloWorld:Ljava/lang/String;
+    INSTRUCTION_FORMAT52c_FIELD_ODEX REGISTER COMMA REGISTER COMMA fully_qualified_field {$size = Format.Format52c.size;}
+    {
+      throwOdexedInstructionException(input, $INSTRUCTION_FORMAT52c_FIELD_ODEX.text);
+    };
+
+insn_format5rc_method returns [int size]
+  : //e.g. invoke-virtual/jumbo {v25..v26}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+    INSTRUCTION_FORMAT5rc_METHOD OPEN_BRACE register_range CLOSE_BRACE COMMA fully_qualified_method {$size = Format.Format5rc.size;}
+    -> ^(I_STATEMENT_FORMAT5rc_METHOD[$start, "I_STATEMENT_FORMAT5rc_METHOD"] INSTRUCTION_FORMAT5rc_METHOD register_range fully_qualified_method);
+
+insn_format5rc_method_odex returns [int size]
+  : //e.g. invoke-object-init/jumbo {v25}, Ljava/lang/Object-><init>()V
+    INSTRUCTION_FORMAT5rc_METHOD_ODEX OPEN_BRACE register_range CLOSE_BRACE COMMA fully_qualified_method {$size = Format.Format5rc.size;}
+    {
+      throwOdexedInstructionException(input, $INSTRUCTION_FORMAT5rc_METHOD_ODEX.text);
+    };
+
+insn_format5rc_type returns [int size]
+  : //e.g. filled-new-array/jumbo {v0..v6}, I
+    INSTRUCTION_FORMAT5rc_TYPE OPEN_BRACE register_range CLOSE_BRACE COMMA nonvoid_type_descriptor {$size = Format.Format5rc.size;}
+    -> ^(I_STATEMENT_FORMAT5rc_TYPE[$start, "I_STATEMENT_FORMAT5rc_TYPE"] INSTRUCTION_FORMAT5rc_TYPE register_range nonvoid_type_descriptor);
 
 insn_array_data_directive returns [int size]
     @init {boolean needsNop = false;}

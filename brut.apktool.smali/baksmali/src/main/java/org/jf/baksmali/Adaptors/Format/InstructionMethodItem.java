@@ -106,6 +106,7 @@ public class InstructionMethodItem<T extends Instruction> extends MethodItem {
                 return true;
             case Format21c:
             case Format31c:
+            case Format41c:
                 writeOpcode(writer);
                 writer.write(' ');
                 writeFirstRegister(writer);
@@ -141,6 +142,7 @@ public class InstructionMethodItem<T extends Instruction> extends MethodItem {
                 writeLiteral(writer);
                 return true;
             case Format22c:
+            case Format52c:
                 writeOpcode(writer);
                 writer.write(' ');
                 writeFirstRegister(writer);
@@ -206,6 +208,7 @@ public class InstructionMethodItem<T extends Instruction> extends MethodItem {
                 writeVtableIndex(writer);
                 return true;
             case Format3rc:
+            case Format5rc:
                 writeOpcode(writer);
                 writer.write(' ');
                 writeInvokeRangeRegisters(writer);

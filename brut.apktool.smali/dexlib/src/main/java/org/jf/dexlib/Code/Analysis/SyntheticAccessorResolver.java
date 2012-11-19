@@ -90,7 +90,11 @@ public class SyntheticAccessorResolver {
                     return null;
                 }
                 InstructionWithReference instruction = (InstructionWithReference)instructions[0];
-                MethodIdItem referencedMethodIdItem = (MethodIdItem)instruction.getReferencedItem();
+                Item referencedItem = instruction.getReferencedItem();
+                if (!(referencedItem instanceof  MethodIdItem)) {
+                    return null;
+                }
+                MethodIdItem referencedMethodIdItem = (MethodIdItem)referencedItem;
 
                 accessedMember = new AccessedMember(METHOD, referencedMethodIdItem);
                 resolvedAccessors.put(methodIdItem, accessedMember);
@@ -102,9 +106,15 @@ public class SyntheticAccessorResolver {
                     return null;
                 }
                 Instruction22c instruction = (Instruction22c)instructions[0];
-                FieldIdItem referencedFieldIdItem = (FieldIdItem)instruction.getReferencedItem();
+                Item referencedItem = instruction.getReferencedItem();
+                if (!(referencedItem instanceof FieldIdItem)) {
+                    return null;
+                }
+                FieldIdItem referencedFieldIdItem = (FieldIdItem)referencedItem;
 
                 if (instruction.opcode.setsRegister() || instruction.opcode.setsWideRegister()) {
+                    //If the instruction sets a register, that means it is a getter - it gets the field value and
+                    //stores it in the register
                     accessedMember = new AccessedMember(GETTER, referencedFieldIdItem);
                 } else {
                     accessedMember = new AccessedMember(SETTER, referencedFieldIdItem);
@@ -119,20 +129,12 @@ public class SyntheticAccessorResolver {
     }
 
     public static class AccessedMember {
-        private final int accessedMemberType;
-        private final Item accessedMember;
+        public final int accessedMemberType;
+        public final Item accessedMember;
 
         public AccessedMember(int accessedMemberType, Item accessedMember) {
             this.accessedMemberType = accessedMemberType;
             this.accessedMember = accessedMember;
-        }
-
-        public int getAccessedMemberType() {
-            return accessedMemberType;
-        }
-
-        public Item getAccessedMember() {
-            return accessedMember;
         }
     }
 }

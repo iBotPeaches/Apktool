@@ -574,8 +574,51 @@ Type = {PrimitiveType} | {ClassDescriptor} | {ArrayDescriptor}
         return newToken(INSTRUCTION_FORMAT3rms_METHOD);
     }
 
+    "check-cast/jumbo" | "new-instance/jumbo" | "const-class/jumbo" {
+        return newToken(INSTRUCTION_FORMAT41c_TYPE);
+    }
+
+    "sget/jumbo" | "sget-wide/jumbo" | "sget-object/jumbo" | "sget-boolean/jumbo" | "sget-byte/jumbo" |
+    "sget-char/jumbo" | "sget-short/jumbo" | "sput/jumbo" | "sput-wide/jumbo" | "sput-object/jumbo" |
+    "sput-boolean/jumbo" | "sput-byte/jumbo" | "sput-char/jumbo" | "sput-short/jumbo" {
+        return newToken(INSTRUCTION_FORMAT41c_FIELD);
+    }
+
+    "sget-volatile/jumbo" | "sget-wide-volatile/jumbo" | "sget-object-volatile/jumbo" | "sput-volatile/jumbo" |
+    "sput-wide-volatile/jumbo" | "sput-object-volatile/jumbo" {
+        return newToken(INSTRUCTION_FORMAT41c_FIELD_ODEX);
+    }
+
     "const-wide" {
         return newToken(INSTRUCTION_FORMAT51l);
+    }
+
+    "instance-of/jumbo" | "new-array/jumbo" {
+        return newToken(INSTRUCTION_FORMAT52c_TYPE);
+    }
+
+    "iget/jumbo" | "iget-wide/jumbo" | "iget-object/jumbo" | "iget-boolean/jumbo" | "iget-byte/jumbo" |
+    "iget-char/jumbo" | "iget-short/jumbo" | "iput/jumbo" | "iput-wide/jumbo" | "iput-object/jumbo" |
+    "iput-boolean/jumbo" | "iput-byte/jumbo" | "iput-char/jumbo" | "iput-short/jumbo" {
+        return newToken(INSTRUCTION_FORMAT52c_FIELD);
+    }
+
+    "iget-volatile/jumbo" | "iget-wide-volatile/jumbo" | "iget-object-volatile/jumbo" | "iput-volatile/jumbo" |
+    "iput-wide-volatile/jumbo" | "iput-object-volatile/jumbo" {
+        return newToken(INSTRUCTION_FORMAT52c_FIELD_ODEX);
+    }
+
+    "invoke-virtual/jumbo" | "invoke-super/jumbo" | "invoke-direct/jumbo" | "invoke-static/jumbo" |
+    "invoke-interface/jumbo" {
+        return newToken(INSTRUCTION_FORMAT5rc_METHOD);
+    }
+
+    "invoke-object-init/jumbo" {
+        return newToken(INSTRUCTION_FORMAT5rc_METHOD_ODEX);
+    }
+
+    "filled-new-array/jumbo" {
+        return newToken(INSTRUCTION_FORMAT5rc_TYPE);
     }
 }
 

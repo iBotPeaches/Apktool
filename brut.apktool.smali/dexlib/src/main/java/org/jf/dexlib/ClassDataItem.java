@@ -431,10 +431,9 @@ public class ClassDataItem extends Item<ClassDataItem> {
      * Returns the parent type for a non-empty ClassDataItem, or null for an empty one (which could be referenced by
      * multiple ClassDefItem parents)
      *
-     * Specifically, the AnnotationDirectoryItem may be referenced by multiple classes if it has only class annotations,
-     * but not field/method/parameter annotations.
+     * Only an empty ClassDataItem may have multiple parents.
      *
-     * @return The parent type for this AnnotationDirectoryItem, or null if it may have multiple parents
+     * @return The parent type for this ClassDefItem, or null if it may have multiple parents
      */
     @Nullable
     public TypeIdItem getParentType() {

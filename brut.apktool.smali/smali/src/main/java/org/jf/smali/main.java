@@ -100,7 +100,7 @@ public class main {
 
         boolean allowOdex = false;
         boolean sort = false;
-        boolean fixJumbo = true;
+        boolean jumboInstructions = false;
         boolean fixGoto = true;
         boolean verboseErrors = false;
         boolean printTokens = false;
@@ -149,7 +149,7 @@ public class main {
                     sort = true;
                     break;
                 case 'J':
-                    fixJumbo = false;
+                    jumboInstructions = true;
                     break;
                 case 'G':
                     fixGoto = false;
@@ -187,7 +187,7 @@ public class main {
                     }
             }
 
-            Opcode.updateMapsForApiLevel(apiLevel);
+            Opcode.updateMapsForApiLevel(apiLevel, jumboInstructions);
 
             DexFile dexFile = new DexFile();
 
@@ -212,8 +212,8 @@ public class main {
                 dexFile.setSortAllItems(true);
             }
 
-            if (fixJumbo || fixGoto) {
-                fixInstructions(dexFile, fixJumbo, fixGoto);
+            if (fixGoto) {
+                fixInstructions(dexFile, true, fixGoto);
             }
 
             dexFile.place();
@@ -399,8 +399,11 @@ public class main {
                 .withDescription("sort the items in the dex file into a canonical order before writing")
                 .create("S");
 
-        Option noFixJumboOption = OptionBuilder.withLongOpt("no-fix-jumbo")
-                .withDescription("Don't automatically instructions with the /jumbo variant where appropriate")
+        Option jumboInstructionsOption = OptionBuilder.withLongOpt("jumbo-instructions")
+                .withDescription("adds support for the jumbo opcodes that were temporarily available around the" +
+                        " ics timeframe. Note that support for these opcodes was removed from newer version of" +
+                        " dalvik. You shouldn't use this option unless you know the dex file will only be used on a" +
+                        " device that supports these opcodes.")
                 .create("J");
 
         Option noFixGotoOption = OptionBuilder.withLongOpt("no-fix-goto")
@@ -423,7 +426,7 @@ public class main {
 
         debugOptions.addOption(dumpOption);
         debugOptions.addOption(sortOption);
-        debugOptions.addOption(noFixJumboOption);
+        debugOptions.addOption(jumboInstructionsOption);
         debugOptions.addOption(noFixGotoOption);
         debugOptions.addOption(verboseErrorsOption);
         debugOptions.addOption(printTokensOption);

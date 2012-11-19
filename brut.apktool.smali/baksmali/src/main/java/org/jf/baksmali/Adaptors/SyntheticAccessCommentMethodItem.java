@@ -49,14 +49,14 @@ public class SyntheticAccessCommentMethodItem extends MethodItem {
 
     public boolean writeTo(IndentingWriter writer) throws IOException {
         writer.write('#');
-        if (accessedMember.getAccessedMemberType() == SyntheticAccessorResolver.METHOD) {
+        if (accessedMember.accessedMemberType == SyntheticAccessorResolver.METHOD) {
             writer.write("calls: ");
-        } else if (accessedMember.getAccessedMemberType() == SyntheticAccessorResolver.GETTER) {
+        } else if (accessedMember.accessedMemberType == SyntheticAccessorResolver.GETTER) {
             writer.write("getter for: ");
         } else {
             writer.write("setter for: ");
         }
-        ReferenceFormatter.writeReference(writer, accessedMember.getAccessedMember());
+        ReferenceFormatter.writeReference(writer, accessedMember.accessedMember);
         return true;
     }
 }
