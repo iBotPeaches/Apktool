@@ -1,4 +1,8 @@
-v1.5.1 (TBA)
+v1.5.1 PR2 (TBA)
+-Closed file-handler when writing frameworks to file system.
+-Updated to Gradle 1.3
+
+v1.5.1 PR1 (Released November 12 - 2012) Codename: Pre Release 1
 -Updated smali/baksmali to v1.4.1
 -Fixed reference-array problem (BurgerZ)
 -Fixed bad spacing issue on Mac OS X
@@ -7,7 +11,6 @@ v1.5.1 (TBA)
 -Merged brut.j.dir,brut.j.common,brut.j.util & brut.apktool.smali (Fork of JesusFreke’s smali) into one repo.
 -Fix –verbose mode to actually work
 -Added SDK API 17 framework
--Closed file-handler when writing frameworks to file system.
 
 v1.5.0 (Released September 2 – 2012 ) Codename : Pikmin
 -Fix for colours being decompiled with improper hex colours
