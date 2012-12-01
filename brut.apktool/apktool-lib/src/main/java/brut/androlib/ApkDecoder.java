@@ -157,6 +157,10 @@ public class ApkDecoder {
     public void setKeepBrokenResources(boolean keepBrokenResources) {
         mKeepBrokenResources = keepBrokenResources;
     }
+       
+    public void setFrameworkDir(String dir) {
+       mFrameworkDir = dir;    
+    }
 
     public ResTable getResTable() throws AndrolibException {
         if (mResTable == null) {
@@ -167,6 +171,7 @@ public class ApkDecoder {
                     "Apk doesn't contain either AndroidManifest.xml file or resources.arsc file");
             }
             AndrolibResources.sKeepBroken = mKeepBrokenResources;
+            AndrolibResources.sFrameworkFolder = mFrameworkDir;
             mResTable = mAndrolib.getResTable(mApkFile, hasResources);
             mResTable.setFrameTag(mFrameTag);
         }
@@ -279,5 +284,6 @@ public class ApkDecoder {
     private boolean mForceDelete = false;
     private String mFrameTag;
     private boolean mKeepBrokenResources = false;
+    private String mFrameworkDir = null;
     private boolean mBakDeb = true;
 }

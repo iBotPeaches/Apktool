@@ -111,7 +111,11 @@ public class Main {
                 decoder.setDecodeResources(ApkDecoder.DECODE_RESOURCES_NONE);
             } else if ("--keep-broken-res".equals(opt)) {
                 decoder.setKeepBrokenResources(true);
-            } else {
+            } else if ("--framework".equals(opt)) {
+                i++;
+                System.out.println("Using Framework Directory: " + args[i]);
+                decoder.setFrameworkDir(args[i]);
+	    } else {
                 throw new InvalidArgsError();
             }
         }
@@ -262,6 +266,8 @@ public class Main {
             "            Force delete destination directory.\n" +
             "        -t <tag>, --frame-tag <tag>\n" +
             "            Try to use framework files tagged by <tag>.\n" +
+            "           --framework <dir>\n" +
+            "            Use the specified directory for framework files" +            
             "        --keep-broken-res\n" +
             "            Use if there was an error and some resources were dropped, e.g.:\n" +
             "            \"Invalid config flags detected. Dropping resources\", but you\n" +
