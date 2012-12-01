@@ -190,6 +190,12 @@ final public class AndrolibResources {
             mMaxSdkVersion = map.get("maxSdkVersion");
         }
     }
+    
+    public void setPackageInfo(Map<String, String> map) {
+    	if (map != null) {
+    		mPackageRenamed = map.get("package");
+    	}
+    }
 
     public void aaptPackage(File apkFile, File manifest, File resDir,
             File rawDir, File assetDir, File[] include, HashMap<String, Boolean> flags) 
@@ -220,6 +226,11 @@ final public class AndrolibResources {
         if (mMaxSdkVersion != null) {
             cmd.add("--max-sdk-version");
             cmd.add(mMaxSdkVersion);
+        }
+        
+        if (mPackageRenamed != null) {
+        	cmd.add("--rename-manifest-package");
+        	cmd.add(mPackageRenamed);
         }
         cmd.add("-F");
         cmd.add(apkFile.getAbsolutePath());
@@ -581,5 +592,7 @@ final public class AndrolibResources {
     private String mMinSdkVersion = null;
     private String mMaxSdkVersion = null;
     private String mTargetSdkVersion = null;
+    
+    private String mPackageRenamed = null;
 
 }
