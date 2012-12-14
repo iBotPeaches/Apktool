@@ -53,30 +53,31 @@ public class XmlPullStreamDecoder implements ResStreamDecoder {
                         	if ("manifest".equalsIgnoreCase(pp.getName())) {
                         		try {
 									hidePackageInfo = parseManifest(pp);
-									if (hidePackageInfo) {
-										return;
-									}
 								} catch (AndrolibException e) {}
-                        	}
-                            if ("uses-sdk".equalsIgnoreCase(pp.getName())) {
+                        	}else if ("uses-sdk".equalsIgnoreCase(pp.getName())) {
                                 try {
                                     hideSdkInfo = parseAttr(pp);
-                                    if(hideSdkInfo) {
-                                        return;
-                                    }
                                 } catch (AndrolibException e) {}
                             }
                         } else if (hideSdkInfo && type == XmlPullParser.END_TAG && 
-                                "uses-sdk".equalsIgnoreCase(pp.getName())) {
+                                	"uses-sdk".equalsIgnoreCase(pp.getName()) || 
+                                   hidePackageInfo && type == XmlPullParser.END_TAG &&
+                                	"manifest".equalsIgnoreCase(pp.getName())) {
                             return;
                         }
                         super.event(pp);
                     }
                 
                 private boolean parseManifest(XmlPullParser pp) throws AndrolibException {
+                	ResTable restable = resTable;
                 	
-                	// @todo read <manifest> for package:
-                	return false;
+                	// read <manifest> for package:
+                	for (int i = 0; i < pp.getAttributeCount(); i++) {
+                		if (pp.getAttributeName(i).equalsIgnoreCase(("package"))) {
+                			restable.addPackageInfo("orig_package", pp.getAttributeValue(i));
+                		}
+                	}
+                	return true;
                 }
                 
                 private boolean parseAttr(XmlPullParser pp) throws AndrolibException {

@@ -82,7 +82,11 @@ public class ARSCDecoder {
         for (int i = 0; i < packageCount; i++) {
             packages[i] = readPackage();
         }
-
+        
+        // store package
+        if (this.mResTable.isPackageInfoValueSet("cur_package") != true) {
+        	this.mResTable.addPackageInfo("cur_package", packages[0].getName());
+        }
         return packages;
     }
 

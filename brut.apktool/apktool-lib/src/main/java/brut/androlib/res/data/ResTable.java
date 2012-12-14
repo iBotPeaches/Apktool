@@ -143,4 +143,8 @@ public class ResTable {
     public Map<String, String> getPackageInfo() {
     	return mPackageInfo;
     }
+    
+    public boolean isPackageInfoValueSet(String key) {
+    	return (mPackageInfo.containsKey(key));
+    }
 }
