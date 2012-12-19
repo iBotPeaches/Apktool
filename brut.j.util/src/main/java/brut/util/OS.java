@@ -19,7 +19,6 @@ package brut.util;
 import brut.common.BrutException;
 import java.io.*;
 import java.util.Arrays;
-import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
 
