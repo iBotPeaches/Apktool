@@ -154,9 +154,12 @@ final public class AndrolibResources {
 	public void adjust_package_manifest(ResTable resTable, String filePath) 
 			throws AndrolibException {
 
-		// check if packages different
+		// check if packages different, and that package is not equal to "android"
 		Map<String, String> packageInfo = resTable.getPackageInfo();
-		if (!(packageInfo.get("cur_package").equalsIgnoreCase(packageInfo.get("orig_package")))) {
+		if ((packageInfo.get("cur_package").equalsIgnoreCase(packageInfo.get("orig_package")) 
+				|| ("android".equalsIgnoreCase(packageInfo.get("cur_package"))))) {
+				LOGGER.info("Regular manifest package...");
+		} else {	
 			try {
 				
 				LOGGER.info("Renamed manifest package found! Fixing...");

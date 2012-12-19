@@ -344,7 +344,7 @@ public class Androlib {
                     APK_RESOURCES_WITHOUT_RES_FILENAMES);
                 
                 // delete tmpDir
-                OS.rmdir(tmpDir.toString());
+                apkFile.delete();
             }
             return true;
         } catch (IOException ex) {
@@ -404,8 +404,6 @@ public class Androlib {
                 Directory tmpDir = new ExtFile(apkFile).getDirectory();
                 tmpDir.copyToDir(apkDir, APK_MANIFEST_FILENAMES);
                 
-                // delete tmp
-                OS.rmdir(apkDir.getAbsolutePath());
             }
             return true;
         } catch (IOException ex) {
@@ -453,6 +451,8 @@ public class Androlib {
         }
         mAndRes.aaptPackage(outApk, null, null,
             new File(appDir, APK_DIRNAME), assetDir, null, flags);
+        
+        
         
         /* check for re-insert */
         if (flags.get("injectOriginal")) {

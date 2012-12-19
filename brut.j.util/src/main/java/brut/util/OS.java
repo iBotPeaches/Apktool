@@ -19,6 +19,8 @@ package brut.util;
 import brut.common.BrutException;
 import java.io.*;
 import java.util.Arrays;
+import java.util.Set;
+
 import org.apache.commons.io.IOUtils;
 
 /**
@@ -39,6 +41,11 @@ public class OS {
             }
         }
         dir.delete();
+    }
+        
+    public static void rmfile(String file) throws BrutException {
+    	File del = new File(file);
+    	del.delete();
     }
 
     public static void rmdir(String dir) throws BrutException {
