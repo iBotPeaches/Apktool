@@ -24,6 +24,8 @@ import brut.androlib.err.CantFindFrameworkResException;
 import brut.androlib.err.InFileNotFoundException;
 import brut.androlib.err.OutDirExistsException;
 import brut.androlib.res.util.ExtFile;
+import brut.common.BrutException;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -35,7 +37,7 @@ import java.util.logging.*;
  */
 public class Main {
     public static void main(String[] args)
-            throws IOException, AndrolibException, InterruptedException {
+            throws IOException, InterruptedException, BrutException {
         try {
             Verbosity verbosity = Verbosity.NORMAL;
             int i;
@@ -156,8 +158,7 @@ public class Main {
         }
     }
 
-    private static void cmdBuild(String[] args) throws InvalidArgsError,
-            AndrolibException {
+    private static void cmdBuild(String[] args) throws BrutException {
         
         // hold all the fields
         HashMap<String, Boolean> flags = new HashMap<String, Boolean>();

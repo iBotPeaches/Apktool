@@ -101,8 +101,7 @@ public class ApkDecoder {
 			}
 		} else {
 			// if there's no resources.asrc, decode the manifest without looking
-			// up
-			// attribute references
+			// up attribute references
 			if (hasManifest()) {
 				switch (mDecodeResources) {
 				case DECODE_RESOURCES_NONE:

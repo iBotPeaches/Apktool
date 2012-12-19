@@ -31,7 +31,24 @@ import java.io.*;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.zip.*;
+
+import java.io.File;
+import java.io.IOException;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+
 import org.apache.commons.io.IOUtils;
+import org.xml.sax.SAXException;
 import org.xmlpull.v1.XmlSerializer;
 
 /**
@@ -128,9 +145,52 @@ final public class AndrolibResources {
 			LOGGER.info("Decoding AndroidManifest.xml with only framework resources...");
 			fileDecoder.decodeManifest(inApk, "AndroidManifest.xml", out,
 					"AndroidManifest.xml");
-
+			
 		} catch (DirectoryException ex) {
 			throw new AndrolibException(ex);
+		}
+	}
+	
+	public void adjust_package_manifest(ResTable resTable, String filePath) 
+			throws AndrolibException {
+
+		// check if packages different
+		Map<String, String> packageInfo = resTable.getPackageInfo();
+		if (!(packageInfo.get("cur_package").equalsIgnoreCase(packageInfo.get("orig_package")))) {
+			try {
+				
+				LOGGER.info("Renamed manifest package found! Fixing...");
+				DocumentBuilderFactory docFactory = DocumentBuilderFactory
+						.newInstance();
+				DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+				Document doc = docBuilder.parse(filePath.toString());
+
+				// Get the manifest line
+				Node manifest = doc.getFirstChild();
+
+				// update package attribute
+				NamedNodeMap attr = manifest.getAttributes();
+				Node nodeAttr = attr.getNamedItem("package");
+				mPackageRenamed = nodeAttr.getNodeValue();
+				nodeAttr.setNodeValue(packageInfo.get("cur_package"));
+				
+				// re-save manifest.
+				// fancy an auto-sort :p
+				TransformerFactory transformerFactory = TransformerFactory.newInstance();
+				Transformer transformer = transformerFactory.newTransformer();
+				DOMSource source = new DOMSource(doc);
+				StreamResult result = new StreamResult(new File(filePath));
+				transformer.transform(source, result);
+				
+			} catch (ParserConfigurationException ex) {
+				throw new AndrolibException(ex);
+			} catch (TransformerException ex) {
+				throw new AndrolibException(ex);
+			} catch (IOException ex) {
+				throw new AndrolibException(ex);
+			} catch (SAXException ex) {
+				throw new AndrolibException(ex);
+			}
 		}
 	}
 
@@ -152,6 +212,9 @@ final public class AndrolibResources {
 
 			fileDecoder.decodeManifest(inApk, "AndroidManifest.xml", out,
 					"AndroidManifest.xml");
+			
+			// fix package if needed
+			adjust_package_manifest(resTable, outDir.getAbsolutePath() + "/AndroidManifest.xml");
 
 			if (inApk.containsDir("res")) {
 				in = inApk.getDir("res");
@@ -228,7 +291,6 @@ final public class AndrolibResources {
 			cmd.add("--max-sdk-version");
 			cmd.add(mMaxSdkVersion);
 		}
-
 		if (mPackageRenamed != null) {
 			cmd.add("--rename-manifest-package");
 			cmd.add(mPackageRenamed);

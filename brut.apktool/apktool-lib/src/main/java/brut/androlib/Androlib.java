@@ -33,10 +33,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-import net.lingala.zip4j.core.ZipFile;
-import net.lingala.zip4j.exception.ZipException;
-import net.lingala.zip4j.model.ZipParameters;
-import net.lingala.zip4j.util.Zip4jConstants;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
@@ -106,7 +102,7 @@ public class Androlib {
     public void decodeResourcesRaw(ExtFile apkFile, File outDir)
             throws AndrolibException {
         try {
-            Directory apk = apkFile.getDirectory();
+            //Directory apk = apkFile.getDirectory();
             LOGGER.info("Copying raw resources...");
             apkFile.getDirectory().copyToDir(outDir, APK_RESOURCES_FILENAMES);
         } catch (DirectoryException ex) {
@@ -176,12 +172,12 @@ public class Androlib {
     }
 
     public void build(File appDir, File outFile, 
-            HashMap<String, Boolean> flags, ExtFile origApk) throws AndrolibException {
+            HashMap<String, Boolean> flags, ExtFile origApk) throws BrutException {
         build(new ExtFile(appDir), outFile, flags, origApk);
     }
 
     public void build(ExtFile appDir, File outFile, 
-            HashMap<String, Boolean> flags, ExtFile origApk) throws AndrolibException {
+            HashMap<String, Boolean> flags, ExtFile origApk) throws BrutException {
         Map<String, Object> meta = readMetaFile(appDir);
         Object t1 = meta.get("isFrameworkApk");
         flags.put("framework", t1 == null ? false : (Boolean) t1);
@@ -280,7 +276,7 @@ public class Androlib {
 
     public void buildResources(ExtFile appDir,  HashMap<String, Boolean> flags,
             Map<String, Object> usesFramework)
-            throws AndrolibException {
+            throws BrutException {
         if (! buildResourcesRaw(appDir, flags)
                 && ! buildResourcesFull(appDir, flags, usesFramework) 
                 && ! buildManifest(appDir, flags, usesFramework)) {
@@ -346,13 +342,18 @@ public class Androlib {
                 tmpDir.copyToDir(apkDir,
                     tmpDir.containsDir("res") ? APK_RESOURCES_FILENAMES :
                     APK_RESOURCES_WITHOUT_RES_FILENAMES);
+                
+                // delete tmpDir
+                OS.rmdir(tmpDir.toString());
             }
             return true;
         } catch (IOException ex) {
             throw new AndrolibException(ex);
         } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
-        }
+        } catch (BrutException ex) {
+        	throw new AndrolibException(ex);
+		}
     }
 
     public boolean buildManifestRaw(ExtFile appDir,  HashMap<String, Boolean> flags)
@@ -370,7 +371,7 @@ public class Androlib {
 
     public boolean buildManifest(ExtFile appDir,  HashMap<String, Boolean> flags,
             Map<String, Object> usesFramework)
-            throws AndrolibException {
+            throws BrutException {
         try {
             if (! new File(appDir, "AndroidManifest.xml").exists()) {
                 return false;
@@ -397,11 +398,14 @@ public class Androlib {
                     new File(appDir, "AndroidManifest.xml"),
                     null,
                     ninePatch, null, parseUsesFramework(usesFramework),
-                   flags
+                    flags
                 );
 
                 Directory tmpDir = new ExtFile(apkFile).getDirectory();
                 tmpDir.copyToDir(apkDir, APK_MANIFEST_FILENAMES);
+                
+                // delete tmp
+                OS.rmdir(apkDir.getAbsolutePath());
             }
             return true;
         } catch (IOException ex) {
