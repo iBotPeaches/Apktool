@@ -1,6 +1,10 @@
 v1.5.1 PR2 (TBA)
 -Closed file-handler when writing frameworks to file system.
 -Updated to Gradle 1.3
+-Properly deleted tmp files after building apk (#365)
+-Added support for renamed packages via --renamed-manifest-package (#252)
+-Prevents removal of <uses-sdk> on decompile, but then throws warning on rebuild (#366)
+-Option to specify framework folder (#175)
 
 v1.5.1 PR1 (Released November 12 - 2012) Codename: Pre Release 1
 -Updated smali/baksmali to v1.4.1
