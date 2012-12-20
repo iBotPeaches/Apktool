@@ -509,7 +509,7 @@ public class Androlib {
         return version.endsWith("-SNAPSHOT") ?
                 version.substring(0, version.length() - 9) + '.' +
                     ApktoolProperties.get("git.commit.id.abbrev")
-                : version;
+                : version.substring(0,version.length() - 1);
     }
 
     private File[] parseUsesFramework(Map<String, Object> usesFramework)

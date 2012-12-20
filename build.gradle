@@ -2,6 +2,8 @@ apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'license'
 ext.apktoolversion = '1.5.1-SNAPSHOT'
+ext.fullrev = '';
+ext.gitrev_version = '';
 import org.apache.tools.ant.filters.*
 
 repositories {
@@ -24,6 +26,10 @@ dependencies {
 
 task wrapper(type: Wrapper) {
     gradleVersion = '1.3'
+}
+
+// If anyone uses this outside of GoogleCode (Apktool) developers. I will hunt you down and hurt you.
+task release {
 }
 
 buildscript {
@@ -84,14 +90,22 @@ subprojects {
 	}
     }
     project(':brut.apktool:apktool-lib') {
+    
+	    // kudos #smali - JesusFreke, for how to build release task
+	    if (!('release' in gradle.startParameter.taskNames)) {
+	      ant.loadfile(srcFile: "../../.git/refs/heads/master", property: fullrev)
+	      gitrev_version = ant.properties[fullrev].substring(0,10);
+	      println "Building SNAPSHOT: " + gitrev_version;
+	    } else {
+	      gitrev_version = '';
+	      println "Building RELEASE: " + apktoolversion;
+	    }
 
 	    processResources {
                from('src/main/resources/properties') {
 		    include '**/*.properties'
                     into 'properties'
-		    ext.fullrev = ''
-		    ant.loadfile(srcFile: "../../.git/refs/heads/master", property: ext.fullrev)
-		    filter(ReplaceTokens, tokens: [version: apktoolversion, gitrev: ant.properties[ext.fullrev].substring(0,10)])
+		     filter(ReplaceTokens, tokens: [version: apktoolversion, gitrev: gitrev_version] )
                }
                from('src/main/resources/') {
 		    include '**/*.jar'
