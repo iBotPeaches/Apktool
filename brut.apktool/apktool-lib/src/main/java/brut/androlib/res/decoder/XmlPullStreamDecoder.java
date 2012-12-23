@@ -64,13 +64,16 @@ public class XmlPullStreamDecoder implements ResStreamDecoder {
                         	}else if ("uses-sdk".equalsIgnoreCase(pp.getName())) {
                                 try {
                                     hideSdkInfo = parseAttr(pp);
+                                    if(hideSdkInfo) {
+                                    	return;                               
+                                    }
                                 } catch (AndrolibException e) {}
                             }
                         } else if (hideSdkInfo && type == XmlPullParser.END_TAG && 
-                                	"uses-sdk".equalsIgnoreCase(pp.getName()) || 
-                                   hidePackageInfo && type == XmlPullParser.END_TAG &&
+                                	"uses-sdk".equalsIgnoreCase(pp.getName())) {
+                        	return;
+                        } else if (hidePackageInfo && type == XmlPullParser.END_TAG &&
                                 	"manifest".equalsIgnoreCase(pp.getName())) {
-                        	
                         	super.event(pp);
                             return;
                         }
