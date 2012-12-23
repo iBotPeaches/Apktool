@@ -45,7 +45,7 @@ public class BuildAndDecodeTest {
 
         LOGGER.info("Building testapp.apk...");
         ExtFile blank = null;
-        new Androlib().build(sTestOrigDir, testApk, BuildAndDecodeTest.returnStock(),blank);
+        new Androlib().build(sTestOrigDir, testApk, BuildAndDecodeTest.returnStock(),blank,"");
 
         LOGGER.info("Decoding testapp.apk...");
         ApkDecoder apkDecoder = new ApkDecoder(testApk);
@@ -118,7 +118,7 @@ public class BuildAndDecodeTest {
 
     @Test
     public void qualifiersTest() throws BrutException {
-        compareValuesFiles("values-mcc004-mnc4-en-rUS-sw100dp-w200dp-h300dp" +
+        compareValuesFiles("values-mcc004-mnc4-en-rUS-ldrtl-sw100dp-w200dp-h300dp" +
                 "-xlarge-long-land-desk-night-xhdpi-finger-keyssoft-12key" +
                 "-navhidden-dpad/strings.xml");
     }

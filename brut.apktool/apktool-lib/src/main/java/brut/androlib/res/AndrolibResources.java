@@ -266,11 +266,25 @@ final public class AndrolibResources {
 
 	public void aaptPackage(File apkFile, File manifest, File resDir,
 			File rawDir, File assetDir, File[] include,
-			HashMap<String, Boolean> flags) throws AndrolibException {
+			HashMap<String, Boolean> flags, String aaptPath) throws AndrolibException {
 
 		List<String> cmd = new ArrayList<String>();
+		
+		// path for aapt binary
+		if (!aaptPath.isEmpty()) {
+			File aaptFile = new File(aaptPath);
+			if (aaptFile.canRead() && aaptFile.exists()) {
+				aaptFile.setExecutable(true);
+				cmd.add(aaptFile.getPath());
+				LOGGER.info(aaptFile.getPath() + " being used as aapt location.");
+			} else {
+				LOGGER.warning("aapt location could not be found. Defaulting back to default");
+				cmd.add("aapt");
+			}
+		} else {
+			cmd.add("aapt");
+		}
 
-		cmd.add("aapt");
 		cmd.add("p");
 
 		if (flags.get("verbose")) { // output aapt verbose

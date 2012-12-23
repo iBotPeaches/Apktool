@@ -172,12 +172,14 @@ public class Androlib {
     }
 
     public void build(File appDir, File outFile, 
-            HashMap<String, Boolean> flags, ExtFile origApk) throws BrutException {
-        build(new ExtFile(appDir), outFile, flags, origApk);
+            HashMap<String, Boolean> flags, ExtFile origApk, String aaptPath) throws BrutException {
+        build(new ExtFile(appDir), outFile, flags, origApk, aaptPath);
     }
 
     public void build(ExtFile appDir, File outFile, 
-            HashMap<String, Boolean> flags, ExtFile origApk) throws BrutException {
+            HashMap<String, Boolean> flags, ExtFile origApk, String aaptPath) throws BrutException {
+    	
+    	mAaptPath = aaptPath;
         Map<String, Object> meta = readMetaFile(appDir);
         Object t1 = meta.get("isFrameworkApk");
         flags.put("framework", t1 == null ? false : (Boolean) t1);
@@ -335,7 +337,7 @@ public class Androlib {
                     new File(appDir, "AndroidManifest.xml"),
                     new File(appDir, "res"),
                     ninePatch, null, parseUsesFramework(usesFramework),
-                    flags
+                    flags, mAaptPath
                 );
 
                 Directory tmpDir = new ExtFile(apkFile).getDirectory();
@@ -398,7 +400,7 @@ public class Androlib {
                     new File(appDir, "AndroidManifest.xml"),
                     null,
                     ninePatch, null, parseUsesFramework(usesFramework),
-                    flags
+                    flags, mAaptPath
                 );
 
                 Directory tmpDir = new ExtFile(apkFile).getDirectory();
@@ -450,7 +452,7 @@ public class Androlib {
             assetDir = null;
         }
         mAndRes.aaptPackage(outApk, null, null,
-            new File(appDir, APK_DIRNAME), assetDir, null, flags);
+            new File(appDir, APK_DIRNAME), assetDir, null, flags, mAaptPath);
         
         
         
@@ -564,6 +566,7 @@ public class Androlib {
         
 
     private ExtFile mOrigApkFile = null;
+    private String mAaptPath = null;
     
     private final static Logger LOGGER =
         Logger.getLogger(Androlib.class.getName());

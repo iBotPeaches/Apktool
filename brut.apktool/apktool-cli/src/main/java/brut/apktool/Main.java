@@ -113,7 +113,7 @@ public class Main {
                 decoder.setDecodeResources(ApkDecoder.DECODE_RESOURCES_NONE);
             } else if ("--keep-broken-res".equals(opt)) {
                 decoder.setKeepBrokenResources(true);
-            } else if ("--framework".equals(opt)) {
+            } else if ("--frame-path".equals(opt)) {
                 i++;
                 System.out.println("Using Framework Directory: " + args[i]);
                 decoder.setFrameworkDir(args[i]);
@@ -172,6 +172,7 @@ public class Main {
         int i;
         int skip = 0;
         ExtFile mOrigApk = null;
+        String mAaptPath = null;
         for (i = 0; i < args.length; i++) {
             String opt = args[i];
             if (! opt.startsWith("-")) {
@@ -183,6 +184,9 @@ public class Main {
                 flags.put("debug", true);
             } else if ("-v".equals(opt) || "--verbose".equals(opt)) {
                 flags.put("verbose", true);
+            } else if ("-a".equals(opt) || "--aapt".equals(opt)) {
+            	mAaptPath = args[i + 1];
+            	skip = 1;
             } else if ("-o".equals(opt) || "--original".equals(opt)) {
                 if (args.length >= 4) {
                     throw new InvalidArgsError();
@@ -211,7 +215,7 @@ public class Main {
                 throw new InvalidArgsError();
         }
         
-        new Androlib().build(new File(appDirName), outFile, flags, mOrigApk);
+        new Androlib().build(new File(appDirName), outFile, flags, mOrigApk, mAaptPath);
     }
 
     private static void cmdInstallFramework(String[] args)
@@ -267,8 +271,8 @@ public class Main {
             "            Force delete destination directory.\n" +
             "        -t <tag>, --frame-tag <tag>\n" +
             "            Try to use framework files tagged by <tag>.\n" +
-            "           --framework <dir>\n" +
-            "            Use the specified directory for framework files" +            
+            "        --frame-path <dir>\n" +
+            "            Use the specified directory for framework files\n" +            
             "        --keep-broken-res\n" +
             "            Use if there was an error and some resources were dropped, e.g.:\n" +
             "            \"Invalid config flags detected. Dropping resources\", but you\n" +
@@ -291,13 +295,15 @@ public class Main {
             "            Skip changes detection and build all files.\n" +
             "        -d, --debug\n" +
             "            Build in debug mode. Check project page for more info.\n" +
+            "        -a, --aapt\n" +
+            "            Loads aapt from specified location.\n" +
            // "        -o, --original\n" +
            // "            Build resources into original APK. Retains signature." +
             "\n" +
             "    if|install-framework <framework.apk> [<tag>]\n" +
             "        Install framework file to your system.\n" +
             "\n" +
-            "For additional info, see: https://github.com/iBotPeaches/Apktool" +
+            "For additional info, see: http://code.google.com/p/android-apktool/" +
             "\n" +
             "For smali/baksmali info, see: http://code.google.com/p/smali/"
         );
