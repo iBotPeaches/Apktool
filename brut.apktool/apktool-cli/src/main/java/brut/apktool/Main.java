@@ -172,7 +172,7 @@ public class Main {
         int i;
         int skip = 0;
         ExtFile mOrigApk = null;
-        String mAaptPath = null;
+        String mAaptPath = "";
         for (i = 0; i < args.length; i++) {
             String opt = args[i];
             if (! opt.startsWith("-")) {
