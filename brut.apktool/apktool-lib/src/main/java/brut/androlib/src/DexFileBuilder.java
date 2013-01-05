@@ -43,7 +43,7 @@ public class DexFileBuilder {
             if (! SmaliMod.assembleSmaliFile(
                     smaliStream, name, mDexFile, false, false, false)) {
                 throw new AndrolibException(
-                    "Could not smali file: " + smaliStream);
+                    "Could not smali file: " + name);
             }
         } catch (IOException ex) {
             throw new AndrolibException(ex);
