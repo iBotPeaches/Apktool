@@ -53,6 +53,8 @@ public class ResConfigFlags {
     public final boolean isInvalid;
 
     private final String mQualifiers;
+    
+    public final short oppoflag;
 
     public ResConfigFlags() {
         mcc = 0;
@@ -76,6 +78,7 @@ public class ResConfigFlags {
         screenHeightDp = 0;
         isInvalid = false;
         mQualifiers = "";
+        oppoflag = 0;
     }
 
     public ResConfigFlags(short mcc, short mnc, char[] language, char[] country,
@@ -83,7 +86,7 @@ public class ResConfigFlags {
             short density, byte keyboard, byte navigation, byte inputFlags, 
             short screenWidth, short screenHeight, short sdkVersion, byte screenLayout,
             byte uiMode, short smallestScreenWidthDp, short screenWidthDp,
-            short screenHeightDp, boolean isInvalid) {
+            short screenHeightDp, boolean isInvalid, short oppoflag) {
         if (orientation < 0 || orientation > 3) {
             LOGGER.warning("Invalid orientation value: " + orientation);
             orientation = 0;
@@ -130,6 +133,7 @@ public class ResConfigFlags {
         this.screenWidthDp = screenWidthDp;
         this.screenHeightDp = screenHeightDp;
         this.isInvalid = isInvalid;
+        this.oppoflag = oppoflag;
         mQualifiers = generateQualifiers();
     }
 
@@ -327,6 +331,11 @@ public class ResConfigFlags {
         if (sdkVersion > getNaturalSdkVersionRequirement()) {
             ret.append("-v").append(sdkVersion);
         }
+        
+        if (oppoflag == 1) {
+        	ret.append("-oppo");
+        }
+        
         if (isInvalid) {
             ret.append("-ERR" + sErrCounter++);
         }

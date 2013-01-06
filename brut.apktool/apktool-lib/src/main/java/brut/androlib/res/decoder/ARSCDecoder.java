@@ -230,12 +230,14 @@ public class ARSCDecoder {
     }
 
     private ResConfigFlags readConfigFlags() throws IOException, AndrolibException {
-        int size = mIn.readInt();
+        short size = mIn.readShort();
         if (size < 28) {
             throw new AndrolibException("Config size < 28");
         }   
 
         boolean isInvalid = false;
+        
+        short oppoflag = mIn.readShort();
 
         short mcc = mIn.readShort();
         short mnc = mIn.readShort();
@@ -300,10 +302,13 @@ public class ARSCDecoder {
             }
         }
 
-        return new ResConfigFlags(mcc, mnc, language, country, layoutDirection, orientation,
+
+        ResConfigFlags flags = ResConfigFlags(mcc, mnc, language, country, layoutDirection, orientation,
             touchscreen, density, keyboard, navigation, inputFlags,
             screenWidth, screenHeight, sdkVersion, screenLayout, uiMode,
-            smallestScreenWidthDp, screenWidthDp, screenHeightDp, isInvalid);
+            smallestScreenWidthDp, screenWidthDp, screenHeightDp, isInvalid, oppoflag);
+            
+        return flags;
     }
 
     private void addMissingResSpecs() throws AndrolibException {
