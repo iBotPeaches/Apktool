@@ -21,44 +21,48 @@ import brut.androlib.AndrolibException;
 import brut.androlib.res.data.*;
 import brut.androlib.res.data.value.*;
 import brut.util.Duo;
-import brut.androlib.res.data.ResTable;
 import brut.util.ExtDataInput;
 import com.mindprod.ledatastream.LEDataInputStream;
-import java.io.*;
-import java.math.BigInteger;
-import java.util.*;
-import java.util.logging.Logger;
 import org.apache.commons.io.input.CountingInputStream;
+
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
 public class ARSCDecoder {
     public static ARSCData decode(InputStream arscStream,
-            boolean findFlagsOffsets, boolean keepBroken)
+                                  boolean findFlagsOffsets, boolean keepBroken)
             throws AndrolibException {
         return decode(arscStream, findFlagsOffsets, keepBroken, new ResTable());
     }
 
     public static ARSCData decode(InputStream arscStream,
-            boolean findFlagsOffsets, boolean keepBroken, ResTable resTable)
+                                  boolean findFlagsOffsets, boolean keepBroken, ResTable resTable)
             throws AndrolibException {
         try {
             ARSCDecoder decoder = new ARSCDecoder(arscStream, resTable,
-                findFlagsOffsets, keepBroken);
+                    findFlagsOffsets, keepBroken);
             ResPackage[] pkgs = decoder.readTable();
             return new ARSCData(
-                pkgs,
-                decoder.mFlagsOffsets == null ? null :
-                    decoder.mFlagsOffsets.toArray(new FlagsOffset[0]),
-                resTable);
+                    pkgs,
+                    decoder.mFlagsOffsets == null ? null :
+                            decoder.mFlagsOffsets.toArray(new FlagsOffset[0]),
+                    resTable);
         } catch (IOException ex) {
             throw new AndrolibException("Could not decode arsc file", ex);
         }
     }
 
     private ARSCDecoder(InputStream arscStream, ResTable resTable,
-            boolean storeFlagsOffsets, boolean keepBroken) {
+                        boolean storeFlagsOffsets, boolean keepBroken) {
         if (storeFlagsOffsets) {
             arscStream = mCountIn = new CountingInputStream(arscStream);
             mFlagsOffsets = new ArrayList<FlagsOffset>();
@@ -82,11 +86,11 @@ public class ARSCDecoder {
         for (int i = 0; i < packageCount; i++) {
             packages[i] = readPackage();
         }
-        
-        // store package
+
         if (this.mResTable.isPackageInfoValueSet("cur_package") != true) {
-        	this.mResTable.addPackageInfo("cur_package", packages[0].getName());
+            this.mResTable.addPackageInfo("cur_package", packages[0].getName());
         }
+
         return packages;
     }
 
@@ -94,10 +98,14 @@ public class ARSCDecoder {
         checkChunkType(Header.TYPE_PACKAGE);
         int id = (byte) mIn.readInt();
         String name = mIn.readNulEndedString(128, true);
-        /*typeNameStrings*/ mIn.skipInt();
-        /*typeNameCount*/ mIn.skipInt();
-        /*specNameStrings*/ mIn.skipInt();
-        /*specNameCount*/ mIn.skipInt();
+        /*typeNameStrings*/
+        mIn.skipInt();
+        /*typeNameCount*/
+        mIn.skipInt();
+        /*specNameStrings*/
+        mIn.skipInt();
+        /*specNameCount*/
+        mIn.skipInt();
 
         mTypeNames = StringBlock.read(mIn);
         mSpecNames = StringBlock.read(mIn);
@@ -115,7 +123,7 @@ public class ARSCDecoder {
 
     private ResType readType() throws AndrolibException, IOException {
         checkChunkType(Header.TYPE_TYPE);
-        byte id =  mIn.readByte();
+        byte id = mIn.readByte();
         mIn.skipBytes(3);
         int entryCount = mIn.readInt();
 
@@ -125,7 +133,8 @@ public class ARSCDecoder {
         if (mFlagsOffsets != null) {
             mFlagsOffsets.add(new FlagsOffset(mCountIn.getCount(), entryCount));
         }
-        /*flags*/ mIn.skipBytes(entryCount * 4);
+        /*flags*/
+        mIn.skipBytes(entryCount * 4);
 
         mResId = (0xff000000 & mResId) | id << 16;
         mType = new ResType(mTypeNames.getString(id - 1), mResTable, mPkg);
@@ -142,9 +151,11 @@ public class ARSCDecoder {
 
     private ResConfig readConfig() throws IOException, AndrolibException {
         checkChunkType(Header.TYPE_CONFIG);
-        /*typeId*/ mIn.skipInt();
+        /*typeId*/
+        mIn.skipInt();
         int entryCount = mIn.readInt();
-        /*entriesStart*/ mIn.skipInt();
+        /*entriesStart*/
+        mIn.skipInt();
 
         ResConfigFlags flags = readConfigFlags();
         int[] entryOffsets = mIn.readIntArray(entryCount);
@@ -152,16 +163,16 @@ public class ARSCDecoder {
         if (flags.isInvalid) {
             String resName = mType.getName() + flags.getQualifiers();
             if (mKeepBroken) {
-                LOGGER.warning(
-                    "Invalid config flags detected: " + resName);
+                /*LOGGER.warning(
+                        "Invalid config flags detected: " + resName);*/
             } else {
                 LOGGER.warning(
-                    "Invalid config flags detected. Dropping resources: " + resName);
+                        "Invalid config flags detected. Dropping resources: " + resName);
             }
         }
 
-        mConfig = flags.isInvalid && ! mKeepBroken ?
-            null : mPkg.getOrCreateConfig(flags);
+        mConfig = flags.isInvalid && !mKeepBroken ?
+                null : mPkg.getOrCreateConfig(flags);
 
         for (int i = 0; i < entryOffsets.length; i++) {
             if (entryOffsets[i] != -1) {
@@ -170,17 +181,18 @@ public class ARSCDecoder {
                 readEntry();
             }
         }
-        
+
         return mConfig;
     }
 
     private void readEntry() throws IOException, AndrolibException {
-        /*size*/ mIn.skipBytes(2);
+        /*size*/
+        mIn.skipBytes(2);
         short flags = mIn.readShort();
         int specNamesId = mIn.readInt();
-        
+
         ResValue value = (flags & ENTRY_FLAG_COMPLEX) == 0 ?
-            readValue() : readComplexEntry();
+                readValue() : readComplexEntry();
 
         if (mConfig == null) {
             return;
@@ -192,7 +204,7 @@ public class ARSCDecoder {
             spec = mPkg.getResSpec(resId);
         } else {
             spec = new ResResSpec(
-                resId, mSpecNames.getString(specNamesId), mPkg, mType);
+                    resId, mSpecNames.getString(specNamesId), mPkg, mType);
             mPkg.addResSpec(spec);
             mType.addResSpec(spec);
         }
@@ -212,41 +224,44 @@ public class ARSCDecoder {
         Duo<Integer, ResScalarValue>[] items = new Duo[count];
         for (int i = 0; i < count; i++) {
             items[i] = new Duo<Integer, ResScalarValue>(
-                mIn.readInt(), (ResScalarValue) readValue());
+                    mIn.readInt(), (ResScalarValue) readValue());
         }
 
         return factory.bagFactory(parent, items);
     }
 
     private ResValue readValue() throws IOException, AndrolibException {
-       /*size*/ mIn.skipCheckShort((short) 8);
-       /*zero*/ mIn.skipCheckByte((byte) 0);
+        /*size*/
+        mIn.skipCheckShort((short) 8);
+        /*zero*/
+        mIn.skipCheckByte((byte) 0);
         byte type = mIn.readByte();
         int data = mIn.readInt();
 
         return type == TypedValue.TYPE_STRING ?
-            mPkg.getValueFactory().factory(mTableStrings.getHTML(data)) :
-            mPkg.getValueFactory().factory(type, data, null);
+                mPkg.getValueFactory().factory(mTableStrings.getHTML(data)) :
+                mPkg.getValueFactory().factory(type, data, null);
     }
 
     private ResConfigFlags readConfigFlags() throws IOException, AndrolibException {
         short size = mIn.readShort();
         if (size < 28) {
             throw new AndrolibException("Config size < 28");
-        }   
+        }
 
         boolean isInvalid = false;
-        
+
         short oppoflag = mIn.readShort();
+        LOGGER.info("oppoflag: " + String.valueOf(oppoflag));
 
         short mcc = mIn.readShort();
         short mnc = mIn.readShort();
 
         char[] language = new char[]{
-            (char) mIn.readByte(), (char) mIn.readByte()};
+                (char) mIn.readByte(), (char) mIn.readByte()};
         char[] country = new char[]{
-            (char) mIn.readByte(), (char) mIn.readByte()};
-        
+                (char) mIn.readByte(), (char) mIn.readByte()};
+
         byte orientation = mIn.readByte();
         byte touchscreen = mIn.readByte();
         short density = mIn.readShort();
@@ -254,13 +269,15 @@ public class ARSCDecoder {
         byte keyboard = mIn.readByte();
         byte navigation = mIn.readByte();
         byte inputFlags = mIn.readByte();
-        /*inputPad0*/ mIn.skipBytes(1);
+        /*inputPad0*/
+        mIn.skipBytes(1);
 
         short screenWidth = mIn.readShort();
         short screenHeight = mIn.readShort();
 
         short sdkVersion = mIn.readShort();
-        /*minorVersion, now must always be 0*/ mIn.skipBytes(2);
+        /*minorVersion, now must always be 0*/
+        mIn.skipBytes(2);
 
         byte screenLayout = 0;
         byte uiMode = 0;
@@ -273,17 +290,17 @@ public class ARSCDecoder {
 
         short screenWidthDp = 0;
         short screenHeightDp = 0;
-        
+
         if (size >= 36) {
             screenWidthDp = mIn.readShort();
             screenHeightDp = mIn.readShort();
         }
-        
+
         short layoutDirection = 0;
         if (size >= 38 && sdkVersion >= 17 && !this.mPkg.getName().equalsIgnoreCase("com.htc")) {
-        	layoutDirection = mIn.readShort();
+            layoutDirection = mIn.readShort();
         }
-               
+
         int exceedingSize = size - KNOWN_CONFIG_BYTES;
         if (exceedingSize > 0) {
             byte[] buf = new byte[exceedingSize];
@@ -291,23 +308,21 @@ public class ARSCDecoder {
             BigInteger exceedingBI = new BigInteger(1, buf);
 
             if (exceedingBI.equals(BigInteger.ZERO)) {
-                LOGGER.fine(String.format(
-                    "Config flags size > %d, but exceeding bytes are all zero, so it should be ok.",
-                    KNOWN_CONFIG_BYTES));
+                /*LOGGER.fine(String.format(
+                        "Config flags size > %d, but exceeding bytes are all zero, so it should be ok.",
+                        KNOWN_CONFIG_BYTES));*/
             } else {
-                LOGGER.warning(String.format(
-                    "Config flags size > %d. Exceeding bytes: 0x%X.",
-                    KNOWN_CONFIG_BYTES, exceedingBI));
+                /*LOGGER.warning(String.format(
+                        "Config flags size > %d. Exceeding bytes: 0x%X.",
+                        KNOWN_CONFIG_BYTES, exceedingBI));*/
                 isInvalid = true;
             }
         }
 
-
-        ResConfigFlags flags = ResConfigFlags(mcc, mnc, language, country, layoutDirection, orientation,
-            touchscreen, density, keyboard, navigation, inputFlags,
-            screenWidth, screenHeight, sdkVersion, screenLayout, uiMode,
-            smallestScreenWidthDp, screenWidthDp, screenHeightDp, isInvalid, oppoflag);
-            
+        ResConfigFlags flags = new ResConfigFlags(mcc, mnc, language, country, layoutDirection, orientation,
+                touchscreen, density, keyboard, navigation, inputFlags,
+                screenWidth, screenHeight, sdkVersion, screenLayout, uiMode,
+                smallestScreenWidthDp, screenWidthDp, screenHeightDp, isInvalid, oppoflag);
         return flags;
     }
 
@@ -315,18 +330,18 @@ public class ARSCDecoder {
         int resId = mResId & 0xffff0000;
 
         for (int i = 0; i < mMissingResSpecs.length; i++) {
-            if (! mMissingResSpecs[i]) {
+            if (!mMissingResSpecs[i]) {
                 continue;
             }
 
             ResResSpec spec = new ResResSpec(new ResID(resId | i),
-                String.format("APKTOOL_DUMMY_%04x", i), mPkg, mType);
+                    String.format("FIXCAP_%04x_dontlook", i), mPkg, mType);
             mPkg.addResSpec(spec);
             mType.addResSpec(spec);
 
             ResValue value = new ResBoolValue(false, null);
             ResResource res = new ResResource(
-                mPkg.getOrCreateConfig(new ResConfigFlags()), spec, value);
+                    mPkg.getOrCreateConfig(new ResConfigFlags()), spec, value);
             mPkg.addResource(res);
             mConfig.addResource(res);
             spec.addResource(res);
@@ -336,12 +351,12 @@ public class ARSCDecoder {
     private Header nextChunk() throws IOException {
         return mHeader = Header.read(mIn);
     }
-    
+
     private void checkChunkType(int expectedType) throws AndrolibException {
         if (mHeader.type != expectedType) {
             throw new AndrolibException(String.format(
-                "Invalid chunk type: expected=0x%08x, got=0x%08x",
-                expectedType, mHeader.type));
+                    "Invalid chunk type: expected=0x%08x, got=0x%08x",
+                    expectedType, mHeader.type));
         }
     }
 
@@ -392,11 +407,11 @@ public class ARSCDecoder {
         }
 
         public final static short
-            TYPE_NONE = -1,
-            TYPE_TABLE = 0x0002,
-            TYPE_PACKAGE = 0x0200,
-            TYPE_TYPE = 0x0202,
-            TYPE_CONFIG = 0x0201;
+                TYPE_NONE = -1,
+                TYPE_TABLE = 0x0002,
+                TYPE_PACKAGE = 0x0200,
+                TYPE_TYPE = 0x0202,
+                TYPE_CONFIG = 0x0201;
     }
 
     public static class FlagsOffset {
@@ -410,14 +425,14 @@ public class ARSCDecoder {
     }
 
     private static final Logger LOGGER =
-        Logger.getLogger(ARSCDecoder.class.getName());
+            Logger.getLogger(ARSCDecoder.class.getName());
     private static final int KNOWN_CONFIG_BYTES = 36;
 
 
     public static class ARSCData {
 
         public ARSCData(ResPackage[] packages, FlagsOffset[] flagsOffsets,
-                ResTable resTable) {
+                        ResTable resTable) {
             mPackages = packages;
             mFlagsOffsets = flagsOffsets;
             mResTable = resTable;
@@ -434,7 +449,7 @@ public class ARSCDecoder {
         public ResPackage getOnePackage() throws AndrolibException {
             if (mPackages.length != 1) {
                 throw new AndrolibException(
-                    "Arsc file contains zero or multiple packages");
+                        "Arsc file contains zero or multiple packages");
             }
             return mPackages[0];
         }
