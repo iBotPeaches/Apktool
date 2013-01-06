@@ -276,7 +276,10 @@ final public class AndrolibResources {
 			if (aaptFile.canRead() && aaptFile.exists()) {
 				aaptFile.setExecutable(true);
 				cmd.add(aaptFile.getPath());
-				LOGGER.info(aaptFile.getPath() + " being used as aapt location.");
+				
+				if (flags.get("verbose")) {
+					LOGGER.info(aaptFile.getPath() + " being used as aapt location.");
+				}
 			} else {
 				LOGGER.warning("aapt location could not be found. Defaulting back to default");
 				cmd.add("aapt");

@@ -1,5 +1,6 @@
 v1.5.2 (TBA)
 -Fixed (issue #299) - output smali filename errors to screen during rebuild instead of filestream
+-Only show the --aapt / -a info in verbose mode.
 
 v1.5.1 PR3 (Released December 23 - 2012) Codename: Pre Release 3
 -Reverted "Prevents removal of <uses-sdk> on decompile, but then throws warning on rebuild (issue #366)"
