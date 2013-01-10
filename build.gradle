@@ -29,6 +29,7 @@ task wrapper(type: Wrapper) {
 }
 
 // If anyone uses this outside of GoogleCode (Apktool) developers. I will hunt you down and hurt you.
+// This is for official releases only. 
 task release {
 }
 
@@ -93,9 +94,14 @@ subprojects {
     
 	    // kudos #smali - JesusFreke, for how to build release task
 	    if (!('release' in gradle.startParameter.taskNames)) {
-	      ant.loadfile(srcFile: "../../.git/refs/heads/master", property: fullrev)
-	      gitrev_version = ant.properties[fullrev].substring(0,10);
-	      println "Building SNAPSHOT: " + gitrev_version;
+	      ant.loadfile(srcFile: "../../.git/refs/heads/master", property: fullrev, failonerror: false);
+	      if (ant.properties[fullrev] == null) {
+	         gitrev_version = "SNAPSHOT_DEV";
+	         println "Building SNAPSHOT (no .git folder found)";
+	      } else {
+		gitrev_version = ant.properties[fullrev].substring(0,10);
+		println "Building SNAPSHOT: " + gitrev_version;
+	      }
 	    } else {
 	      gitrev_version = '';
 	      println "Building RELEASE: " + apktoolversion;
