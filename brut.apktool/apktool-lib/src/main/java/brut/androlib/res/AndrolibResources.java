@@ -320,8 +320,11 @@ final public class AndrolibResources {
 
 		if (flags.get("framework")) {
 			cmd.add("-x");
-			// cmd.add("-0");
-			// cmd.add("arsc");
+		}
+		
+		if (!(flags.get("compression"))) {
+			 cmd.add("-0");
+			 cmd.add("arsc");
 		}
 
 		if (include != null) {

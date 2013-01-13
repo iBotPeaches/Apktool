@@ -183,6 +183,7 @@ public class Androlib {
         Map<String, Object> meta = readMetaFile(appDir);
         Object t1 = meta.get("isFrameworkApk");
         flags.put("framework", t1 == null ? false : (Boolean) t1);
+        flags.put("compression", meta.get("compressionType") == null ? false : (Boolean) meta.get("compressionType"));
         mAndRes.setSdkInfo((Map<String, String>) meta.get("sdkInfo"));
         
         // check the orig apk

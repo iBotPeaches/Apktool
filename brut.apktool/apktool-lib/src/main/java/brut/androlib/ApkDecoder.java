@@ -26,7 +26,11 @@ import brut.common.BrutException;
 import brut.directory.DirectoryException;
 import brut.util.OS;
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+import java.util.zip.ZipEntry;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
@@ -58,7 +62,7 @@ public class ApkDecoder {
 		mOutDir = outDir;
 	}
 
-	public void decode() throws AndrolibException {
+	public void decode() throws AndrolibException, IOException {
 		File outDir = getOutDir();
 
 		if (!mForceDelete && outDir.exists()) {
@@ -91,6 +95,20 @@ public class ApkDecoder {
 		}
 
 		if (hasResources()) {
+			
+			// read the resources.arsc checking for STORED vs DEFLATE compression
+			// this will determine whether we compress on rebuild or not.
+			JarFile jf = new JarFile(mApkFile.getAbsoluteFile());
+			Enumeration<?> e = jf.entries();
+			while(e.hasMoreElements()) {
+				JarEntry je = (JarEntry) e.nextElement();
+				if (je.getName().equalsIgnoreCase("resources.arsc")) {
+					setCompressionType(je.getMethod());
+					continue;
+				}
+			}
+			jf.close();
+			
 			switch (mDecodeResources) {
 			case DECODE_RESOURCES_NONE:
 				mAndrolib.decodeResourcesRaw(mApkFile, outDir);
@@ -227,6 +245,7 @@ public class ApkDecoder {
 			putUsesFramework(meta);
 			putSdkInfo(meta);
 			putPackageInfo(meta);
+			putCompressionInfo(meta);
 		}
 
 		mAndrolib.writeMetaFile(mOutDir, meta);
@@ -270,6 +289,27 @@ public class ApkDecoder {
 			meta.put("packageInfo", info);
 		}
 	}
+	
+	private void putCompressionInfo(Map<String, Object> meta)
+			throws AndrolibException {
+		meta.put("compressionType", getCompressionType());
+	}
+	
+	private boolean getCompressionType() {
+		return mCompressResources;
+	}
+	
+	private void setCompressionType(int compression) {
+		
+		// check for deflate vs stored
+		if (compression == ZipEntry.STORED) {
+			mCompressResources = false;
+		} else if (compression == ZipEntry.DEFLATED) {
+			mCompressResources = true;
+		} else {
+			mCompressResources = false;
+		}
+	}
 
 	private final Androlib mAndrolib;
 
@@ -284,4 +324,5 @@ public class ApkDecoder {
 	private boolean mKeepBrokenResources = false;
 	private String mFrameworkDir = null;
 	private boolean mBakDeb = true;
+	private boolean mCompressResources = false;
 }

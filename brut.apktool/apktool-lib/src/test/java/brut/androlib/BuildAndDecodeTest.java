@@ -33,7 +33,7 @@ import org.xml.sax.SAXException;
 public class BuildAndDecodeTest {
 
     @BeforeClass
-    public static void beforeClass() throws BrutException {
+    public static void beforeClass() throws BrutException, IOException {
         sTmpDir = new ExtFile(OS.createTempDirectory());
         sTestOrigDir = new ExtFile(sTmpDir, "testapp-orig");
         sTestNewDir = new ExtFile(sTmpDir, "testapp-new");

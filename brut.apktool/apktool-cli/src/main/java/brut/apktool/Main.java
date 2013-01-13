@@ -155,7 +155,12 @@ public class Main {
                 String.valueOf(ex.getPkgId()) + ". You must install proper " +
                 "framework files, see project website for more info.");
             System.exit(1);
+        } catch (IOException ex) {
+        	System.out.println(
+        			"Could not modify file. Please ensure you have permission.");
+        	System.exit(1);
         }
+        
     }
 
     private static void cmdBuild(String[] args) throws BrutException {
