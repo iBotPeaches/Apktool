@@ -27,7 +27,7 @@ public class ResConfigFlags {
 
     public final char[] language;
     public final char[] country;
-    
+
     public final short layoutDirection;
 
     public final byte orientation;
@@ -54,6 +54,8 @@ public class ResConfigFlags {
 
     private final String mQualifiers;
 
+    public final short oppoflag;
+
     public ResConfigFlags() {
         mcc = 0;
         mnc = 0;
@@ -62,7 +64,7 @@ public class ResConfigFlags {
         layoutDirection = SCREENLAYOUT_LAYOUTDIR_ANY;
         orientation = ORIENTATION_ANY;
         touchscreen = TOUCHSCREEN_ANY;
-        density = DENSITY_DEFAULT;
+        density = DENSITY_DPI_UNDEFINED;
         keyboard = KEYBOARD_ANY;
         navigation = NAVIGATION_ANY;
         inputFlags = KEYSHIDDEN_ANY | NAVHIDDEN_ANY;
@@ -76,14 +78,15 @@ public class ResConfigFlags {
         screenHeightDp = 0;
         isInvalid = false;
         mQualifiers = "";
+        oppoflag = 0;
     }
 
     public ResConfigFlags(short mcc, short mnc, char[] language, char[] country,
-            short layoutDirection, byte orientation, byte touchscreen, 
-            short density, byte keyboard, byte navigation, byte inputFlags, 
-            short screenWidth, short screenHeight, short sdkVersion, byte screenLayout,
-            byte uiMode, short smallestScreenWidthDp, short screenWidthDp,
-            short screenHeightDp, boolean isInvalid) {
+                          short layoutDirection, byte orientation, byte touchscreen,
+                          short density, byte keyboard, byte navigation, byte inputFlags,
+                          short screenWidth, short screenHeight, short sdkVersion, byte screenLayout,
+                          byte uiMode, short smallestScreenWidthDp, short screenWidthDp,
+                          short screenHeightDp, boolean isInvalid, short oppoflag) {
         if (orientation < 0 || orientation > 3) {
             LOGGER.warning("Invalid orientation value: " + orientation);
             orientation = 0;
@@ -130,6 +133,7 @@ public class ResConfigFlags {
         this.screenWidthDp = screenWidthDp;
         this.screenHeightDp = screenHeightDp;
         this.isInvalid = isInvalid;
+        this.oppoflag = oppoflag;
         mQualifiers = generateQualifiers();
     }
 
@@ -151,14 +155,14 @@ public class ResConfigFlags {
                 ret.append("-r").append(country);
             }
         }
-		switch (screenLayout & MASK_LAYOUTDIR) {
-			case SCREENLAYOUT_LAYOUTDIR_RTL:
-				ret.append("-ldrtl");
-				break;
-			case SCREENLAYOUT_LAYOUTDIR_LTR:
-				ret.append("-ldltr");
-				break;
-		}
+        switch (screenLayout & MASK_LAYOUTDIR) {
+            case SCREENLAYOUT_LAYOUTDIR_RTL:
+                ret.append("-ldrtl");
+                break;
+            case SCREENLAYOUT_LAYOUTDIR_LTR:
+                ret.append("-ldltr");
+                break;
+        }
         if (smallestScreenWidthDp != 0) {
             ret.append("-sw").append(smallestScreenWidthDp).append("dp");
         }
@@ -236,7 +240,7 @@ public class ResConfigFlags {
                 break;
         }
         switch (density) {
-            case DENSITY_DEFAULT:
+            case DENSITY_DPI_UNDEFINED:
                 break;
             case DENSITY_LOW:
                 ret.append("-ldpi");
@@ -327,6 +331,9 @@ public class ResConfigFlags {
         if (sdkVersion > getNaturalSdkVersionRequirement()) {
             ret.append("-v").append(sdkVersion);
         }
+        if (oppoflag == 1) {
+            ret.append("-oppo");
+        }
         if (isInvalid) {
             ret.append("-ERR" + sErrCounter++);
         }
@@ -343,7 +350,7 @@ public class ResConfigFlags {
             return 8;
         }
         if ((screenLayout & (MASK_SCREENSIZE | MASK_SCREENLONG)) != 0
-                || density != DENSITY_DEFAULT) {
+                || density != DENSITY_DPI_UNDEFINED) {
             return 4;
         }
         return 0;
@@ -351,7 +358,7 @@ public class ResConfigFlags {
 
     @Override
     public String toString() {
-        return ! getQualifiers().equals("") ? getQualifiers() : "[DEFAULT]";
+        return !getQualifiers().equals("") ? getQualifiers() : "[DEFAULT]";
     }
 
     @Override
@@ -379,17 +386,17 @@ public class ResConfigFlags {
     private static int sErrCounter = 0;
 
 
-    public final static byte ORIENTATION_ANY  = 0;
+    public final static byte ORIENTATION_ANY = 0;
     public final static byte ORIENTATION_PORT = 1;
     public final static byte ORIENTATION_LAND = 2;
     public final static byte ORIENTATION_SQUARE = 3;
 
-    public final static byte TOUCHSCREEN_ANY  = 0;
-    public final static byte TOUCHSCREEN_NOTOUCH  = 1;
-    public final static byte TOUCHSCREEN_STYLUS  = 2;
-    public final static byte TOUCHSCREEN_FINGER  = 3;
+    public final static byte TOUCHSCREEN_ANY = 0;
+    public final static byte TOUCHSCREEN_NOTOUCH = 1;
+    public final static byte TOUCHSCREEN_STYLUS = 2;
+    public final static byte TOUCHSCREEN_FINGER = 3;
 
-    public final static short DENSITY_DEFAULT = 0;
+    public final static short DENSITY_DPI_UNDEFINED = 0;
     public final static short DENSITY_LOW = 120;
     public final static short DENSITY_MEDIUM = 160;
     public final static short DENSITY_TV = 213;
@@ -397,23 +404,23 @@ public class ResConfigFlags {
     public final static short DENSITY_XHIGH = 320;
     public final static short DENSITY_XXHIGH = 480;
     public final static short DENSITY_NONE = -1;
-    
+
     public final static short MASK_LAYOUTDIR = 0xc0;
     public final static short SCREENLAYOUT_LAYOUTDIR_ANY = 0x00;
     public final static short SCREENLAYOUT_LAYOUTDIR_LTR = 0x40;
     public final static short SCREENLAYOUT_LAYOUTDIR_RTL = 0x80;
     public final static short SCREENLAYOUT_LAYOUTDIR_SHIFT = 0x06;
 
-    public final static byte KEYBOARD_ANY  = 0;
-    public final static byte KEYBOARD_NOKEYS  = 1;
-    public final static byte KEYBOARD_QWERTY  = 2;
-    public final static byte KEYBOARD_12KEY  = 3;
+    public final static byte KEYBOARD_ANY = 0;
+    public final static byte KEYBOARD_NOKEYS = 1;
+    public final static byte KEYBOARD_QWERTY = 2;
+    public final static byte KEYBOARD_12KEY = 3;
 
-    public final static byte NAVIGATION_ANY  = 0;
-    public final static byte NAVIGATION_NONAV  = 1;
-    public final static byte NAVIGATION_DPAD  = 2;
-    public final static byte NAVIGATION_TRACKBALL  = 3;
-    public final static byte NAVIGATION_WHEEL  = 4;
+    public final static byte NAVIGATION_ANY = 0;
+    public final static byte NAVIGATION_NONAV = 1;
+    public final static byte NAVIGATION_DPAD = 2;
+    public final static byte NAVIGATION_TRACKBALL = 3;
+    public final static byte NAVIGATION_WHEEL = 4;
 
     public final static byte MASK_KEYSHIDDEN = 0x3;
     public final static byte KEYSHIDDEN_ANY = 0x0;
@@ -427,12 +434,12 @@ public class ResConfigFlags {
     public final static byte NAVHIDDEN_YES = 0x8;
 
     public final static byte MASK_SCREENSIZE = 0x0f;
-    public final static byte SCREENSIZE_ANY  = 0x00;
+    public final static byte SCREENSIZE_ANY = 0x00;
     public final static byte SCREENSIZE_SMALL = 0x01;
     public final static byte SCREENSIZE_NORMAL = 0x02;
     public final static byte SCREENSIZE_LARGE = 0x03;
     public final static byte SCREENSIZE_XLARGE = 0x04;
-   
+
     public final static byte MASK_SCREENLONG = 0x30;
     public final static byte SCREENLONG_ANY = 0x00;
     public final static byte SCREENLONG_NO = 0x10;
@@ -457,5 +464,5 @@ public class ResConfigFlags {
 
 
     private static final Logger LOGGER =
-        Logger.getLogger(ResConfigFlags.class.getName());
+            Logger.getLogger(ResConfigFlags.class.getName());
 }
