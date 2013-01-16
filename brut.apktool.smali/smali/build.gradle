@@ -36,30 +36,45 @@ configurations {
 }
 
 ext.antlrSource = 'src/main/antlr3'
-ext.antlrOutput =  file(new File(buildDir, '/generated-sources/antlr3'))
+ext.antlrOutput = file("${buildDir}/generated-sources/antlr3")
 
 ext.jflexSource = "src/main/jflex"
-ext.jflexOutput = file(new File(buildDir, '/generated-sources/jflex'))
+ext.jflexOutput = file("${buildDir}/generated-sources/jflex")
 
 ext.testAntlrSource = 'src/test/antlr3'
-ext.testAntlrOutput = file(new File(buildDir, '/generated-test-sources/antlr3'))
+ext.testAntlrOutput = file("${buildDir}/generated-test-sources/antlr3")
 
 sourceSets.main.java.srcDir antlrOutput
 sourceSets.main.java.srcDir jflexOutput
 
 sourceSets.test.java.srcDir testAntlrOutput
 
+idea {
+    module {
+        excludeDirs -= buildDir
+        if (buildDir.exists()) {
+            excludeDirs.addAll(buildDir.listFiles())
+        }
+        for (sourceDir in (sourceDirs + testSourceDirs)) {
+            excludeDirs.remove(sourceDir);
+            while ((sourceDir = sourceDir.getParentFile()) != null) {
+                excludeDirs.remove(sourceDir);
+            }
+        }
+    }
+}
+
 dependencies {
     compile project(':brut.apktool.smali:util')
     compile project(':brut.apktool.smali:dexlib')
     compile 'org.antlr:antlr-runtime:3.2'
     compile 'commons-cli:commons-cli:1.2'
+    compile 'com.google.guava:guava:13.0.1'
 
     testCompile 'junit:junit:4.6'
 
     antlr3 'org.antlr:antlr:3.2'
     jflex 'de.jflex:jflex:1.4.3'
-    proguard 'net.sf.proguard:proguard-base:4.8'
 }
 
 task generateAntlrSource(type: JavaExec) {
@@ -69,9 +84,9 @@ task generateAntlrSource(type: JavaExec) {
     mkdir(antlrOutput)
     def grammars = fileTree(antlrSource).include('**/*.g')
 
-    classpath = files(configurations.antlr3.asPath)
+    classpath = configurations.antlr3
     main = 'org.antlr.Tool'
-    args '-fo', relativePath(new File(antlrOutput, 'org/jf/smali'))
+    args '-fo', relativePath("${antlrOutput}/org/jf/smali")
     args grammars.files
 }
 
@@ -82,9 +97,9 @@ task generateTestAntlrSource(type: JavaExec) {
     mkdir(testAntlrOutput)
     def grammars = fileTree(testAntlrSource).include('**/*.g')
 
-    classpath = files(configurations.antlr3.asPath)
+    classpath = configurations.antlr3
     main = 'org.antlr.Tool'
-    args '-fo', relativePath(new File(testAntlrOutput, 'org/jf/smali'))
+    args '-fo', relativePath("${testAntlrOutput}/org/jf/smali")
     args grammars.files.join(' ')
 }
 
@@ -95,51 +110,24 @@ task generateJflexSource(type: JavaExec) {
     mkdir(jflexOutput)
     def grammars = fileTree(jflexSource).include('**/*.flex')
 
-    classpath = files(configurations.jflex.asPath)
+    classpath = configurations.jflex
     main = 'JFlex.Main'
     args '-q'
-    args '-d', relativePath(new File(jflexOutput, 'org/jf/smali'))
+    args '-d', relativePath("${jflexOutput}/org/jf/smali")
     args grammars.files.join(' ')
 }
-
 
 compileJava.dependsOn generateAntlrSource, generateJflexSource
 compileTestJava.dependsOn generateTestAntlrSource
 
-// We have to do this in taskGraph.whenReady, so that we use the correct
-// version to resolve the project dependencies
-gradle.taskGraph.whenReady {
-    // build a jar containing all dependencies
-    jar {
-        from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+// build a jar containing all dependencies
+jar {
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
 
-        manifest {
-            attributes("Main-Class": "org.jf.smali.main")
-        }
-    }
-
-    processResources.inputs.properties('version': version)
-    processResources.expand('version': version)
-
-    proguard {
-        def outFile = relativePath(buildDir) + '/libs/' + jar.baseName + '-' + jar.version + '-small' + '.' + jar.extension
-
-        inputs.file jar.archivePath
-        outputs.file outFile
-
-        args '-injars ' + jar.archivePath + '(!**/TestStringTemplate*.class)'
-        args '-outjars ' + outFile
+    manifest {
+        attributes("Main-Class": "org.jf.smali.main")
     }
 }
 
-task proguard(type: JavaExec, dependsOn: jar) {
-    classpath = files(configurations.proguard.asPath)
-    main = 'proguard.ProGuard'
-    args '-libraryjars ' + System.properties['java.home'] + '/lib/rt.jar'
-    args '-dontobfuscate'
-    args '-dontoptimize'
-    args '-keep public class org.jf.smali.main { public static void main(java.lang.String[]); }'
-    args '-keepclassmembers enum * { public static **[] values(); public static ** valueOf(java.lang.String); }'
-    args '-dontwarn com.google.common.base.**'
-    args '-dontnote com.google.common.base.**'
-}
+processResources.inputs.property('version', version)
+processResources.expand('version': version)
