@@ -16,8 +16,13 @@
 
 version = apktoolversion
 
+configurations {
+    proguard
+}
+
 dependencies {
   compile project(':brut.apktool:apktool-lib')
+  proguard 'net.sf.proguard:proguard-base:4.8'
 }
 
 gradle.taskGraph.whenReady {
@@ -29,3 +34,26 @@ gradle.taskGraph.whenReady {
     }
   }
 }
+
+task proguard(type: JavaExec, dependsOn: jar) {
+    def outFile = jar.destinationDir.getPath() + '/' + jar.baseName + '-' + jar.version + '-small' + '.' + jar.extension
+    inputs.file jar.archivePath
+    outputs.file outFile
+
+    classpath = configurations.proguard
+    main = 'proguard.ProGuard'
+    args '-injars ' + "${jar.archivePath}" + ' (!META-INF/LICENSE.txt,!META-INF/NOTICE.txt,!README)'
+    args "-outjars ${outFile}"
+    args "-libraryjars ${System.properties['java.home']}/lib/rt.jar"
+    args '-dontobfuscate'
+    args '-dontoptimize'
+    args '-keep public class brut.apktool.Main { public static void main(java.lang.String[]); }'
+    args '-keep class org.yaml.snakeyaml.** { public protected private *; }'
+    args '-keepclassmembers enum * { public static **[] values(); public static ** valueOf(java.lang.String); }'
+    args '-dontwarn com.google.common.base.**'
+    args '-dontwarn com.google.common.collect.**'
+    args '-dontwarn javax.xml.xpath.**'
+    args '-dontnote **'
+}
+
+tasks.getByPath(':release').dependsOn(proguard)
