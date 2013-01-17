@@ -15,6 +15,7 @@
  */
 
 version = apktoolversion
+apply plugin: 'fatjar'
 
 configurations {
     proguard
@@ -26,16 +27,14 @@ dependencies {
 }
 
 gradle.taskGraph.whenReady {
-  jar {
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-    
+  fatJar { 
     manifest {
       attributes("Main-Class": "brut.apktool.Main")
     }
   }
 }
 
-task proguard(type: JavaExec, dependsOn: jar) {
+task proguard(type: JavaExec, dependsOn: fatJar) {
     def outFile = jar.destinationDir.getPath() + '/' + jar.baseName + '-' + jar.version + '-small' + '.' + jar.extension
     inputs.file jar.archivePath
     outputs.file outFile
