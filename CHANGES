@@ -6,6 +6,7 @@ v1.5.2 (TBA)
 -Moved build.gradle files to each sub-project, more organization :)
 -Fixed (issue #394) - Prevented duplicated files in final jar which saved around 1.2mb.
 -Added Proguard to drop final jar size from 6.2mb to 2.6mb.
+-Fixed (issue #395) - Added check for "aapt" in unit-tests.
 
 v1.5.1 PR3 (Released December 23 - 2012) Codename: Pre Release 3
 -Reverted "Prevents removal of <uses-sdk> on decompile, but then throws warning on rebuild (issue #366)"

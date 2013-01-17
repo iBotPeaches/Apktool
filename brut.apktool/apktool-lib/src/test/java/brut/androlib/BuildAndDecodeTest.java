@@ -115,12 +115,30 @@ public class BuildAndDecodeTest {
     public void xmlReferencesTest() throws BrutException {
         compareXmlFiles("res/xml/references.xml");
     }
+    
+    @Test
+    public void aaptPresent() throws BrutException {
+    	checkIfAaptPresent();
+    }
 
     @Test
     public void qualifiersTest() throws BrutException {
         compareValuesFiles("values-mcc004-mnc4-en-rUS-ldrtl-sw100dp-w200dp-h300dp" +
                 "-xlarge-long-land-desk-night-xhdpi-finger-keyssoft-12key" +
                 "-navhidden-dpad/strings.xml");
+    }
+    
+    private void checkIfAaptPresent() throws BrutException {
+    	try
+    	{            
+    		Process proc = Runtime.getRuntime().exec("aapt");
+    		BufferedReader br = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
+    		String line = null;
+    		while ( (line = br.readLine()) != null){}
+    	} catch (Exception ex){
+    		System.out.println("Please install 'aapt' to your path. See project website for more information.");
+    		throw new BrutException(ex);
+    	}
     }
 
     private void compareValuesFiles(String path) throws BrutException {
