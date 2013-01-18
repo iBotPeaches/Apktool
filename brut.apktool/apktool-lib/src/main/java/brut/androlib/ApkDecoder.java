@@ -99,13 +99,9 @@ public class ApkDecoder {
 			// read the resources.arsc checking for STORED vs DEFLATE compression
 			// this will determine whether we compress on rebuild or not.
 			JarFile jf = new JarFile(mApkFile.getAbsoluteFile());
-			Enumeration<?> e = jf.entries();
-			while(e.hasMoreElements()) {
-				JarEntry je = (JarEntry) e.nextElement();
-				if (je.getName().equalsIgnoreCase("resources.arsc")) {
-					setCompressionType(je.getMethod());
-					continue;
-				}
+			JarEntry je = jf.getJarEntry("resources.arsc");             
+			if (je != null) 	 {	        
+				setCompressionType(je.getMethod()); 
 			}
 			jf.close();
 			
@@ -302,13 +298,7 @@ public class ApkDecoder {
 	private void setCompressionType(int compression) {
 		
 		// check for deflate vs stored
-		if (compression == ZipEntry.STORED) {
-			mCompressResources = false;
-		} else if (compression == ZipEntry.DEFLATED) {
-			mCompressResources = true;
-		} else {
-			mCompressResources = false;
-		}
+		mCompressResources = (compression == ZipEntry.STORED) ? false : (compression == ZipEntry.DEFLATED); 
 	}
 
 	private final Androlib mAndrolib;
