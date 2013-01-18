@@ -33,17 +33,31 @@ import org.xml.sax.SAXException;
 public class BuildAndDecodeTest {
 
     @BeforeClass
-    public static void beforeClass() throws BrutException, IOException {
+    public static void beforeClass() throws Exception, BrutException {
         sTmpDir = new ExtFile(OS.createTempDirectory());
         sTestOrigDir = new ExtFile(sTmpDir, "testapp-orig");
         sTestNewDir = new ExtFile(sTmpDir, "testapp-new");
-        File testApk = new File(sTmpDir, "testapp.apk");
-
         LOGGER.info("Unpacking testapp...");
         TestUtils.copyResourceDir(BuildAndDecodeTest.class,
                 "brut/apktool/testapp/", sTestOrigDir);
+    }
+
+    @AfterClass
+    public static void afterClass() throws BrutException {
+        OS.rmdir(sTmpDir);
+    }
+
+    @Test
+    public void isAaptInstalledTest()  throws Exception {
+        assertEquals(true, isAaptPresent());
+    }
+
+    
+    @Test
+    public void encodeAndDecodeTest() throws BrutException, IOException {
 
         LOGGER.info("Building testapp.apk...");
+        File testApk = new File(sTmpDir, "testapp.apk");
         ExtFile blank = null;
         new Androlib().build(sTestOrigDir, testApk, BuildAndDecodeTest.returnStock(),blank,"");
 
@@ -53,10 +67,6 @@ public class BuildAndDecodeTest {
         apkDecoder.decode();
     }
 
-    @AfterClass
-    public static void afterClass() throws BrutException {
-        OS.rmdir(sTmpDir);
-    }
 
     @Test
     public void valuesArraysTest() throws BrutException {
@@ -117,18 +127,14 @@ public class BuildAndDecodeTest {
     }
     
     @Test
-    public void aaptPresent() throws BrutException {
-    	checkIfAaptPresent();
-    }
-
-    @Test
     public void qualifiersTest() throws BrutException {
         compareValuesFiles("values-mcc004-mnc4-en-rUS-ldrtl-sw100dp-w200dp-h300dp" +
                 "-xlarge-long-land-desk-night-xhdpi-finger-keyssoft-12key" +
                 "-navhidden-dpad/strings.xml");
     }
     
-    private void checkIfAaptPresent() throws BrutException {
+    private static boolean isAaptPresent()  throws Exception {
+        boolean result = true;
     	try
     	{            
     		Process proc = Runtime.getRuntime().exec("aapt");
@@ -136,9 +142,9 @@ public class BuildAndDecodeTest {
     		String line = null;
     		while ( (line = br.readLine()) != null){}
     	} catch (Exception ex){
-    		System.out.println("Please install 'aapt' to your path. See project website for more information.");
-    		throw new BrutException(ex);
+            result = false;
     	}
+        return result;
     }
 
     private void compareValuesFiles(String path) throws BrutException {
