@@ -226,11 +226,23 @@ public class Main {
     private static void cmdInstallFramework(String[] args)
             throws AndrolibException {
         String tag = null;
+        String frame_path = null;
+        int i = 0;
         switch (args.length) {
+            case 4:
+		if (args[2].equalsIgnoreCase("--frame-path")) {
+		  i++;
+		} else {
+		  throw new InvalidArgsError();
+		}
+	    case 3:
+		frame_path = args[2 + i];
             case 2:
-                tag = args[1];
+            	if (!(args[1].equalsIgnoreCase("--frame-path"))) {
+            		tag = args[1];
+            	}
             case 1:
-                new Androlib().installFramework(new File(args[0]), tag);
+                new Androlib().installFramework(new File(args[0]), tag,frame_path);
                 return;
         }
 
@@ -305,7 +317,7 @@ public class Main {
            // "        -o, --original\n" +
            // "            Build resources into original APK. Retains signature." +
             "\n" +
-            "    if|install-framework <framework.apk> [<tag>]\n" +
+            "    if|install-framework <framework.apk> [<tag>] --frame-path [<location>] \n" +
             "        Install framework file to your system.\n" +
             "\n" +
             "For additional info, see: http://code.google.com/p/android-apktool/" +

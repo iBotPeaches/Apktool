@@ -493,8 +493,9 @@ public class Androlib {
         mAndRes.publicizeResources(arscFile);
     }
 
-    public void installFramework(File frameFile, String tag)
+    public void installFramework(File frameFile, String tag, String frame_path)
             throws AndrolibException {
+    	mAndRes.setFrameworkFolder(frame_path);
         mAndRes.installFramework(frameFile, tag);
     }
 

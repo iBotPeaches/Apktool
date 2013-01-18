@@ -648,11 +648,11 @@ final public class AndrolibResources {
 	private File getFrameworkDir() throws AndrolibException {
 		String path;
 
-		/* if a framework path was specified on the command line, use it */
+		// if a framework path was specified on the command line, use it
 		if (sFrameworkFolder != null) {
 			path = sFrameworkFolder;
 		} else if (System.getProperty("os.name").equals("Mac OS X")) {
-			/* store in user-home, for Mac OS X */
+			// store in user-home, for Mac OS X
 			path = System.getProperty("user.home") + File.separatorChar
 					+ "Library/apktool/framework";
 		} else {
@@ -663,8 +663,7 @@ final public class AndrolibResources {
 		if (!dir.exists()) {
 			if (!dir.mkdirs()) {
 				if (sFrameworkFolder != null) {
-					System.out.println("Can't create Framework directory: "
-							+ dir);
+					System.out.println("Can't create Framework directory: " + dir);
 				}
 				throw new AndrolibException("Can't create directory: " + dir);
 			}
@@ -679,6 +678,10 @@ final public class AndrolibResources {
 		} catch (BrutException ex) {
 			throw new AndrolibException(ex);
 		}
+	}
+	
+	public void setFrameworkFolder(String path) {
+		sFrameworkFolder = path;
 	}
 
 	// TODO: dirty static hack. I have to refactor decoding mechanisms.
