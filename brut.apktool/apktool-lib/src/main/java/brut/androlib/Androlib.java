@@ -455,37 +455,11 @@ public class Androlib {
         mAndRes.aaptPackage(outApk, null, null,
             new File(appDir, APK_DIRNAME), assetDir, null, flags, mAaptPath);
         
-        
-        
-        /* check for re-insert */
+        // retain signature
+        // aapt r (remove)
+        // aapt a (add)
         if (flags.get("injectOriginal")) {
-            //try {
-                //LOGGER.info("Building resources into original apk file...");
                 LOGGER.info("Injecting contents isn't ready yet. Sorry :(");
-                //ZipFile editOrig = new ZipFile(mOrigApkFile.getAbsoluteFile());
-                
-                // no compression levels, paras
-                //ZipParameters parameters = new ZipParameters();
-                //parameters.setCompressionMethod(Zip4jConstants.COMP_STORE);
-                //parameters.setCompressionLevel(0);
-                //parameters.setIncludeRootFolder(true);
-                //parameters.setRootFolderInZip("/");
-                
-                // add res folder
-                //editOrig.addFolder(new File(appDir,  APK_DIRNAME + "/res").getAbsolutePath(), parameters);
-                //System.out.println("file: " + new File(appDir,  APK_DIRNAME + "/res").getAbsolutePath());
-                
-                // add assets, if there
-                //if (assetDir != null) {
-                    //editOrig.addFolder(new File(appDir, APK_DIRNAME + "/assets").getAbsolutePath(), parameters);
-                //}
-                
-                // add resources.arsc
-               // parameters.setFileNameInZip("resources.arsc");
-               // editOrig.addFile(new File(appDir, "resources.arsc"), parameters);
-            //} catch(ZipException ex) {
-               // throw new AndrolibException(ex);
-            //}
         }
     }
 

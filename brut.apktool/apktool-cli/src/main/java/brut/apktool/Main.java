@@ -223,31 +223,31 @@ public class Main {
         new Androlib().build(new File(appDirName), outFile, flags, mOrigApk, mAaptPath);
     }
 
-    private static void cmdInstallFramework(String[] args)
-            throws AndrolibException {
-        String tag = null;
-        String frame_path = null;
-        int i = 0;
-        switch (args.length) {
-            case 4:
-		if (args[2].equalsIgnoreCase("--frame-path")) {
-		  i++;
-		} else {
-		  throw new InvalidArgsError();
+	private static void cmdInstallFramework(String[] args)
+			throws AndrolibException {
+		String tag = null;
+		String frame_path = null;
+		int i = 0;
+		switch (args.length) {
+		case 4:
+			if (args[2].equalsIgnoreCase("--frame-path")) {
+				i++;
+			} else {
+				throw new InvalidArgsError();
+			}
+		case 3:
+			frame_path = args[2 + i];
+		case 2:
+			if (!(args[1].equalsIgnoreCase("--frame-path"))) {
+				tag = args[1];
+			}
+		case 1:
+			new Androlib().installFramework(new File(args[0]), tag, frame_path);
+			return;
 		}
-	    case 3:
-		frame_path = args[2 + i];
-            case 2:
-            	if (!(args[1].equalsIgnoreCase("--frame-path"))) {
-            		tag = args[1];
-            	}
-            case 1:
-                new Androlib().installFramework(new File(args[0]), tag,frame_path);
-                return;
-        }
 
-        throw new InvalidArgsError();
-    }
+		throw new InvalidArgsError();
+	}
 
     private static void cmdPublicizeResources(String[] args)
             throws InvalidArgsError, AndrolibException {
