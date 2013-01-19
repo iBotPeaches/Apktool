@@ -101,7 +101,8 @@ public class ApkDecoder {
 			JarFile jf = new JarFile(mApkFile.getAbsoluteFile());
 			JarEntry je = jf.getJarEntry("resources.arsc");             
 			if (je != null) 	 {	        
-				setCompressionType(je.getMethod()); 
+                int compression = je.getMethod();
+                mCompressResources = (compression != ZipEntry.STORED) && (compression == ZipEntry.DEFLATED);
 			}
 			jf.close();
 			
@@ -293,12 +294,6 @@ public class ApkDecoder {
 	
 	private boolean getCompressionType() {
 		return mCompressResources;
-	}
-	
-	private void setCompressionType(int compression) {
-		
-		// check for deflate vs stored
-		mCompressResources = (compression == ZipEntry.STORED) ? false : (compression == ZipEntry.DEFLATED); 
 	}
 
 	private final Androlib mAndrolib;
