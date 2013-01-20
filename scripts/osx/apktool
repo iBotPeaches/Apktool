@@ -77,4 +77,4 @@ fi
 # add current location to path for aapt
 PATH=$PATH:`pwd`;
 export PATH;
-exec java $javaOpts -jar "$jarpath" "$@"
+exec java $javaOpts -Djava.awt.headless=true -jar "$jarpath" "$@"
