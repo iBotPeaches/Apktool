@@ -84,7 +84,7 @@ final public class AndrolibResources {
 				LOGGER.warning("Skipping \"android\" package group");
 				pkg = pkgs[1];
 			} else if (pkgs[0].getName().equals("com.htc")) {
-				LOGGER.warning("Skipping \"htc\" stupid package group");
+				LOGGER.warning("Skipping \"htc\" package group");
 				pkg = pkgs[1];
 			}
 			break;
@@ -157,7 +157,9 @@ final public class AndrolibResources {
 		// check if packages different, and that package is not equal to "android"
 		Map<String, String> packageInfo = resTable.getPackageInfo();
 		if ((packageInfo.get("cur_package").equalsIgnoreCase(packageInfo.get("orig_package")) 
-				|| ("android".equalsIgnoreCase(packageInfo.get("cur_package"))))) {
+				|| ("android".equalsIgnoreCase(packageInfo.get("cur_package"))
+			    || ("com.htc".equalsIgnoreCase(packageInfo.get("cur_package")))))) {
+			
 				LOGGER.info("Regular manifest package...");
 		} else {	
 			try {

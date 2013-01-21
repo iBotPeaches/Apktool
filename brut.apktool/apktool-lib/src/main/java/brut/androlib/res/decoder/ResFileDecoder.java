@@ -63,6 +63,11 @@ public class ResFileDecoder {
             if (typeName.equals("drawable") || typeName.equals("mipmap")) {
                 if (inFileName.toLowerCase().endsWith(".9.png")) {
                     outFileName = outResName + ".9" + ext;
+                    
+                    // check for htc .r.9.png
+                    if (inFileName.toLowerCase().endsWith(".r.9.png")) {
+                    	outFileName = outResName + ".r.9" + ext;
+                    }
 
                     try {
                         decode(
