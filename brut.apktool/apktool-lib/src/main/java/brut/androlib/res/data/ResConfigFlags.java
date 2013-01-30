@@ -337,14 +337,14 @@ public class ResConfigFlags {
     private short getNaturalSdkVersionRequirement() {
         if (smallestScreenWidthDp != 0 || screenWidthDp != 0
                 || screenHeightDp != 0) {
-            return 13;
+            return SDK_HONEYCOMB_MR2;
         }
         if ((uiMode & (MASK_UI_MODE_TYPE | MASK_UI_MODE_NIGHT)) != 0) {
-            return 8;
+            return SDK_FROYO;
         }
         if ((screenLayout & (MASK_SCREENSIZE | MASK_SCREENLONG)) != 0
                 || density != DENSITY_DEFAULT) {
-            return 4;
+            return SDK_DONUT;
         }
         return 0;
     }
@@ -378,6 +378,23 @@ public class ResConfigFlags {
     // but it would be hard right now and this feature is very rarely used.
     private static int sErrCounter = 0;
 
+    public final static byte SDK_BASE = 1;
+    public final static byte SDK_BASE_1_1 = 2;
+    public final static byte SDK_CUPCAKE = 3;
+    public final static byte SDK_DONUT = 4;
+    public final static byte SDK_ECLAIR = 5;
+    public final static byte SDK_ECLAIR_0_1 = 6;
+    public final static byte SDK_ECLAIR_MR1 = 7;
+    public final static byte SDK_FROYO = 8;
+    public final static byte SDK_GINGERBREAD = 9;
+    public final static byte SDK_GINGERBREAD_MR1 = 10;
+    public final static byte SDK_HONEYCOMB = 11;
+    public final static byte SDK_HONEYCOMB_MR1 = 12;
+    public final static byte SDK_HONEYCOMB_MR2 = 13;
+    public final static byte SDK_ICE_CREAM_SANDWICH = 14;
+    public final static byte SDK_ICE_CREAM_SANDWICH_MR1 = 15;
+    public final static byte SDK_JELLY_BEAN = 16;
+    public final static byte SDK_JELLY_BEAN_MR1 = 17;
 
     public final static byte ORIENTATION_ANY  = 0;
     public final static byte ORIENTATION_PORT = 1;
