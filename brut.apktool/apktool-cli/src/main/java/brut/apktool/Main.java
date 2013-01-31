@@ -43,6 +43,11 @@ public class Main {
             int i;
             for (i = 0; i < args.length; i++) {
                 String opt = args[i];
+                
+                if (opt.startsWith("--version") || (opt.startsWith("-version"))) {
+                	version_print();
+                	System.exit(1);
+                }
                 if (! opt.startsWith("-")) {
                     break;
                 }
@@ -258,6 +263,11 @@ public class Main {
         new Androlib().publicizeResources(new File(args[0]));
     }
 
+    private static void version_print() {
+    	System.out.println(
+    			Androlib.getVersion());
+    }
+    
     private static void usage() {
         System.out.println(
             "Apktool v" + Androlib.getVersion() + " - a tool for reengineering Android apk files\n" +
@@ -314,8 +324,6 @@ public class Main {
             "            Build in debug mode. Check project page for more info.\n" +
             "        -a, --aapt\n" +
             "            Loads aapt from specified location.\n" +
-           // "        -o, --original\n" +
-           // "            Build resources into original APK. Retains signature." +
             "\n" +
             "    if|install-framework <framework.apk> [<tag>] --frame-path [<location>] \n" +
             "        Install framework file to your system.\n" +
@@ -356,6 +364,8 @@ public class Main {
     private static enum Verbosity {
         NORMAL, VERBOSE, QUIET;
     }
+    
+    private static boolean Advanced = false;
 
     static class InvalidArgsError extends AndrolibException {
 

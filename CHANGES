@@ -9,6 +9,7 @@ v1.5.2 (TBA)
 -Fixed (issue #395) - Added check for "aapt" in unit-tests.
 -Added ability to use "--frame-path" on [if|install-framework]
 -Fixed renaming of ".r.9.png" images -> ".9.png".
+-Added ability to use --version to print out Apktool version
 
 v1.5.1 PR3 (Released December 23 - 2012) Codename: Pre Release 3
 -Reverted "Prevents removal of <uses-sdk> on decompile, but then throws warning on rebuild (issue #366)"
