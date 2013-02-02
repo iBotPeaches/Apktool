@@ -1,4 +1,4 @@
-v1.5.2 (TBA)
+v1.5.2 (Released February 2 - 2013) Codename: Bug Fixes
 -Fixed (issue #299) - output smali filename errors to screen during rebuild instead of filestream
 -Only show the --aapt / -a info in verbose mode.
 -Fixed (issue #392) - Don't crash out if .git folder isn't present. Use SNAPSHOT-DEV instead.
