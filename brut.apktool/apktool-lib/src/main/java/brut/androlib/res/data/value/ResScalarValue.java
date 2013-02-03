@@ -94,15 +94,14 @@ public abstract class ResScalarValue extends ResValue
         
         String body = encodeAsResXmlValue();
         
-        
-        /* check for resource reference */
+        // check for resource reference
         if (body.contains("@")){
             if(!res.getFilePath().contains("string")) {
                 item = true;
             }
         }
         
-        /* check for using attrib as node or item */
+        // check for using attrib as node or item
         String tagName = item ? "item" : type;
         
         serializer.startTag(null, tagName);

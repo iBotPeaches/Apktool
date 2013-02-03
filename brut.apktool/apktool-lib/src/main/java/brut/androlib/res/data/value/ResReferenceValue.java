@@ -48,11 +48,10 @@ public class ResReferenceValue extends ResIntValue {
             spec.hasDefaultResource() &&
             spec.getDefaultResource().getValue() instanceof ResIdValue;
 
-           /* generate the beginning to fix @android */
+           // generate the beginning to fix @android 
            String mStart = (mTheme ? '?' : '@') + (newId ? "+" : "");
-          // mStart = mStart.replace("@android", "@*android");
+           //mStart = mStart.replace("@android", "@*android");
            
-           /* now dump back */
         return mStart +
             spec.getFullName(mPackage,
                 mTheme && spec.getType().getName().equals("attr"));
