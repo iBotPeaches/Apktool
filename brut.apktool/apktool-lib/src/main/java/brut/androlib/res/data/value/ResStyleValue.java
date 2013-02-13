@@ -27,53 +27,54 @@ import org.xmlpull.v1.XmlSerializer;
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
-public class ResStyleValue extends ResBagValue implements ResValuesXmlSerializable {
-    ResStyleValue(ResReferenceValue parent,
-            Duo<Integer, ResScalarValue>[] items, ResValueFactory factory) {
-        super(parent);
+public class ResStyleValue extends ResBagValue implements
+		ResValuesXmlSerializable {
+	ResStyleValue(ResReferenceValue parent,
+			Duo<Integer, ResScalarValue>[] items, ResValueFactory factory) {
+		super(parent);
 
-        mItems = new Duo[items.length];
-        for (int i = 0; i < items.length; i++) {
-            mItems[i] = new Duo<ResReferenceValue, ResScalarValue>(
-                factory.newReference(items[i].m1, null), items[i].m2);
-        }
-    }
+		mItems = new Duo[items.length];
+		for (int i = 0; i < items.length; i++) {
+			mItems[i] = new Duo<ResReferenceValue, ResScalarValue>(
+					factory.newReference(items[i].m1, null), items[i].m2);
+		}
+	}
 
-    @Override
-    public void serializeToResValuesXml(XmlSerializer serializer, ResResource res)
-            throws IOException, AndrolibException {
-        serializer.startTag(null, "style");
-        serializer.attribute(null, "name", res.getResSpec().getName());
-        if (! mParent.isNull()) {
-            serializer.attribute(null, "parent", mParent.encodeAsResXmlAttr());
-        }
-        for (int i = 0; i < mItems.length; i++) {
-            ResResSpec spec = mItems[i].m1.getReferent();
-            
-            // hacky-fix remove bad ReferenceVars
-            if (spec.getDefaultResource().getValue().toString().contains("ResReferenceValue@")) {
-            	continue;
-            }
-            ResAttr attr = (ResAttr) spec.getDefaultResource().getValue();
-            String value = attr.convertToResXmlFormat(mItems[i].m2);
+	@Override
+	public void serializeToResValuesXml(XmlSerializer serializer,
+			ResResource res) throws IOException, AndrolibException {
+		serializer.startTag(null, "style");
+		serializer.attribute(null, "name", res.getResSpec().getName());
+		if (!mParent.isNull()) {
+			serializer.attribute(null, "parent", mParent.encodeAsResXmlAttr());
+		}
+		for (int i = 0; i < mItems.length; i++) {
+			ResResSpec spec = mItems[i].m1.getReferent();
 
-            if (value == null) {
-                value = mItems[i].m2.encodeAsResXmlValue();
-            }
+			// hacky-fix remove bad ReferenceVars
+			if (spec.getDefaultResource().getValue().toString()
+					.contains("ResReferenceValue@")) {
+				continue;
+			}
+			ResAttr attr = (ResAttr) spec.getDefaultResource().getValue();
+			String value = attr.convertToResXmlFormat(mItems[i].m2);
 
-            if (value == null) {
-                continue;
-            }
+			if (value == null) {
+				value = mItems[i].m2.encodeAsResXmlValue();
+			}
 
-            serializer.startTag(null, "item");
-            serializer.attribute(null, "name",
-                spec.getFullName(res.getResSpec().getPackage(), true));
-            serializer.text(value);
-            serializer.endTag(null, "item");
-        }
-        serializer.endTag(null, "style");
-    }
+			if (value == null) {
+				continue;
+			}
 
+			serializer.startTag(null, "item");
+			serializer.attribute(null, "name",
+					spec.getFullName(res.getResSpec().getPackage(), true));
+			serializer.text(value);
+			serializer.endTag(null, "item");
+		}
+		serializer.endTag(null, "style");
+	}
 
-    private final Duo<ResReferenceValue, ResScalarValue>[] mItems;
+	private final Duo<ResReferenceValue, ResScalarValue>[] mItems;
 }

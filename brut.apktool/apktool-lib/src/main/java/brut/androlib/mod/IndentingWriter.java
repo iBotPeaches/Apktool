@@ -23,7 +23,7 @@ import java.io.Writer;
  */
 public class IndentingWriter extends org.jf.util.IndentingWriter {
 
-    public IndentingWriter(Writer writer) {
-        super(writer);
-    }
+	public IndentingWriter(Writer writer) {
+		super(writer);
+	}
 }

@@ -29,34 +29,35 @@ import org.jf.dexlib.DexFile;
  */
 public class SmaliDecoder {
 
-    public static void decode(File apkFile, File outDir, boolean debug, boolean bakdeb)
-            throws AndrolibException {
-        new SmaliDecoder(apkFile, outDir, debug, bakdeb).decode();
-    }
+	public static void decode(File apkFile, File outDir, boolean debug,
+			boolean bakdeb) throws AndrolibException {
+		new SmaliDecoder(apkFile, outDir, debug, bakdeb).decode();
+	}
 
-    private SmaliDecoder(File apkFile, File outDir, boolean debug, boolean bakdeb) {
-        mApkFile = apkFile;
-        mOutDir = outDir;
-        mDebug = debug;
-        mBakDeb = bakdeb;
-    }
+	private SmaliDecoder(File apkFile, File outDir, boolean debug,
+			boolean bakdeb) {
+		mApkFile = apkFile;
+		mOutDir = outDir;
+		mDebug = debug;
+		mBakDeb = bakdeb;
+	}
 
-    private void decode() throws AndrolibException {
-        if (mDebug) {	
-            ClassPath.dontLoadClassPath = true;
-        }
-        try {
-            baksmali.disassembleDexFile(mApkFile.getAbsolutePath(),
-                new DexFile(mApkFile), false, mOutDir.getAbsolutePath(), null,
-                null, null, false, true, true, mBakDeb, false, false, 
-                mDebug ? main.DIFFPRE: 0, false, false, null, false);
-        } catch (IOException ex) {
-            throw new AndrolibException(ex);
-        }
-    }
+	private void decode() throws AndrolibException {
+		if (mDebug) {
+			ClassPath.dontLoadClassPath = true;
+		}
+		try {
+			baksmali.disassembleDexFile(mApkFile.getAbsolutePath(),
+					new DexFile(mApkFile), false, mOutDir.getAbsolutePath(),
+					null, null, null, false, true, true, mBakDeb, false, false,
+					mDebug ? main.DIFFPRE : 0, false, false, null, false);
+		} catch (IOException ex) {
+			throw new AndrolibException(ex);
+		}
+	}
 
-    private final File mApkFile;
-    private final File mOutDir;
-    private final boolean mDebug;
-    private final boolean mBakDeb;
+	private final File mApkFile;
+	private final File mOutDir;
+	private final boolean mDebug;
+	private final boolean mBakDeb;
 }

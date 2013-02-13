@@ -24,51 +24,49 @@ import java.util.*;
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
 public class ResConfig {
-    private final ResConfigFlags mFlags;
-    private final Map<ResResSpec, ResResource> mResources =
-        new LinkedHashMap<ResResSpec, ResResource>();
+	private final ResConfigFlags mFlags;
+	private final Map<ResResSpec, ResResource> mResources = new LinkedHashMap<ResResSpec, ResResource>();
 
-    public ResConfig(ResConfigFlags flags) {
-        this.mFlags = flags;
-    }
+	public ResConfig(ResConfigFlags flags) {
+		this.mFlags = flags;
+	}
 
-    public Set<ResResource> listResources() {
-        return new LinkedHashSet<ResResource>(mResources.values());
-    }
+	public Set<ResResource> listResources() {
+		return new LinkedHashSet<ResResource>(mResources.values());
+	}
 
-    public ResResource getResource(ResResSpec spec) throws AndrolibException {
-        ResResource res = mResources.get(spec);
-        if (res == null) {
-            throw new UndefinedResObject(String.format(
-                "resource: spec=%s, config=%s", spec, this));
-        }
-        return res;
-    }
+	public ResResource getResource(ResResSpec spec) throws AndrolibException {
+		ResResource res = mResources.get(spec);
+		if (res == null) {
+			throw new UndefinedResObject(String.format(
+					"resource: spec=%s, config=%s", spec, this));
+		}
+		return res;
+	}
 
-    public Set<ResResSpec> listResSpecs() {
-        return mResources.keySet();
-    }
+	public Set<ResResSpec> listResSpecs() {
+		return mResources.keySet();
+	}
 
-    public ResConfigFlags getFlags() {
-        return mFlags;
-    }
+	public ResConfigFlags getFlags() {
+		return mFlags;
+	}
 
-    public void addResource(ResResource res)
-            throws AndrolibException {
-        addResource(res, false);
-    }
+	public void addResource(ResResource res) throws AndrolibException {
+		addResource(res, false);
+	}
 
-    public void addResource(ResResource res, boolean overwrite)
-            throws AndrolibException {
-        ResResSpec spec = res.getResSpec();
-        if (mResources.put(spec, res) != null && ! overwrite) {
-            throw new AndrolibException(String.format(
-                "Multiple resources: spec=%s, config=%s", spec, this));
-        }
-    }
+	public void addResource(ResResource res, boolean overwrite)
+			throws AndrolibException {
+		ResResSpec spec = res.getResSpec();
+		if (mResources.put(spec, res) != null && !overwrite) {
+			throw new AndrolibException(String.format(
+					"Multiple resources: spec=%s, config=%s", spec, this));
+		}
+	}
 
-    @Override
-    public String toString() {
-        return mFlags.toString();
-    }
+	@Override
+	public String toString() {
+		return mFlags.toString();
+	}
 }

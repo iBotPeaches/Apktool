@@ -23,42 +23,41 @@ import brut.androlib.res.data.value.ResValue;
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
 public class ResResource {
-    private final ResConfig mConfig;
-    private final ResResSpec mResSpec;
-    private final ResValue mValue;
+	private final ResConfig mConfig;
+	private final ResResSpec mResSpec;
+	private final ResValue mValue;
 
-    public ResResource(ResConfig config, ResResSpec spec,
-            ResValue value) {
-        this.mConfig = config;
-        this.mResSpec = spec;
-        this.mValue = value;
-    }
+	public ResResource(ResConfig config, ResResSpec spec, ResValue value) {
+		this.mConfig = config;
+		this.mResSpec = spec;
+		this.mValue = value;
+	}
 
-    public String getFilePath() {
-        return mResSpec.getType().getName() +
-            mConfig.getFlags().getQualifiers() + "/" + mResSpec.getName();
-    }
+	public String getFilePath() {
+		return mResSpec.getType().getName()
+				+ mConfig.getFlags().getQualifiers() + "/" + mResSpec.getName();
+	}
 
-    public ResConfig getConfig() {
-        return mConfig;
-    }
+	public ResConfig getConfig() {
+		return mConfig;
+	}
 
-    public ResResSpec getResSpec() {
-        return mResSpec;
-    }
+	public ResResSpec getResSpec() {
+		return mResSpec;
+	}
 
-    public ResValue getValue() {
-        return mValue;
-    }
+	public ResValue getValue() {
+		return mValue;
+	}
 
-    public void replace(ResValue value) throws AndrolibException {
-        ResResource res = new ResResource(mConfig, mResSpec, value);
-        mConfig.addResource(res, true);
-        mResSpec.addResource(res, true);
-    }
+	public void replace(ResValue value) throws AndrolibException {
+		ResResource res = new ResResource(mConfig, mResSpec, value);
+		mConfig.addResource(res, true);
+		mResSpec.addResource(res, true);
+	}
 
-    @Override
-    public String toString() {
-        return getFilePath();
-    }
+	@Override
+	public String toString() {
+		return getFilePath();
+	}
 }

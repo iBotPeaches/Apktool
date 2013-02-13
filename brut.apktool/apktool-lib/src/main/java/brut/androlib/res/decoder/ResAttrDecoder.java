@@ -25,31 +25,31 @@ import brut.androlib.res.data.value.ResScalarValue;
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
 public class ResAttrDecoder {
-    public String decode(int type, int value, String rawValue, int attrResId)
-            throws AndrolibException {
-        ResScalarValue resValue = mCurrentPackage.getValueFactory()
-            .factory(type, value, rawValue);
+	public String decode(int type, int value, String rawValue, int attrResId)
+			throws AndrolibException {
+		ResScalarValue resValue = mCurrentPackage.getValueFactory().factory(
+				type, value, rawValue);
 
-        String decoded = null;
-        if (attrResId != 0) {
-            ResAttr attr = (ResAttr) getCurrentPackage().getResTable()
-                .getResSpec(attrResId).getDefaultResource().getValue();
-            decoded = attr.convertToResXmlFormat(resValue);
-        }
+		String decoded = null;
+		if (attrResId != 0) {
+			ResAttr attr = (ResAttr) getCurrentPackage().getResTable()
+					.getResSpec(attrResId).getDefaultResource().getValue();
+			decoded = attr.convertToResXmlFormat(resValue);
+		}
 
-        return decoded != null ? decoded : resValue.encodeAsResXmlAttr();
-    }
+		return decoded != null ? decoded : resValue.encodeAsResXmlAttr();
+	}
 
-    public ResPackage getCurrentPackage() throws AndrolibException {
-        if (mCurrentPackage == null) {
-            throw new AndrolibException("Current package not set");
-        }
-        return mCurrentPackage;
-    }
+	public ResPackage getCurrentPackage() throws AndrolibException {
+		if (mCurrentPackage == null) {
+			throw new AndrolibException("Current package not set");
+		}
+		return mCurrentPackage;
+	}
 
-    public void setCurrentPackage(ResPackage currentPackage) {
-        mCurrentPackage = currentPackage;
-    }
+	public void setCurrentPackage(ResPackage currentPackage) {
+		mCurrentPackage = currentPackage;
+	}
 
-    private ResPackage mCurrentPackage;
+	private ResPackage mCurrentPackage;
 }

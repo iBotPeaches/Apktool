@@ -22,18 +22,18 @@ import brut.common.BrutException;
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
 public class AndrolibException extends BrutException {
-    public AndrolibException() {
-    }
+	public AndrolibException() {
+	}
 
-    public AndrolibException(String message) {
-        super(message);
-    }
+	public AndrolibException(String message) {
+		super(message);
+	}
 
-    public AndrolibException(String message, Throwable cause) {
-        super(message, cause);
-    }
+	public AndrolibException(String message, Throwable cause) {
+		super(message, cause);
+	}
 
-    public AndrolibException(Throwable cause) {
-        super(cause);
-    }
+	public AndrolibException(Throwable cause) {
+		super(cause);
+	}
 }

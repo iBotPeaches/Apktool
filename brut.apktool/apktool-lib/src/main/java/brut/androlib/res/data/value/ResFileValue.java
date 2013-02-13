@@ -22,21 +22,21 @@ import brut.androlib.AndrolibException;
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
 public class ResFileValue extends ResValue {
-    private final String mPath;
+	private final String mPath;
 
-    public ResFileValue(String path) {
-        this.mPath = path;
-    }
+	public ResFileValue(String path) {
+		this.mPath = path;
+	}
 
-    public String getPath() {
-        return mPath;
-    }
+	public String getPath() {
+		return mPath;
+	}
 
-    public String getStrippedPath() throws AndrolibException {
-        if (! mPath.startsWith("res/")) {
-            throw new AndrolibException(
-                "File path does not start with \"res/\": " + mPath);
-        }
-        return mPath.substring(4);
-    }
+	public String getStrippedPath() throws AndrolibException {
+		if (!mPath.startsWith("res/")) {
+			throw new AndrolibException(
+					"File path does not start with \"res/\": " + mPath);
+		}
+		return mPath.substring(4);
+	}
 }

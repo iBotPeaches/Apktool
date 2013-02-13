@@ -28,57 +28,58 @@ import org.jf.smali.*;
  */
 public class SmaliMod {
 
-    public static boolean assembleSmaliFile(InputStream smaliStream,
-            String name, DexFile dexFile, boolean verboseErrors,
-            boolean oldLexer, boolean printTokens)
-            throws IOException, RecognitionException {
-        CommonTokenStream tokens;
+	public static boolean assembleSmaliFile(InputStream smaliStream,
+			String name, DexFile dexFile, boolean verboseErrors,
+			boolean oldLexer, boolean printTokens) throws IOException,
+			RecognitionException {
+		CommonTokenStream tokens;
 
+		boolean lexerErrors = false;
+		LexerErrorInterface lexer;
 
-        boolean lexerErrors = false;
-        LexerErrorInterface lexer;
+		InputStreamReader reader = new InputStreamReader(smaliStream, "UTF-8");
 
-        InputStreamReader reader = new InputStreamReader(smaliStream, "UTF-8");
+		lexer = new smaliFlexLexer(reader);
+		tokens = new CommonTokenStream((TokenSource) lexer);
 
-        lexer = new smaliFlexLexer(reader);
-        tokens = new CommonTokenStream((TokenSource)lexer);
+		if (printTokens) {
+			tokens.getTokens();
 
-        if (printTokens) {
-            tokens.getTokens();
+			for (int i = 0; i < tokens.size(); i++) {
+				Token token = tokens.get(i);
+				if (token.getChannel() == BaseRecognizer.HIDDEN) {
+					continue;
+				}
 
-            for (int i=0; i<tokens.size(); i++) {
-                Token token = tokens.get(i);
-                if (token.getChannel() == smaliParser.HIDDEN) {
-                    continue;
-                }
+				System.out.println(smaliParser.tokenNames[token.getType()]
+						+ ": " + token.getText());
+			}
+		}
 
-                System.out.println(smaliParser.tokenNames[token.getType()] + ": " + token.getText());
-            }
-        }
+		smaliParser parser = new smaliParser(tokens);
+		parser.setVerboseErrors(verboseErrors);
 
-        smaliParser parser = new smaliParser(tokens);
-        parser.setVerboseErrors(verboseErrors);
+		smaliParser.smali_file_return result = parser.smali_file();
 
-        smaliParser.smali_file_return result = parser.smali_file();
+		if (parser.getNumberOfSyntaxErrors() > 0
+				|| lexer.getNumberOfSyntaxErrors() > 0) {
+			return false;
+		}
 
-        if (parser.getNumberOfSyntaxErrors() > 0 || lexer.getNumberOfSyntaxErrors() > 0) {
-            return false;
-        }
+		CommonTree t = (CommonTree) result.getTree();
 
-        CommonTree t = (CommonTree) result.getTree();
+		CommonTreeNodeStream treeStream = new CommonTreeNodeStream(t);
+		treeStream.setTokenStream(tokens);
 
-        CommonTreeNodeStream treeStream = new CommonTreeNodeStream(t);
-        treeStream.setTokenStream(tokens);
+		smaliTreeWalker dexGen = new smaliTreeWalker(treeStream);
 
-        smaliTreeWalker dexGen = new smaliTreeWalker(treeStream);
+		dexGen.dexFile = dexFile;
+		dexGen.smali_file();
 
-        dexGen.dexFile = dexFile;
-        dexGen.smali_file();
+		if (dexGen.getNumberOfSyntaxErrors() > 0) {
+			return false;
+		}
 
-        if (dexGen.getNumberOfSyntaxErrors() > 0) {
-            return false;
-        }
-
-        return true;
-    }
+		return true;
+	}
 }

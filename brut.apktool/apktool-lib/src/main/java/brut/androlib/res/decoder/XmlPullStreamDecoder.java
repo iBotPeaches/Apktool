@@ -36,122 +36,133 @@ import brut.androlib.res.util.ExtXmlSerializer;
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
 public class XmlPullStreamDecoder implements ResStreamDecoder {
-    public XmlPullStreamDecoder(XmlPullParser parser,
-            ExtXmlSerializer serializer) {
-        this.mParser = parser;
-        this.mSerial = serializer;
-    }
+	public XmlPullStreamDecoder(XmlPullParser parser,
+			ExtXmlSerializer serializer) {
+		this.mParser = parser;
+		this.mSerial = serializer;
+	}
 
-    public void decode(InputStream in, OutputStream out)
-            throws AndrolibException {
-        try {
-            XmlPullWrapperFactory factory = XmlPullWrapperFactory.newInstance();
-            XmlPullParserWrapper par = factory.newPullParserWrapper(mParser);
-            final ResTable resTable = ((AXmlResourceParser)mParser).getAttrDecoder().getCurrentPackage().getResTable();
-            
-            XmlSerializerWrapper ser = new StaticXmlSerializerWrapper(mSerial, factory){
-                boolean hideSdkInfo = false;
-                boolean hidePackageInfo = false;
-                @Override
-                public void event(XmlPullParser pp) throws XmlPullParserException, IOException {
-                    int type = pp.getEventType();
-                    
-                        if (type == XmlPullParser.START_TAG) {
-                        	if ("manifest".equalsIgnoreCase(pp.getName())) {
-                        		try {
-									hidePackageInfo = parseManifest(pp);
-								} catch (AndrolibException e) {}
-                        	}else if ("uses-sdk".equalsIgnoreCase(pp.getName())) {
-                                try {
-                                    hideSdkInfo = parseAttr(pp);
-                                    if(hideSdkInfo) {
-                                    	return;                               
-                                    }
-                                } catch (AndrolibException e) {}
-                            }
-                        } else if (hideSdkInfo && type == XmlPullParser.END_TAG && 
-                                	"uses-sdk".equalsIgnoreCase(pp.getName())) {
-                        	return;
-                        } else if (hidePackageInfo && type == XmlPullParser.END_TAG &&
-                                	"manifest".equalsIgnoreCase(pp.getName())) {
-                        	super.event(pp);
-                            return;
-                        }
-                        super.event(pp);
-                    }
-                
-                private boolean parseManifest(XmlPullParser pp) throws AndrolibException {
-                	ResTable restable = resTable;
-                	
-                	// read <manifest> for package:
-                	for (int i = 0; i < pp.getAttributeCount(); i++) {
-                		if (pp.getAttributeName(i).equalsIgnoreCase(("package"))) {
-                			restable.addPackageInfo("orig_package", pp.getAttributeValue(i));
-                		}
-                	}
-                	return true;
-                }
-                
-                private boolean parseAttr(XmlPullParser pp) throws AndrolibException {
-                    ResTable restable = resTable;
-                    for (int i = 0; i < pp.getAttributeCount(); i++) {
-                        final String a_ns = "http://schemas.android.com/apk/res/android";
-                        String ns = pp.getAttributeNamespace (i);
-                                                
-                        if (a_ns.equalsIgnoreCase(ns)) {
-                            String name = pp.getAttributeName (i);
-                            String value = pp.getAttributeValue (i);
-                            if (name != null && value != null) {
-                                if (name.equalsIgnoreCase("minSdkVersion") || 
-                                        name.equalsIgnoreCase("targetSdkVersion") || 
-                                        name.equalsIgnoreCase("maxSdkVersion")) {
-                                    restable.addSdkInfo(name, value);
-                                } else {
-                                    restable.clearSdkInfo();
-                                    return false;//Found unknown flags
-                                }
-                            }
-                        } else {
-                            resTable.clearSdkInfo();
-                            
-                            if (i >= pp.getAttributeCount()) {
-                            	return false;//Found unknown flags
-                            }
-                        }
-                    }
-                    return true;
-                }
-            };
+	@Override
+	public void decode(InputStream in, OutputStream out)
+			throws AndrolibException {
+		try {
+			XmlPullWrapperFactory factory = XmlPullWrapperFactory.newInstance();
+			XmlPullParserWrapper par = factory.newPullParserWrapper(mParser);
+			final ResTable resTable = ((AXmlResourceParser) mParser)
+					.getAttrDecoder().getCurrentPackage().getResTable();
 
-            par.setInput(in, null);
-            ser.setOutput(out, null);
+			XmlSerializerWrapper ser = new StaticXmlSerializerWrapper(mSerial,
+					factory) {
+				boolean hideSdkInfo = false;
+				boolean hidePackageInfo = false;
 
-            while (par.nextToken() != XmlPullParser.END_DOCUMENT) {
-                ser.event(par);
-            }
-            ser.flush();
-        } catch (XmlPullParserException ex) {
-            throw new AndrolibException("Could not decode XML", ex);
-        } catch (IOException ex) {
-            throw new AndrolibException("Could not decode XML", ex);
-        }
-    }
+				@Override
+				public void event(XmlPullParser pp)
+						throws XmlPullParserException, IOException {
+					int type = pp.getEventType();
 
-    public void decodeManifest(InputStream in, OutputStream out)
-            throws AndrolibException {
-        mOptimizeForManifest = true;
-        try {
-            decode(in, out);
-        } finally {
-            mOptimizeForManifest = false;
-        }
-    }
+					if (type == XmlPullParser.START_TAG) {
+						if ("manifest".equalsIgnoreCase(pp.getName())) {
+							try {
+								hidePackageInfo = parseManifest(pp);
+							} catch (AndrolibException e) {
+							}
+						} else if ("uses-sdk".equalsIgnoreCase(pp.getName())) {
+							try {
+								hideSdkInfo = parseAttr(pp);
+								if (hideSdkInfo) {
+									return;
+								}
+							} catch (AndrolibException e) {
+							}
+						}
+					} else if (hideSdkInfo && type == XmlPullParser.END_TAG
+							&& "uses-sdk".equalsIgnoreCase(pp.getName())) {
+						return;
+					} else if (hidePackageInfo && type == XmlPullParser.END_TAG
+							&& "manifest".equalsIgnoreCase(pp.getName())) {
+						super.event(pp);
+						return;
+					}
+					super.event(pp);
+				}
 
-    private final XmlPullParser mParser;
-    private final ExtXmlSerializer mSerial;
+				private boolean parseManifest(XmlPullParser pp)
+						throws AndrolibException {
+					ResTable restable = resTable;
 
-    private boolean mOptimizeForManifest = false;
+					// read <manifest> for package:
+					for (int i = 0; i < pp.getAttributeCount(); i++) {
+						if (pp.getAttributeName(i)
+								.equalsIgnoreCase(("package"))) {
+							restable.addPackageInfo("orig_package",
+									pp.getAttributeValue(i));
+						}
+					}
+					return true;
+				}
 
-    private final static Logger LOGGER =
-        Logger.getLogger(XmlPullStreamDecoder.class.getName());
+				private boolean parseAttr(XmlPullParser pp)
+						throws AndrolibException {
+					ResTable restable = resTable;
+					for (int i = 0; i < pp.getAttributeCount(); i++) {
+						final String a_ns = "http://schemas.android.com/apk/res/android";
+						String ns = pp.getAttributeNamespace(i);
+
+						if (a_ns.equalsIgnoreCase(ns)) {
+							String name = pp.getAttributeName(i);
+							String value = pp.getAttributeValue(i);
+							if (name != null && value != null) {
+								if (name.equalsIgnoreCase("minSdkVersion")
+										|| name.equalsIgnoreCase("targetSdkVersion")
+										|| name.equalsIgnoreCase("maxSdkVersion")) {
+									restable.addSdkInfo(name, value);
+								} else {
+									restable.clearSdkInfo();
+									return false;// Found unknown flags
+								}
+							}
+						} else {
+							resTable.clearSdkInfo();
+
+							if (i >= pp.getAttributeCount()) {
+								return false;// Found unknown flags
+							}
+						}
+					}
+					return true;
+				}
+			};
+
+			par.setInput(in, null);
+			ser.setOutput(out, null);
+
+			while (par.nextToken() != XmlPullParser.END_DOCUMENT) {
+				ser.event(par);
+			}
+			ser.flush();
+		} catch (XmlPullParserException ex) {
+			throw new AndrolibException("Could not decode XML", ex);
+		} catch (IOException ex) {
+			throw new AndrolibException("Could not decode XML", ex);
+		}
+	}
+
+	public void decodeManifest(InputStream in, OutputStream out)
+			throws AndrolibException {
+		mOptimizeForManifest = true;
+		try {
+			decode(in, out);
+		} finally {
+			mOptimizeForManifest = false;
+		}
+	}
+
+	private final XmlPullParser mParser;
+	private final ExtXmlSerializer mSerial;
+
+	private boolean mOptimizeForManifest = false;
+
+	private final static Logger LOGGER = Logger
+			.getLogger(XmlPullStreamDecoder.class.getName());
 }

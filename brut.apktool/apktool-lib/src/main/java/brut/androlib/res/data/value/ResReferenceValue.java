@@ -24,44 +24,44 @@ import brut.androlib.res.data.ResResSpec;
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
 public class ResReferenceValue extends ResIntValue {
-    private final ResPackage mPackage;
-    private final boolean mTheme;
+	private final ResPackage mPackage;
+	private final boolean mTheme;
 
-    public ResReferenceValue(ResPackage package_, int value, String rawValue) {
-        this(package_, value, rawValue, false);
-    }
-    
-    public ResReferenceValue(ResPackage package_, int value, String rawValue,
-            boolean theme) {
-        super(value, rawValue, "reference");
-        mPackage = package_;
-        mTheme = theme;
-    }
+	public ResReferenceValue(ResPackage package_, int value, String rawValue) {
+		this(package_, value, rawValue, false);
+	}
 
-    protected String encodeAsResXml() throws AndrolibException {
-        if (isNull()) {
-            return "@null";
-        }
+	public ResReferenceValue(ResPackage package_, int value, String rawValue,
+			boolean theme) {
+		super(value, rawValue, "reference");
+		mPackage = package_;
+		mTheme = theme;
+	}
 
-        ResResSpec spec = getReferent();
-        boolean newId =
-            spec.hasDefaultResource() &&
-            spec.getDefaultResource().getValue() instanceof ResIdValue;
+	@Override
+	protected String encodeAsResXml() throws AndrolibException {
+		if (isNull()) {
+			return "@null";
+		}
 
-           // generate the beginning to fix @android 
-           String mStart = (mTheme ? '?' : '@') + (newId ? "+" : "");
-           //mStart = mStart.replace("@android", "@*android");
-           
-        return mStart +
-            spec.getFullName(mPackage,
-                mTheme && spec.getType().getName().equals("attr"));
-    }
+		ResResSpec spec = getReferent();
+		boolean newId = spec.hasDefaultResource()
+				&& spec.getDefaultResource().getValue() instanceof ResIdValue;
 
-    public ResResSpec getReferent() throws AndrolibException {
-        return mPackage.getResTable().getResSpec(getValue());
-    }
+		// generate the beginning to fix @android
+		String mStart = (mTheme ? '?' : '@') + (newId ? "+" : "");
+		// mStart = mStart.replace("@android", "@*android");
 
-    public boolean isNull() {
-        return mValue == 0;
-    }
+		return mStart
+				+ spec.getFullName(mPackage, mTheme
+						&& spec.getType().getName().equals("attr"));
+	}
+
+	public ResResSpec getReferent() throws AndrolibException {
+		return mPackage.getResTable().getResSpec(getValue());
+	}
+
+	public boolean isNull() {
+		return mValue == 0;
+	}
 }

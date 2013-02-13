@@ -20,18 +20,19 @@ package brut.androlib.res.data.value;
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
 public class ResBoolValue extends ResScalarValue {
-    private final boolean mValue;
+	private final boolean mValue;
 
-    public ResBoolValue(boolean value, String rawValue) {
-        super("bool", rawValue);
-        this.mValue = value;
-    }
+	public ResBoolValue(boolean value, String rawValue) {
+		super("bool", rawValue);
+		this.mValue = value;
+	}
 
-    public boolean getValue() {
-        return mValue;
-    }
+	public boolean getValue() {
+		return mValue;
+	}
 
-    protected String encodeAsResXml() {
-        return mValue ? "true" : "false";
-    }
+	@Override
+	protected String encodeAsResXml() {
+		return mValue ? "true" : "false";
+	}
 }

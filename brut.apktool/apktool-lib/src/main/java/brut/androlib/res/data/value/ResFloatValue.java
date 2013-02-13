@@ -20,18 +20,19 @@ package brut.androlib.res.data.value;
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
 public class ResFloatValue extends ResScalarValue {
-    private final float mValue;
+	private final float mValue;
 
-    public ResFloatValue(float value, String rawValue) {
-        super("float", rawValue);
-        this.mValue = value;
-    }
+	public ResFloatValue(float value, String rawValue) {
+		super("float", rawValue);
+		this.mValue = value;
+	}
 
-    public float getValue() {
-        return mValue;
-    }
+	public float getValue() {
+		return mValue;
+	}
 
-    protected String encodeAsResXml() {
-        return String.valueOf(mValue);
-    }
+	@Override
+	protected String encodeAsResXml() {
+		return String.valueOf(mValue);
+	}
 }

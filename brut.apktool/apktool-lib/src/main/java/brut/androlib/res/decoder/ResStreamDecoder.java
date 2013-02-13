@@ -24,6 +24,6 @@ import java.io.OutputStream;
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
 public interface ResStreamDecoder {
-    public void decode(InputStream in, OutputStream out)
-        throws AndrolibException;
+	public void decode(InputStream in, OutputStream out)
+			throws AndrolibException;
 }

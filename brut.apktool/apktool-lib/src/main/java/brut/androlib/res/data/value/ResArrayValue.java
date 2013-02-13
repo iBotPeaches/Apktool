@@ -22,70 +22,70 @@ import brut.androlib.res.xml.ResValuesXmlSerializable;
 import brut.util.Duo;
 import java.io.IOException;
 import org.xmlpull.v1.XmlSerializer;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
-public class ResArrayValue extends ResBagValue implements ResValuesXmlSerializable {
-    private String mRawItems;
-    ResArrayValue(ResReferenceValue parent,
-            Duo<Integer, ResScalarValue>[] items) {
-        super(parent);
+public class ResArrayValue extends ResBagValue implements
+		ResValuesXmlSerializable {
+	private String mRawItems;
 
-        mItems = new ResScalarValue[items.length];
-        for (int i = 0; i < items.length; i++) {
-            mItems[i] = items[i].m2;
-        }
-    }
+	ResArrayValue(ResReferenceValue parent, Duo<Integer, ResScalarValue>[] items) {
+		super(parent);
 
-    public ResArrayValue(ResReferenceValue parent, ResScalarValue[] items) {
-        super(parent);
-        mItems = items;
-    }
+		mItems = new ResScalarValue[items.length];
+		for (int i = 0; i < items.length; i++) {
+			mItems[i] = items[i].m2;
+		}
+	}
 
-    @Override
-    public void serializeToResValuesXml(XmlSerializer serializer, ResResource res)
-            throws IOException, AndrolibException {
-        String type = getType();
-        type = (type == null ? "" : type + "-") + "array";
-// reference array (04 10 2012, BurgerZ)              
-        if ("reference-array".equals(type)) {
-            type = "string-array";
-        }
-// reference array (04 10 2012, BurgerZ) 
-        serializer.startTag(null, type);
-        serializer.attribute(null, "name", res.getResSpec().getName());
-        for (int i = 0; i < mItems.length; i++) {
-            serializer.startTag(null, "item");
-            serializer.text(mItems[i].encodeAsResXmlItemValue());
-            serializer.endTag(null, "item");
-        }
-        serializer.endTag(null, type);
-    }
+	public ResArrayValue(ResReferenceValue parent, ResScalarValue[] items) {
+		super(parent);
+		mItems = items;
+	}
 
-    public String getType() throws AndrolibException {
-        if (mItems.length == 0) {
-            return null;
-        }
-        String type = mItems[0].getType();
-        for (int i = 1; i < mItems.length; i++) {
-            
-            if (mItems[i].encodeAsResXmlItemValue().startsWith("@string")) {
-                return "string";
-            } else if (mItems[i].encodeAsResXmlItemValue().startsWith("@drawable")) {
-                return null;
-            } else if (!"string".equals(type) && !"integer".equals(type)) {
-                return null;
-            } else if (!type.equals(mItems[i].getType())) {
-                return null;
-            }
-        }
-        return type;
-    }
+	@Override
+	public void serializeToResValuesXml(XmlSerializer serializer,
+			ResResource res) throws IOException, AndrolibException {
+		String type = getType();
+		type = (type == null ? "" : type + "-") + "array";
+		// reference array (04 10 2012, BurgerZ)
+		if ("reference-array".equals(type)) {
+			type = "string-array";
+		}
+		// reference array (04 10 2012, BurgerZ)
+		serializer.startTag(null, type);
+		serializer.attribute(null, "name", res.getResSpec().getName());
+		for (int i = 0; i < mItems.length; i++) {
+			serializer.startTag(null, "item");
+			serializer.text(mItems[i].encodeAsResXmlItemValue());
+			serializer.endTag(null, "item");
+		}
+		serializer.endTag(null, type);
+	}
 
-    private final ResScalarValue[] mItems;
+	public String getType() throws AndrolibException {
+		if (mItems.length == 0) {
+			return null;
+		}
+		String type = mItems[0].getType();
+		for (int i = 1; i < mItems.length; i++) {
 
+			if (mItems[i].encodeAsResXmlItemValue().startsWith("@string")) {
+				return "string";
+			} else if (mItems[i].encodeAsResXmlItemValue().startsWith(
+					"@drawable")) {
+				return null;
+			} else if (!"string".equals(type) && !"integer".equals(type)) {
+				return null;
+			} else if (!type.equals(mItems[i].getType())) {
+				return null;
+			}
+		}
+		return type;
+	}
 
-    public static final int BAG_KEY_ARRAY_START = 0x02000000;
+	private final ResScalarValue[] mItems;
+
+	public static final int BAG_KEY_ARRAY_START = 0x02000000;
 }

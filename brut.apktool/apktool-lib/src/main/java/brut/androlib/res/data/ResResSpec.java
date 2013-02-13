@@ -25,101 +25,97 @@ import org.apache.commons.lang3.StringUtils;
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
 public class ResResSpec {
-    private final ResID mId;
-    private final String mName;
-    private final ResPackage mPackage;
-    private final ResType mType;
-    private final Map<ResConfigFlags, ResResource> mResources =
-        new LinkedHashMap<ResConfigFlags, ResResource>();
+	private final ResID mId;
+	private final String mName;
+	private final ResPackage mPackage;
+	private final ResType mType;
+	private final Map<ResConfigFlags, ResResource> mResources = new LinkedHashMap<ResConfigFlags, ResResource>();
 
-    public ResResSpec(ResID id, String name, ResPackage pkg, ResType type) {
-        this.mId = id;
-        this.mName = name;
-        this.mPackage = pkg;
-        this.mType = type;
-    }
+	public ResResSpec(ResID id, String name, ResPackage pkg, ResType type) {
+		this.mId = id;
+		this.mName = name;
+		this.mPackage = pkg;
+		this.mType = type;
+	}
 
-    public Set<ResResource> listResources() {
-        return new LinkedHashSet<ResResource>(mResources.values());
-    }
+	public Set<ResResource> listResources() {
+		return new LinkedHashSet<ResResource>(mResources.values());
+	}
 
-    public ResResource getResource(ResConfig config) throws AndrolibException {
-        return getResource(config.getFlags());
-    }
-    
-    public ResResource getResource(ResConfigFlags config)
-            throws AndrolibException {
-        ResResource res = mResources.get(config);
-        if (res == null) {
-            throw new UndefinedResObject(String.format(
-                "resource: spec=%s, config=%s", this, config));
-        }
-        return res;
-    }
+	public ResResource getResource(ResConfig config) throws AndrolibException {
+		return getResource(config.getFlags());
+	}
 
-    public boolean hasResource(ResConfig config) {
-        return hasResource(config.getFlags());
-    }
+	public ResResource getResource(ResConfigFlags config)
+			throws AndrolibException {
+		ResResource res = mResources.get(config);
+		if (res == null) {
+			throw new UndefinedResObject(String.format(
+					"resource: spec=%s, config=%s", this, config));
+		}
+		return res;
+	}
 
-    private boolean hasResource(ResConfigFlags flags) {
-        return mResources.containsKey(flags);
-    }
+	public boolean hasResource(ResConfig config) {
+		return hasResource(config.getFlags());
+	}
 
-    public ResResource getDefaultResource() throws AndrolibException {
-        return getResource(new ResConfigFlags());
-    }
+	private boolean hasResource(ResConfigFlags flags) {
+		return mResources.containsKey(flags);
+	}
 
-    public boolean hasDefaultResource() {
-        return mResources.containsKey(new ResConfigFlags());
-    }
+	public ResResource getDefaultResource() throws AndrolibException {
+		return getResource(new ResConfigFlags());
+	}
 
-    public String getFullName() {
-        return getFullName(false, false);
-    }
+	public boolean hasDefaultResource() {
+		return mResources.containsKey(new ResConfigFlags());
+	}
 
-    public String getFullName(ResPackage relativeToPackage,
-            boolean excludeType) {
-        return getFullName(
-            getPackage().equals(relativeToPackage), excludeType);
-    }
+	public String getFullName() {
+		return getFullName(false, false);
+	}
 
-    public String getFullName(boolean excludePackage, boolean excludeType) {
-        return
-            (excludePackage ? "" : getPackage().getName() + ":") +
-            (excludeType ? "" : getType().getName() + "/") + getName();
-    }
+	public String getFullName(ResPackage relativeToPackage, boolean excludeType) {
+		return getFullName(getPackage().equals(relativeToPackage), excludeType);
+	}
 
-    public ResID getId() {
-        return mId;
-    }
+	public String getFullName(boolean excludePackage, boolean excludeType) {
+		return (excludePackage ? "" : getPackage().getName() + ":")
+				+ (excludeType ? "" : getType().getName() + "/") + getName();
+	}
 
-    public String getName() {
-        return StringUtils.replace(mName, "\"", "q");
-    }
+	public ResID getId() {
+		return mId;
+	}
 
-    public ResPackage getPackage() {
-        return mPackage;
-    }
+	public String getName() {
+		return StringUtils.replace(mName, "\"", "q");
+	}
 
-    public ResType getType() {
-        return mType;
-    }
+	public ResPackage getPackage() {
+		return mPackage;
+	}
 
-    public void addResource(ResResource res)
-            throws AndrolibException {
-        addResource(res, false);
-    }
+	public ResType getType() {
+		return mType;
+	}
 
-    public void addResource(ResResource res, boolean overwrite)
-            throws AndrolibException {
-        ResConfigFlags flags = res.getConfig().getFlags();
-        if (mResources.put(flags, res) != null && ! overwrite) {
-            throw new AndrolibException(String.format("Multiple resources: spec=%s, config=%s", this, flags));
-        }
-    }
+	public void addResource(ResResource res) throws AndrolibException {
+		addResource(res, false);
+	}
 
-    @Override
-    public String toString() {
-        return mId.toString() + " " + mType.toString() + "/" + mName;
-    }
+	public void addResource(ResResource res, boolean overwrite)
+			throws AndrolibException {
+		ResConfigFlags flags = res.getConfig().getFlags();
+		if (mResources.put(flags, res) != null && !overwrite) {
+			throw new AndrolibException(String.format(
+					"Multiple resources: spec=%s, config=%s", this, flags));
+		}
+	}
+
+	@Override
+	public String toString() {
+		return mId.toString() + " " + mType.toString() + "/" + mName;
+	}
 }

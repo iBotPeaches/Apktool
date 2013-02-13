@@ -26,12 +26,13 @@ import org.apache.commons.io.IOUtils;
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
 public class ResRawStreamDecoder implements ResStreamDecoder {
-    public void decode(InputStream in, OutputStream out)
-            throws AndrolibException {
-        try {
-            IOUtils.copy(in, out);
-        } catch (IOException ex) {
-            throw new AndrolibException("Could not decode raw stream", ex);
-        }
-    }
+	@Override
+	public void decode(InputStream in, OutputStream out)
+			throws AndrolibException {
+		try {
+			IOUtils.copy(in, out);
+		} catch (IOException ex) {
+			throw new AndrolibException("Could not decode raw stream", ex);
+		}
+	}
 }

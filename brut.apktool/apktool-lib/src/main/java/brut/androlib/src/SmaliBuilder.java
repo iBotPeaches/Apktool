@@ -31,86 +31,85 @@ import org.apache.commons.io.IOUtils;
  */
 public class SmaliBuilder {
 
-    public static void build(ExtFile smaliDir, File dexFile, 
-            HashMap<String, Boolean> flags)
-            throws AndrolibException {
-        new SmaliBuilder(smaliDir, dexFile, flags).build();
-    }
+	public static void build(ExtFile smaliDir, File dexFile,
+			HashMap<String, Boolean> flags) throws AndrolibException {
+		new SmaliBuilder(smaliDir, dexFile, flags).build();
+	}
 
-    private SmaliBuilder(ExtFile smaliDir, File dexFile, HashMap<String, Boolean> flags) {
-        mSmaliDir = smaliDir;
-        mDexFile = dexFile;
-        mFlags = flags;
-    }
+	private SmaliBuilder(ExtFile smaliDir, File dexFile,
+			HashMap<String, Boolean> flags) {
+		mSmaliDir = smaliDir;
+		mDexFile = dexFile;
+		mFlags = flags;
+	}
 
-    private void build() throws AndrolibException {
-        try {
-            mDexBuilder = new DexFileBuilder();
-            for (String fileName : mSmaliDir.getDirectory().getFiles(true)) {
-                buildFile(fileName);
-            }
-            mDexBuilder.writeTo(mDexFile);
-        } catch (IOException ex) {
-            throw new AndrolibException(ex);
-        } catch (DirectoryException ex) {
-            throw new AndrolibException(ex);
-        }
-    }
+	private void build() throws AndrolibException {
+		try {
+			mDexBuilder = new DexFileBuilder();
+			for (String fileName : mSmaliDir.getDirectory().getFiles(true)) {
+				buildFile(fileName);
+			}
+			mDexBuilder.writeTo(mDexFile);
+		} catch (IOException ex) {
+			throw new AndrolibException(ex);
+		} catch (DirectoryException ex) {
+			throw new AndrolibException(ex);
+		}
+	}
 
-    private void buildFile(String fileName) throws AndrolibException,
-            IOException {
-        File inFile = new File(mSmaliDir, fileName);
-        InputStream inStream = new FileInputStream(inFile);
+	private void buildFile(String fileName) throws AndrolibException,
+			IOException {
+		File inFile = new File(mSmaliDir, fileName);
+		InputStream inStream = new FileInputStream(inFile);
 
-        if (fileName.endsWith(".smali")) {
-            mDexBuilder.addSmaliFile(inFile);
-            return;
-        }
-        if (! fileName.endsWith(".java")) {
-            LOGGER.warning("Unknown file type, ignoring: " + inFile);
-            return;
-        }
+		if (fileName.endsWith(".smali")) {
+			mDexBuilder.addSmaliFile(inFile);
+			return;
+		}
+		if (!fileName.endsWith(".java")) {
+			LOGGER.warning("Unknown file type, ignoring: " + inFile);
+			return;
+		}
 
-        StringBuilder out = new StringBuilder();
-        List<String> lines = IOUtils.readLines(inStream);
+		StringBuilder out = new StringBuilder();
+		List<String> lines = IOUtils.readLines(inStream);
 
-        if (!mFlags.containsKey("debug")) {
-            final String[] linesArray = lines.toArray(new String[0]);
-            for (int i = 2; i < linesArray.length - 2; i++) {
-                out.append(linesArray[i]).append('\n');
-            }
-        } else {
-            lines.remove(lines.size() - 1);
-            lines.remove(lines.size() - 1);
-            ListIterator<String> it = lines.listIterator(2);
+		if (!mFlags.containsKey("debug")) {
+			final String[] linesArray = lines.toArray(new String[0]);
+			for (int i = 2; i < linesArray.length - 2; i++) {
+				out.append(linesArray[i]).append('\n');
+			}
+		} else {
+			lines.remove(lines.size() - 1);
+			lines.remove(lines.size() - 1);
+			ListIterator<String> it = lines.listIterator(2);
 
-            out.append(".source \"").append(inFile.getName()).append("\"\n");
-            while (it.hasNext()) {
-                String line = it.next().trim();
-                if (line.isEmpty() || line.charAt(0) == '#' ||
-                        line.startsWith(".source")) {
-                    continue;
-                }
-                if (line.startsWith(".method ")) {
-                    it.previous();
-                    DebugInjector.inject(it, out);
-                    continue;
-                }
+			out.append(".source \"").append(inFile.getName()).append("\"\n");
+			while (it.hasNext()) {
+				String line = it.next().trim();
+				if (line.isEmpty() || line.charAt(0) == '#'
+						|| line.startsWith(".source")) {
+					continue;
+				}
+				if (line.startsWith(".method ")) {
+					it.previous();
+					DebugInjector.inject(it, out);
+					continue;
+				}
 
-                out.append(line).append('\n');
-            }
-        }
-        mDexBuilder.addSmaliFile(
-            IOUtils.toInputStream(out.toString()), fileName);
-    }
+				out.append(line).append('\n');
+			}
+		}
+		mDexBuilder.addSmaliFile(IOUtils.toInputStream(out.toString()),
+				fileName);
+	}
 
-    private final ExtFile mSmaliDir;
-    private final File mDexFile;
-    private final HashMap<String, Boolean>  mFlags;
+	private final ExtFile mSmaliDir;
+	private final File mDexFile;
+	private final HashMap<String, Boolean> mFlags;
 
-    private DexFileBuilder mDexBuilder;
+	private DexFileBuilder mDexBuilder;
 
-
-    private final static Logger LOGGER =
-        Logger.getLogger(SmaliBuilder.class.getName());
+	private final static Logger LOGGER = Logger.getLogger(SmaliBuilder.class
+			.getName());
 }

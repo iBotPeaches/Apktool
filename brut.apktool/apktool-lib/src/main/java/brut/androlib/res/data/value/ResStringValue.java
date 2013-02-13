@@ -27,40 +27,41 @@ import org.xmlpull.v1.XmlSerializer;
  */
 public class ResStringValue extends ResScalarValue {
 
-    public ResStringValue(String value) {
-        this(value, "string");
-    }
+	public ResStringValue(String value) {
+		this(value, "string");
+	}
 
-    public ResStringValue(String value, String type) {
-        super(type, value);
-    }
+	public ResStringValue(String value, String type) {
+		super(type, value);
+	}
 
-    @Override
-    public String encodeAsResXmlAttr() {
-        return ResXmlEncoders.encodeAsResXmlAttr(mRawValue);
-    }
+	@Override
+	public String encodeAsResXmlAttr() {
+		return ResXmlEncoders.encodeAsResXmlAttr(mRawValue);
+	}
 
-    @Override
-    public String encodeAsResXmlItemValue() {
-        return ResXmlEncoders.enumerateNonPositionalSubstitutions(
-                ResXmlEncoders.encodeAsXmlValue(mRawValue));
-    }
+	@Override
+	public String encodeAsResXmlItemValue() {
+		return ResXmlEncoders
+				.enumerateNonPositionalSubstitutions(ResXmlEncoders
+						.encodeAsXmlValue(mRawValue));
+	}
 
-    @Override
-    public String encodeAsResXmlValue() {
-        return ResXmlEncoders.encodeAsXmlValue(mRawValue);
-    }
+	@Override
+	public String encodeAsResXmlValue() {
+		return ResXmlEncoders.encodeAsXmlValue(mRawValue);
+	}
 
-    @Override
-    protected String encodeAsResXml() throws AndrolibException {
-        throw new UnsupportedOperationException();
-    }
+	@Override
+	protected String encodeAsResXml() throws AndrolibException {
+		throw new UnsupportedOperationException();
+	}
 
-    @Override
-    protected void serializeExtraXmlAttrs(XmlSerializer serializer,
-            ResResource res) throws IOException {
-        if (ResXmlEncoders.hasMultipleNonPositionalSubstitutions(mRawValue)) {
-            serializer.attribute(null, "formatted", "false");
-        }
-    }
+	@Override
+	protected void serializeExtraXmlAttrs(XmlSerializer serializer,
+			ResResource res) throws IOException {
+		if (ResXmlEncoders.hasMultipleNonPositionalSubstitutions(mRawValue)) {
+			serializer.attribute(null, "formatted", "false");
+		}
+	}
 }
