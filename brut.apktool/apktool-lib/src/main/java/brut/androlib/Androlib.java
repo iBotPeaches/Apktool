@@ -54,9 +54,6 @@ public class Androlib {
 	public void decodeSourcesRaw(ExtFile apkFile, File outDir, boolean debug)
 			throws AndrolibException {
 		try {
-			if (debug) {
-				LOGGER.warning("Debug mode not available.");
-			}
 			Directory apk = apkFile.getDirectory();
 			LOGGER.info("Copying raw classes.dex file...");
 			apkFile.getDirectory().copyToDir(outDir, "classes.dex");
