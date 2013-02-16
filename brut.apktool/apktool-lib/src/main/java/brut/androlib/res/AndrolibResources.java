@@ -38,6 +38,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -46,6 +47,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import org.apache.commons.io.IOUtils;
 import org.xml.sax.SAXException;
@@ -151,6 +153,48 @@ final public class AndrolibResources {
 		}
 	}
 
+	public void remove_application_debug(String filePath)
+		throws AndrolibException {
+		
+		// change application:debug to true
+		try {
+			DocumentBuilderFactory docFactory = DocumentBuilderFactory
+					.newInstance();
+			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+			Document doc = docBuilder.parse(filePath.toString());
+		
+			Node application = doc.getElementById("application");
+			
+			// load attr
+			NamedNodeMap attr = application.getAttributes();
+			Node debugAttr = attr.getNamedItem("debug");
+			
+			// remove application:debug
+			if (debugAttr != null) {
+				attr.removeNamedItem("debug");
+			}
+			
+			// save manifest
+			TransformerFactory transformerFactory = TransformerFactory
+					.newInstance();
+			Transformer transformer = transformerFactory.newTransformer();
+			DOMSource source = new DOMSource(doc);
+			StreamResult result = new StreamResult(new File(filePath));
+			transformer.transform(source, result);
+		
+		} catch (ParserConfigurationException ex) {
+			throw new AndrolibException(ex);
+		} catch (SAXException ex) {
+			throw new AndrolibException(ex);
+		} catch (IOException ex) {
+			throw new AndrolibException(ex);
+		} catch (TransformerConfigurationException ex) {
+			throw new AndrolibException(ex);
+		} catch (TransformerException ex) {
+			throw new AndrolibException(ex);
+		}
+	}
+
 	public void adjust_package_manifest(ResTable resTable, String filePath)
 			throws AndrolibException {
 
@@ -182,7 +226,6 @@ final public class AndrolibResources {
 				nodeAttr.setNodeValue(packageInfo.get("cur_package"));
 
 				// re-save manifest.
-				// fancy an auto-sort :p
 				TransformerFactory transformerFactory = TransformerFactory
 						.newInstance();
 				Transformer transformer = transformerFactory.newTransformer();

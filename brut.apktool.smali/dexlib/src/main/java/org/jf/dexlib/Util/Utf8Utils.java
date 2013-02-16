@@ -68,23 +68,16 @@ public final class Utf8Utils {
         return result;
     }
 
-    private static char[] tempBuffer = null;
-
     /**
      * Converts an array of UTF-8 bytes into a string.
      *
-     * This method uses a global buffer to avoid having to allocate one every time, so it is *not* thread-safe
-     *
+     * @param buffer a buffer to hold the chars as they are read.  Make sure the length of the array is at least 'length'
      * @param bytes non-null; the bytes to convert
      * @param start the start index of the utf8 string to convert
      * @param length the length of the utf8 string to convert, not including any null-terminator that might be present
      * @return non-null; the converted string
      */
-    public static String utf8BytesToString(byte[] bytes, int start, int length) {
-        if (tempBuffer == null || tempBuffer.length < length) {
-            tempBuffer = new char[length];
-        }
-        char[] chars = tempBuffer;
+    public static String utf8BytesToString(char[] buffer, byte[] bytes, int start, int length) {
         int outAt = 0;
 
         for (int at = start; length > 0; /*at*/) {
@@ -157,11 +150,11 @@ public final class Utf8Utils {
                     return throwBadUtf8(v0, at);
                 }
             }
-            chars[outAt] = out;
+            buffer[outAt] = out;
             outAt++;
         }
 
-        return new String(chars, 0, outAt);
+        return new String(buffer, 0, outAt);
     }
 
     /**

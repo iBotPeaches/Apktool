@@ -36,6 +36,7 @@ options {
 @header {
 package org.jf.smali;
 
+import com.google.common.collect.ImmutableSortedMap;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.regex.*;
@@ -1616,23 +1617,26 @@ annotation_element returns[StringIdItem elementName, EncodedValue elementValue]
     };
 
 subannotation returns[TypeIdItem annotationType, StringIdItem[\] elementNames, EncodedValue[\] elementValues]
-  : {ArrayList<StringIdItem> elementNamesList = new ArrayList<StringIdItem>();
-    ArrayList<EncodedValue> elementValuesList = new ArrayList<EncodedValue>();}
+  : {ImmutableSortedMap.Builder<StringIdItem, EncodedValue> elementBuilder =
+        ImmutableSortedMap.<StringIdItem, EncodedValue>naturalOrder();}
     ^(I_SUBANNOTATION
         class_type_descriptor
         (annotation_element
         {
-          elementNamesList.add($annotation_element.elementName);
-          elementValuesList.add($annotation_element.elementValue);
+          elementBuilder.put($annotation_element.elementName, $annotation_element.elementValue);
         }
         )*
      )
     {
+      ImmutableSortedMap<StringIdItem, EncodedValue> elementMap = elementBuilder.build();
+
       $annotationType = $class_type_descriptor.type;
-      $elementNames = new StringIdItem[elementNamesList.size()];
-      elementNamesList.toArray($elementNames);
-      $elementValues = new EncodedValue[elementValuesList.size()];
-      elementValuesList.toArray($elementValues);
+
+      $elementNames = new StringIdItem[elementMap.size()];
+      $elementValues = new EncodedValue[elementMap.size()];
+
+      elementMap.keySet().toArray($elementNames);
+      elementMap.values().toArray($elementValues);
     };
 
 field_literal returns[FieldIdItem value]

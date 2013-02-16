@@ -1,4 +1,6 @@
 v1.5.3 (TBA)
+-Updated to smali/baksmali to v1.4.2
+-Fixed (issue #396) - Correctly handle android:debuggable while in debug mode.
 
 v1.5.2 (Released February 2 - 2013) Codename: Bug Fixes
 -Fixed (issue #299) - output smali filename errors to screen during rebuild instead of filestream

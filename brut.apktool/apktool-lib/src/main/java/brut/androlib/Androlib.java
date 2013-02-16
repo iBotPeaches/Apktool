@@ -228,9 +228,6 @@ public class Androlib {
 			if (!working.exists()) {
 				return false;
 			}
-			if (flags.get("debug")) {
-				LOGGER.warning("Debug mode not available.");
-			}
 			File stored = new File(appDir, APK_DIRNAME + "/classes.dex");
 			if (flags.get("forceBuildAll") || isModified(working, stored)) {
 				LOGGER.info("Copying classes.dex file...");
@@ -379,7 +376,13 @@ public class Androlib {
 			if (!flags.get("forceBuildAll")) {
 				LOGGER.info("Checking whether resources has changed...");
 			}
+			
 			File apkDir = new File(appDir, APK_DIRNAME);
+			
+			if (flags.get("debug")) {
+				mAndRes.remove_application_debug(new File(apkDir,"AndroidManifest.xml").getAbsolutePath());
+			}
+
 			if (flags.get("forceBuildAll")
 					|| isModified(newFiles(APK_MANIFEST_FILENAMES, appDir),
 							newFiles(APK_MANIFEST_FILENAMES, apkDir))) {

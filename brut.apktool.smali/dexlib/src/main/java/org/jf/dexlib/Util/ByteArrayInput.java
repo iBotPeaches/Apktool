@@ -40,6 +40,9 @@ public class ByteArrayInput
     /** &gt;= 0; current read cursor */
     private int cursor;
 
+    /* buffer for reading UTF-8 strings */
+    private char[] buffer = null;
+
     /**
      * Constructs an instance with the given data
      *
@@ -291,7 +294,11 @@ public class ByteArrayInput
         //skip the terminating null
         cursor++;
 
-        return Utf8Utils.utf8BytesToString(data, startPosition, byteCount);
+        if (buffer == null || buffer.length < byteCount) {
+            buffer = new char[byteCount];
+        }
+
+        return Utf8Utils.utf8BytesToString(buffer, data, startPosition, byteCount);
     }
 
     /** {@inheritDoc} */
