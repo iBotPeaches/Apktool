@@ -62,6 +62,11 @@ public class Res9patchStreamDecoder implements ResStreamDecoder {
 			ImageIO.write(im2, "png", out);
 		} catch (IOException ex) {
 			throw new AndrolibException(ex);
+		} catch (NullPointerException ex) {
+			// In my case this was triggered because a .png file was
+			// containing a html document instead of an image.
+			// This could be more verbose and try to MIME ?
+			throw new AndrolibException(ex);
 		}
 	}
 
