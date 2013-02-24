@@ -401,7 +401,7 @@ public class ARSCDecoder {
 
 	private static final Logger LOGGER = Logger.getLogger(ARSCDecoder.class
 			.getName());
-	private static final int KNOWN_CONFIG_BYTES = 36;
+	private static final int KNOWN_CONFIG_BYTES = 38;
 
 	public static class ARSCData {
 
