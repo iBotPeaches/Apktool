@@ -319,9 +319,13 @@ public class ARSCDecoder {
 			mPkg.addResSpec(spec);
 			mType.addResSpec(spec);
 
+			if (mConfig == null) {
+			    mConfig = mPkg.getOrCreateConfig(new ResConfigFlags());
+			}
+
 			ResValue value = new ResBoolValue(false, null);
-			ResResource res = new ResResource(
-					mPkg.getOrCreateConfig(new ResConfigFlags()), spec, value);
+			ResResource res = new ResResource(mConfig, spec, value);
+
 			mPkg.addResource(res);
 			mConfig.addResource(res);
 			spec.addResource(res);
