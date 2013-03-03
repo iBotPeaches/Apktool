@@ -1,6 +1,7 @@
 v1.5.3 (TBA)
 -Updated to smali/baksmali to v1.4.2
 -Fixed (issue #396) - Correctly handle android:debuggable while in debug mode.
+-Fixed (issue #340) - Fixed superclass errors on debug mode.
 -Updated to Gradle 1.4
 -Updated known bytes for configurations to 38 (from addition of layout direction)
 -Fixed NPE when handling odex apks even with --no-src specified. (Thanks Rodrigo Chiossi)
