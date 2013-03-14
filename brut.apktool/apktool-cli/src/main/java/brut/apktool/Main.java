@@ -120,7 +120,9 @@ public class Main {
 				decoder.setKeepBrokenResources(true);
 			} else if ("--frame-path".equals(opt)) {
 				i++;
-				System.out.println("Using Framework Directory: " + args[i]);
+        if (i >= args.length) {
+          throw new InvalidArgsError();
+        }
 				decoder.setFrameworkDir(args[i]);
 			} else {
 				throw new InvalidArgsError();
@@ -172,6 +174,8 @@ public class Main {
 
 	private static void cmdBuild(String[] args) throws BrutException {
 
+	  Androlib instance = new Androlib();
+	  
 		// hold all the fields
 		HashMap<String, Boolean> flags = new HashMap<String, Boolean>();
 		flags.put("forceBuildAll", false);
@@ -199,6 +203,9 @@ public class Main {
 			} else if ("-a".equals(opt) || "--aapt".equals(opt)) {
 				mAaptPath = args[i + 1];
 				skip = 1;
+			} else if ("--frame-path".equals(opt)) {
+			    i++;
+	        instance.setFrameworkFolder(args[i]);
 			} else if ("-o".equals(opt) || "--original".equals(opt)) {
 				if (args.length >= 4) {
 					throw new InvalidArgsError();
@@ -227,7 +234,7 @@ public class Main {
 			throw new InvalidArgsError();
 		}
 
-		new Androlib().build(new File(appDirName), outFile, flags, mOrigApk,
+		instance.build(new File(appDirName), outFile, flags, mOrigApk,
 				mAaptPath);
 	}
 
@@ -331,6 +338,8 @@ public class Main {
 						+ "            Build in debug mode. Check project page for more info.\n"
 						+ "        -a, --aapt\n"
 						+ "            Loads aapt from specified location.\n"
+            + "        --frame-path <dir>\n"
+            + "            Use the specified directory for framework files\n"
 						+ "\n"
 						+ "    if|install-framework <framework.apk> [<tag>] --frame-path [<location>] \n"
 						+ "        Install framework file to your system.\n"

@@ -5,6 +5,7 @@ v1.5.3 (TBA)
 -Updated to Gradle 1.4
 -Updated known bytes for configurations to 38 (from addition of layout direction)
 -Fixed NPE when handling odex apks even with --no-src specified. (Thanks Rodrigo Chiossi)
+-Fixed (issue #427) - Correctly handles `--frame-path` on [b]uild
 
 v1.5.2 (Released February 2 - 2013) Codename: Bug Fixes
 -Fixed (issue #299) - output smali filename errors to screen during rebuild instead of filestream

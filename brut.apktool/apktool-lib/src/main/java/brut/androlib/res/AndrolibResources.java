@@ -704,12 +704,11 @@ final public class AndrolibResources {
 			path = sFrameworkFolder;
 		} else if (System.getProperty("os.name").equals("Mac OS X")) {
 			// store in user-home, for Mac OS X
-			path = System.getProperty("user.home") + File.separatorChar
-					+ "Library/apktool/framework";
+			path = System.getProperty("user.home") + File.separatorChar + "Library/apktool/framework";
 		} else {
-			path = System.getProperty("user.home") + File.separatorChar
-					+ "apktool" + File.separatorChar + "framework";
+			path = System.getProperty("user.home") + File.separatorChar + "apktool" + File.separatorChar + "framework";
 		}
+		
 		File dir = new File(path);
 		if (!dir.exists()) {
 			if (!dir.mkdirs()) {

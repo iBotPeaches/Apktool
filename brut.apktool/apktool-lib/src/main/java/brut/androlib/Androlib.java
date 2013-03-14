@@ -534,6 +534,10 @@ public class Androlib {
 	public void setApkFile(File apkFile) {
 		mOrigApkFile = new ExtFile(apkFile);
 	}
+	
+	public void setFrameworkFolder(String path) {
+	  mAndRes.setFrameworkFolder(path);
+	}
 
 	private ExtFile mOrigApkFile = null;
 	private String mAaptPath = null;
