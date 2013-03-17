@@ -133,6 +133,7 @@ public class ApkDecoder {
 		}
 
 		mAndrolib.decodeRawFiles(mApkFile, outDir);
+		mAndrolib.writeOriginalFiles(mApkFile, outDir);
 		writeMetaFile();
 	}
 
