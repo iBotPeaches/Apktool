@@ -208,6 +208,7 @@ public class Androlib {
 		flags.put("compression", meta.get("compressionType") == null ? false
 				: (Boolean) meta.get("compressionType"));
 		mAndRes.setSdkInfo((Map<String, String>) meta.get("sdkInfo"));
+		mAndRes.setPackageId((String)meta.get("packageId"));
 
 		if (outFile == null) {
 			String outFileName = (String) meta.get("apkFileName");

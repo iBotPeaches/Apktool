@@ -246,6 +246,7 @@ public class ApkDecoder {
 			putSdkInfo(meta);
 			putPackageInfo(meta);
 			putCompressionInfo(meta);
+			meta.put("packageId", getResTable().getPackageInfo().get("cur_package_id"));
 		}
 
 		mAndrolib.writeMetaFile(mOutDir, meta);

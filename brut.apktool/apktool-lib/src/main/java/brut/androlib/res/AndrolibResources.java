@@ -313,6 +313,10 @@ final public class AndrolibResources {
 		}
 	}
 
+	public void setPackageId(String id) {
+		mPackageId = id;
+	}
+
 	public void aaptPackage(File apkFile, File manifest, File resDir,
 			File rawDir, File assetDir, File[] include,
 			HashMap<String, Boolean> flags, String aaptPath)
@@ -349,6 +353,10 @@ final public class AndrolibResources {
 		}
 		if (flags.get("debug")) { // inject debuggable="true" into manifest
 			cmd.add("--debug-mode");
+		}
+		if (mPackageId != null) {
+			cmd.add("--forced-package-id");
+			cmd.add(mPackageId);
 		}
 		if (mMinSdkVersion != null) {
 			cmd.add("--min-sdk-version");
@@ -742,6 +750,7 @@ final public class AndrolibResources {
 	private final static Logger LOGGER = Logger
 			.getLogger(AndrolibResources.class.getName());
 
+	private String mPackageId = null;
 	private String mMinSdkVersion = null;
 	private String mMaxSdkVersion = null;
 	private String mTargetSdkVersion = null;
