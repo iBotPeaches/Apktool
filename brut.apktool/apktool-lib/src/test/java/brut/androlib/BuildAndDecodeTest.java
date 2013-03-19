@@ -182,7 +182,6 @@ public class BuildAndDecodeTest {
 		tmp.put("forceBuildAll", false);
 		tmp.put("debug", false);
 		tmp.put("verbose", false);
-		tmp.put("injectOriginal", false);
 		tmp.put("framework", false);
 		tmp.put("update", false);
 

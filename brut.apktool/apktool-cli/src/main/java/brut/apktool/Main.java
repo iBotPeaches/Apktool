@@ -181,7 +181,6 @@ public class Main {
 		flags.put("forceBuildAll", false);
 		flags.put("debug", false);
 		flags.put("verbose", false);
-		flags.put("injectOriginal", false);
 		flags.put("framework", false);
 		flags.put("update", false);
 
@@ -206,14 +205,6 @@ public class Main {
 			} else if ("--frame-path".equals(opt)) {
 			    i++;
 	        instance.setFrameworkFolder(args[i]);
-			} else if ("-o".equals(opt) || "--original".equals(opt)) {
-				if (args.length >= 4) {
-					throw new InvalidArgsError();
-				} else {
-					flags.put("injectOriginal", true);
-					mOrigApk = new ExtFile(args[i + 1]);
-					skip = 1;
-				}
 			} else {
 				throw new InvalidArgsError();
 			}

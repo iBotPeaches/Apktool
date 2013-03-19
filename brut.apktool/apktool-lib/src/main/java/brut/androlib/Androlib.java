@@ -189,15 +189,6 @@ public class Androlib {
 				: (Boolean) meta.get("compressionType"));
 		mAndRes.setSdkInfo((Map<String, String>) meta.get("sdkInfo"));
 
-		// check the orig apk
-		if (flags.get("injectOriginal")) {
-			if (!origApk.isFile() || !origApk.canRead()) {
-				throw new InFileNotFoundException();
-			} else {
-				mOrigApkFile = origApk;
-			}
-		}
-
 		if (outFile == null) {
 			String outFileName = (String) meta.get("apkFileName");
 			outFile = new File(appDir, "dist" + File.separator
@@ -450,13 +441,6 @@ public class Androlib {
 		}
 		mAndRes.aaptPackage(outApk, null, null, new File(appDir, APK_DIRNAME),
 				assetDir, null, flags, mAaptPath);
-
-		// retain signature
-		// aapt r (remove)
-		// aapt a (add)
-		if (flags.get("injectOriginal")) {
-			LOGGER.info("Injecting contents isn't ready yet. Sorry :(");
-		}
 	}
 
 	public void publicizeResources(File arscFile) throws AndrolibException {
