@@ -57,9 +57,13 @@ public class Main {
 		  CommandLineParser parser = new PosixParser();
 		  CommandLine commandLine = null;
 		  
+		  // load options
+		  _Options();
+		  
   		try {
           commandLine = parser.parse(normalOptions, args);
       } catch (ParseException ex) {
+          System.out.println(ex.getMessage());
           usage(commandLine);
           return;
       }
@@ -86,6 +90,8 @@ public class Main {
 		    cmdInstallFramework(args);
 		  } else if (commandLine.hasOption("publicize-resources")) {
 		    cmdPublicizeResources(args);
+		  } else if (commandLine.hasOption("version") || commandLine.hasOption("version")) {
+		    _version();
 		  } else {
 		    usage(commandLine);
 		  }
@@ -275,10 +281,14 @@ public class Main {
 
 	private static void _Options() {
 	  
-	  // create basic options
+	  // create options
 	  Option versionOption = OptionBuilder.withLongOpt("version")
         .withDescription("prints the version then exits")
-        .create("v");
+        .create("version");
+	  
+	  Option advanceOption = OptionBuilder.withLongOpt("advanced")
+	      .withDescription("prints advance information.")
+	      .create("advance");
 	  
 	  Option noSrcOption = OptionBuilder.withLongOpt("no-src")
 	      .withDescription("Do not decode sources.")
@@ -288,24 +298,96 @@ public class Main {
 	      .withDescription("Do not decode resources.")
 	      .create("r");
 	  
-	  Option debugOption = OptionBuilder.withLongOpt("debug")
+	  Option debugDecOption = OptionBuilder.withLongOpt("debug")
 	      .withDescription("Decode in debug mode. Check project page for more info.")
 	      .create("d");
 	  
-	  // add them
+	  Option debugBuiOption = OptionBuilder.withLongOpt("debug")
+	      .withDescription("Builds in debug mode. Check project page for more info.")
+	      .create("d");
+	  
+	  Option noDbgOption = OptionBuilder.withLongOpt("no-debug-info")
+	      .withDescription("don't write out debug info (.local, .param, .line, etc.)")
+	      .create("b");
+	  
+	  Option forceDecOption = OptionBuilder.withLongOpt("force")
+	      .withDescription("Force delete destination directory.")
+	      .create("f");
+	  
+	  Option frameTagOption = OptionBuilder.withLongOpt("frame-tag")
+        .withDescription("Uses framework files tagged by <tag>.")
+        .hasArg(true)
+        .withArgName("tag")
+        .create("t");
+	  
+	   Option frameDirOption = OptionBuilder.withLongOpt("frame-path")
+	        .withDescription("Uses framework files tagged by <dir>.")
+	        .hasArg(true)
+	        .withArgName("dir")
+	        .create("p");
+	   
+	   Option keepResOption = OptionBuilder.withLongOpt("keep-broken-res")
+	       .withDescription("Use if there was an error and some resources were dropped, e.g.\n"
+            + "            \"Invalid config flags detected. Dropping resources\", but you\n"
+            + "            want to decode them anyway, even with errors. You will have to\n"
+            + "            fix them manually before building.")
+            .create("k");
+	   
+	   Option forceBuiOption = OptionBuilder.withLongOpt("force-all")
+	       .withDescription("Skip changes detection and build all files.")
+	       .create("f");
+	   
+	   Option aaptOption = OptionBuilder.withLongOpt("aapt")
+	       .hasArg(true)
+	       .withArgName("loc")
+	       .withDescription("Loads aapt from specified location.")
+	       .create("a");
+	   
+	   Option originalOption = OptionBuilder.withLongOpt("copy-original")
+	       .withDescription("Copies original AndroidManifest.xml and META-INF. See project page for more info.")
+	       .create("c");
+	   
+	   Option tagOption = OptionBuilder.withLongOpt("tag")
+	       .withDescription("Tag frameworks using <tag>.")
+	       .hasArg(true)
+	       .withArgName("tag")
+	       .create("t");
+	         
+	  // check for advance mode
+    if (advanceMode) {
+      DecodeOptions.addOption(debugDecOption);
+      DecodeOptions.addOption(noDbgOption);
+      DecodeOptions.addOption(keepResOption);
+      
+      BuildOptions.addOption(debugBuiOption);
+      BuildOptions.addOption(aaptOption);
+    }
+    
+	  // add global options
 	  normalOptions.addOption(versionOption);
+	  normalOptions.addOption(advanceOption);
+	  
+	  // add basic decode options
+    DecodeOptions.addOption(frameDirOption);
+	  DecodeOptions.addOption(frameTagOption);
+	  DecodeOptions.addOption(forceDecOption);
 	  DecodeOptions.addOption(noSrcOption);
 	  DecodeOptions.addOption(noResOption);
 	  
-	  // check for advance mode
-	  if (advanceMode) {
-	    DecodeOptions.addOption(debugOption);
-	  }
+	  // add basic build options
+	  BuildOptions.addOption(frameDirOption);
+	  BuildOptions.addOption(originalOption);
+	  BuildOptions.addOption(forceBuiOption);
+	  
+	  // add basic framework options
+	  frameOptions.addOption(tagOption);
+	  frameOptions.addOption(frameDirOption);
+	  
 	}
 	
 	private static String verbosityHelp() {
 	  if (advanceMode) {
-	    return "[-q|--quiet OR -v|--verbose]";
+	    return "[-q|--quiet OR -v|--verbose] ";
 	  } else {
 	    return "";
 	  }
@@ -317,7 +399,6 @@ public class Main {
 	    // load basicOptions
 	    _Options();
 	    HelpFormatter formatter = new HelpFormatter();
-	    PrintWriter pw = new PrintWriter(System.out, true);
 	    
 	    // max their window to 120, if small.
 	    int consoleWidth = ConsoleUtil.getConsoleWidth();
@@ -336,56 +417,15 @@ public class Main {
           "Apache License 2.0 (http://www.apache.org/licenses/LICENSE-2.0)\n");
       
       // two different outputs for build / decode
+      formatter.printHelp("apktool " + verbosityHelp(), normalOptions);
+      formatter.printHelp("apktool " + verbosityHelp() + "if|install-framework [options] <framework.apk>", frameOptions);
 	    formatter.printHelp("apktool " + verbosityHelp() + "d[ecode] [options] <file_apk> [<out_file>]", DecodeOptions);
 	    formatter.printHelp("apktool " + verbosityHelp() + "b[uild] [options] <app_path> [<out_file>]", BuildOptions);
 	    
-	    
-
-//						+ "        -d, --debug\n"
-//						+ "            Decode in debug mode. Check project page for more info.\n"
-//						+ "        -b, --no-debug-info\n"
-//						+ "            Baksmali -- don't write out debug info (.local, .param, .line, etc.)\n"
-//						+ "        -f, --force\n"
-//						+ "            Force delete destination directory.\n"
-//						+ "        -t <tag>, --frame-tag <tag>\n"
-//						+ "            Try to use framework files tagged by <tag>.\n"
-//						+ "        --frame-path <dir>\n"
-//						+ "            Use the specified directory for framework files\n"
-//						+ "        --keep-broken-res\n"
-//						+ "            Use if there was an error and some resources were dropped, e.g.:\n"
-//						+ "            \"Invalid config flags detected. Dropping resources\", but you\n"
-//						+ "            want to decode them anyway, even with errors. You will have to\n"
-//						+ "            fix them manually before building."
-//						+ "\n\n"
-//						+ "    b[uild] [OPTS] [<app_path>] [<out_file>]\n"
-//						+ "        Build an apk from already decoded application located in <app_path>.\n"
-//						+ "\n"
-//						+ "        It will automatically detect, whether files was changed and perform\n"
-//						+ "        needed steps only.\n"
-//						+ "\n"
-//						+ "        If you omit <app_path> then current directory will be used.\n"
-//						+ "        If you omit <out_file> then <app_path>/dist/<name_of_original.apk>\n"
-//						+ "        will be used.\n"
-//						+ "\n"
-//						+ "        OPTS:\n"
-//						+ "\n"
-//						+ "        -f, --force-all\n"
-//						+ "            Skip changes detection and build all files.\n"
-//						+ "        -d, --debug\n"
-//						+ "            Build in debug mode. Check project page for more info.\n"
-//						+ "        -a, --aapt\n"
-//						+ "            Loads aapt from specified location.\n"
-//						+ "        -c, --copy-original\n"
-//						+ "            Copies original AndroidManifest.xml and META-INF.\n"
-//            + "        --frame-path <dir>\n"
-//            + "            Use the specified directory for framework files\n"
-//						+ "\n"
-//						+ "    if|install-framework <framework.apk> [<tag>] --frame-path [<location>] \n"
-//						+ "        Install framework file to your system.\n"
-//						+ "\n"
-//						+ "For additional info, see: http://code.google.com/p/android-apktool/"
-//						+ "\n"
-//						+ "For smali/baksmali info, see: http://code.google.com/p/smali/");
+	    // print out more information
+	    System.out.println(
+	            "\nFor additional info, see: http://code.google.com/p/android-apktool/ \n"
+            + "For smali/baksmali info, see: http://code.google.com/p/smali/");
 	}
 
 	private static void setupLogging(Verbosity verbosity) {
@@ -432,12 +472,14 @@ public class Main {
 	private final static Options normalOptions;
   private final static Options DecodeOptions;
   private final static Options BuildOptions;
+  private final static Options frameOptions;
   
   static {
     //normal and advance usage output
     normalOptions = new Options();
     BuildOptions = new Options();
     DecodeOptions = new Options();
+    frameOptions = new Options();
   }
   
 	static class InvalidArgsError extends AndrolibException {
