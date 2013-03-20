@@ -28,9 +28,20 @@ import brut.common.BrutException;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.logging.*;
+
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.PosixParser;
+import org.jf.util.ConsoleUtil;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
@@ -38,56 +49,46 @@ import java.util.logging.*;
 public class Main {
 	public static void main(String[] args) throws IOException,
 			InterruptedException, BrutException {
-		try {
-			Verbosity verbosity = Verbosity.NORMAL;
-			int i;
-			for (i = 0; i < args.length; i++) {
-				String opt = args[i];
+		    
+	    // set verbosity default
+	    Verbosity verbosity = Verbosity.NORMAL;
+	    
+		  // cli parser
+		  CommandLineParser parser = new PosixParser();
+		  CommandLine commandLine = null;
+		  
+  		try {
+          commandLine = parser.parse(normalOptions, args);
+      } catch (ParseException ex) {
+          usage(commandLine);
+          return;
+      }
+  		
+  		// check for verbose / quiet
+		  if (commandLine.hasOption("-v") || commandLine.hasOption("--verbose")) {
+		    verbosity = Verbosity.VERBOSE;
+		  } else if (commandLine.hasOption("-q") || commandLine.hasOption("--quiet")) {
+		    verbosity = Verbosity.QUIET;
+		  }
+		  setupLogging(verbosity);
+		  
+		  // check for advance mode
+		  if (commandLine.hasOption("-advance") || commandLine.hasOption("--advanced")) {
+		    setAdvanceMode(true);
+		  }
 
-				if (opt.startsWith("--version") || (opt.startsWith("-version"))) {
-					version_print();
-					System.exit(1);
-				}
-				if (!opt.startsWith("-")) {
-					break;
-				}
-				if ("-v".equals(opt) || "--verbose".equals(opt)) {
-					if (verbosity != Verbosity.NORMAL) {
-						throw new InvalidArgsError();
-					}
-					verbosity = Verbosity.VERBOSE;
-				} else if ("-q".equals(opt) || "--quiet".equals(opt)) {
-					if (verbosity != Verbosity.NORMAL) {
-						throw new InvalidArgsError();
-					}
-					verbosity = Verbosity.QUIET;
-				} else {
-					throw new InvalidArgsError();
-				}
-			}
-			setupLogging(verbosity);
-
-			if (args.length <= i) {
-				throw new InvalidArgsError();
-			}
-			String cmd = args[i];
-			args = Arrays.copyOfRange(args, i + 1, args.length);
-
-			if ("d".equals(cmd) || "decode".equals(cmd)) {
-				cmdDecode(args);
-			} else if ("b".equals(cmd) || "build".equals(cmd)) {
-				cmdBuild(args);
-			} else if ("if".equals(cmd) || "install-framework".equals(cmd)) {
-				cmdInstallFramework(args);
-			} else if ("publicize-resources".equals(cmd)) {
-				cmdPublicizeResources(args);
-			} else {
-				throw new InvalidArgsError();
-			}
-		} catch (InvalidArgsError ex) {
-			usage();
-			System.exit(1);
-		}
+		  // check for main options
+		  if (commandLine.hasOption("d") || commandLine.hasOption("decode")) {
+		    cmdDecode(args);
+		  } else if (commandLine.hasOption("b") || commandLine.hasOption("build")) {
+		    cmdBuild(args);
+		  } else if (commandLine.hasOption("if") || commandLine.hasOption("install-framework")) {
+		    cmdInstallFramework(args);
+		  } else if (commandLine.hasOption("publicize-resources")) {
+		    cmdPublicizeResources(args);
+		  } else {
+		    usage(commandLine);
+		  }
 	}
 
 	private static void cmdDecode(String[] args) throws InvalidArgsError,
@@ -268,82 +269,123 @@ public class Main {
 		new Androlib().publicizeResources(new File(args[0]));
 	}
 
-	private static void version_print() {
+	private static void _version() {
 		System.out.println(Androlib.getVersion());
 	}
 
-	private static void usage() {
-		System.out
-				.println("Apktool v"
-						+ Androlib.getVersion()
-						+ " - a tool for reengineering Android apk files\n"
-						+ "Copyright 2010 Ryszard Wiśniewski <brut.alll@gmail.com>\n"
-						+ "with smali v"
-						+ ApktoolProperties.get("smaliVersion")
-						+ ", and baksmali v"
-						+ ApktoolProperties.get("baksmaliVersion")
-						+ "\n"
-						+ "Updated by @iBotPeaches <connor.tumbleson@gmail.com> \n"
-						+ "Apache License 2.0 (http://www.apache.org/licenses/LICENSE-2.0)\n"
-						+ "\n"
-						+ "Usage: apktool [-q|--quiet OR -v|--verbose] COMMAND [...]\n"
-						+ "\n"
-						+ "COMMANDs are:\n"
-						+ "\n"
-						+ "    d[ecode] [OPTS] <file.apk> [<dir>]\n"
-						+ "        Decode <file.apk> to <dir>.\n"
-						+ "\n"
-						+ "        OPTS:\n"
-						+ "\n"
-						+ "        -s, --no-src\n"
-						+ "            Do not decode sources.\n"
-						+ "        -r, --no-res\n"
-						+ "            Do not decode resources.\n"
-						+ "        -d, --debug\n"
-						+ "            Decode in debug mode. Check project page for more info.\n"
-						+ "        -b, --no-debug-info\n"
-						+ "            Baksmali -- don't write out debug info (.local, .param, .line, etc.)\n"
-						+ "        -f, --force\n"
-						+ "            Force delete destination directory.\n"
-						+ "        -t <tag>, --frame-tag <tag>\n"
-						+ "            Try to use framework files tagged by <tag>.\n"
-						+ "        --frame-path <dir>\n"
-						+ "            Use the specified directory for framework files\n"
-						+ "        --keep-broken-res\n"
-						+ "            Use if there was an error and some resources were dropped, e.g.:\n"
-						+ "            \"Invalid config flags detected. Dropping resources\", but you\n"
-						+ "            want to decode them anyway, even with errors. You will have to\n"
-						+ "            fix them manually before building."
-						+ "\n\n"
-						+ "    b[uild] [OPTS] [<app_path>] [<out_file>]\n"
-						+ "        Build an apk from already decoded application located in <app_path>.\n"
-						+ "\n"
-						+ "        It will automatically detect, whether files was changed and perform\n"
-						+ "        needed steps only.\n"
-						+ "\n"
-						+ "        If you omit <app_path> then current directory will be used.\n"
-						+ "        If you omit <out_file> then <app_path>/dist/<name_of_original.apk>\n"
-						+ "        will be used.\n"
-						+ "\n"
-						+ "        OPTS:\n"
-						+ "\n"
-						+ "        -f, --force-all\n"
-						+ "            Skip changes detection and build all files.\n"
-						+ "        -d, --debug\n"
-						+ "            Build in debug mode. Check project page for more info.\n"
-						+ "        -a, --aapt\n"
-						+ "            Loads aapt from specified location.\n"
-						+ "        -c, --copy-original\n"
-						+ "            Copies original AndroidManifest.xml and META-INF.\n"
-            + "        --frame-path <dir>\n"
-            + "            Use the specified directory for framework files\n"
-						+ "\n"
-						+ "    if|install-framework <framework.apk> [<tag>] --frame-path [<location>] \n"
-						+ "        Install framework file to your system.\n"
-						+ "\n"
-						+ "For additional info, see: http://code.google.com/p/android-apktool/"
-						+ "\n"
-						+ "For smali/baksmali info, see: http://code.google.com/p/smali/");
+	private static void _Options() {
+	  
+	  // create basic options
+	  Option versionOption = OptionBuilder.withLongOpt("version")
+        .withDescription("prints the version then exits")
+        .create("v");
+	  
+	  Option noSrcOption = OptionBuilder.withLongOpt("no-src")
+	      .withDescription("Do not decode sources.")
+	      .create("s");
+	  
+	  Option noResOption = OptionBuilder.withLongOpt("no-res")
+	      .withDescription("Do not decode resources.")
+	      .create("r");
+	  
+	  Option debugOption = OptionBuilder.withLongOpt("debug")
+	      .withDescription("Decode in debug mode. Check project page for more info.")
+	      .create("d");
+	  
+	  // add them
+	  normalOptions.addOption(versionOption);
+	  DecodeOptions.addOption(noSrcOption);
+	  DecodeOptions.addOption(noResOption);
+	  
+	  // check for advance mode
+	  if (advanceMode) {
+	    DecodeOptions.addOption(debugOption);
+	  }
+	}
+	
+	private static String verbosityHelp() {
+	  if (advanceMode) {
+	    return "[-q|--quiet OR -v|--verbose]";
+	  } else {
+	    return "";
+	  }
+	}
+	
+	
+	private static void usage(CommandLine commandLine) {
+	  
+	    // load basicOptions
+	    _Options();
+	    HelpFormatter formatter = new HelpFormatter();
+	    PrintWriter pw = new PrintWriter(System.out, true);
+	    
+	    // max their window to 120, if small.
+	    int consoleWidth = ConsoleUtil.getConsoleWidth();
+      if (consoleWidth <= 0) {
+          consoleWidth = 120;
+      }
+      formatter.setWidth(consoleWidth);
+      
+      // print out license info prior to formatter.
+      System.out.println(
+          "Apktool v" + Androlib.getVersion() + " - a tool for reengineering Android apk files\n" +
+          "Copyright 2010 Ryszard Wiśniewski <brut.alll@gmail.com>\n" +
+          "Updated by @iBotPeaches <connor.tumbleson@gmail.com> \n" +
+          "with smali v" + ApktoolProperties.get("smaliVersion") +
+          " and baksmali v" + ApktoolProperties.get("baksmaliVersion") + "\n" +
+          "Apache License 2.0 (http://www.apache.org/licenses/LICENSE-2.0)\n");
+      
+      // two different outputs for build / decode
+	    formatter.printHelp("apktool " + verbosityHelp() + "d[ecode] [options] <file_apk> [<out_file>]", DecodeOptions);
+	    formatter.printHelp("apktool " + verbosityHelp() + "b[uild] [options] <app_path> [<out_file>]", BuildOptions);
+	    
+	    
+
+//						+ "        -d, --debug\n"
+//						+ "            Decode in debug mode. Check project page for more info.\n"
+//						+ "        -b, --no-debug-info\n"
+//						+ "            Baksmali -- don't write out debug info (.local, .param, .line, etc.)\n"
+//						+ "        -f, --force\n"
+//						+ "            Force delete destination directory.\n"
+//						+ "        -t <tag>, --frame-tag <tag>\n"
+//						+ "            Try to use framework files tagged by <tag>.\n"
+//						+ "        --frame-path <dir>\n"
+//						+ "            Use the specified directory for framework files\n"
+//						+ "        --keep-broken-res\n"
+//						+ "            Use if there was an error and some resources were dropped, e.g.:\n"
+//						+ "            \"Invalid config flags detected. Dropping resources\", but you\n"
+//						+ "            want to decode them anyway, even with errors. You will have to\n"
+//						+ "            fix them manually before building."
+//						+ "\n\n"
+//						+ "    b[uild] [OPTS] [<app_path>] [<out_file>]\n"
+//						+ "        Build an apk from already decoded application located in <app_path>.\n"
+//						+ "\n"
+//						+ "        It will automatically detect, whether files was changed and perform\n"
+//						+ "        needed steps only.\n"
+//						+ "\n"
+//						+ "        If you omit <app_path> then current directory will be used.\n"
+//						+ "        If you omit <out_file> then <app_path>/dist/<name_of_original.apk>\n"
+//						+ "        will be used.\n"
+//						+ "\n"
+//						+ "        OPTS:\n"
+//						+ "\n"
+//						+ "        -f, --force-all\n"
+//						+ "            Skip changes detection and build all files.\n"
+//						+ "        -d, --debug\n"
+//						+ "            Build in debug mode. Check project page for more info.\n"
+//						+ "        -a, --aapt\n"
+//						+ "            Loads aapt from specified location.\n"
+//						+ "        -c, --copy-original\n"
+//						+ "            Copies original AndroidManifest.xml and META-INF.\n"
+//            + "        --frame-path <dir>\n"
+//            + "            Use the specified directory for framework files\n"
+//						+ "\n"
+//						+ "    if|install-framework <framework.apk> [<tag>] --frame-path [<location>] \n"
+//						+ "        Install framework file to your system.\n"
+//						+ "\n"
+//						+ "For additional info, see: http://code.google.com/p/android-apktool/"
+//						+ "\n"
+//						+ "For smali/baksmali info, see: http://code.google.com/p/smali/");
 	}
 
 	private static void setupLogging(Verbosity verbosity) {
@@ -373,12 +415,31 @@ public class Main {
 		}
 	}
 
-	private static enum Verbosity {
+	public static boolean isAdvanceMode() {
+    return advanceMode;
+  }
+
+  public static void setAdvanceMode(boolean advanceMode) {
+    Main.advanceMode = advanceMode;
+  }
+
+  private static enum Verbosity {
 		NORMAL, VERBOSE, QUIET;
 	}
 
-	private static boolean Advanced = false;
+	private static boolean advanceMode = false;
 
+	private final static Options normalOptions;
+  private final static Options DecodeOptions;
+  private final static Options BuildOptions;
+  
+  static {
+    //normal and advance usage output
+    normalOptions = new Options();
+    BuildOptions = new Options();
+    DecodeOptions = new Options();
+  }
+  
 	static class InvalidArgsError extends AndrolibException {
 
 	}
