@@ -432,13 +432,12 @@ public class Main {
       // print out license info prior to formatter.
       System.out.println(
           "Apktool v" + Androlib.getVersion() + " - a tool for reengineering Android apk files\n" +
-          "Copyright 2010 Ryszard Wiśniewski <brut.alll@gmail.com>\n" +
-          "Updated by @iBotPeaches <connor.tumbleson@gmail.com> \n" +
           "with smali v" + ApktoolProperties.get("smaliVersion") +
           " and baksmali v" + ApktoolProperties.get("baksmaliVersion") + "\n" +
-          "Apache License 2.0 (http://www.apache.org/licenses/LICENSE-2.0)\n");
+          "Copyright 2010 Ryszard Wiśniewski <brut.alll@gmail.com>\n" +
+          "Updated by Connor Tumbleson <connor.tumbleson@gmail.com> \n" );
       
-      // two different outputs for build / decode
+      // 4 usage outputs (general, frameworks, decode, build)
       formatter.printHelp("apktool " + verbosityHelp(), normalOptions);
       formatter.printHelp("apktool " + verbosityHelp() + "if|install-framework [options] <framework.apk>", frameOptions);
 	    formatter.printHelp("apktool " + verbosityHelp() + "d[ecode] [options] <file_apk>", DecodeOptions);
