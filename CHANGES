@@ -1,6 +1,7 @@
 v2.0.0 (TBA) 
 -Fixed (issue #8) - Correctly uses -c to retain original manifest and META-INF. Thanks M1cha
 -Fixed (issue #403) - Uses new usage output to cleanup organization of features.
+-Fixed (issue #359) - Correclty handles malformed 9patch images. (Thanks Felipe Richards)
 
 v1.5.3 (TBA)
 -Updated to smali/baksmali to v1.4.2
