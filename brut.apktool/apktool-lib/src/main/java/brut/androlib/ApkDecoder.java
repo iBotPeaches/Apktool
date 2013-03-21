@@ -109,31 +109,34 @@ public class ApkDecoder {
 			jf.close();
 
 			switch (mDecodeResources) {
-			case DECODE_RESOURCES_NONE:
-				mAndrolib.decodeResourcesRaw(mApkFile, outDir);
-				break;
-			case DECODE_RESOURCES_FULL:
-				mAndrolib.decodeResourcesFull(mApkFile, outDir, getResTable());
-				break;
-			}
+  			case DECODE_RESOURCES_NONE:
+  				mAndrolib.decodeResourcesRaw(mApkFile, outDir);
+  				break;
+  			case DECODE_RESOURCES_FULL:
+  				mAndrolib.decodeResourcesFull(mApkFile, outDir, getResTable());
+  				break;
+			} 
 		} else {
 			// if there's no resources.asrc, decode the manifest without looking
 			// up attribute references
 			if (hasManifest()) {
 				switch (mDecodeResources) {
-				case DECODE_RESOURCES_NONE:
-					mAndrolib.decodeManifestRaw(mApkFile, outDir);
-					break;
-				case DECODE_RESOURCES_FULL:
-					mAndrolib.decodeManifestFull(mApkFile, outDir,
-							getResTable());
-					break;
+  				case DECODE_RESOURCES_NONE:
+  					mAndrolib.decodeManifestRaw(mApkFile, outDir);
+  					break;
+  				case DECODE_RESOURCES_FULL:
+  					mAndrolib.decodeManifestFull(mApkFile, outDir,
+  							getResTable());
+  					break;
 				}
 			}
 		}
 
 		mAndrolib.decodeRawFiles(mApkFile, outDir);
 		mAndrolib.writeOriginalFiles(mApkFile, outDir);
+		
+    // remove version names in favour of aapt injection
+    mAndrolib.remove_manifest_versions(outDir.getAbsolutePath() + "/AndroidManifest.xml");
 		writeMetaFile();
 	}
 
@@ -245,8 +248,9 @@ public class ApkDecoder {
 			putUsesFramework(meta);
 			putSdkInfo(meta);
 			putPackageInfo(meta);
+			putVersionInfo(meta);
 			putCompressionInfo(meta);
-			meta.put("packageId", getResTable().getPackageInfo().get("cur_package_id"));
+			//meta.put("packageId", getResTable().getPackageInfo().get("cur_package_id"));
 		}
 
 		mAndrolib.writeMetaFile(mOutDir, meta);
@@ -290,6 +294,13 @@ public class ApkDecoder {
 			meta.put("packageInfo", info);
 		}
 	}
+	
+	private void putVersionInfo(Map<String, Object> meta) throws AndrolibException {
+    Map<String, String> info = getResTable().getVersionInfo();
+    if (info.size() > 0) {
+      meta.put("versionInfo", info);
+    }
+  }
 
 	private void putCompressionInfo(Map<String, Object> meta)
 			throws AndrolibException {

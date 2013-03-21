@@ -32,6 +32,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
@@ -209,6 +224,7 @@ public class Androlib {
 				: (Boolean) meta.get("compressionType"));
 		mAndRes.setSdkInfo((Map<String, String>) meta.get("sdkInfo"));
 		mAndRes.setPackageId((String)meta.get("packageId"));
+		mAndRes.setVersionInfo((Map<String, String>) meta.get("versionInfo"));
 
 		if (outFile == null) {
 			String outFileName = (String) meta.get("apkFileName");
@@ -469,6 +485,54 @@ public class Androlib {
 		}
 	}
 
+  public void remove_manifest_versions(String filePath)
+      throws AndrolibException {
+
+    File f = new File(filePath);
+    
+    if (f.exists()) {
+      // remove versionCode and versionName
+      try {
+        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+        Document doc = docBuilder.parse(filePath.toString());
+
+        Node manifest = doc.getFirstChild();
+
+        // load attr
+        NamedNodeMap attr = manifest.getAttributes();
+        Node vCode = attr.getNamedItem("android:versionCode");
+        Node vName = attr.getNamedItem("android:versionName");
+
+        // remove versionCode
+        if (vCode != null) {
+          attr.removeNamedItem("android:versionCode");
+        }
+        if (vName != null) {
+          attr.removeNamedItem("android:versionName");
+        }
+
+        // save manifest
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        Transformer transformer = transformerFactory.newTransformer();
+        DOMSource source = new DOMSource(doc);
+        StreamResult result = new StreamResult(new File(filePath));
+        transformer.transform(source, result);
+
+      } catch (ParserConfigurationException ex) {
+        throw new AndrolibException(ex);
+      } catch (SAXException ex) {
+        throw new AndrolibException(ex);
+      } catch (IOException ex) {
+        throw new AndrolibException(ex);
+      } catch (TransformerConfigurationException ex) {
+        throw new AndrolibException(ex);
+      } catch (TransformerException ex) {
+        throw new AndrolibException(ex);
+      }
+    }
+  }
+  
 	public void buildApk(File appDir, File outApk,
 			HashMap<String, Boolean> flags) throws AndrolibException {
 		LOGGER.info("Building apk file...");

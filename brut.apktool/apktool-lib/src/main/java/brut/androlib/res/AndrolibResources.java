@@ -193,7 +193,7 @@ final public class AndrolibResources {
 		} catch (TransformerException ex) {
 			throw new AndrolibException(ex);
 		}
-	}
+  }
 
 	public void adjust_package_manifest(ResTable resTable, String filePath)
 			throws AndrolibException {
@@ -201,10 +201,9 @@ final public class AndrolibResources {
 		// check if packages different, and that package is not equal to
 		// "android"
 		Map<String, String> packageInfo = resTable.getPackageInfo();
-		if ((packageInfo.get("cur_package").equalsIgnoreCase(
-				packageInfo.get("orig_package")) || ("android"
-				.equalsIgnoreCase(packageInfo.get("cur_package")) || ("com.htc"
-				.equalsIgnoreCase(packageInfo.get("cur_package")))))) {
+		if ((packageInfo.get("cur_package").equalsIgnoreCase(packageInfo.get("orig_package")) || 
+		    ("android".equalsIgnoreCase(packageInfo.get("cur_package")) || 
+		        ("com.htc".equalsIgnoreCase(packageInfo.get("cur_package")))))) {
 
 			LOGGER.info("Regular manifest package...");
 		} else {
@@ -306,6 +305,13 @@ final public class AndrolibResources {
 			mMaxSdkVersion = map.get("maxSdkVersion");
 		}
 	}
+	
+	public void setVersionInfo(Map<String, String> map) {
+	  if (map != null) {
+	    mVersionCode = map.get("versionCode");
+	    mVersionName = map.get("versionName");
+	  }
+	}
 
 	public void setPackageInfo(Map<String, String> map) {
 		if (map != null) {
@@ -378,6 +384,14 @@ final public class AndrolibResources {
 		if (mPackageRenamed != null) {
 			cmd.add("--rename-manifest-package");
 			cmd.add(mPackageRenamed);
+		}
+		if (mVersionCode != null) {
+		  cmd.add("--version-code");
+		  cmd.add(mVersionCode);
+		}
+		if (mVersionName != null) {
+		  cmd.add("--version-name");
+		  cmd.add(mVersionName);
 		}
 		cmd.add("-F");
 		cmd.add(apkFile.getAbsolutePath());
@@ -758,6 +772,8 @@ final public class AndrolibResources {
 	private String mMinSdkVersion = null;
 	private String mMaxSdkVersion = null;
 	private String mTargetSdkVersion = null;
+	private String mVersionCode = null;
+	private String mVersionName = null;
 
 	private String mPackageRenamed = null;
 

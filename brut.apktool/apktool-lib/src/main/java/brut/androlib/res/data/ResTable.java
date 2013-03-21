@@ -37,6 +37,7 @@ public class ResTable {
 
 	private Map<String, String> mSdkInfo = new LinkedHashMap<String, String>();
 	private Map<String, String> mPackageInfo = new LinkedHashMap<String, String>();
+	private Map<String, String> mVersionInfo = new LinkedHashMap<String, String>();
 
 	public ResTable() {
 		mAndRes = null;
@@ -119,17 +120,17 @@ public class ResTable {
 	public void setFrameTag(String tag) {
 		mFrameTag = tag;
 	}
-
-	public Map<String, String> getSdkInfo() {
-		return mSdkInfo;
+	
+	public void clearSdkInfo() {
+	  mSdkInfo.clear();
 	}
 
 	public void addSdkInfo(String key, String value) {
 		mSdkInfo.put(key, value);
 	}
-
-	public void clearSdkInfo() {
-		mSdkInfo.clear();
+	
+	public void addVersionInfo(String key, String value) {
+	  mVersionInfo.put(key, value);
 	}
 
 	public void addPackageInfo(String key, String value) {
@@ -138,6 +139,14 @@ public class ResTable {
 
 	public Map<String, String> getPackageInfo() {
 		return mPackageInfo;
+	}
+	
+	public Map<String, String> getVersionInfo() {
+	  return mVersionInfo;
+	}
+	
+	public Map<String, String> getSdkInfo() {
+	  return mSdkInfo;
 	}
 
 	public boolean isPackageInfoValueSet(String key) {

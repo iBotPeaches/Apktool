@@ -93,11 +93,13 @@ public class XmlPullStreamDecoder implements ResStreamDecoder {
 
 					// read <manifest> for package:
 					for (int i = 0; i < pp.getAttributeCount(); i++) {
-						if (pp.getAttributeName(i)
-								.equalsIgnoreCase(("package"))) {
-							restable.addPackageInfo("orig_package",
-									pp.getAttributeValue(i));
-						}
+						if (pp.getAttributeName(i).equalsIgnoreCase(("package"))) {
+							restable.addPackageInfo("orig_package",pp.getAttributeValue(i));
+						} else if (pp.getAttributeName(i).equalsIgnoreCase("versionCode")) {
+						  restable.addVersionInfo("versionCode", pp.getAttributeValue(i));
+            } else if (pp.getAttributeName(i).equalsIgnoreCase("versionName")) {
+              restable.addVersionInfo("versionName", pp.getAttributeValue(i));
+            }
 					}
 					return true;
 				}
