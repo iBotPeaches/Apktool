@@ -369,6 +369,11 @@ final public class AndrolibResources {
 		if (mMaxSdkVersion != null) {
 			cmd.add("--max-sdk-version");
 			cmd.add(mMaxSdkVersion);
+			
+			// if we have max sdk version, set --max-res-version
+			// so we can ignore anything over that during build.
+			cmd.add("--max-res-version");
+			cmd.add(mMaxSdkVersion);
 		}
 		if (mPackageRenamed != null) {
 			cmd.add("--rename-manifest-package");
@@ -407,7 +412,6 @@ final public class AndrolibResources {
 		if (rawDir != null) {
 			cmd.add(rawDir.getAbsolutePath());
 		}
-
 		try {
 			OS.exec(cmd.toArray(new String[0]));
 		} catch (BrutException ex) {
