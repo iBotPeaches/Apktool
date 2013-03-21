@@ -47,6 +47,7 @@ import org.jf.util.ConsoleUtil;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
+ * @author Connor Tumbleson <connor.tumbleson@gmail.com>
  */
 public class Main {
 	public static void main(String[] args) throws IOException,
@@ -63,7 +64,7 @@ public class Main {
 		  _Options();
 		  
   		try {
-          commandLine = parser.parse(allOptions, args, true);
+          commandLine = parser.parse(allOptions, args, false);
       } catch (ParseException ex) {
           System.out.println(ex.getMessage());
           usage(commandLine);
@@ -89,13 +90,13 @@ public class Main {
 		      cmdDecode(commandLine);
 		      cmdFound = true;
 		    } else if (opt.equalsIgnoreCase("b") || opt.equalsIgnoreCase("build")) {
-		      cmdBuild(args);
+		      cmdBuild(commandLine);
 		      cmdFound = true;
 		    } else if (opt.equalsIgnoreCase("if") || opt.equalsIgnoreCase("install-framework")) {
-		      cmdInstallFramework(args);
+		      cmdInstallFramework(commandLine);
 		      cmdFound = true;
 		    } else if (opt.equalsIgnoreCase("publicize-resources")) {
-		      cmdPublicizeResources(args);
+		      cmdPublicizeResources(commandLine);
 		      cmdFound = true;
 		    }
 		  }
@@ -110,11 +111,12 @@ public class Main {
 		  }
 	}
 
-	private static void cmdDecode(CommandLine cli) throws InvalidArgsError,
-			AndrolibException {
+	private static void cmdDecode(CommandLine cli) throws AndrolibException {
 		ApkDecoder decoder = new ApkDecoder();
 		
-		int para = cli.getArgList().size();
+    int paraCount = cli.getArgList().size();
+    String apkName = (String) cli.getArgList().get(paraCount - 1);
+    File outDir = null;
 		
 		// check for options
 		if (cli.hasOption("s") || cli.hasOption("no-src")) {
@@ -144,57 +146,54 @@ public class Main {
 		if (cli.hasOption("o") || cli.hasOption("output")) {
 		  decoder.setOutDir(new File(cli.getOptionValue("o")));
 		} else {
+		  
+		  // make out folder manually using name of apk
+		  String outName = apkName;
+		  outName = outName.endsWith(".apk") ? outName.substring(0,
+        outName.length() - 4) : outName + ".out";
+		  
+		  // make file from path
+		  outName = new File(outName).getName();
+		  outDir = new File(outName);
+		  decoder.setOutDir(outDir);
 		}
 		
-		
+		decoder.setApkFile(new File(apkName));
 
-//		String outName = null;
-//		if (args.length == i + 2) {
-//			outName = args[i + 1];
-//		} else if (args.length == i + 1) {
-//			outName = args[i];
-//			outName = outName.endsWith(".apk") ? outName.substring(0,
-//					outName.length() - 4) : outName + ".out";
-//			outName = new File(outName).getName();
-//		} else {
-//			throw new InvalidArgsError();
-//		}
-//		File outDir = new File(outName);
-//		decoder.setOutDir(outDir);
-//		decoder.setApkFile(new File(args[i]));
-//
-//		try {
-//			decoder.decode();
-//		} catch (OutDirExistsException ex) {
-//			System.out
-//					.println("Destination directory ("
-//							+ outDir.getAbsolutePath()
-//							+ ") "
-//							+ "already exists. Use -f switch if you want to overwrite it.");
-//			System.exit(1);
-//		} catch (InFileNotFoundException ex) {
-//			System.out.println("Input file (" + args[i] + ") "
-//					+ "was not found or was not readable.");
-//			System.exit(1);
-//		} catch (CantFindFrameworkResException ex) {
-//			System.out
-//					.println("Can't find framework resources for package of id: "
-//							+ String.valueOf(ex.getPkgId())
-//							+ ". You must install proper "
-//							+ "framework files, see project website for more info.");
-//			System.exit(1);
-//		} catch (IOException ex) {
-//			System.out
-//					.println("Could not modify file. Please ensure you have permission.");
-//			System.exit(1);
-//		}
+		try {
+			decoder.decode();
+		} catch (OutDirExistsException ex) {
+			System.out
+					.println("Destination directory ("
+							+ outDir.getAbsolutePath()
+							+ ") "
+							+ "already exists. Use -f switch if you want to overwrite it.");
+			System.exit(1);
+		} catch (InFileNotFoundException ex) {
+			System.out.println("Input file (" + apkName + ") " + "was not found or was not readable.");
+			System.exit(1);
+		} catch (CantFindFrameworkResException ex) {
+			System.out
+					.println("Can't find framework resources for package of id: "
+							+ String.valueOf(ex.getPkgId())
+							+ ". You must install proper "
+							+ "framework files, see project website for more info.");
+			System.exit(1);
+		} catch (IOException ex) {
+			System.out.println("Could not modify file. Please ensure you have permission.");
+			System.exit(1);
+		}
 
 	}
 
-	private static void cmdBuild(String[] args) throws BrutException {
-
+	private static void cmdBuild(CommandLine cli) throws BrutException {
+    int paraCount = cli.getArgList().size();
+    String apkName = (String) cli.getArgList().get(paraCount - 1);
+	  String mAaptPath = "";
+	  String appDirName = ".";
+	  File outFile = null;
 	  Androlib instance = new Androlib();
-	  
+	   
 		// hold all the fields
 		HashMap<String, Boolean> flags = new HashMap<String, Boolean>();
 		flags.put("forceBuildAll", false);
@@ -204,87 +203,61 @@ public class Main {
 		flags.put("update", false);
 		flags.put("copyOriginal", false);
 
-		int i;
-		int skip = 0;
-
-		ExtFile mOrigApk = null;
-		String mAaptPath = "";
-		for (i = 0; i < args.length; i++) {
-			String opt = args[i];
-			if (!opt.startsWith("-")) {
-				break;
-			}
-			if ("-f".equals(opt) || "--force-all".equals(opt)) {
-				flags.put("forceBuildAll", true);
-			} else if ("-d".equals(opt) || "--debug".equals(opt)) {
-				flags.put("debug", true);
-			} else if ("-v".equals(opt) || "--verbose".equals(opt)) {
-				flags.put("verbose", true);
-			} else if ("-a".equals(opt) || "--aapt".equals(opt)) {
-				mAaptPath = args[i + 1];
-				skip = 1;
-			} else if ("-c".equals(opt) || "--copy-original".equals(opt)) {
-				flags.put("copyOriginal", true);
-			} else if ("--frame-path".equals(opt)) {
-			    i++;
-	        instance.setFrameworkFolder(args[i]);
-			} else {
-				throw new InvalidArgsError();
-			}
+		// check for build options
+		if (cli.hasOption("f") || cli.hasOption("force-all")) {
+		  flags.put("forceBuildAll", true);
 		}
-
-		String appDirName;
-		File outFile = null;
-		switch (args.length - i - skip) {
-		case 0:
-			appDirName = ".";
-			break;
-		case 2:
-			outFile = new File(args[i + 1 + skip]);
-		case 1:
-			appDirName = args[i + skip];
-			break;
-		default:
-			throw new InvalidArgsError();
+		if (cli.hasOption("d") || cli.hasOption("debug")) {
+		  flags.put("debug", true);
 		}
-
-		instance.build(new File(appDirName), outFile, flags, mOrigApk,
-				mAaptPath);
+		if (cli.hasOption("v") || cli.hasOption("verbose")) {
+		  flags.put("verbose", true);
+		}
+		if (cli.hasOption("a") || cli.hasOption("aapt")) {
+		  mAaptPath = cli.getOptionValue("a");
+		}
+		if (cli.hasOption("c") || cli.hasOption("copy-original")) {
+		  flags.put("copyOriginal", true);
+		}
+		if (cli.hasOption("p") || cli.hasOption("frame-path")) {
+		  instance.setFrameworkFolder(cli.getOptionValue("p"));
+		}
+		if (cli.hasOption("o") || cli.hasOption("output")) {
+		  outFile = new File(cli.getOptionValue("o"));
+		} else {
+		  outFile = null;
+		}
+		
+		if (apkName != null) {
+		  appDirName = apkName;
+		}
+		
+		// try and build apk
+		instance.build(new File(appDirName), outFile, flags,mAaptPath);
 	}
 
-	private static void cmdInstallFramework(String[] args)
+	private static void cmdInstallFramework(CommandLine cli)
 			throws AndrolibException {
+    int paraCount = cli.getArgList().size();
+    String apkName = (String) cli.getArgList().get(paraCount - 1);
 		String tag = null;
 		String frame_path = null;
-		int i = 0;
-		switch (args.length) {
-		case 4:
-			if (args[2].equalsIgnoreCase("--frame-path")) {
-				i++;
-			} else {
-				throw new InvalidArgsError();
-			}
-		case 3:
-			frame_path = args[2 + i];
-		case 2:
-			if (!(args[1].equalsIgnoreCase("--frame-path"))) {
-				tag = args[1];
-			}
-		case 1:
-			new Androlib().installFramework(new File(args[0]), tag, frame_path);
-			return;
+		
+		if (cli.hasOption("p") || cli.hasOption("frame-path")) {
+		  frame_path = cli.getOptionValue("p");
 		}
-
-		throw new InvalidArgsError();
+		if (cli.hasOption("t") || cli.hasOption("tag")) {
+		  tag = cli.getOptionValue("t");
+		}
+		new Androlib().installFramework(new File(apkName), tag, frame_path);
 	}
 
-	private static void cmdPublicizeResources(String[] args)
-			throws InvalidArgsError, AndrolibException {
-		if (args.length != 1) {
-			throw new InvalidArgsError();
-		}
+	private static void cmdPublicizeResources(CommandLine cli)
+			throws AndrolibException {
+    int paraCount = cli.getArgList().size();
+    String apkName = (String) cli.getArgList().get(paraCount - 1);
 
-		new Androlib().publicizeResources(new File(args[0]));
+		new Androlib().publicizeResources(new File(apkName));
 	}
 
 	private static void _version() {
@@ -392,6 +365,7 @@ public class Main {
       
       BuildOptions.addOption(debugBuiOption);
       BuildOptions.addOption(aaptOption);
+      BuildOptions.addOption(originalOption);
     }
     
 	  // add global options
@@ -409,7 +383,6 @@ public class Main {
 	  // add basic build options
 	  BuildOptions.addOption(outputBuiOption);
 	  BuildOptions.addOption(frameDirOption);
-	  BuildOptions.addOption(originalOption);
 	  BuildOptions.addOption(forceBuiOption);
 	  
 	  // add basic framework options
@@ -434,6 +407,7 @@ public class Main {
 	  allOptions.addOption(keepResOption);
 	  allOptions.addOption(debugBuiOption);
 	  allOptions.addOption(aaptOption);
+	  allOptions.addOption(originalOption);
 	}
 	
 	private static String verbosityHelp() {
@@ -534,8 +508,4 @@ public class Main {
     frameOptions = new Options();
     allOptions = new Options();
   }
-  
-	static class InvalidArgsError extends AndrolibException {
-
-	}
 }

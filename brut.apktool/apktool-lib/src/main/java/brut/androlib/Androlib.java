@@ -192,13 +192,13 @@ public class Androlib {
 	}
 
 	public void build(File appDir, File outFile,
-			HashMap<String, Boolean> flags, ExtFile origApk, String aaptPath)
+			HashMap<String, Boolean> flags, String aaptPath)
 			throws BrutException {
-		build(new ExtFile(appDir), outFile, flags, origApk, aaptPath);
+		build(new ExtFile(appDir), outFile, flags, aaptPath);
 	}
 
 	public void build(ExtFile appDir, File outFile,
-			HashMap<String, Boolean> flags, ExtFile origApk, String aaptPath)
+			HashMap<String, Boolean> flags, String aaptPath)
 			throws BrutException {
 
 		mAaptPath = aaptPath;
