@@ -346,11 +346,11 @@ public class Main {
 	       .withArgName("dir")
 	       .create("o");
 	   
-	   Option decodeOption = OptionBuilder.withLongOpt("decode")
-	       .create("d");
+	   Option quietOption = OptionBuilder.withLongOpt("quiet")
+	       .create("q");
 	   
-	   Option buildOption = OptionBuilder.withLongOpt("build")
-	       .create("b");
+	   Option verboseOption = OptionBuilder.withLongOpt("verbose")
+	       .create("v");
 	         
 	  // check for advance mode
     if (advanceMode) {
@@ -403,8 +403,10 @@ public class Main {
 	  allOptions.addOption(debugBuiOption);
 	  allOptions.addOption(aaptOption);
 	  allOptions.addOption(originalOption);
+	  allOptions.addOption(verboseOption);
+	  allOptions.addOption(quietOption);
 	}
-	
+
 	private static String verbosityHelp() {
 	  if (advanceMode) {
 	    return "[-q|--quiet OR -v|--verbose] ";
