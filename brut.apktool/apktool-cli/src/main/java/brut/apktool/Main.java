@@ -65,6 +65,7 @@ public class Main {
           usage(commandLine);
           return;
       }
+  		
   		// check for verbose / quiet
 		  if (commandLine.hasOption("-v") || commandLine.hasOption("--verbose")) {
 		    verbosity = Verbosity.VERBOSE;
@@ -435,17 +436,28 @@ public class Main {
           "with smali v" + ApktoolProperties.get("smaliVersion") +
           " and baksmali v" + ApktoolProperties.get("baksmaliVersion") + "\n" +
           "Copyright 2010 Ryszard Wiśniewski <brut.alll@gmail.com>\n" +
-          "Updated by Connor Tumbleson <connor.tumbleson@gmail.com> \n" );
+          "Updated by Connor Tumbleson <connor.tumbleson@gmail.com>" );
+      if (advanceMode) {
+        System.out.println("Apache License 2.0 (http://www.apache.org/licenses/LICENSE-2.0)\n");
+      }else {
+        System.out.println("");
+      }
       
       // 4 usage outputs (general, frameworks, decode, build)
       formatter.printHelp("apktool " + verbosityHelp(), normalOptions);
       formatter.printHelp("apktool " + verbosityHelp() + "if|install-framework [options] <framework.apk>", frameOptions);
 	    formatter.printHelp("apktool " + verbosityHelp() + "d[ecode] [options] <file_apk>", DecodeOptions);
 	    formatter.printHelp("apktool " + verbosityHelp() + "b[uild] [options] <app_path>", BuildOptions);
+	    if (advanceMode) {
+	      formatter.printHelp("apktool " + verbosityHelp() + "publicize-resources <file_path>", 
+	          "Make all framework resources public.", emptyOptions, null);
+	    } else {
+	      System.out.println("");
+	    }
 	    
 	    // print out more information
 	    System.out.println(
-	            "\nFor additional info, see: http://code.google.com/p/android-apktool/ \n"
+	            "For additional info, see: http://code.google.com/p/android-apktool/ \n"
             + "For smali/baksmali info, see: http://code.google.com/p/smali/");
 	}
 
@@ -495,6 +507,7 @@ public class Main {
   private final static Options BuildOptions;
   private final static Options frameOptions;
   private final static Options allOptions;
+  private final static Options emptyOptions;
   
   static {
     //normal and advance usage output
@@ -503,5 +516,6 @@ public class Main {
     DecodeOptions = new Options();
     frameOptions = new Options();
     allOptions = new Options();
+    emptyOptions = new Options();
   }
 }
