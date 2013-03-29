@@ -25,3 +25,4 @@ build/
 *.setting
 bin/
 *.iml
+.idea/*
