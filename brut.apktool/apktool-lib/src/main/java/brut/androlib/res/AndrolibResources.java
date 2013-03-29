@@ -332,21 +332,30 @@ final public class AndrolibResources {
 
 		// path for aapt binary
 		if (!aaptPath.isEmpty()) {
-			File aaptFile = new File(aaptPath);
-			if (aaptFile.canRead() && aaptFile.exists()) {
-				aaptFile.setExecutable(true);
-				cmd.add(aaptFile.getPath());
+		  File aaptFile = new File(aaptPath);
+		  if (aaptFile.canRead() && aaptFile.exists()) {
+		    aaptFile.setExecutable(true);
+		    cmd.add(aaptFile.getPath());
 
-				if (flags.get("verbose")) {
-					LOGGER.info(aaptFile.getPath()
-							+ " being used as aapt location.");
-				}
-			} else {
-				LOGGER.warning("aapt location could not be found. Defaulting back to default");
-				cmd.add("aapt");
-			}
+		    if (flags.get("verbose")) {
+		      LOGGER.info(aaptFile.getPath()
+		          + " being used as aapt location.");
+		    }
+		  } else {
+		    LOGGER.warning("aapt location could not be found. Defaulting back to default");
+
+		    try {
+		      cmd.add(getAaptBinaryFile().getAbsolutePath());
+		    } catch (BrutException ignored) {
+		      cmd.add("aapt");
+		    }
+		  }
 		} else {
-			cmd.add("aapt");
+		  try {
+		    cmd.add(getAaptBinaryFile().getAbsolutePath());
+		  } catch (BrutException ignored) {
+		    cmd.add("aapt");
+		  }
 		}
 
 		cmd.add("p");
@@ -728,7 +737,7 @@ final public class AndrolibResources {
 		// if a framework path was specified on the command line, use it
 		if (sFrameworkFolder != null) {
 			path = sFrameworkFolder;
-		} else if (System.getProperty("os.name").equals("Mac OS X")) {
+		} else if (OSDetection.isMacOSX()) {
 			// store in user-home, for Mac OS X
 			path = System.getProperty("user.home") + File.separatorChar + "Library/apktool/framework";
 		} else {
@@ -746,6 +755,33 @@ final public class AndrolibResources {
 			}
 		}
 		return dir;
+	}
+	
+	/**
+	 * 
+	 * @see https://github.com/iBotPeaches/platform_frameworks_base
+	 * @return
+	 * @throws AndrolibException
+	 */
+	public File getAaptBinaryFile() throws AndrolibException {
+	  try {
+  	  if (OSDetection.isMacOSX()) {
+  	    mAaptBinary = Jar
+  	        .getResourceAsFile("/aapt/macosx/aapt");
+  	  } else if (OSDetection.isUnix()) {
+  	    mAaptBinary = Jar
+  	        .getResourceAsFile("/aapt/linux/aapt");
+  	  } else if (OSDetection.isWindows()) {
+  	    mAaptBinary = Jar
+  	        .getResourceAsFile("/aapt/windows/aapt.exe");
+  	  } else {
+  	    return null;
+  	  }
+	  } catch (BrutException ex) {
+	    throw new AndrolibException(ex);
+	  }
+	  mAaptBinary.setExecutable(true);
+	  return mAaptBinary;
 	}
 
 	public File getAndroidResourcesFile() throws AndrolibException {
@@ -776,5 +812,6 @@ final public class AndrolibResources {
 	private String mVersionName = null;
 
 	private String mPackageRenamed = null;
+	private File mAaptBinary = null;
 
 }
