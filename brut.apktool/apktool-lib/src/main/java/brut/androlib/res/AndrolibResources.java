@@ -323,40 +323,42 @@ final public class AndrolibResources {
 		mPackageId = id;
 	}
 
-	public void aaptPackage(File apkFile, File manifest, File resDir,
-			File rawDir, File assetDir, File[] include,
-			HashMap<String, Boolean> flags, String aaptPath)
-			throws AndrolibException {
+    public void aaptPackage(File apkFile, File manifest, File resDir,
+                            File rawDir, File assetDir, File[] include,
+                            HashMap<String, Boolean> flags, String aaptPath)
+            throws AndrolibException {
 
-		List<String> cmd = new ArrayList<String>();
+        boolean customAapt = false;
+        List<String> cmd = new ArrayList<String>();
 
-		// path for aapt binary
-		if (!aaptPath.isEmpty()) {
-		  File aaptFile = new File(aaptPath);
-		  if (aaptFile.canRead() && aaptFile.exists()) {
-		    aaptFile.setExecutable(true);
-		    cmd.add(aaptFile.getPath());
+        // path for aapt binary
+        if (!aaptPath.isEmpty()) {
+            File aaptFile = new File(aaptPath);
+            if (aaptFile.canRead() && aaptFile.exists()) {
+                aaptFile.setExecutable(true);
+                cmd.add(aaptFile.getPath());
+                customAapt = true;
 
-		    if (flags.get("verbose")) {
-		      LOGGER.info(aaptFile.getPath()
-		          + " being used as aapt location.");
-		    }
-		  } else {
-		    LOGGER.warning("aapt location could not be found. Defaulting back to default");
+                if (flags.get("verbose")) {
+                    LOGGER.info(aaptFile.getPath()
+                            + " being used as aapt location.");
+                }
+            } else {
+                LOGGER.warning("aapt location could not be found. Defaulting back to default");
 
-		    try {
-		      cmd.add(getAaptBinaryFile().getAbsolutePath());
-		    } catch (BrutException ignored) {
-		      cmd.add("aapt");
-		    }
-		  }
-		} else {
-		  try {
-		    cmd.add(getAaptBinaryFile().getAbsolutePath());
-		  } catch (BrutException ignored) {
-		    cmd.add("aapt");
-		  }
-		}
+                try {
+                    cmd.add(getAaptBinaryFile().getAbsolutePath());
+                } catch (BrutException ignored) {
+                    cmd.add("aapt");
+                }
+            }
+        } else {
+            try {
+                cmd.add(getAaptBinaryFile().getAbsolutePath());
+            } catch (BrutException ignored) {
+                cmd.add("aapt");
+            }
+        }
 
 		cmd.add("p");
 
@@ -369,7 +371,10 @@ final public class AndrolibResources {
 		if (flags.get("debug")) { // inject debuggable="true" into manifest
 			cmd.add("--debug-mode");
 		}
-		if (mPackageId != null) {
+
+        // force package id so that some frameworks build with correct id
+        // disable if user adds own aapt (can't know if they have this feature)
+		if (mPackageId != null && customAapt == false) {
 			cmd.add("--forced-package-id");
 			cmd.add(mPackageId);
 		}
