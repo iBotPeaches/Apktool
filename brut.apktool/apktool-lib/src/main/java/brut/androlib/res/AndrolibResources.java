@@ -761,7 +761,8 @@ final public class AndrolibResources {
 	 * Using a prebuilt aapt and forcing its use, allows us to prevent bugs from older aapt's
      * along with having a finer control over the build procedure.
      *
-     * Aapt can still be over
+     * Aapt can still be overridden via --aapt/-a on build, but specific features will be disabled
+     *
 	 * @url https://github.com/iBotPeaches/platform_frameworks_base
 	 * @return
 	 * @throws AndrolibException
