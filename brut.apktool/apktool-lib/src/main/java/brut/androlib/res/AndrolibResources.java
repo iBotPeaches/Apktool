@@ -758,8 +758,11 @@ final public class AndrolibResources {
 	}
 	
 	/**
-	 * 
-	 * @see https://github.com/iBotPeaches/platform_frameworks_base
+	 * Using a prebuilt aapt and forcing its use, allows us to prevent bugs from older aapt's
+     * along with having a finer control over the build procedure.
+     *
+     * Aapt can still be over
+	 * @url https://github.com/iBotPeaches/platform_frameworks_base
 	 * @return
 	 * @throws AndrolibException
 	 */
@@ -767,13 +770,13 @@ final public class AndrolibResources {
 	  try {
   	  if (OSDetection.isMacOSX()) {
   	    mAaptBinary = Jar
-  	        .getResourceAsFile("/aapt/macosx/aapt");
+  	        .getResourceAsFile("/prebuilt/aapt/macosx/aapt");
   	  } else if (OSDetection.isUnix()) {
   	    mAaptBinary = Jar
-  	        .getResourceAsFile("/aapt/linux/aapt");
+  	        .getResourceAsFile("/prebuilt/aapt/linux/aapt");
   	  } else if (OSDetection.isWindows()) {
   	    mAaptBinary = Jar
-  	        .getResourceAsFile("/aapt/windows/aapt.exe");
+  	        .getResourceAsFile("/prebuilt/aapt/windows/aapt.exe");
   	  } else {
   	    return null;
   	  }

@@ -3,6 +3,7 @@ v2.0.0 (TBA)
 -Fixed (issue #403) - Uses new usage output to cleanup organization of features.
 -Fixed (issue #359) - Correclty handles malformed 9patch images. (Thanks Felipe Richards)
 -Fixed (issue #401) - Uses versionInfo meta to correctly parse versionName and versionCode
+-Fixed (issue #440) - Include aapt binaries within Apktool to have closer control over build.
 
 v1.5.3 (TBA)
 -Updated to smali/baksmali to v1.4.2
