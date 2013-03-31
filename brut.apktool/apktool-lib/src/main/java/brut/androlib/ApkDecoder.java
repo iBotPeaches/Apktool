@@ -133,11 +133,8 @@ public class ApkDecoder {
 		}
 
 		mAndrolib.decodeRawFiles(mApkFile, outDir);
-        mAndrolib.decodeUnknownFiles(mApkFile, outDir);
+        mAndrolib.decodeUnknownFiles(mApkFile, outDir, mResTable);
 		mAndrolib.writeOriginalFiles(mApkFile, outDir);
-		
-        // remove version names in favour of aapt injection
-        mAndrolib.remove_manifest_versions(outDir.getAbsolutePath() + "/AndroidManifest.xml");
 		writeMetaFile();
 	}
 
@@ -251,6 +248,7 @@ public class ApkDecoder {
 			putPackageInfo(meta);
 			putVersionInfo(meta);
 			putCompressionInfo(meta);
+            putUnknownInfo(meta);
 			//meta.put("packageId", getResTable().getPackageInfo().get("cur_package_id"));
 		}
 
@@ -281,32 +279,42 @@ public class ApkDecoder {
 		meta.put("usesFramework", uses);
 	}
 
-	private void putSdkInfo(Map<String, Object> meta) throws AndrolibException {
-		Map<String, String> info = getResTable().getSdkInfo();
-		if (info.size() > 0) {
-			meta.put("sdkInfo", info);
-		}
-	}
-
-	private void putPackageInfo(Map<String, Object> meta)
-			throws AndrolibException {
-		Map<String, String> info = getResTable().getPackageInfo();
-		if (info.size() > 0) {
-			meta.put("packageInfo", info);
-		}
-	}
-	
-	private void putVersionInfo(Map<String, Object> meta) throws AndrolibException {
-    Map<String, String> info = getResTable().getVersionInfo();
-    if (info.size() > 0) {
-      meta.put("versionInfo", info);
+    private void putSdkInfo(Map<String, Object> meta)
+            throws AndrolibException {
+        Map<String, String> info = getResTable().getSdkInfo();
+        if (info.size() > 0) {
+            meta.put("sdkInfo", info);
+        }
     }
-  }
 
-	private void putCompressionInfo(Map<String, Object> meta)
-			throws AndrolibException {
-		meta.put("compressionType", getCompressionType());
-	}
+    private void putPackageInfo(Map<String, Object> meta)
+            throws AndrolibException {
+        Map<String, String> info = getResTable().getPackageInfo();
+        if (info.size() > 0) {
+            meta.put("packageInfo", info);
+        }
+    }
+
+    private void putVersionInfo(Map<String, Object> meta)
+            throws AndrolibException {
+        Map<String, String> info = getResTable().getVersionInfo();
+        if (info.size() > 0) {
+            meta.put("versionInfo", info);
+        }
+    }
+
+    private void putUnknownInfo(Map<String, Object> meta)
+            throws AndrolibException {
+        Map<String,String> info = getResTable().getUnknownFiles();
+        if (info.size() > 0) {
+            meta.put("unknownFiles", info);
+        }
+    }
+
+    private void putCompressionInfo(Map<String, Object> meta)
+            throws AndrolibException {
+        meta.put("compressionType", getCompressionType());
+    }
 
 	private boolean getCompressionType() {
 		return mCompressResources;

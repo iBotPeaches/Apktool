@@ -47,7 +47,6 @@ import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import org.apache.commons.io.IOUtils;
 import org.xml.sax.SAXException;
@@ -244,6 +243,54 @@ final public class AndrolibResources {
 		}
 	}
 
+    public void remove_manifest_versions(String filePath)
+            throws AndrolibException {
+
+        File f = new File(filePath);
+
+        if (f.exists()) {
+            // remove versionCode and versionName
+            try {
+                DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+                DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+                Document doc = docBuilder.parse(filePath.toString());
+
+                Node manifest = doc.getFirstChild();
+
+                // load attr
+                NamedNodeMap attr = manifest.getAttributes();
+                Node vCode = attr.getNamedItem("android:versionCode");
+                Node vName = attr.getNamedItem("android:versionName");
+
+                // remove versionCode
+                if (vCode != null) {
+                    attr.removeNamedItem("android:versionCode");
+                }
+                if (vName != null) {
+                    attr.removeNamedItem("android:versionName");
+                }
+
+                // save manifest
+                TransformerFactory transformerFactory = TransformerFactory.newInstance();
+                Transformer transformer = transformerFactory.newTransformer();
+                DOMSource source = new DOMSource(doc);
+                StreamResult result = new StreamResult(new File(filePath));
+                transformer.transform(source, result);
+
+            } catch (ParserConfigurationException ex) {
+                throw new AndrolibException(ex);
+            } catch (SAXException ex) {
+                throw new AndrolibException(ex);
+            } catch (IOException ex) {
+                throw new AndrolibException(ex);
+            } catch (TransformerConfigurationException ex) {
+                throw new AndrolibException(ex);
+            } catch (TransformerException ex) {
+                throw new AndrolibException(ex);
+            }
+        }
+    }
+
 	public void decode(ResTable resTable, ExtFile apkFile, File outDir)
 			throws AndrolibException {
 		Duo<ResFileDecoder, AXmlResourceParser> duo = getResFileDecoder();
@@ -263,9 +310,13 @@ final public class AndrolibResources {
 			fileDecoder.decodeManifest(inApk, "AndroidManifest.xml", out,
 					"AndroidManifest.xml");
 
-			// fix package if needed
+			// fix package (Android 4.2)
 			adjust_package_manifest(resTable, outDir.getAbsolutePath()
-					+ "/AndroidManifest.xml");
+					+ File.separator + "AndroidManifest.xml");
+
+            // Remove versionName / versionCode (aapt API 16)
+            remove_manifest_versions(outDir.getAbsolutePath()
+                    + File.separator + "/AndroidManifest.xml");
 
 			if (inApk.containsDir("res")) {
 				in = inApk.getDir("res");

@@ -33,22 +33,11 @@ import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
+import org.apache.commons.io.FileUtils;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
+
+import org.apache.commons.io.FileUtils.*;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
@@ -152,10 +141,11 @@ public class Androlib {
         return false;
     }
 
-    public void decodeUnknownFiles(ExtFile apkFile, File outDir)
+    public void decodeUnknownFiles(ExtFile apkFile, File outDir, ResTable resTable)
             throws AndrolibException {
         LOGGER.info("Copying unknown files/dir...");
         File unknownOut = new File(outDir, UNK_DIRNAME);
+        ZipEntry invZipFile;
 
         // have to use container of ZipFile to help identify compression type
         // with regular looping of apkFile for easy copy
@@ -163,22 +153,26 @@ public class Androlib {
             Directory unk = apkFile.getDirectory();
             ZipFile apkZipFile = new ZipFile(apkFile.getAbsolutePath());
 
-            // loop all items in container, ignoring any that are pre-defined by aapt
-            Set<String> files = unk.getFiles();
+            // loop all items in container recursively, ignoring any that are pre-defined by aapt
+            Set<String> files = unk.getFiles(true);
             for (String file : files) {
                 if (!isAPKFileNames(file)) {
+
+                    // copy file out of archive into special "unknown" folder
+                    // to be re-included on build
                     unk.copyToDir(unknownOut,file);
-                    System.out.println(apkZipFile.getEntry(file).getMethod());
+                    try {
+                        invZipFile = apkZipFile.getEntry(file.toString());
+
+                        // lets record the name of the file, and its compression type
+                        // so that we may re-include it the same way
+                        if (invZipFile != null) {
+                            resTable.addUnknownFileInfo(invZipFile.getName(), String.valueOf(invZipFile.getMethod()));
+                        }
+                    } catch (NullPointerException ignored) {
+
+                    }
                 }
-            }
-            // for folders now.
-            Map<String, Directory> dirs = unk.getDirs();
-            for (String dir : dirs.keySet()) {
-                if (!isAPKFileNames(dir)) {
-                    unk.copyToDir(unknownOut,dir);
-                    System.out.println(apkZipFile.getEntry(dir).getMethod());
-                }
-                // @todo add ability to loop through dir and pull those methods
             }
         }
         catch (DirectoryException ex) {
@@ -187,8 +181,6 @@ public class Androlib {
         catch (IOException ex) {
             throw new AndrolibException(ex);
         }
-
-
     }
 
 	public void writeOriginalFiles(ExtFile apkFile, File outDir)
@@ -287,6 +279,10 @@ public class Androlib {
 		buildLib(appDir, flags);
 		buildCopyOriginalFiles(appDir, flags);
 		buildApk(appDir, outFile, flags);
+
+        // we must go after the Apk is built, and copy the files in via Zip
+        // this is because Aapt won't add files it doesn't know (ex unknown files)
+        buildUnknownFiles(appDir,outFile,meta);
 	}
 
 	public void buildSources(File appDir, HashMap<String, Boolean> flags)
@@ -533,53 +529,31 @@ public class Androlib {
 		}
 	}
 
-  public void remove_manifest_versions(String filePath)
-      throws AndrolibException {
+    public void buildUnknownFiles(File appDir, File outFile, Map<String, Object> meta)
+        throws AndrolibException {
 
-    File f = new File(filePath);
-    
-    if (f.exists()) {
-      // remove versionCode and versionName
-      try {
-        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-        Document doc = docBuilder.parse(filePath.toString());
+        // confirm we have unknown files to inject
+        if (meta.containsKey("unknownFiles")) {
+            LOGGER.info("Copying unknown files/dir...");
 
-        Node manifest = doc.getFirstChild();
+            Map<String, String> files = (Map<String, String>)meta.get("unknownFiles");
 
-        // load attr
-        NamedNodeMap attr = manifest.getAttributes();
-        Node vCode = attr.getNamedItem("android:versionCode");
-        Node vName = attr.getNamedItem("android:versionName");
+            try {
+                ZipFile apkZipFile = new ZipFile(outFile.getAbsolutePath());
 
-        // remove versionCode
-        if (vCode != null) {
-          attr.removeNamedItem("android:versionCode");
+                // loop through files inside
+                for (Map.Entry<String,String> entry : files.entrySet()) {
+
+                    // check if file exists
+                    if (new File(appDir,entry.getKey()).isFile()) {
+                       // apkZipFile.
+                    }
+                }
+            } catch (IOException ex) {
+                throw new AndrolibException(ex);
+            }
         }
-        if (vName != null) {
-          attr.removeNamedItem("android:versionName");
-        }
-
-        // save manifest
-        TransformerFactory transformerFactory = TransformerFactory.newInstance();
-        Transformer transformer = transformerFactory.newTransformer();
-        DOMSource source = new DOMSource(doc);
-        StreamResult result = new StreamResult(new File(filePath));
-        transformer.transform(source, result);
-
-      } catch (ParserConfigurationException ex) {
-        throw new AndrolibException(ex);
-      } catch (SAXException ex) {
-        throw new AndrolibException(ex);
-      } catch (IOException ex) {
-        throw new AndrolibException(ex);
-      } catch (TransformerConfigurationException ex) {
-        throw new AndrolibException(ex);
-      } catch (TransformerException ex) {
-        throw new AndrolibException(ex);
-      }
     }
-  }
   
 	public void buildApk(File appDir, File outApk,
 			HashMap<String, Boolean> flags) throws AndrolibException {
