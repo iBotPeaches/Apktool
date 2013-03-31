@@ -28,10 +28,10 @@ import brut.directory.*;
 import brut.util.BrutIO;
 import brut.util.OS;
 import java.io.*;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Logger;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -142,6 +142,54 @@ public class Androlib {
 			throw new AndrolibException(ex);
 		}
 	}
+
+    private boolean isAPKFileNames(String file) {
+        for (String apkFile : APK_STANDARD_ALL_FILENAMES) {
+            if (apkFile.equals(file) || file.startsWith(apkFile)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void decodeUnknownFiles(ExtFile apkFile, File outDir)
+            throws AndrolibException {
+        LOGGER.info("Copying unknown files/dir...");
+        File unknownOut = new File(outDir, UNK_DIRNAME);
+
+        // have to use container of ZipFile to help identify compression type
+        // with regular looping of apkFile for easy copy
+        try {
+            Directory unk = apkFile.getDirectory();
+            ZipFile apkZipFile = new ZipFile(apkFile.getAbsolutePath());
+
+            // loop all items in container, ignoring any that are pre-defined by aapt
+            Set<String> files = unk.getFiles();
+            for (String file : files) {
+                if (!isAPKFileNames(file)) {
+                    unk.copyToDir(unknownOut,file);
+                    System.out.println(apkZipFile.getEntry(file).getMethod());
+                }
+            }
+            // for folders now.
+            Map<String, Directory> dirs = unk.getDirs();
+            for (String dir : dirs.keySet()) {
+                if (!isAPKFileNames(dir)) {
+                    unk.copyToDir(unknownOut,dir);
+                    System.out.println(apkZipFile.getEntry(dir).getMethod());
+                }
+                // @todo add ability to loop through dir and pull those methods
+            }
+        }
+        catch (DirectoryException ex) {
+            throw new AndrolibException(ex);
+        }
+        catch (IOException ex) {
+            throw new AndrolibException(ex);
+        }
+
+
+    }
 
 	public void writeOriginalFiles(ExtFile apkFile, File outDir)
 			throws AndrolibException {
@@ -635,11 +683,15 @@ public class Androlib {
 
 	private final static String SMALI_DIRNAME = "smali";
 	private final static String APK_DIRNAME = "build/apk";
+    private final static String UNK_DIRNAME = "unknown";
 	private final static String[] APK_RESOURCES_FILENAMES = new String[] {
 			"resources.arsc", "AndroidManifest.xml", "res" };
 	private final static String[] APK_RESOURCES_WITHOUT_RES_FILENAMES = new String[] {
 			"resources.arsc", "AndroidManifest.xml" };
 	private final static String[] APP_RESOURCES_FILENAMES = new String[] {
 			"AndroidManifest.xml", "res" };
-	private final static String[] APK_MANIFEST_FILENAMES = new String[] { "AndroidManifest.xml" };
+	private final static String[] APK_MANIFEST_FILENAMES = new String[] {
+            "AndroidManifest.xml" };
+    private final static String[] APK_STANDARD_ALL_FILENAMES = new String[] {
+            "classes.dex", "AndroidManifest.xml", "resources.arsc","res","lib","assets","META-INF" };
 }

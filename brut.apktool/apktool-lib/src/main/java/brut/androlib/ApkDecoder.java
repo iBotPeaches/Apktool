@@ -133,10 +133,11 @@ public class ApkDecoder {
 		}
 
 		mAndrolib.decodeRawFiles(mApkFile, outDir);
+        mAndrolib.decodeUnknownFiles(mApkFile, outDir);
 		mAndrolib.writeOriginalFiles(mApkFile, outDir);
 		
-    // remove version names in favour of aapt injection
-    mAndrolib.remove_manifest_versions(outDir.getAbsolutePath() + "/AndroidManifest.xml");
+        // remove version names in favour of aapt injection
+        mAndrolib.remove_manifest_versions(outDir.getAbsolutePath() + "/AndroidManifest.xml");
 		writeMetaFile();
 	}
 
