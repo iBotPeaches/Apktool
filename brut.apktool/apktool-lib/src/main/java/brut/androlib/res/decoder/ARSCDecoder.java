@@ -246,7 +246,13 @@ public class ARSCDecoder {
 
 		byte orientation = mIn.readByte();
 		byte touchscreen = mIn.readByte();
+
 		short density = mIn.readShort();
+        // some htc apks have 40 byte configs, with int(s) as density
+        // we are just gonna ignore the rest of the qualifer for now.
+        if (this.mPkg.getName().equalsIgnoreCase("com.htc") && size == 40) {
+            mIn.skipBytes(2);
+        }
 
 		byte keyboard = mIn.readByte();
 		byte navigation = mIn.readByte();
