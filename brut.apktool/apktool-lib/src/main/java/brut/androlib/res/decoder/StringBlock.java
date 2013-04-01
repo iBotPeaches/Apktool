@@ -309,20 +309,6 @@ public class StringBlock {
 		}
 	}
 
-	public boolean touch(int index, int own) {
-		if (index < 0 || m_stringOwns == null || index >= m_stringOwns.length) {
-			return false;
-		}
-		if (m_stringOwns[index] == -1) {
-			m_stringOwns[index] = own;
-			return true;
-		} else if (m_stringOwns[index] == own) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
 	private int[] m_stringOffsets;
 	private byte[] m_strings;
 	private int[] m_styleOffsets;

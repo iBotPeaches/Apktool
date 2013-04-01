@@ -546,7 +546,9 @@ public class Androlib {
 
                     // check if file exists
                     if (new File(appDir,entry.getKey()).isFile()) {
-                       // apkZipFile.
+
+                        // @todo read ZipFile and inject file into
+                        // might need to use Zip4j
                     }
                 }
             } catch (IOException ex) {

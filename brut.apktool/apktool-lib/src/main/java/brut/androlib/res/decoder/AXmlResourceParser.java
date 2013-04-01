@@ -31,17 +31,17 @@ import org.xmlpull.v1.XmlPullParserException;
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  * @author Dmitry Skiba
- * 
+ *
  *         Binary xml files parser.
- * 
+ *
  *         Parser has only two states: (1) Operational state, which parser
  *         obtains after first successful call to next() and retains until
  *         open(), close(), or failed call to next(). (2) Closed state, which
  *         parser obtains after open(), close(), or failed call to next(). In
  *         this state methods return invalid values or throw exceptions.
- * 
+ *
  *         TODO: * check all methods in closed state
- * 
+ *
  */
 public class AXmlResourceParser implements XmlResourceParser {
 
@@ -283,7 +283,7 @@ public class AXmlResourceParser implements XmlResourceParser {
 		if (m_event != START_TAG) {
 			return -1;
 		}
-		return m_attributes.length / ATTRIBUTE_LENGHT;
+		return m_attributes.length / ATTRIBUTE_LENGTH;
 	}
 
 	@Override
@@ -362,13 +362,7 @@ public class AXmlResourceParser implements XmlResourceParser {
 						getAttributePrefix(index), getAttributeName(index),
 						valueData), ex);
 			}
-		} else {
-			if (valueType == TypedValue.TYPE_STRING) {
-				return ResXmlEncoders.escapeXmlChars(m_strings
-						.getString(valueRaw));
-			}
 		}
-
 		return TypedValue.coerceToString(valueType, valueData);
 	}
 
@@ -574,9 +568,9 @@ public class AXmlResourceParser implements XmlResourceParser {
 	 * methods search all depth frames starting from the last namespace pair of
 	 * current depth frame. All functions that operate with int, use -1 as
 	 * 'invalid value'.
-	 * 
+	 *
 	 * !! functions expect 'prefix'+'uri' pairs, not 'uri'+'prefix' !!
-	 * 
+	 *
 	 */
 	private static final class NamespaceStack {
 
@@ -830,7 +824,7 @@ public class AXmlResourceParser implements XmlResourceParser {
 			throw new IndexOutOfBoundsException(
 					"Current event is not START_TAG.");
 		}
-		int offset = index * ATTRIBUTE_LENGHT;
+		int offset = index * ATTRIBUTE_LENGTH;
 		if (offset >= m_attributes.length) {
 			throw new IndexOutOfBoundsException("Invalid attribute index ("
 					+ index + ").");
@@ -847,11 +841,11 @@ public class AXmlResourceParser implements XmlResourceParser {
 			return -1;
 		}
 		int uri = (namespace != null) ? m_strings.find(namespace) : -1;
-		for (int o = 0; o != m_attributes.length; o += ATTRIBUTE_LENGHT) {
+		for (int o = 0; o != m_attributes.length; o += ATTRIBUTE_LENGTH) {
 			if (name == m_attributes[o + ATTRIBUTE_IX_NAME]
 					&& (uri == -1 || uri == m_attributes[o
 							+ ATTRIBUTE_IX_NAMESPACE_URI])) {
-				return o / ATTRIBUTE_LENGHT;
+				return o / ATTRIBUTE_LENGTH;
 			}
 		}
 		return -1;
@@ -874,7 +868,8 @@ public class AXmlResourceParser implements XmlResourceParser {
 			m_reader.skipCheckInt(CHUNK_AXML_FILE);
 			/*
 			 * chunkSize
-			 */m_reader.skipInt();
+			 */
+            m_reader.skipInt();
 			m_strings = StringBlock.read(m_reader);
 			m_namespaces.increaseDepth();
 			m_operational = true;
@@ -960,10 +955,10 @@ public class AXmlResourceParser implements XmlResourceParser {
 				m_styleAttribute = (m_classAttribute >>> 16) - 1;
 				m_classAttribute = (m_classAttribute & 0xFFFF) - 1;
 				m_attributes = m_reader.readIntArray(attributeCount
-						* ATTRIBUTE_LENGHT);
+						* ATTRIBUTE_LENGTH);
 				for (int i = ATTRIBUTE_IX_VALUE_TYPE; i < m_attributes.length;) {
 					m_attributes[i] = (m_attributes[i] >>> 24);
-					i += ATTRIBUTE_LENGHT;
+					i += ATTRIBUTE_LENGTH;
 				}
 				m_namespaces.increaseDepth();
 				m_event = START_TAG;
@@ -985,62 +980,6 @@ public class AXmlResourceParser implements XmlResourceParser {
 				m_event = TEXT;
 				break;
 			}
-		}
-	}
-
-	private static String formatArray(int[] array, int min, int max) {
-		if (max > array.length) {
-			max = array.length;
-		}
-		if (min < 0) {
-			min = 0;
-		}
-		StringBuffer sb = new StringBuffer("[");
-		int i = min;
-		while (true) {
-			sb.append(array[i]);
-			i++;
-			if (i < max) {
-				sb.append(", ");
-			} else {
-				sb.append("]");
-				break;
-			}
-		}
-		return sb.toString();
-	}
-
-	private boolean compareAttr(int[] attr1, int[] attr2) {
-		// TODO: sort Attrs
-		/*
-		 * ATTRIBUTE_IX_VALUE_TYPE == TYPE_STRING : ATTRIBUTE_IX_VALUE_STRING :
-		 * ATTRIBUTE_IX_NAMESPACE_URI ATTRIBUTE_IX_NAMESPACE_URI :
-		 * ATTRIBUTE_IX_NAME id
-		 */
-		if (attr1[ATTRIBUTE_IX_VALUE_TYPE] == TypedValue.TYPE_STRING
-				&& attr1[ATTRIBUTE_IX_VALUE_TYPE] == attr2[ATTRIBUTE_IX_VALUE_TYPE]
-				&& // (m_strings.touch(attr1[ATTRIBUTE_IX_VALUE_STRING], m_name)
-					// ||
-					// m_strings.touch(attr2[ATTRIBUTE_IX_VALUE_STRING],
-					// m_name)) &&
-					// m_strings.touch(attr1[ATTRIBUTE_IX_VALUE_STRING], m_name)
-					// &&
-				attr1[ATTRIBUTE_IX_VALUE_STRING] != attr2[ATTRIBUTE_IX_VALUE_STRING]) {
-			return (attr1[ATTRIBUTE_IX_VALUE_STRING] < attr2[ATTRIBUTE_IX_VALUE_STRING]);
-		} else if ((attr1[ATTRIBUTE_IX_NAMESPACE_URI] == attr2[ATTRIBUTE_IX_NAMESPACE_URI])
-				&& (attr1[ATTRIBUTE_IX_NAMESPACE_URI] != -1) && // (m_strings.touch(attr1[ATTRIBUTE_IX_NAME],
-																// m_name) ||
-																// m_strings.touch(attr2[ATTRIBUTE_IX_NAME],
-																// m_name)) &&
-																// m_strings.touch(attr1[ATTRIBUTE_IX_NAME],
-																// m_name) &&
-				(attr1[ATTRIBUTE_IX_NAME] != attr2[ATTRIBUTE_IX_NAME])) {
-			return (attr1[ATTRIBUTE_IX_NAME] < attr2[ATTRIBUTE_IX_NAME]);
-			// } else if (attr1[ATTRIBUTE_IX_NAMESPACE_URI] <
-			// attr2[ATTRIBUTE_IX_NAMESPACE_URI]) {
-			// return true;
-		} else {
-			return false;
 		}
 	}
 
@@ -1079,7 +1018,7 @@ public class AXmlResourceParser implements XmlResourceParser {
 	private static final int ATTRIBUTE_IX_NAMESPACE_URI = 0,
 			ATTRIBUTE_IX_NAME = 1, ATTRIBUTE_IX_VALUE_STRING = 2,
 			ATTRIBUTE_IX_VALUE_TYPE = 3, ATTRIBUTE_IX_VALUE_DATA = 4,
-			ATTRIBUTE_LENGHT = 5;
+			ATTRIBUTE_LENGTH = 5;
 
 	private static final int CHUNK_AXML_FILE = 0x00080003,
 			CHUNK_RESOURCEIDS = 0x00080180, CHUNK_XML_FIRST = 0x00100100,
