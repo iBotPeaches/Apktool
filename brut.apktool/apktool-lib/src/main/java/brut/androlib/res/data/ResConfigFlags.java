@@ -32,7 +32,7 @@ public class ResConfigFlags {
 
 	public final byte orientation;
 	public final byte touchscreen;
-	public final short density;
+	public final int density;
 
 	public final byte keyboard;
 	public final byte navigation;
@@ -80,7 +80,7 @@ public class ResConfigFlags {
 
 	public ResConfigFlags(short mcc, short mnc, char[] language,
 			char[] country, short layoutDirection, byte orientation,
-			byte touchscreen, short density, byte keyboard, byte navigation,
+			byte touchscreen, int density, byte keyboard, byte navigation,
 			byte inputFlags, short screenWidth, short screenHeight,
 			short sdkVersion, byte screenLayout, byte uiMode,
 			short smallestScreenWidthDp, short screenWidthDp,
