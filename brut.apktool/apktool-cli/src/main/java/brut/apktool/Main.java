@@ -38,7 +38,6 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
-import org.jf.util.ConsoleUtil;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
@@ -421,13 +420,6 @@ public class Main {
         // load basicOptions
         _Options();
         HelpFormatter formatter = new HelpFormatter();
-
-        // max their window to 120, if small.
-        int consoleWidth = ConsoleUtil.getConsoleWidth();
-        if (consoleWidth <= 0) {
-            consoleWidth = 120;
-        }
-        formatter.setWidth(consoleWidth);
 
         // print out license info prior to formatter.
         System.out.println(
