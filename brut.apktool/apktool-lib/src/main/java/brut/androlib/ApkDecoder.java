@@ -24,12 +24,13 @@ import brut.androlib.res.data.ResTable;
 import brut.androlib.res.util.ExtFile;
 import brut.common.BrutException;
 import brut.directory.DirectoryException;
+import brut.directory.ZipExtFile;
 import brut.util.OS;
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
 /**
@@ -95,18 +96,17 @@ public class ApkDecoder {
 		}
 
 		if (hasResources()) {
-
 			// read the resources.arsc checking for STORED vs DEFLATE
 			// compression
 			// this will determine whether we compress on rebuild or not.
-			JarFile jf = new JarFile(mApkFile.getAbsoluteFile());
-			JarEntry je = jf.getJarEntry("resources.arsc");
-			if (je != null) {
-				int compression = je.getMethod();
+            ZipExtFile zef = new ZipExtFile(mApkFile.getAbsolutePath());
+            ZipArchiveEntry ze = zef.getEntry("resources.arsc");
+			if (ze != null) {
+				int compression = ze.getMethod();
 				mCompressResources = (compression != ZipEntry.STORED)
 						&& (compression == ZipEntry.DEFLATED);
 			}
-			jf.close();
+            zef.close();
 
 			switch (mDecodeResources) {
   			case DECODE_RESOURCES_NONE:

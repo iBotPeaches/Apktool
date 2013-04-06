@@ -151,7 +151,7 @@ public class Androlib {
         // with regular looping of apkFile for easy copy
         try {
             Directory unk = apkFile.getDirectory();
-            ZipFile apkZipFile = new ZipFile(apkFile.getAbsolutePath());
+            ZipExtFile apkZipFile = new ZipExtFile(apkFile.getAbsolutePath());
 
             // loop all items in container recursively, ignoring any that are pre-defined by aapt
             Set<String> files = unk.getFiles(true);
@@ -162,6 +162,8 @@ public class Androlib {
                     // to be re-included on build
                     unk.copyToDir(unknownOut,file);
                     try {
+                        // ignore encryption
+                        apkZipFile.getEntry(file.toString()).getGeneralPurposeBit().useEncryption(false);
                         invZipFile = apkZipFile.getEntry(file.toString());
 
                         // lets record the name of the file, and its compression type

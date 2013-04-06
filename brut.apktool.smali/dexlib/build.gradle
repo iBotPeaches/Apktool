@@ -30,6 +30,7 @@
  */
 
 dependencies {
+    compile project(':brut.j.dir')
     compile 'com.google.code.findbugs:jsr305:1.3.9'
     compile 'com.google.collections:google-collections:1.0'
 }
