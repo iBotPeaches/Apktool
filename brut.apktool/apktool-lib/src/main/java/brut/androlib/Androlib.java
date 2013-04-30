@@ -553,6 +553,7 @@ public class Androlib {
                         // might need to use Zip4j
                     }
                 }
+                apkZipFile.close();
             } catch (IOException ex) {
                 throw new AndrolibException(ex);
             }

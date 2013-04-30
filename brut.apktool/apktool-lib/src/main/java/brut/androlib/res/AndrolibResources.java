@@ -44,6 +44,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -687,10 +689,10 @@ final public class AndrolibResources {
 	public void installFramework(File frameFile, String tag)
 			throws AndrolibException {
 		InputStream in = null;
-		ZipOutputStream out = null;
+		ZipArchiveOutputStream out = null;
 		try {
-			ZipFile zip = new ZipFile(frameFile);
-			ZipEntry entry = zip.getEntry("resources.arsc");
+			ZipExtFile zip = new ZipExtFile(frameFile);
+			ZipArchiveEntry entry = zip.getEntry("resources.arsc");
 
 			if (entry == null) {
 				throw new AndrolibException("Can't find resources.arsc file");
@@ -708,15 +710,19 @@ final public class AndrolibResources {
 					+ (tag == null ? "" : '-' + tag)
 					+ ".apk");
 
-			out = new ZipOutputStream(new FileOutputStream(outFile));
+			out = new ZipArchiveOutputStream(new FileOutputStream(outFile));
 			out.setMethod(ZipOutputStream.STORED);
+
 			CRC32 crc = new CRC32();
 			crc.update(data);
-			entry = new ZipEntry("resources.arsc");
+			entry = new ZipArchiveEntry("resources.arsc");
 			entry.setSize(data.length);
 			entry.setCrc(crc.getValue());
-			out.putNextEntry(entry);
+			out.putArchiveEntry(entry);
 			out.write(data);
+
+            out.closeArchiveEntry();
+            zip.close();
 			LOGGER.info("Framework installed to: " + outFile);
 		} catch (ZipException ex) {
 			throw new AndrolibException(ex);
