@@ -343,10 +343,10 @@ public class ResConfigFlags {
                 || screenHeightDp != 0) {
             return SDK_HONEYCOMB_MR2;
         }
-        if ((uiMode & (MASK_UI_MODE_TYPE | MASK_UI_MODE_NIGHT)) != 0) {
+        if ((uiMode & (MASK_UI_MODE_TYPE | MASK_UI_MODE_NIGHT)) != UI_MODE_NIGHT_ANY) {
             return SDK_FROYO;
         }
-        if ((screenLayout & (MASK_SCREENSIZE | MASK_SCREENLONG)) != 0
+        if ((screenLayout & (MASK_SCREENSIZE | MASK_SCREENLONG)) != SCREENSIZE_ANY
                 || density != DENSITY_DEFAULT) {
             return SDK_DONUT;
         }
@@ -409,14 +409,14 @@ public class ResConfigFlags {
     public final static byte TOUCHSCREEN_STYLUS = 2;
     public final static byte TOUCHSCREEN_FINGER = 3;
 
-    public final static short DENSITY_DEFAULT = 0;
-    public final static short DENSITY_LOW = 120;
-    public final static short DENSITY_MEDIUM = 160;
-    public final static short DENSITY_TV = 213;
-    public final static short DENSITY_HIGH = 240;
-    public final static short DENSITY_XHIGH = 320;
-    public final static short DENSITY_XXHIGH = 480;
-    public final static short DENSITY_NONE = -1;
+    public final static int DENSITY_DEFAULT = 0;
+    public final static int DENSITY_LOW = 120;
+    public final static int DENSITY_MEDIUM = 160;
+    public final static int DENSITY_TV = 213;
+    public final static int DENSITY_HIGH = 240;
+    public final static int DENSITY_XHIGH = 320;
+    public final static int DENSITY_XXHIGH = 480;
+    public final static int DENSITY_NONE = -1;
 
     public final static short MASK_LAYOUTDIR = 0xc0;
     public final static short SCREENLAYOUT_LAYOUTDIR_ANY = 0x00;
