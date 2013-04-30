@@ -686,63 +686,63 @@ final public class AndrolibResources {
 		throw new CantFindFrameworkResException(id);
 	}
 
-	public void installFramework(File frameFile, String tag)
-			throws AndrolibException {
-		InputStream in = null;
-		ZipArchiveOutputStream out = null;
-		try {
-			ZipExtFile zip = new ZipExtFile(frameFile);
-			ZipArchiveEntry entry = zip.getEntry("resources.arsc");
+    public void installFramework(File frameFile, String tag)
+            throws AndrolibException {
+        InputStream in = null;
+        ZipArchiveOutputStream out = null;
+        try {
+            ZipExtFile zip = new ZipExtFile(frameFile);
+            ZipArchiveEntry entry = zip.getEntry("resources.arsc");
 
-			if (entry == null) {
-				throw new AndrolibException("Can't find resources.arsc file");
-			}
+            if (entry == null) {
+                throw new AndrolibException("Can't find resources.arsc file");
+            }
 
-			in = zip.getInputStream(entry);
-			byte[] data = IOUtils.toByteArray(in);
+            in = zip.getInputStream(entry);
+            byte[] data = IOUtils.toByteArray(in);
 
-			ARSCData arsc = ARSCDecoder.decode(new ByteArrayInputStream(data),
-					true, true);
-			publicizeResources(data, arsc.getFlagsOffsets());
+            ARSCData arsc = ARSCDecoder.decode(new ByteArrayInputStream(data),
+                    true, true);
+            publicizeResources(data, arsc.getFlagsOffsets());
 
-			File outFile = new File(getFrameworkDir(), String.valueOf(arsc
-					.getOnePackage().getId())
-					+ (tag == null ? "" : '-' + tag)
-					+ ".apk");
+            File outFile = new File(getFrameworkDir(), String.valueOf(arsc
+                    .getOnePackage().getId())
+                    + (tag == null ? "" : '-' + tag)
+                    + ".apk");
 
-			out = new ZipArchiveOutputStream(new FileOutputStream(outFile));
-			out.setMethod(ZipOutputStream.STORED);
+            out = new ZipArchiveOutputStream(new FileOutputStream(outFile));
+            out.setMethod(ZipOutputStream.STORED);
 
-			CRC32 crc = new CRC32();
-			crc.update(data);
-			entry = new ZipArchiveEntry("resources.arsc");
-			entry.setSize(data.length);
-			entry.setCrc(crc.getValue());
-			out.putArchiveEntry(entry);
-			out.write(data);
+            CRC32 crc = new CRC32();
+            crc.update(data);
+            entry = new ZipArchiveEntry("resources.arsc");
+            entry.setSize(data.length);
+            entry.setCrc(crc.getValue());
+            out.putArchiveEntry(entry);
+            out.write(data);
 
             out.closeArchiveEntry();
             zip.close();
-			LOGGER.info("Framework installed to: " + outFile);
-		} catch (ZipException ex) {
-			throw new AndrolibException(ex);
-		} catch (IOException ex) {
-			throw new AndrolibException(ex);
-		} finally {
-			if (in != null) {
-				try {
-					in.close();
-				} catch (IOException ex) {
-				}
-			}
-			if (out != null) {
-				try {
-					out.close();
-				} catch (IOException ex) {
-				}
-			}
-		}
-	}
+            LOGGER.info("Framework installed to: " + outFile);
+        } catch (ZipException ex) {
+            throw new AndrolibException(ex);
+        } catch (IOException ex) {
+            throw new AndrolibException(ex);
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException ex) {
+                }
+            }
+            if (out != null) {
+                try {
+                    out.close();
+                } catch (IOException ex) {
+                }
+            }
+        }
+    }
 
 	public void publicizeResources(File arscFile) throws AndrolibException {
 		byte[] data = new byte[(int) arscFile.length()];
