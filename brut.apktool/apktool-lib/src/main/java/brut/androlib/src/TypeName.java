@@ -18,8 +18,12 @@ package brut.androlib.src;
 
 import brut.androlib.AndrolibException;
 import brut.util.Duo;
+import com.google.common.base.Joiner;
+
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -120,6 +124,27 @@ public class TypeName {
 		return types;
 	}
 
+    public static TypeName fromPath(Path path) {
+        List<String> parts = new ArrayList<>(path.getNameCount());
+        for (Path p : path) {
+            parts.add(p.toString());
+        }
+        return fromNameParts(parts, 0);
+    }
+
+    public static TypeName fromNameParts(List<String> parts, int array) {
+        String type = parts.get(parts.size() - 1);
+        parts = parts.subList(0, parts.size() - 1);
+        String innerType = null;
+
+        int pos = type.indexOf('$');
+        if (pos != -1) {
+            innerType = type.substring(pos + 1);
+            type = type.substring(0, pos);
+        }
+        return new TypeName(Joiner.on('.').join(parts), type, innerType, array);
+    }
+
 	public static Duo<TypeName, Integer> fetchFromInternalName(String internal)
 			throws AndrolibException {
 		String origInternal = internal;
@@ -139,9 +164,7 @@ public class TypeName {
 		} while (isArray);
 
 		int length = array + 1;
-		String package_ = null;
-		String type = null;
-		String innerType = null;
+		String type;
 		switch (internal.charAt(0)) {
 		case 'B':
 			type = "byte";
@@ -176,31 +199,13 @@ public class TypeName {
 				throw new AndrolibException("Invalid internal name: "
 						+ origInternal);
 			}
-			length += pos;
-			internal = internal.substring(1, pos);
-
-			pos = internal.lastIndexOf('/');
-			if (pos == -1) {
-				package_ = "";
-				type = internal;
-			} else {
-				package_ = internal.substring(0, pos).replace('/', '.');
-				type = internal.substring(pos + 1);
-			}
-
-			pos = type.indexOf('$');
-			if (pos != -1) {
-				innerType = type.substring(pos + 1);
-				type = type.substring(0, pos);
-			}
-			break;
+            return new Duo<>(fromNameParts(Arrays.asList(internal.substring(1, pos).split("/")), array), length + pos);
 		default:
 			throw new AndrolibException("Invalid internal name: "
 					+ origInternal);
 		}
 
-		return new Duo<TypeName, Integer>(new TypeName(package_, type,
-				innerType, array), length);
+		return new Duo<>(new TypeName(null, type, null, array), length);
 	}
 
 	private Boolean mIsFileOwner;
