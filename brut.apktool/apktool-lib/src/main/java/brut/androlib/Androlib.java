@@ -31,13 +31,9 @@ import java.io.*;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
-import org.apache.commons.io.FileUtils;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
-
-import org.apache.commons.io.FileUtils.*;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
@@ -541,7 +537,7 @@ public class Androlib {
             Map<String, String> files = (Map<String, String>)meta.get("unknownFiles");
 
             try {
-                ZipFile apkZipFile = new ZipFile(outFile.getAbsolutePath());
+                ZipExtFile apkZipFile = new ZipExtFile(outFile.getAbsolutePath());
 
                 // loop through files inside
                 for (Map.Entry<String,String> entry : files.entrySet()) {
