@@ -193,7 +193,7 @@ public class DebugInjector {
 	}
 
 	private String next() {
-		return mIt.next().trim();
+		return mIt.next().split("//", 2)[1].trim();
 	}
 
 	private String nextAndAppend() {
