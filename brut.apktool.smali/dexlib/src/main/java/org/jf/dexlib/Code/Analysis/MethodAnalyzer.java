@@ -2434,7 +2434,7 @@ public class MethodAnalyzer {
         RegisterType arrayRegisterType = analyzedInstruction.getPreInstructionRegisterType(instruction.getRegisterB());
         assert arrayRegisterType != null;
 
-        if (arrayRegisterType.category != RegisterType.Category.Null) {
+        if (! ClassPath.dontLoadClassPath && arrayRegisterType.category != RegisterType.Category.Null) {
             assert arrayRegisterType.type != null;
             if (arrayRegisterType.type.getClassType().charAt(0) != '[') {
                 throw new ValidationException(String.format("Cannot use aget-wide with non-array type %s",
@@ -2503,7 +2503,7 @@ public class MethodAnalyzer {
         RegisterType arrayRegisterType = analyzedInstruction.getPreInstructionRegisterType(instruction.getRegisterB());
         assert arrayRegisterType != null;
 
-        if (arrayRegisterType.category != RegisterType.Category.Null) {
+        if (! ClassPath.dontLoadClassPath && arrayRegisterType.category != RegisterType.Category.Null) {
             assert arrayRegisterType.type != null;
             if (arrayRegisterType.type.getClassType().charAt(0) != '[') {
                 throw new ValidationException(String.format("Cannot use aget-object with non-array type %s",
