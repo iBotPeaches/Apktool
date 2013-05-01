@@ -74,7 +74,7 @@ public class SmaliBuilder {
 		StringBuilder out = new StringBuilder();
 		List<String> lines = IOUtils.readLines(inStream);
 
-		if (!mFlags.containsKey("debug")) {
+		if (!mFlags.get("debug")) {
 			final String[] linesArray = lines.toArray(new String[0]);
 			for (int i = 1; i < linesArray.length - 1; i++) {
 				out.append(linesArray[i].split("//", 2)[1]).append('\n');
