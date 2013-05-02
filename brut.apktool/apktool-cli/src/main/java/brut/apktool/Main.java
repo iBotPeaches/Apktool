@@ -307,6 +307,12 @@ public class Main {
                 .withArgName("dir")
                 .create("p");
 
+        Option frameIfDirOption = OptionBuilder.withLongOpt("frame-path")
+                .withDescription("Stores framework files into <dir>.")
+                .hasArg(true)
+                .withArgName("dir")
+                .create("p");
+
         Option keepResOption = OptionBuilder.withLongOpt("keep-broken-res")
                 .withDescription("Use if there was an error and some resources were dropped, e.g.\n"
                         + "            \"Invalid config flags detected. Dropping resources\", but you\n"
@@ -382,7 +388,7 @@ public class Main {
 
         // add basic framework options
         frameOptions.addOption(tagOption);
-        frameOptions.addOption(frameDirOption);
+        frameOptions.addOption(frameIfDirOption);
 
         // add all, loop existing cats then manually add advance
         for (Object op : normalOptions.getOptions()) {
