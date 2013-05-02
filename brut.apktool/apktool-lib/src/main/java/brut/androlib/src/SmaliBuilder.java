@@ -74,19 +74,18 @@ public class SmaliBuilder {
 		StringBuilder out = new StringBuilder();
 		List<String> lines = IOUtils.readLines(inStream);
 
-		if (!mFlags.containsKey("debug")) {
+		if (!mFlags.get("debug")) {
 			final String[] linesArray = lines.toArray(new String[0]);
-			for (int i = 2; i < linesArray.length - 2; i++) {
-				out.append(linesArray[i]).append('\n');
+			for (int i = 1; i < linesArray.length - 1; i++) {
+				out.append(linesArray[i].split("//", 2)[1]).append('\n');
 			}
 		} else {
 			lines.remove(lines.size() - 1);
-			lines.remove(lines.size() - 1);
-			ListIterator<String> it = lines.listIterator(2);
+			ListIterator<String> it = lines.listIterator(1);
 
 			out.append(".source \"").append(inFile.getName()).append("\"\n");
 			while (it.hasNext()) {
-				String line = it.next().trim();
+				String line = it.next().split("//", 2)[1].trim();
 				if (line.isEmpty() || line.charAt(0) == '#'
 						|| line.startsWith(".source")) {
 					continue;

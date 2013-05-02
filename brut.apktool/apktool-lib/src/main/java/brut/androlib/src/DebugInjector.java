@@ -27,6 +27,10 @@ import org.jf.dexlib.Code.Analysis.RegisterType;
  */
 public class DebugInjector {
 
+    private boolean areParamsInjected;
+    private int currParam;
+    private int lastParam;
+
 	public static void inject(ListIterator<String> it, StringBuilder out)
 			throws AndrolibException {
 		new DebugInjector(it, out).inject();
@@ -44,7 +48,7 @@ public class DebugInjector {
 			nextAndAppend();
 			return;
 		}
-		injectParameters(definition);
+		parseParamsNumber(definition);
 
 		boolean end = false;
 		while (!end) {
@@ -52,24 +56,28 @@ public class DebugInjector {
 		}
 	}
 
-	private void injectParameters(String definition) throws AndrolibException {
-		int pos = definition.indexOf('(');
-		if (pos == -1) {
-			throw new AndrolibException();
-		}
-		int pos2 = definition.indexOf(')', pos);
-		if (pos2 == -1) {
-			throw new AndrolibException();
-		}
-		String params = definition.substring(pos + 1, pos2);
+    private void parseParamsNumber(String definition) throws AndrolibException {
+        int pos = definition.indexOf('(');
+        if (pos == -1) {
+            throw new AndrolibException();
+        }
+        int pos2 = definition.indexOf(')', pos);
+        if (pos2 == -1) {
+            throw new AndrolibException();
+        }
+        String params = definition.substring(pos + 1, pos2);
 
-		int i = definition.contains(" static ") ? 0 : 1;
-		int argc = TypeName.listFromInternalName(params).size() + i;
-		while (i < argc) {
-			mOut.append(".parameter \"p").append(i).append("\"\n");
-			i++;
-		}
-	}
+        currParam = definition.contains(" static ") ? 0 : 1;
+        lastParam = TypeName.listFromInternalName(params).size() + currParam - 1;
+    }
+
+    private void injectRemainingParams() {
+        areParamsInjected = true;
+        while(currParam <= lastParam) {
+            mOut.append(".parameter \"p").append(currParam).append("\"\n");
+            currParam++;
+        }
+    }
 
 	private boolean step() {
 		String line = next();
@@ -86,6 +94,9 @@ public class DebugInjector {
 		case '.':
 			return processDirective(line);
 		default:
+            if (! areParamsInjected) {
+                injectRemainingParams();
+            }
 			return processInstruction(line);
 		}
 	}
@@ -158,11 +169,19 @@ public class DebugInjector {
 
 	private boolean processDirective(String line) {
 		String line2 = line.substring(1);
-		if (line2.startsWith("line ") || line2.equals("prologue")
-				|| line2.startsWith("parameter") || line2.startsWith("local ")
-				|| line2.startsWith("end local ")) {
-			return false;
-		}
+        if (line2.startsWith("line ") || line2.startsWith("local ") || line2.startsWith("end local ")) {
+            return false;
+        }
+        if (line2.equals("prologue")) {
+            if (! areParamsInjected) {
+                injectRemainingParams();
+            }
+            return false;
+        }
+        if (line2.equals("parameter")) {
+            mOut.append(".parameter \"p").append(currParam++).append("\"\n");
+            return false;
+        }
 
 		append(line);
 		if (line2.equals("end method")) {
@@ -193,7 +212,7 @@ public class DebugInjector {
 	}
 
 	private String next() {
-		return mIt.next().trim();
+		return mIt.next().split("//", 2)[1].trim();
 	}
 
 	private String nextAndAppend() {
