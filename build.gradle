@@ -25,8 +25,8 @@ repositories {
   mavenCentral()
 }
 
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
 
 class Compatibility {
   String version
