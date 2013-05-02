@@ -420,6 +420,7 @@ public class Main {
         // load basicOptions
         _Options();
         HelpFormatter formatter = new HelpFormatter();
+        formatter.setWidth(120);
 
         // print out license info prior to formatter.
         System.out.println(
