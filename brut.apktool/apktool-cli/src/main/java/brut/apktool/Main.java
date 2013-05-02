@@ -182,10 +182,9 @@ public class Main {
     }
 
     private static void cmdBuild(CommandLine cli) throws BrutException {
-        int paraCount = cli.getArgList().size();
-        String apkName = (String) cli.getArgList().get(paraCount - 1);
+        String[] args = cli.getArgs();
+        String appDirName = args.length < 2 ? "." : args[1];
         String mAaptPath = "";
-        String appDirName = ".";
         File outFile = null;
         Androlib instance = new Androlib();
 
@@ -221,10 +220,6 @@ public class Main {
             outFile = new File(cli.getOptionValue("o"));
         } else {
             outFile = null;
-        }
-
-        if (apkName != null) {
-            appDirName = apkName;
         }
 
         // try and build apk

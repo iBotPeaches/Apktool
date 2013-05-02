@@ -26,3 +26,4 @@ build/
 bin/
 *.iml
 .idea/*
+/out
