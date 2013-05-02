@@ -86,17 +86,17 @@ public class SmaliDecoder {
                             file.resolveSibling(fileName + ".java"), Charset.defaultCharset())
             ) {
                 TypeName type = TypeName.fromPath(mOutDir.relativize(file.resolveSibling(fileName)));
-                out.write("package " + type.package_ + "; class " + type.getName(true, true) + " {");
+                out.write("package " + type.package_ + "; class " + type.getName(true, true) + " { void a() { int a;");
                 out.newLine();
 
                 String line;
                 while ((line = in.readLine()) != null) {
-                    out.write("// ");
+                    out.write(";// ");
                     out.write(line);
                     out.newLine();
                 }
 
-                out.write("}");
+                out.write("}}");
                 out.newLine();
             }
             Files.delete(file);
