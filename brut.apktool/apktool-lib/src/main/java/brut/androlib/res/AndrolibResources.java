@@ -361,8 +361,8 @@ final public class AndrolibResources {
 	
 	public void setVersionInfo(Map<String, String> map) {
 	  if (map != null) {
-	    mVersionCode = map.get("versionCode");
-	    mVersionName = map.get("versionName");
+	    mVersionCode = map.get("versionCode").toString();
+	    mVersionName = map.get("versionName").toString();
 	  }
 	}
 
@@ -712,7 +712,6 @@ final public class AndrolibResources {
 
             out = new ZipArchiveOutputStream(new FileOutputStream(outFile));
             out.setMethod(ZipOutputStream.STORED);
-
             CRC32 crc = new CRC32();
             crc.update(data);
             entry = new ZipArchiveEntry("resources.arsc");
