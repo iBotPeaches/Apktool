@@ -182,6 +182,11 @@ public class DebugInjector {
             mOut.append(".parameter \"p").append(currParam++).append("\"\n");
             return false;
         }
+        if (line2.startsWith("parameter")) {
+            mOut.append(line).append("\n");
+            currParam++;
+            return false;
+        }
 
 		append(line);
 		if (line2.equals("end method")) {
