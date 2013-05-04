@@ -23,15 +23,21 @@ import brut.androlib.res.data.ResTable;
 import brut.androlib.res.util.ExtFile;
 import brut.androlib.src.SmaliBuilder;
 import brut.androlib.src.SmaliDecoder;
+import brut.androlib.src.TypeName;
 import brut.common.BrutException;
 import brut.directory.*;
 import brut.util.BrutIO;
 import brut.util.OS;
 import java.io.*;
+import java.net.URI;
+import java.nio.charset.Charset;
+import java.nio.file.*;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
-
+import java.nio.file.Files;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
@@ -529,31 +535,53 @@ public class Androlib {
 
     public void buildUnknownFiles(File appDir, File outFile, Map<String, Object> meta)
         throws AndrolibException {
+        File file;
+        mPath = Paths.get(appDir.getPath() + File.separatorChar + UNK_DIRNAME);
 
-        // confirm we have unknown files to inject
         if (meta.containsKey("unknownFiles")) {
             LOGGER.info("Copying unknown files/dir...");
 
             Map<String, String> files = (Map<String, String>)meta.get("unknownFiles");
 
             try {
-                ZipExtFile apkZipFile = new ZipExtFile(outFile.getAbsolutePath());
+                // set our filesystem options
+                Map<String, String> zip_properties = new HashMap<>();
+                zip_properties.put("create", "false");
+                zip_properties.put("encoding", "UTF-8");
 
-                // loop through files inside
-                for (Map.Entry<String,String> entry : files.entrySet()) {
+                // create filesystem
+                URI apkFileSystem = URI.create("jar:file:" + outFile.getAbsolutePath());
+                try(FileSystem zipFS = FileSystems.newFileSystem(apkFileSystem, zip_properties)) {
 
-                    // check if file exists
-                    if (new File(appDir,entry.getKey()).isFile()) {
+                    // loop through files inside
+                    for (Map.Entry<String,String> entry : files.entrySet()) {
 
-                        // @todo read ZipFile and inject file into
-                        // might need to use Zip4j
+                        // check if file exists
+                        file = new File(mPath.toFile(), entry.getKey());
+                        if (file.isFile() && file.exists()) {
+                            insertFile(zipFS, file, entry.getValue(),mPath.toAbsolutePath());
+                        }
                     }
+                    zipFS.close();
                 }
-                apkZipFile.close();
             } catch (IOException ex) {
                 throw new AndrolibException(ex);
             }
         }
+
+    }
+
+    public void insertFile(FileSystem zipfs, File insert, String method, Path root)
+            throws AndrolibException, IOException {
+        Path zipRoot = zipfs.getPath(zipfs.getSeparator());
+        Path zipPath = zipfs.getPath(zipRoot + insert.getAbsolutePath().replace(root.toString(),""));
+        Path tmp = zipPath.normalize().getParent();
+
+        if (!Files.isDirectory(tmp, LinkOption.NOFOLLOW_LINKS)) {
+            Files.createDirectories(tmp);
+        }
+        Path newFile = Paths.get(insert.getAbsolutePath());
+        Files.copy(newFile,zipPath, StandardCopyOption.REPLACE_EXISTING);
     }
   
 	public void buildApk(File appDir, File outApk,
@@ -652,6 +680,7 @@ public class Androlib {
 	}
 
 	private String mAaptPath = null;
+    private Path mPath = null;
 
 	private final static Logger LOGGER = Logger.getLogger(Androlib.class
 			.getName());

@@ -5,6 +5,7 @@ v2.0.0 (TBA)
 -Fixed (issue #401) - Uses versionInfo meta to correctly parse versionName and versionCode
 -Fixed (issue #440) - Include aapt binaries within Apktool to have closer control over build.
 -Fixed (issue #439) - Correctly handles apk's that have have the general access bit enabled for encryption
+-Fixed (issue #63) - Correctly handles apk's that have unknown files outside of the standard aapt allowed resources.
 
 v1.5.3 (TBA)
 -Updated to smali/baksmali to v1.4.2

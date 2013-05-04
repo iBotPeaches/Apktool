@@ -1,6 +1,13 @@
-version: 1.5.0
+version: 2.0.0
 apkFileName: testapp.apk
 isFrameworkApk: false
 usesFramework:
   ids:
   - 1
+versionInfo:
+  versionCode: '1'
+  versionName: '1.0'
+compressionType: false
+unknownFiles:
+  hidden.file: '8'
+  unk_folder/unknown_file: '8'
