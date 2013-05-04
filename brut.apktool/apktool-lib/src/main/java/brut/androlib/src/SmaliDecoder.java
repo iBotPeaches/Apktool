@@ -37,16 +37,17 @@ import java.nio.file.attribute.BasicFileAttributes;
  */
 public class SmaliDecoder {
 
-	public static void decode(File apkFile, File outDir, boolean debug,
+	public static void decode(File apkFile, File outDir, boolean debug, String debugLinePrefix,
 			boolean bakdeb) throws AndrolibException {
-		new SmaliDecoder(apkFile, outDir, debug, bakdeb).decode();
+		new SmaliDecoder(apkFile, outDir, debug, debugLinePrefix, bakdeb).decode();
 	}
 
-	private SmaliDecoder(File apkFile, File outDir, boolean debug,
+	private SmaliDecoder(File apkFile, File outDir, boolean debug, String debugLinePrefix,
 			boolean bakdeb) {
 		mApkFile = apkFile;
 		mOutDir = outDir.toPath();
 		mDebug = debug;
+        mDebugLinePrefix = debugLinePrefix;
 		mBakDeb = bakdeb;
 	}
 
@@ -69,6 +70,7 @@ public class SmaliDecoder {
 	private final File mApkFile;
 	private final Path mOutDir;
 	private final boolean mDebug;
+    private final String mDebugLinePrefix;
 	private final boolean mBakDeb;
 
 
@@ -90,8 +92,9 @@ public class SmaliDecoder {
                 out.newLine();
 
                 String line;
+                final String debugLinePrefix = mDebugLinePrefix;
                 while ((line = in.readLine()) != null) {
-                    out.write(";// ");
+                    out.write(debugLinePrefix);
                     out.write(line);
                     out.newLine();
                 }
