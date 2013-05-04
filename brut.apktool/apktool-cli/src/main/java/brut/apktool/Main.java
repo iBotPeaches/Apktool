@@ -120,6 +120,9 @@ public class Main {
         if (cli.hasOption("d") || cli.hasOption("debug")) {
             decoder.setDebugMode(true);
         }
+        if (cli.hasOption("debug-line-prefix")) {
+            decoder.setDebugLinePrefix(cli.getOptionValue("debug-line-prefix"));
+        }
         if (cli.hasOption("b") || cli.hasOption("no-debug-info")) {
             decoder.setBaksmaliDebugMode(false);
         }
@@ -278,6 +281,12 @@ public class Main {
                 .withDescription("Decode in debug mode. Check project page for more info.")
                 .create("d");
 
+        Option debugLinePrefix = OptionBuilder.withLongOpt("debug-line-prefix")
+                .withDescription("Smali line prefix when decoding in debug mode. Default is \"a=0;// \".")
+                .hasArg(true)
+                .withArgName("prefix")
+                .create();
+
         Option debugBuiOption = OptionBuilder.withLongOpt("debug")
                 .withDescription("Builds in debug mode. Check project page for more info.")
                 .create("d");
@@ -355,6 +364,7 @@ public class Main {
 
         // check for advance mode
         if (isAdvanceMode()) {
+            DecodeOptions.addOption(debugLinePrefix);
             DecodeOptions.addOption(debugDecOption);
             DecodeOptions.addOption(noDbgOption);
             DecodeOptions.addOption(keepResOption);
@@ -398,6 +408,7 @@ public class Main {
         for (Object op : frameOptions.getOptions()) {
             allOptions.addOption((Option)op);
         }
+        allOptions.addOption(debugLinePrefix);
         allOptions.addOption(debugDecOption);
         allOptions.addOption(noDbgOption);
         allOptions.addOption(keepResOption);

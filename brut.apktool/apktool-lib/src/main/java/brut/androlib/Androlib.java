@@ -64,14 +64,14 @@ public class Androlib {
 		}
 	}
 
-	public void decodeSourcesSmali(File apkFile, File outDir, boolean debug,
+	public void decodeSourcesSmali(File apkFile, File outDir, boolean debug, String debugLinePrefix,
 			boolean bakdeb) throws AndrolibException {
 		try {
 			File smaliDir = new File(outDir, SMALI_DIRNAME);
 			OS.rmdir(smaliDir);
 			smaliDir.mkdirs();
 			LOGGER.info("Baksmaling...");
-			SmaliDecoder.decode(apkFile, smaliDir, debug, bakdeb);
+			SmaliDecoder.decode(apkFile, smaliDir, debug, debugLinePrefix, bakdeb);
 		} catch (BrutException ex) {
 			throw new AndrolibException(ex);
 		}

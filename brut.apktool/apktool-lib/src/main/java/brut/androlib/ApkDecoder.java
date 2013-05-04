@@ -87,7 +87,7 @@ public class ApkDecoder {
 				mAndrolib.decodeSourcesRaw(mApkFile, outDir, mDebug);
 				break;
 			case DECODE_SOURCES_SMALI:
-				mAndrolib.decodeSourcesSmali(mApkFile, outDir, mDebug, mBakDeb);
+				mAndrolib.decodeSourcesSmali(mApkFile, outDir, mDebug, mDebugLinePrefix, mBakDeb);
 				break;
 			case DECODE_SOURCES_JAVA:
 				mAndrolib.decodeSourcesJava(mApkFile, outDir, mDebug);
@@ -156,6 +156,10 @@ public class ApkDecoder {
 	public void setDebugMode(boolean debug) {
 		mDebug = debug;
 	}
+
+    public void setDebugLinePrefix(String debugLinePrefix) {
+        mDebugLinePrefix = debugLinePrefix;
+    }
 
 	public void setBaksmaliDebugMode(boolean bakdeb) {
 		mBakDeb = bakdeb;
@@ -328,6 +332,7 @@ public class ApkDecoder {
 	private short mDecodeSources = DECODE_SOURCES_SMALI;
 	private short mDecodeResources = DECODE_RESOURCES_FULL;
 	private boolean mDebug = false;
+    private String mDebugLinePrefix = "a=0;// ";
 	private boolean mForceDelete = false;
 	private String mFrameTag;
 	private boolean mKeepBrokenResources = false;
