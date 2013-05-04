@@ -1,12 +1,14 @@
-v2.0.0 (TBA) 
--Fixed (issue #8) - Correctly uses -c to retain original manifest and META-INF. Thanks M1cha
+v2.0.0 (TBA)
+-Fixed (issue #8)   - Correctly uses -c to retain original manifest and META-INF. (Thanks M1cha)
+-Fixed (issue #63)  - Correctly handles apk's that have unknown files outside of the standard aapt allowed resources.
+-Fixed (issue #202) - Includes modified aapt to force package id on build. (Thanks M1cha)
 -Fixed (issue #403) - Uses new usage output to cleanup organization of features.
 -Fixed (issue #359) - Correctly handles malformed 9patch images. (Thanks Felipe Richards)
--Fixed (issue #401) - Uses versionInfo meta to correctly parse versionName and versionCode
+-Fixed (issue #401) - Uses versionInfo meta to correctly parse versionName and versionCode.
 -Fixed (issue #440) - Include aapt binaries within Apktool to have closer control over build.
--Fixed (issue #439) - Correctly handles apk's that have have the general access bit enabled for encryption
--Fixed (issue #63) - Correctly handles apk's that have unknown files outside of the standard aapt allowed resources.
--Fixed (issue #339) - Re-enables debug mode ( -d flag) to fix smali debugging (Thanks Ryszard).
+-Fixed (issue #439) - Correctly handles apk's that have have the general access bit enabled for encryption.
+-Fixed (issue #339) - Re-enables debug mode ( -d flag) to fix smali debugging. (Thanks Ryszard)
+-Fixed (issue #177) - Adapted output of smali to make breakpoint setting easier in different IDEs. (Thanks Ryszard)
 
 v1.5.3 (TBA)
 -Updated to smali/baksmali to v1.4.2
