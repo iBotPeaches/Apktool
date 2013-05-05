@@ -9,6 +9,7 @@ v2.0.0 (TBA)
 -Fixed (issue #439) - Correctly handles apk's that have have the general access bit enabled for encryption.
 -Fixed (issue #339) - Re-enables debug mode ( -d flag) to fix smali debugging. (Thanks Ryszard)
 -Fixed (issue #177) - Adapted output of smali to make breakpoint setting easier in different IDEs. (Thanks Ryszard)
+-Fixed (issue #391) - Fixes characters (& and <) from being double escaped in <item>'s of arrays.xml
 
 v1.5.3 (TBA)
 -Updated to smali/baksmali to v1.4.2

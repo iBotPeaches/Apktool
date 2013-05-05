@@ -58,7 +58,7 @@ public class ResArrayValue extends ResBagValue implements
 		serializer.attribute(null, "name", res.getResSpec().getName());
 		for (int i = 0; i < mItems.length; i++) {
 			serializer.startTag(null, "item");
-			serializer.text(mItems[i].encodeAsResXmlItemValue());
+			serializer.text(mItems[i].encodeAsResXmlNonEscapedItemValue());
 			serializer.endTag(null, "item");
 		}
 		serializer.endTag(null, type);

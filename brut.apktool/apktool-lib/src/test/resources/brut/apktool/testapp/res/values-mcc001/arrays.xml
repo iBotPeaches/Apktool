@@ -5,6 +5,8 @@
         <item>TEST2</item>
         <item>TEST3</item>
         <item>%2$s foo %1$d</item>
+        <item>http://google.com&amp;boo=1&amp;foo=2</item>
+        <item>&lt;b>Bolded Text&lt;/b></item>
     </string-array>
     <integer-array name="test_array2">
         <item>-1</item>

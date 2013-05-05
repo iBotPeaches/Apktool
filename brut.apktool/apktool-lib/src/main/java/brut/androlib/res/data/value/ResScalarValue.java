@@ -57,6 +57,10 @@ public abstract class ResScalarValue extends ResValue implements
 		return encodeAsResXmlValueExt().replace("@android:", "@*android:");
 	}
 
+    public String encodeAsResXmlNonEscapedItemValue() throws AndrolibException {
+        return encodeAsResXmlValue().replace("@android:", "@*android:").replace("&amp;", "&").replace("&lt;","<");
+    }
+
 	public String encodeAsResXmlValueExt() throws AndrolibException {
 		String rawValue = mRawValue;
 		if (rawValue != null) {
