@@ -9,3 +9,18 @@ Links
 - Source (Github) https://github.com/iBotPeaches/Apktool
 - Source (GoogleCode) http://code.google.com/p/android-apktool/source/list
 
+add build explanation
+
+build environment: Java (1.7)
+
+Build Steps
+
+git clone git://github.com/iBotPeaches/Apktool.git
+
+cd Apktool
+
+[./gradlew][gradlew.bat] fatJar
+
+or [./gradlew][gradlew.bat] fatJar proguard
+
+./brut.apktool/apktool-cli/build/libs/apktool-xxxxx.jar
