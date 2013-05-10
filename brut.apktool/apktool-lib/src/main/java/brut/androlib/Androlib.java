@@ -126,6 +126,9 @@ public class Androlib {
 			if (in.containsDir("lib")) {
 				in.copyToDir(outDir, "lib");
 			}
+            if (in.containsDir("libs")) {
+                in.copyToDir(outDir, "libs");
+            }
 		} catch (DirectoryException ex) {
 			throw new AndrolibException(ex);
 		}
@@ -694,5 +697,5 @@ public class Androlib {
 	private final static String[] APK_MANIFEST_FILENAMES = new String[] {
             "AndroidManifest.xml" };
     private final static String[] APK_STANDARD_ALL_FILENAMES = new String[] {
-            "classes.dex", "AndroidManifest.xml", "resources.arsc","res","lib","assets","META-INF" };
+            "classes.dex", "AndroidManifest.xml", "resources.arsc","res","lib", "libs","assets","META-INF" };
 }
