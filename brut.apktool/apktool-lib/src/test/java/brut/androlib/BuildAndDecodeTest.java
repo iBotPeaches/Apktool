@@ -167,6 +167,11 @@ public class BuildAndDecodeTest {
         compareDrawablesFolder("drawable-xxhdpi");
     }
 
+    @Test
+    public void libsTest() throws BrutException, IOException {
+        compareLibsFolder("libs");
+    }
+
 	private static boolean isAaptPresent() throws Exception {
 		boolean result = true;
 		try {
@@ -182,8 +187,12 @@ public class BuildAndDecodeTest {
 		return result;
 	}
 
-    private void compareDrawable(String path) throws BrutException, IOException {
-        String tmp = File.separatorChar + "res" + File.separatorChar;
+    private void compareBinaryFolder(String path, boolean res) throws BrutException, IOException {
+
+        String tmp = "";
+        if (res) {
+            tmp = File.separatorChar + "res" + File.separatorChar;
+        }
 
         Files.walkFileTree(Paths.get(sTestOrigDir.toPath() + tmp +  path), new SimpleFileVisitor<Path>() {
 
@@ -211,9 +220,14 @@ public class BuildAndDecodeTest {
 
     private boolean compareDrawablesFolder(String path) throws BrutException, IOException {
         sResult = true;
-        compareDrawable(path);
+        compareBinaryFolder(path, true);
         return sResult;
+    }
 
+    private boolean compareLibsFolder(String path) throws BrutException, IOException {
+        sResult = true;
+        compareBinaryFolder(File.separatorChar + path,false);
+        return sResult;
     }
 
 	private void compareValuesFiles(String path) throws BrutException {
