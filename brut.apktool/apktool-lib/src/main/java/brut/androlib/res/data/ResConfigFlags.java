@@ -416,7 +416,7 @@ public class ResConfigFlags {
     public final static int DENSITY_HIGH = 240;
     public final static int DENSITY_XHIGH = 320;
     public final static int DENSITY_XXHIGH = 480;
-    public final static int DENSITY_NONE = -1;
+    public final static int DENSITY_NONE = 0xFFFF;
 
     public final static short MASK_LAYOUTDIR = 0xc0;
     public final static short SCREENLAYOUT_LAYOUTDIR_ANY = 0x00;
