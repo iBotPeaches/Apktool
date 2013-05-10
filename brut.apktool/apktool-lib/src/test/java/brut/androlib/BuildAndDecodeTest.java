@@ -19,6 +19,8 @@ import brut.androlib.res.util.ExtFile;
 import brut.common.BrutException;
 import brut.util.OS;
 import java.io.*;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.HashMap;
 import java.util.logging.Logger;
 import org.custommonkey.xmlunit.*;
@@ -130,6 +132,46 @@ public class BuildAndDecodeTest {
 				+ "-navhidden-dpad/strings.xml");
 	}
 
+    @Test
+    public void drawableNoDpiTest() throws BrutException, IOException {
+        compareDrawablesFolder("drawable-nodpi");
+    }
+
+    @Test
+    public void drawableNumberedDpiTest() throws BrutException, IOException {
+        compareDrawablesFolder("drawable-534dpi");
+    }
+
+    @Test
+    public void drawableLdpiTest() throws BrutException, IOException {
+        compareDrawablesFolder("drawable-ldpi");
+    }
+
+    @Test
+    public void drawableMdpiTest() throws BrutException, IOException {
+        compareDrawablesFolder("drawable-mdpi");
+    }
+
+    @Test
+    public void drawableTvdpiTest() throws BrutException, IOException {
+        compareDrawablesFolder("drawable-tvdpi");
+    }
+
+    @Test
+    public void drawableXhdpiTest() throws BrutException, IOException {
+        compareDrawablesFolder("drawable-xhdpi");
+    }
+
+    @Test
+    public void drawableXxhdpiTest() throws BrutException, IOException {
+        compareDrawablesFolder("drawable-xxhdpi");
+    }
+
+    @Test
+    public void libsTest() throws BrutException, IOException {
+        compareLibsFolder("libs");
+    }
+
 	private static boolean isAaptPresent() throws Exception {
 		boolean result = true;
 		try {
@@ -144,6 +186,49 @@ public class BuildAndDecodeTest {
 		}
 		return result;
 	}
+
+    private void compareBinaryFolder(String path, boolean res) throws BrutException, IOException {
+
+        String tmp = "";
+        if (res) {
+            tmp = File.separatorChar + "res" + File.separatorChar;
+        }
+
+        Files.walkFileTree(Paths.get(sTestOrigDir.toPath() + tmp +  path), new SimpleFileVisitor<Path>() {
+
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+
+                // hacky fix - load test by changing name of control
+                File control = file.toFile();
+                File test =  new File(file.toString().replace("testapp-orig", "testapp-new"));
+
+                if (test.isFile()) {
+                    if (control.hashCode() != test.hashCode()) {
+                        sResult = false;
+                        return FileVisitResult.TERMINATE;
+                    }
+                }   else {
+                    sResult = false;
+                    return FileVisitResult.TERMINATE;
+                }
+                return FileVisitResult.CONTINUE;
+            }
+
+        });
+    }
+
+    private boolean compareDrawablesFolder(String path) throws BrutException, IOException {
+        sResult = true;
+        compareBinaryFolder(path, true);
+        return sResult;
+    }
+
+    private boolean compareLibsFolder(String path) throws BrutException, IOException {
+        sResult = true;
+        compareBinaryFolder(File.separatorChar + path,false);
+        return sResult;
+    }
 
 	private void compareValuesFiles(String path) throws BrutException {
 		compareXmlFiles("res/" + path, new ElementNameAndAttributeQualifier(
@@ -191,6 +276,8 @@ public class BuildAndDecodeTest {
 	private static ExtFile sTmpDir;
 	private static ExtFile sTestOrigDir;
 	private static ExtFile sTestNewDir;
+
+    private static boolean sResult;
 
 	private final static Logger LOGGER = Logger
 			.getLogger(BuildAndDecodeTest.class.getName());
