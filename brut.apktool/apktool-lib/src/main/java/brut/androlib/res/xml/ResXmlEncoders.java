@@ -137,14 +137,16 @@ public final class ResXmlEncoders {
 	}
 
 	public static boolean hasMultipleNonPositionalSubstitutions(String str) {
-		return findSubstitutions(str, 2).m1.size() > 1;
+        Duo<List<Integer>, List<Integer>> tuple = findSubstitutions(str, 2);
+        return ! tuple.m1.isEmpty() && tuple.m1.size() + tuple.m2.size() > 1;
 	}
 
 	public static String enumerateNonPositionalSubstitutionsIfRequired(String str) {
-		List<Integer> subs = findSubstitutions(str, -1).m1;
-		if (subs.size() < 2) {
-			return str;
-		}
+        Duo<List<Integer>, List<Integer>> tuple = findSubstitutions(str, 2);
+        if (tuple.m1.isEmpty() || tuple.m1.size() + tuple.m2.size() < 2) {
+            return str;
+        }
+		List<Integer> subs = tuple.m1;
 
 		StringBuilder out = new StringBuilder();
 		int pos = 0;
