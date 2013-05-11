@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="test_color1">#ff123456</color>
+    <item type="color" name="test_color2">@*android:color/white</item>
 </resources>
