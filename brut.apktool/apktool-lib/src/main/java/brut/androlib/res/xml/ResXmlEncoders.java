@@ -140,7 +140,7 @@ public final class ResXmlEncoders {
 		return findSubstitutions(str, 2).m1.size() > 1;
 	}
 
-	public static String enumerateNonPositionalSubstitutions(String str) {
+	public static String enumerateNonPositionalSubstitutionsIfRequired(String str) {
 		List<Integer> subs = findSubstitutions(str, -1).m1;
 		if (subs.size() < 2) {
 			return str;

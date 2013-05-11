@@ -54,43 +54,12 @@ public abstract class ResScalarValue extends ResValue implements
 		if (mRawValue != null) {
 			return mRawValue;
 		}
-		return encodeAsResXmlValueExt().replace("@android:", "@*android:");
+		return encodeAsResXml().replace("@android:", "@*android:");
 	}
 
     public String encodeAsResXmlNonEscapedItemValue() throws AndrolibException {
         return encodeAsResXmlValue().replace("@android:", "@*android:").replace("&amp;", "&").replace("&lt;","<");
     }
-
-	public String encodeAsResXmlValueExt() throws AndrolibException {
-		String rawValue = mRawValue;
-		if (rawValue != null) {
-			if (ResXmlEncoders.hasMultipleNonPositionalSubstitutions(rawValue)) {
-				int count = 1;
-				StringBuilder result = new StringBuilder();
-				String tmp1[] = rawValue.split("%%", -1);
-				int tmp1_sz = tmp1.length;
-				for (int i = 0; i < tmp1_sz; i++) {
-					String cur1 = tmp1[i];
-					String tmp2[] = cur1.split("%", -1);
-					int tmp2_sz = tmp2.length;
-					for (int j = 0; j < tmp2_sz; j++) {
-						String cur2 = tmp2[j];
-						result.append(cur2);
-						if (j != (tmp2_sz - 1)) {
-							result.append('%').append(count).append('$');
-							count++;
-						}
-					}
-					if (i != (tmp1_sz - 1)) {
-						result.append("%%");
-					}
-				}
-				rawValue = result.toString();
-			}
-			return rawValue;
-		}
-		return encodeAsResXml();
-	}
 
 	@Override
 	public void serializeToResValuesXml(XmlSerializer serializer,
