@@ -162,23 +162,23 @@ public class Main {
             decoder.decode();
         } catch (OutDirExistsException ex) {
             System.out
-                    .println("Destination directory ("
+                    .println("目标文件夹 ("
                             + outDir.getAbsolutePath()
                             + ") "
-                            + "already exists. Use -f switch if you want to overwrite it.");
+                            + "已经存在. 可以使用使用 -f 参数覆盖文件夹.");
             System.exit(1);
         } catch (InFileNotFoundException ex) {
-            System.out.println("Input file (" + apkName + ") " + "was not found or was not readable.");
+            System.out.println("文件 (" + apkName + ") " + "未找到或无法读取.");
             System.exit(1);
         } catch (CantFindFrameworkResException ex) {
             System.out
-                    .println("Can't find framework resources for package of id: "
+                    .println("无法找到的框架资源包的id: "
                             + String.valueOf(ex.getPkgId())
-                            + ". You must install proper "
-                            + "framework files, see project website for more info.");
+                            + ". 你必须安装适当的框架文件, "
+                            + "更多信息见项目网站.");
             System.exit(1);
         } catch (IOException ex) {
-            System.out.println("Could not modify file. Please ensure you have permission.");
+            System.out.println("无法修改文件. 请确认是否有权限.");
             System.exit(1);
         }
 
@@ -262,51 +262,54 @@ public class Main {
 
         // create options
         Option versionOption = OptionBuilder.withLongOpt("version")
-                .withDescription("prints the version then exits")
+                .withDescription("显示版本\n")
                 .create("version");
 
         Option advanceOption = OptionBuilder.withLongOpt("advanced")
-                .withDescription("prints advance information.")
+                .withDescription("显示高级信息.")
                 .create("advance");
 
         Option noSrcOption = OptionBuilder.withLongOpt("no-src")
-                .withDescription("Do not decode sources.")
+                .withDescription("不反编译源码.")
                 .create("s");
 
         Option noResOption = OptionBuilder.withLongOpt("no-res")
-                .withDescription("Do not decode resources.")
+                .withDescription("不反编译 resources.")
                 .create("r");
 
         Option debugDecOption = OptionBuilder.withLongOpt("debug")
-                .withDescription("Decode in debug mode. Check project page for more info.")
+                .withDescription("调试模式反编译.\n"
+                        + "       更多信息，请参阅项目主页.")
                 .create("d");
 
         Option debugLinePrefix = OptionBuilder.withLongOpt("debug-line-prefix")
-                .withDescription("Smali line prefix when decoding in debug mode. Default is \"a=0;// \".")
+                .withDescription("使用反编译调试模式时Smali line 前缀.\n"
+                        + "       默认 \"a=0;// \".")
                 .hasArg(true)
                 .withArgName("prefix")
                 .create();
 
         Option debugBuiOption = OptionBuilder.withLongOpt("debug")
-                .withDescription("Builds in debug mode. Check project page for more info.")
+                .withDescription("调试模式下编译.\n"
+                        + "       更多信息，请参阅项目主页.")
                 .create("d");
 
         Option noDbgOption = OptionBuilder.withLongOpt("no-debug-info")
-                .withDescription("don't write out debug info (.local, .param, .line, etc.)")
+                .withDescription("不输出调试信息 (.local, .param, .line, etc.)")
                 .create("b");
 
         Option forceDecOption = OptionBuilder.withLongOpt("force")
-                .withDescription("Force delete destination directory.")
+                .withDescription("强制删除目标目录.")
                 .create("f");
 
         Option frameTagOption = OptionBuilder.withLongOpt("frame-tag")
-                .withDescription("Uses framework files tagged by <tag>.")
+                .withDescription("使用框架文件 <tag>.\n")
                 .hasArg(true)
                 .withArgName("tag")
                 .create("t");
 
         Option frameDirOption = OptionBuilder.withLongOpt("frame-path")
-                .withDescription("Uses framework files located in <dir>.")
+                .withDescription("Uses framework files located in <dir>.\n")
                 .hasArg(true)
                 .withArgName("dir")
                 .create("p");
@@ -318,40 +321,41 @@ public class Main {
                 .create("p");
 
         Option keepResOption = OptionBuilder.withLongOpt("keep-broken-res")
-                .withDescription("Use if there was an error and some resources were dropped, e.g.\n"
-                        + "            \"Invalid config flags detected. Dropping resources\", but you\n"
-                        + "            want to decode them anyway, even with errors. You will have to\n"
-                        + "            fix them manually before building.")
+                .withDescription("如果有一个错误、一些资源丢失、无效的配置\n"
+                        + "            \"或者即使有错误，也要对其进行反编译. \"\n"
+                        + "            你可以删除资源. \n"
+                        + "            但是编译之前你必须手动修复它们.")
                 .create("k");
 
         Option forceBuiOption = OptionBuilder.withLongOpt("force-all")
-                .withDescription("Skip changes detection and build all files.")
+                .withDescription("跳过变化检测，并编译所有文件.")
                 .create("f");
 
         Option aaptOption = OptionBuilder.withLongOpt("aapt")
                 .hasArg(true)
                 .withArgName("loc")
-                .withDescription("Loads aapt from specified location.")
+                .withDescription("从指定位置加载 aapt.")
                 .create("a");
 
         Option originalOption = OptionBuilder.withLongOpt("copy-original")
-                .withDescription("Copies original AndroidManifest.xml and META-INF. See project page for more info.")
+                .withDescription("复制官方 AndroidManifest.xml 和 META-INF.\n"
+                        + "       更多信息，请参阅项目主页.")
                 .create("c");
 
         Option tagOption = OptionBuilder.withLongOpt("tag")
-                .withDescription("Tag frameworks using <tag>.")
+                .withDescription("使用 <tag> 标签框架\n.")
                 .hasArg(true)
                 .withArgName("tag")
                 .create("t");
 
         Option outputBuiOption = OptionBuilder.withLongOpt("output")
-                .withDescription("The name of apk that gets written. Default is dist/name.apk")
+                .withDescription("输出的apk文件名. 默认 路径/文件名.apk")
                 .hasArg(true)
                 .withArgName("dir")
                 .create("o");
 
         Option outputDecOption = OptionBuilder.withLongOpt("output")
-                .withDescription("The name of folder that gets written. Default is apk.out")
+                .withDescription("输出的文件夹名称. 默认 apk文件名.out")
                 .hasArg(true)
                 .withArgName("dir")
                 .create("o");
@@ -421,7 +425,7 @@ public class Main {
 
     private static String verbosityHelp() {
         if (isAdvanceMode()) {
-            return "[-q|--quiet OR -v|--verbose] ";
+            return "[-q|--隐藏信息 或者使用 -v|--详细信息] ";
         } else {
             return "";
         }
@@ -436,33 +440,34 @@ public class Main {
 
         // print out license info prior to formatter.
         System.out.println(
-                "Apktool v" + Androlib.getVersion() + " - a tool for reengineering Android apk files\n" +
-                        "with smali v" + ApktoolProperties.get("smaliVersion") +
-                        " and baksmali v" + ApktoolProperties.get("baksmaliVersion") + "\n" +
-                        "Copyright 2010 Ryszard Wiśniewski <brut.alll@gmail.com>\n" +
-                        "Updated by Connor Tumbleson <connor.tumbleson@gmail.com>" );
+                "Apktool 版本" + Androlib.getVersion() + " - 一个编译Android apk文件的工具\n" +
+                        "smali 版本" + ApktoolProperties.get("smaliVersion") +
+                        " 和 baksmali 版本" + ApktoolProperties.get("baksmaliVersion") + "\n" +
+                        "版权2010 归Ryszard Wiśniewski <brut.alll@gmail.com>所有\n" +
+                        "由 Connor Tumbleson <connor.tumbleson@gmail.com> 更新\n" +
+                        "由 loogeo <loogeo@gmail.com> 修改汉化" );
         if (isAdvanceMode()) {
-            System.out.println("Apache License 2.0 (http://www.apache.org/licenses/LICENSE-2.0)\n");
+            System.out.println("Apache 许可证 2.0 (http://www.apache.org/licenses/LICENSE-2.0)\n");
         }else {
             System.out.println("");
         }
 
         // 4 usage outputs (general, frameworks, decode, build)
         formatter.printHelp("apktool " + verbosityHelp(), normalOptions);
-        formatter.printHelp("apktool " + verbosityHelp() + "if|install-framework [options] <framework.apk>", frameOptions);
-        formatter.printHelp("apktool " + verbosityHelp() + "d[ecode] [options] <file_apk>", DecodeOptions);
-        formatter.printHelp("apktool " + verbosityHelp() + "b[uild] [options] <app_path>", BuildOptions);
+        formatter.printHelp("apktool " + verbosityHelp() + "if|安装框架文件 [参数] <framework.apk>", frameOptions);
+        formatter.printHelp("apktool " + verbosityHelp() + "d[反编译] [参数] <apk文件>", DecodeOptions);
+        formatter.printHelp("apktool " + verbosityHelp() + "b[编译] [参数] <apk文件>", BuildOptions);
         if (isAdvanceMode()) {
             formatter.printHelp("apktool " + verbosityHelp() + "publicize-resources <file_path>",
-                    "Make all framework resources public.", emptyOptions, null);
+                    "确定所有框架资源公开.", emptyOptions, null);
         } else {
             System.out.println("");
         }
 
         // print out more information
         System.out.println(
-                "For additional info, see: http://code.google.com/p/android-apktool/ \n"
-                        + "For smali/baksmali info, see: http://code.google.com/p/smali/");
+                "如需更多信息，请参阅: http://code.google.com/p/android-apktool/ \n"
+                        + "需更多 smali/baksmali 信息，请参阅: http://code.google.com/p/smali/");
     }
 
     private static void setupLogging(Verbosity verbosity) {
