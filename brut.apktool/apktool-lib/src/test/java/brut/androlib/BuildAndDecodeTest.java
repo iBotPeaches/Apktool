@@ -98,6 +98,11 @@ public class BuildAndDecodeTest {
 		compareValuesFiles("values-mcc001/integers.xml");
 	}
 
+    @Test
+    public void xmlPluralsTest() throws BrutException {
+        compareValuesFiles("values-mcc001/plurals.xml");
+    }
+
 	@Test
 	public void valuesStringsTest() throws BrutException {
 		compareValuesFiles("values-mcc001/strings.xml");

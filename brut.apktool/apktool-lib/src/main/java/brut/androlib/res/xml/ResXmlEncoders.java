@@ -16,6 +16,8 @@
 
 package brut.androlib.res.xml;
 
+import brut.util.Duo;
+
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
@@ -135,14 +137,16 @@ public final class ResXmlEncoders {
 	}
 
 	public static boolean hasMultipleNonPositionalSubstitutions(String str) {
-		return findNonPositionalSubstitutions(str, 2).size() > 1;
+        Duo<List<Integer>, List<Integer>> tuple = findSubstitutions(str, 2);
+        return ! tuple.m1.isEmpty() && tuple.m1.size() + tuple.m2.size() > 1;
 	}
 
-	public static String enumerateNonPositionalSubstitutions(String str) {
-		List<Integer> subs = findNonPositionalSubstitutions(str, -1);
-		if (subs.size() < 2) {
-			return str;
-		}
+	public static String enumerateNonPositionalSubstitutionsIfRequired(String str) {
+        Duo<List<Integer>, List<Integer>> tuple = findSubstitutions(str, 2);
+        if (tuple.m1.isEmpty() || tuple.m1.size() + tuple.m2.size() < 2) {
+            return str;
+        }
+		List<Integer> subs = tuple.m1;
 
 		StringBuilder out = new StringBuilder();
 		int pos = 0;
@@ -157,17 +161,23 @@ public final class ResXmlEncoders {
 	}
 
 	/**
-	 * It searches for "%", but not "%%" nor "%(\d)+\$"
+	 * It returns a tuple of:
+     *   - a list of offsets of non positional substitutions. non-pos is defined as any "%" which isn't "%%" nor "%\d+\$"
+     *   - a list of offsets of positional substitutions
 	 */
-	private static List<Integer> findNonPositionalSubstitutions(String str,
-			int max) {
-		int pos = 0;
+	private static Duo<List<Integer>, List<Integer>> findSubstitutions(String str, int nonPosMax) {
+        if (nonPosMax == -1) {
+            nonPosMax = Integer.MAX_VALUE;
+        }
+		int pos;
 		int pos2 = 0;
-		int count = 0;
 		int length = str.length();
-		List<Integer> ret = new ArrayList<Integer>();
-		while ((pos2 = (pos = str.indexOf('%', pos2)) + 1) != 0) {
+		List<Integer> nonPositional = new ArrayList<>();
+		List<Integer> positional = new ArrayList<>();
+		while ((pos = str.indexOf('%', pos2)) != -1) {
+            pos2 = pos + 1;
 			if (pos2 == length) {
+                nonPositional.add(pos);
 				break;
 			}
 			char c = str.charAt(pos2++);
@@ -175,21 +185,20 @@ public final class ResXmlEncoders {
 				continue;
 			}
 			if (c >= '0' && c <= '9' && pos2 < length) {
-				do {
-					c = str.charAt(pos2++);
-				} while (c >= '0' && c <= '9' && pos2 < length);
-				if (c == '$') {
-					continue;
-				}
+                while ((c = str.charAt(pos2++)) >= '0' && c <= '9' && pos2 < length);
+                if (c == '$') {
+                    positional.add(pos);
+                    continue;
+                }
 			}
 
-			ret.add(pos);
-			if (max != -1 && ++count >= max) {
+			nonPositional.add(pos);
+			if (nonPositional.size() >= nonPosMax) {
 				break;
 			}
 		}
 
-		return ret;
+		return new Duo<>(nonPositional, positional);
 	}
 
 	private static boolean isPrintableChar(char c) {

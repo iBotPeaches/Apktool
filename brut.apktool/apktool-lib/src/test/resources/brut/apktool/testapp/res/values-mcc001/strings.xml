@@ -17,11 +17,12 @@ bar"</string>
     <string name="test_string16">foo<b>bar<i>"b
         az"</i></b>foo</string>
     <string name="test_string17" formatted="false">%d of %d</string>
-    <string name="test_string18">foo %d bar %</string>
+    <string name="test_string18" formatted="false">foo %d bar %</string>
     <string name="test_string19">%2$s foo %1$d</string>
     <string name="test_string20" formatted="false">%-e foo %,d</string>
     <string name="test_string21">%2$-e foo %1$,d</string>
     <string name="test_string22" formatted="false">%02d foo %01d</string>
     <string name="test_string23" formatted="false">%d foo %1</string>
     <string name="test_string24" formatted="false">%1% foo %2%</string>
+    <string name="test_string25" formatted="false">foo %s bar %2$s baz</string>
 </resources>
