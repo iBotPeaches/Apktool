@@ -57,7 +57,7 @@ public class Androlib {
 			throws AndrolibException {
 		try {
 			Directory apk = apkFile.getDirectory();
-			LOGGER.info("Copying raw classes.dex file...");
+			LOGGER.info("正在复制 raw classes.dex 文件...");
 			apkFile.getDirectory().copyToDir(outDir, "classes.dex");
 		} catch (DirectoryException ex) {
 			throw new AndrolibException(ex);
@@ -79,7 +79,7 @@ public class Androlib {
 
 	public void decodeSourcesJava(ExtFile apkFile, File outDir, boolean debug)
 			throws AndrolibException {
-		LOGGER.info("Decoding Java sources...");
+		LOGGER.info("反编译 Java 源码...");
 		new AndrolibJava().decode(apkFile, outDir);
 	}
 
@@ -87,7 +87,7 @@ public class Androlib {
 			throws AndrolibException {
 		try {
 			Directory apk = apkFile.getDirectory();
-			LOGGER.info("Copying raw manifest...");
+			LOGGER.info("正在复制 raw manifest...");
 			apkFile.getDirectory().copyToDir(outDir, APK_MANIFEST_FILENAMES);
 		} catch (DirectoryException ex) {
 			throw new AndrolibException(ex);
@@ -103,7 +103,7 @@ public class Androlib {
 			throws AndrolibException {
 		try {
 			// Directory apk = apkFile.getDirectory();
-			LOGGER.info("Copying raw resources...");
+			LOGGER.info("正在复制 raw resources...");
 			apkFile.getDirectory().copyToDir(outDir, APK_RESOURCES_FILENAMES);
 		} catch (DirectoryException ex) {
 			throw new AndrolibException(ex);
@@ -117,7 +117,7 @@ public class Androlib {
 
 	public void decodeRawFiles(ExtFile apkFile, File outDir)
 			throws AndrolibException {
-		LOGGER.info("Copying assets and libs...");
+		LOGGER.info("正在复制 assets 和 libs...");
 		try {
 			Directory in = apkFile.getDirectory();
 			if (in.containsDir("assets")) {
@@ -145,7 +145,7 @@ public class Androlib {
 
     public void decodeUnknownFiles(ExtFile apkFile, File outDir, ResTable resTable)
             throws AndrolibException {
-        LOGGER.info("Copying unknown files/dir...");
+        LOGGER.info("正在复制未知文件/文件夹...");
         File unknownOut = new File(outDir, UNK_DIRNAME);
         ZipEntry invZipFile;
 
@@ -189,7 +189,7 @@ public class Androlib {
 
 	public void writeOriginalFiles(ExtFile apkFile, File outDir)
 			throws AndrolibException {
-		LOGGER.info("Copying original files...");
+		LOGGER.info("正在复制官方文件...");
 		File originalDir = new File(outDir, "original");
 		if (!originalDir.exists()) {
 			originalDir.mkdirs();
@@ -307,7 +307,7 @@ public class Androlib {
 			}
 			File stored = new File(appDir, APK_DIRNAME + "/classes.dex");
 			if (flags.get("forceBuildAll") || isModified(working, stored)) {
-				LOGGER.info("Copying classes.dex file...");
+				LOGGER.info("正在复制 classes.dex 文件...");
 				BrutIO.copyAndClose(new FileInputStream(working),
 						new FileOutputStream(stored));
 			}
@@ -325,7 +325,7 @@ public class Androlib {
 		}
 		File dex = new File(appDir, APK_DIRNAME + "/classes.dex");
 		if (!flags.get("forceBuildAll")) {
-			LOGGER.info("Checking whether sources has changed...");
+			LOGGER.info("正在检查源文件是否已经改变...");
 		}
 		if (flags.get("forceBuildAll") || isModified(smaliDir, dex)) {
 			LOGGER.info("Smaling...");
@@ -343,10 +343,10 @@ public class Androlib {
 		}
 		File dex = new File(appDir, APK_DIRNAME + "/classes.dex");
 		if (!flags.get("forceBuildAll")) {
-			LOGGER.info("Checking whether sources has changed...");
+			LOGGER.info("正在检查源文件是否已经改变...");
 		}
 		if (flags.get("forceBuildAll") || isModified(javaDir, dex)) {
-			LOGGER.info("Building java sources...");
+			LOGGER.info("正在编译 java 源码...");
 			dex.delete();
 			new AndrolibJava().build(javaDir, dex);
 		}
@@ -358,7 +358,7 @@ public class Androlib {
 		if (!buildResourcesRaw(appDir, flags)
 				&& !buildResourcesFull(appDir, flags, usesFramework)
 				&& !buildManifest(appDir, flags, usesFramework)) {
-			LOGGER.warning("Could not find resources");
+			LOGGER.warning("无法找到 resources");
 		}
 	}
 
@@ -370,12 +370,12 @@ public class Androlib {
 			}
 			File apkDir = new File(appDir, APK_DIRNAME);
 			if (!flags.get("forceBuildAll")) {
-				LOGGER.info("Checking whether resources has changed...");
+				LOGGER.info("正在检查源文件是否已经改变...");
 			}
 			if (flags.get("forceBuildAll")
 					|| isModified(newFiles(APK_RESOURCES_FILENAMES, appDir),
 							newFiles(APK_RESOURCES_FILENAMES, apkDir))) {
-				LOGGER.info("Copying raw resources...");
+				LOGGER.info("正在复制 raw resources...");
 				appDir.getDirectory()
 						.copyToDir(apkDir, APK_RESOURCES_FILENAMES);
 			}
@@ -393,13 +393,13 @@ public class Androlib {
 				return false;
 			}
 			if (!flags.get("forceBuildAll")) {
-				LOGGER.info("Checking whether resources has changed...");
+				LOGGER.info("正在检查源文件是否已经改变...");
 			}
 			File apkDir = new File(appDir, APK_DIRNAME);
 			if (flags.get("forceBuildAll")
 					|| isModified(newFiles(APP_RESOURCES_FILENAMES, appDir),
 							newFiles(APK_RESOURCES_FILENAMES, apkDir))) {
-				LOGGER.info("Building resources...");
+				LOGGER.info("正在编译 resources...");
 
 				File apkFile = File.createTempFile("APKTOOL", null);
 				apkFile.delete();
@@ -435,7 +435,7 @@ public class Androlib {
 			HashMap<String, Boolean> flags) throws AndrolibException {
 		try {
 			File apkDir = new File(appDir, APK_DIRNAME);
-			LOGGER.info("Copying raw AndroidManifest.xml...");
+			LOGGER.info("正在复制 raw AndroidManifest.xml...");
 			appDir.getDirectory().copyToDir(apkDir, APK_MANIFEST_FILENAMES);
 			return true;
 		} catch (DirectoryException ex) {
@@ -451,7 +451,7 @@ public class Androlib {
 				return false;
 			}
 			if (!flags.get("forceBuildAll")) {
-				LOGGER.info("Checking whether resources has changed...");
+				LOGGER.info("正在检查源文件是否已经改变...");
 			}
 			
 			File apkDir = new File(appDir, APK_DIRNAME);
@@ -463,7 +463,7 @@ public class Androlib {
 			if (flags.get("forceBuildAll")
 					|| isModified(newFiles(APK_MANIFEST_FILENAMES, appDir),
 							newFiles(APK_MANIFEST_FILENAMES, apkDir))) {
-				LOGGER.info("Building AndroidManifest.xml...");
+				LOGGER.info("正在编译 AndroidManifest.xml...");
 
 				File apkFile = File.createTempFile("APKTOOL", null);
 				apkFile.delete();
@@ -500,7 +500,7 @@ public class Androlib {
 		}
 		File stored = new File(appDir, APK_DIRNAME + "/lib");
 		if (flags.get("forceBuildAll") || isModified(working, stored)) {
-			LOGGER.info("Copying libs...");
+			LOGGER.info("正在复制 libs...");
 			try {
 				OS.rmdir(stored);
 				OS.cpdir(working, stored);
@@ -516,14 +516,14 @@ public class Androlib {
 			File originalDir = new File(appDir, "original");
 			if(originalDir.exists()) {
 				try {
-					LOGGER.info("Copy original files...");
+					LOGGER.info("复制官方文件...");
 					Directory in = (new ExtFile(originalDir)).getDirectory();
 					if(in.containsFile("AndroidManifest.xml")) {
-						LOGGER.info("Copy AndroidManifest.xml...");
+						LOGGER.info("复制 AndroidManifest.xml...");
 						in.copyToDir(new File(appDir, APK_DIRNAME), "AndroidManifest.xml");
 					}
 					if (in.containsDir("META-INF")) {
-						LOGGER.info("Copy META-INF...");
+						LOGGER.info("复制 META-INF...");
 						in.copyToDir(new File(appDir, APK_DIRNAME), "META-INF");
 					}
 				} catch (DirectoryException ex) {
@@ -539,7 +539,7 @@ public class Androlib {
         mPath = Paths.get(appDir.getPath() + File.separatorChar + UNK_DIRNAME);
 
         if (meta.containsKey("unknownFiles")) {
-            LOGGER.info("Copying unknown files/dir...");
+            LOGGER.info("正在复制未知文件/文件夹...");
 
             Map<String, String> files = (Map<String, String>)meta.get("unknownFiles");
 
@@ -586,7 +586,7 @@ public class Androlib {
   
 	public void buildApk(File appDir, File outApk,
 			HashMap<String, Boolean> flags) throws AndrolibException {
-		LOGGER.info("Building apk file...");
+		LOGGER.info("正在编译 apk 文件...");
 		if (outApk.exists()) {
 			outApk.delete();
 		} else {
