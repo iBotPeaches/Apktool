@@ -21,13 +21,13 @@ cd Apktool
 
 # for Wondows user
 set JAVA_TOOL_OPTIONS=-Dfile.encoding=utf-8 -Duser.language=en -Duser.country=US
+gradlew.bat fatJar
+或者
+gradlew.bat fatJar proguard
 
 # for Linux user
 export JAVA_TOOL_OPTIONS=-Dfile.encoding=utf-8 -Duser.language=en -Duser.country=US
 
-
-[./gradlew][gradlew.bat] fatJar
-
-or [./gradlew][gradlew.bat] fatJar proguard
-
-./brut.apktool/apktool-cli/build/libs/apktool-xxxxx.jar
+./gradlew fatJar
+或者
+./gradlew fatJar proguard
