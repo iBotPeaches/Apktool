@@ -182,19 +182,11 @@ final public class AndrolibResources {
 			DOMSource source = new DOMSource(doc);
 			StreamResult result = new StreamResult(new File(filePath));
 			transformer.transform(source, result);
-		
-		} catch (ParserConfigurationException ex) {
-			throw new AndrolibException(ex);
-		} catch (SAXException ex) {
-			throw new AndrolibException(ex);
-		} catch (IOException ex) {
-			throw new AndrolibException(ex);
-		} catch (TransformerConfigurationException ex) {
-			throw new AndrolibException(ex);
-		} catch (TransformerException ex) {
-			throw new AndrolibException(ex);
-		}
-  }
+
+        } catch (SAXException | ParserConfigurationException | IOException | TransformerException ex) {
+            throw new AndrolibException(ex);
+        }
+    }
 
 	public void adjust_package_manifest(ResTable resTable, String filePath)
 			throws AndrolibException {
@@ -233,16 +225,10 @@ final public class AndrolibResources {
 				StreamResult result = new StreamResult(new File(filePath));
 				transformer.transform(source, result);
 
-			} catch (ParserConfigurationException ex) {
-				throw new AndrolibException(ex);
-			} catch (TransformerException ex) {
-				throw new AndrolibException(ex);
-			} catch (IOException ex) {
-				throw new AndrolibException(ex);
-			} catch (SAXException ex) {
-				throw new AndrolibException(ex);
-			}
-		}
+            } catch (SAXException | ParserConfigurationException | IOException | TransformerException ex) {
+                throw new AndrolibException(ex);
+            }
+        }
 	}
 
     public void remove_manifest_versions(String filePath)
@@ -279,15 +265,7 @@ final public class AndrolibResources {
                 StreamResult result = new StreamResult(new File(filePath));
                 transformer.transform(source, result);
 
-            } catch (ParserConfigurationException ex) {
-                throw new AndrolibException(ex);
-            } catch (SAXException ex) {
-                throw new AndrolibException(ex);
-            } catch (IOException ex) {
-                throw new AndrolibException(ex);
-            } catch (TransformerConfigurationException ex) {
-                throw new AndrolibException(ex);
-            } catch (TransformerException ex) {
+            } catch (SAXException | ParserConfigurationException | IOException | TransformerException ex) {
                 throw new AndrolibException(ex);
             }
         }
@@ -372,8 +350,10 @@ final public class AndrolibResources {
 		}
 	}
 
-	public void setPackageId(String id) {
-		mPackageId = id;
+	public void setPackageId(Map<String, String> map) {
+        if (map != null) {
+            mPackageId = map.get("cur_package_id");
+        }
 	}
 
     public void aaptPackage(File apkFile, File manifest, File resDir,
@@ -495,6 +475,10 @@ final public class AndrolibResources {
 		}
 		try {
 			OS.exec(cmd.toArray(new String[0]));
+            if (flags.get("verbose")) {
+                LOGGER.info("command ran: ");
+                LOGGER.info(cmd.toString());
+            }
 		} catch (BrutException ex) {
 			throw new AndrolibException(ex);
 		}
