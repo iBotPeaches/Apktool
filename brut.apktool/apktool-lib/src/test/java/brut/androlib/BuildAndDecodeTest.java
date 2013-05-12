@@ -67,11 +67,21 @@ public class BuildAndDecodeTest {
 		apkDecoder.decode();
 	}
 
+    @Test
+    public void valuesAnimsTest() throws BrutException {
+        compareValuesFiles("values-mcc001/anims.xml");
+    }
+
 	@Test
 	public void valuesArraysTest() throws BrutException {
 		compareValuesFiles("values-mcc001/arrays.xml");
 		compareValuesFiles("values-mcc002/arrays.xml");
 	}
+
+    @Test
+    public void valuesAttrsTest() throws BrutException {
+        compareValuesFiles("values/attrs.xml");
+    }
 
 	@Test
 	public void valuesBoolsTest() throws BrutException {
@@ -88,6 +98,11 @@ public class BuildAndDecodeTest {
 		compareValuesFiles("values-mcc001/dimens.xml");
 	}
 
+    @Test
+    public void valuesDrawablesTest() throws BrutException {
+        compareValuesFiles("values-mcc001/drawables.xml");
+    }
+
 	@Test
 	public void valuesIdsTest() throws BrutException {
 		compareValuesFiles("values-mcc001/ids.xml");
@@ -99,6 +114,11 @@ public class BuildAndDecodeTest {
 	}
 
     @Test
+    public void valuesLayoutsTest() throws BrutException {
+        compareValuesFiles("values-mcc001/layouts.xml");
+    }
+
+    @Test
     public void xmlPluralsTest() throws BrutException {
         compareValuesFiles("values-mcc001/plurals.xml");
     }
@@ -107,6 +127,11 @@ public class BuildAndDecodeTest {
 	public void valuesStringsTest() throws BrutException {
 		compareValuesFiles("values-mcc001/strings.xml");
 	}
+
+    @Test
+    public void valuesStylesTest() throws BrutException {
+        compareValuesFiles("values-mcc001/styles.xml");
+    }
 
 	@Test
 	public void valuesReferencesTest() throws BrutException {
@@ -139,37 +164,42 @@ public class BuildAndDecodeTest {
 
     @Test
     public void drawableNoDpiTest() throws BrutException, IOException {
-        compareDrawablesFolder("drawable-nodpi");
+        compareResFolder("drawable-nodpi");
     }
 
     @Test
     public void drawableNumberedDpiTest() throws BrutException, IOException {
-        compareDrawablesFolder("drawable-534dpi");
+        compareResFolder("drawable-534dpi");
     }
 
     @Test
     public void drawableLdpiTest() throws BrutException, IOException {
-        compareDrawablesFolder("drawable-ldpi");
+        compareResFolder("drawable-ldpi");
     }
 
     @Test
     public void drawableMdpiTest() throws BrutException, IOException {
-        compareDrawablesFolder("drawable-mdpi");
+        compareResFolder("drawable-mdpi");
     }
 
     @Test
     public void drawableTvdpiTest() throws BrutException, IOException {
-        compareDrawablesFolder("drawable-tvdpi");
+        compareResFolder("drawable-tvdpi");
     }
 
     @Test
     public void drawableXhdpiTest() throws BrutException, IOException {
-        compareDrawablesFolder("drawable-xhdpi");
+        compareResFolder("drawable-xhdpi");
     }
 
     @Test
     public void drawableXxhdpiTest() throws BrutException, IOException {
-        compareDrawablesFolder("drawable-xxhdpi");
+        compareResFolder("drawable-xxhdpi");
+    }
+
+    @Test
+    public void resRawTest() throws BrutException, IOException {
+        compareResFolder("raw");
     }
 
     @Test
@@ -223,7 +253,7 @@ public class BuildAndDecodeTest {
         });
     }
 
-    private boolean compareDrawablesFolder(String path) throws BrutException, IOException {
+    private boolean compareResFolder(String path) throws BrutException, IOException {
         sResult = true;
         compareBinaryFolder(path, true);
         return sResult;
