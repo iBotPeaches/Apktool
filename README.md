@@ -21,6 +21,7 @@ cd Apktool
 
 # for Wondows user
 set JAVA_TOOL_OPTIONS=-Dfile.encoding=utf-8 -Duser.language=en -Duser.country=US
+
 gradlew.bat fatJar
 或者
 gradlew.bat fatJar proguard
