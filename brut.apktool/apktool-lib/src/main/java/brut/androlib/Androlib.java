@@ -178,6 +178,7 @@ public class Androlib {
                     }
                 }
             }
+            apkZipFile.close();
         }
         catch (DirectoryException ex) {
             throw new AndrolibException(ex);
@@ -267,7 +268,7 @@ public class Androlib {
 		flags.put("compression", meta.get("compressionType") == null ? false
 				: (Boolean) meta.get("compressionType"));
 		mAndRes.setSdkInfo((Map<String, String>) meta.get("sdkInfo"));
-		mAndRes.setPackageId((String)meta.get("packageId"));
+		mAndRes.setPackageId((Map<String, String>) meta.get("packageInfo"));
 		mAndRes.setVersionInfo((Map<String, String>) meta.get("versionInfo"));
 
 		if (outFile == null) {

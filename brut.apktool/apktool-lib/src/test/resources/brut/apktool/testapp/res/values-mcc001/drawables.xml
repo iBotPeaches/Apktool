@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <item name="test_drawable1" type="drawable">@*android:drawable/ab_bottom_solid_light_holo</item>
+    <item name="test_drawable2" type="drawable">@*android:drawable/btn_check_off_holo_light</item>
+    <item name="test_drawable3" type="drawable">@*android:drawable/btn_check_on_holo_light</item>
+    <item name="test_drawable4" type="drawable">@*android:drawable/btn_keyboard_key_fulltrans</item>
+    <item name="test_drawable5" type="drawable">#00000000</item>
+</resources>

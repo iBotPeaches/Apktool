@@ -1,4 +1,6 @@
 v2.0.0 (TBA)
+-Updated to smali/baksmali to v1.4.2
+-Updated to Gradle 1.5
 -Fixed (issue #8)   - Correctly uses -c to retain original manifest and META-INF. (Thanks M1cha)
 -Fixed (issue #63)  - Correctly handles apk's that have unknown files outside of the standard aapt allowed resources.
 -Fixed (issue #202) - Includes modified aapt to force package id on build. (Thanks M1cha)
@@ -10,15 +12,13 @@ v2.0.0 (TBA)
 -Fixed (issue #339) - Re-enables debug mode ( -d flag) to fix smali debugging. (Thanks Ryszard)
 -Fixed (issue #177) - Adapted output of smali to make breakpoint setting easier in different IDEs. (Thanks Ryszard)
 -Fixed (issue #391) - Fixes characters (& and <) from being double escaped in <item>'s of arrays.xml
-
-v1.5.3 (TBA)
--Updated to smali/baksmali to v1.4.2
+-Fixed (issue #260) - Fixes "Multiple substitution" errors with positional and exactly 1 non-positional argument.
+-Fixed (issue #427) - Correctly handles `--frame-path` on [b]uild
 -Fixed (issue #396) - Correctly handle android:debuggable while in debug mode.
 -Fixed (issue #340) - Fixed superclass errors on debug mode.
--Updated to Gradle 1.4
+-Fixed (issue #458) - Fixed pkg id not being correctly set in framework files.
 -Updated known bytes for configurations to 38 (from addition of layout direction)
 -Fixed NPE when handling odex apks even with --no-src specified. (Thanks Rodrigo Chiossi)
--Fixed (issue #427) - Correctly handles `--frame-path` on [b]uild
 
 v1.5.2 (Released February 2 - 2013) Codename: Bug Fixes
 -Fixed (issue #299) - output smali filename errors to screen during rebuild instead of filestream

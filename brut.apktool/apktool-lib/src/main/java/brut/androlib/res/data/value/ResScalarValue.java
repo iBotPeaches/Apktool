@@ -70,11 +70,13 @@ public abstract class ResScalarValue extends ResValue implements
 		String body = encodeAsResXmlValue();
 
 		// check for resource reference
-		if (body.contains("@")) {
-			if (!res.getFilePath().contains("string")) {
-				item = true;
-			}
-		}
+        if (!type.equalsIgnoreCase("color")) {
+            if (body.contains("@")) {
+                if (!res.getFilePath().contains("string")) {
+                    item = true;
+                }
+            }
+        }
 
 		// check for using attrib as node or item
 		String tagName = item ? "item" : type;
