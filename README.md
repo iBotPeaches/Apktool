@@ -19,6 +19,13 @@ git clone git://github.com/iBotPeaches/Apktool.git
 
 cd Apktool
 
+# for Wondows user
+set JAVA_TOOL_OPTIONS=-Dfile.encoding=utf-8 -Duser.language=en -Duser.country=US
+
+# for Linux user
+export JAVA_TOOL_OPTIONS=-Dfile.encoding=utf-8 -Duser.language=en -Duser.country=US
+
+
 [./gradlew][gradlew.bat] fatJar
 
 or [./gradlew][gradlew.bat] fatJar proguard
