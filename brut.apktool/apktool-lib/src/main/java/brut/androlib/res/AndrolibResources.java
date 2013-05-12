@@ -73,7 +73,7 @@ final public class AndrolibResources {
 
 	public ResPackage loadMainPkg(ResTable resTable, ExtFile apkFile)
 			throws AndrolibException {
-		LOGGER.info("Loading resource table...");
+		LOGGER.info("加载资源表...");
 		ResPackage[] pkgs = getResPackagesFromApk(apkFile, resTable,
 				sKeepBroken);
 		ResPackage pkg = null;
@@ -99,7 +99,7 @@ final public class AndrolibResources {
 		}
 
 		resTable.addPackage(pkg, true);
-		LOGGER.info("Loaded.");
+		LOGGER.info("加载完成.");
 		return pkg;
 	}
 
@@ -107,7 +107,7 @@ final public class AndrolibResources {
 			String frameTag) throws AndrolibException {
 		File apk = getFrameworkApk(id, frameTag);
 
-		LOGGER.info("Loading resource table from file: " + apk);
+		LOGGER.info("加载资源表: " + apk);
 		ResPackage[] pkgs = getResPackagesFromApk(new ExtFile(apk), resTable,
 				true);
 
@@ -123,7 +123,7 @@ final public class AndrolibResources {
 		}
 
 		resTable.addPackage(pkg, false);
-		LOGGER.info("Loaded.");
+		LOGGER.info("加载完成.");
 		return pkg;
 	}
 
@@ -145,7 +145,7 @@ final public class AndrolibResources {
 			inApk = apkFile.getDirectory();
 			out = new FileDirectory(outDir);
 
-			LOGGER.info("Decoding AndroidManifest.xml with only framework resources...");
+			LOGGER.info("使用框架资源反编译 AndroidManifest.xml...");
 			fileDecoder.decodeManifest(inApk, "AndroidManifest.xml", out,
 					"AndroidManifest.xml");
 
@@ -206,11 +206,11 @@ final public class AndrolibResources {
 		    ("android".equalsIgnoreCase(packageInfo.get("cur_package")) || 
 		        ("com.htc".equalsIgnoreCase(packageInfo.get("cur_package")))))) {
 
-			LOGGER.info("Regular manifest package...");
+			LOGGER.info("正常的 manifest 资源包...");
 		} else {
 			try {
 
-				LOGGER.info("Renamed manifest package found! Fixing...");
+				LOGGER.info("找到重命名的 manifest 资源包! 正在修复...");
 				DocumentBuilderFactory docFactory = DocumentBuilderFactory
 						.newInstance();
 				DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
@@ -307,7 +307,7 @@ final public class AndrolibResources {
 			inApk = apkFile.getDirectory();
 			out = new FileDirectory(outDir);
 
-			LOGGER.info("Decoding AndroidManifest.xml with resources...");
+			LOGGER.info("使用资源反编译 AndroidManifest.xml...");
 
 			fileDecoder.decodeManifest(inApk, "AndroidManifest.xml", out,
 					"AndroidManifest.xml");
@@ -332,17 +332,17 @@ final public class AndrolibResources {
 		for (ResPackage pkg : resTable.listMainPackages()) {
 			attrDecoder.setCurrentPackage(pkg);
 
-			LOGGER.info("Decoding file-resources...");
+			LOGGER.info("正在反编译 file-resources...");
 			for (ResResource res : pkg.listFiles()) {
 				fileDecoder.decode(res, in, out);
 			}
 
-			LOGGER.info("Decoding values */* XMLs...");
+			LOGGER.info("正在反编译 values */* XMLs...");
 			for (ResValuesFile valuesFile : pkg.listValuesFiles()) {
 				generateValuesFile(valuesFile, out, xmlSerializer);
 			}
 			generatePublicXml(pkg, out, xmlSerializer);
-			LOGGER.info("Done.");
+			LOGGER.info("反编译完成.");
 		}
 
 		AndrolibException decodeError = duo.m2.getFirstError();
@@ -397,7 +397,7 @@ final public class AndrolibResources {
                             + " being used as aapt location.");
                 }
             } else {
-                LOGGER.warning("aapt location could not be found. Defaulting back to default");
+                LOGGER.warning("本地 aapt 文件没有找到. 正在默认返回默认设置");
 
                 try {
                     cmd.add(getAaptBinaryFile().getAbsolutePath());
@@ -722,7 +722,7 @@ final public class AndrolibResources {
 
             out.closeArchiveEntry();
             zip.close();
-            LOGGER.info("Framework installed to: " + outFile);
+            LOGGER.info("安装框架到: " + outFile);
         } catch (ZipException ex) {
             throw new AndrolibException(ex);
         } catch (IOException ex) {
