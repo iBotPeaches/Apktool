@@ -178,6 +178,7 @@ public class Androlib {
                     }
                 }
             }
+            apkZipFile.close();
         }
         catch (DirectoryException ex) {
             throw new AndrolibException(ex);
