@@ -576,7 +576,7 @@ public class Androlib {
     public void insertFile(FileSystem zipfs, File insert, String method, Path root)
             throws AndrolibException, IOException {
         Path zipRoot = zipfs.getPath(zipfs.getSeparator());
-        Path zipPath = zipfs.getPath(zipRoot + insert.getAbsolutePath().replace(root.toString(),""));
+        Path zipPath = zipfs.getPath(zipRoot.toString() + insert.getAbsolutePath().replace(root.toString(),""));
         Path tmp = zipPath.normalize().getParent();
 
         if (!Files.isDirectory(tmp, LinkOption.NOFOLLOW_LINKS)) {
