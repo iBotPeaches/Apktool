@@ -551,7 +551,10 @@ public class Androlib {
                 zip_properties.put("encoding", "UTF-8");
 
                 // create filesystem
-                URI apkFileSystem = URI.create("jar:file:" + outFile.getAbsolutePath());
+                // convert the filename to a URI
+		Path path = Paths.get(outFile.getAbsolutePath());
+		URI apkFileSystem = URI.create("jar:file:" + path.toUri().getPath());
+                //URI apkFileSystem = URI.create("jar:file:" + outFile.getAbsolutePath());
                 try(FileSystem zipFS = FileSystems.newFileSystem(apkFileSystem, zip_properties)) {
 
                     // loop through files inside
