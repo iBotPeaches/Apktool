@@ -551,7 +551,8 @@ public class Androlib {
                 zip_properties.put("encoding", "UTF-8");
 
                 // create filesystem
-                URI apkFileSystem = URI.create("jar:file:" + outFile.getAbsolutePath());
+                Path path = Paths.get(outFile.getAbsolutePath());
+                URI apkFileSystem = URI.create("jar:file:" + path.toUri().getPath());
                 try(FileSystem zipFS = FileSystems.newFileSystem(apkFileSystem, zip_properties)) {
 
                     // loop through files inside
@@ -575,7 +576,7 @@ public class Androlib {
     public void insertFile(FileSystem zipfs, File insert, String method, Path root)
             throws AndrolibException, IOException {
         Path zipRoot = zipfs.getPath(zipfs.getSeparator());
-        Path zipPath = zipfs.getPath(zipRoot + insert.getAbsolutePath().replace(root.toString(),""));
+        Path zipPath = zipfs.getPath(zipRoot.toString() + insert.getAbsolutePath().replace(root.toString(),""));
         Path tmp = zipPath.normalize().getParent();
 
         if (!Files.isDirectory(tmp, LinkOption.NOFOLLOW_LINKS)) {
