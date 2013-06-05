@@ -7,4 +7,5 @@
     <style name="TextAppearance.EditEvent_Button" parent="@style/TextAppearance.EditEvent_Label">
         <item name="android:textColor">#ff777777</item>
     </style>
+    <style name="Foo.Bar" parent=""/>
 </resources>

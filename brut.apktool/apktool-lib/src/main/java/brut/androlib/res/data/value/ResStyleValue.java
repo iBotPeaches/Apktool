@@ -47,7 +47,9 @@ public class ResStyleValue extends ResBagValue implements
 		serializer.attribute(null, "name", res.getResSpec().getName());
 		if (!mParent.isNull()) {
 			serializer.attribute(null, "parent", mParent.encodeAsResXmlAttr());
-		}
+		} else if (res.getResSpec().getName().indexOf('.') != -1) {
+            serializer.attribute(null, "parent", "");
+        }
 		for (int i = 0; i < mItems.length; i++) {
 			ResResSpec spec = mItems[i].m1.getReferent();
 
