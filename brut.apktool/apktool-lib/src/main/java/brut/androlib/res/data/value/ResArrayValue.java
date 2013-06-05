@@ -49,11 +49,9 @@ public class ResArrayValue extends ResBagValue implements
 			ResResource res) throws IOException, AndrolibException {
 		String type = getType();
 		type = (type == null ? "" : type + "-") + "array";
-		// reference array (04 10 2012, BurgerZ)
 		if ("reference-array".equals(type)) {
 			type = "string-array";
 		}
-		// reference array (04 10 2012, BurgerZ)
 		serializer.startTag(null, type);
 		serializer.attribute(null, "name", res.getResSpec().getName());
 		for (int i = 0; i < mItems.length; i++) {
