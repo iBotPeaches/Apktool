@@ -50,7 +50,6 @@ public class ResReferenceValue extends ResIntValue {
 
 		// generate the beginning to fix @android
 		String mStart = (mTheme ? '?' : '@') + (newId ? "+" : "");
-		// mStart = mStart.replace("@android", "@*android");
 
 		return mStart
 				+ spec.getFullName(mPackage, mTheme
