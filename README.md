@@ -27,7 +27,7 @@ gradlew.bat fatJar
 gradlew.bat fatJar proguard
 
 # for Linux user
-export JAVA_TOOL_OPTIONS=-Dfile.encoding=utf-8 -Duser.language=en -Duser.country=US
+export JAVA_TOOL_OPTIONS=-Dfile.encoding=utf-8
 
 ./gradlew fatJar
 或者
