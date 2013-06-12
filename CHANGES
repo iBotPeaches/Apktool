@@ -17,6 +17,7 @@ v2.0.0 (TBA)
 -Fixed (issue #396) - Correctly handle android:debuggable while in debug mode.
 -Fixed (issue #340) - Fixed superclass errors on debug mode.
 -Fixed (issue #458) - Fixed pkg id not being correctly set in framework files.
+-Fixed (issue #469) - Added (-m / --match-original)
 -Updated known bytes for configurations to 38 (from addition of layout direction)
 -Fixed NPE when handling odex apks even with --no-src specified. (Thanks Rodrigo Chiossi)
 
