@@ -182,8 +182,7 @@ final public class AndrolibResources {
 			StreamResult result = new StreamResult(new File(filePath));
 			transformer.transform(source, result);
 
-        } catch (SAXException | ParserConfigurationException | IOException | TransformerException ex) {
-            throw new AndrolibException(ex);
+        } catch (SAXException | ParserConfigurationException | IOException | TransformerException ignored) {
         }
     }
 
@@ -226,8 +225,7 @@ final public class AndrolibResources {
 				StreamResult result = new StreamResult(new File(filePath));
 				transformer.transform(source, result);
 
-            } catch (SAXException | ParserConfigurationException | IOException | TransformerException ex) {
-                throw new AndrolibException(ex);
+            } catch (SAXException | ParserConfigurationException | IOException | TransformerException ignored) {
             }
         }
 	}
@@ -268,8 +266,7 @@ final public class AndrolibResources {
                 StreamResult result = new StreamResult(new File(filePath));
                 transformer.transform(source, result);
 
-            } catch (SAXException | ParserConfigurationException | IOException | TransformerException ex) {
-                throw new AndrolibException(ex);
+            } catch (SAXException | ParserConfigurationException | IOException | TransformerException ignored) {
             }
         }
     }
