@@ -1,7 +1,11 @@
 # Apktool #
 http://code.google.com/p/android-apktool/
 
+Requires Java 1.7.x
+
+
 Links
+- How to Build https://code.google.com/p/android-apktool/wiki/BuildApktool
 - Wiki http://code.google.com/p/android-apktool/w/list
 - Bug Reports http://code.google.com/p/android-apktool/issues/list
 - Changelog/Information http://code.google.com/p/android-apktool/wiki/Changelog
