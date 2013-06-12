@@ -34,6 +34,7 @@ public class ResTable {
 	private final Set<ResPackage> mFramePackages = new LinkedHashSet<ResPackage>();
 
 	private String mFrameTag;
+    private boolean mAnalysisMode = false;
 
 	private Map<String, String> mSdkInfo = new LinkedHashMap<String, String>();
 	private Map<String, String> mPackageInfo = new LinkedHashMap<String, String>();
@@ -121,6 +122,10 @@ public class ResTable {
 	public void setFrameTag(String tag) {
 		mFrameTag = tag;
 	}
+
+    public void setAnalysisMode(boolean mode) {
+        mAnalysisMode = mode;
+    }
 	
 	public void clearSdkInfo() {
 	  mSdkInfo.clear();
@@ -153,6 +158,10 @@ public class ResTable {
 	public Map<String, String> getSdkInfo() {
 	  return mSdkInfo;
 	}
+
+    public boolean getAnalysisMode() {
+        return mAnalysisMode;
+    }
 
     public Map<String, String> getUnknownFiles() {
         return mUnknownFiles;

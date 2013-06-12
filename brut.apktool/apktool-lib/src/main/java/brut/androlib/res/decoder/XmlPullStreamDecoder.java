@@ -132,7 +132,11 @@ public class XmlPullStreamDecoder implements ResStreamDecoder {
 							}
 						}
 					}
-					return true;
+                    if (resTable.getAnalysisMode() == true) {
+                        return false;
+                    } else {
+                        return true;
+                    }
 				}
 			};
 
