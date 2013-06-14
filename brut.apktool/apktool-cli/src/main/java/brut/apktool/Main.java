@@ -141,6 +141,9 @@ public class Main {
         if (cli.hasOption("p") || cli.hasOption("frame-path")) {
             decoder.setFrameworkDir(cli.getOptionValue("p"));
         }
+        if (cli.hasOption("m") || cli.hasOption("match-original")) {
+            decoder.setAnalysisMode(true, false);
+        }
         if (cli.hasOption("o") || cli.hasOption("output")) {
             decoder.setOutDir(new File(cli.getOptionValue("o")));
         } else {
@@ -282,6 +285,10 @@ public class Main {
                         + "       更多信息，请参阅项目主页.")
                 .create("d");
 
+        Option analysisOption = OptionBuilder.withLongOpt("-match-original")
+                .withDescription("Keeps files to closest to original as possible. Prevents rebuild.")
+                .create("m");
+
         Option debugLinePrefix = OptionBuilder.withLongOpt("debug-line-prefix")
                 .withDescription("使用反编译调试模式时Smali line 前缀.\n"
                         + "       默认 \"a=0;// \".")
@@ -372,6 +379,7 @@ public class Main {
             DecodeOptions.addOption(debugDecOption);
             DecodeOptions.addOption(noDbgOption);
             DecodeOptions.addOption(keepResOption);
+            DecodeOptions.addOption(analysisOption);
 
             BuildOptions.addOption(debugBuiOption);
             BuildOptions.addOption(aaptOption);
@@ -412,6 +420,7 @@ public class Main {
         for (Object op : frameOptions.getOptions()) {
             allOptions.addOption((Option)op);
         }
+        allOptions.addOption(analysisOption);
         allOptions.addOption(debugLinePrefix);
         allOptions.addOption(debugDecOption);
         allOptions.addOption(noDbgOption);

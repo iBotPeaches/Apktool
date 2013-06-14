@@ -17,7 +17,7 @@
 apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'license'
-ext.apktoolversion = '2.0.0-Beta1'
+ext.apktoolversion = '2.0.0-Beta2'
 ext.fullrev = '';
 ext.gitrev_version = '';
 

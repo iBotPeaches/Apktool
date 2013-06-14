@@ -65,6 +65,7 @@ public class ApkDecoder {
 
 	public void decode() throws AndrolibException, IOException {
 		File outDir = getOutDir();
+        setAnalysisMode(mAnalysisMode, true);
 
 		if (!mForceDelete && outDir.exists()) {
 			throw new OutDirExistsException();
@@ -156,6 +157,18 @@ public class ApkDecoder {
 	public void setDebugMode(boolean debug) {
 		mDebug = debug;
 	}
+
+    public void setAnalysisMode(boolean mode, boolean pass) throws AndrolibException{
+        mAnalysisMode = mode;
+
+        // only set mResTable, once it exists
+        if (pass) {
+            if (mResTable == null) {
+                mResTable = getResTable();
+            }
+            mResTable.setAnalysisMode(mode);
+        }
+    }
 
     public void setDebugLinePrefix(String debugLinePrefix) {
         mDebugLinePrefix = debugLinePrefix;
@@ -339,4 +352,5 @@ public class ApkDecoder {
 	private String mFrameworkDir = null;
 	private boolean mBakDeb = true;
 	private boolean mCompressResources = false;
+    private boolean mAnalysisMode = false;
 }

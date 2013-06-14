@@ -37,10 +37,7 @@ import java.io.IOException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
@@ -179,12 +176,13 @@ final public class AndrolibResources {
 			TransformerFactory transformerFactory = TransformerFactory
 					.newInstance();
 			Transformer transformer = transformerFactory.newTransformer();
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty(OutputKeys.STANDALONE,"yes");
 			DOMSource source = new DOMSource(doc);
 			StreamResult result = new StreamResult(new File(filePath));
 			transformer.transform(source, result);
 
-        } catch (SAXException | ParserConfigurationException | IOException | TransformerException ex) {
-            throw new AndrolibException(ex);
+        } catch (SAXException | ParserConfigurationException | IOException | TransformerException ignored) {
         }
     }
 
@@ -221,12 +219,13 @@ final public class AndrolibResources {
 				TransformerFactory transformerFactory = TransformerFactory
 						.newInstance();
 				Transformer transformer = transformerFactory.newTransformer();
-				DOMSource source = new DOMSource(doc);
+                transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+                transformer.setOutputProperty(OutputKeys.STANDALONE,"yes");
+                DOMSource source = new DOMSource(doc);
 				StreamResult result = new StreamResult(new File(filePath));
 				transformer.transform(source, result);
 
-            } catch (SAXException | ParserConfigurationException | IOException | TransformerException ex) {
-                throw new AndrolibException(ex);
+            } catch (SAXException | ParserConfigurationException | IOException | TransformerException ignored) {
             }
         }
 	}
@@ -261,12 +260,13 @@ final public class AndrolibResources {
                 // save manifest
                 TransformerFactory transformerFactory = TransformerFactory.newInstance();
                 Transformer transformer = transformerFactory.newTransformer();
+                transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+                transformer.setOutputProperty(OutputKeys.STANDALONE,"yes");
                 DOMSource source = new DOMSource(doc);
                 StreamResult result = new StreamResult(new File(filePath));
                 transformer.transform(source, result);
 
-            } catch (SAXException | ParserConfigurationException | IOException | TransformerException ex) {
-                throw new AndrolibException(ex);
+            } catch (SAXException | ParserConfigurationException | IOException | TransformerException ignored) {
             }
         }
     }
@@ -295,8 +295,10 @@ final public class AndrolibResources {
 					+ File.separator + "AndroidManifest.xml");
 
             // Remove versionName / versionCode (aapt API 16)
-            remove_manifest_versions(outDir.getAbsolutePath()
-                    + File.separator + "/AndroidManifest.xml");
+            if (resTable.getAnalysisMode() == false) {
+                remove_manifest_versions(outDir.getAbsolutePath()
+                        + File.separator + "/AndroidManifest.xml");
+            }
 
 			if (inApk.containsDir("res")) {
 				in = inApk.getDir("res");
