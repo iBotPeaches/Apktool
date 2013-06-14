@@ -65,7 +65,6 @@ public class ApkDecoder {
 
 	public void decode() throws AndrolibException, IOException {
 		File outDir = getOutDir();
-        setAnalysisMode(mAnalysisMode, true);
 
 		if (!mForceDelete && outDir.exists()) {
 			throw new OutDirExistsException();
@@ -97,6 +96,7 @@ public class ApkDecoder {
 		}
 
 		if (hasResources()) {
+            setAnalysisMode(mAnalysisMode, true);
 			// read the resources.arsc checking for STORED vs DEFLATE
 			// compression
 			// this will determine whether we compress on rebuild or not.
