@@ -316,13 +316,13 @@ public class Main {
                 .create("t");
 
         Option frameDirOption = OptionBuilder.withLongOpt("frame-path")
-                .withDescription("Uses framework files located in <dir>.\n")
+                .withDescription("使用本地 <dir> 的框架文件.\n")
                 .hasArg(true)
                 .withArgName("dir")
                 .create("p");
 
         Option frameIfDirOption = OptionBuilder.withLongOpt("frame-path")
-                .withDescription("Stores framework files into <dir>.")
+                .withDescription("存储框架文件到 <dir>.")
                 .hasArg(true)
                 .withArgName("dir")
                 .create("p");

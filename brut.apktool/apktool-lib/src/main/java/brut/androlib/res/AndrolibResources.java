@@ -81,10 +81,10 @@ final public class AndrolibResources {
 			break;
 		case 2:
 			if (pkgs[0].getName().equals("android")) {
-				LOGGER.warning("Skipping \"android\" package group");
+				LOGGER.warning("正在略过 \"android\" 文件组");
 				pkg = pkgs[1];
 			} else if (pkgs[0].getName().equals("com.htc")) {
-				LOGGER.warning("Skipping \"htc\" package group");
+				LOGGER.warning("正在略过 \"htc\" 文件组");
 				pkg = pkgs[1];
 			}
 			break;
@@ -92,7 +92,7 @@ final public class AndrolibResources {
 
 		if (pkg == null) {
 			throw new AndrolibException(
-					"Arsc files with zero or multiple packages");
+					"文件包没有或含有多个Arsc 文件");
 		}
 
 		resTable.addPackage(pkg, true);
@@ -110,7 +110,7 @@ final public class AndrolibResources {
 
 		if (pkgs.length != 1) {
 			throw new AndrolibException(
-					"Arsc files with zero or multiple packages");
+					"文件包没有或含有多个Arsc 文件");
 		}
 
 		ResPackage pkg = pkgs[0];
@@ -312,7 +312,7 @@ final public class AndrolibResources {
 		for (ResPackage pkg : resTable.listMainPackages()) {
 			attrDecoder.setCurrentPackage(pkg);
 
-			LOGGER.info("正在反编译 file-resources...");
+			LOGGER.info("正在反编译 resources...");
 			for (ResResource res : pkg.listFiles()) {
 				fileDecoder.decode(res, in, out);
 			}
@@ -499,7 +499,7 @@ final public class AndrolibResources {
 					"res/values/public.xml")));
 		} catch (FileNotFoundException ex) {
 			throw new AndrolibException(
-					"Could not detect whether app is framework one", ex);
+					"无法检测应用程序是否是框架之一", ex);
 		}
 		it.next();
 		it.next();
@@ -575,10 +575,10 @@ final public class AndrolibResources {
 			serial.flush();
 			outStream.close();
 		} catch (IOException ex) {
-			throw new AndrolibException("Could not generate: "
+			throw new AndrolibException("无法生成: "
 					+ valuesFile.getPath(), ex);
 		} catch (DirectoryException ex) {
-			throw new AndrolibException("Could not generate: "
+			throw new AndrolibException("无法生成: "
 					+ valuesFile.getPath(), ex);
 		}
 	}
@@ -605,10 +605,10 @@ final public class AndrolibResources {
 			serial.flush();
 			outStream.close();
 		} catch (IOException ex) {
-			throw new AndrolibException("Could not generate public.xml file",
+			throw new AndrolibException("无法生成 public.xml 文件",
 					ex);
 		} catch (DirectoryException ex) {
-			throw new AndrolibException("Could not generate public.xml file",
+			throw new AndrolibException("无法生成 public.xml 文件",
 					ex);
 		}
 	}
@@ -621,7 +621,7 @@ final public class AndrolibResources {
 					false, keepBroken, resTable).getPackages();
 		} catch (DirectoryException ex) {
 			throw new AndrolibException(
-					"Could not load resources.arsc from file: " + apkFile, ex);
+					"无法从" + apkFile + "加载 resources.arsc", ex);
 		}
 	}
 
@@ -681,7 +681,7 @@ final public class AndrolibResources {
             ZipArchiveEntry entry = zip.getEntry("resources.arsc");
 
             if (entry == null) {
-                throw new AndrolibException("Can't find resources.arsc file");
+                throw new AndrolibException("无法找到 resources.arsc 文件");
             }
 
             in = zip.getInputStream(entry);
@@ -795,10 +795,10 @@ final public class AndrolibResources {
 		if (!dir.exists()) {
 			if (!dir.mkdirs()) {
 				if (sFrameworkFolder != null) {
-					System.out.println("Can't create Framework directory: "
+					System.out.println("无法创建框架目录: "
 							+ dir);
 				}
-				throw new AndrolibException("Can't create directory: " + dir);
+				throw new AndrolibException("无法创建目录: " + dir);
 			}
 		}
 		return dir;

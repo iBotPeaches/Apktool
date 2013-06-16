@@ -57,7 +57,7 @@ public class Androlib {
 			throws AndrolibException {
 		try {
 			Directory apk = apkFile.getDirectory();
-			LOGGER.info("正在复制 raw classes.dex 文件...");
+			LOGGER.info("正在复制原始 classes.dex 文件...");
 			apkFile.getDirectory().copyToDir(outDir, "classes.dex");
 		} catch (DirectoryException ex) {
 			throw new AndrolibException(ex);
@@ -87,7 +87,7 @@ public class Androlib {
 			throws AndrolibException {
 		try {
 			Directory apk = apkFile.getDirectory();
-			LOGGER.info("正在复制 raw manifest...");
+			LOGGER.info("正在复制原始 manifest...");
 			apkFile.getDirectory().copyToDir(outDir, APK_MANIFEST_FILENAMES);
 		} catch (DirectoryException ex) {
 			throw new AndrolibException(ex);
@@ -103,7 +103,7 @@ public class Androlib {
 			throws AndrolibException {
 		try {
 			// Directory apk = apkFile.getDirectory();
-			LOGGER.info("正在复制 raw resources...");
+			LOGGER.info("正在复制原始 resources...");
 			apkFile.getDirectory().copyToDir(outDir, APK_RESOURCES_FILENAMES);
 		} catch (DirectoryException ex) {
 			throw new AndrolibException(ex);
@@ -376,7 +376,7 @@ public class Androlib {
 			if (flags.get("forceBuildAll")
 					|| isModified(newFiles(APK_RESOURCES_FILENAMES, appDir),
 							newFiles(APK_RESOURCES_FILENAMES, apkDir))) {
-				LOGGER.info("正在复制 raw resources...");
+				LOGGER.info("正在复制原始 resources...");
 				appDir.getDirectory()
 						.copyToDir(apkDir, APK_RESOURCES_FILENAMES);
 			}
@@ -436,7 +436,7 @@ public class Androlib {
 			HashMap<String, Boolean> flags) throws AndrolibException {
 		try {
 			File apkDir = new File(appDir, APK_DIRNAME);
-			LOGGER.info("正在复制 raw AndroidManifest.xml...");
+			LOGGER.info("正在复制原始 AndroidManifest.xml...");
 			appDir.getDirectory().copyToDir(apkDir, APK_MANIFEST_FILENAMES);
 			return true;
 		} catch (DirectoryException ex) {
@@ -488,7 +488,7 @@ public class Androlib {
 		} catch (DirectoryException ex) {
 			throw new AndrolibException(ex);
 		} catch (AndrolibException ex) {
-			LOGGER.warning("Parse AndroidManifest.xml failed, treat it as raw file.");
+			LOGGER.warning("解析 AndroidManifest.xml 文件失败, 把它作为原始文件.");
 			return buildManifestRaw(appDir, flags);
 		}
 	}
