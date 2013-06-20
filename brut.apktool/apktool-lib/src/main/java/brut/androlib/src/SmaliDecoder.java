@@ -18,8 +18,10 @@ package brut.androlib.src;
 
 import brut.androlib.AndrolibException;
 import org.jf.baksmali.baksmali;
-import org.jf.dexlib.Code.Analysis.ClassPath;
-import org.jf.dexlib.DexFile;
+import org.jf.baksmali.baksmaliOptions;
+import org.jf.dexlib2.DexFileFactory;
+import org.jf.dexlib2.analysis.ClassPath;
+import org.jf.dexlib2.DexFileFactory;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -54,10 +56,24 @@ public class SmaliDecoder {
 	private void decode() throws AndrolibException {
 		try {
             ClassPath.dontLoadClassPath = mDebug;
-			baksmali.disassembleDexFile(mApkFile.getAbsolutePath(),
-					new DexFile(mApkFile), false, mOutDir.toAbsolutePath().toString(),
-					null, null, null, false, true, true, mBakDeb, false, false,
-                    mDebug ? org.jf.baksmali.main.DIFFPRE : 0, false, false, null, false);
+
+            baksmaliOptions options = new baksmaliOptions();
+
+            // options
+            options.deodex = false;
+            options.outputDirectory = mOutDir.toAbsolutePath().toString();
+            options.noParameterRegisters = false;
+            options.useLocalsDirective = true;
+            options.useSequentialLabels = true;
+            options.outputDebugInfo = mBakDeb;
+            options.addCodeOffsets = false;
+            options.noAccessorComments = false;
+            options.registerInfo = (mDebug ? baksmaliOptions.DIFFPRE : 0);
+            options.ignoreErrors = false;
+            options.inlineResolver = null;
+            options.checkPackagePrivateAccess = false;
+
+            baksmali.disassembleDexFile(DexFileFactory.loadDexFile(mApkFile, 0), options);
 
             if (mDebug) {
                 Files.walkFileTree(mOutDir, new SmaliFileVisitor());
