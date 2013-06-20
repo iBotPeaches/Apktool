@@ -49,6 +49,8 @@ public class baksmaliOptions {
     public static final int MERGE = 32;
     public static final int FULLMERGE = 64;
 
+    public static final int DIFFPRE = 128;
+
     public int apiLevel = 15;
     public String outputDirectory = "out";
     public List<String> bootClassPathDirs = Lists.newArrayList();

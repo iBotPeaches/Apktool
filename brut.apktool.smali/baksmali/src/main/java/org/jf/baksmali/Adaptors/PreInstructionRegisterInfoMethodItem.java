@@ -40,6 +40,8 @@ import java.io.IOException;
 import java.util.BitSet;
 
 public class PreInstructionRegisterInfoMethodItem extends MethodItem {
+    private static AnalyzedInstruction lastInstruction;
+
     private final int registerInfo;
     @Nonnull private final MethodAnalyzer methodAnalyzer;
     @Nonnull private final RegisterFormatter registerFormatter;
@@ -76,6 +78,9 @@ public class PreInstructionRegisterInfoMethodItem extends MethodItem {
             } else {
                 if ((registerInfo & baksmaliOptions.ARGS) != 0) {
                     addArgsRegs(registers);
+                }
+                if ((registerInfo & baksmaliOptions.DIFFPRE) != 0) {
+                    addDiffRegs(registers);
                 }
                 if ((registerInfo & baksmaliOptions.MERGE) != 0) {
                     if (analyzedInstruction.isBeginningInstruction()) {
@@ -142,6 +147,19 @@ public class PreInstructionRegisterInfoMethodItem extends MethodItem {
             OneRegisterInstruction instruction = (OneRegisterInstruction)analyzedInstruction.getInstruction();
             registers.set(instruction.getRegisterA());
         }
+    }
+
+    private void addDiffRegs(BitSet registers) {
+        if (! analyzedInstruction.isBeginningInstruction()) {
+            for (int i = 0; i < analyzedInstruction.getRegisterCount(); i++) {
+                if (lastInstruction.getPreInstructionRegisterType(i).category !=
+                        analyzedInstruction.getPreInstructionRegisterType(i).category) {
+                    registers.set(i);
+                }
+            }
+        }
+
+        lastInstruction = analyzedInstruction;
     }
 
     private void addMergeRegs(BitSet registers, int registerCount) {
