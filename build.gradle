@@ -37,6 +37,7 @@ build.doFirst {
     } 
 }
 
+
 class Compatibility {
   String version
   Compatibility(String versionValue) {
