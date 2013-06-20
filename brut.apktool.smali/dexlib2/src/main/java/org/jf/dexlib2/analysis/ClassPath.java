@@ -55,6 +55,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ClassPath {
+    public static boolean dontLoadClassPath = false;
+
     @Nonnull private final TypeProto unknownClass;
     @Nonnull private HashMap<String, ClassDef> availableClasses = Maps.newHashMap();
     private int api;
@@ -136,6 +138,10 @@ public class ClassPath {
 
     @Nonnull
     public ClassDef getClassDef(String type) {
+        if (dontLoadClassPath) {
+            return null;
+        }
+
         ClassDef ret = availableClasses.get(type);
         if (ret == null) {
             throw new UnresolvedClassException("Could not resolve class %s", type);

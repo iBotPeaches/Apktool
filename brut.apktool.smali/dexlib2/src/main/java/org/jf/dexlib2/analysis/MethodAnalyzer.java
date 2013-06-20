@@ -1162,7 +1162,7 @@ public class MethodAnalyzer {
         ThreeRegisterInstruction instruction = (ThreeRegisterInstruction)analyzedInstruction.instruction;
 
         RegisterType arrayRegisterType = analyzedInstruction.getPreInstructionRegisterType(instruction.getRegisterB());
-        if (arrayRegisterType.category != RegisterType.NULL) {
+        if (! ClassPath.dontLoadClassPath && arrayRegisterType.category != RegisterType.NULL) {
             if (arrayRegisterType.category != RegisterType.REFERENCE ||
                     !(arrayRegisterType.type instanceof ArrayProto)) {
                 throw new AnalysisException("aget-wide used with non-array register: %s", arrayRegisterType.toString());
@@ -1193,7 +1193,7 @@ public class MethodAnalyzer {
         ThreeRegisterInstruction instruction = (ThreeRegisterInstruction)analyzedInstruction.instruction;
 
         RegisterType arrayRegisterType = analyzedInstruction.getPreInstructionRegisterType(instruction.getRegisterB());
-        if (arrayRegisterType.category != RegisterType.NULL) {
+        if (! ClassPath.dontLoadClassPath && arrayRegisterType.category != RegisterType.NULL) {
             if (arrayRegisterType.category != RegisterType.REFERENCE ||
                     !(arrayRegisterType.type instanceof ArrayProto)) {
                 throw new AnalysisException("aget-object used with non-array register: %s",
