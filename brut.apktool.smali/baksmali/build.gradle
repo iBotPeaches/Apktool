@@ -34,8 +34,8 @@ configurations {
 }
 
 dependencies {
-    compile project(':util')
-    compile project(':dexlib2')
+    compile project(':brut.apktool.smali:util')
+    compile project(':brut.apktool.smali:dexlib2')
     compile depends.commons_cli
     compile depends.guava
 
@@ -56,7 +56,7 @@ jar {
     }
 
     doLast {
-        ant.symlink(link: file("${destinationDir}/baksmali.jar"), resource: archivePath, overwrite: true)
+        //ant.symlink(link: file("${destinationDir}/baksmali.jar"), resource: archivePath, overwrite: true)
     }
 }
 

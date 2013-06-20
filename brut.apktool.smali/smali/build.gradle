@@ -65,8 +65,8 @@ idea {
 }
 
 dependencies {
-    compile project(':util')
-    compile project(':dexlib2')
+    compile project(':brut.apktool.smali:util')
+    compile project(':brut.apktool.smali:dexlib2')
     compile depends.antlr_runtime
     compile depends.commons_cli
 
@@ -142,7 +142,7 @@ jar {
     }
 
     doLast {
-        ant.symlink(link: file("${destinationDir}/smali.jar"), resource: archivePath, overwrite: true)
+        // ant.symlink(link: file("${destinationDir}/smali.jar"), resource: archivePath, overwrite: true)
     }
 }
 

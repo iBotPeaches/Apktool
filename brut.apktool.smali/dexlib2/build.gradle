@@ -34,7 +34,7 @@ configurations {
 }
 
 dependencies {
-    compile project(':util')
+    compile project(':brut.apktool.smali:util')
     compile depends.findbugs
     compile depends.guava
 

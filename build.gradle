@@ -17,6 +17,7 @@
 apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'license'
+
 ext.apktoolversion = '2.0.0-Beta4'
 ext.fullrev = '';
 ext.gitrev_version = '';
@@ -69,9 +70,22 @@ subprojects {
   apply plugin: 'maven'
   apply plugin: 'idea'
   
+  ext {
+        depends = [guava: 'com.google.guava:guava:14.0',
+                   findbugs: 'com.google.code.findbugs:jsr305:1.3.9',
+                   junit: 'junit:junit:4.6',
+                   antlr_runtime: 'org.antlr:antlr-runtime:3.5',
+                   antlr: 'org.antlr:antlr:3.5',
+                   commons_cli: 'commons-cli:commons-cli:1.2',
+                   jflex: 'de.jflex:jflex:1.4.3',
+                   proguard: 'net.sf.proguard:proguard-base:4.8'
+         ]
+  }
+    
   repositories {
     mavenCentral()
   }
+  
   dependencies {
     testCompile 'junit:junit:4.8.2'
   }
