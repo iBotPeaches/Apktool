@@ -30,6 +30,7 @@ package org.jf.dexlib;
 
 import com.google.common.base.Preconditions;
 import org.jf.dexlib.Util.*;
+import org.jf.util.ExceptionWithContext;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

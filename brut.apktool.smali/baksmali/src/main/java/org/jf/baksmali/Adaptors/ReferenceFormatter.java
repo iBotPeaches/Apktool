@@ -28,52 +28,35 @@
 
 package org.jf.baksmali.Adaptors;
 
+import org.jf.dexlib2.ReferenceType;
+import org.jf.dexlib2.iface.reference.*;
+import org.jf.dexlib2.util.ReferenceUtil;
 import org.jf.util.IndentingWriter;
-import org.jf.dexlib.*;
-import org.jf.dexlib.Util.Utf8Utils;
+import org.jf.util.StringUtils;
 
 import java.io.IOException;
 
 public class ReferenceFormatter {
-    public static void writeReference(IndentingWriter writer, Item item) throws IOException {
-        switch (item.getItemType()) {
-            case TYPE_METHOD_ID_ITEM:
-                writeMethodReference(writer, (MethodIdItem)item);
+    public static void writeStringReference(IndentingWriter writer, String item) throws IOException {
+        writer.write('"');
+        StringUtils.writeEscapedString(writer, item);
+        writer.write('"');
+    }
+
+    public static void writeReference(IndentingWriter writer, int referenceType,
+                                      Reference reference) throws IOException {
+        switch (referenceType) {
+            case ReferenceType.STRING:
+                writeStringReference(writer, ((StringReference)reference).getString());
                 return;
-            case TYPE_FIELD_ID_ITEM:
-                writeFieldReference(writer, (FieldIdItem)item);
+            case ReferenceType.TYPE:
+                writer.write(((TypeReference)reference).getType());
                 return;
-            case TYPE_STRING_ID_ITEM:
-                writeStringReference(writer, (StringIdItem)item);
+            case ReferenceType.METHOD:
+                ReferenceUtil.writeMethodDescriptor(writer, (MethodReference)reference);
                 return;
-            case TYPE_TYPE_ID_ITEM:
-                writeTypeReference(writer, (TypeIdItem)item);
-                return;
+            case ReferenceType.FIELD:
+                ReferenceUtil.writeFieldDescriptor(writer, (FieldReference)reference);
         }
-    }
-
-    public static void writeMethodReference(IndentingWriter writer, MethodIdItem item) throws IOException {
-        writer.write(item.getContainingClass().getTypeDescriptor());
-        writer.write("->");
-        writer.write(item.getMethodName().getStringValue());
-        writer.write(item.getPrototype().getPrototypeString());
-    }
-
-    public static void writeFieldReference(IndentingWriter writer, FieldIdItem item) throws IOException {
-        writer.write(item.getContainingClass().getTypeDescriptor());
-        writer.write("->");
-        writer.write(item.getFieldName().getStringValue());
-        writer.write(':');
-        writer.write(item.getFieldType().getTypeDescriptor());
-    }
-
-    public static void writeStringReference(IndentingWriter writer, StringIdItem item) throws IOException {
-        writer.write('"');
-        Utf8Utils.writeEscapedString(writer, item.getStringValue());
-        writer.write('"');
-    }
-
-    public static void writeTypeReference(IndentingWriter writer, TypeIdItem item) throws IOException {
-        writer.write(item.getTypeDescriptor());
     }
 }

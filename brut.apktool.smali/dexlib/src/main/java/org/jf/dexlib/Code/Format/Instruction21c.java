@@ -100,11 +100,7 @@ public class Instruction21c extends InstructionWithReference implements SingleRe
             return null;
         }
 
-        if (jumboOpcode.format == Format.Format31c) {
-            return new Instruction31c(jumboOpcode, (short)getRegisterA(), getReferencedItem());
-        }
-
-        return new Instruction41c(jumboOpcode, getRegisterA(), getReferencedItem());
+        return new Instruction31c(jumboOpcode, (short)getRegisterA(), getReferencedItem());
     }
 
     private static class Factory implements Instruction.InstructionFactory {

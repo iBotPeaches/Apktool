@@ -30,7 +30,7 @@ package org.jf.dexlib;
 
 import org.jf.dexlib.Util.AnnotatedOutput;
 import org.jf.dexlib.Util.Input;
-import org.jf.dexlib.Util.Utf8Utils;
+import org.jf.util.StringUtils;
 
 import javax.annotation.Nullable;
 
@@ -118,7 +118,7 @@ public class StringIdItem extends Item<StringIdItem> {
 
     /** {@inheritDoc} */
     public String getConciseIdentity() {
-        return "string_id_item: " + Utf8Utils.escapeString(getStringValue());
+        return "string_id_item: " + StringUtils.escapeString(getStringValue());
     }
 
     /** {@inheritDoc} */

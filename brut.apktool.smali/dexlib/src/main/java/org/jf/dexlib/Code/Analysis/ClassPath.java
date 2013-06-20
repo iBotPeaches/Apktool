@@ -30,7 +30,7 @@ package org.jf.dexlib.Code.Analysis;
 
 import org.jf.dexlib.*;
 import org.jf.dexlib.Util.AccessFlags;
-import org.jf.dexlib.Util.ExceptionWithContext;
+import org.jf.util.ExceptionWithContext;
 import org.jf.dexlib.Util.SparseArray;
 
 import javax.annotation.Nonnull;
@@ -44,8 +44,6 @@ import static org.jf.dexlib.ClassDataItem.EncodedField;
 import static org.jf.dexlib.ClassDataItem.EncodedMethod;
 
 public class ClassPath {
-    public static boolean dontLoadClassPath = false;
-
     private static ClassPath theClassPath = null;
 
     /**
@@ -263,10 +261,6 @@ public class ClassPath {
 
     @Nonnull
     public static ClassDef getClassDef(String classType, boolean createUnresolvedClassDef)  {
-        if (dontLoadClassPath) {
-            return null;
-        }
-
         ClassDef classDef = theClassPath.classDefs.get(classType);
         if (classDef == null) {
             //if it's an array class, try to create it
@@ -543,7 +537,7 @@ public class ClassPath {
         }
 
         public ClassDef getSuperclass() {
-            return theClassPath.javaLangObjectClassDef;
+            throw unresolvedValidationException();
         }
 
         public int getClassDepth() {
@@ -599,10 +593,6 @@ public class ClassPath {
 
         private final int classDepth;
 
-        // classes can only be public or package-private. Internally, any private/protected inner class is actually
-        // package-private.
-        private final boolean isPublic;
-
         private final VirtualMethod[] vtable;
 
         //this maps a method name of the form method(III)Ljava/lang/String; to an integer
@@ -645,7 +635,6 @@ public class ClassPath {
                 implementedInterfaces.add(ClassPath.getClassDef("Ljava/lang/Cloneable;"));
                 implementedInterfaces.add(ClassPath.getClassDef("Ljava/io/Serializable;"));
                 isInterface = false;
-                isPublic = true;
 
                 vtable = superclass.vtable;
                 methodLookup = superclass.methodLookup;
@@ -663,7 +652,6 @@ public class ClassPath {
                 this.superclass = null;
                 implementedInterfaces = null;
                 isInterface = false;
-                isPublic = true;
                 vtable = null;
                 methodLookup = null;
                 instanceFields = null;
@@ -677,7 +665,6 @@ public class ClassPath {
                 this.superclass = ClassPath.getClassDef("Ljava/lang/Object;");
                 implementedInterfaces = new TreeSet<ClassDef>();
                 isInterface = false;
-                isPublic = true;
 
                 vtable = superclass.vtable;
                 methodLookup = superclass.methodLookup;
@@ -692,7 +679,6 @@ public class ClassPath {
 
         protected ClassDef(UnresolvedClassInfo classInfo)  {
             classType = classInfo.classType;
-            isPublic = classInfo.isPublic;
             isInterface = classInfo.isInterface;
 
             superclass = loadSuperclass(classInfo);
@@ -738,16 +724,20 @@ public class ClassPath {
             return superclass;
         }
 
+        VirtualMethod[] getVtable() {
+            return vtable;
+        }
+
+        SparseArray<FieldDef> getInstanceFields() {
+            return instanceFields;
+        }
+
         public int getClassDepth() {
             return classDepth;
         }
 
         public boolean isInterface() {
             return this.isInterface;
-        }
-
-        public boolean isPublic() {
-            return this.isPublic;
         }
 
         public boolean extendsClass(ClassDef superclassDef) {
@@ -1225,7 +1215,7 @@ public class ClassPath {
         }
     }
 
-    private static class VirtualMethod {
+    static class VirtualMethod {
         public String containingClass;
         public String method;
         public boolean isPackagePrivate;
@@ -1238,7 +1228,6 @@ public class ClassPath {
     private static class UnresolvedClassInfo {
         public final String dexFilePath;
         public final String classType;
-        public final boolean isPublic;
         public final boolean isInterface;
         public final String superclassType;
         public final String[] interfaces;
@@ -1252,7 +1241,6 @@ public class ClassPath {
 
             classType = classDefItem.getClassType().getTypeDescriptor();
 
-            isPublic = (classDefItem.getAccessFlags() & AccessFlags.PUBLIC.getValue()) != 0;
             isInterface = (classDefItem.getAccessFlags() & AccessFlags.INTERFACE.getValue()) != 0;
 
             TypeIdItem superclassType = classDefItem.getSuperclass();

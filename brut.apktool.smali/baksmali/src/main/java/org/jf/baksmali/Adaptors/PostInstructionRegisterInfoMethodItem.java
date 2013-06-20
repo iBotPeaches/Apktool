@@ -28,26 +28,25 @@
 
 package org.jf.baksmali.Adaptors;
 
+import org.jf.baksmali.baksmaliOptions;
+import org.jf.dexlib2.analysis.AnalyzedInstruction;
+import org.jf.dexlib2.analysis.RegisterType;
 import org.jf.util.IndentingWriter;
-import org.jf.baksmali.baksmali;
-import org.jf.baksmali.main;
-import org.jf.dexlib.ClassDataItem;
-import org.jf.dexlib.Code.Analysis.AnalyzedInstruction;
-import org.jf.dexlib.Code.Analysis.MethodAnalyzer;
-import org.jf.dexlib.Code.Analysis.RegisterType;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.BitSet;
 
 public class PostInstructionRegisterInfoMethodItem extends MethodItem {
-    private final AnalyzedInstruction analyzedInstruction;
-    private final MethodAnalyzer methodAnalyzer;
+    @Nonnull private final RegisterFormatter registerFormatter;
+    @Nonnull private final AnalyzedInstruction analyzedInstruction;
 
-    public PostInstructionRegisterInfoMethodItem(AnalyzedInstruction analyzedInstruction, MethodAnalyzer methodAnalyzer,
-                                                int codeAddress) {
+    public PostInstructionRegisterInfoMethodItem(@Nonnull RegisterFormatter registerFormatter,
+                                                 @Nonnull AnalyzedInstruction analyzedInstruction,
+                                                 int codeAddress) {
         super(codeAddress);
+        this.registerFormatter = registerFormatter;
         this.analyzedInstruction = analyzedInstruction;
-        this.methodAnalyzer = methodAnalyzer;
     }
 
     @Override
@@ -57,16 +56,16 @@ public class PostInstructionRegisterInfoMethodItem extends MethodItem {
 
     @Override
     public boolean writeTo(IndentingWriter writer) throws IOException {
-        int registerInfo = baksmali.registerInfo;
+        int registerInfo = registerFormatter.options.registerInfo;
         int registerCount = analyzedInstruction.getRegisterCount();
         BitSet registers = new BitSet(registerCount);
 
-        if ((registerInfo & main.ALL) != 0) {
+        if ((registerInfo & baksmaliOptions.ALL) != 0) {
             registers.set(0, registerCount);
         } else {
-            if ((registerInfo & main.ALLPOST) != 0) {
+            if ((registerInfo & baksmaliOptions.ALLPOST) != 0) {
                 registers.set(0, registerCount);
-            } else if ((registerInfo & main.DEST) != 0) {
+            } else if ((registerInfo & baksmaliOptions.DEST) != 0) {
                 addDestRegs(registers, registerCount);
             }
         }
@@ -76,16 +75,14 @@ public class PostInstructionRegisterInfoMethodItem extends MethodItem {
 
     private void addDestRegs(BitSet printPostRegister, int registerCount) {
         for (int registerNum=0; registerNum<registerCount; registerNum++) {
-            if (analyzedInstruction.getPreInstructionRegisterType(registerNum) !=
-                    analyzedInstruction.getPostInstructionRegisterType(registerNum)) {
+            if (!analyzedInstruction.getPreInstructionRegisterType(registerNum).equals(
+                    analyzedInstruction.getPostInstructionRegisterType(registerNum))) {
                 printPostRegister.set(registerNum);
             }
         }
     }
 
     private boolean writeRegisterInfo(IndentingWriter writer, BitSet registers) throws IOException {
-        ClassDataItem.EncodedMethod encodedMethod = methodAnalyzer.getMethod();
-
         int registerNum = registers.nextSetBit(0);
         if (registerNum < 0) {
             return false;
@@ -93,17 +90,11 @@ public class PostInstructionRegisterInfoMethodItem extends MethodItem {
 
         writer.write('#');
         for (; registerNum >= 0; registerNum = registers.nextSetBit(registerNum + 1)) {
-
             RegisterType registerType = analyzedInstruction.getPostInstructionRegisterType(registerNum);
 
-            RegisterFormatter.writeTo(writer, encodedMethod.codeItem, registerNum);
+            registerFormatter.writeTo(writer, registerNum);
             writer.write('=');
-
-            if (registerType == null) {
-                writer.write("null");
-            } else {
-                registerType.writeTo(writer);
-            }
+            registerType.writeTo(writer);
             writer.write(';');
         }
         return true;

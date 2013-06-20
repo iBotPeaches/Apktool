@@ -29,40 +29,39 @@
 package org.jf.baksmali.Adaptors;
 
 import org.jf.baksmali.Adaptors.EncodedValue.EncodedValueAdaptor;
+import org.jf.dexlib2.AccessFlags;
+import org.jf.dexlib2.iface.Annotation;
+import org.jf.dexlib2.iface.Field;
+import org.jf.dexlib2.iface.value.EncodedValue;
+import org.jf.dexlib2.util.EncodedValueUtils;
 import org.jf.util.IndentingWriter;
-import org.jf.dexlib.AnnotationSetItem;
-import org.jf.dexlib.ClassDataItem;
-import org.jf.dexlib.EncodedValue.EncodedValue;
-import org.jf.dexlib.EncodedValue.NullEncodedValue;
-import org.jf.dexlib.Util.AccessFlags;
 
 import java.io.IOException;
+import java.util.Collection;
 
 public class FieldDefinition {
-    public static void writeTo(IndentingWriter writer, ClassDataItem.EncodedField encodedField,
-                                                EncodedValue initialValue, AnnotationSetItem annotationSet,
-                                                boolean setInStaticConstructor) throws IOException {
-
-        String fieldTypeDescriptor = encodedField.field.getFieldType().getTypeDescriptor();
+    public static void writeTo(IndentingWriter writer, Field field, boolean setInStaticConstructor) throws IOException {
+        EncodedValue initialValue = field.getInitialValue();
+        int accessFlags = field.getAccessFlags();
 
         if (setInStaticConstructor &&
-            encodedField.isStatic() &&
-            (encodedField.accessFlags & AccessFlags.FINAL.getValue()) != 0 &&
-            initialValue != null &&
-            (
-                //it's a primitive type, or it's an array/reference type and the initial value isn't null
-                fieldTypeDescriptor.length() == 1 ||
-                initialValue != NullEncodedValue.NullValue
-            )) {
-
-            writer.write("#the value of this static final field might be set in the static constructor\n");
+                AccessFlags.STATIC.isSet(accessFlags) &&
+                AccessFlags.FINAL.isSet(accessFlags) &&
+                initialValue != null) {
+            if (!EncodedValueUtils.isDefaultValue(initialValue)) {
+                writer.write("# The value of this static final field might be set in the static constructor\n");
+            } else {
+                // don't write out the default initial value for static final fields that get set in the static
+                // constructor
+                initialValue = null;
+            }
         }
 
         writer.write(".field ");
-        writeAccessFlags(writer, encodedField);
-        writer.write(encodedField.field.getFieldName().getStringValue());
+        writeAccessFlags(writer, field.getAccessFlags());
+        writer.write(field.getName());
         writer.write(':');
-        writer.write(encodedField.field.getFieldType().getTypeDescriptor());
+        writer.write(field.getType());
         if (initialValue != null) {
             writer.write(" = ");
             EncodedValueAdaptor.writeTo(writer, initialValue);
@@ -70,17 +69,17 @@ public class FieldDefinition {
 
         writer.write('\n');
 
-        if (annotationSet != null) {
+        Collection<? extends Annotation> annotations = field.getAnnotations();
+        if (annotations.size() > 0) {
             writer.indent(4);
-            AnnotationFormatter.writeTo(writer, annotationSet);
+            AnnotationFormatter.writeTo(writer, annotations);
             writer.deindent(4);
             writer.write(".end field\n");
         }
     }
 
-    private static void writeAccessFlags(IndentingWriter writer, ClassDataItem.EncodedField encodedField)
-                                                                                                 throws IOException {
-        for (AccessFlags accessFlag: AccessFlags.getAccessFlagsForField(encodedField.accessFlags)) {
+    private static void writeAccessFlags(IndentingWriter writer, int accessFlags) throws IOException {
+        for (AccessFlags accessFlag: AccessFlags.getAccessFlagsForField(accessFlags)) {
             writer.write(accessFlag.toString());
             writer.write(' ');
         }

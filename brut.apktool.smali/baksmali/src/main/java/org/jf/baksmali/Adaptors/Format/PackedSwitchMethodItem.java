@@ -30,55 +30,56 @@ package org.jf.baksmali.Adaptors.Format;
 
 import org.jf.baksmali.Adaptors.LabelMethodItem;
 import org.jf.baksmali.Adaptors.MethodDefinition;
+import org.jf.dexlib2.iface.instruction.SwitchElement;
+import org.jf.dexlib2.iface.instruction.formats.PackedSwitchPayload;
 import org.jf.util.IndentingWriter;
 import org.jf.baksmali.Renderers.IntegerRenderer;
-import org.jf.dexlib.Code.Format.PackedSwitchDataPseudoInstruction;
-import org.jf.dexlib.CodeItem;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
-public class PackedSwitchMethodItem extends InstructionMethodItem<PackedSwitchDataPseudoInstruction> {
+public class PackedSwitchMethodItem extends InstructionMethodItem<PackedSwitchPayload> {
     private final List<PackedSwitchTarget> targets;
+    private final int firstKey;
 
-    public PackedSwitchMethodItem(MethodDefinition methodDefinition, CodeItem codeItem, int codeAddress,
-                                  PackedSwitchDataPseudoInstruction instruction) {
-        super(codeItem, codeAddress, instruction);
+    public PackedSwitchMethodItem(MethodDefinition methodDef, int codeAddress, PackedSwitchPayload instruction) {
+        super(methodDef, codeAddress, instruction);
 
-        int baseCodeAddress = methodDefinition.getPackedSwitchBaseAddress(codeAddress);
+        int baseCodeAddress = methodDef.getPackedSwitchBaseAddress(codeAddress);
 
         targets = new ArrayList<PackedSwitchTarget>();
-        Iterator<PackedSwitchDataPseudoInstruction.PackedSwitchTarget> iterator = instruction.iterateKeysAndTargets();
 
+        boolean first = true;
+        //TODO: does dalvik allow switc payloads with no cases?
+        int firstKey = 0;
         if (baseCodeAddress >= 0) {
-            while (iterator.hasNext()) {
-                PackedSwitchDataPseudoInstruction.PackedSwitchTarget target = iterator.next();
-                PackedSwitchLabelTarget packedSwitchLabelTarget = new PackedSwitchLabelTarget();
-
-
-                LabelMethodItem label = new LabelMethodItem(baseCodeAddress + target.targetAddressOffset, "pswitch_");
-                label = methodDefinition.getLabelCache().internLabel(label);
-                packedSwitchLabelTarget.Target = label;
-                targets.add(packedSwitchLabelTarget);
+            for (SwitchElement switchElement: instruction.getSwitchElements()) {
+                if (first) {
+                    firstKey = switchElement.getKey();
+                    first = false;
+                }
+                LabelMethodItem label = methodDef.getLabelCache().internLabel(
+                        new LabelMethodItem(methodDef.classDef.options, baseCodeAddress + switchElement.getOffset(),
+                                "pswitch_"));
+                targets.add(new PackedSwitchLabelTarget(label));
             }
         } else {
-            while (iterator.hasNext()) {
-                PackedSwitchDataPseudoInstruction.PackedSwitchTarget target = iterator.next();
-                PackedSwitchOffsetTarget packedSwitchOffsetTarget = new PackedSwitchOffsetTarget();
-
-
-                packedSwitchOffsetTarget.Target = target.targetAddressOffset;
-                targets.add(packedSwitchOffsetTarget);
+            for (SwitchElement switchElement: instruction.getSwitchElements()) {
+                if (first) {
+                    firstKey = switchElement.getKey();
+                    first = false;
+                }
+                targets.add(new PackedSwitchOffsetTarget(switchElement.getOffset()));
             }
         }
+        this.firstKey = firstKey;
     }
 
     @Override
     public boolean writeTo(IndentingWriter writer) throws IOException {
         writer.write(".packed-switch ");
-        IntegerRenderer.writeTo(writer, instruction.getFirstKey());
+        IntegerRenderer.writeTo(writer, firstKey);
         writer.indent(4);
         writer.write('\n');
         for (PackedSwitchTarget target: targets) {
@@ -95,19 +96,25 @@ public class PackedSwitchMethodItem extends InstructionMethodItem<PackedSwitchDa
     }
 
     private static class PackedSwitchLabelTarget extends PackedSwitchTarget {
-        public LabelMethodItem Target;
+        private final LabelMethodItem target;
+        public PackedSwitchLabelTarget(LabelMethodItem target) {
+            this.target = target;
+        }
         public void writeTargetTo(IndentingWriter writer) throws IOException {
-            Target.writeTo(writer);
+            target.writeTo(writer);
         }
     }
 
     private static class PackedSwitchOffsetTarget extends PackedSwitchTarget {
-        public int Target;
+        private final int target;
+        public PackedSwitchOffsetTarget(int target) {
+            this.target = target;
+        }
         public void writeTargetTo(IndentingWriter writer) throws IOException {
-            if (Target >= 0) {
+            if (target >= 0) {
                 writer.write('+');
             }
-            writer.printSignedIntAsDec(Target);
+            writer.printSignedIntAsDec(target);
         }
     }
 }

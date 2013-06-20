@@ -29,9 +29,9 @@
 package org.jf.dexlib;
 
 import com.google.common.base.Preconditions;
-import org.jf.dexlib.Util.AlignmentUtils;
+import org.jf.util.AlignmentUtils;
 import org.jf.dexlib.Util.AnnotatedOutput;
-import org.jf.dexlib.Util.ExceptionWithContext;
+import org.jf.util.ExceptionWithContext;
 import org.jf.dexlib.Util.Input;
 
 public abstract class Item<T extends Item> implements Comparable<T> {

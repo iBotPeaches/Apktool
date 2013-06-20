@@ -30,7 +30,7 @@ package org.jf.dexlib;
 
 import com.google.common.base.Preconditions;
 import org.jf.dexlib.Util.AnnotatedOutput;
-import org.jf.dexlib.Util.ExceptionWithContext;
+import org.jf.util.ExceptionWithContext;
 import org.jf.dexlib.Util.Input;
 import org.jf.dexlib.Util.ReadOnlyArrayList;
 

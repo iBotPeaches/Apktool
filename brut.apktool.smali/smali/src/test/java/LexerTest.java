@@ -30,15 +30,20 @@ import org.antlr.runtime.ANTLRInputStream;
 import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
-import org.jf.dexlib.Util.Utf8Utils;
-import org.jf.smali.*;
-import static org.jf.smali.expectedTokensTestGrammarParser.ExpectedToken;
+import org.jf.smali.expectedTokensTestGrammarLexer;
+import org.jf.smali.expectedTokensTestGrammarParser;
+import org.jf.smali.smaliFlexLexer;
+import org.jf.smali.smaliParser;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
+
+import static org.jf.smali.expectedTokensTestGrammarParser.ExpectedToken;
 
 public class LexerTest {
     private static final HashMap<String, Integer> tokenTypesByName;
@@ -158,11 +163,12 @@ public class LexerTest {
         lexer.setSuppressErrors(true);
 
         CommonTokenStream tokenStream = new CommonTokenStream(lexer);
+        tokenStream.fill();
         List tokens = tokenStream.getTokens();
 
         int expectedTokenIndex = 0;
         CommonToken token;
-        for (int i=0; i<tokens.size(); i++) {
+        for (int i=0; i<tokens.size()-1; i++) {
             token = (CommonToken)tokens.get(i);
 
             if (discardHiddenTokens && token.getChannel() == smaliParser.HIDDEN) {

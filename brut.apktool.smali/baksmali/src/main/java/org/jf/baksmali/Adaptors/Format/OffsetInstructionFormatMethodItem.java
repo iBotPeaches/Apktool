@@ -30,22 +30,23 @@ package org.jf.baksmali.Adaptors.Format;
 
 import org.jf.baksmali.Adaptors.LabelMethodItem;
 import org.jf.baksmali.Adaptors.MethodDefinition;
+import org.jf.baksmali.baksmaliOptions;
+import org.jf.dexlib2.Opcode;
+import org.jf.dexlib2.iface.instruction.OffsetInstruction;
 import org.jf.util.IndentingWriter;
-import org.jf.dexlib.Code.OffsetInstruction;
-import org.jf.dexlib.Code.Opcode;
-import org.jf.dexlib.CodeItem;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 
 public class OffsetInstructionFormatMethodItem extends InstructionMethodItem<OffsetInstruction> {
     protected LabelMethodItem label;
 
-    public OffsetInstructionFormatMethodItem(MethodDefinition.LabelCache labelCache, CodeItem codeItem, int codeAddress,
-                                             OffsetInstruction instruction) {
-        super(codeItem, codeAddress, instruction);
+    public OffsetInstructionFormatMethodItem(@Nonnull baksmaliOptions options, @Nonnull MethodDefinition methodDef,
+                                             int codeAddress, OffsetInstruction instruction) {
+        super(methodDef, codeAddress, instruction);
 
-        label = new LabelMethodItem(codeAddress + instruction.getTargetAddressOffset(), getLabelPrefix());
-        label = labelCache.internLabel(label);
+        label = new LabelMethodItem(options, codeAddress + instruction.getCodeOffset(), getLabelPrefix());
+        label = methodDef.getLabelCache().internLabel(label);
     }
 
     @Override
@@ -58,7 +59,8 @@ public class OffsetInstructionFormatMethodItem extends InstructionMethodItem<Off
     }
 
     private String getLabelPrefix() {
-        switch (instruction.getFormat()) {
+        Opcode opcode = instruction.getOpcode();
+        switch (opcode.format) {
             case Format10t:
             case Format20t:
             case Format30t:
@@ -67,13 +69,13 @@ public class OffsetInstructionFormatMethodItem extends InstructionMethodItem<Off
             case Format22t:
                 return "cond_";
             case Format31t:
-                if (instruction.opcode == Opcode.FILL_ARRAY_DATA) {
+                if (opcode == Opcode.FILL_ARRAY_DATA) {
                     return "array_";
                 }
-                if (instruction.opcode == Opcode.PACKED_SWITCH) {
+                if (opcode == Opcode.PACKED_SWITCH) {
                     return "pswitch_data_";
                 }
-                assert instruction.opcode == Opcode.SPARSE_SWITCH;
+                // Opcode.SPARSE_SWITCH;
                 return "sswitch_data_";
         }
 

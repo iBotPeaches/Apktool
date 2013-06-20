@@ -32,7 +32,7 @@ import org.jf.dexlib.Code.*;
 import org.jf.dexlib.Item;
 import org.jf.dexlib.ItemType;
 import org.jf.dexlib.MethodIdItem;
-import org.jf.dexlib.Util.ExceptionWithContext;
+import org.jf.util.ExceptionWithContext;
 
 import java.util.*;
 

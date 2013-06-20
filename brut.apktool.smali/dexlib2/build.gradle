@@ -1,0 +1,119 @@
+/*
+ * Copyright 2012, Google Inc.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are
+ * met:
+ *
+ *     * Redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above
+ * copyright notice, this list of conditions and the following disclaimer
+ * in the documentation and/or other materials provided with the
+ * distribution.
+ *     * Neither the name of Google Inc. nor the names of its
+ * contributors may be used to endorse or promote products derived from
+ * this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+configurations {
+    accessorTestGenerator
+}
+
+dependencies {
+    compile project(':util')
+    compile depends.findbugs
+    compile depends.guava
+
+    testCompile depends.junit
+
+    accessorTestGenerator project('accessorTestGenerator')
+}
+
+ext.testAccessorOutputDir = file("${buildDir}/generated-accessor-test-sources")
+ext.testAccessorOutputFile = file("${buildDir}/generated-accessor-test-sources/org/jf/dexlib2/AccessorTypes.java")
+
+sourceSets {
+    // The sources for building the test dex file for the accessor test
+    accessorTestDex {
+        java {
+            srcDir testAccessorOutputDir
+        }
+    }
+
+    // The sources for the accessor test itself
+    accessorTest {
+        java {
+            compileClasspath += main.output
+            runtimeClasspath += main.output
+        }
+    }
+}
+
+configurations {
+    accessorTestDexCompile.extendsFrom compile
+    accessorTestDexRuntime.extendsFrom runtime
+
+    accessorTestCompile.extendsFrom testCompile
+    accessorTestRuntime.extendsFrom testRuntime
+}
+
+idea {
+    module {
+        testSourceDirs += sourceSets.accessorTest.java.srcDirs
+    }
+}
+
+// You must manually execute this task to regenerate SyntheticAccessorFSM.java, after modifying the ragel file
+// e.g. ./gradlew ragel
+task ragel(type:Exec) {
+    workingDir = 'src/main/ragel'
+
+    commandLine 'ragel', '-J', '-o', file('src/main/java/org/jf/dexlib2/util/SyntheticAccessorFSM.java'),
+            'SyntheticAccessorFSM.rl'
+}
+
+task generateAccessorTestSource(type: JavaExec) {
+    outputs.dir file(testAccessorOutputDir)
+
+    mkdir(file(testAccessorOutputFile).parent)
+
+    classpath = configurations.accessorTestGenerator
+    main = 'org.jf.dexlib2.AccessorTestGenerator'
+    args testAccessorOutputFile
+}
+compileAccessorTestDexJava.dependsOn(generateAccessorTestSource)
+
+task generateAccessorTestDex(type: Exec, dependsOn: compileAccessorTestDexJava) {
+    def outputDex = file("${sourceSets.accessorTest.output.resourcesDir}/accessorTest.dex")
+    mkdir(outputDex.parent)
+
+    inputs.dir project.sourceSets.accessorTestDex.output.classesDir
+    outputs.file outputDex
+
+    sourceSets.accessorTest.resources
+
+    workingDir project.sourceSets.accessorTestDex.output.classesDir
+    executable 'dx'
+    args '--dex'
+    args "--output=${outputDex}"
+    args '.'
+}
+
+task accessorTest(type: Test, dependsOn: generateAccessorTestDex) {
+    testClassesDir = project.sourceSets.accessorTest.output.classesDir
+    classpath = project.sourceSets.accessorTest.runtimeClasspath
+}

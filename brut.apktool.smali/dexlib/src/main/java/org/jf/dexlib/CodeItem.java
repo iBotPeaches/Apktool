@@ -33,6 +33,8 @@ import org.jf.dexlib.Code.*;
 import org.jf.dexlib.Debug.DebugInstructionIterator;
 import org.jf.dexlib.Debug.DebugOpcode;
 import org.jf.dexlib.Util.*;
+import org.jf.util.AlignmentUtils;
+import org.jf.util.ExceptionWithContext;
 
 import java.util.ArrayList;
 import java.util.List;

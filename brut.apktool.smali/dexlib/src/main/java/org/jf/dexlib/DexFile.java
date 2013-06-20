@@ -28,8 +28,10 @@
 
 package org.jf.dexlib;
 
-import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.jf.dexlib.Util.*;
+import org.jf.util.AlignmentUtils;
+import org.jf.util.ExceptionWithContext;
+import org.jf.util.Hex;
 
 import java.io.*;
 import java.security.DigestException;
@@ -39,7 +41,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.zip.Adler32;
-import brut.directory.ZipExtFile;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 /**
  * <h3>Main use cases</h3>
@@ -287,13 +290,13 @@ public class DexFile
 
         InputStream inputStream = null;
         Input in = null;
-        ZipExtFile zipFile = null;
+        ZipFile zipFile = null;
 
         try {
             //do we have a zip file?
             if (magic[0] == 0x50 && magic[1] == 0x4B) {
-                zipFile = new ZipExtFile(file);
-                ZipArchiveEntry zipEntry = zipFile.getEntry("classes.dex");
+                zipFile = new ZipFile(file);
+                ZipEntry zipEntry = zipFile.getEntry("classes.dex");
                 if (zipEntry == null) {
                     throw new NoClassesDexException("zip file " + file.getName() + " does not contain a classes.dex " +
                             "file");

@@ -31,7 +31,7 @@ package org.jf.dexlib;
 import com.google.common.base.Preconditions;
 import org.jf.dexlib.Util.AnnotatedOutput;
 import org.jf.dexlib.Util.Input;
-import org.jf.dexlib.Util.Utf8Utils;
+import org.jf.util.StringUtils;
 
 public class HeaderItem extends Item<HeaderItem> {
     /**
@@ -182,7 +182,7 @@ public class HeaderItem extends Item<HeaderItem> {
             magicBuilder.append((char)MAGIC_VALUES[magic_index][i]);
         }
 
-        out.annotate("magic: " + Utf8Utils.escapeString(magicBuilder.toString()));
+        out.annotate("magic: " + StringUtils.escapeString(magicBuilder.toString()));
         out.write(MAGIC_VALUES[magic_index]);
 
         out.annotate("checksum");

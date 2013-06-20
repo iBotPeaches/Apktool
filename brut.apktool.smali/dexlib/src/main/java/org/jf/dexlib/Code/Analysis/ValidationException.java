@@ -28,7 +28,7 @@
 
 package org.jf.dexlib.Code.Analysis;
 
-import org.jf.dexlib.Util.ExceptionWithContext;
+import org.jf.util.ExceptionWithContext;
 
 public class ValidationException extends ExceptionWithContext {
     private int codeAddress;

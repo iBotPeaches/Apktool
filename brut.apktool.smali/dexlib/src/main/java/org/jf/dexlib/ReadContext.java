@@ -28,7 +28,7 @@
 
 package org.jf.dexlib;
 
-import org.jf.dexlib.Util.ExceptionWithContext;
+import org.jf.util.ExceptionWithContext;
 import org.jf.dexlib.Util.SparseArray;
 
 import java.util.List;

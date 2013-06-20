@@ -178,107 +178,6 @@ public class OdexedFieldInstructionMapper {
             }
     };
 
-    private static Opcode[][][][] jumboOpcodeMap = new Opcode[][][][] {
-            //get opcodes
-            new Opcode[][][] {
-                    //iget volatile
-                    new Opcode[][] {
-                            //odexed
-                            new Opcode[] {
-                                /*Z*/   Opcode.IGET_VOLATILE_JUMBO,
-                                /*B*/   Opcode.IGET_VOLATILE_JUMBO,
-                                /*S*/   Opcode.IGET_VOLATILE_JUMBO,
-                                /*C*/   Opcode.IGET_VOLATILE_JUMBO,
-                                /*I,F*/ Opcode.IGET_VOLATILE_JUMBO,
-                                /*J,D*/ Opcode.IGET_WIDE_VOLATILE_JUMBO,
-                                /*L,[*/ Opcode.IGET_OBJECT_VOLATILE_JUMBO
-                            },
-                            //deodexed
-                            new Opcode[] {
-                                /*Z*/   Opcode.IGET_BOOLEAN_JUMBO,
-                                /*B*/   Opcode.IGET_BYTE_JUMBO,
-                                /*S*/   Opcode.IGET_SHORT_JUMBO,
-                                /*C*/   Opcode.IGET_CHAR_JUMBO,
-                                /*I,F*/ Opcode.IGET_JUMBO,
-                                /*J,D*/ Opcode.IGET_WIDE_JUMBO,
-                                /*L,[*/ Opcode.IGET_OBJECT_JUMBO
-                            }
-                    },
-                    //sget volatile
-                    new Opcode[][] {
-                            //odexed
-                            new Opcode[] {
-                                /*Z*/   Opcode.SGET_VOLATILE_JUMBO,
-                                /*B*/   Opcode.SGET_VOLATILE_JUMBO,
-                                /*S*/   Opcode.SGET_VOLATILE_JUMBO,
-                                /*C*/   Opcode.SGET_VOLATILE_JUMBO,
-                                /*I,F*/ Opcode.SGET_VOLATILE_JUMBO,
-                                /*J,D*/ Opcode.SGET_WIDE_VOLATILE_JUMBO,
-                                /*L,[*/ Opcode.SGET_OBJECT_VOLATILE_JUMBO
-                            },
-                            //deodexed
-                            new Opcode[] {
-                                /*Z*/   Opcode.SGET_BOOLEAN_JUMBO,
-                                /*B*/   Opcode.SGET_BYTE_JUMBO,
-                                /*S*/   Opcode.SGET_SHORT_JUMBO,
-                                /*C*/   Opcode.SGET_CHAR_JUMBO,
-                                /*I,F*/ Opcode.SGET_JUMBO,
-                                /*J,D*/ Opcode.SGET_WIDE_JUMBO,
-                                /*L,[*/ Opcode.SGET_OBJECT_JUMBO
-                            }
-                    }
-            },
-            //put opcodes
-            new Opcode[][][] {
-                    //iput volatile
-                    new Opcode[][] {
-                            //odexed
-                            new Opcode[] {
-                                /*Z*/   Opcode.IPUT_VOLATILE_JUMBO,
-                                /*B*/   Opcode.IPUT_VOLATILE_JUMBO,
-                                /*S*/   Opcode.IPUT_VOLATILE_JUMBO,
-                                /*C*/   Opcode.IPUT_VOLATILE_JUMBO,
-                                /*I,F*/ Opcode.IPUT_VOLATILE_JUMBO,
-                                /*J,D*/ Opcode.IPUT_WIDE_VOLATILE_JUMBO,
-                                /*L,[*/ Opcode.IPUT_OBJECT_VOLATILE_JUMBO
-                            },
-                            //deodexed
-                            new Opcode[] {
-                                /*Z*/   Opcode.IPUT_BOOLEAN_JUMBO,
-                                /*B*/   Opcode.IPUT_BYTE_JUMBO,
-                                /*S*/   Opcode.IPUT_SHORT_JUMBO,
-                                /*C*/   Opcode.IPUT_CHAR_JUMBO,
-                                /*I,F*/ Opcode.IPUT_JUMBO,
-                                /*J,D*/ Opcode.IPUT_WIDE_JUMBO,
-                                /*L,[*/ Opcode.IPUT_OBJECT_JUMBO
-                            }
-                    },
-                    //sput volatile
-                    new Opcode[][] {
-                            //odexed
-                            new Opcode[] {
-                                /*Z*/   Opcode.SPUT_VOLATILE_JUMBO,
-                                /*B*/   Opcode.SPUT_VOLATILE_JUMBO,
-                                /*S*/   Opcode.SPUT_VOLATILE_JUMBO,
-                                /*C*/   Opcode.SPUT_VOLATILE_JUMBO,
-                                /*I,F*/ Opcode.SPUT_VOLATILE_JUMBO,
-                                /*J,D*/ Opcode.SPUT_WIDE_VOLATILE_JUMBO,
-                                /*L,[*/ Opcode.SPUT_OBJECT_VOLATILE_JUMBO
-                            },
-                            //deodexed
-                            new Opcode[] {
-                                /*Z*/   Opcode.SPUT_BOOLEAN_JUMBO,
-                                /*B*/   Opcode.SPUT_BYTE_JUMBO,
-                                /*S*/   Opcode.SPUT_SHORT_JUMBO,
-                                /*C*/   Opcode.SPUT_CHAR_JUMBO,
-                                /*I,F*/ Opcode.SPUT_JUMBO,
-                                /*J,D*/ Opcode.SPUT_WIDE_JUMBO,
-                                /*L,[*/ Opcode.SPUT_OBJECT_JUMBO
-                            }
-                    }
-            }
-    };
-
     private static int getTypeIndex(char type) {
         switch (type) {
             case 'Z':
@@ -315,20 +214,14 @@ public class OdexedFieldInstructionMapper {
     }
 
     static Opcode getAndCheckDeodexedOpcodeForOdexedOpcode(String fieldType, Opcode odexedOpcode) {
-        boolean jumbo = odexedOpcode.isJumboOpcode();
         int opcodeType = odexedOpcode.setsRegister()?0:1;
         int opcodeSubType = getOpcodeSubtype(odexedOpcode);
         int typeIndex = getTypeIndex(fieldType.charAt(0));
 
         Opcode correctOdexedOpcode, deodexedOpcode;
 
-        if (jumbo) {
-            correctOdexedOpcode = jumboOpcodeMap[opcodeType][opcodeSubType-1][0][typeIndex];
-            deodexedOpcode = jumboOpcodeMap[opcodeType][opcodeSubType-1][1][typeIndex];
-        } else {
-            correctOdexedOpcode = opcodeMap[opcodeType][opcodeSubType][0][typeIndex];
-            deodexedOpcode = opcodeMap[opcodeType][opcodeSubType][1][typeIndex];
-        }
+        correctOdexedOpcode = opcodeMap[opcodeType][opcodeSubType][0][typeIndex];
+        deodexedOpcode = opcodeMap[opcodeType][opcodeSubType][1][typeIndex];
 
         if (correctOdexedOpcode != odexedOpcode) {
             throw new ValidationException(String.format("Incorrect field type \"%s\" for %s", fieldType,

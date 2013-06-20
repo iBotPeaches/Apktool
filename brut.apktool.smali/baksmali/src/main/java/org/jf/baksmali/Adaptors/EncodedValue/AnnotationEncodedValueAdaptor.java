@@ -28,32 +28,32 @@
 
 package org.jf.baksmali.Adaptors.EncodedValue;
 
-import org.jf.baksmali.Adaptors.ReferenceFormatter;
+import org.jf.dexlib2.iface.AnnotationElement;
+import org.jf.dexlib2.iface.value.AnnotationEncodedValue;
 import org.jf.util.IndentingWriter;
-import org.jf.dexlib.EncodedValue.AnnotationEncodedSubValue;
 
 import java.io.IOException;
+import java.util.Collection;
 
 public abstract class AnnotationEncodedValueAdaptor {
 
-    public static void writeTo(IndentingWriter writer, AnnotationEncodedSubValue encodedAnnotation)
+    public static void writeTo(IndentingWriter writer, AnnotationEncodedValue annotationEncodedValue)
                                throws IOException {
         writer.write(".subannotation ");
-        ReferenceFormatter.writeTypeReference(writer, encodedAnnotation.annotationType);
+        writer.write(annotationEncodedValue.getType());
         writer.write('\n');
 
-        writeElementsTo(writer, encodedAnnotation);
+        writeElementsTo(writer, annotationEncodedValue.getElements());
         writer.write(".end subannotation");
     }
 
-    public static void writeElementsTo(IndentingWriter writer, AnnotationEncodedSubValue encodedAnnotation)
-                                throws IOException {
+    public static void writeElementsTo(IndentingWriter writer,
+                                       Collection<? extends AnnotationElement> annotationElements) throws IOException {
         writer.indent(4);
-        for (int i=0; i<encodedAnnotation.names.length; i++) {
-            writer.write(encodedAnnotation.names[i].getStringValue());
+        for (AnnotationElement annotationElement: annotationElements) {
+            writer.write(annotationElement.getName());
             writer.write(" = ");
-
-            EncodedValueAdaptor.writeTo(writer, encodedAnnotation.values[i]);
+            EncodedValueAdaptor.writeTo(writer, annotationElement.getValue());
             writer.write('\n');
         }
         writer.deindent(4);

@@ -114,7 +114,7 @@ public class ClassFileNameHandler {
 
         try {
             FileWriter writer = new FileWriter(f);
-//            writer.write("test");
+            writer.write("test");
             writer.flush();
             writer.close();
             f.delete(); //doesn't throw IOException
@@ -159,7 +159,7 @@ public class ClassFileNameHandler {
         }
 
         @Override
-        public File addUniqueChild(String[] pathElements, int pathElementsIndex) {
+        public synchronized File addUniqueChild(String[] pathElements, int pathElementsIndex) {
             String elementName;
             String elementNameLower;
 

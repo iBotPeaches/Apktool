@@ -30,8 +30,7 @@ package org.jf.dexlib.Code;
 
 import org.jf.dexlib.Code.Format.*;
 import org.jf.dexlib.DexFile;
-import org.jf.dexlib.Util.ExceptionWithContext;
-import org.jf.dexlib.Util.Hex;
+import org.jf.util.ExceptionWithContext;
 
 public class InstructionIterator {
     public static void IterateInstructions(DexFile dexFile, byte[] insns, ProcessInstructionDelegate delegate) {

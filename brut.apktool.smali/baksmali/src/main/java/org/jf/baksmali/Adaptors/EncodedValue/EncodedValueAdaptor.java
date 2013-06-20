@@ -29,62 +29,65 @@
 package org.jf.baksmali.Adaptors.EncodedValue;
 
 import org.jf.baksmali.Adaptors.ReferenceFormatter;
+import org.jf.dexlib2.ValueType;
+import org.jf.dexlib2.iface.value.*;
+import org.jf.dexlib2.util.ReferenceUtil;
 import org.jf.util.IndentingWriter;
 import org.jf.baksmali.Renderers.*;
-import org.jf.dexlib.EncodedValue.*;
 
 import java.io.IOException;
 
 public abstract class EncodedValueAdaptor {
     public static void writeTo(IndentingWriter writer, EncodedValue encodedValue) throws IOException {
         switch (encodedValue.getValueType()) {
-            case VALUE_ANNOTATION:
+            case ValueType.ANNOTATION:
                 AnnotationEncodedValueAdaptor.writeTo(writer, (AnnotationEncodedValue)encodedValue);
                 return;
-            case VALUE_ARRAY:
+            case ValueType.ARRAY:
                 ArrayEncodedValueAdaptor.writeTo(writer, (ArrayEncodedValue)encodedValue);
                 return;
-            case VALUE_BOOLEAN:
-                BooleanRenderer.writeTo(writer, ((BooleanEncodedValue)encodedValue).value);
+            case ValueType.BOOLEAN:
+                BooleanRenderer.writeTo(writer, ((BooleanEncodedValue)encodedValue).getValue());
                 return;
-            case VALUE_BYTE:
-                ByteRenderer.writeTo(writer, ((ByteEncodedValue)encodedValue).value);
+            case ValueType.BYTE:
+                ByteRenderer.writeTo(writer, ((ByteEncodedValue)encodedValue).getValue());
                 return;
-            case VALUE_CHAR:
-                CharRenderer.writeTo(writer, ((CharEncodedValue)encodedValue).value);
+            case ValueType.CHAR:
+                CharRenderer.writeTo(writer, ((CharEncodedValue)encodedValue).getValue());
                 return;
-            case VALUE_DOUBLE:
-                DoubleRenderer.writeTo(writer, ((DoubleEncodedValue)encodedValue).value);
+            case ValueType.DOUBLE:
+                DoubleRenderer.writeTo(writer, ((DoubleEncodedValue)encodedValue).getValue());
                 return;
-            case VALUE_ENUM:
-                EnumEncodedValueAdaptor.writeTo(writer, ((EnumEncodedValue)encodedValue).value);
+            case ValueType.ENUM:
+                writer.write(".enum ");
+                ReferenceUtil.writeFieldDescriptor(writer, ((EnumEncodedValue)encodedValue).getValue());
                 return;
-            case VALUE_FIELD:
-                ReferenceFormatter.writeFieldReference(writer, ((FieldEncodedValue)encodedValue).value);
+            case ValueType.FIELD:
+                ReferenceUtil.writeFieldDescriptor(writer, ((FieldEncodedValue)encodedValue).getValue());
                 return;
-            case VALUE_FLOAT:
-                FloatRenderer.writeTo(writer, ((FloatEncodedValue)encodedValue).value);
+            case ValueType.FLOAT:
+                FloatRenderer.writeTo(writer, ((FloatEncodedValue)encodedValue).getValue());
                 return;
-            case VALUE_INT:
-                IntegerRenderer.writeTo(writer, ((IntEncodedValue)encodedValue).value);
+            case ValueType.INT:
+                IntegerRenderer.writeTo(writer, ((IntEncodedValue)encodedValue).getValue());
                 return;
-            case VALUE_LONG:
-                LongRenderer.writeTo(writer, ((LongEncodedValue)encodedValue).value);
+            case ValueType.LONG:
+                LongRenderer.writeTo(writer, ((LongEncodedValue)encodedValue).getValue());
                 return;
-            case VALUE_METHOD:
-                ReferenceFormatter.writeMethodReference(writer, ((MethodEncodedValue)encodedValue).value);
+            case ValueType.METHOD:
+                ReferenceUtil.writeMethodDescriptor(writer, ((MethodEncodedValue)encodedValue).getValue());
                 return;
-            case VALUE_NULL:
+            case ValueType.NULL:
                 writer.write("null");
                 return;
-            case VALUE_SHORT:
-                ShortRenderer.writeTo(writer, ((ShortEncodedValue)encodedValue).value);
+            case ValueType.SHORT:
+                ShortRenderer.writeTo(writer, ((ShortEncodedValue)encodedValue).getValue());
                 return;
-            case VALUE_STRING:
-                ReferenceFormatter.writeStringReference(writer, ((StringEncodedValue)encodedValue).value);
+            case ValueType.STRING:
+                ReferenceFormatter.writeStringReference(writer, ((StringEncodedValue)encodedValue).getValue());
                 return;
-            case VALUE_TYPE:
-                ReferenceFormatter.writeTypeReference(writer, ((TypeEncodedValue)encodedValue).value);
+            case ValueType.TYPE:
+                writer.write(((TypeEncodedValue)encodedValue).getValue());
         }
     }
 }

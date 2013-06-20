@@ -28,36 +28,44 @@
 
 package org.jf.baksmali.Adaptors.Format;
 
+import org.jf.baksmali.Adaptors.MethodDefinition;
+import org.jf.baksmali.Renderers.LongRenderer;
+import org.jf.dexlib2.iface.instruction.formats.ArrayPayload;
 import org.jf.util.IndentingWriter;
-import org.jf.baksmali.Renderers.ByteRenderer;
-import org.jf.dexlib.Code.Format.ArrayDataPseudoInstruction;
-import org.jf.dexlib.CodeItem;
 
 import java.io.IOException;
-import java.util.Iterator;
+import java.util.List;
 
-public class ArrayDataMethodItem extends InstructionMethodItem<ArrayDataPseudoInstruction> {
-    public ArrayDataMethodItem(CodeItem codeItem, int codeAddress, ArrayDataPseudoInstruction instruction) {
-        super(codeItem, codeAddress, instruction);
+public class ArrayDataMethodItem extends InstructionMethodItem<ArrayPayload> {
+    public ArrayDataMethodItem(MethodDefinition methodDef, int codeAddress, ArrayPayload instruction) {
+        super(methodDef, codeAddress, instruction);
     }
 
     public boolean writeTo(IndentingWriter writer) throws IOException {
-        writer.write(".array-data 0x");
-        writer.printUnsignedLongAsHex(instruction.getElementWidth());
+        int elementWidth = instruction.getElementWidth();
+
+        writer.write(".array-data ");
+        writer.printSignedIntAsDec(instruction.getElementWidth());
         writer.write('\n');
 
         writer.indent(4);
-        Iterator<ArrayDataPseudoInstruction.ArrayElement> iterator = instruction.getElements();
-        while (iterator.hasNext()) {
-            ArrayDataPseudoInstruction.ArrayElement element = iterator.next();
 
-            for (int i=0; i<element.elementWidth; i++) {
-                if (i!=0) {
-                    writer.write(' ');
-                }
-                ByteRenderer.writeUnsignedTo(writer, element.buffer[element.bufferIndex+i]);
-            }
-            writer.write('\n');
+        List<Number> elements = instruction.getArrayElements();
+
+        String suffix = "";
+        switch (elementWidth) {
+            case 1:
+                suffix = "t";
+                break;
+            case 2:
+                suffix = "s";
+                break;
+        }
+
+        for (Number number: elements) {
+            LongRenderer.writeSignedIntOrLongTo(writer, number.longValue());
+            writer.write(suffix);
+            writer.write("\n");
         }
         writer.deindent(4);
         writer.write(".end array-data");

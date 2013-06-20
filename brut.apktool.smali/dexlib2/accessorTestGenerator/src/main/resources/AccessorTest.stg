@@ -1,0 +1,86 @@
+decl(type, name, value) ::= "<type> <name><init(value)>;"
+init(v) ::= "<if(v)> = <v><endif>"
+
+field_decl(type) ::= "private <type.name> <type.name>_val;"
+
+preinc_template(type) ::=  "++<type.name>_val;"
+postinc_template(type) ::= "<type.name>_val++;"
+predec_template(type) ::= "--<type.name>_val;"
+postdec_template(type) ::= "<type.name>_val--;"
+add_template(type) ::= "<type.name>_val += val;"
+sub_template(type) ::= "<type.name>_val -= val;"
+mul_template(type) ::= "<type.name>_val *= val;"
+div_template(type) ::= "<type.name>_val /= val;"
+rem_template(type) ::= "<type.name>_val %= val;"
+and_template(type) ::= "<type.name>_val &= val;"
+or_template(type) ::= "<type.name>_val |= val;"
+xor_template(type) ::= "<type.name>_val ^= val;"
+shl_template(type) ::= "<type.name>_val \<\<= val;"
+shr_template(type) ::= "<type.name>_val >>= val;"
+ushr_template(type) ::= "<type.name>_val >>>= val;"
+
+operation_template_name(operation) ::= "<operation.name>_template"
+
+binary_method(input, type, binary_operation) ::= <<
+public void <type.name>_<binary_operation.name>(<input> val) {
+    <(operation_template_name(binary_operation))(type)>
+}
+>>
+
+binary_methods(binary_operation, type) ::= <<
+<binary_operation.inputTypes:binary_method(type, binary_operation);separator="\n\n">
+>>
+
+unary_method(unary_operation, type) ::= <<
+public void <type.name>_<unary_operation.name>() {
+    <(operation_template_name(unary_operation))(type)>
+}
+>>
+
+type_methods(type) ::= <<
+<[type.unaryOperations:unary_method(type), type.binaryOperations:binary_methods(type)];separator="\n\n">
+>>
+
+
+file(types) ::= <<
+/*
+ * Copyright 2012, Google Inc.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are
+ * met:
+ *
+ *     * Redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above
+ * copyright notice, this list of conditions and the following disclaimer
+ * in the documentation and/or other materials provided with the
+ * distribution.
+ *     * Neither the name of Google Inc. nor the names of its
+ * contributors may be used to endorse or promote products derived from
+ * this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+package org.jf.dexlib2;
+
+public class AccessorTypes {
+    <types:field_decl();separator="\n">
+
+    private class Accessors {
+        <types:type_methods();separator="\n\n">
+    }
+}
+>>

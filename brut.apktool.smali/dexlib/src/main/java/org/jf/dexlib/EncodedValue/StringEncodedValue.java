@@ -33,7 +33,7 @@ import org.jf.dexlib.StringIdItem;
 import org.jf.dexlib.Util.AnnotatedOutput;
 import org.jf.dexlib.Util.EncodedValueUtils;
 import org.jf.dexlib.Util.Input;
-import org.jf.dexlib.Util.Utf8Utils;
+import org.jf.util.StringUtils;
 
 public class StringEncodedValue extends EncodedValue {
     public final StringIdItem value;
@@ -65,7 +65,7 @@ public class StringEncodedValue extends EncodedValue {
 
         if (out.annotates()) {
             out.annotate(1, "value_type=" + ValueType.VALUE_STRING.name() + ",value_arg=" + (bytes.length - 1));
-            out.annotate(bytes.length, "value: \"" + Utf8Utils.escapeString(value.getStringValue()) + "\"");
+            out.annotate(bytes.length, "value: \"" + StringUtils.escapeString(value.getStringValue()) + "\"");
         }
 
         out.writeByte(ValueType.VALUE_STRING.value | ((bytes.length - 1) << 5));

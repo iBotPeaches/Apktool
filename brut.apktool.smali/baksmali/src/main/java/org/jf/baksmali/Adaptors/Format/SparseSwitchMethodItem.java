@@ -30,48 +30,35 @@ package org.jf.baksmali.Adaptors.Format;
 
 import org.jf.baksmali.Adaptors.LabelMethodItem;
 import org.jf.baksmali.Adaptors.MethodDefinition;
+import org.jf.dexlib2.iface.instruction.SwitchElement;
+import org.jf.dexlib2.iface.instruction.formats.SparseSwitchPayload;
 import org.jf.util.IndentingWriter;
 import org.jf.baksmali.Renderers.IntegerRenderer;
-import org.jf.dexlib.Code.Format.SparseSwitchDataPseudoInstruction;
-import org.jf.dexlib.CodeItem;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
-public class SparseSwitchMethodItem extends InstructionMethodItem<SparseSwitchDataPseudoInstruction> {
+public class SparseSwitchMethodItem extends InstructionMethodItem<SparseSwitchPayload> {
     private final List<SparseSwitchTarget> targets;
 
-    public SparseSwitchMethodItem(MethodDefinition methodDefinition, CodeItem codeItem, int codeAddress,
-                                  SparseSwitchDataPseudoInstruction instruction) {
-        super(codeItem, codeAddress, instruction);
+    public SparseSwitchMethodItem(MethodDefinition methodDef, int codeAddress, SparseSwitchPayload instruction) {
+        super(methodDef, codeAddress, instruction);
 
-        int baseCodeAddress = methodDefinition.getSparseSwitchBaseAddress(codeAddress);
+        int baseCodeAddress = methodDef.getSparseSwitchBaseAddress(codeAddress);
 
         targets = new ArrayList<SparseSwitchTarget>();
-        Iterator<SparseSwitchDataPseudoInstruction.SparseSwitchTarget> iterator = instruction.iterateKeysAndTargets();
         if (baseCodeAddress >= 0) {
-            while (iterator.hasNext()) {
-                SparseSwitchDataPseudoInstruction.SparseSwitchTarget target = iterator.next();
-                SparseSwitchLabelTarget sparseSwitchLabelTarget = new SparseSwitchLabelTarget();
-                sparseSwitchLabelTarget.Key = target.key;
-
-                LabelMethodItem label = new LabelMethodItem(baseCodeAddress + target.targetAddressOffset, "sswitch_");
-                label = methodDefinition.getLabelCache().internLabel(label);
-                sparseSwitchLabelTarget.Target = label;
-
-                targets.add(sparseSwitchLabelTarget);
+            for (SwitchElement switchElement: instruction.getSwitchElements()) {
+                LabelMethodItem label = methodDef.getLabelCache().internLabel(
+                        new LabelMethodItem( methodDef.classDef.options, baseCodeAddress + switchElement.getOffset(),
+                                "sswitch_"));
+                targets.add(new SparseSwitchLabelTarget(switchElement.getKey(), label));
             }
         } else {
             //if we couldn't determine a base address, just use relative offsets rather than labels
-            while (iterator.hasNext()) {
-                SparseSwitchDataPseudoInstruction.SparseSwitchTarget target = iterator.next();
-                SparseSwitchOffsetTarget sparseSwitchOffsetTarget = new SparseSwitchOffsetTarget();
-                sparseSwitchOffsetTarget.Key = target.key;
-
-                sparseSwitchOffsetTarget.Target = target.targetAddressOffset;
-                targets.add(sparseSwitchOffsetTarget);
+            for (SwitchElement switchElement: instruction.getSwitchElements()) {
+                targets.add(new SparseSwitchOffsetTarget(switchElement.getKey(), switchElement.getOffset()));
             }
         }
     }
@@ -81,7 +68,7 @@ public class SparseSwitchMethodItem extends InstructionMethodItem<SparseSwitchDa
         writer.write(".sparse-switch\n");
         writer.indent(4);
         for (SparseSwitchTarget target: targets) {
-            IntegerRenderer.writeTo(writer, target.Key);
+            IntegerRenderer.writeTo(writer, target.getKey());
             writer.write(" -> ");
             target.writeTargetTo(writer);
             writer.write('\n');
@@ -92,24 +79,38 @@ public class SparseSwitchMethodItem extends InstructionMethodItem<SparseSwitchDa
     }
 
     private static abstract class SparseSwitchTarget {
-        public int Key;
+        private final int key;
+        public SparseSwitchTarget(int key) {
+            this.key = key;
+        }
+        public int getKey() { return key; }
         public abstract void writeTargetTo(IndentingWriter writer) throws IOException;
     }
 
     private static class SparseSwitchLabelTarget extends SparseSwitchTarget {
-        public LabelMethodItem Target;
+        private final LabelMethodItem target;
+        public SparseSwitchLabelTarget(int key, LabelMethodItem target) {
+            super(key);
+            this.target = target;
+        }
+
         public void writeTargetTo(IndentingWriter writer) throws IOException {
-            Target.writeTo(writer);
+            target.writeTo(writer);
         }
     }
 
     private static class SparseSwitchOffsetTarget extends SparseSwitchTarget {
-        public int Target;
+        private final int target;
+        public SparseSwitchOffsetTarget(int key, int target) {
+            super(key);
+            this.target = target;
+        }
+
         public void writeTargetTo(IndentingWriter writer) throws IOException {
-            if (Target >= 0) {
+            if (target >= 0) {
                 writer.write('+');
             }
-            writer.printSignedIntAsDec(Target);
+            writer.printSignedIntAsDec(target);
         }
     }
 }

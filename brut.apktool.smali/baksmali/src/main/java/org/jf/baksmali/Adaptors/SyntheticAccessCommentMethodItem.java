@@ -28,16 +28,17 @@
 
 package org.jf.baksmali.Adaptors;
 
-import org.jf.dexlib.Code.Analysis.SyntheticAccessorResolver;
-import static org.jf.dexlib.Code.Analysis.SyntheticAccessorResolver.AccessedMember;
+import org.jf.dexlib2.ReferenceType;
+import org.jf.dexlib2.util.SyntheticAccessorResolver;
+import org.jf.util.ExceptionWithContext;
 import org.jf.util.IndentingWriter;
 
 import java.io.IOException;
 
 public class SyntheticAccessCommentMethodItem extends MethodItem {
-    private final AccessedMember accessedMember;
+    private final SyntheticAccessorResolver.AccessedMember accessedMember;
 
-    public SyntheticAccessCommentMethodItem(AccessedMember accessedMember, int codeAddress) {
+    public SyntheticAccessCommentMethodItem(SyntheticAccessorResolver.AccessedMember accessedMember, int codeAddress) {
         super(codeAddress);
         this.accessedMember = accessedMember;
     }
@@ -48,15 +49,73 @@ public class SyntheticAccessCommentMethodItem extends MethodItem {
     }
 
     public boolean writeTo(IndentingWriter writer) throws IOException {
-        writer.write('#');
-        if (accessedMember.accessedMemberType == SyntheticAccessorResolver.METHOD) {
-            writer.write("calls: ");
-        } else if (accessedMember.accessedMemberType == SyntheticAccessorResolver.GETTER) {
-            writer.write("getter for: ");
-        } else {
-            writer.write("setter for: ");
+        writer.write("# ");
+        switch (accessedMember.accessedMemberType) {
+            case SyntheticAccessorResolver.METHOD:
+                writer.write("invokes: ");
+                break;
+            case SyntheticAccessorResolver.GETTER:
+                writer.write("getter for: ");
+                break;
+            case SyntheticAccessorResolver.SETTER:
+                writer.write("setter for: ");
+                break;
+            case SyntheticAccessorResolver.PREFIX_INCREMENT:
+                writer.write("++operator for: ");
+                break;
+            case SyntheticAccessorResolver.POSTFIX_INCREMENT:
+                writer.write("operator++ for: ");
+                break;
+            case SyntheticAccessorResolver.PREFIX_DECREMENT:
+                writer.write("--operator for: ");
+                break;
+            case SyntheticAccessorResolver.POSTFIX_DECREMENT:
+                writer.write("operator-- for: ");
+                break;
+            case SyntheticAccessorResolver.ADD_ASSIGNMENT:
+                writer.write("+= operator for: ");
+                break;
+            case SyntheticAccessorResolver.SUB_ASSIGNMENT:
+                writer.write("-= operator for: ");
+                break;
+            case SyntheticAccessorResolver.MUL_ASSIGNMENT:
+                writer.write("*= operator for: ");
+                break;
+            case SyntheticAccessorResolver.DIV_ASSIGNMENT:
+                writer.write("/= operator for: ");
+                break;
+            case SyntheticAccessorResolver.REM_ASSIGNMENT:
+                writer.write("%= operator for: ");
+                break;
+            case SyntheticAccessorResolver.AND_ASSIGNMENT:
+                writer.write("&= operator for: ");
+                break;
+            case SyntheticAccessorResolver.OR_ASSIGNMENT:
+                writer.write("|= operator for: ");
+                break;
+            case SyntheticAccessorResolver.XOR_ASSIGNMENT:
+                writer.write("^= operator for: ");
+                break;
+            case SyntheticAccessorResolver.SHL_ASSIGNMENT:
+                writer.write("<<= operator for: ");
+                break;
+            case SyntheticAccessorResolver.SHR_ASSIGNMENT:
+                writer.write(">>= operator for: ");
+                break;
+            case SyntheticAccessorResolver.USHR_ASSIGNMENT:
+                writer.write(">>>= operator for: ");
+                break;
+            default:
+                throw new ExceptionWithContext("Unknown access type: %d", accessedMember.accessedMemberType);
         }
-        ReferenceFormatter.writeReference(writer, accessedMember.accessedMember);
+
+        int referenceType;
+        if (accessedMember.accessedMemberType == SyntheticAccessorResolver.METHOD) {
+            referenceType = ReferenceType.METHOD;
+        } else {
+            referenceType = ReferenceType.FIELD;
+        }
+        ReferenceFormatter.writeReference(writer, referenceType, accessedMember.accessedMember);
         return true;
     }
 }
