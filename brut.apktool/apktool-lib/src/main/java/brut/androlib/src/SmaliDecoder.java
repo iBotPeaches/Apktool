@@ -21,7 +21,6 @@ import org.jf.baksmali.baksmali;
 import org.jf.baksmali.baksmaliOptions;
 import org.jf.dexlib2.DexFileFactory;
 import org.jf.dexlib2.analysis.ClassPath;
-import org.jf.dexlib2.DexFileFactory;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
