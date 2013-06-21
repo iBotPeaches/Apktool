@@ -119,13 +119,16 @@ public class ApkDecoder {
             }
         }
 
+        Map<String, String> sdkInfo = mAndrolib.getResTable(mApkFile).getSdkInfo();
+        int api = (sdkInfo.get("targetSdkVersion") != null) ? Integer.parseInt(sdkInfo.get("targetSdkVersion")) : mDefaultApi;
+
         if (hasSources()) {
             switch (mDecodeSources) {
                 case DECODE_SOURCES_NONE:
                     mAndrolib.decodeSourcesRaw(mApkFile, outDir, mDebug);
                     break;
                 case DECODE_SOURCES_SMALI:
-                    mAndrolib.decodeSourcesSmali(mApkFile, outDir, mDebug, mDebugLinePrefix, mBakDeb);
+                    mAndrolib.decodeSourcesSmali(mApkFile, outDir, mDebug, mDebugLinePrefix, mBakDeb, api);
                     break;
                 case DECODE_SOURCES_JAVA:
                     mAndrolib.decodeSourcesJava(mApkFile, outDir, mDebug);
@@ -350,6 +353,7 @@ public class ApkDecoder {
     private String mFrameTag;
     private boolean mKeepBrokenResources = false;
     private String mFrameworkDir = null;
+    private int mDefaultApi = 15;
     private boolean mBakDeb = true;
     private boolean mCompressResources = false;
     private boolean mAnalysisMode = false;

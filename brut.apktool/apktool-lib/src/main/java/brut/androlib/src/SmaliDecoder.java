@@ -40,17 +40,18 @@ import java.nio.file.attribute.BasicFileAttributes;
 public class SmaliDecoder {
 
 	public static void decode(File apkFile, File outDir, boolean debug, String debugLinePrefix,
-			boolean bakdeb) throws AndrolibException {
-		new SmaliDecoder(apkFile, outDir, debug, debugLinePrefix, bakdeb).decode();
+			boolean bakdeb, int api) throws AndrolibException {
+		new SmaliDecoder(apkFile, outDir, debug, debugLinePrefix, bakdeb, api).decode();
 	}
 
 	private SmaliDecoder(File apkFile, File outDir, boolean debug, String debugLinePrefix,
-			boolean bakdeb) {
+			boolean bakdeb, int api) {
 		mApkFile = apkFile;
 		mOutDir = outDir.toPath();
 		mDebug = debug;
         mDebugLinePrefix = debugLinePrefix;
 		mBakDeb = bakdeb;
+        mApi    = api;
 	}
 
 	private void decode() throws AndrolibException {
@@ -73,7 +74,7 @@ public class SmaliDecoder {
             options.inlineResolver = null;
             options.checkPackagePrivateAccess = false;
 
-            baksmali.disassembleDexFile(DexFileFactory.loadDexFile(mApkFile, 0), options);
+            baksmali.disassembleDexFile(DexFileFactory.loadDexFile(mApkFile, mApi), options);
 
             if (mDebug) {
                 Files.walkFileTree(mOutDir, new SmaliFileVisitor());
@@ -88,6 +89,7 @@ public class SmaliDecoder {
 	private final boolean mDebug;
     private final String mDebugLinePrefix;
 	private final boolean mBakDeb;
+    private final int mApi;
 
 
     private class SmaliFileVisitor extends SimpleFileVisitor<Path> {
