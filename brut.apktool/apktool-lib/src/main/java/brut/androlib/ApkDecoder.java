@@ -81,20 +81,6 @@ public class ApkDecoder {
         }
         outDir.mkdirs();
 
-        if (hasSources()) {
-            switch (mDecodeSources) {
-            case DECODE_SOURCES_NONE:
-                mAndrolib.decodeSourcesRaw(mApkFile, outDir, mDebug);
-                break;
-            case DECODE_SOURCES_SMALI:
-                mAndrolib.decodeSourcesSmali(mApkFile, outDir, mDebug, mDebugLinePrefix, mBakDeb);
-                break;
-            case DECODE_SOURCES_JAVA:
-                mAndrolib.decodeSourcesJava(mApkFile, outDir, mDebug);
-                break;
-            }
-        }
-
         if (hasResources()) {
             setAnalysisMode(mAnalysisMode, true);
             // read the resources.arsc checking for STORED vs DEFLATE
@@ -130,6 +116,20 @@ public class ApkDecoder {
                             getResTable());
                     break;
                 }
+            }
+        }
+
+        if (hasSources()) {
+            switch (mDecodeSources) {
+                case DECODE_SOURCES_NONE:
+                    mAndrolib.decodeSourcesRaw(mApkFile, outDir, mDebug);
+                    break;
+                case DECODE_SOURCES_SMALI:
+                    mAndrolib.decodeSourcesSmali(mApkFile, outDir, mDebug, mDebugLinePrefix, mBakDeb);
+                    break;
+                case DECODE_SOURCES_JAVA:
+                    mAndrolib.decodeSourcesJava(mApkFile, outDir, mDebug);
+                    break;
             }
         }
 
