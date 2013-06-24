@@ -17,6 +17,7 @@
 package brut.androlib.src;
 
 import brut.androlib.AndrolibException;
+import brut.androlib.mod.SmaliMod;
 import brut.androlib.res.util.ExtFile;
 import brut.directory.DirectoryException;
 import java.io.*;
@@ -24,7 +25,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.logging.Logger;
+
+import org.antlr.runtime.RecognitionException;
 import org.apache.commons.io.IOUtils;
+import org.jf.dexlib2.writer.builder.DexBuilder;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
@@ -45,25 +49,30 @@ public class SmaliBuilder {
 
 	private void build() throws AndrolibException {
 		try {
-			mDexBuilder = new DexFileBuilder();
-			for (String fileName : mSmaliDir.getDirectory().getFiles(true)) {
-				buildFile(fileName);
+            DexBuilder dexBuilder = DexBuilder.makeDexBuilder();
+
+            for (String fileName : mSmaliDir.getDirectory().getFiles(true)) {
+				buildFile(fileName, dexBuilder);
 			}
-			mDexBuilder.writeTo(mDexFile);
-		} catch (IOException ex) {
-			throw new AndrolibException(ex);
-		} catch (DirectoryException ex) {
+            dexBuilder.writeTo(mDexFile.getAbsolutePath());
+		} catch (IOException | DirectoryException ex) {
 			throw new AndrolibException(ex);
 		}
 	}
 
-	private void buildFile(String fileName) throws AndrolibException,
+	private void buildFile(String fileName, DexBuilder dexBuilder) throws AndrolibException,
 			IOException {
 		File inFile = new File(mSmaliDir, fileName);
 		InputStream inStream = new FileInputStream(inFile);
 
 		if (fileName.endsWith(".smali")) {
-			mDexBuilder.addSmaliFile(inFile);
+            try {
+                if (!SmaliMod.assembleSmaliFile(inFile,dexBuilder, false, false)) {
+                    throw new AndrolibException("Could not smali file: " + fileName);
+                }
+            } catch (IOException | RecognitionException ex) {
+                throw new AndrolibException(ex);
+            }
 			return;
 		}
 		if (!fileName.endsWith(".java")) {
@@ -99,15 +108,13 @@ public class SmaliBuilder {
 				out.append(line).append('\n');
 			}
 		}
-		mDexBuilder.addSmaliFile(IOUtils.toInputStream(out.toString()),
-				fileName);
+		//mDexBuilder.addSmaliFile(IOUtils.toInputStream(out.toString()),
+				//fileName);
 	}
 
 	private final ExtFile mSmaliDir;
 	private final File mDexFile;
 	private final HashMap<String, Boolean> mFlags;
-
-	private DexFileBuilder mDexBuilder;
 
 	private final static Logger LOGGER = Logger.getLogger(SmaliBuilder.class
 			.getName());
