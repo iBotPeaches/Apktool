@@ -284,7 +284,7 @@ public class Main {
                 .withDescription("Decode in debug mode. Check project page for more info.")
                 .create("d");
 
-        Option analysisOption = OptionBuilder.withLongOpt("-match-original")
+        Option analysisOption = OptionBuilder.withLongOpt("match-original")
                 .withDescription("Keeps files to closest to original as possible. Prevents rebuild.")
                 .create("m");
 
