@@ -266,7 +266,7 @@ public class Androlib {
 		Object t1 = meta.get("isFrameworkApk");
 		flags.put("framework", t1 == null ? false : (Boolean) t1);
 		flags.put("compression", meta.get("compressionType") == null ? false
-				: (Boolean) meta.get("compressionType"));
+				: Boolean.valueOf(meta.get("compressionType").toString()));
 		mAndRes.setSdkInfo((Map<String, String>) meta.get("sdkInfo"));
 		mAndRes.setPackageId((Map<String, String>) meta.get("packageInfo"));
 		mAndRes.setVersionInfo((Map<String, String>) meta.get("versionInfo"));
