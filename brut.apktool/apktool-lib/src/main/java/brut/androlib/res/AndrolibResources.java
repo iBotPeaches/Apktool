@@ -322,7 +322,6 @@ final public class AndrolibResources {
 				generateValuesFile(valuesFile, out, xmlSerializer);
 			}
 			generatePublicXml(pkg, out, xmlSerializer);
-			LOGGER.info("Done.");
 		}
 
 		AndrolibException decodeError = duo.m2.getFirstError();
