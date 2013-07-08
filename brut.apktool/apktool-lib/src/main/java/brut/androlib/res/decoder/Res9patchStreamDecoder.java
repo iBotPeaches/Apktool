@@ -22,6 +22,8 @@ import brut.util.ExtDataInput;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageTypeSpecifier;
+
 import org.apache.commons.io.IOUtils;
 
 /**
@@ -37,14 +39,10 @@ public class Res9patchStreamDecoder implements ResStreamDecoder {
 			BufferedImage im = ImageIO.read(new ByteArrayInputStream(data));
 			int w = im.getWidth(), h = im.getHeight();
 
-			BufferedImage im2 = new BufferedImage(w + 2, h + 2,
-					BufferedImage.TYPE_4BYTE_ABGR);
-			if (im.getType() == BufferedImage.TYPE_4BYTE_ABGR) {
-				im2.getRaster().setRect(1, 1, im.getRaster());
-			} else {
-				im2.getGraphics().drawImage(im, 1, 1, null);
-			}
+            ImageTypeSpecifier its = ImageTypeSpecifier.createFromRenderedImage( im );
+            BufferedImage im2 = its.createBufferedImage( w+2, h+2 );
 
+            im2.getRaster().setRect(1, 1, im.getRaster());
 			NinePatch np = getNinePatch(data);
 			drawHLine(im2, h + 1, np.padLeft + 1, w - np.padRight);
 			drawVLine(im2, w + 1, np.padTop + 1, h - np.padBottom);
