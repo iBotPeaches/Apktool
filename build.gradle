@@ -25,8 +25,16 @@ repositories {
   mavenCentral()
 }
 
-sourceCompatibility = 1.6
-targetCompatibility = 1.6
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+build.doFirst {
+    def javaVersion = System.getProperty("java.version")
+    //fail the build if we don't have the expected Java version
+    if (!javaVersion.startsWith("1.7")) {
+        throw new GradleException("You can fix this problem!\nWe found a " + javaVersion + " JDK\nPlease update JAVA_HOME to use a 1.7 JDK\nCurrently it is set to: " + System.getProperty("java.home"));
+    } 
+}
 
 class Compatibility {
   String version
