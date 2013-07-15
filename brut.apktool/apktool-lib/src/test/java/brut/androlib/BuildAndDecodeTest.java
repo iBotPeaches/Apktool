@@ -60,7 +60,7 @@ public class BuildAndDecodeTest {
 
     @Test
     public void buildAndDecodeTest() throws BrutException {
-        assertTrue(sTestNewDir.hashCode() == sTestNewDir.hashCode());
+        assertTrue(sTestNewDir.isDirectory());
     }
 
 	@Test
