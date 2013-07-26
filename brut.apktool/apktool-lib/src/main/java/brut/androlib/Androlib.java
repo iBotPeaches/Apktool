@@ -29,6 +29,7 @@ import brut.util.BrutIO;
 import brut.util.OS;
 import java.io.*;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.*;
 import java.nio.file.Path;
 import java.util.*;
@@ -552,7 +553,7 @@ public class Androlib {
 
                 // create filesystem
                 Path path = Paths.get(outFile.getAbsolutePath());
-                URI apkFileSystem = URI.create("jar:file:" + path.toUri().getPath());
+                URI apkFileSystem = new URI("jar", path.toUri().toString(), null);
                 try(FileSystem zipFS = FileSystems.newFileSystem(apkFileSystem, zip_properties)) {
 
                     // loop through files inside
@@ -568,9 +569,10 @@ public class Androlib {
                 }
             } catch (IOException ex) {
                 throw new AndrolibException(ex);
+            } catch (URISyntaxException ex) {
+                throw new AndrolibException(ex);
             }
         }
-
     }
 
     public void insertFile(FileSystem zipfs, File insert, String method, Path root)
