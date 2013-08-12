@@ -139,7 +139,7 @@ public class ClassPath {
     @Nonnull
     public ClassDef getClassDef(String type) {
         if (dontLoadClassPath) {
-            return null;
+            throw new UnresolvedClassException("Could not resolve class %s", type);
         }
 
         ClassDef ret = availableClasses.get(type);
