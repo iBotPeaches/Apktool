@@ -51,6 +51,7 @@ task proguard(type: JavaExec, dependsOn: fatJar) {
     args '-keepclassmembers enum * { public static **[] values(); public static ** valueOf(java.lang.String); }'
     args '-dontwarn com.google.common.base.**'
     args '-dontwarn com.google.common.collect.**'
+    args '-dontwarn com.google.common.util.**'
     args '-dontwarn javax.xml.xpath.**'
     args '-dontnote **'
 }

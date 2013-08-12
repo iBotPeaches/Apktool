@@ -16,7 +16,7 @@
 
 import org.apache.tools.ant.filters.*
 
-// kudos #smali - JesusFreke, for how to build release task
+// release
 if (!('release' in gradle.startParameter.taskNames)) {
   ant.loadfile(srcFile: "../../.git/refs/heads/master", property: fullrev, failonerror: false);
   if (ant.properties[fullrev] == null) {
