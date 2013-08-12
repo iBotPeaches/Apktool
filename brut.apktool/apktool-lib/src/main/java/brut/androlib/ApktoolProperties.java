@@ -16,6 +16,9 @@
 
 package brut.androlib;
 
+import org.jf.baksmali.baksmali;
+import org.jf.smali.main;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -37,8 +40,7 @@ public class ApktoolProperties {
 	}
 
 	private static void loadProps() {
-		InputStream in = ApktoolProperties.class
-				.getResourceAsStream("/properties/apktool.properties");
+		InputStream in = ApktoolProperties.class.getResourceAsStream("/properties/apktool.properties");
 		sProps = new Properties();
 		try {
 			sProps.load(in);
@@ -47,25 +49,31 @@ public class ApktoolProperties {
 			LOGGER.warning("Can't load properties.");
 		}
 
-		InputStream templateStream = ApktoolProperties.class
-				.getResourceAsStream("/properties/baksmali.properties");
+		InputStream templateStream = baksmali.class.getClassLoader().getResourceAsStream("baksmali.properties");
 		Properties properties = new Properties();
 		String version = "(unknown)";
-		try {
-			properties.load(templateStream);
-			version = properties.getProperty("application.version");
-		} catch (IOException ex) {
-		}
+
+        if (templateStream != null) {
+            try {
+                properties.load(templateStream);
+                version = properties.getProperty("application.version");
+            } catch (IOException ignored) {
+            }
+        }
 		sProps.put("baksmaliVersion", version);
-		templateStream = ApktoolProperties.class
-				.getResourceAsStream("/properties/smali.properties");
+
+
+		templateStream = main.class.getClassLoader().getResourceAsStream("smali.properties");
 		properties = new Properties();
 		version = "(unknown)";
-		try {
-			properties.load(templateStream);
-			version = properties.getProperty("application.version");
-		} catch (IOException ex) {
-		}
+
+        if (templateStream != null) {
+            try {
+                properties.load(templateStream);
+                version = properties.getProperty("application.version");
+            } catch (IOException ignored) {
+            }
+        }
 		sProps.put("smaliVersion", version);
 	}
 
