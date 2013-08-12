@@ -17,10 +17,14 @@
 package brut.androlib.src;
 
 import brut.androlib.AndrolibException;
+import com.google.common.collect.Lists;
 import org.jf.baksmali.baksmali;
 import org.jf.baksmali.baksmaliOptions;
 import org.jf.dexlib2.DexFileFactory;
 import org.jf.dexlib2.analysis.ClassPath;
+import org.jf.dexlib2.dexbacked.DexBackedDexFile;
+import org.jf.dexlib2.dexbacked.DexBackedOdexFile;
+import org.jf.dexlib2.analysis.InlineMethodResolver;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -32,6 +36,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.List;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
@@ -67,13 +72,34 @@ public class SmaliDecoder {
             options.useSequentialLabels = true;
             options.outputDebugInfo = mBakDeb;
             options.addCodeOffsets = false;
+            options.jobs = -1;
             options.noAccessorComments = false;
             options.registerInfo = (mDebug ? baksmaliOptions.DIFFPRE : 0);
             options.ignoreErrors = false;
             options.inlineResolver = null;
             options.checkPackagePrivateAccess = false;
 
-            baksmali.disassembleDexFile(DexFileFactory.loadDexFile(mApkFile, mApi), options);
+            // set jobs automatically
+            if (options.jobs <= 0) {
+                options.jobs = Runtime.getRuntime().availableProcessors();
+                if (options.jobs > 6) {
+                    options.jobs = 6;
+                }
+            }
+
+            // create the dex
+            DexBackedDexFile dexFile = DexFileFactory.loadDexFile(mApkFile, mApi);
+
+            if (dexFile.isOdexFile()) {
+                throw new AndrolibException("Warning: You are disassembling an odex file without deodexing it.");
+            }
+
+            if (options.inlineResolver == null && dexFile instanceof DexBackedOdexFile) {
+                options.inlineResolver =
+                        InlineMethodResolver.createInlineMethodResolver(((DexBackedOdexFile)dexFile).getOdexVersion());
+            }
+
+            baksmali.disassembleDexFile(dexFile,options);
 
             if (mDebug) {
                 Files.walkFileTree(mOutDir, new SmaliFileVisitor());
