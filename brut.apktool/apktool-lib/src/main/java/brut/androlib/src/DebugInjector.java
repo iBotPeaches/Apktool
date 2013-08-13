@@ -20,7 +20,6 @@ import brut.androlib.AndrolibException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.jf.dexlib.Code.Analysis.RegisterType;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
@@ -74,7 +73,7 @@ public class DebugInjector {
     private void injectRemainingParams() {
         areParamsInjected = true;
         while(currParam <= lastParam) {
-            mOut.append(".parameter \"p").append(currParam).append("\"\n");
+            //mOut.append(".param \"p").append(currParam).append("\"\n");
             currParam++;
         }
     }
@@ -108,61 +107,65 @@ public class DebugInjector {
 
 		Matcher m = REGISTER_INFO_PATTERN.matcher(line);
 
-		while (m.find()) {
-			String localName = m.group(1);
-			String localType = null;
-			switch (RegisterType.Category.valueOf(m.group(2))) {
-			case Reference:
-			case Null:
-			case UninitRef:
-			case UninitThis:
-				localType = "Ljava/lang/Object;";
-				break;
-			case Boolean:
-				localType = "Z";
-				break;
-			case Integer:
-			case One:
-			case Unknown:
-				localType = "I";
-				break;
-			case Uninit:
-			case Conflicted:
-				if (mInitializedRegisters.remove(localName)) {
-					mOut.append(".end local ").append(localName).append('\n');
-				}
-				continue;
-			case Short:
-			case PosShort:
-				localType = "S";
-				break;
-			case Byte:
-			case PosByte:
-				localType = "B";
-				break;
-			case Char:
-				localType = "C";
-				break;
-			case Float:
-				localType = "F";
-				break;
-			case LongHi:
-			case LongLo:
-				localType = "J";
-				break;
-			case DoubleHi:
-			case DoubleLo:
-				localType = "D";
-				break;
-			default:
-				assert false;
-			}
+        while (m.find()) {
+            String localName = m.group(1);
+            String localType = null;
+            switch (m.group(2)) {
+                case "Reference":
+                case "UninitRef":
+                case "REFERENCE":
+                case "Null":
+                case "UninitThis":
+                    localType = "Ljava/lang/Object;";
+                    break;
+                case "Boolean":
+                    localType = "Z";
+                    break;
+                case "Integer":
+                case "One":
+                case "Unknown":
+                    localType = "I";
+                    break;
+                case "Uninit":
+                case "Conflicted":
+                    if (mInitializedRegisters.remove(localName)) {
+                        mOut.append(".end local ").append(localName).append('\n');
+                    }
+                    continue;
+                case "Short":
+                case "PosShort":
+                    localType = "S";
+                    break;
+                case "Byte":
+                case "PosByte":
+                    localType = "B";
+                    break;
+                case "Char":
+                    localType = "C";
+                    break;
+                case "Float":
+                    localType = "F";
+                   break;
+                case "LongHi":
+                case "LongLo":
+                    localType = "J";
+                    break;
+                case "DoubleHi":
+                case "DoubleLo":
+                    localType = "D";
+                    break;
+                default:
+                    System.out.println(line);
+                    System.out.println(m.group(2));
+                    System.out.println(m.group(3));
+                    assert false;
+            }
 
-			mInitializedRegisters.add(localName);
-			mOut.append(".local ").append(localName).append(", ")
-					.append(localName).append(':').append(localType)
-					.append('\n');
-		}
+            mInitializedRegisters.add(localName);
+            mOut.append(".local ").append(localName).append(", ").append('"')
+                    .append(localName).append('"').append(':').append(localType)
+                    .append('\n');
+        }
 
 		return false;
 	}
@@ -178,11 +181,11 @@ public class DebugInjector {
             }
             return false;
         }
-        if (line2.equals("parameter")) {
-            mOut.append(".parameter \"p").append(currParam++).append("\"\n");
+        if (line2.equals("param")) {
+            mOut.append(".param \"p").append(currParam++).append("\"\n");
             return false;
         }
-        if (line2.startsWith("parameter")) {
+        if (line2.startsWith("param")) {
             mOut.append(line).append("\n");
             currParam++;
             return false;
@@ -237,5 +240,5 @@ public class DebugInjector {
 	private final Set<String> mInitializedRegisters = new HashSet<String>();
 
 	private static final Pattern REGISTER_INFO_PATTERN = Pattern
-			.compile("((?:p|v)\\d+)=\\(([^)]+)\\);");
+			.compile("((?:p|v)\\d+)=\\(([^,)]+)([^)]*)\\);");
 }
