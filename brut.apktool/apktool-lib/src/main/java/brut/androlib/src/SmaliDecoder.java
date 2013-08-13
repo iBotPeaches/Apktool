@@ -17,7 +17,6 @@
 package brut.androlib.src;
 
 import brut.androlib.AndrolibException;
-import com.google.common.collect.Lists;
 import org.jf.baksmali.baksmali;
 import org.jf.baksmali.baksmaliOptions;
 import org.jf.dexlib2.DexFileFactory;
@@ -36,7 +35,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.List;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
@@ -81,9 +79,13 @@ public class SmaliDecoder {
 
             // set jobs automatically
             if (options.jobs <= 0) {
-                options.jobs = Runtime.getRuntime().availableProcessors();
-                if (options.jobs > 6) {
-                    options.jobs = 6;
+                if (mDebug) {
+                    options.jobs = 1;
+                } else {
+                    options.jobs = Runtime.getRuntime().availableProcessors();
+                    if (options.jobs > 6) {
+                        options.jobs = 6;
+                    }
                 }
             }
 
