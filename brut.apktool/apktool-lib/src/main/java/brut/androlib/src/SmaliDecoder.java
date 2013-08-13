@@ -96,7 +96,7 @@ public class SmaliDecoder {
                 throw new AndrolibException("Warning: You are disassembling an odex file without deodexing it.");
             }
 
-            if (options.inlineResolver == null && dexFile instanceof DexBackedOdexFile) {
+            if (dexFile instanceof DexBackedOdexFile) {
                 options.inlineResolver =
                         InlineMethodResolver.createInlineMethodResolver(((DexBackedOdexFile)dexFile).getOdexVersion());
             }

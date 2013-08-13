@@ -108,8 +108,14 @@ public class SmaliBuilder {
 				out.append(line).append('\n');
 			}
 		}
-		//mDexBuilder.addSmaliFile(IOUtils.toInputStream(out.toString()),
-				//fileName);
+
+        try {
+            if (!SmaliMod.assembleSmaliFile(out.toString(),dexBuilder, false, false, inFile)) {
+                throw new AndrolibException("Could not smali file: " + fileName);
+            }
+        } catch (IOException | RecognitionException ex) {
+            throw new AndrolibException(ex);
+        }
 	}
 
 	private final ExtFile mSmaliDir;
