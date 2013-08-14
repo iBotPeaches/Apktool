@@ -96,7 +96,6 @@ final public class AndrolibResources {
         }
 
         resTable.addPackage(pkg, true);
-        LOGGER.info("Loaded.");
         return pkg;
     }
 
@@ -120,7 +119,6 @@ final public class AndrolibResources {
         }
 
         resTable.addPackage(pkg, false);
-        LOGGER.info("Loaded.");
         return pkg;
     }
 
@@ -321,7 +319,6 @@ final public class AndrolibResources {
                 generateValuesFile(valuesFile, out, xmlSerializer);
             }
             generatePublicXml(pkg, out, xmlSerializer);
-            LOGGER.info("Done.");
         }
 
         AndrolibException decodeError = duo.m2.getFirstError();
