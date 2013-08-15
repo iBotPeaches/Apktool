@@ -145,7 +145,8 @@ public class Main {
             decoder.setAnalysisMode(true, false);
         }
         if (cli.hasOption("o") || cli.hasOption("output")) {
-            decoder.setOutDir(new File(cli.getOptionValue("o")));
+            outDir = new File(cli.getOptionValue("o"));
+            decoder.setOutDir(outDir);
         } else {
 
             // make out folder manually using name of apk
