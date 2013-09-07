@@ -536,7 +536,7 @@ public class Androlib {
 	}
 
     public void buildUnknownFiles(File appDir, File outFile, Map<String, Object> meta)
-        throws AndrolibException {
+            throws AndrolibException {
         File file;
         mPath = Paths.get(appDir.getPath() + File.separatorChar + UNK_DIRNAME);
 
@@ -554,18 +554,15 @@ public class Androlib {
                 // create filesystem
                 Path path = Paths.get(outFile.getAbsolutePath());
                 URI apkFileSystem = new URI("jar", path.toUri().toString(), null);
-                try(FileSystem zipFS = FileSystems.newFileSystem(apkFileSystem, zip_properties)) {
 
-                    // loop through files inside
-                    for (Map.Entry<String,String> entry : files.entrySet()) {
+                // loop through files inside
+                for (Map.Entry<String,String> entry : files.entrySet()) {
 
-                        // check if file exists
-                        file = new File(mPath.toFile(), entry.getKey());
-                        if (file.isFile() && file.exists()) {
-                            insertFile(zipFS, file, entry.getValue(),mPath.toAbsolutePath());
-                        }
+                    file = new File(mPath.toFile(), entry.getKey());
+                    if (file.isFile() && file.exists()) {
+                        insertFolder(apkFileSystem, zip_properties, file.getParentFile(), entry.getValue(), mPath.toAbsolutePath());
+                        insertFile(apkFileSystem, zip_properties, file, entry.getValue(), mPath.toAbsolutePath());
                     }
-                    zipFS.close();
                 }
             } catch (IOException ex) {
                 throw new AndrolibException(ex);
@@ -575,17 +572,41 @@ public class Androlib {
         }
     }
 
-    public void insertFile(FileSystem zipfs, File insert, String method, Path root)
+    private void insertFile(URI apkFileSystem, Map<String,String> zip_properties, File insert, String method, Path location)
             throws AndrolibException, IOException {
-        Path zipRoot = zipfs.getPath(zipfs.getSeparator());
-        Path zipPath = zipfs.getPath(zipRoot.toString() + insert.getAbsolutePath().replace(root.toString(),""));
-        Path tmp = zipPath.normalize().getParent();
 
-        if (!Files.isDirectory(tmp, LinkOption.NOFOLLOW_LINKS)) {
-            Files.createDirectories(tmp);
+        // ZipFileSystem only writes at .close()
+        // http://mail.openjdk.java.net/pipermail/nio-dev/2012-July/001764.html
+        try(FileSystem fs = FileSystems.newFileSystem(apkFileSystem, zip_properties)) {
+
+            Path root = fs.getPath("/");
+
+            // in order to get the path relative to the zip, we strip off the absolute path, minus what we
+            // already have in the zip. thus /var/files/apktool/apk/unknown/folder/file => /folder/file
+            Path dest = fs.getPath(root.toString() + insert.getAbsolutePath().replace(location.toString(),""));
+            Path newFile = Paths.get(insert.getAbsolutePath());
+            Files.copy(newFile,dest, StandardCopyOption.REPLACE_EXISTING);
+            fs.close();
         }
-        Path newFile = Paths.get(insert.getAbsolutePath());
-        Files.copy(newFile,zipPath, StandardCopyOption.REPLACE_EXISTING);
+    }
+
+    private void insertFolder(URI apkFileSystem, Map<String,String> zip_properties, File insert, String method, Path location)
+            throws AndrolibException, IOException {
+
+        try(FileSystem fs = FileSystems.newFileSystem(apkFileSystem, zip_properties)) {
+
+            Path root = fs.getPath("/");
+            Path dest = fs.getPath(root.toString() + insert.getAbsolutePath().replace(location.toString(),""));
+            Path parent = dest.normalize();
+
+            // check for folder existing in apkFileSystem
+            if (parent != null && Files.notExists(parent)) {
+                if (!Files.isDirectory(parent, LinkOption.NOFOLLOW_LINKS)) {
+                    Files.createDirectories(parent);
+                }
+            }
+            fs.close();
+        }
     }
   
 	public void buildApk(File appDir, File outApk,
