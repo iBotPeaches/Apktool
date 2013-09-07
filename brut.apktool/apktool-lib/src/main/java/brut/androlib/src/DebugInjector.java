@@ -155,9 +155,9 @@ public class DebugInjector {
                     localType = "D";
                     break;
                 default:
-                    System.out.println(line);
-                    System.out.println(m.group(2));
-                    System.out.println(m.group(3));
+                    System.err.println(line);
+                    System.err.println(m.group(2));
+                    System.err.println(m.group(3));
                     assert false;
             }
 

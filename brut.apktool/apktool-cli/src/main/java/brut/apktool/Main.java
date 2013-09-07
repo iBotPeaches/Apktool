@@ -60,7 +60,7 @@ public class Main {
         try {
             commandLine = parser.parse(allOptions, args, false);
         } catch (ParseException ex) {
-            System.out.println(ex.getMessage());
+            System.err.println(ex.getMessage());
             usage(commandLine);
             return;
         }
@@ -165,24 +165,24 @@ public class Main {
         try {
             decoder.decode();
         } catch (OutDirExistsException ex) {
-            System.out
+            System.err
                     .println("Destination directory ("
                             + outDir.getAbsolutePath()
                             + ") "
                             + "already exists. Use -f switch if you want to overwrite it.");
             System.exit(1);
         } catch (InFileNotFoundException ex) {
-            System.out.println("Input file (" + apkName + ") " + "was not found or was not readable.");
+            System.err.println("Input file (" + apkName + ") " + "was not found or was not readable.");
             System.exit(1);
         } catch (CantFindFrameworkResException ex) {
-            System.out
+            System.err
                     .println("Can't find framework resources for package of id: "
                             + String.valueOf(ex.getPkgId())
                             + ". You must install proper "
                             + "framework files, see project website for more info.");
             System.exit(1);
         } catch (IOException ex) {
-            System.out.println("Could not modify file. Please ensure you have permission.");
+            System.err.println("Could not modify file. Please ensure you have permission.");
             System.exit(1);
         }
 

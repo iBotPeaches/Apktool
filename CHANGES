@@ -21,6 +21,7 @@ v2.0.0 (TBA)
 -Fixed (issue #326) - Fixed PNG increasing brightness on build (Thanks Christiaan)
 -Fixed (issue #448) - Merge smali2 into Apktool
 -Fixed (issue #496) - Fixes Windows builds caused by java.nio problems
+-Fixed (issue #510) - Any error output is sent stderr instead of stdout
 -Updated known bytes for configurations to 38 (from addition of layout direction)
 -Fixed NPE when handling odex apks even with --no-src specified. (Thanks Rodrigo Chiossi)
 

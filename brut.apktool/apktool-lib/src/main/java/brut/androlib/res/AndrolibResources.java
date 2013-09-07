@@ -791,7 +791,7 @@ final public class AndrolibResources {
         if (!dir.exists()) {
             if (!dir.mkdirs()) {
                 if (sFrameworkFolder != null) {
-                    System.out.println("Can't create Framework directory: "
+                    System.err.println("Can't create Framework directory: "
                             + dir);
                 }
                 throw new AndrolibException("Can't create directory: " + dir);
