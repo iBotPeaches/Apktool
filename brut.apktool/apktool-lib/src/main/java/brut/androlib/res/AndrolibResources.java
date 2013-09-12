@@ -337,8 +337,8 @@ final public class AndrolibResources {
 
     public void setVersionInfo(Map<String, String> map) {
         if (map != null) {
-            mVersionCode = map.get("versionCode").toString();
-            mVersionName = map.get("versionName").toString();
+            mVersionCode = map.get("versionCode");
+            mVersionName = map.get("versionName");
         }
     }
 
