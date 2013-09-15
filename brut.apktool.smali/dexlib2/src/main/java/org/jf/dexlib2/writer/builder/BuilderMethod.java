@@ -33,6 +33,7 @@ package org.jf.dexlib2.writer.builder;
 
 import org.jf.dexlib2.base.reference.BaseMethodReference;
 import org.jf.dexlib2.iface.Method;
+import org.jf.dexlib2.iface.MethodImplementation;
 import org.jf.dexlib2.writer.DexWriter;
 
 import javax.annotation.Nonnull;
@@ -44,17 +45,16 @@ public class BuilderMethod extends BaseMethodReference implements Method {
     @Nonnull final List<? extends BuilderMethodParameter> parameters;
     final int accessFlags;
     @Nonnull final BuilderAnnotationSet annotations;
-    @Nullable final BuilderMethodImplementation methodImplementation;
+    @Nullable final MethodImplementation methodImplementation;
 
     int annotationSetRefListOffset = DexWriter.NO_OFFSET;
     int codeItemOffset = DexWriter.NO_OFFSET;
-    int debugInfoOffset = DexWriter.NO_OFFSET;
 
     BuilderMethod(@Nonnull BuilderMethodReference methodReference,
                   @Nonnull List<? extends BuilderMethodParameter> parameters,
                   int accessFlags,
                   @Nonnull BuilderAnnotationSet annotations,
-                  @Nullable BuilderMethodImplementation methodImplementation) {
+                  @Nullable MethodImplementation methodImplementation) {
         this.methodReference = methodReference;
         this.parameters = parameters;
         this.accessFlags = accessFlags;
@@ -69,5 +69,5 @@ public class BuilderMethod extends BaseMethodReference implements Method {
     @Override @Nonnull public List<? extends BuilderMethodParameter> getParameters() { return parameters; }
     @Override public int getAccessFlags() { return accessFlags; }
     @Override @Nonnull public BuilderAnnotationSet getAnnotations() { return annotations; }
-    @Override @Nullable public BuilderMethodImplementation getImplementation() { return methodImplementation; }
+    @Override @Nullable public MethodImplementation getImplementation() { return methodImplementation; }
 }

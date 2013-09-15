@@ -33,6 +33,7 @@ package org.jf.dexlib2.writer.pool;
 
 import org.jf.dexlib2.iface.reference.StringReference;
 import org.jf.dexlib2.writer.StringSection;
+import org.jf.util.ExceptionWithContext;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -49,6 +50,14 @@ public class StringPool extends StringTypeBasePool implements StringSection<Char
     }
 
     @Override public int getItemIndex(@Nonnull StringReference key) {
-        return getItemIndex(key.getString());
+        Integer index = internedItems.get(key.toString());
+        if (index == null) {
+            throw new ExceptionWithContext("Item not found.: %s", key.toString());
+        }
+        return index;
+    }
+
+    @Override public boolean hasJumboIndexes() {
+        return internedItems.size() > 65536;
     }
 }

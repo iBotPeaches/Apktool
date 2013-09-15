@@ -50,7 +50,6 @@ public class ImmutableInstruction22b extends ImmutableInstruction implements Ins
                                    int registerB,
                                    int literal) {
         super(opcode);
-        Preconditions.checkFormat(opcode, FORMAT);
         this.registerA = Preconditions.checkByteRegister(registerA);
         this.registerB = Preconditions.checkByteRegister(registerB);
         this.literal = Preconditions.checkByteLiteral(literal);

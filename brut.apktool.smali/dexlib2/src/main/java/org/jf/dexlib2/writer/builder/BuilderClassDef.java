@@ -73,10 +73,20 @@ public class BuilderClassDef extends BaseTypeReference implements ClassDef {
         this.interfaces = interfaces;
         this.sourceFile = sourceFile;
         this.annotations = annotations;
-        this.staticFields = ImmutableSortedSet.copyOf(Iterables.filter(fields, FieldUtil.FIELD_IS_STATIC));
-        this.instanceFields = ImmutableSortedSet.copyOf(Iterables.filter(fields, FieldUtil.FIELD_IS_INSTANCE));
-        this.directMethods = ImmutableSortedSet.copyOf(Iterables.filter(methods, MethodUtil.METHOD_IS_DIRECT));
-        this.virtualMethods = ImmutableSortedSet.copyOf(Iterables.filter(methods, MethodUtil.METHOD_IS_VIRTUAL));
+        if (fields == null) {
+            this.staticFields = ImmutableSortedSet.of();
+            this.instanceFields = ImmutableSortedSet.of();
+        } else {
+            this.staticFields = ImmutableSortedSet.copyOf(Iterables.filter(fields, FieldUtil.FIELD_IS_STATIC));
+            this.instanceFields = ImmutableSortedSet.copyOf(Iterables.filter(fields, FieldUtil.FIELD_IS_INSTANCE));
+        }
+        if (methods == null) {
+            this.directMethods = ImmutableSortedSet.of();
+            this.virtualMethods = ImmutableSortedSet.of();
+        } else {
+            this.directMethods = ImmutableSortedSet.copyOf(Iterables.filter(methods, MethodUtil.METHOD_IS_DIRECT));
+            this.virtualMethods = ImmutableSortedSet.copyOf(Iterables.filter(methods, MethodUtil.METHOD_IS_VIRTUAL));
+        }
     }
 
     @Nonnull @Override public String getType() { return type.getType(); }

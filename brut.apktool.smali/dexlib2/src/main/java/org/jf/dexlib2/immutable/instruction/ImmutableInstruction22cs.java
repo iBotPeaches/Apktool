@@ -43,14 +43,13 @@ public class ImmutableInstruction22cs extends ImmutableInstruction implements In
 
     protected final int registerA;
     protected final int registerB;
-    @Nonnull protected final int fieldOffset;
+    protected final int fieldOffset;
 
     public ImmutableInstruction22cs(@Nonnull Opcode opcode,
                                    int registerA,
                                    int registerB,
                                    int fieldOffset) {
         super(opcode);
-        Preconditions.checkFormat(opcode, FORMAT);
         this.registerA = Preconditions.checkNibbleRegister(registerA);
         this.registerB = Preconditions.checkNibbleRegister(registerB);
         this.fieldOffset = Preconditions.checkFieldOffset(fieldOffset);

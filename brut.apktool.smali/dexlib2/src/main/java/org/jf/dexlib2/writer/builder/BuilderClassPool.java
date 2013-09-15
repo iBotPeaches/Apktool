@@ -35,17 +35,19 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.*;
 import org.jf.dexlib2.DebugItemType;
+import org.jf.dexlib2.builder.MutableMethodImplementation;
+import org.jf.dexlib2.iface.ExceptionHandler;
 import org.jf.dexlib2.iface.Field;
+import org.jf.dexlib2.iface.MethodImplementation;
 import org.jf.dexlib2.iface.TryBlock;
-import org.jf.dexlib2.iface.debug.EndLocal;
-import org.jf.dexlib2.iface.debug.LineNumber;
-import org.jf.dexlib2.iface.debug.RestartLocal;
+import org.jf.dexlib2.iface.debug.*;
+import org.jf.dexlib2.iface.instruction.Instruction;
+import org.jf.dexlib2.iface.reference.StringReference;
+import org.jf.dexlib2.iface.reference.TypeReference;
 import org.jf.dexlib2.iface.value.EncodedValue;
 import org.jf.dexlib2.util.EncodedValueUtils;
 import org.jf.dexlib2.writer.ClassSection;
 import org.jf.dexlib2.writer.DebugWriter;
-import org.jf.dexlib2.writer.builder.BuilderDebugItem.BuilderSetSourceFile;
-import org.jf.dexlib2.writer.builder.BuilderDebugItem.BuilderStartLocal;
 import org.jf.dexlib2.writer.builder.BuilderEncodedValues.BuilderEncodedValue;
 import org.jf.util.AbstractForwardSequentialList;
 import org.jf.util.CollectionUtils;
@@ -59,8 +61,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentMap;
 
 public class BuilderClassPool implements ClassSection<BuilderStringReference, BuilderTypeReference, BuilderTypeList,
-        BuilderClassDef, BuilderField, BuilderMethod, BuilderAnnotationSet, BuilderEncodedValue, BuilderDebugItem,
-        BuilderInstruction, BuilderExceptionHandler> {
+        BuilderClassDef, BuilderField, BuilderMethod, BuilderAnnotationSet, BuilderEncodedValue> {
     @Nonnull private final ConcurrentMap<String, BuilderClassDef> internedItems =
             Maps.newConcurrentMap();
 
@@ -266,8 +267,8 @@ public class BuilderClassPool implements ClassSection<BuilderStringReference, Bu
     }
 
     @Nullable @Override
-    public Iterable<? extends BuilderDebugItem> getDebugItems(@Nonnull BuilderMethod builderMethod) {
-        BuilderMethodImplementation impl = builderMethod.getImplementation();
+    public Iterable<? extends DebugItem> getDebugItems(@Nonnull BuilderMethod builderMethod) {
+        MethodImplementation impl = builderMethod.getImplementation();
         if (impl == null) {
             return null;
         }
@@ -284,16 +285,16 @@ public class BuilderClassPool implements ClassSection<BuilderStringReference, Bu
     }
 
     @Override public int getRegisterCount(@Nonnull BuilderMethod builderMethod) {
-        BuilderMethodImplementation impl = builderMethod.getImplementation();
+        MethodImplementation impl = builderMethod.getImplementation();
         if (impl == null) {
             return 0;
         }
-        return impl.registerCount;
+        return impl.getRegisterCount();
     }
 
     @Nullable @Override
-    public Iterable<? extends BuilderInstruction> getInstructions(@Nonnull BuilderMethod builderMethod) {
-        BuilderMethodImplementation impl = builderMethod.getImplementation();
+    public Iterable<? extends Instruction> getInstructions(@Nonnull BuilderMethod builderMethod) {
+        MethodImplementation impl = builderMethod.getImplementation();
         if (impl == null) {
             return null;
         }
@@ -301,16 +302,25 @@ public class BuilderClassPool implements ClassSection<BuilderStringReference, Bu
     }
 
     @Nonnull @Override
-    public List<? extends TryBlock<? extends BuilderExceptionHandler>> getTryBlocks(@Nonnull BuilderMethod builderMethod) {
-        BuilderMethodImplementation impl = builderMethod.getImplementation();
+    public List<? extends TryBlock<? extends ExceptionHandler>> getTryBlocks(@Nonnull BuilderMethod builderMethod) {
+        MethodImplementation impl = builderMethod.getImplementation();
         if (impl == null) {
             return ImmutableList.of();
         }
         return impl.getTryBlocks();
     }
 
-    @Nullable @Override public BuilderTypeReference getExceptionType(@Nonnull BuilderExceptionHandler handler) {
-        return handler.exceptionType;
+    @Nullable @Override public BuilderTypeReference getExceptionType(@Nonnull ExceptionHandler handler) {
+        return checkTypeReference(handler.getExceptionTypeReference());
+    }
+
+    @Nonnull @Override
+    public MutableMethodImplementation makeMutableMethodImplementation(@Nonnull BuilderMethod builderMethod) {
+        MethodImplementation impl = builderMethod.getImplementation();
+        if (impl instanceof MutableMethodImplementation) {
+            return (MutableMethodImplementation)impl;
+        }
+        return new MutableMethodImplementation(impl);
     }
 
     @Override public void setEncodedArrayOffset(@Nonnull BuilderClassDef builderClassDef, int offset) {
@@ -345,25 +355,41 @@ public class BuilderClassPool implements ClassSection<BuilderStringReference, Bu
         return builderMethod.codeItemOffset;
     }
 
-    @Override public void setDebugItemOffset(@Nonnull BuilderMethod builderMethod, int offset) {
-        builderMethod.debugInfoOffset = offset;
+    @Nullable private BuilderStringReference checkStringReference(@Nullable StringReference stringReference) {
+        if (stringReference == null) {
+            return null;
+        }
+        try {
+            return (BuilderStringReference)stringReference;
+        } catch (ClassCastException ex) {
+            throw new IllegalStateException("Only StringReference instances returned by " +
+                    "DexBuilder.internStringReference or DexBuilder.internNullableStringReference may be used.");
+        }
     }
 
-    @Override public int getDebugItemOffset(@Nonnull BuilderMethod builderMethod) {
-        return builderMethod.debugInfoOffset;
+    @Nullable private BuilderTypeReference checkTypeReference(@Nullable TypeReference typeReference) {
+        if (typeReference == null) {
+            return null;
+        }
+        try {
+            return (BuilderTypeReference)typeReference;
+        } catch (ClassCastException ex) {
+            throw new IllegalStateException("Only TypeReference instances returned by " +
+                    "DexBuilder.internTypeReference or DexBuilder.internNullableTypeReference may be used.");
+        }
     }
 
     @Override
     public void writeDebugItem(@Nonnull DebugWriter<BuilderStringReference, BuilderTypeReference> writer,
-                               BuilderDebugItem debugItem) throws IOException {
+                               DebugItem debugItem) throws IOException {
         switch (debugItem.getDebugItemType()) {
             case DebugItemType.START_LOCAL: {
-                BuilderStartLocal startLocal = (BuilderStartLocal)debugItem;
+                StartLocal startLocal = (StartLocal)debugItem;
                 writer.writeStartLocal(startLocal.getCodeAddress(),
-                        startLocal.register,
-                        startLocal.name,
-                        startLocal.type,
-                        startLocal.signature);
+                        startLocal.getRegister(),
+                        checkStringReference(startLocal.getNameReference()),
+                        checkTypeReference(startLocal.getTypeReference()),
+                        checkStringReference(startLocal.getSignatureReference()));
                 break;
             }
             case DebugItemType.END_LOCAL: {
@@ -390,8 +416,9 @@ public class BuilderClassPool implements ClassSection<BuilderStringReference, Bu
                 break;
             }
             case DebugItemType.SET_SOURCE_FILE: {
-                BuilderSetSourceFile setSourceFile = (BuilderSetSourceFile)debugItem;
-                writer.writeSetSourceFile(setSourceFile.getCodeAddress(), setSourceFile.sourceFile);
+                SetSourceFile setSourceFile = (SetSourceFile)debugItem;
+                writer.writeSetSourceFile(setSourceFile.getCodeAddress(),
+                        checkStringReference(setSourceFile.getSourceFileReference()));
             }
             default:
                 throw new ExceptionWithContext("Unexpected debug item type: %d", debugItem.getDebugItemType());

@@ -34,7 +34,6 @@ package org.jf.dexlib2.immutable.instruction;
 import org.jf.dexlib2.Format;
 import org.jf.dexlib2.Opcode;
 import org.jf.dexlib2.iface.instruction.formats.Instruction10x;
-import org.jf.dexlib2.util.Preconditions;
 
 import javax.annotation.Nonnull;
 
@@ -43,7 +42,6 @@ public class ImmutableInstruction10x extends ImmutableInstruction implements Ins
 
     public ImmutableInstruction10x(@Nonnull Opcode opcode) {
         super(opcode);
-        Preconditions.checkFormat(opcode, FORMAT);
     }
 
     public static ImmutableInstruction10x of(Instruction10x instruction) {

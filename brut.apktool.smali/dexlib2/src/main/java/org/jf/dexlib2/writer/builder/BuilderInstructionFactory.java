@@ -40,7 +40,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class BuilderInstructionFactory implements InstructionFactory<BuilderInstruction, BuilderReference> {
+public class BuilderInstructionFactory implements InstructionFactory<BuilderReference> {
     public static final BuilderInstructionFactory INSTANCE = new BuilderInstructionFactory();
 
     private BuilderInstructionFactory() {

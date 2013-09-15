@@ -46,7 +46,6 @@ public class ImmutableInstruction11x extends ImmutableInstruction implements Ins
     public ImmutableInstruction11x(@Nonnull Opcode opcode,
                                    int registerA) {
         super(opcode);
-        Preconditions.checkFormat(opcode, FORMAT);
         this.registerA = Preconditions.checkByteRegister(registerA);
     }
 

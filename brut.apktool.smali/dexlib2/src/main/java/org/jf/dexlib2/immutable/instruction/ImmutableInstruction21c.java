@@ -51,7 +51,6 @@ public class ImmutableInstruction21c extends ImmutableInstruction implements Ins
                                       int registerA,
                                       @Nonnull Reference reference) {
         super(opcode);
-        Preconditions.checkFormat(opcode, FORMAT);
         this.registerA = Preconditions.checkByteRegister(registerA);
         this.reference = ImmutableReferenceFactory.of(opcode.referenceType, reference);
     }

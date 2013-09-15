@@ -163,42 +163,42 @@ public class DexBackedDexFile extends BaseDexBuffer implements DexFile {
 
     public int getStringIdItemOffset(int stringIndex) {
         if (stringIndex < 0 || stringIndex >= stringCount) {
-            throw new ExceptionWithContext("String index out of bounds: %d", stringIndex);
+            throw new InvalidItemIndex(stringIndex, "String index out of bounds: %d", stringIndex);
         }
         return stringStartOffset + stringIndex*StringIdItem.ITEM_SIZE;
     }
 
     public int getTypeIdItemOffset(int typeIndex) {
         if (typeIndex < 0 || typeIndex >= typeCount) {
-            throw new ExceptionWithContext("Type index out of bounds: %d", typeIndex);
+            throw new InvalidItemIndex(typeIndex, "Type index out of bounds: %d", typeIndex);
         }
         return typeStartOffset + typeIndex*TypeIdItem.ITEM_SIZE;
     }
 
     public int getFieldIdItemOffset(int fieldIndex) {
         if (fieldIndex < 0 || fieldIndex >= fieldCount) {
-            throw new ExceptionWithContext("Field index out of bounds: %d", fieldIndex);
+            throw new InvalidItemIndex(fieldIndex, "Field index out of bounds: %d", fieldIndex);
         }
         return fieldStartOffset + fieldIndex*FieldIdItem.ITEM_SIZE;
     }
 
     public int getMethodIdItemOffset(int methodIndex) {
         if (methodIndex < 0 || methodIndex >= methodCount) {
-            throw new ExceptionWithContext("Method index out of bounds: %d", methodIndex);
+            throw new InvalidItemIndex(methodIndex, "Method findex out of bounds: %d", methodIndex);
         }
         return methodStartOffset + methodIndex*MethodIdItem.ITEM_SIZE;
     }
 
     public int getProtoIdItemOffset(int protoIndex) {
         if (protoIndex < 0 || protoIndex >= protoCount) {
-            throw new ExceptionWithContext("Proto index out of bounds: %d", protoIndex);
+            throw new InvalidItemIndex(protoIndex, "Proto index out of bounds: %d", protoIndex);
         }
         return protoStartOffset + protoIndex*ProtoIdItem.ITEM_SIZE;
     }
 
     public int getClassDefItemOffset(int classIndex) {
         if (classIndex < 0 || classIndex >= classCount) {
-            throw new ExceptionWithContext("Class index out of bounds: %d", classIndex);
+            throw new InvalidItemIndex(classIndex, "Class index out of bounds: %d", classIndex);
         }
         return classStartOffset + classIndex*ClassDefItem.ITEM_SIZE;
     }
@@ -259,6 +259,24 @@ public class DexBackedDexFile extends BaseDexBuffer implements DexFile {
 
         public NotADexFile(String message, Throwable cause) {
             super(message, cause);
+        }
+    }
+
+    public static class InvalidItemIndex extends ExceptionWithContext {
+        private final int itemIndex;
+
+        public InvalidItemIndex(int itemIndex) {
+            super("");
+            this.itemIndex = itemIndex;
+        }
+
+        public InvalidItemIndex(int itemIndex, String message, Object... formatArgs) {
+            super(message, formatArgs);
+            this.itemIndex = itemIndex;
+        }
+
+        public int getInvalidIndex() {
+            return itemIndex;
         }
     }
 }

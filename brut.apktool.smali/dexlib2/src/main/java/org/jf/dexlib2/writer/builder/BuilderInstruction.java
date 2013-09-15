@@ -49,6 +49,7 @@ public interface BuilderInstruction extends Instruction {
         @Nonnull protected final Opcode opcode;
 
         public BaseBuilderInstruction(@Nonnull Opcode opcode) {
+            Preconditions.checkFormat(opcode, getFormat());
             this.opcode = opcode;
         }
 
@@ -103,7 +104,6 @@ public interface BuilderInstruction extends Instruction {
                                       int verificationError,
                                       @Nonnull BuilderReference reference) {
             super(opcode);
-            Preconditions.checkFormat(opcode, FORMAT);
             this.verificationError = Preconditions.checkVerificationError(verificationError);
             this.reference = Preconditions.checkReference(opcode.referenceType, reference);
         }
@@ -130,7 +130,6 @@ public interface BuilderInstruction extends Instruction {
                                      int registerA,
                                      @Nonnull BuilderReference reference) {
             super(opcode);
-            Preconditions.checkFormat(opcode, FORMAT);
             this.registerA = Preconditions.checkByteRegister(registerA);
             this.reference = Preconditions.checkReference(opcode.referenceType, reference);
         }
@@ -183,7 +182,6 @@ public interface BuilderInstruction extends Instruction {
                                      int registerB,
                                      @Nonnull BuilderReference reference) {
             super(opcode);
-            Preconditions.checkFormat(opcode, FORMAT);
             this.registerA = Preconditions.checkNibbleRegister(registerA);
             this.registerB = Preconditions.checkNibbleRegister(registerB);
             this.reference = Preconditions.checkReference(opcode.referenceType, reference);
@@ -236,7 +234,6 @@ public interface BuilderInstruction extends Instruction {
                                      int registerA,
                                      @Nonnull BuilderReference reference) {
             super(opcode);
-            Preconditions.checkFormat(opcode, FORMAT);
             this.registerA = Preconditions.checkByteRegister(registerA);
             this.reference = Preconditions.checkReference(opcode.referenceType, reference);
         }
@@ -285,7 +282,6 @@ public interface BuilderInstruction extends Instruction {
                                      int registerG,
                                      @Nonnull BuilderReference reference) {
             super(opcode);
-            Preconditions.checkFormat(opcode, FORMAT);
             this.registerCount = Preconditions.check35cRegisterCount(registerCount);
             this.registerC = (registerCount>0) ? Preconditions.checkNibbleRegister(registerC) : 0;
             this.registerD = (registerCount>1) ? Preconditions.checkNibbleRegister(registerD) : 0;
@@ -319,8 +315,6 @@ public interface BuilderInstruction extends Instruction {
                                      int registerCount,
                                      @Nonnull BuilderReference reference) {
             super(opcode);
-
-            Preconditions.checkFormat(opcode, FORMAT);
             this.startRegister = Preconditions.checkShortRegister(startRegister);
             this.registerCount = Preconditions.checkRegisterRangeCount(registerCount);
             this.reference = Preconditions.checkReference(opcode.referenceType, reference);

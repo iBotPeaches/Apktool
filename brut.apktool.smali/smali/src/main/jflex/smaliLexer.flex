@@ -377,8 +377,6 @@ Type = {PrimitiveType} | {ClassDescriptor} | {ArrayDescriptor}
     "vtable@0x" {HexDigit}+ { return newToken(VTABLE_INDEX); }
     "field@0x" {HexDigit}+ { return newToken(FIELD_OFFSET); }
 
-    "+" {Integer} { return newToken(OFFSET); }
-
     # [^\r\n]* { return newToken(LINE_COMMENT, true); }
 }
 
@@ -592,7 +590,7 @@ Type = {PrimitiveType} | {ClassDescriptor} | {ArrayDescriptor}
     {PrimitiveType} {PrimitiveType}+ { return newToken(PARAM_LIST_OR_ID); }
     {Type} {Type}+ { return newToken(PARAM_LIST); }
     {SimpleName} { return newToken(SIMPLE_NAME); }
-    "<init>" | "<clinit>" { return newToken(METHOD_NAME); }
+    "<" {SimpleName} ">" { return newToken(MEMBER_NAME); }
 }
 
 /*Symbols/Whitespace/EOF*/

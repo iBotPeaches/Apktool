@@ -48,7 +48,6 @@ public class ImmutableInstruction31t extends ImmutableInstruction implements Ins
                                    int registerA,
                                    int codeOffset) {
         super(opcode);
-        Preconditions.checkFormat(opcode, FORMAT);
         this.registerA = Preconditions.checkByteRegister(registerA);
         this.codeOffset = codeOffset;
     }

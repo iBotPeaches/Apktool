@@ -69,6 +69,10 @@ class BuilderStringPool implements StringSection<BuilderStringReference, Builder
         return key.index;
     }
 
+    @Override public boolean hasJumboIndexes() {
+        return internedItems.size() > 65536;
+    }
+
     @Nonnull @Override public Collection<? extends Entry<? extends BuilderStringReference, Integer>> getItems() {
         return new BuilderMapEntryCollection<BuilderStringReference>(internedItems.values()) {
             @Override protected int getValue(@Nonnull BuilderStringReference key) {

@@ -53,6 +53,8 @@ public class DexAnnotator extends AnnotatedBytes {
 
     static {
         int[] sectionOrder = new int[] {
+                ItemType.MAP_LIST,
+
                 ItemType.HEADER_ITEM,
                 ItemType.STRING_ID_ITEM,
                 ItemType.TYPE_ID_ITEM,
@@ -66,7 +68,6 @@ public class DexAnnotator extends AnnotatedBytes {
                 ItemType.CODE_ITEM,
                 ItemType.DEBUG_INFO_ITEM,
 
-                ItemType.MAP_LIST,
                 ItemType.TYPE_LIST,
                 ItemType.ANNOTATION_SET_REF_LIST,
                 ItemType.ANNOTATION_SET_ITEM,

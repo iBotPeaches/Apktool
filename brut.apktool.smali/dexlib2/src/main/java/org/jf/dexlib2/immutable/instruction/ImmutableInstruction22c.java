@@ -53,7 +53,6 @@ public class ImmutableInstruction22c extends ImmutableInstruction implements Ins
                                    int registerB,
                                    @Nonnull Reference reference) {
         super(opcode);
-        Preconditions.checkFormat(opcode, FORMAT);
         this.registerA = Preconditions.checkNibbleRegister(registerA);
         this.registerB = Preconditions.checkNibbleRegister(registerB);
         this.reference = ImmutableReferenceFactory.of(opcode.referenceType, reference);

@@ -41,36 +41,36 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public interface InstructionFactory<Insn extends Instruction, Ref extends Reference> {
-    Insn makeInstruction10t(@Nonnull Opcode opcode, int codeOffset);
-    Insn makeInstruction10x(@Nonnull Opcode opcode);
-    Insn makeInstruction11n(@Nonnull Opcode opcode, int registerA, int literal);
-    Insn makeInstruction11x(@Nonnull Opcode opcode, int registerA);
-    Insn makeInstruction12x(@Nonnull Opcode opcode, int registerA, int registerB);
-    Insn makeInstruction20bc(@Nonnull Opcode opcode, int verificationError, @Nonnull Ref reference);
-    Insn makeInstruction20t(@Nonnull Opcode opcode, int codeOffset);
-    Insn makeInstruction21c(@Nonnull Opcode opcode, int registerA, @Nonnull Ref reference);
-    Insn makeInstruction21ih(@Nonnull Opcode opcode, int registerA, int literal);
-    Insn makeInstruction21lh(@Nonnull Opcode opcode, int registerA, long literal);
-    Insn makeInstruction21s(@Nonnull Opcode opcode, int registerA, int literal);
-    Insn makeInstruction21t(@Nonnull Opcode opcode, int registerA, int codeOffset);
-    Insn makeInstruction22b(@Nonnull Opcode opcode, int registerA, int registerB, int literal);
-    Insn makeInstruction22c(@Nonnull Opcode opcode, int registerA, int registerB, @Nonnull Ref reference);
-    Insn makeInstruction22s(@Nonnull Opcode opcode, int registerA, int registerB, int literal);
-    Insn makeInstruction22t(@Nonnull Opcode opcode, int registerA, int registerB, int codeOffset);
-    Insn makeInstruction22x(@Nonnull Opcode opcode, int registerA, int registerB);
-    Insn makeInstruction23x(@Nonnull Opcode opcode, int registerA, int registerB, int registerC);
-    Insn makeInstruction30t(@Nonnull Opcode opcode, int codeOffset);
-    Insn makeInstruction31c(@Nonnull Opcode opcode, int registerA, @Nonnull Ref reference);
-    Insn makeInstruction31i(@Nonnull Opcode opcode, int registerA, int literal);
-    Insn makeInstruction31t(@Nonnull Opcode opcode, int registerA, int codeOffset);
-    Insn makeInstruction32x(@Nonnull Opcode opcode, int registerA, int registerB);
-    Insn makeInstruction35c(@Nonnull Opcode opcode, int registerCount, int registerC, int registerD, int registerE,
+public interface InstructionFactory<Ref extends Reference> {
+    Instruction makeInstruction10t(@Nonnull Opcode opcode, int codeOffset);
+    Instruction makeInstruction10x(@Nonnull Opcode opcode);
+    Instruction makeInstruction11n(@Nonnull Opcode opcode, int registerA, int literal);
+    Instruction makeInstruction11x(@Nonnull Opcode opcode, int registerA);
+    Instruction makeInstruction12x(@Nonnull Opcode opcode, int registerA, int registerB);
+    Instruction makeInstruction20bc(@Nonnull Opcode opcode, int verificationError, @Nonnull Ref reference);
+    Instruction makeInstruction20t(@Nonnull Opcode opcode, int codeOffset);
+    Instruction makeInstruction21c(@Nonnull Opcode opcode, int registerA, @Nonnull Ref reference);
+    Instruction makeInstruction21ih(@Nonnull Opcode opcode, int registerA, int literal);
+    Instruction makeInstruction21lh(@Nonnull Opcode opcode, int registerA, long literal);
+    Instruction makeInstruction21s(@Nonnull Opcode opcode, int registerA, int literal);
+    Instruction makeInstruction21t(@Nonnull Opcode opcode, int registerA, int codeOffset);
+    Instruction makeInstruction22b(@Nonnull Opcode opcode, int registerA, int registerB, int literal);
+    Instruction makeInstruction22c(@Nonnull Opcode opcode, int registerA, int registerB, @Nonnull Ref reference);
+    Instruction makeInstruction22s(@Nonnull Opcode opcode, int registerA, int registerB, int literal);
+    Instruction makeInstruction22t(@Nonnull Opcode opcode, int registerA, int registerB, int codeOffset);
+    Instruction makeInstruction22x(@Nonnull Opcode opcode, int registerA, int registerB);
+    Instruction makeInstruction23x(@Nonnull Opcode opcode, int registerA, int registerB, int registerC);
+    Instruction makeInstruction30t(@Nonnull Opcode opcode, int codeOffset);
+    Instruction makeInstruction31c(@Nonnull Opcode opcode, int registerA, @Nonnull Ref reference);
+    Instruction makeInstruction31i(@Nonnull Opcode opcode, int registerA, int literal);
+    Instruction makeInstruction31t(@Nonnull Opcode opcode, int registerA, int codeOffset);
+    Instruction makeInstruction32x(@Nonnull Opcode opcode, int registerA, int registerB);
+    Instruction makeInstruction35c(@Nonnull Opcode opcode, int registerCount, int registerC, int registerD, int registerE,
                             int registerF, int registerG, @Nonnull Ref reference);
-    Insn makeInstruction3rc(@Nonnull Opcode opcode,  int startRegister, int registerCount,
+    Instruction makeInstruction3rc(@Nonnull Opcode opcode,  int startRegister, int registerCount,
                             @Nonnull Ref reference);
-    Insn makeInstruction51l(@Nonnull Opcode opcode, int registerA, long literal);
-    Insn makeSparseSwitchPayload(@Nullable List<? extends SwitchElement> switchElements);
-    Insn makePackedSwitchPayload(@Nullable List<? extends SwitchElement> switchElements);
-    Insn makeArrayPayload(int elementWidth, @Nullable List<Number> arrayElements);
+    Instruction makeInstruction51l(@Nonnull Opcode opcode, int registerA, long literal);
+    Instruction makeSparseSwitchPayload(@Nullable List<? extends SwitchElement> switchElements);
+    Instruction makePackedSwitchPayload(@Nullable List<? extends SwitchElement> switchElements);
+    Instruction makeArrayPayload(int elementWidth, @Nullable List<Number> arrayElements);
 }

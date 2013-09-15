@@ -32,10 +32,13 @@ import org.jf.baksmali.Adaptors.MethodDefinition;
 import org.jf.baksmali.Adaptors.MethodItem;
 import org.jf.baksmali.Adaptors.ReferenceFormatter;
 import org.jf.baksmali.Renderers.LongRenderer;
+import org.jf.dexlib2.ReferenceType;
 import org.jf.dexlib2.VerificationError;
+import org.jf.dexlib2.dexbacked.DexBackedDexFile.InvalidItemIndex;
 import org.jf.dexlib2.iface.instruction.*;
 import org.jf.dexlib2.iface.instruction.formats.Instruction20bc;
 import org.jf.dexlib2.iface.instruction.formats.UnknownInstruction;
+import org.jf.dexlib2.iface.reference.Reference;
 import org.jf.util.IndentingWriter;
 
 import javax.annotation.Nonnull;
@@ -58,6 +61,21 @@ public class InstructionMethodItem<T extends Instruction> extends MethodItem {
 
     @Override
     public boolean writeTo(IndentingWriter writer) throws IOException {
+        boolean invalidReference = false;
+        if (instruction instanceof ReferenceInstruction) {
+            try {
+                Reference reference = ((ReferenceInstruction)instruction).getReference();
+            } catch (InvalidItemIndex ex) {
+                invalidReference = true;
+
+                writer.write("#invalid ");
+                writer.write(ReferenceType.toString(instruction.getOpcode().referenceType));
+                writer.write(" index: ");
+                writer.printSignedIntAsDec(ex.getInvalidIndex());
+                writer.write("\n#");
+            }
+        }
+
         switch (instruction.getOpcode().format) {
             case Format10t:
                 writeOpcode(writer);
@@ -336,8 +354,14 @@ public class InstructionMethodItem<T extends Instruction> extends MethodItem {
     }
 
     protected void writeReference(IndentingWriter writer) throws IOException {
-        ReferenceFormatter.writeReference(writer, instruction.getOpcode().referenceType,
-                ((ReferenceInstruction)instruction).getReference());
+        try {
+            ReferenceFormatter.writeReference(writer, instruction.getOpcode().referenceType,
+                    ((ReferenceInstruction)instruction).getReference());
+        } catch (InvalidItemIndex ex) {
+            writer.write(ReferenceType.toString(instruction.getOpcode().referenceType));
+            writer.write("@");
+            writer.printSignedIntAsDec(ex.getInvalidIndex());
+        }
     }
 
     protected void writeVerificationErrorType(IndentingWriter writer) throws IOException {

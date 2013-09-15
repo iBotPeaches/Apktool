@@ -32,17 +32,20 @@
 package org.jf.dexlib2.writer.pool;
 
 import org.jf.dexlib2.ValueType;
-import org.jf.dexlib2.iface.*;
-import org.jf.dexlib2.iface.debug.DebugItem;
-import org.jf.dexlib2.iface.instruction.Instruction;
+import org.jf.dexlib2.iface.Annotation;
+import org.jf.dexlib2.iface.AnnotationElement;
+import org.jf.dexlib2.iface.ClassDef;
+import org.jf.dexlib2.iface.Field;
 import org.jf.dexlib2.iface.reference.*;
 import org.jf.dexlib2.iface.value.*;
 import org.jf.dexlib2.immutable.instruction.ImmutableInstructionFactory;
 import org.jf.dexlib2.writer.DexWriter;
+import org.jf.dexlib2.writer.io.FileDataStore;
 import org.jf.dexlib2.writer.pool.ProtoPool.Key;
 import org.jf.util.ExceptionWithContext;
 
 import javax.annotation.Nonnull;
+import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Set;
@@ -51,7 +54,7 @@ public class DexPool extends DexWriter<CharSequence, StringReference, CharSequen
         FieldReference, MethodReference, Reference, PoolClassDef,
         Annotation, Set<? extends Annotation>,
         TypeListPool.Key<? extends Collection<? extends CharSequence>>, Field, PoolMethod,
-        EncodedValue, AnnotationElement, DebugItem, Instruction, ExceptionHandler> {
+        EncodedValue, AnnotationElement> {
 
     public static DexPool makeDexPool() {
         return makeDexPool(15);
@@ -85,7 +88,7 @@ public class DexPool extends DexWriter<CharSequence, StringReference, CharSequen
         for (ClassDef classDef: input.getClasses()) {
             ((ClassPool)dexPool.classSection).intern(classDef);
         }
-        dexPool.writeTo(path);
+        dexPool.writeTo(new FileDataStore(new File(path)));
     }
 
     @Override protected void writeEncodedValue(@Nonnull InternalEncodedValueWriter writer,

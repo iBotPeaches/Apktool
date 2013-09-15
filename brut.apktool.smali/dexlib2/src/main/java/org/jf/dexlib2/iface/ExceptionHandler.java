@@ -31,6 +31,8 @@
 
 package org.jf.dexlib2.iface;
 
+import org.jf.dexlib2.iface.reference.TypeReference;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -44,6 +46,14 @@ public interface ExceptionHandler extends Comparable<ExceptionHandler> {
      * @return The type of exception that is handled by this handler, or null if this is a catch-all handler.
      */
     @Nullable String getExceptionType();
+
+    /**
+     * Gets the type of exception that is handled by this handler.
+     *
+     * @return A TypeReference to the type of exception that is handled by this handler, or null if this is a
+     * catch-all handler.
+     */
+    @Nullable TypeReference getExceptionTypeReference();
 
     /**
      * Gets the code offset of the handler.

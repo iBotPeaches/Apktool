@@ -38,5 +38,20 @@ public final class ReferenceType {
     public static final int METHOD = 3;
     public static final int NONE = 4;
 
+    public static String toString(int referenceType) {
+        switch (referenceType) {
+            case STRING:
+                return "string";
+            case TYPE:
+                return "type";
+            case FIELD:
+                return "field";
+            case METHOD:
+                return "method";
+            default:
+                throw new IllegalArgumentException("Invalid reference type: " + referenceType);
+        }
+    }
+
     private ReferenceType() {}
 }

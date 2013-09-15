@@ -148,7 +148,7 @@ public class main {
                     options.addCodeOffsets = true;
                     break;
                 case 'r':
-                    String[] values = commandLine.getOptionValues('r');
+                    String[] values = commandLine.getOptionValues("r");
                     int registerInfo = 0;
 
                     if (values == null || values.length == 0) {

@@ -51,7 +51,6 @@ public class ImmutableInstruction20bc extends ImmutableInstruction implements In
                                    int verificationError,
                                    @Nonnull Reference reference) {
         super(opcode);
-        Preconditions.checkFormat(opcode, FORMAT);
         this.verificationError = Preconditions.checkVerificationError(verificationError);
         this.reference = ImmutableReferenceFactory.of(opcode.referenceType, reference);
     }

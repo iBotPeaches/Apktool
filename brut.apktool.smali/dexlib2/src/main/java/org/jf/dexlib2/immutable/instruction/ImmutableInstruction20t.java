@@ -46,7 +46,6 @@ public class ImmutableInstruction20t extends ImmutableInstruction implements Ins
     public ImmutableInstruction20t(@Nonnull Opcode opcode,
                                    int codeOffset) {
         super(opcode);
-        Preconditions.checkFormat(opcode, FORMAT);
         this.codeOffset = Preconditions.checkShortCodeOffset(codeOffset);
     }
 

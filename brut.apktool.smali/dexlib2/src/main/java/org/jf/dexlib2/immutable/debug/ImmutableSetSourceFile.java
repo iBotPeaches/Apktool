@@ -32,7 +32,9 @@
 package org.jf.dexlib2.immutable.debug;
 
 import org.jf.dexlib2.DebugItemType;
+import org.jf.dexlib2.base.reference.BaseStringReference;
 import org.jf.dexlib2.iface.debug.SetSourceFile;
+import org.jf.dexlib2.iface.reference.StringReference;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -57,6 +59,15 @@ public class ImmutableSetSourceFile extends ImmutableDebugItem implements SetSou
     }
 
     @Nullable @Override public String getSourceFile() { return sourceFile; }
+
+    @Nullable @Override public StringReference getSourceFileReference() {
+        return sourceFile==null?null:new BaseStringReference() {
+            @Nonnull @Override public String getString() {
+                return sourceFile;
+            }
+        };
+    }
+
 
     @Override public int getDebugItemType() { return DebugItemType.SET_SOURCE_FILE; }
 }

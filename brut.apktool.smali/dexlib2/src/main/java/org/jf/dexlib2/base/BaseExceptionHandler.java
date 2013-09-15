@@ -33,13 +33,28 @@ package org.jf.dexlib2.base;
 
 import com.google.common.base.Objects;
 import com.google.common.primitives.Ints;
+import org.jf.dexlib2.base.reference.BaseTypeReference;
 import org.jf.dexlib2.iface.ExceptionHandler;
+import org.jf.dexlib2.iface.reference.TypeReference;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Comparator;
 
 public abstract class BaseExceptionHandler implements ExceptionHandler {
+    @Nullable @Override public TypeReference getExceptionTypeReference() {
+        final String exceptionType = getExceptionType();
+        if (exceptionType == null) {
+            return null;
+        }
+
+        return new BaseTypeReference() {
+            @Nonnull @Override public String getType() {
+                return exceptionType;
+            }
+        };
+    }
+
     @Override
     public int hashCode() {
         String exceptionType = getExceptionType();
@@ -75,6 +90,8 @@ public abstract class BaseExceptionHandler implements ExceptionHandler {
         }
         return Ints.compare(getHandlerCodeAddress(), o.getHandlerCodeAddress());
     }
+
+
 
     public static final Comparator<ExceptionHandler> BY_EXCEPTION = new Comparator<ExceptionHandler>() {
         @Override public int compare(ExceptionHandler o1, ExceptionHandler o2) {

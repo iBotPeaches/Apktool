@@ -34,7 +34,6 @@ package org.jf.dexlib2.immutable.instruction;
 import org.jf.dexlib2.Format;
 import org.jf.dexlib2.Opcode;
 import org.jf.dexlib2.iface.instruction.formats.Instruction30t;
-import org.jf.dexlib2.util.Preconditions;
 
 import javax.annotation.Nonnull;
 
@@ -46,7 +45,6 @@ public class ImmutableInstruction30t extends ImmutableInstruction implements Ins
     public ImmutableInstruction30t(@Nonnull Opcode opcode,
                                    int codeOffset) {
         super(opcode);
-        Preconditions.checkFormat(opcode, FORMAT);
         this.codeOffset = codeOffset;
     }
 

@@ -45,8 +45,8 @@ public abstract class ImmutableInstruction implements Instruction {
     @Nonnull protected final Opcode opcode;
 
     protected ImmutableInstruction(@Nonnull Opcode opcode) {
-        this.opcode = opcode;
         Preconditions.checkFormat(opcode, getFormat());
+        this.opcode = opcode;
     }
 
     @Nonnull

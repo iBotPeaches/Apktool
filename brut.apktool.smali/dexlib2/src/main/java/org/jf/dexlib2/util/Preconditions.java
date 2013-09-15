@@ -109,20 +109,20 @@ public class Preconditions {
         return literal;
     }
 
-    public static int checkByteCodeOffset(int register) {
-        if (register < -128 || register > 127) {
+    public static int checkByteCodeOffset(int offset) {
+        if (offset < -128 || offset > 127) {
             throw new IllegalArgumentException(
-                    String.format("Invalid code offset: %d. Must be between -128 and 127, inclusive.", register));
+                    String.format("Invalid code offset: %d. Must be between -128 and 127, inclusive.", offset));
         }
-        return register;
+        return offset;
     }
 
-    public static int checkShortCodeOffset(int register) {
-        if (register < -32768 || register > 32768) {
+    public static int checkShortCodeOffset(int offset) {
+        if (offset < -32768 || offset > 32767) {
             throw new IllegalArgumentException(
-                    String.format("Invalid code offset: %d. Must be between -32768 and 32767, inclusive.", register));
+                    String.format("Invalid code offset: %d. Must be between -32768 and 32767, inclusive.", offset));
         }
-        return register;
+        return offset;
     }
 
     public static int check35cRegisterCount(int registerCount) {

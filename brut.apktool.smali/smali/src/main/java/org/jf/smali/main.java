@@ -36,6 +36,7 @@ import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.apache.commons.cli.*;
 import org.jf.dexlib2.writer.builder.DexBuilder;
+import org.jf.dexlib2.writer.io.FileDataStore;
 import org.jf.util.ConsoleUtil;
 import org.jf.util.SmaliHelpFormatter;
 
@@ -225,7 +226,7 @@ public class main {
                 System.exit(1);
             }
 
-            dexBuilder.writeTo(outputDexFile);
+            dexBuilder.writeTo(new FileDataStore(new File(outputDexFile)));
         } catch (RuntimeException ex) {
             System.err.println("\nUNEXPECTED TOP-LEVEL EXCEPTION:");
             ex.printStackTrace();
@@ -241,14 +242,14 @@ public class main {
         File[] files = dir.listFiles();
         if (files != null) {
             for(File file: files) {
-            if (file.isDirectory()) {
-                getSmaliFilesInDir(file, smaliFiles);
-            } else if (file.getName().endsWith(".smali")) {
-                smaliFiles.add(file);
+                if (file.isDirectory()) {
+                    getSmaliFilesInDir(file, smaliFiles);
+                } else if (file.getName().endsWith(".smali")) {
+                    smaliFiles.add(file);
+                }
             }
         }
     }
-        }
 
     private static boolean assembleSmaliFile(File smaliFile, DexBuilder dexBuilder, boolean verboseErrors,
                                              boolean printTokens, boolean allowOdex, int apiLevel)

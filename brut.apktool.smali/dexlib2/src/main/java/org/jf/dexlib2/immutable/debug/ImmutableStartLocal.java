@@ -32,7 +32,11 @@
 package org.jf.dexlib2.immutable.debug;
 
 import org.jf.dexlib2.DebugItemType;
+import org.jf.dexlib2.base.reference.BaseStringReference;
+import org.jf.dexlib2.base.reference.BaseTypeReference;
 import org.jf.dexlib2.iface.debug.StartLocal;
+import org.jf.dexlib2.iface.reference.StringReference;
+import org.jf.dexlib2.iface.reference.TypeReference;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -69,6 +73,31 @@ public class ImmutableStartLocal extends ImmutableDebugItem implements StartLoca
     }
 
     @Override public int getRegister() { return register; }
+
+    @Nullable @Override public StringReference getNameReference() {
+        return name==null?null:new BaseStringReference() {
+            @Nonnull @Override public String getString() {
+                return name;
+            }
+        };
+    }
+
+    @Nullable @Override public TypeReference getTypeReference() {
+        return type==null?null:new BaseTypeReference() {
+            @Nonnull @Override public String getType() {
+                return type;
+            }
+        };
+    }
+
+    @Nullable @Override public StringReference getSignatureReference() {
+        return signature==null?null:new BaseStringReference() {
+            @Nonnull @Override public String getString() {
+                return signature;
+            }
+        };
+    }
+
     @Nullable @Override public String getName() { return name; }
     @Nullable @Override public String getType() { return type; }
     @Nullable @Override public String getSignature() { return signature; }

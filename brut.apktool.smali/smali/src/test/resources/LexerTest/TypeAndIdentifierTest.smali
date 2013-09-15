@@ -34,6 +34,8 @@ Ljava/lang/String;Ljava/lang/String;
 
 <init>
 <clinit>
+<blah>
+<init->
 
 Ljava/lang/String
 L;

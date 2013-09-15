@@ -48,7 +48,6 @@ public class ImmutableInstruction21lh extends ImmutableInstruction implements In
                                     int registerA,
                                     long literal) {
         super(opcode);
-        Preconditions.checkFormat(opcode, FORMAT);
         this.registerA = Preconditions.checkByteRegister(registerA);
         this.literal = Preconditions.checkLongHatLiteral(literal);
     }

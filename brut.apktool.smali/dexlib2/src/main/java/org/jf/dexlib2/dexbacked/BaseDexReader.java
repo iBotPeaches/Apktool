@@ -90,6 +90,10 @@ public class BaseDexReader<T extends BaseDexBuffer> {
     }
 
     public int readSmallUleb128() {
+        return readUleb128(false);
+    }
+
+    private int readUleb128(boolean allowLarge) {
         int end = offset;
         int currentByteValue;
         int result;
@@ -113,10 +117,12 @@ public class BaseDexReader<T extends BaseDexBuffer> {
                             throw new ExceptionWithContext(
                                     "Invalid uleb128 integer encountered at offset 0x%x", offset);
                         } else if ((currentByteValue & 0xf) > 0x07) {
-                            // we assume most significant bit of the result will not be set, so that it can fit into
-                            // a signed integer without wrapping
-                            throw new ExceptionWithContext(
-                                    "Encountered valid uleb128 that is out of range at offset 0x%x", offset);
+                            if (!allowLarge) {
+                                // for non-large uleb128s, we assume most significant bit of the result will not be
+                                // set, so that it can fit into a signed integer without wrapping
+                                throw new ExceptionWithContext(
+                                        "Encountered valid uleb128 that is out of range at offset 0x%x", offset);
+                            }
                         }
                         result |= currentByteValue << 28;
                     }
@@ -126,6 +132,16 @@ public class BaseDexReader<T extends BaseDexBuffer> {
 
         offset = end;
         return result;
+    }
+
+    /**
+     * Reads a "large" uleb128. That is, one that may legitimately be greater than a signed int.
+     *
+     * The value is returned as if it were signed. i.e. a value of 0xFFFFFFFF would be returned as -1. It is up to the
+     * caller to handle the value appropriately.
+     */
+    public int readLargeUleb128() {
+       return readUleb128(true);
     }
 
     /**
@@ -185,11 +201,6 @@ public class BaseDexReader<T extends BaseDexBuffer> {
                         if (currentByteValue < 0) {
                             throw new ExceptionWithContext(
                                     "Invalid uleb128 integer encountered at offset 0x%x", offset);
-                        } else if ((currentByteValue & 0xf) > 0x07) {
-                            // we assume most significant bit of the result will not be set, so that it can fit into
-                            // a signed integer without wrapping
-                            throw new ExceptionWithContext(
-                                    "Encountered valid uleb128 that is out of range at offset 0x%x", offset);
                         }
                     }
                 }

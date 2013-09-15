@@ -37,11 +37,11 @@ import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import org.jf.dexlib2.ValueType;
 import org.jf.dexlib2.iface.Annotation;
+import org.jf.dexlib2.iface.MethodImplementation;
 import org.jf.dexlib2.iface.MethodParameter;
 import org.jf.dexlib2.iface.reference.*;
 import org.jf.dexlib2.iface.value.*;
 import org.jf.dexlib2.writer.DexWriter;
-import org.jf.dexlib2.writer.builder.BuilderDebugItem.*;
 import org.jf.dexlib2.writer.builder.BuilderEncodedValues.*;
 import org.jf.util.ExceptionWithContext;
 
@@ -56,7 +56,7 @@ import java.util.Set;
 public class DexBuilder extends DexWriter<BuilderStringReference, BuilderStringReference, BuilderTypeReference,
         BuilderTypeReference, BuilderProtoReference, BuilderFieldReference, BuilderMethodReference, BuilderReference,
         BuilderClassDef, BuilderAnnotation, BuilderAnnotationSet, BuilderTypeList, BuilderField, BuilderMethod,
-        BuilderEncodedValue, BuilderAnnotationElement, BuilderDebugItem, BuilderInstruction, BuilderExceptionHandler> {
+        BuilderEncodedValue, BuilderAnnotationElement> {
 
     private final BuilderContext context;
 
@@ -95,7 +95,7 @@ public class DexBuilder extends DexWriter<BuilderStringReference, BuilderStringR
                                                @Nonnull String returnType,
                                                int accessFlags,
                                                @Nonnull Set<? extends Annotation> annotations,
-                                               @Nullable BuilderMethodImplementation methodImplementation) {
+                                               @Nullable MethodImplementation methodImplementation) {
         if (parameters == null) {
             parameters = ImmutableList.of();
         }
@@ -104,26 +104,6 @@ public class DexBuilder extends DexWriter<BuilderStringReference, BuilderStringR
                 accessFlags,
                 context.annotationSetPool.internAnnotationSet(annotations),
                 methodImplementation);
-    }
-
-    @Nonnull public BuilderMethodImplementation internMethodImplementation(
-            int registerCount,
-            @Nullable List<? extends BuilderInstruction> instructions,
-            @Nullable List<? extends BuilderTryBlock> tryBlocks,
-            @Nullable List<? extends BuilderDebugItem> debugItems) {
-        if (instructions == null) {
-            instructions = ImmutableList.of();
-        }
-
-        if (tryBlocks == null) {
-            tryBlocks = ImmutableList.of();
-        }
-
-        if (debugItems == null) {
-            debugItems = ImmutableList.of();
-        }
-
-        return new BuilderMethodImplementation(registerCount, instructions, tryBlocks, debugItems);
     }
 
     @Nonnull public BuilderClassDef internClassDef(@Nonnull String type,
@@ -164,8 +144,22 @@ public class DexBuilder extends DexWriter<BuilderStringReference, BuilderStringR
         return context.stringPool.internString(string);
     }
 
+    @Nullable public BuilderStringReference internNullableStringReference(@Nullable String string) {
+        if (string != null) {
+            return internStringReference(string);
+        }
+        return null;
+    }
+
     @Nonnull public BuilderTypeReference internTypeReference(@Nonnull String type) {
         return context.typePool.internType(type);
+    }
+
+    @Nullable public BuilderTypeReference internNullableTypeReference(@Nullable String type) {
+        if (type != null) {
+            return internTypeReference(type);
+        }
+        return null;
     }
 
     @Nonnull public BuilderFieldReference internFieldReference(@Nonnull FieldReference field) {
@@ -191,7 +185,7 @@ public class DexBuilder extends DexWriter<BuilderStringReference, BuilderStringR
         }
         throw new IllegalArgumentException("Could not determine type of reference");
     }
-    
+
     @Nonnull private List<BuilderMethodParameter> internMethodParameters(
             @Nullable List<? extends MethodParameter> methodParameters) {
         if (methodParameters == null) {
@@ -210,46 +204,6 @@ public class DexBuilder extends DexWriter<BuilderStringReference, BuilderStringR
                 context.typePool.internType(methodParameter.getType()),
                 context.stringPool.internNullableString(methodParameter.getName()),
                 context.annotationSetPool.internAnnotationSet(methodParameter.getAnnotations()));
-    }
-
-    @Nonnull public BuilderExceptionHandler internExceptionHandler(@Nullable String exceptionType,
-                                                                   int handlerCodeAddress) {
-        return new BuilderExceptionHandler(context.typePool.internNullableType(exceptionType),
-                handlerCodeAddress);
-    }
-
-    @Nonnull public BuilderStartLocal internStartLocal(int codeAddress, int register, @Nullable String name,
-                                                        @Nullable String type, @Nullable String signature) {
-        return new BuilderStartLocal(codeAddress,
-                register,
-                context.stringPool.internNullableString(name),
-                context.typePool.internNullableType(type),
-                context.stringPool.internNullableString(signature));
-    }
-
-    @Nonnull public BuilderSetSourceFile internSetSourceFile(int codeAddress, @Nullable String sourceFile) {
-        return new BuilderSetSourceFile(codeAddress,
-                context.stringPool.internNullableString(sourceFile));
-    }
-
-    @Nonnull public BuilderEndLocal internEndLocal(int codeAddress, int register) {
-        return new BuilderEndLocal(codeAddress, register);
-    }
-
-    @Nonnull public BuilderRestartLocal internRestartLocal(int codeAddress, int register) {
-        return new BuilderRestartLocal(codeAddress, register);
-    }
-
-    @Nonnull public BuilderPrologueEnd internPrologueEnd(int codeAddress) {
-        return new BuilderPrologueEnd(codeAddress);
-    }
-
-    @Nonnull public BuilderEpilogueBegin internEpilogueBegin(int codeAddress) {
-        return new BuilderEpilogueBegin(codeAddress);
-    }
-
-    @Nonnull public BuilderLineNumber internLineNumber(int codeAddress, int lineNumber) {
-        return new BuilderLineNumber(codeAddress, lineNumber);
     }
 
     @Override protected void writeEncodedValue(@Nonnull InternalEncodedValueWriter writer,

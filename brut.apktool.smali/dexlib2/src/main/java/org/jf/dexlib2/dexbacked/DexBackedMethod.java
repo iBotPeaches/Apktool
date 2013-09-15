@@ -73,7 +73,9 @@ public class DexBackedMethod extends BaseMethodReference implements Method {
         this.dexFile = reader.dexBuf;
         this.classDef = classDef;
 
-        int methodIndexDiff = reader.readSmallUleb128();
+        // large values may be used for the index delta, which cause the cumulative index to overflow upon
+        // addition, effectively allowing out of order entries.
+        int methodIndexDiff = reader.readLargeUleb128();
         this.methodIndex = methodIndexDiff + previousMethodIndex;
         this.accessFlags = reader.readSmallUleb128();
         this.codeOffset = reader.readSmallUleb128();
@@ -90,7 +92,9 @@ public class DexBackedMethod extends BaseMethodReference implements Method {
         this.dexFile = reader.dexBuf;
         this.classDef = classDef;
 
-        int methodIndexDiff = reader.readSmallUleb128();
+        // large values may be used for the index delta, which cause the cumulative index to overflow upon
+        // addition, effectively allowing out of order entries.
+        int methodIndexDiff = reader.readLargeUleb128();
         this.methodIndex = methodIndexDiff + previousMethodIndex;
         this.accessFlags = reader.readSmallUleb128();
         this.codeOffset = reader.readSmallUleb128();

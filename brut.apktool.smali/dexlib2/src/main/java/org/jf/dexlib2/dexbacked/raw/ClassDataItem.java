@@ -127,7 +127,9 @@ public class ClassDataItem {
 
             private int annotateEncodedField(@Nonnull AnnotatedBytes out, @Nonnull RawDexFile dexFile,
                                              @Nonnull DexReader reader, int previousIndex) {
-                int indexDelta = reader.readSmallUleb128();
+                // large values may be used for the index delta, which cause the cumulative index to overflow upon
+                // addition, effectively allowing out of order entries.
+                int indexDelta = reader.readLargeUleb128();
                 int fieldIndex = previousIndex + indexDelta;
                 out.annotateTo(reader.getOffset(), "field_idx_diff = %d: %s", indexDelta,
                         FieldIdItem.getReferenceAnnotation(dexFile, fieldIndex));
@@ -141,7 +143,9 @@ public class ClassDataItem {
 
             private int annotateEncodedMethod(@Nonnull AnnotatedBytes out, @Nonnull RawDexFile dexFile,
                                               @Nonnull DexReader reader, int previousIndex) {
-                int indexDelta = reader.readSmallUleb128();
+                // large values may be used for the index delta, which cause the cumulative index to overflow upon
+                // addition, effectively allowing out of order entries.
+                int indexDelta = reader.readLargeUleb128();
                 int methodIndex = previousIndex + indexDelta;
                 out.annotateTo(reader.getOffset(), "method_idx_diff = %d: %s", indexDelta,
                         MethodIdItem.getReferenceAnnotation(dexFile, methodIndex));

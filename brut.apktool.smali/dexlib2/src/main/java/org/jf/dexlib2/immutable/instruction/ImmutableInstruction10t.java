@@ -46,7 +46,6 @@ public class ImmutableInstruction10t extends ImmutableInstruction implements Ins
     public ImmutableInstruction10t(@Nonnull Opcode opcode,
                                    int codeOffset) {
         super(opcode);
-        Preconditions.checkFormat(opcode, FORMAT);
         this.codeOffset = Preconditions.checkByteCodeOffset(codeOffset);
     }
 

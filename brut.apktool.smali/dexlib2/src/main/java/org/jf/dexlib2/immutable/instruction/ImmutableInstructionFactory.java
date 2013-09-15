@@ -40,7 +40,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class ImmutableInstructionFactory implements InstructionFactory<ImmutableInstruction, Reference> {
+public class ImmutableInstructionFactory implements InstructionFactory<Reference> {
     public static final ImmutableInstructionFactory INSTANCE = new ImmutableInstructionFactory();
 
     private ImmutableInstructionFactory() {

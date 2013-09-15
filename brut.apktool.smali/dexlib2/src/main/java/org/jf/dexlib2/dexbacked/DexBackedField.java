@@ -63,7 +63,9 @@ public class DexBackedField extends BaseFieldReference implements Field {
         this.dexFile = reader.dexBuf;
         this.classDef = classDef;
 
-        int fieldIndexDiff = reader.readSmallUleb128();
+        // large values may be used for the index delta, which cause the cumulative index to overflow upon
+        // addition, effectively allowing out of order entries.
+        int fieldIndexDiff = reader.readLargeUleb128();
         this.fieldIndex = fieldIndexDiff + previousFieldIndex;
         this.accessFlags = reader.readSmallUleb128();
 
@@ -78,7 +80,9 @@ public class DexBackedField extends BaseFieldReference implements Field {
         this.dexFile = reader.dexBuf;
         this.classDef = classDef;
 
-        int fieldIndexDiff = reader.readSmallUleb128();
+        // large values may be used for the index delta, which cause the cumulative index to overflow upon
+        // addition, effectively allowing out of order entries.
+        int fieldIndexDiff = reader.readLargeUleb128();
         this.fieldIndex = fieldIndexDiff + previousFieldIndex;
         this.accessFlags = reader.readSmallUleb128();
 

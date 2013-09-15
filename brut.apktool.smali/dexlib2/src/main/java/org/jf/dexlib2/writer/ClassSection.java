@@ -31,7 +31,11 @@
 
 package org.jf.dexlib2.writer;
 
+import org.jf.dexlib2.builder.MutableMethodImplementation;
+import org.jf.dexlib2.iface.ExceptionHandler;
 import org.jf.dexlib2.iface.TryBlock;
+import org.jf.dexlib2.iface.debug.DebugItem;
+import org.jf.dexlib2.iface.instruction.Instruction;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -41,8 +45,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface ClassSection<StringKey extends CharSequence, TypeKey extends CharSequence, TypeListKey, ClassKey,
-        FieldKey, MethodKey, AnnotationSetKey, EncodedValue, DebugItem, Insn,
-        ExceptionHandler extends org.jf.dexlib2.iface.ExceptionHandler> extends IndexSection<ClassKey> {
+        FieldKey, MethodKey, AnnotationSetKey, EncodedValue> extends IndexSection<ClassKey> {
     @Nonnull Collection<? extends ClassKey> getSortedClasses();
 
     @Nullable Map.Entry<? extends ClassKey, Integer> getClassEntryByType(@Nullable TypeKey key);
@@ -73,9 +76,10 @@ public interface ClassSection<StringKey extends CharSequence, TypeKey extends Ch
     @Nullable Iterable<? extends StringKey> getParameterNames(@Nonnull MethodKey key);
 
     int getRegisterCount(@Nonnull MethodKey key);
-    @Nullable Iterable<? extends Insn> getInstructions(@Nonnull MethodKey key);
+    @Nullable Iterable<? extends Instruction> getInstructions(@Nonnull MethodKey key);
     @Nonnull List<? extends TryBlock<? extends ExceptionHandler>> getTryBlocks(@Nonnull MethodKey key);
     @Nullable TypeKey getExceptionType(@Nonnull ExceptionHandler handler);
+    @Nonnull MutableMethodImplementation makeMutableMethodImplementation(@Nonnull MethodKey key);
 
     void setEncodedArrayOffset(@Nonnull ClassKey key, int offset);
     int getEncodedArrayOffset(@Nonnull ClassKey key);
@@ -88,9 +92,6 @@ public interface ClassSection<StringKey extends CharSequence, TypeKey extends Ch
 
     void setCodeItemOffset(@Nonnull MethodKey key, int offset);
     int getCodeItemOffset(@Nonnull MethodKey key);
-
-    void setDebugItemOffset(@Nonnull MethodKey key, int offset);
-    int getDebugItemOffset(@Nonnull MethodKey key);
 
     void writeDebugItem(@Nonnull DebugWriter<StringKey, TypeKey> writer, DebugItem debugItem) throws IOException;
 }
