@@ -781,8 +781,7 @@ final public class AndrolibResources {
         if (sFrameworkFolder != null) {
             path = sFrameworkFolder;
         } else if (OSDetection.isMacOSX()) {
-            // store in user-home, for Mac OS X
-            path = System.getProperty("user.home") + File.separatorChar + "Library/apktool/framework";
+            path = System.getProperty("user.home") + File.separatorChar + "Library" + File.separatorChar + "apktool" + File.separatorChar + "framework";
         } else {
             path = System.getProperty("user.home") + File.separatorChar + "apktool" + File.separatorChar + "framework";
         }
@@ -807,7 +806,6 @@ final public class AndrolibResources {
      * Aapt can still be overridden via --aapt/-a on build, but specific features will be disabled
      *
      * @url https://github.com/iBotPeaches/platform_frameworks_base
-     * @return
      * @throws AndrolibException
      */
     public File getAaptBinaryFile() throws AndrolibException {
@@ -822,6 +820,7 @@ final public class AndrolibResources {
                 mAaptBinary = Jar
                         .getResourceAsFile("/prebuilt/aapt/windows/aapt.exe");
             } else {
+                LOGGER.warning("Unknown Operating System: " + OSDetection.returnOS());
                 return null;
             }
         } catch (BrutException ex) {
