@@ -262,7 +262,9 @@ public class Androlib {
 			HashMap<String, Boolean> flags, String aaptPath)
 			throws BrutException {
 
-		mAaptPath = aaptPath;
+        LOGGER.info("Using Apktool " + Androlib.getVersion() + " on " + appDir.getName());
+
+        mAaptPath = aaptPath;
 		Map<String, Object> meta = readMetaFile(appDir);
 		Object t1 = meta.get("isFrameworkApk");
 		flags.put("framework", t1 == null ? false : (Boolean) t1);

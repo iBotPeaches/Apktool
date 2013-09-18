@@ -31,6 +31,7 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 
 /**
@@ -80,6 +81,8 @@ public class ApkDecoder {
             throw new AndrolibException(ex);
         }
         outDir.mkdirs();
+
+        LOGGER.info("Using Apktool " + Androlib.getVersion() + " on " + mApkFile.getName());
 
         if (hasResources()) {
             setAnalysisMode(mAnalysisMode, true);
@@ -341,6 +344,9 @@ public class ApkDecoder {
     }
 
     private final Androlib mAndrolib;
+
+    private final static Logger LOGGER = Logger.getLogger(Androlib.class
+            .getName());
 
     private ExtFile mApkFile;
     private File mOutDir;
