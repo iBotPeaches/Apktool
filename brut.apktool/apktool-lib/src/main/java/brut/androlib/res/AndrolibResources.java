@@ -295,7 +295,7 @@ final public class AndrolibResources {
             // Remove versionName / versionCode (aapt API 16)
             if (resTable.getAnalysisMode() == false) {
                 remove_manifest_versions(outDir.getAbsolutePath()
-                        + File.separator + "/AndroidManifest.xml");
+                        + File.separator + "AndroidManifest.xml");
             }
             if (inApk.containsDir("res")) {
                 in = inApk.getDir("res");
