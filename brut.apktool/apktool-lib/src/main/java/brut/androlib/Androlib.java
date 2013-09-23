@@ -124,6 +124,10 @@ public class Androlib {
 			if (in.containsDir("lib")) {
 				in.copyToDir(outDir, "lib");
 			}
+    	if (in.containsDir("com")) {
+				in.copyToDir(outDir, "com");
+			}
+
 		} catch (DirectoryException ex) {
 			throw new AndrolibException(ex);
 		}
@@ -209,6 +213,7 @@ public class Androlib {
 		buildResources(appDir, flags,
 				(Map<String, Object>) meta.get("usesFramework"));
 		buildLib(appDir, flags);
+		buildCom(appDir, flags);
 		buildApk(appDir, outFile, flags);
 	}
 
@@ -433,6 +438,24 @@ public class Androlib {
 		}
 	}
 
+	public void buildCom(File appDir, HashMap<String, Boolean> flags)
+			throws AndrolibException {
+		File working = new File(appDir, "com");
+		if (!working.exists()) {
+			return;
+		}
+		File stored = new File(appDir, APK_DIRNAME + "/com");
+		if (flags.get("forceBuildAll") || isModified(working, stored)) {
+			LOGGER.info("Copying libs...");
+			try {
+				OS.rmdir(stored);
+				OS.cpdir(working, stored);
+			} catch (BrutException ex) {
+				throw new AndrolibException(ex);
+			}
+		}
+	}
+  
 	public void buildApk(File appDir, File outApk,
 			HashMap<String, Boolean> flags) throws AndrolibException {
 		LOGGER.info("Building apk file...");
