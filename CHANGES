@@ -1,6 +1,6 @@
 v2.0.0 (TBA)
--Updated to smali/baksmali to v2.0.0b5
--Updated to Gradle 1.5
+-Updated to smali/baksmali to v2.0.0
+-Updated to Gradle 1.8
 -Fixed (issue #8)   - Correctly uses -c to retain original manifest and META-INF. (Thanks M1cha)
 -Fixed (issue #63)  - Correctly handles apk's that have unknown files outside of the standard aapt allowed resources.
 -Fixed (issue #202) - Includes modified aapt to force package id on build. (Thanks M1cha)
@@ -23,6 +23,7 @@ v2.0.0 (TBA)
 -Fixed (issue #496) - Fixes Windows builds caused by java.nio problems
 -Fixed (issue #510) - Any error output is sent stderr instead of stdout
 -Fixed (issue #426) - Filename too long (JesusFreke)
+-Fixed (issue #524) - INSTALL_FAILED_DEXOPT fix (JesusFreke)
 -Added output to list Apktool version to help debugging.
 -Updated known bytes for configurations to 38 (from addition of layout direction)
 -Fixed NPE when handling odex apks even with --no-src specified. (Thanks Rodrigo Chiossi)
