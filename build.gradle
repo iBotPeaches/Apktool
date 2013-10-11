@@ -48,7 +48,7 @@ class Compatibility {
 }
 
 task wrapper(type: Wrapper) {
-  gradleVersion = '1.5'
+  gradleVersion = '1.8'
 }
 
 // If anyone uses this outside of GoogleCode (Apktool) developers. I will hunt you down and hurt you.
