@@ -31,6 +31,7 @@ package org.jf.baksmali.Adaptors;
 import com.google.common.collect.ImmutableList;
 import org.jf.baksmali.Adaptors.Debug.DebugMethodItem;
 import org.jf.baksmali.Adaptors.Format.InstructionMethodItemFactory;
+import org.jf.baksmali.baksmaliOptions;
 import org.jf.dexlib2.AccessFlags;
 import org.jf.dexlib2.Format;
 import org.jf.dexlib2.Opcode;
@@ -113,7 +114,8 @@ public class MethodDefinition {
         }
     }
 
-    public static void writeEmptyMethodTo(IndentingWriter writer, Method method) throws IOException {
+    public static void writeEmptyMethodTo(IndentingWriter writer, Method method,
+                                          baksmaliOptions options) throws IOException {
         writer.write(".method ");
         writeAccessFlags(writer, method.getAccessFlags());
         writer.write(method.getName());
@@ -127,7 +129,7 @@ public class MethodDefinition {
         writer.write('\n');
 
         writer.indent(4);
-        writeParameters(writer, method, methodParameters);
+        writeParameters(writer, method, methodParameters, options);
         AnnotationFormatter.writeTo(writer, method.getAnnotations());
         writer.deindent(4);
         writer.write(".end method\n");
@@ -164,7 +166,7 @@ public class MethodDefinition {
             writer.printSignedIntAsDec(methodImpl.getRegisterCount());
         }
         writer.write('\n');
-        writeParameters(writer, method, methodParameters);
+        writeParameters(writer, method, methodParameters, classDef.options);
 
         if (registerFormatter == null) {
             registerFormatter = new RegisterFormatter(classDef.options, methodImpl.getRegisterCount(),
@@ -218,7 +220,8 @@ public class MethodDefinition {
     }
 
     private static void writeParameters(IndentingWriter writer, Method method,
-                                        List<? extends MethodParameter> parameters) throws IOException {
+                                        List<? extends MethodParameter> parameters,
+                                        baksmaliOptions options) throws IOException {
         boolean isStatic = AccessFlags.STATIC.isSet(method.getAccessFlags());
         int registerNumber = isStatic?0:1;
         for (MethodParameter parameter: parameters) {
@@ -229,7 +232,7 @@ public class MethodDefinition {
                 writer.write(".param p");
                 writer.printSignedIntAsDec(registerNumber);
 
-                if (parameterName != null) {
+                if (parameterName != null && options.outputDebugInfo) {
                     writer.write(", ");
                     ReferenceFormatter.writeStringReference(writer, parameterName);
                 }

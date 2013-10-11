@@ -106,7 +106,7 @@ public class MutableMethodImplementation implements MethodImplementation {
             int debugCodeAddress = debugItem.getCodeAddress();
             int locationIndex = mapCodeAddressToIndex(codeAddressToIndex, debugCodeAddress);
             MethodLocation debugLocation = instructionList.get(locationIndex);
-            BuilderDebugItem builderDebugItem = convertDebugItem(debugLocation, debugItem);
+            BuilderDebugItem builderDebugItem = convertDebugItem(debugItem);
             debugLocation.getDebugItems().add(builderDebugItem);
             builderDebugItem.location = debugLocation;
         }
@@ -909,32 +909,32 @@ public class MutableMethodImplementation implements MethodImplementation {
     }
 
     @Nonnull
-    private BuilderDebugItem convertDebugItem(@Nonnull MethodLocation location, @Nonnull DebugItem debugItem) {
+    private BuilderDebugItem convertDebugItem(@Nonnull DebugItem debugItem) {
         switch (debugItem.getDebugItemType()) {
             case DebugItemType.START_LOCAL: {
                 StartLocal startLocal = (StartLocal)debugItem;
-                return new BuilderStartLocal(location, startLocal.getRegister(), startLocal.getNameReference(),
+                return new BuilderStartLocal(startLocal.getRegister(), startLocal.getNameReference(),
                         startLocal.getTypeReference(), startLocal.getSignatureReference());
             }
             case DebugItemType.END_LOCAL: {
                 EndLocal endLocal = (EndLocal)debugItem;
-                return new BuilderEndLocal(location, endLocal.getRegister());
+                return new BuilderEndLocal(endLocal.getRegister());
             }
             case DebugItemType.RESTART_LOCAL: {
                 RestartLocal restartLocal = (RestartLocal)debugItem;
-                return new BuilderRestartLocal(location, restartLocal.getRegister());
+                return new BuilderRestartLocal(restartLocal.getRegister());
             }
             case DebugItemType.PROLOGUE_END:
-                return new BuilderPrologueEnd(location);
+                return new BuilderPrologueEnd();
             case DebugItemType.EPILOGUE_BEGIN:
-                return new BuilderEpilogueBegin(location);
+                return new BuilderEpilogueBegin();
             case DebugItemType.LINE_NUMBER: {
                 LineNumber lineNumber = (LineNumber)debugItem;
-                return new BuilderLineNumber(location, lineNumber.getLineNumber());
+                return new BuilderLineNumber(lineNumber.getLineNumber());
             }
             case DebugItemType.SET_SOURCE_FILE: {
                 SetSourceFile setSourceFile = (SetSourceFile)debugItem;
-                return new BuilderSetSourceFile(location, setSourceFile.getSourceFileReference());
+                return new BuilderSetSourceFile(setSourceFile.getSourceFileReference());
             }
             default:
                 throw new ExceptionWithContext("Invalid debug item type: " + debugItem.getDebugItemType());

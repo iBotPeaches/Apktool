@@ -183,31 +183,31 @@ public class MethodLocation {
     }
 
     public void addLineNumber(int lineNumber) {
-        debugItems.add(new BuilderLineNumber(this, lineNumber));
+        getDebugItems().add(new BuilderLineNumber(lineNumber));
     }
 
     public void addStartLocal(int registerNumber, @Nullable StringReference name, @Nullable TypeReference type,
                               @Nullable StringReference signature) {
-        debugItems.add(new BuilderStartLocal(this, registerNumber, name, type, signature));
+        getDebugItems().add(new BuilderStartLocal(registerNumber, name, type, signature));
     }
 
     public void addEndLocal(int registerNumber) {
-        debugItems.add(new BuilderEndLocal(this, registerNumber));
+        getDebugItems().add(new BuilderEndLocal(registerNumber));
     }
 
     public void addRestartLocal(int registerNumber) {
-        debugItems.add(new BuilderRestartLocal(this, registerNumber));
+        getDebugItems().add(new BuilderRestartLocal(registerNumber));
     }
 
     public void addPrologue() {
-        debugItems.add(new BuilderPrologueEnd(this));
+        getDebugItems().add(new BuilderPrologueEnd());
     }
 
     public void addEpilogue() {
-        debugItems.add(new BuilderEpilogueBegin(this));
+        getDebugItems().add(new BuilderEpilogueBegin());
     }
 
     public void addSetSourceFile(@Nullable BuilderStringReference sourceFile) {
-        debugItems.add(new BuilderSetSourceFile(this, sourceFile));
+        getDebugItems().add(new BuilderSetSourceFile(sourceFile));
     }
 }

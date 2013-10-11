@@ -31,10 +31,7 @@
 
 package org.jf.dexlib2.writer;
 
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Ordering;
+import com.google.common.collect.*;
 import org.jf.dexlib2.AccessFlags;
 import org.jf.dexlib2.Opcode;
 import org.jf.dexlib2.ReferenceType;
@@ -80,7 +77,6 @@ public abstract class DexWriter<
         StringKey extends CharSequence, StringRef extends StringReference, TypeKey extends CharSequence,
         TypeRef extends TypeReference, ProtoKey extends Comparable<ProtoKey>,
         FieldRefKey extends FieldReference, MethodRefKey extends MethodReference,
-        BaseReference extends Reference,
         ClassKey extends Comparable<? super ClassKey>,
         AnnotationKey extends Annotation, AnnotationSetKey,
         TypeListKey,
@@ -117,8 +113,6 @@ public abstract class DexWriter<
     protected int numCodeItemItems = 0;
     protected int numClassDataItems = 0;
 
-    protected final InstructionFactory<BaseReference> instructionFactory;
-
     protected final StringSection<StringKey, StringRef> stringSection;
     protected final TypeSection<StringKey, TypeKey, TypeRef> typeSection;
     protected final ProtoSection<StringKey, TypeKey, ProtoKey, TypeListKey> protoSection;
@@ -132,7 +126,6 @@ public abstract class DexWriter<
     protected final AnnotationSetSection<AnnotationKey, AnnotationSetKey> annotationSetSection;
 
     protected DexWriter(int api,
-                        InstructionFactory<BaseReference> instructionFactory,
                         StringSection<StringKey, StringRef> stringSection,
                         TypeSection<StringKey, TypeKey, TypeRef> typeSection,
                         ProtoSection<StringKey, TypeKey, ProtoKey, TypeListKey> protoSection,
@@ -145,7 +138,6 @@ public abstract class DexWriter<
                                 EncodedValue> annotationSection,
                         AnnotationSetSection<AnnotationKey, AnnotationSetKey> annotationSetSection) {
         this.api = api;
-        this.instructionFactory = instructionFactory;
         this.stringSection = stringSection;
         this.typeSection = typeSection;
         this.protoSection = protoSection;
@@ -816,7 +808,8 @@ public abstract class DexWriter<
             }
         }
 
-        if (debugItems == null && parameterCount == 0) {
+
+        if (parameterCount == 0 && (debugItems == null || Iterables.isEmpty(debugItems))) {
             return NO_OFFSET;
         }
 
@@ -1179,11 +1172,8 @@ public abstract class DexWriter<
     }
 
     private void writeHeader(@Nonnull DexDataWriter writer, int dataOffset, int fileSize) throws IOException {
-        if (api < 14) {
-            writer.write(HeaderItem.MAGIC_VALUES[0]);
-        } else {
-            writer.write(HeaderItem.MAGIC_VALUES[1]);
-        }
+        // always write the 035 version, there's no reason to use the 036 version for now
+        writer.write(HeaderItem.MAGIC_VALUES[0]);
 
         // checksum placeholder
         writer.writeInt(0);

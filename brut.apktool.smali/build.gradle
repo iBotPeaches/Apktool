@@ -31,7 +31,7 @@
 
 apply plugin: 'idea'
 
-version = '2.0b5'
+version = '2.0'
 
 def jarVersion = version
 
@@ -98,4 +98,8 @@ buildscript {
     dependencies {
         classpath 'org.eclipse.jgit:org.eclipse.jgit:2.0.0.201206130900-r'
     }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.8'
 }

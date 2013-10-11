@@ -33,14 +33,12 @@ package org.jf.dexlib2.builder;
 
 import org.jf.dexlib2.iface.debug.DebugItem;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public abstract class BuilderDebugItem implements DebugItem {
     @Nullable MethodLocation location;
 
-    public BuilderDebugItem(@Nonnull MethodLocation location) {
-        this.location = location;
+    public BuilderDebugItem() {
     }
 
     @Override public int getCodeAddress() {

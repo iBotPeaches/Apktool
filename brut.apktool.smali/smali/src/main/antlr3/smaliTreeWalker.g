@@ -79,8 +79,6 @@ import java.util.*;
   private int apiLevel = 15;
   private Opcodes opcodes = new Opcodes(apiLevel);
   private DexBuilder dexBuilder;
-  private InstructionFactory<BuilderReference> instructionFactory =
-          BuilderInstructionFactory.INSTANCE;
 
   public void setDexBuilder(DexBuilder dexBuilder) {
       this.dexBuilder = dexBuilder;

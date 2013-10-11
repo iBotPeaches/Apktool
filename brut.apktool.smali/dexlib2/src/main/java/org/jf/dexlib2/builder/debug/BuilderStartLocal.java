@@ -33,12 +33,10 @@ package org.jf.dexlib2.builder.debug;
 
 import org.jf.dexlib2.DebugItemType;
 import org.jf.dexlib2.builder.BuilderDebugItem;
-import org.jf.dexlib2.builder.MethodLocation;
 import org.jf.dexlib2.iface.debug.StartLocal;
 import org.jf.dexlib2.iface.reference.StringReference;
 import org.jf.dexlib2.iface.reference.TypeReference;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class BuilderStartLocal extends BuilderDebugItem implements StartLocal {
@@ -47,12 +45,10 @@ public class BuilderStartLocal extends BuilderDebugItem implements StartLocal {
     @Nullable private final TypeReference type;
     @Nullable private final StringReference signature;
 
-    public BuilderStartLocal(@Nonnull MethodLocation location,
-                             int register,
+    public BuilderStartLocal(int register,
                              @Nullable StringReference name,
                              @Nullable TypeReference type,
                              @Nullable StringReference signature) {
-        super(location);
         this.register = register;
         this.name = name;
         this.type = type;

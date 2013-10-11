@@ -54,7 +54,7 @@ import java.util.List;
 import java.util.Set;
 
 public class DexBuilder extends DexWriter<BuilderStringReference, BuilderStringReference, BuilderTypeReference,
-        BuilderTypeReference, BuilderProtoReference, BuilderFieldReference, BuilderMethodReference, BuilderReference,
+        BuilderTypeReference, BuilderProtoReference, BuilderFieldReference, BuilderMethodReference,
         BuilderClassDef, BuilderAnnotation, BuilderAnnotationSet, BuilderTypeList, BuilderField, BuilderMethod,
         BuilderEncodedValue, BuilderAnnotationElement> {
 
@@ -71,7 +71,7 @@ public class DexBuilder extends DexWriter<BuilderStringReference, BuilderStringR
     }
 
     private DexBuilder(int api, @Nonnull BuilderContext context) {
-        super(api, BuilderInstructionFactory.INSTANCE, context.stringPool, context.typePool, context.protoPool,
+        super(api, context.stringPool, context.typePool, context.protoPool,
                 context.fieldPool, context.methodPool, context.classPool, context.typeListPool, context.annotationPool,
                 context.annotationSetPool);
         this.context = context;

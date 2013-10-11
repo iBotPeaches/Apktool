@@ -263,7 +263,7 @@ public class ClassDefinition {
 
             MethodImplementation methodImpl = method.getImplementation();
             if (methodImpl == null) {
-                MethodDefinition.writeEmptyMethodTo(methodWriter, method);
+                MethodDefinition.writeEmptyMethodTo(methodWriter, method, options);
             } else {
                 MethodDefinition methodDefinition = new MethodDefinition(this, method, methodImpl);
                 methodDefinition.writeTo(methodWriter);
@@ -308,7 +308,7 @@ public class ClassDefinition {
 
             MethodImplementation methodImpl = method.getImplementation();
             if (methodImpl == null) {
-                MethodDefinition.writeEmptyMethodTo(methodWriter, method);
+                MethodDefinition.writeEmptyMethodTo(methodWriter, method, options);
             } else {
                 MethodDefinition methodDefinition = new MethodDefinition(this, method, methodImpl);
                 methodDefinition.writeTo(methodWriter);

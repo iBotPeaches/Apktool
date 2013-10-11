@@ -31,10 +31,7 @@
 
 package org.jf.dexlib2.immutable;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSortedSet;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Iterators;
+import com.google.common.collect.*;
 import org.jf.dexlib2.base.reference.BaseTypeReference;
 import org.jf.dexlib2.iface.Annotation;
 import org.jf.dexlib2.iface.ClassDef;
@@ -71,6 +68,13 @@ public class ImmutableClassDef extends BaseTypeReference implements ClassDef {
                              @Nullable Collection<? extends Annotation> annotations,
                              @Nullable Iterable<? extends Field> fields,
                              @Nullable Iterable<? extends Method> methods) {
+        if (fields == null) {
+            fields = ImmutableList.of();
+        }
+        if (methods == null) {
+            methods = ImmutableList.of();
+        }
+
         this.type = type;
         this.accessFlags = accessFlags;
         this.superclass = superclass;

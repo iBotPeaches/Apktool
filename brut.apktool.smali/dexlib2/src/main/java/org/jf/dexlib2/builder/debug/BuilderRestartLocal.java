@@ -33,18 +33,14 @@ package org.jf.dexlib2.builder.debug;
 
 import org.jf.dexlib2.DebugItemType;
 import org.jf.dexlib2.builder.BuilderDebugItem;
-import org.jf.dexlib2.builder.MethodLocation;
 import org.jf.dexlib2.iface.debug.RestartLocal;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class BuilderRestartLocal extends BuilderDebugItem implements RestartLocal {
     private final int register;
 
-    public BuilderRestartLocal(@Nonnull MethodLocation location,
-                               int register) {
-        super(location);
+    public BuilderRestartLocal(int register) {
         this.register = register;
     }
 

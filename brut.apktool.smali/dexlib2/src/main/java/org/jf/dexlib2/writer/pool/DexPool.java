@@ -38,7 +38,6 @@ import org.jf.dexlib2.iface.ClassDef;
 import org.jf.dexlib2.iface.Field;
 import org.jf.dexlib2.iface.reference.*;
 import org.jf.dexlib2.iface.value.*;
-import org.jf.dexlib2.immutable.instruction.ImmutableInstructionFactory;
 import org.jf.dexlib2.writer.DexWriter;
 import org.jf.dexlib2.writer.io.FileDataStore;
 import org.jf.dexlib2.writer.pool.ProtoPool.Key;
@@ -51,7 +50,7 @@ import java.util.Collection;
 import java.util.Set;
 
 public class DexPool extends DexWriter<CharSequence, StringReference, CharSequence, TypeReference, Key,
-        FieldReference, MethodReference, Reference, PoolClassDef,
+        FieldReference, MethodReference, PoolClassDef,
         Annotation, Set<? extends Annotation>,
         TypeListPool.Key<? extends Collection<? extends CharSequence>>, Field, PoolMethod,
         EncodedValue, AnnotationElement> {
@@ -79,7 +78,7 @@ public class DexPool extends DexWriter<CharSequence, StringReference, CharSequen
     private DexPool(int api, StringPool stringPool, TypePool typePool, ProtoPool protoPool, FieldPool fieldPool,
                     MethodPool methodPool, ClassPool classPool, TypeListPool typeListPool,
                     AnnotationPool annotationPool, AnnotationSetPool annotationSetPool) {
-        super(api, ImmutableInstructionFactory.INSTANCE, stringPool, typePool, protoPool, fieldPool, methodPool,
+        super(api, stringPool, typePool, protoPool, fieldPool, methodPool,
                 classPool, typeListPool, annotationPool, annotationSetPool);
     }
 

@@ -33,18 +33,14 @@ package org.jf.dexlib2.builder.debug;
 
 import org.jf.dexlib2.DebugItemType;
 import org.jf.dexlib2.builder.BuilderDebugItem;
-import org.jf.dexlib2.builder.MethodLocation;
 import org.jf.dexlib2.iface.debug.EndLocal;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class BuilderEndLocal extends BuilderDebugItem implements EndLocal {
     private final int register;
 
-    public BuilderEndLocal(@Nonnull MethodLocation location,
-                           int register) {
-        super(location);
+    public BuilderEndLocal(int register) {
         this.register = register;
     }
 
