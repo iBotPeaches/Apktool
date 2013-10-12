@@ -75,6 +75,7 @@ final public class AndrolibResources {
                 sKeepBroken);
         ResPackage pkg = null;
 
+        // @todo handle multiple packages using findPackageWithMostResSpecs()
         switch (pkgs.length) {
             case 1:
                 pkg = pkgs[0];
