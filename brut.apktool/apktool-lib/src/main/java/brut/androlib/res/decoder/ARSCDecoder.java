@@ -425,12 +425,34 @@ public class ARSCDecoder {
 		}
 
 		public ResPackage getOnePackage() throws AndrolibException {
-			if (mPackages.length != 1) {
-				throw new AndrolibException(
-						"Arsc file contains zero or multiple packages");
+            if (mPackages.length <= 0) {
+                throw new AndrolibException(
+                        "Arsc file contains zero packages");
+            } else if (mPackages.length != 1) {
+                int id = findPackageWithMostResSpecs();
+                LOGGER.warning("Arsc file contains multiple packages. Using package " + mPackages[id].getName() + " as default.");
+                return mPackages[id];
 			}
 			return mPackages[0];
 		}
+
+        public int findPackageWithMostResSpecs() {
+            int count = -1;
+            int id = 0;
+
+            // set starting point to package id 0.
+            count = mPackages[0].getResSpecCount();
+
+            // loop through packages looking for largest
+            for (int i = 0; i < mPackages.length; i++) {
+                if (mPackages[i].getResSpecCount() >= count) {
+                    count = mPackages[i].getResSpecCount();
+                    id = i;
+                }
+            }
+
+            return id;
+        }
 
 		public ResTable getResTable() {
 			return mResTable;

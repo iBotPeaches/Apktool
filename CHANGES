@@ -24,6 +24,7 @@ v2.0.0 (TBA)
 -Fixed (issue #510) - Any error output is sent stderr instead of stdout
 -Fixed (issue #426) - Filename too long (JesusFreke)
 -Fixed (issue #524) - INSTALL_FAILED_DEXOPT fix (JesusFreke)
+-Fixed (issue #473) - multiple package frameworks are treated correctly.
 -Added output to list Apktool version to help debugging.
 -Updated known bytes for configurations to 38 (from addition of layout direction)
 -Fixed NPE when handling odex apks even with --no-src specified. (Thanks Rodrigo Chiossi)
