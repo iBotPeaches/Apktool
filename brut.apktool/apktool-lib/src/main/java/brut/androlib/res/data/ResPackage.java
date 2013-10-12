@@ -76,6 +76,10 @@ public class ResPackage {
 		return config;
 	}
 
+    public int getResSpecCount() {
+        return mResSpecs.size();
+    }
+
 	public ResConfig getOrCreateConfig(ResConfigFlags flags)
 			throws AndrolibException {
 		ResConfig config = mConfigs.get(flags);
