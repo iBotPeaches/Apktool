@@ -64,6 +64,10 @@ public class ApkDecoder {
         mOutDir = outDir;
     }
 
+    public void setApi(int api) {
+        mApi = api;
+    }
+
     public void decode() throws AndrolibException, IOException {
         File outDir = getOutDir();
 
@@ -85,9 +89,15 @@ public class ApkDecoder {
         LOGGER.info("Using Apktool " + Androlib.getVersion() + " on " + mApkFile.getName());
 
         if (hasResources()) {
+
+            Map<String, String> sdkInfo = mAndrolib.getResTable(mApkFile).getSdkInfo();
+
+            if (sdkInfo.get("targetSdkVersion") != null) {
+                mApi = Integer.parseInt(sdkInfo.get("targetSdkVersion"));
+            }
+
             setAnalysisMode(mAnalysisMode, true);
             // read the resources.arsc checking for STORED vs DEFLATE
-            // compression
             // this will determine whether we compress on rebuild or not.
             ZipExtFile zef = new ZipExtFile(mApkFile.getAbsolutePath());
             ZipArchiveEntry ze = zef.getEntry("resources.arsc");
@@ -122,8 +132,7 @@ public class ApkDecoder {
             }
         }
 
-        Map<String, String> sdkInfo = mAndrolib.getResTable(mApkFile).getSdkInfo();
-        int api = (sdkInfo.get("targetSdkVersion") != null) ? Integer.parseInt(sdkInfo.get("targetSdkVersion")) : mDefaultApi;
+
 
         if (hasSources()) {
             switch (mDecodeSources) {
@@ -131,7 +140,7 @@ public class ApkDecoder {
                     mAndrolib.decodeSourcesRaw(mApkFile, outDir, mDebug);
                     break;
                 case DECODE_SOURCES_SMALI:
-                    mAndrolib.decodeSourcesSmali(mApkFile, outDir, mDebug, mDebugLinePrefix, mBakDeb, api);
+                    mAndrolib.decodeSourcesSmali(mApkFile, outDir, mDebug, mDebugLinePrefix, mBakDeb, mApi);
                     break;
                 case DECODE_SOURCES_JAVA:
                     mAndrolib.decodeSourcesJava(mApkFile, outDir, mDebug);
@@ -359,7 +368,7 @@ public class ApkDecoder {
     private String mFrameTag;
     private boolean mKeepBrokenResources = false;
     private String mFrameworkDir = null;
-    private int mDefaultApi = 15;
+    private int mApi = 15;
     private boolean mBakDeb = true;
     private boolean mCompressResources = false;
     private boolean mAnalysisMode = false;

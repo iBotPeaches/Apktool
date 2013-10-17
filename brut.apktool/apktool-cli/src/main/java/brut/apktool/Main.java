@@ -144,6 +144,9 @@ public class Main {
         if (cli.hasOption("m") || cli.hasOption("match-original")) {
             decoder.setAnalysisMode(true, false);
         }
+        if (cli.hasOption("api")) {
+            decoder.setApi(Integer.parseInt(cli.getOptionValue("api")));
+        }
         if (cli.hasOption("o") || cli.hasOption("output")) {
             outDir = new File(cli.getOptionValue("o"));
             decoder.setOutDir(outDir);
@@ -295,6 +298,12 @@ public class Main {
                 .withArgName("prefix")
                 .create();
 
+        Option apiLevelOption = OptionBuilder.withLongOpt("api")
+                .withDescription("The numeric api-level of the file to generate, e.g. 14 for ICS.")
+                .hasArg(true)
+                .withArgName("API")
+                .create();
+
         Option debugBuiOption = OptionBuilder.withLongOpt("debug")
                 .withDescription("Builds in debug mode. Check project page for more info.")
                 .create("d");
@@ -377,6 +386,7 @@ public class Main {
             DecodeOptions.addOption(noDbgOption);
             DecodeOptions.addOption(keepResOption);
             DecodeOptions.addOption(analysisOption);
+            DecodeOptions.addOption(apiLevelOption);
 
             BuildOptions.addOption(debugBuiOption);
             BuildOptions.addOption(aaptOption);
