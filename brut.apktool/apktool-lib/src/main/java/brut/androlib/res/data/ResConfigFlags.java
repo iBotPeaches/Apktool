@@ -141,9 +141,11 @@ public class ResConfigFlags {
     private String generateQualifiers() {
         StringBuilder ret = new StringBuilder();
         if (mcc != 0) {
-            ret.append("-mcc").append(String.format("%03d", mcc));
-            if (mnc != 0) {
-                ret.append("-mnc").append(mnc);
+            if (mcc != MNC_ZERO) {
+                ret.append("-mcc").append(String.format("%03d", mcc));
+                if (mnc != 0) {
+                    ret.append("-mnc").append(mnc);
+                }
             }
         }
         if (language[0] != '\00') {
@@ -256,6 +258,9 @@ public class ResConfigFlags {
                 break;
             case DENSITY_XXHIGH:
                 ret.append("-xxhdpi");
+                break;
+            case DENSITY_XXXHIGH:
+                ret.append("-xxxhdpi");
                 break;
             case DENSITY_NONE:
                 ret.append("-nodpi");
@@ -409,11 +414,15 @@ public class ResConfigFlags {
     public final static int DENSITY_DEFAULT = 0;
     public final static int DENSITY_LOW = 120;
     public final static int DENSITY_MEDIUM = 160;
+    public final static int DENSITY_400 = 190;
     public final static int DENSITY_TV = 213;
     public final static int DENSITY_HIGH = 240;
     public final static int DENSITY_XHIGH = 320;
     public final static int DENSITY_XXHIGH = 480;
+    public final static int DENSITY_XXXHIGH = 640;
     public final static int DENSITY_NONE = 0xFFFF;
+
+    public final static int MNC_ZERO = 0xFFFF;
 
     public final static short MASK_LAYOUTDIR = 0xc0;
     public final static short SCREENLAYOUT_LAYOUTDIR_ANY = 0x00;
