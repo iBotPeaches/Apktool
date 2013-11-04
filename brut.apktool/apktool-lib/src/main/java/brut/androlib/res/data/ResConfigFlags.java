@@ -400,6 +400,8 @@ public class ResConfigFlags {
     public final static byte SDK_ICE_CREAM_SANDWICH_MR1 = 15;
     public final static byte SDK_JELLY_BEAN = 16;
     public final static byte SDK_JELLY_BEAN_MR1 = 17;
+    public final static byte SDK_JELLY_BEAN_MR2 = 18;
+    public final static byte KITKAT = 19;
 
     public final static byte ORIENTATION_ANY = 0;
     public final static byte ORIENTATION_PORT = 1;
