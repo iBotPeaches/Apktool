@@ -91,7 +91,6 @@ public class ApkDecoder {
         if (hasResources()) {
 
             Map<String, String> sdkInfo = mAndrolib.getResTable(mApkFile).getSdkInfo();
-
             if (sdkInfo.get("targetSdkVersion") != null) {
                 mApi = Integer.parseInt(sdkInfo.get("targetSdkVersion"));
             }
@@ -131,8 +130,6 @@ public class ApkDecoder {
                 }
             }
         }
-
-
 
         if (hasSources()) {
             switch (mDecodeSources) {
@@ -354,8 +351,7 @@ public class ApkDecoder {
 
     private final Androlib mAndrolib;
 
-    private final static Logger LOGGER = Logger.getLogger(Androlib.class
-            .getName());
+    private final static Logger LOGGER = Logger.getLogger(Androlib.class.getName());
 
     private ExtFile mApkFile;
     private File mOutDir;
