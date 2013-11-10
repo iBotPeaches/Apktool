@@ -187,7 +187,7 @@ public class StringBlock {
 			builder.append(tag.substring(0, pos));
 			if (!close) {
 				boolean loop = true;
-				while (loop) {
+				while (loop && pos+1<tag.length()) {
 					int pos2 = tag.indexOf('=', pos + 1);
 					builder.append(' ').append(tag.substring(pos + 1, pos2))
 							.append("=\"");
