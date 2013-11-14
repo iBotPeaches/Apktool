@@ -29,6 +29,7 @@ v2.0.0 (TBA)
 -Added output to list Apktool version to help debugging.
 -Updated known bytes for configurations to 38 (from addition of layout direction)
 -Fixed NPE when handling odex apks even with --no-src specified. (Thanks Rodrigo Chiossi)
+-Fixed locale problems when locale changes meaning of default letters in windows .bat script (Thanks Adem666)
 
 v1.5.2 (Released February 2 - 2013) Codename: Bug Fixes
 -Fixed (issue #299) - output smali filename errors to screen during rebuild instead of filestream
