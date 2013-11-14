@@ -47,6 +47,7 @@ import org.jf.dexlib2.iface.reference.Reference;
 import org.jf.dexlib2.util.ReferenceUtil;
 import org.jf.util.ExceptionWithContext;
 import org.jf.util.IndentingWriter;
+import org.jf.util.NumberUtils;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
@@ -230,9 +231,13 @@ public class InstructionMethodItem<T extends Instruction> extends MethodItem {
                 writeFirstRegister(writer);
                 writer.write(", ");
                 writeLiteral(writer);
-                if (instruction.getOpcode().setsWideRegister() == false)
+                if (instruction.getOpcode().setsWideRegister()) {
+                    writeDouble(writer);
+                } else {
                     writeResourceId(writer);
-                break;
+                    writeFloat(writer);
+                }
+                return true;
             case Format21t:
             case Format31t:
                 writeOpcode(writer);
@@ -434,6 +439,58 @@ public class InstructionMethodItem<T extends Instruction> extends MethodItem {
 
     protected void writeLiteral(IndentingWriter writer) throws IOException {
         LongRenderer.writeSignedIntOrLongTo(writer, ((WideLiteralInstruction)instruction).getWideLiteral());
+    }
+
+    protected void writeFloat(IndentingWriter writer) throws IOException {
+        writeFloat(writer, ((NarrowLiteralInstruction)instruction).getNarrowLiteral());
+    }
+
+    protected void writeFloat(IndentingWriter writer, int val) throws IOException {
+        if (NumberUtils.isLikelyFloat(val)) {
+            writer.write("    # ");
+            float fval = Float.intBitsToFloat(val);
+            if (fval == Float.POSITIVE_INFINITY)
+                writer.write("Float.POSITIVE_INFINITY");
+            else if (fval == Float.NEGATIVE_INFINITY)
+                writer.write("Float.NEGATIVE_INFINITY");
+            else if (fval == Float.NaN)
+                writer.write("Float.NaN");
+            else if (fval == Float.MAX_VALUE)
+                writer.write("Float.MAX_VALUE");
+            else if (fval == (float)Math.PI)
+                writer.write("(float)Math.PI");
+            else if (fval == (float)Math.E)
+                writer.write("(float)Math.E");
+            else {
+                writer.write(Float.toString(fval));
+                writer.write('f');
+            }
+        }
+    }
+
+    protected void writeDouble(IndentingWriter writer) throws IOException {
+        writeDouble(writer, ((WideLiteralInstruction)instruction).getWideLiteral());
+    }
+
+    protected void writeDouble(IndentingWriter writer, long val) throws IOException {
+        if (NumberUtils.isLikelyDouble(val)) {
+            writer.write("    # ");
+            double dval = Double.longBitsToDouble(val);
+            if (dval == Double.POSITIVE_INFINITY)
+                writer.write("Double.POSITIVE_INFINITY");
+            else if (dval == Double.NEGATIVE_INFINITY)
+                writer.write("Double.NEGATIVE_INFINITY");
+            else if (dval == Double.NaN)
+                writer.write("Double.NaN");
+            else if (dval == Double.MAX_VALUE)
+                writer.write("Double.MAX_VALUE");
+            else if (dval == Math.PI)
+                writer.write("Math.PI");
+            else if (dval == Math.E)
+                writer.write("Math.E");
+            else
+                writer.write(Double.toString(dval));
+        }
     }
 
     protected void writeResourceId(IndentingWriter writer) throws IOException {
