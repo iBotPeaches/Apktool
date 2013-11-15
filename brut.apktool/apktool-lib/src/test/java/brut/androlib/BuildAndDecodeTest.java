@@ -17,11 +17,14 @@ package brut.androlib;
 
 import brut.androlib.res.util.ExtFile;
 import brut.common.BrutException;
+import brut.directory.FileDirectory;
 import brut.util.OS;
 import java.io.*;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.logging.Logger;
 import org.custommonkey.xmlunit.*;
 import org.junit.*;
@@ -223,47 +226,37 @@ public class BuildAndDecodeTest {
 		return result;
 	}
 
-    private void compareBinaryFolder(String path, boolean res) throws BrutException, IOException {
+    private boolean compareBinaryFolder(String path, boolean res) throws BrutException, IOException {
 
         String tmp = "";
         if (res) {
             tmp = File.separatorChar + "res" + File.separatorChar;
         }
 
-        Files.walkFileTree(Paths.get(sTestOrigDir.toPath() + tmp +  path), new SimpleFileVisitor<Path>() {
+        FileDirectory fileDirectory = new FileDirectory(sTestOrigDir + tmp + path);
 
-            @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+        Set<String> files = fileDirectory.getFiles(true);
+        for (String filename : files) {
+            File control = new File(filename);
 
-                // hacky fix - load test by changing name of control
-                File control = file.toFile();
-                File test =  new File(file.toString().replace("testapp-orig", "testapp-new"));
+            // hacky fix - load test by changing name of control
+            File test =  new File(control.toString().replace("testapp-orig", "testapp-new"));
 
-                if (test.isFile()) {
-                    if (control.hashCode() != test.hashCode()) {
-                        sResult = false;
-                        return FileVisitResult.TERMINATE;
-                    }
-                }   else {
-                    sResult = false;
-                    return FileVisitResult.TERMINATE;
+            if (test.isFile()) {
+                if (control.hashCode() != test.hashCode()) {
+                    return false;
                 }
-                return FileVisitResult.CONTINUE;
             }
-
-        });
+        }
+        return true;
     }
 
     private boolean compareResFolder(String path) throws BrutException, IOException {
-        sResult = true;
-        compareBinaryFolder(path, true);
-        return sResult;
+        return compareBinaryFolder(path, true);
     }
 
     private boolean compareLibsFolder(String path) throws BrutException, IOException {
-        sResult = true;
-        compareBinaryFolder(File.separatorChar + path,false);
-        return sResult;
+        return compareBinaryFolder(File.separatorChar + path,false);
     }
 
 	private void compareValuesFiles(String path) throws BrutException {
@@ -312,8 +305,6 @@ public class BuildAndDecodeTest {
 	private static ExtFile sTmpDir;
 	private static ExtFile sTestOrigDir;
 	private static ExtFile sTestNewDir;
-
-    private static boolean sResult;
 
 	private final static Logger LOGGER = Logger
 			.getLogger(BuildAndDecodeTest.class.getName());

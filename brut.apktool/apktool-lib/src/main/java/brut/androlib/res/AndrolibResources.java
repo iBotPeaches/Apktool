@@ -275,14 +275,15 @@ final public class AndrolibResources {
             fileDecoder.decodeManifest(inApk, "AndroidManifest.xml", out,
                     "AndroidManifest.xml");
 
-            // fix package (Android 4.2)
-            adjust_package_manifest(resTable, outDir.getAbsolutePath()
-                    + File.separator + "AndroidManifest.xml");
-
             // Remove versionName / versionCode (aapt API 16)
-            if (resTable.getAnalysisMode() == false) {
-                remove_manifest_versions(outDir.getAbsolutePath()
-                        + File.separator + "AndroidManifest.xml");
+            if (!resTable.getAnalysisMode()) {
+
+                // check for a mismatch between resources.arsc package and the package listed in AndroidManifest
+                // also remove the android::versionCode / versionName from manifest for rebuild
+                // this is a required change to prevent aapt warning about conflicting versions
+                // it will be passed as a parameter to aapt like "--min-sdk-version" via apktool.yml
+                adjust_package_manifest(resTable, outDir.getAbsolutePath() + File.separator + "AndroidManifest.xml");
+                remove_manifest_versions(outDir.getAbsolutePath() + File.separator + "AndroidManifest.xml");
             }
             if (inApk.containsDir("res")) {
                 in = inApk.getDir("res");
