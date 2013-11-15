@@ -155,11 +155,7 @@ final public class AndrolibResources {
 
         // change application:debug to true
         try {
-            DocumentBuilderFactory docFactory = DocumentBuilderFactory
-                    .newInstance();
-            DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-            Document doc = docBuilder.parse(filePath.toString());
-
+            Document doc = loadDocument(filePath);
             Node application = doc.getElementById("application");
 
             // load attr
@@ -171,15 +167,7 @@ final public class AndrolibResources {
                 attr.removeNamedItem("debug");
             }
 
-            // save manifest
-            TransformerFactory transformerFactory = TransformerFactory
-                    .newInstance();
-            Transformer transformer = transformerFactory.newTransformer();
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            transformer.setOutputProperty(OutputKeys.STANDALONE,"yes");
-            DOMSource source = new DOMSource(doc);
-            StreamResult result = new StreamResult(new File(filePath));
-            transformer.transform(source, result);
+            saveDocument(filePath, doc);
 
         } catch (SAXException | ParserConfigurationException | IOException | TransformerException ignored) {
         }
@@ -188,22 +176,19 @@ final public class AndrolibResources {
     public void adjust_package_manifest(ResTable resTable, String filePath)
             throws AndrolibException {
 
-        // check if packages different, and that package is not equal to
-        // "android"
+        // check if packages different, and that package is not equal to "android"
         Map<String, String> packageInfo = resTable.getPackageInfo();
-        if ((packageInfo.get("cur_package").equalsIgnoreCase(packageInfo.get("orig_package")) ||
-                ("android".equalsIgnoreCase(packageInfo.get("cur_package")) ||
-                        ("com.htc".equalsIgnoreCase(packageInfo.get("cur_package")))))) {
+        String currentPackage = packageInfo.get("cur_package");
+        String originalPackage = packageInfo.get("orig_package");
 
+        if (currentPackage.equalsIgnoreCase(originalPackage) || "android".equalsIgnoreCase(currentPackage)
+                || "com.htc".equalsIgnoreCase(currentPackage)) {
             LOGGER.info("Regular manifest package...");
         } else {
             try {
 
                 LOGGER.info("Renamed manifest package found! Fixing...");
-                DocumentBuilderFactory docFactory = DocumentBuilderFactory
-                        .newInstance();
-                DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-                Document doc = docBuilder.parse(filePath.toString());
+                Document doc = loadDocument(filePath);
 
                 // Get the manifest line
                 Node manifest = doc.getFirstChild();
@@ -212,17 +197,9 @@ final public class AndrolibResources {
                 NamedNodeMap attr = manifest.getAttributes();
                 Node nodeAttr = attr.getNamedItem("package");
                 mPackageRenamed = nodeAttr.getNodeValue();
-                nodeAttr.setNodeValue(packageInfo.get("cur_package"));
+                nodeAttr.setNodeValue(currentPackage);
 
-                // re-save manifest.
-                TransformerFactory transformerFactory = TransformerFactory
-                        .newInstance();
-                Transformer transformer = transformerFactory.newTransformer();
-                transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-                transformer.setOutputProperty(OutputKeys.STANDALONE,"yes");
-                DOMSource source = new DOMSource(doc);
-                StreamResult result = new StreamResult(new File(filePath));
-                transformer.transform(source, result);
+                saveDocument(filePath, doc);
 
             } catch (SAXException | ParserConfigurationException | IOException | TransformerException ignored) {
             }
@@ -235,12 +212,8 @@ final public class AndrolibResources {
         File f = new File(filePath);
 
         if (f.exists()) {
-            // remove versionCode and versionName
             try {
-                DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-                DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-                Document doc = docBuilder.parse(filePath.toString());
-
+                Document doc = loadDocument(filePath);
                 Node manifest = doc.getFirstChild();
 
                 // load attr
@@ -255,19 +228,32 @@ final public class AndrolibResources {
                 if (vName != null) {
                     attr.removeNamedItem("android:versionName");
                 }
-
-                // save manifest
-                TransformerFactory transformerFactory = TransformerFactory.newInstance();
-                Transformer transformer = transformerFactory.newTransformer();
-                transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-                transformer.setOutputProperty(OutputKeys.STANDALONE,"yes");
-                DOMSource source = new DOMSource(doc);
-                StreamResult result = new StreamResult(new File(filePath));
-                transformer.transform(source, result);
+                saveDocument(filePath, doc);
 
             } catch (SAXException | ParserConfigurationException | IOException | TransformerException ignored) {
             }
         }
+    }
+
+    private Document loadDocument(String filename)
+            throws IOException, SAXException, ParserConfigurationException {
+
+        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+        Document doc = docBuilder.parse(filename);
+        return doc;
+    }
+
+    private void saveDocument(String filename, Document doc)
+            throws IOException, SAXException, ParserConfigurationException, TransformerException {
+
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        Transformer transformer = transformerFactory.newTransformer();
+        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+        transformer.setOutputProperty(OutputKeys.STANDALONE,"yes");
+        DOMSource source = new DOMSource(doc);
+        StreamResult result = new StreamResult(new File(filename));
+        transformer.transform(source, result);
     }
 
     public void decode(ResTable resTable, ExtFile apkFile, File outDir)
