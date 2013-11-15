@@ -20,10 +20,7 @@ import brut.common.BrutException;
 import brut.directory.FileDirectory;
 import brut.util.OS;
 import java.io.*;
-import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Logger;
 import org.custommonkey.xmlunit.*;
@@ -36,14 +33,14 @@ import org.xml.sax.SAXException;
  */
 public class BuildAndDecodeTest {
 
-	@BeforeClass
-	public static void beforeClass() throws Exception, BrutException {
-		sTmpDir = new ExtFile(OS.createTempDirectory());
-		sTestOrigDir = new ExtFile(sTmpDir, "testapp-orig");
-		sTestNewDir = new ExtFile(sTmpDir, "testapp-new");
-		LOGGER.info("Unpacking testapp...");
-		TestUtils.copyResourceDir(BuildAndDecodeTest.class,
-				"brut/apktool/testapp/", sTestOrigDir);
+    @BeforeClass
+    public static void beforeClass() throws Exception, BrutException {
+        sTmpDir = new ExtFile(OS.createTempDirectory());
+        sTestOrigDir = new ExtFile(sTmpDir, "testapp-orig");
+        sTestNewDir = new ExtFile(sTmpDir, "testapp-new");
+        LOGGER.info("Unpacking testapp...");
+        TestUtils.copyResourceDir(BuildAndDecodeTest.class,
+                "brut/apktool/testapp/", sTestOrigDir);
 
         LOGGER.info("Building testapp.apk...");
         File testApk = new File(sTmpDir, "testapp.apk");
@@ -54,68 +51,68 @@ public class BuildAndDecodeTest {
         ApkDecoder apkDecoder = new ApkDecoder(testApk);
         apkDecoder.setOutDir(sTestNewDir);
         apkDecoder.decode();
-	}
+    }
 
-	@AfterClass
-	public static void afterClass() throws BrutException {
-		OS.rmdir(sTmpDir);
-	}
+    @AfterClass
+    public static void afterClass() throws BrutException {
+        OS.rmdir(sTmpDir);
+    }
 
     @Test
     public void buildAndDecodeTest() throws BrutException {
         assertTrue(sTestNewDir.isDirectory());
     }
 
-	@Test
-	public void isAaptInstalledTest() throws Exception {
-		assertEquals(true, isAaptPresent());
-	}
+    @Test
+    public void isAaptInstalledTest() throws Exception {
+        assertEquals(true, isAaptPresent());
+    }
 
     @Test
     public void valuesAnimsTest() throws BrutException {
         compareValuesFiles("values-mcc001/anims.xml");
     }
 
-	@Test
-	public void valuesArraysTest() throws BrutException {
-		compareValuesFiles("values-mcc001/arrays.xml");
-		compareValuesFiles("values-mcc002/arrays.xml");
-	}
+    @Test
+    public void valuesArraysTest() throws BrutException {
+        compareValuesFiles("values-mcc001/arrays.xml");
+        compareValuesFiles("values-mcc002/arrays.xml");
+    }
 
     @Test
     public void valuesAttrsTest() throws BrutException {
         compareValuesFiles("values/attrs.xml");
     }
 
-	@Test
-	public void valuesBoolsTest() throws BrutException {
-		compareValuesFiles("values-mcc001/bools.xml");
-	}
+    @Test
+    public void valuesBoolsTest() throws BrutException {
+        compareValuesFiles("values-mcc001/bools.xml");
+    }
 
-	@Test
-	public void valuesColorsTest() throws BrutException {
-		compareValuesFiles("values-mcc001/colors.xml");
-	}
+    @Test
+    public void valuesColorsTest() throws BrutException {
+        compareValuesFiles("values-mcc001/colors.xml");
+    }
 
-	@Test
-	public void valuesDimensTest() throws BrutException {
-		compareValuesFiles("values-mcc001/dimens.xml");
-	}
+    @Test
+    public void valuesDimensTest() throws BrutException {
+        compareValuesFiles("values-mcc001/dimens.xml");
+    }
 
     @Test
     public void valuesDrawablesTest() throws BrutException {
         compareValuesFiles("values-mcc001/drawables.xml");
     }
 
-	@Test
-	public void valuesIdsTest() throws BrutException {
-		compareValuesFiles("values-mcc001/ids.xml");
-	}
+    @Test
+    public void valuesIdsTest() throws BrutException {
+        compareValuesFiles("values-mcc001/ids.xml");
+    }
 
-	@Test
-	public void valuesIntegersTest() throws BrutException {
-		compareValuesFiles("values-mcc001/integers.xml");
-	}
+    @Test
+    public void valuesIntegersTest() throws BrutException {
+        compareValuesFiles("values-mcc001/integers.xml");
+    }
 
     @Test
     public void valuesLayoutsTest() throws BrutException {
@@ -127,44 +124,44 @@ public class BuildAndDecodeTest {
         compareValuesFiles("values-mcc001/plurals.xml");
     }
 
-	@Test
-	public void valuesStringsTest() throws BrutException {
-		compareValuesFiles("values-mcc001/strings.xml");
-	}
+    @Test
+    public void valuesStringsTest() throws BrutException {
+        compareValuesFiles("values-mcc001/strings.xml");
+    }
 
     @Test
     public void valuesStylesTest() throws BrutException {
         compareValuesFiles("values-mcc001/styles.xml");
     }
 
-	@Test
-	public void valuesReferencesTest() throws BrutException {
-		compareValuesFiles("values-mcc002/strings.xml");
-	}
+    @Test
+    public void valuesReferencesTest() throws BrutException {
+        compareValuesFiles("values-mcc002/strings.xml");
+    }
 
-	@Test
-	public void crossTypeTest() throws BrutException {
-		compareValuesFiles("values-mcc003/strings.xml");
-		compareValuesFiles("values-mcc003/integers.xml");
-		compareValuesFiles("values-mcc003/bools.xml");
-	}
+    @Test
+    public void crossTypeTest() throws BrutException {
+        compareValuesFiles("values-mcc003/strings.xml");
+        compareValuesFiles("values-mcc003/integers.xml");
+        compareValuesFiles("values-mcc003/bools.xml");
+    }
 
-	@Test
-	public void xmlLiteralsTest() throws BrutException {
-		compareXmlFiles("res/xml/literals.xml");
-	}
+    @Test
+    public void xmlLiteralsTest() throws BrutException {
+        compareXmlFiles("res/xml/literals.xml");
+    }
 
-	@Test
-	public void xmlReferencesTest() throws BrutException {
-		compareXmlFiles("res/xml/references.xml");
-	}
+    @Test
+    public void xmlReferencesTest() throws BrutException {
+        compareXmlFiles("res/xml/references.xml");
+    }
 
-	@Test
-	public void qualifiersTest() throws BrutException {
-		compareValuesFiles("values-mcc004-mnc4-en-rUS-ldrtl-sw100dp-w200dp-h300dp"
-				+ "-xlarge-long-land-desk-night-xhdpi-finger-keyssoft-12key"
-				+ "-navhidden-dpad/strings.xml");
-	}
+    @Test
+    public void qualifiersTest() throws BrutException {
+        compareValuesFiles("values-mcc004-mnc4-en-rUS-ldrtl-sw100dp-w200dp-h300dp"
+                + "-xlarge-long-land-desk-night-xhdpi-finger-keyssoft-12key"
+                + "-navhidden-dpad/strings.xml");
+    }
 
     @Test
     public void drawableNoDpiTest() throws BrutException, IOException {
@@ -211,20 +208,20 @@ public class BuildAndDecodeTest {
         compareLibsFolder("libs");
     }
 
-	private static boolean isAaptPresent() throws Exception {
-		boolean result = true;
-		try {
-			Process proc = Runtime.getRuntime().exec("aapt");
-			BufferedReader br = new BufferedReader(new InputStreamReader(
-					proc.getErrorStream()));
-			String line = null;
-			while ((line = br.readLine()) != null) {
-			}
-		} catch (Exception ex) {
-			result = false;
-		}
-		return result;
-	}
+    private static boolean isAaptPresent() throws Exception {
+        boolean result = true;
+        try {
+            Process proc = Runtime.getRuntime().exec("aapt");
+            BufferedReader br = new BufferedReader(new InputStreamReader(
+                    proc.getErrorStream()));
+            String line = null;
+            while ((line = br.readLine()) != null) {
+            }
+        } catch (Exception ex) {
+            result = false;
+        }
+        return result;
+    }
 
     private boolean compareBinaryFolder(String path, boolean res) throws BrutException, IOException {
 
@@ -259,53 +256,53 @@ public class BuildAndDecodeTest {
         return compareBinaryFolder(File.separatorChar + path,false);
     }
 
-	private void compareValuesFiles(String path) throws BrutException {
-		compareXmlFiles("res/" + path, new ElementNameAndAttributeQualifier(
-				"name"));
-	}
+    private void compareValuesFiles(String path) throws BrutException {
+        compareXmlFiles("res/" + path, new ElementNameAndAttributeQualifier(
+                "name"));
+    }
 
-	private void compareXmlFiles(String path) throws BrutException {
-		compareXmlFiles(path, null);
-	}
+    private void compareXmlFiles(String path) throws BrutException {
+        compareXmlFiles(path, null);
+    }
 
-	private void compareXmlFiles(String path, ElementQualifier qualifier)
-			throws BrutException {
-		DetailedDiff diff;
-		try {
-			Reader control = new FileReader(new File(sTestOrigDir, path));
-			Reader test = new FileReader(new File(sTestNewDir, path));
+    private void compareXmlFiles(String path, ElementQualifier qualifier)
+            throws BrutException {
+        DetailedDiff diff;
+        try {
+            Reader control = new FileReader(new File(sTestOrigDir, path));
+            Reader test = new FileReader(new File(sTestNewDir, path));
 
-			diff = new DetailedDiff(new Diff(control, test));
-		} catch (SAXException ex) {
-			throw new BrutException(ex);
-		} catch (IOException ex) {
-			throw new BrutException(ex);
-		}
+            diff = new DetailedDiff(new Diff(control, test));
+        } catch (SAXException ex) {
+            throw new BrutException(ex);
+        } catch (IOException ex) {
+            throw new BrutException(ex);
+        }
 
-		if (qualifier != null) {
-			diff.overrideElementQualifier(qualifier);
-		}
+        if (qualifier != null) {
+            diff.overrideElementQualifier(qualifier);
+        }
 
-		assertTrue(path + ": " + diff.getAllDifferences().toString(),
-				diff.similar());
-	}
+        assertTrue(path + ": " + diff.getAllDifferences().toString(),
+                diff.similar());
+    }
 
-	private static HashMap<String, Boolean> returnStock() throws BrutException {
-		HashMap<String, Boolean> tmp = new HashMap<String, Boolean>();
-		tmp.put("forceBuildAll", false);
-		tmp.put("debug", false);
-		tmp.put("verbose", false);
-		tmp.put("framework", false);
-		tmp.put("update", false);
-		tmp.put("copyOriginal", false);
+    private static HashMap<String, Boolean> returnStock() throws BrutException {
+        HashMap<String, Boolean> tmp = new HashMap<String, Boolean>();
+        tmp.put("forceBuildAll", false);
+        tmp.put("debug", false);
+        tmp.put("verbose", false);
+        tmp.put("framework", false);
+        tmp.put("update", false);
+        tmp.put("copyOriginal", false);
 
-		return tmp;
-	}
+        return tmp;
+    }
 
-	private static ExtFile sTmpDir;
-	private static ExtFile sTestOrigDir;
-	private static ExtFile sTestNewDir;
+    private static ExtFile sTmpDir;
+    private static ExtFile sTestOrigDir;
+    private static ExtFile sTestNewDir;
 
-	private final static Logger LOGGER = Logger
-			.getLogger(BuildAndDecodeTest.class.getName());
+    private final static Logger LOGGER = Logger
+            .getLogger(BuildAndDecodeTest.class.getName());
 }
