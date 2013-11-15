@@ -32,19 +32,29 @@
 package org.jf.dexlib2.builder;
 
 import org.jf.dexlib2.base.BaseExceptionHandler;
-import org.jf.dexlib2.iface.ExceptionHandler;
 import org.jf.dexlib2.iface.reference.TypeReference;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-class BuilderExceptionHandler {
-    static ExceptionHandler newExceptionHandler(@Nullable final TypeReference exceptionType,
-                                                @Nonnull final Label handler) {
+public abstract class BuilderExceptionHandler extends BaseExceptionHandler {
+    @Nonnull protected final Label handler;
+
+    private BuilderExceptionHandler(@Nonnull Label handler) {
+        this.handler = handler;
+    }
+
+    @Nonnull
+    public Label getHandler() {
+        return handler;
+    }
+
+    static BuilderExceptionHandler newExceptionHandler(@Nullable final TypeReference exceptionType,
+                                                @Nonnull Label handler) {
         if (exceptionType == null) {
             return newExceptionHandler(handler);
         }
-        return new BaseExceptionHandler() {
+        return new BuilderExceptionHandler(handler) {
             @Nullable @Override public String getExceptionType() {
                 return exceptionType.getType();
             }
@@ -59,8 +69,8 @@ class BuilderExceptionHandler {
         };
     }
 
-    static ExceptionHandler newExceptionHandler(@Nonnull final Label handler) {
-        return new BaseExceptionHandler() {
+    static BuilderExceptionHandler newExceptionHandler(@Nonnull Label handler) {
+        return new BuilderExceptionHandler(handler) {
             @Nullable @Override public String getExceptionType() {
                 return null;
             }
@@ -71,12 +81,12 @@ class BuilderExceptionHandler {
         };
     }
 
-    static ExceptionHandler newExceptionHandler(@Nullable final String exceptionType,
-                                                @Nonnull final Label handler) {
+    static BuilderExceptionHandler newExceptionHandler(@Nullable final String exceptionType,
+                                                @Nonnull Label handler) {
         if (exceptionType == null) {
             return newExceptionHandler(handler);
         }
-        return new BaseExceptionHandler() {
+        return new BuilderExceptionHandler(handler) {
             @Nullable @Override public String getExceptionType() {
                 return exceptionType;
             }

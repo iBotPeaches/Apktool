@@ -248,18 +248,18 @@ public class BuilderClassPool implements ClassSection<BuilderStringReference, Bu
 
     @Nullable @Override public List<? extends BuilderAnnotationSet> getParameterAnnotations(
             @Nonnull final BuilderMethod method) {
-        final int lastIndex = CollectionUtils.lastIndexOf(method.getParameters(), HAS_PARAMETER_ANNOTATIONS);
+        final List<? extends BuilderMethodParameter> parameters = method.getParameters();
+        boolean hasParameterAnnotations = Iterables.any(parameters, HAS_PARAMETER_ANNOTATIONS);
 
-        if (lastIndex > -1) {
+        if (hasParameterAnnotations) {
             return new AbstractForwardSequentialList<BuilderAnnotationSet>() {
                 @Nonnull @Override public Iterator<BuilderAnnotationSet> iterator() {
-                    return FluentIterable.from(method.getParameters())
-                            .limit(lastIndex+1)
+                    return FluentIterable.from(parameters)
                             .transform(PARAMETER_ANNOTATIONS).iterator();
                 }
 
                 @Override public int size() {
-                    return lastIndex+1;
+                    return parameters.size();
                 }
             };
         }

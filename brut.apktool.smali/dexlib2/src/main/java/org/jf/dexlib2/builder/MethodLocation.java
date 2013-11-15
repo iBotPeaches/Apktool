@@ -36,7 +36,6 @@ import org.jf.dexlib2.builder.debug.*;
 import org.jf.dexlib2.iface.instruction.Instruction;
 import org.jf.dexlib2.iface.reference.StringReference;
 import org.jf.dexlib2.iface.reference.TypeReference;
-import org.jf.dexlib2.writer.builder.BuilderStringReference;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -207,7 +206,7 @@ public class MethodLocation {
         getDebugItems().add(new BuilderEpilogueBegin());
     }
 
-    public void addSetSourceFile(@Nullable BuilderStringReference sourceFile) {
+    public void addSetSourceFile(@Nullable StringReference sourceFile) {
         getDebugItems().add(new BuilderSetSourceFile(sourceFile));
     }
 }

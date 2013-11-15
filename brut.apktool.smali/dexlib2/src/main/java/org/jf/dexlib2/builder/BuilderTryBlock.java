@@ -33,16 +33,15 @@ package org.jf.dexlib2.builder;
 
 import com.google.common.collect.ImmutableList;
 import org.jf.dexlib2.base.BaseTryBlock;
-import org.jf.dexlib2.iface.ExceptionHandler;
 import org.jf.dexlib2.iface.reference.TypeReference;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 
-class BuilderTryBlock extends BaseTryBlock<ExceptionHandler> {
+public class BuilderTryBlock extends BaseTryBlock<BuilderExceptionHandler> {
     // We only ever have one exception handler per try block. They are later merged as needed in TryListBuilder
-    @Nonnull public final ExceptionHandler exceptionHandler;
+    @Nonnull public final BuilderExceptionHandler exceptionHandler;
     @Nonnull public final Label start;
     // The end location is exclusive, it should point to the codeAddress of the instruction immediately after the last
     // covered instruction.
@@ -76,7 +75,7 @@ class BuilderTryBlock extends BaseTryBlock<ExceptionHandler> {
         return end.getCodeAddress() - start.getCodeAddress();
     }
 
-    @Nonnull @Override public List<? extends ExceptionHandler> getExceptionHandlers() {
+    @Nonnull @Override public List<? extends BuilderExceptionHandler> getExceptionHandlers() {
         return ImmutableList.of(exceptionHandler);
     }
 }

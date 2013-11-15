@@ -67,8 +67,8 @@ public class ImmutableStartLocal extends ImmutableDebugItem implements StartLoca
         return new ImmutableStartLocal(
                 startLocal.getCodeAddress(),
                 startLocal.getRegister(),
-                startLocal.getType(),
                 startLocal.getName(),
+                startLocal.getType(),
                 startLocal.getSignature());
     }
 

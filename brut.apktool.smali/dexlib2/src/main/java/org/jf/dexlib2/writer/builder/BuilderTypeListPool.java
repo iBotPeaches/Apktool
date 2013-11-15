@@ -55,7 +55,7 @@ class BuilderTypeListPool implements TypeListSection<BuilderTypeReference, Build
     }
 
     @Nonnull public BuilderTypeList internTypeList(@Nullable List<? extends CharSequence> types) {
-        if (types == null) {
+        if (types == null || types.size() == 0) {
             return BuilderTypeList.EMPTY;
         }
 
@@ -76,7 +76,7 @@ class BuilderTypeListPool implements TypeListSection<BuilderTypeReference, Build
     }
 
     @Override public int getNullableItemOffset(@Nullable BuilderTypeList key) {
-        return key==null?DexWriter.NO_OFFSET:key.offset;
+        return (key==null||key.size()==0)?DexWriter.NO_OFFSET:key.offset;
     }
 
     @Nonnull @Override

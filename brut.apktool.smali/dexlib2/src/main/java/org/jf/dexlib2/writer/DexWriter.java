@@ -236,7 +236,7 @@ public abstract class DexWriter<
         }
 
         byte[] buffer = new byte[4 * 1024];
-        InputStream input = dataStore.readAt(HeaderItem.HEADER_SIZE_OFFSET);
+        InputStream input = dataStore.readAt(HeaderItem.SIGNATURE_DATA_START_OFFSET);
         int bytesRead = input.read(buffer);
         while (bytesRead >= 0) {
             md.update(buffer, 0, bytesRead);
@@ -258,7 +258,7 @@ public abstract class DexWriter<
         Adler32 a32 = new Adler32();
 
         byte[] buffer = new byte[4 * 1024];
-        InputStream input = dataStore.readAt(HeaderItem.SIGNATURE_OFFSET);
+        InputStream input = dataStore.readAt(HeaderItem.CHECKSUM_DATA_START_OFFSET);
         int bytesRead = input.read(buffer);
         while (bytesRead >= 0) {
             a32.update(buffer, 0, bytesRead);
@@ -777,7 +777,7 @@ public abstract class DexWriter<
     }
 
     private void fixInstructions(@Nonnull MutableMethodImplementation methodImplementation) {
-        List<Instruction> instructions = methodImplementation.getInstructions();
+        List<? extends Instruction> instructions = methodImplementation.getInstructions();
 
         for (int i=0; i<instructions.size(); i++) {
             Instruction instruction = instructions.get(i);
@@ -798,18 +798,20 @@ public abstract class DexWriter<
                                @Nullable Iterable<? extends StringKey> parameterNames,
                                @Nullable Iterable<? extends DebugItem> debugItems) throws IOException {
         int parameterCount = 0;
+        int lastNamedParameterIndex = -1;
         if (parameterNames != null) {
+            parameterCount = Iterables.size(parameterNames);
             int index = 0;
             for (StringKey parameterName: parameterNames) {
-                index++;
                 if (parameterName != null) {
-                    parameterCount = index;
+                    lastNamedParameterIndex = index;
                 }
+                index++;
             }
         }
 
 
-        if (parameterCount == 0 && (debugItems == null || Iterables.isEmpty(debugItems))) {
+        if (lastNamedParameterIndex == -1 && (debugItems == null || Iterables.isEmpty(debugItems))) {
             return NO_OFFSET;
         }
 

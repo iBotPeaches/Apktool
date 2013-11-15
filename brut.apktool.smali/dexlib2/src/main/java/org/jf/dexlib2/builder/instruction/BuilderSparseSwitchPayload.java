@@ -38,7 +38,6 @@ import org.jf.dexlib2.Format;
 import org.jf.dexlib2.Opcode;
 import org.jf.dexlib2.builder.BuilderSwitchPayload;
 import org.jf.dexlib2.builder.SwitchLabelElement;
-import org.jf.dexlib2.iface.instruction.SwitchElement;
 import org.jf.dexlib2.iface.instruction.formats.SparseSwitchPayload;
 
 import javax.annotation.Nonnull;
@@ -48,7 +47,7 @@ import java.util.List;
 public class BuilderSparseSwitchPayload extends BuilderSwitchPayload implements SparseSwitchPayload {
     public static final Opcode OPCODE = Opcode.SPARSE_SWITCH_PAYLOAD;
 
-    @Nonnull protected final List<? extends BuilderSwitchElement> switchElements;
+    @Nonnull protected final List<BuilderSwitchElement> switchElements;
 
     public BuilderSparseSwitchPayload(@Nullable List<? extends SwitchLabelElement> switchElements) {
         super(OPCODE);
@@ -64,7 +63,7 @@ public class BuilderSparseSwitchPayload extends BuilderSwitchPayload implements 
         }
     }
 
-    @Nonnull @Override public List<? extends SwitchElement> getSwitchElements() { return switchElements; }
+    @Nonnull @Override public List<BuilderSwitchElement> getSwitchElements() { return switchElements; }
 
     @Override public int getCodeUnits() { return 2 + switchElements.size() * 4; }
     @Override public Format getFormat() { return OPCODE.format; }

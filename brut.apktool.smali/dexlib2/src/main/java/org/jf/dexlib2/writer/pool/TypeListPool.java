@@ -32,10 +32,12 @@
 package org.jf.dexlib2.writer.pool;
 
 import com.google.common.collect.ImmutableList;
-import org.jf.dexlib2.writer.pool.TypeListPool.Key;
+import org.jf.dexlib2.writer.DexWriter;
 import org.jf.dexlib2.writer.TypeListSection;
+import org.jf.dexlib2.writer.pool.TypeListPool.Key;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -48,11 +50,13 @@ public class TypeListPool extends BaseNullableOffsetPool<Key<? extends Collectio
     }
 
     public void intern(@Nonnull Collection<? extends CharSequence> types) {
-        Key<? extends Collection<? extends CharSequence>> key = new Key<Collection<? extends CharSequence>>(types);
-        Integer prev = internedItems.put(key, 0);
-        if (prev == null) {
-            for (CharSequence type: types) {
-                typePool.intern(type);
+        if (types.size() > 0) {
+            Key<? extends Collection<? extends CharSequence>> key = new Key<Collection<? extends CharSequence>>(types);
+            Integer prev = internedItems.put(key, 0);
+            if (prev == null) {
+                for (CharSequence type: types) {
+                    typePool.intern(type);
+                }
             }
         }
     }
@@ -63,6 +67,14 @@ public class TypeListPool extends BaseNullableOffsetPool<Key<? extends Collectio
             return ImmutableList.of();
         }
         return typesKey.types;
+    }
+
+    @Override public int getNullableItemOffset(@Nullable Key<? extends Collection<? extends CharSequence>> key) {
+        if (key == null || key.types.size() == 0) {
+            return DexWriter.NO_OFFSET;
+        } else {
+            return super.getNullableItemOffset(key);
+        }
     }
 
     public static class Key<TypeCollection extends Collection<? extends CharSequence>>
