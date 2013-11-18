@@ -161,11 +161,9 @@ public class BuildAndDecodeTest {
 
 	@Test
 	public void qualifiersTest() throws BrutException {
-		if (!System.getProperty("os.name").toLowerCase().contains("windows")) {
-			compareValuesFiles("values-mcc004-mnc4-en-rUS-ldrtl-sw100dp-w200dp-h300dp"
-					 + "-xlarge-long-land-desk-night-xhdpi-finger-keyssoft-12key"
-					 + "-navhidden-dpad/strings.xml");
-		}
+		compareValuesFiles("values-mcc004-mnc4-en-rUS-ldrtl-sw100dp-w200dp-h300dp"
+				+ "-xlarge-long-land-desk-night-xhdpi-finger-keyssoft-12key"
+				+ "-navhidden-dpad/strings.xml");
 	}
 
     @Test
