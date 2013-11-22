@@ -141,9 +141,9 @@ public class ResConfigFlags {
     private String generateQualifiers() {
         StringBuilder ret = new StringBuilder();
         if (mcc != 0) {
+            ret.append("-mcc").append(String.format("%03d", mcc));
             if (mcc != MNC_ZERO) {
-                ret.append("-mcc").append(String.format("%03d", mcc));
-                if (mnc != 0) {
+                if (mnc != 0 && mnc != -1) {
                     ret.append("-mnc").append(mnc);
                 }
             }
