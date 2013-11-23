@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import com.sun.corba.se.impl.orb.ParserTable;
 import org.custommonkey.xmlunit.*;
 import org.junit.*;
 import static org.junit.Assert.*;
