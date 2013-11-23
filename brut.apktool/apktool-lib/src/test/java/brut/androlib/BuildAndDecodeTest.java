@@ -23,6 +23,8 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.logging.Logger;
+
+import com.sun.corba.se.impl.orb.ParserTable;
 import org.custommonkey.xmlunit.*;
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -76,7 +78,12 @@ public class BuildAndDecodeTest {
     @Test
     public void valuesArraysTest() throws BrutException {
         compareValuesFiles("values-mcc001/arrays.xml");
+    }
+
+    @Test
+    public void valuesArraysCastingTest() throws BrutException {
         compareValuesFiles("values-mcc002/arrays.xml");
+        compareValuesFiles("values-mcc003/arrays.xml");
     }
 
     @Test

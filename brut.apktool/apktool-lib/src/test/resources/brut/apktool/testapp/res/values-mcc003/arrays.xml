@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="test_array4">
+        <item>3.0in</item>
+    </string-array>
+    <string-array name="test_array5">
+        <item>65.0%</item>
+        <item>65%</item>
+    </string-array>
+</resources>

@@ -21,6 +21,8 @@ import brut.androlib.res.data.ResResource;
 import brut.androlib.res.xml.ResValuesXmlSerializable;
 import brut.util.Duo;
 import java.io.IOException;
+import java.util.Arrays;
+
 import org.xmlpull.v1.XmlSerializer;
 
 /**
@@ -49,9 +51,6 @@ public class ResArrayValue extends ResBagValue implements
 			ResResource res) throws IOException, AndrolibException {
 		String type = getType();
 		type = (type == null ? "" : type + "-") + "array";
-		if ("reference-array".equals(type)) {
-			type = "string-array";
-		}
 		serializer.startTag(null, type);
 		serializer.attribute(null, "name", res.getResSpec().getName());
 		for (int i = 0; i < mItems.length; i++) {
@@ -71,19 +70,24 @@ public class ResArrayValue extends ResBagValue implements
 
 			if (mItems[i].encodeAsResXmlItemValue().startsWith("@string")) {
 				return "string";
-			} else if (mItems[i].encodeAsResXmlItemValue().startsWith(
-					"@drawable")) {
+			} else if (mItems[i].encodeAsResXmlItemValue().startsWith("@drawable")) {
 				return null;
+            } else if (mItems[i].encodeAsResXmlItemValue().startsWith("@integer")) {
+                return "integer";
 			} else if (!"string".equals(type) && !"integer".equals(type)) {
 				return null;
 			} else if (!type.equals(mItems[i].getType())) {
 				return null;
 			}
 		}
+        if (!Arrays.asList(AllowedArrayTypes).contains(type)) {
+            return "string";
+        }
 		return type;
 	}
 
 	private final ResScalarValue[] mItems;
+    private final String AllowedArrayTypes[] = {"string", "integer"};
 
 	public static final int BAG_KEY_ARRAY_START = 0x02000000;
 }
