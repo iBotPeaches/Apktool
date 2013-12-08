@@ -56,7 +56,9 @@ jar {
     }
 
     doLast {
-        //ant.symlink(link: file("${destinationDir}/baksmali.jar"), resource: archivePath, overwrite: true)
+             if (!System.getProperty("os.name").toLowerCase().contains("windows")) {
+             ant.symlink(link: file("${destinationDir}/baksmali.jar"), resource: archivePath, overwrite: true)
+         }
     }
 }
 
