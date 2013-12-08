@@ -585,7 +585,7 @@ public class Androlib {
 
             // in order to get the path relative to the zip, we strip off the absolute path, minus what we
             // already have in the zip. thus /var/files/apktool/apk/unknown/folder/file => /folder/file
-            Path dest = fs.getPath(root.toString() + insert.getAbsolutePath().replace(location.toString(),""));
+            Path dest = fs.getPath(root.toString(), insert.getAbsolutePath().replace(location.toString(),""));
             Path newFile = Paths.get(insert.getAbsolutePath());
             Files.copy(newFile,dest, StandardCopyOption.REPLACE_EXISTING);
             fs.close();
@@ -598,7 +598,7 @@ public class Androlib {
         try(FileSystem fs = FileSystems.newFileSystem(apkFileSystem, zip_properties)) {
 
             Path root = fs.getPath("/");
-            Path dest = fs.getPath(root.toString() + insert.getAbsolutePath().replace(location.toString(),""));
+            Path dest = fs.getPath(root.toString(), insert.getAbsolutePath().replace(location.toString(),""));
             Path parent = dest.normalize();
 
             // check for folder existing in apkFileSystem
