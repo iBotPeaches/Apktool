@@ -102,8 +102,7 @@ public class ApkDecoder {
             ZipArchiveEntry ze = zef.getEntry("resources.arsc");
             if (ze != null) {
                 int compression = ze.getMethod();
-                mCompressResources = (compression != ZipEntry.STORED)
-                        && (compression == ZipEntry.DEFLATED);
+                mCompressResources = (compression == ZipEntry.DEFLATED);
             }
             zef.close();
 
