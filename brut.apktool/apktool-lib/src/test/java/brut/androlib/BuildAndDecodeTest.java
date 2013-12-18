@@ -146,6 +146,11 @@ public class BuildAndDecodeTest {
     }
 
     @Test
+    public void valuesExtraLongTest() throws BrutException {
+        compareValuesFiles("values-en/strings.xml");
+    }
+
+    @Test
     public void crossTypeTest() throws BrutException {
         compareValuesFiles("values-mcc003/strings.xml");
         compareValuesFiles("values-mcc003/integers.xml");
