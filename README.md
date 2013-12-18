@@ -15,4 +15,5 @@ It is NOT intended for piracy and other non-legal uses. It could be used for loc
 - [XDA Post](http://forum.xda-developers.com/showthread.php?p=28366939)
 - [Source (Github)](https://github.com/iBotPeaches/Apktool)
 - [Source (GoogleCode)](http://code.google.com/p/android-apktool/source/list)
+- [Source (Bitbucket)](https://bitbucket.org/iBotPeaches/apktool/)
 
