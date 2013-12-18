@@ -26,7 +26,8 @@ v2.0.0 (TBA)
 -Fixed (issue #524) - INSTALL_FAILED_DEXOPT fix (JesusFreke)
 -Fixed (issue #473) - multiple package frameworks are treated correctly.
 -Fixed (issue #531) - JAR disassembling borking is fixed
--Fixed (issue #550) - Corectly labels incorrect type handling of <array>
+-Fixed (issue #550) - Correctly labels incorrect type handling of <array>
+-Fixed (issue #571) - Fixed truncated strings (Thanks jtmuhone)
 -Added output to list Apktool version to help debugging.
 -Updated known bytes for configurations to 38 (from addition of layout direction)
 -Fixed NPE when handling odex apks even with --no-src specified. (Thanks Rodrigo Chiossi)

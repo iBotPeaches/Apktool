@@ -102,10 +102,22 @@ public class StringBlock {
 			length = getShort(m_strings, offset) * 2;
 			offset += 2;
 		} else {
-			offset += getVarint(m_strings, offset)[1];
-			int[] varint = getVarint(m_strings, offset);
-			offset += varint[1];
-			length = varint[0];
+			int val = m_strings[offset];
+			if ((val & 0x80) != 0) {
+				offset += 2;
+			} else {
+				offset += 1;
+			}
+			val = m_strings[offset];
+			if ((val & 0x80) != 0) {
+				offset += 2;
+			} else {
+				offset += 1;
+			}
+			length = 0;
+			while (m_strings[offset + length] != 0) {
+				length++;
+			}
 		}
 		return decodeString(offset, length);
 	}
