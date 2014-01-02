@@ -555,8 +555,7 @@ public class Androlib {
                 zip_properties.put("encoding", "UTF-8");
 
                 // create filesystem
-                Path path = Paths.get(outFile.getAbsolutePath());
-                URI apkFileSystem = new URI("jar", path.toUri().toString(), null);
+                URI apkFileSystem = new URI("jar", outFile.toURI().toString(), null);
 
                 // loop through files inside
                 for (Map.Entry<String,String> entry : files.entrySet()) {
