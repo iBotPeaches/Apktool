@@ -23,6 +23,7 @@ import brut.androlib.res.data.value.ResValueFactory;
 import brut.androlib.res.xml.ResValuesXmlSerializable;
 import brut.util.Duo;
 import java.util.*;
+import java.util.logging.Logger;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
@@ -168,9 +169,11 @@ public class ResPackage {
 	}
 
 	public void addType(ResType type) throws AndrolibException {
-		if (mTypes.put(type.getName(), type) != null) {
-			throw new AndrolibException("Multiple types: " + type);
-		}
+        if (mTypes.containsKey(type.getName())) {
+            LOGGER.warning("Multiple types detected! " + type + " ignored!");
+        } else {
+            mTypes.put(type.getName(), type);
+        }
 	}
 
 	public void addResource(ResResource res) {
@@ -220,4 +223,7 @@ public class ResPackage {
 		}
 		return mValueFactory;
 	}
+
+    private final static Logger LOGGER = Logger
+            .getLogger(ResPackage.class.getName());
 }
