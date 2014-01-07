@@ -335,14 +335,13 @@ final public class AndrolibResources {
 
     public void setPackageInfo(Map<String, String> map) {
         if (map != null) {
-            mPackageRenamed = map.get("renamed");
-            mPackageOriginal = map.get("original");
+            mPackageRenamed = map.get("rename-manifest-package");
         }
     }
 
     public void setPackageId(Map<String, String> map) {
         if (map != null) {
-            mPackageId = map.get("original_id");
+            mPackageId = map.get("forced-package-id");
         }
     }
 

@@ -318,13 +318,11 @@ public class ApkDecoder {
     private void putPackageInfo(Map<String, Object> meta)
             throws AndrolibException {
         String renamed = getResTable().getPackageRenamed();
-        String original = getResTable().getPackageOriginal();
         int id = getResTable().getPackageId();
 
         HashMap<String, String> packages = new HashMap<String, String>();
-        packages.put("renamed", renamed);
-        packages.put("original", original);
-        packages.put("original_id", String.valueOf(id));
+        packages.put("rename-manifest-package", renamed);
+        packages.put("forced-package-id", String.valueOf(id));
         meta.put("packageInfo", packages);
     }
 
