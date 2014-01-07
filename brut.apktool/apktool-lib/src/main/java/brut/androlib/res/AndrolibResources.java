@@ -176,13 +176,17 @@ final public class AndrolibResources {
     public void adjust_package_manifest(ResTable resTable, String filePath)
             throws AndrolibException {
 
-        // check if packages different, and that package is not equal to "android"
-        Map<String, String> packageInfo = resTable.getPackageInfo();
-        String currentPackage = packageInfo.get("cur_package");
-        String originalPackage = packageInfo.get("orig_package");
+        // compare resources.arsc package name to the one present in AndroidManifest
+        ResPackage resPackage = resTable.getHighestSpecPackage();
+        mPackageOriginal = resPackage.getName();
+        mPackageRenamed = resTable.getPackageRenamed();
 
-        if (currentPackage.equalsIgnoreCase(originalPackage) || "android".equalsIgnoreCase(currentPackage)
-                || "com.htc".equalsIgnoreCase(currentPackage)) {
+
+        resTable.setPackageId(resPackage.getId());
+        resTable.setPackageOriginal(mPackageOriginal);
+
+        if (mPackageOriginal.equalsIgnoreCase(mPackageRenamed) || "android".equalsIgnoreCase(mPackageRenamed)
+                || "com.htc".equalsIgnoreCase(mPackageRenamed)) {
             LOGGER.info("Regular manifest package...");
         } else {
             try {
@@ -196,9 +200,7 @@ final public class AndrolibResources {
                 // update package attribute
                 NamedNodeMap attr = manifest.getAttributes();
                 Node nodeAttr = attr.getNamedItem("package");
-                mPackageRenamed = nodeAttr.getNodeValue();
-                nodeAttr.setNodeValue(currentPackage);
-
+                nodeAttr.setNodeValue(mPackageOriginal);
                 saveDocument(filePath, doc);
 
             } catch (SAXException | ParserConfigurationException | IOException | TransformerException ignored) {
@@ -284,6 +286,7 @@ final public class AndrolibResources {
                 // it will be passed as a parameter to aapt like "--min-sdk-version" via apktool.yml
                 adjust_package_manifest(resTable, outDir.getAbsolutePath() + File.separator + "AndroidManifest.xml");
                 remove_manifest_versions(outDir.getAbsolutePath() + File.separator + "AndroidManifest.xml");
+                mPackageId = String.valueOf(resTable.getPackageId());
             }
             if (inApk.containsDir("res")) {
                 in = inApk.getDir("res");
@@ -332,13 +335,14 @@ final public class AndrolibResources {
 
     public void setPackageInfo(Map<String, String> map) {
         if (map != null) {
-            mPackageRenamed = map.get("package");
+            mPackageRenamed = map.get("renamed");
+            mPackageOriginal = map.get("original");
         }
     }
 
     public void setPackageId(Map<String, String> map) {
         if (map != null) {
-            mPackageId = map.get("cur_package_id");
+            mPackageId = map.get("original_id");
         }
     }
 
@@ -359,8 +363,7 @@ final public class AndrolibResources {
                 customAapt = true;
 
                 if (flags.get("verbose")) {
-                    LOGGER.info(aaptFile.getPath()
-                            + " being used as aapt location.");
+                    LOGGER.info(aaptFile.getPath() + " being used as aapt location.");
                 }
             } else {
                 LOGGER.warning("aapt location could not be found. Defaulting back to default");
@@ -838,7 +841,6 @@ final public class AndrolibResources {
     private final static Logger LOGGER = Logger
             .getLogger(AndrolibResources.class.getName());
 
-    private String mPackageId = null;
     private String mMinSdkVersion = null;
     private String mMaxSdkVersion = null;
     private String mTargetSdkVersion = null;
@@ -846,6 +848,9 @@ final public class AndrolibResources {
     private String mVersionName = null;
 
     private String mPackageRenamed = null;
+    private String mPackageOriginal = null;
+    private String mPackageId = null;
+
     private File mAaptBinary = null;
 
 }

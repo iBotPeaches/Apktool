@@ -34,10 +34,12 @@ public class ResTable {
 	private final Set<ResPackage> mFramePackages = new LinkedHashSet<ResPackage>();
 
 	private String mFrameTag;
+    private String mPackageRenamed;
+    private String mPackageOriginal;
+    private int mPackageId;
     private boolean mAnalysisMode = false;
 
 	private Map<String, String> mSdkInfo = new LinkedHashMap<String, String>();
-	private Map<String, String> mPackageInfo = new LinkedHashMap<String, String>();
 	private Map<String, String> mVersionInfo = new LinkedHashMap<String, String>();
     private Map<String, String> mUnknownFiles = new LinkedHashMap<String, String>();
 
@@ -75,6 +77,18 @@ public class ResTable {
 		}
 		throw new UndefinedResObject(String.format("package: id=%d", id));
 	}
+
+    public ResPackage getHighestSpecPackage() throws AndrolibException {
+        int id = 0;
+        int value = 0;
+        for(ResPackage resPackage : mPackagesById.values()) {
+            if(resPackage.getResSpecCount() > value && !resPackage.getName().equalsIgnoreCase("android")) {
+                value = resPackage.getResSpecCount();
+                id = resPackage.getId();
+            }
+        }
+        return getPackage(id);
+    }
 
 	public ResPackage getPackage(String name) throws AndrolibException {
 		ResPackage pkg = mPackagesByName.get(name);
@@ -126,6 +140,18 @@ public class ResTable {
     public void setAnalysisMode(boolean mode) {
         mAnalysisMode = mode;
     }
+
+    public void setPackageRenamed(String pkg) {
+        mPackageRenamed = pkg;
+    }
+
+    public void setPackageOriginal(String pkg) {
+        mPackageOriginal = pkg;
+    }
+
+    public void setPackageId(int id) {
+        mPackageId = id;
+    }
 	
 	public void clearSdkInfo() {
 	  mSdkInfo.clear();
@@ -139,18 +165,10 @@ public class ResTable {
 	  mVersionInfo.put(key, value);
 	}
 
-	public void addPackageInfo(String key, String value) {
-		mPackageInfo.put(key, value);
-	}
-
     public void addUnknownFileInfo(String file, String value) {
         mUnknownFiles.put(file,value);
     }
 
-	public Map<String, String> getPackageInfo() {
-		return mPackageInfo;
-	}
-	
 	public Map<String, String> getVersionInfo() {
 	  return mVersionInfo;
 	}
@@ -167,7 +185,15 @@ public class ResTable {
         return mUnknownFiles;
     }
 
-	public boolean isPackageInfoValueSet(String key) {
-		return (mPackageInfo.containsKey(key));
-	}
+    public String getPackageRenamed() {
+        return mPackageRenamed;
+    }
+
+    public String getPackageOriginal() {
+        return mPackageOriginal;
+    }
+
+    public int getPackageId() {
+        return mPackageId;
+    }
 }

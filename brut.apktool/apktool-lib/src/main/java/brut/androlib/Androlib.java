@@ -272,6 +272,7 @@ public class Androlib {
 				: Boolean.valueOf(meta.get("compressionType").toString()));
 		mAndRes.setSdkInfo((Map<String, String>) meta.get("sdkInfo"));
 		mAndRes.setPackageId((Map<String, String>) meta.get("packageInfo"));
+        mAndRes.setPackageInfo((Map<String, String>) meta.get("packageInfo"));
 		mAndRes.setVersionInfo((Map<String, String>) meta.get("versionInfo"));
 
 		if (outFile == null) {

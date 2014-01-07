@@ -317,10 +317,15 @@ public class ApkDecoder {
 
     private void putPackageInfo(Map<String, Object> meta)
             throws AndrolibException {
-        Map<String, String> info = getResTable().getPackageInfo();
-        if (info.size() > 0) {
-            meta.put("packageInfo", info);
-        }
+        String renamed = getResTable().getPackageRenamed();
+        String original = getResTable().getPackageOriginal();
+        int id = getResTable().getPackageId();
+
+        HashMap<String, String> packages = new HashMap<String, String>();
+        packages.put("renamed", renamed);
+        packages.put("original", original);
+        packages.put("original_id", String.valueOf(id));
+        meta.put("packageInfo", packages);
     }
 
     private void putVersionInfo(Map<String, Object> meta)
