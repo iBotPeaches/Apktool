@@ -181,7 +181,6 @@ final public class AndrolibResources {
         mPackageOriginal = resPackage.getName();
         mPackageRenamed = resTable.getPackageRenamed();
 
-
         resTable.setPackageId(resPackage.getId());
         resTable.setPackageOriginal(mPackageOriginal);
 

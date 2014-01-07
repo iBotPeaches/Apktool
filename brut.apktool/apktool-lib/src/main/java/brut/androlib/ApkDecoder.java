@@ -318,10 +318,15 @@ public class ApkDecoder {
     private void putPackageInfo(Map<String, Object> meta)
             throws AndrolibException {
         String renamed = getResTable().getPackageRenamed();
+        String original = getResTable().getPackageOriginal();
         int id = getResTable().getPackageId();
 
         HashMap<String, String> packages = new HashMap<String, String>();
-        packages.put("rename-manifest-package", renamed);
+
+        // only put rename-manifest-package into apktool.yml, if the change will be required
+        if (!renamed.equalsIgnoreCase(original)) {
+            packages.put("rename-manifest-package", renamed);
+        }
         packages.put("forced-package-id", String.valueOf(id));
         meta.put("packageInfo", packages);
     }
