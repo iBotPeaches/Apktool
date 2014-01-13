@@ -87,7 +87,8 @@ public class ResTable {
                 id = resPackage.getId();
             }
         }
-        return getPackage(id);
+        // if id is still 0, we only have one pkgId which is "android" -> 1
+        return (id == 0) ? getPackage(1) : getPackage(id);
     }
 
 	public ResPackage getPackage(String name) throws AndrolibException {

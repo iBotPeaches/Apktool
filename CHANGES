@@ -29,6 +29,7 @@ v2.0.0 (TBA)
 -Fixed (issue #550) - Correctly labels incorrect type handling of <array>
 -Fixed (issue #571) - Fixed truncated strings (Thanks jtmuhone)
 -Fixed (issue #578) - Fixed apk's with multiple empty types via ignoring them
+-Fixed (issue #589) - Fixed apk's with one package named "android" from improper decoding.
 -Added output to list Apktool version to help debugging.
 -Updated known bytes for configurations to 38 (from addition of layout direction)
 -Fixed NPE when handling odex apks even with --no-src specified. (Thanks Rodrigo Chiossi)
