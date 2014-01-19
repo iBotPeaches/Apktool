@@ -61,6 +61,7 @@ public class BuilderInstruction3rc extends BuilderInstruction implements Instruc
     @Override public int getStartRegister() { return startRegister; }
     @Override public int getRegisterCount() { return registerCount; }
     @Nonnull @Override public Reference getReference() { return reference; }
+    @Override public int getReferenceType() { return opcode.referenceType; }
 
     @Override public Format getFormat() { return FORMAT; }
 }

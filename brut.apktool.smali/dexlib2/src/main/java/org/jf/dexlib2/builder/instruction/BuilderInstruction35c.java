@@ -76,6 +76,7 @@ public class BuilderInstruction35c extends BuilderInstruction implements Instruc
     @Override public int getRegisterF() { return registerF; }
     @Override public int getRegisterG() { return registerG; }
     @Nonnull @Override public Reference getReference() { return reference; }
+    @Override public int getReferenceType() { return opcode.referenceType; }
 
     @Override public Format getFormat() { return FORMAT; }
 }

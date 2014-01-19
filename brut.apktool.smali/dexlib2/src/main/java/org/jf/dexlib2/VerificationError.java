@@ -34,6 +34,7 @@ package org.jf.dexlib2;
 import com.google.common.collect.Maps;
 import org.jf.util.ExceptionWithContext;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
 
 public class VerificationError {
@@ -61,6 +62,7 @@ public class VerificationError {
         verificationErrorNames.put("instantiation-error", INSTANTIATION_ERROR);
     }
 
+    @Nullable
     public static String getVerificationErrorName(int verificationError) {
         switch (verificationError) {
             case GENERIC:

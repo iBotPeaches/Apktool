@@ -142,7 +142,7 @@ public class ClassFileNameHandler {
                 writer.close();
                 f.delete(); //doesn't throw IOException
             } catch (IOException ex) {
-                //if an exception occured, it's likely that we're on a windows system.
+                //if an exception occurred, it's likely that we're on a windows system.
                 return true;
             }
         }

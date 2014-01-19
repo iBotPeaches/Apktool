@@ -59,7 +59,7 @@ public class InstructionOffsetMap {
         int index = Arrays.binarySearch(instructionCodeOffsets, codeOffset);
         if (index < 0) {
             if (exact) {
-                throw new ExceptionWithContext("No instruction at offset %d", codeOffset);
+                throw new InvalidInstructionOffset(codeOffset);
             } else {
                 // This calculation would be incorrect if index was -1 (i.e. insertion point of 0). Luckily, we can
                 // ignore this case, because codeOffset will always be non-negative, and the code offset of the first
@@ -72,8 +72,34 @@ public class InstructionOffsetMap {
 
     public int getInstructionCodeOffset(int index) {
         if (index < 0 || index >= instructionCodeOffsets.length) {
-            throw new ExceptionWithContext("Index out of bounds: %d", index);
+            throw new InvalidInstructionIndex(index);
         }
         return instructionCodeOffsets[index];
+    }
+
+    public static class InvalidInstructionOffset extends ExceptionWithContext {
+        private final int instructionOffset;
+
+        public InvalidInstructionOffset(int instructionOffset) {
+            super("No instruction at offset %d", instructionOffset);
+            this.instructionOffset = instructionOffset;
+        }
+
+        public int getInstructionOffset() {
+            return instructionOffset;
+        }
+    }
+
+    public static class InvalidInstructionIndex extends ExceptionWithContext {
+        private final int instructionIndex;
+
+        public InvalidInstructionIndex(int instructionIndex) {
+            super("Instruction index out of bounds: %d", instructionIndex);
+            this.instructionIndex = instructionIndex;
+        }
+
+        public int getInstructionIndex() {
+            return instructionIndex;
+        }
     }
 }

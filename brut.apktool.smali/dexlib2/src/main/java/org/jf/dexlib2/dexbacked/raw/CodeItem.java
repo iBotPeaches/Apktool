@@ -41,6 +41,7 @@ import org.jf.dexlib2.iface.instruction.*;
 import org.jf.dexlib2.iface.instruction.formats.*;
 import org.jf.dexlib2.util.AnnotatedBytes;
 import org.jf.dexlib2.util.ReferenceUtil;
+import org.jf.util.ExceptionWithContext;
 import org.jf.util.NumberUtils;
 
 import javax.annotation.Nonnull;
@@ -84,121 +85,160 @@ public class CodeItem {
 
             @Override
             public void annotateItem(@Nonnull AnnotatedBytes out, int itemIndex, @Nullable String itemIdentity) {
-                DexReader reader = dexFile.readerAt(out.getCursor());
+                try {
+                    DexReader reader = dexFile.readerAt(out.getCursor());
 
-                int registers = reader.readUshort();
-                out.annotate(2, "registers_size = %d", registers);
+                    int registers = reader.readUshort();
+                    out.annotate(2, "registers_size = %d", registers);
 
-                int inSize = reader.readUshort();
-                out.annotate(2, "ins_size = %d", inSize);
+                    int inSize = reader.readUshort();
+                    out.annotate(2, "ins_size = %d", inSize);
 
-                int outSize = reader.readUshort();
-                out.annotate(2, "outs_size = %d", outSize);
+                    int outSize = reader.readUshort();
+                    out.annotate(2, "outs_size = %d", outSize);
 
-                int triesCount = reader.readUshort();
-                out.annotate(2, "tries_size = %d", triesCount);
+                    int triesCount = reader.readUshort();
+                    out.annotate(2, "tries_size = %d", triesCount);
 
-                int debugInfoOffset = reader.readSmallUint();
-                out.annotate(4, "debug_info_off = 0x%x", debugInfoOffset);
+                    int debugInfoOffset = reader.readSmallUint();
+                    out.annotate(4, "debug_info_off = 0x%x", debugInfoOffset);
 
-                if (debugInfoOffset != 0) {
-                    addDebugInfoIdentity(debugInfoOffset, itemIdentity);
-                }
-
-                int instructionSize = reader.readSmallUint();
-                out.annotate(4, "insns_size = 0x%x", instructionSize);
-
-                out.annotate(0, "instructions:");
-                out.indent();
-
-                int end = reader.getOffset() + instructionSize*2;
-                while (reader.getOffset() < end) {
-                    Instruction instruction = DexBackedInstruction.readFrom(reader);
-
-                    switch (instruction.getOpcode().format) {
-                        case Format10x:
-                            annotateInstruction10x(out, instruction);
-                            break;
-                        case Format35c:
-                            annotateInstruction35c(out, (Instruction35c)instruction);
-                            break;
-                        case Format3rc:
-                            annotateInstruction3rc(out, (Instruction3rc)instruction);
-                            break;
-                        case ArrayPayload:
-                            annotateArrayPayload(out, (ArrayPayload)instruction);
-                            break;
-                        case PackedSwitchPayload:
-                            annotatePackedSwitchPayload(out, (PackedSwitchPayload)instruction);
-                            break;
-                        case SparseSwitchPayload:
-                            annotateSparseSwitchPayload(out, (SparseSwitchPayload)instruction);
-                            break;
-                        default:
-                            annotateDefaultInstruction(out, instruction);
-                            break;
+                    if (debugInfoOffset != 0) {
+                        addDebugInfoIdentity(debugInfoOffset, itemIdentity);
                     }
 
-                    assert reader.getOffset() == out.getCursor();
-                }
-                out.deindent();
+                    int instructionSize = reader.readSmallUint();
+                    out.annotate(4, "insns_size = 0x%x", instructionSize);
 
-                if (triesCount > 0) {
-                    if ((reader.getOffset() % 4) != 0) {
-                        reader.readUshort();
-                        out.annotate(2, "padding");
-                    }
-
-                    out.annotate(0, "try_items:");
+                    out.annotate(0, "instructions:");
                     out.indent();
-                    for (int i=0; i<triesCount; i++) {
-                        out.annotate(0, "try_item[%d]:", i);
-                        out.indent();
-                        int startAddr = reader.readSmallUint();
-                        out.annotate(4, "start_addr = 0x%x", startAddr);
 
-                        int instructionCount = reader.readUshort();
-                        out.annotate(2, "insn_count = 0x%x", instructionCount);
+                    out.setLimit(out.getCursor(), out.getCursor() + instructionSize * 2);
 
-                        int handlerOffset = reader.readUshort();
-                        out.annotate(2, "handler_off = 0x%x", handlerOffset);
+                    int end = reader.getOffset() + instructionSize*2;
+                    try {
+                        while (reader.getOffset() < end) {
+                            Instruction instruction = DexBackedInstruction.readFrom(reader);
+
+                            // if we read past the end of the instruction list
+                            if (reader.getOffset() > end) {
+                                out.annotateTo(end, "truncated instruction");
+                                reader.setOffset(end);
+                            } else {
+                                switch (instruction.getOpcode().format) {
+                                    case Format10x:
+                                        annotateInstruction10x(out, instruction);
+                                        break;
+                                    case Format35c:
+                                        annotateInstruction35c(out, (Instruction35c)instruction);
+                                        break;
+                                    case Format3rc:
+                                        annotateInstruction3rc(out, (Instruction3rc)instruction);
+                                        break;
+                                    case ArrayPayload:
+                                        annotateArrayPayload(out, (ArrayPayload)instruction);
+                                        break;
+                                    case PackedSwitchPayload:
+                                        annotatePackedSwitchPayload(out, (PackedSwitchPayload)instruction);
+                                        break;
+                                    case SparseSwitchPayload:
+                                        annotateSparseSwitchPayload(out, (SparseSwitchPayload)instruction);
+                                        break;
+                                    default:
+                                        annotateDefaultInstruction(out, instruction);
+                                        break;
+                                }
+                            }
+
+                            assert reader.getOffset() == out.getCursor();
+                        }
+                    } catch (ExceptionWithContext ex) {
+                        ex.printStackTrace(System.err);
+                        out.annotate(0, "annotation error: %s", ex.getMessage());
+                        out.moveTo(end);
+                        reader.setOffset(end);
+                    } finally {
+                        out.clearLimit();
                         out.deindent();
                     }
-                    out.deindent();
 
-                    int handlerListCount = reader.readSmallUleb128();
-                    out.annotate(0, "encoded_catch_handler_list:");
-                    out.annotateTo(reader.getOffset(), "size = %d", handlerListCount);
-                    out.indent();
-                    for (int i=0; i<handlerListCount; i++) {
-                        out.annotate(0, "encoded_catch_handler[%d]", i);
+                    if (triesCount > 0) {
+                        if ((reader.getOffset() % 4) != 0) {
+                            reader.readUshort();
+                            out.annotate(2, "padding");
+                        }
+
+                        out.annotate(0, "try_items:");
                         out.indent();
-                        int handlerCount = reader.readSleb128();
-                        out.annotateTo(reader.getOffset(), "size = %d", handlerCount);
-                        boolean hasCatchAll = handlerCount <= 0;
-                        handlerCount = Math.abs(handlerCount);
-                        if (handlerCount != 0) {
-                            out.annotate(0, "handlers:");
-                            out.indent();
-                            for (int j=0; j<handlerCount; j++) {
-                                out.annotate(0, "encoded_type_addr_pair[%d]", i);
+                        try {
+                            for (int i=0; i<triesCount; i++) {
+                                out.annotate(0, "try_item[%d]:", i);
                                 out.indent();
-                                int typeIndex = reader.readSmallUleb128();
-                                out.annotateTo(reader.getOffset(), TypeIdItem.getReferenceAnnotation(dexFile, typeIndex));
+                                try {
+                                    int startAddr = reader.readSmallUint();
+                                    out.annotate(4, "start_addr = 0x%x", startAddr);
 
-                                int handlerAddress = reader.readSmallUleb128();
-                                out.annotateTo(reader.getOffset(), "addr = 0x%x", handlerAddress);
-                                out.deindent();
+                                    int instructionCount = reader.readUshort();
+                                    out.annotate(2, "insn_count = 0x%x", instructionCount);
+
+                                    int handlerOffset = reader.readUshort();
+                                    out.annotate(2, "handler_off = 0x%x", handlerOffset);
+                                } finally {
+                                    out.deindent();
+                                }
                             }
+                        } finally {
                             out.deindent();
                         }
-                        if (hasCatchAll) {
-                            int catchAllAddress = reader.readSmallUleb128();
-                            out.annotateTo(reader.getOffset(), "catch_all_addr = 0x%x", catchAllAddress);
+
+                        int handlerListCount = reader.readSmallUleb128();
+                        out.annotate(0, "encoded_catch_handler_list:");
+                        out.annotateTo(reader.getOffset(), "size = %d", handlerListCount);
+                        out.indent();
+                        try {
+                            for (int i=0; i<handlerListCount; i++) {
+                                out.annotate(0, "encoded_catch_handler[%d]", i);
+                                out.indent();
+                                try {
+                                    int handlerCount = reader.readSleb128();
+                                    out.annotateTo(reader.getOffset(), "size = %d", handlerCount);
+                                    boolean hasCatchAll = handlerCount <= 0;
+                                    handlerCount = Math.abs(handlerCount);
+                                    if (handlerCount != 0) {
+                                        out.annotate(0, "handlers:");
+                                        out.indent();
+                                        try {
+                                            for (int j=0; j<handlerCount; j++) {
+                                                out.annotate(0, "encoded_type_addr_pair[%d]", i);
+                                                out.indent();
+                                                try {
+                                                    int typeIndex = reader.readSmallUleb128();
+                                                    out.annotateTo(reader.getOffset(), TypeIdItem.getReferenceAnnotation(dexFile, typeIndex));
+
+                                                    int handlerAddress = reader.readSmallUleb128();
+                                                    out.annotateTo(reader.getOffset(), "addr = 0x%x", handlerAddress);
+                                                } finally {
+                                                    out.deindent();
+                                                }
+                                            }
+                                        } finally {
+                                            out.deindent();
+                                        }
+                                    }
+                                    if (hasCatchAll) {
+                                        int catchAllAddress = reader.readSmallUleb128();
+                                        out.annotateTo(reader.getOffset(), "catch_all_addr = 0x%x", catchAllAddress);
+                                    }
+                                } finally {
+                                    out.deindent();
+                                }
+                            }
+                        } finally {
+                            out.deindent();
                         }
-                        out.deindent();
                     }
-                    out.deindent();
+                } catch (ExceptionWithContext ex) {
+                    out.annotate(0, "annotation error: %s", ex.getMessage());
                 }
             }
 
@@ -263,13 +303,17 @@ public class CodeItem {
                         }
                     }
                 }  else if (instruction instanceof VerificationErrorInstruction) {
-                    args.add(VerificationError.getVerificationErrorName(
-                            ((VerificationErrorInstruction)instruction).getVerificationError()));
+                    String verificationError = VerificationError.getVerificationErrorName(
+                        ((VerificationErrorInstruction) instruction).getVerificationError());
+                    if (verificationError != null) {
+                        args.add(verificationError);
+                    } else {
+                        args.add("invalid verification error type");
+                    }
                 }
 
                 if (instruction instanceof ReferenceInstruction) {
-                    args.add(ReferenceUtil.getReferenceString(
-                            ((ReferenceInstruction)instruction).getReference()));
+                    args.add(ReferenceUtil.getReferenceString(((ReferenceInstruction)instruction).getReference()));
                 } else if (instruction instanceof OffsetInstruction) {
                     int offset = ((OffsetInstruction)instruction).getCodeOffset();
                     String sign = offset>=0?"+":"-";

@@ -31,6 +31,9 @@
 
 package org.jf.dexlib2;
 
+import org.jf.dexlib2.iface.reference.*;
+import org.jf.util.ExceptionWithContext;
+
 public final class ReferenceType {
     public static final int STRING = 0;
     public static final int TYPE = 1;
@@ -49,7 +52,50 @@ public final class ReferenceType {
             case METHOD:
                 return "method";
             default:
-                throw new IllegalArgumentException("Invalid reference type: " + referenceType);
+                throw new InvalidReferenceTypeException(referenceType);
+        }
+    }
+
+    public static int getReferenceType(Reference reference) {
+        if (reference instanceof StringReference) {
+            return STRING;
+        } else if (reference instanceof TypeReference) {
+            return TYPE;
+        } else if (reference instanceof FieldReference) {
+            return FIELD;
+        } else if (reference instanceof MethodReference) {
+            return METHOD;
+        } else {
+            throw new IllegalStateException("Invalid reference");
+        }
+    }
+
+    /**
+     * Validate a specific reference type. Note that the NONE placeholder is specifically not considered valid here.
+     *
+     * @throws InvalidReferenceTypeException
+     */
+    public static void validateReferenceType(int referenceType) {
+        if (referenceType < 0 || referenceType > 3) {
+            throw new InvalidReferenceTypeException(referenceType);
+        }
+    }
+
+    public static class InvalidReferenceTypeException extends ExceptionWithContext {
+        private final int referenceType;
+
+        public InvalidReferenceTypeException(int referenceType) {
+            super("Invalid reference type: %d", referenceType);
+            this.referenceType = referenceType;
+        }
+
+        public InvalidReferenceTypeException(int referenceType, String message, Object... formatArgs) {
+            super(message, formatArgs);
+            this.referenceType = referenceType;
+        }
+
+        public int getReferenceType() {
+            return referenceType;
         }
     }
 

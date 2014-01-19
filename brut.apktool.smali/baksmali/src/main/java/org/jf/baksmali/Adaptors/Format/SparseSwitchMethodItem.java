@@ -71,6 +71,7 @@ public class SparseSwitchMethodItem extends InstructionMethodItem<SparseSwitchPa
             IntegerRenderer.writeTo(writer, target.getKey());
             writer.write(" -> ");
             target.writeTargetTo(writer);
+            writeResourceId(writer, target.getKey());
             writer.write('\n');
         }
         writer.deindent(4);

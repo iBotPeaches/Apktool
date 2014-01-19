@@ -39,10 +39,18 @@ import org.jf.dexlib2.iface.DexFile;
 import org.jf.dexlib2.util.SyntheticAccessorResolver;
 import org.jf.util.ClassFileNameHandler;
 import org.jf.util.IndentingWriter;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
 import java.io.*;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.concurrent.*;
+
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 public class baksmali {
 
@@ -60,9 +68,50 @@ public class baksmali {
                         Iterables.concat(options.bootClassPathEntries, extraClassPathEntries), dexFile,
                         options.apiLevel);
             } catch (Exception ex) {
-                System.err.println("\n\nError occured while loading boot class path files. Aborting.");
+                System.err.println("\n\nError occurred while loading boot class path files. Aborting.");
                 ex.printStackTrace(System.err);
-                System.exit(1);
+                return false;
+            }
+        }
+
+        if (options.resourceIdFileEntries != null) {
+            class PublicHandler extends DefaultHandler {
+                String prefix = null;
+                public PublicHandler(String prefix) {
+                    super();
+                    this.prefix = prefix;
+                }
+
+                public void startElement(String uri, String localName,
+                        String qName, Attributes attr) throws SAXException {
+                    if (qName.equals("public")) {
+                        String type = attr.getValue("type");
+                        String name = attr.getValue("name").replace('.', '_');
+                        Integer public_key = Integer.decode(attr.getValue("id"));
+                        String public_val = new StringBuffer()
+                            .append(prefix)
+                            .append(".")
+                            .append(type)
+                            .append(".")
+                            .append(name)
+                            .toString();
+                        options.resourceIds.put(public_key, public_val);
+                    }
+                }
+            };
+
+            for (Entry<String,String> entry: options.resourceIdFileEntries.entrySet()) {
+                try {
+                    SAXParser saxp = SAXParserFactory.newInstance().newSAXParser();
+                    String prefix = entry.getValue();
+                    saxp.parse(entry.getKey(), new PublicHandler(prefix));
+                } catch (ParserConfigurationException e) {
+                    continue;
+                } catch (SAXException e) {
+                    continue;
+                } catch (IOException e) {
+                    continue;
+                }
             }
         }
 
@@ -70,7 +119,7 @@ public class baksmali {
         if (!outputDirectoryFile.exists()) {
             if (!outputDirectoryFile.mkdirs()) {
                 System.err.println("Can't create the output directory " + options.outputDirectory);
-                System.exit(1);
+                return false;
             }
         }
 
@@ -98,22 +147,24 @@ public class baksmali {
         }
 
         boolean errorOccurred = false;
-        for (Future<Boolean> task: tasks) {
-            while(true) {
-                try {
-                    if (!task.get()) {
-                        errorOccurred = true;
+        try {
+            for (Future<Boolean> task: tasks) {
+                while(true) {
+                    try {
+                        if (!task.get()) {
+                            errorOccurred = true;
+                        }
+                    } catch (InterruptedException ex) {
+                        continue;
+                    } catch (ExecutionException ex) {
+                        throw new RuntimeException(ex);
                     }
-                } catch (InterruptedException ex) {
-                    continue;
-                } catch (ExecutionException ex) {
-                    throw new RuntimeException(ex);
+                    break;
                 }
-                break;
             }
+        } finally {
+            executor.shutdown();
         }
-
-        executor.shutdown();
         return !errorOccurred;
     }
 
@@ -168,7 +219,7 @@ public class baksmali {
             writer = new IndentingWriter(bufWriter);
             classDefinition.writeTo((IndentingWriter)writer);
         } catch (Exception ex) {
-            System.err.println("\n\nError occured while disassembling class " + classDescriptor.replace('/', '.') + " - skipping class");
+            System.err.println("\n\nError occurred while disassembling class " + classDescriptor.replace('/', '.') + " - skipping class");
             ex.printStackTrace();
             // noinspection ResultOfMethodCallIgnored
             smaliFile.delete();
@@ -180,7 +231,7 @@ public class baksmali {
                 try {
                     writer.close();
                 } catch (Throwable ex) {
-                    System.err.println("\n\nError occured while closing file " + smaliFile.toString());
+                    System.err.println("\n\nError occurred while closing file " + smaliFile.toString());
                     ex.printStackTrace();
                 }
             }

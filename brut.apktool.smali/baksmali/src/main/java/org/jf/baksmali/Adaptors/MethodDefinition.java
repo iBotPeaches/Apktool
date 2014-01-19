@@ -39,6 +39,7 @@ import org.jf.dexlib2.ReferenceType;
 import org.jf.dexlib2.analysis.AnalysisException;
 import org.jf.dexlib2.analysis.AnalyzedInstruction;
 import org.jf.dexlib2.analysis.MethodAnalyzer;
+import org.jf.dexlib2.dexbacked.DexBackedDexFile.InvalidItemIndex;
 import org.jf.dexlib2.iface.*;
 import org.jf.dexlib2.iface.debug.DebugItem;
 import org.jf.dexlib2.iface.instruction.Instruction;
@@ -46,6 +47,7 @@ import org.jf.dexlib2.iface.instruction.OffsetInstruction;
 import org.jf.dexlib2.iface.instruction.ReferenceInstruction;
 import org.jf.dexlib2.iface.reference.MethodReference;
 import org.jf.dexlib2.util.InstructionOffsetMap;
+import org.jf.dexlib2.util.InstructionOffsetMap.InvalidInstructionOffset;
 import org.jf.dexlib2.util.ReferenceUtil;
 import org.jf.dexlib2.util.SyntheticAccessorResolver;
 import org.jf.dexlib2.util.TypeUtils;
@@ -92,15 +94,31 @@ public class MethodDefinition {
 
                 Opcode opcode = instruction.getOpcode();
                 if (opcode == Opcode.PACKED_SWITCH) {
+                    boolean valid = true;
                     int codeOffset = instructionOffsetMap.getInstructionCodeOffset(i);
                     int targetOffset = codeOffset + ((OffsetInstruction)instruction).getCodeOffset();
-                    targetOffset = findSwitchPayload(targetOffset, Opcode.PACKED_SWITCH_PAYLOAD);
-                    packedSwitchMap.append(targetOffset, codeOffset);
+                    try {
+                        targetOffset = findSwitchPayload(targetOffset, Opcode.PACKED_SWITCH_PAYLOAD);
+                    } catch (InvalidSwitchPayload ex) {
+                        valid = false;
+                    }
+                    if (valid) {
+                        packedSwitchMap.append(targetOffset, codeOffset);
+                    }
                 } else if (opcode == Opcode.SPARSE_SWITCH) {
+                    boolean valid = true;
                     int codeOffset = instructionOffsetMap.getInstructionCodeOffset(i);
                     int targetOffset = codeOffset + ((OffsetInstruction)instruction).getCodeOffset();
-                    targetOffset = findSwitchPayload(targetOffset, Opcode.SPARSE_SWITCH_PAYLOAD);
-                    sparseSwitchMap.append(targetOffset, codeOffset);
+                    try {
+                        targetOffset = findSwitchPayload(targetOffset, Opcode.SPARSE_SWITCH_PAYLOAD);
+                    } catch (InvalidSwitchPayload ex) {
+                        valid = false;
+                        // The offset to the payload instruction was invalid. Nothing to do, except that we won't
+                        // add this instruction to the map.
+                    }
+                    if (valid) {
+                        sparseSwitchMap.append(targetOffset, codeOffset);
+                    }
                 }
             }
         }catch (Exception ex) {
@@ -187,8 +205,13 @@ public class MethodDefinition {
         writer.write(".end method\n");
     }
 
-    private int findSwitchPayload(int targetOffset, Opcode type) {
-        int targetIndex = instructionOffsetMap.getInstructionIndexAtCodeOffset(targetOffset);
+    public int findSwitchPayload(int targetOffset, Opcode type) {
+        int targetIndex;
+        try {
+            targetIndex = instructionOffsetMap.getInstructionIndexAtCodeOffset(targetOffset);
+        } catch (InvalidInstructionOffset ex) {
+            throw new InvalidSwitchPayload(targetOffset);
+        }
 
         //TODO: does dalvik let you pad with multiple nops?
         //TODO: does dalvik let a switch instruction point to a non-payload instruction?
@@ -205,7 +228,7 @@ public class MethodDefinition {
                     }
                 }
             }
-            throw new ExceptionWithContext("No switch payload at offset 0x%x", targetOffset);
+            throw new InvalidSwitchPayload(targetOffset);
         } else {
             return targetOffset;
         }
@@ -337,10 +360,16 @@ public class MethodDefinition {
                 Opcode opcode = instruction.getOpcode();
 
                 if (opcode.referenceType == ReferenceType.METHOD) {
-                    MethodReference methodReference =
-                            (MethodReference)((ReferenceInstruction)instruction).getReference();
+                    MethodReference methodReference = null;
+                    try {
+                        methodReference = (MethodReference)((ReferenceInstruction)instruction).getReference();
+                    } catch (InvalidItemIndex ex) {
+                        // just ignore it for now. We'll deal with it later, when processing the instructions
+                        // themselves
+                    }
 
-                    if (SyntheticAccessorResolver.looksLikeSyntheticAccessor(methodReference.getName())) {
+                    if (methodReference != null &&
+                            SyntheticAccessorResolver.looksLikeSyntheticAccessor(methodReference.getName())) {
                         SyntheticAccessorResolver.AccessedMember accessedMember =
                                 classDef.options.syntheticAccessorResolver.getAccessedMember(methodReference);
                         if (accessedMember != null) {
@@ -508,6 +537,19 @@ public class MethodDefinition {
 
         public Collection<LabelMethodItem> getLabels() {
             return labels.values();
+        }
+    }
+
+    public static class InvalidSwitchPayload extends ExceptionWithContext {
+        private final int payloadOffset;
+
+        public InvalidSwitchPayload(int payloadOffset) {
+            super("No switch payload at offset: %d", payloadOffset);
+            this.payloadOffset = payloadOffset;
+        }
+
+        public int getPayloadOffset() {
+            return payloadOffset;
         }
     }
 }

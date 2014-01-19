@@ -62,4 +62,9 @@ public class DexBackedInstruction22c extends DexBackedInstruction implements Ins
     public Reference getReference() {
         return DexBackedReference.makeReference(dexFile, opcode.referenceType, dexFile.readUshort(instructionStart + 2));
     }
+
+    @Override
+    public int getReferenceType() {
+        return opcode.referenceType;
+    }
 }

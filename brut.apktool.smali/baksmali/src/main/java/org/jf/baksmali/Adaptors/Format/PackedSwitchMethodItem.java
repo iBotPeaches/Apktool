@@ -82,9 +82,12 @@ public class PackedSwitchMethodItem extends InstructionMethodItem<PackedSwitchPa
         IntegerRenderer.writeTo(writer, firstKey);
         writer.indent(4);
         writer.write('\n');
+        int key = firstKey;
         for (PackedSwitchTarget target: targets) {
             target.writeTargetTo(writer);
+            writeResourceId(writer, key);
             writer.write('\n');
+            key++;
         }
         writer.deindent(4);
         writer.write(".end packed-switch");

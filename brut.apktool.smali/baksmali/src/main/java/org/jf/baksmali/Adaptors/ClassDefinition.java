@@ -32,6 +32,7 @@ import com.google.common.collect.Lists;
 import org.jf.baksmali.baksmaliOptions;
 import org.jf.dexlib2.AccessFlags;
 import org.jf.dexlib2.dexbacked.DexBackedClassDef;
+import org.jf.dexlib2.dexbacked.DexBackedDexFile.InvalidItemIndex;
 import org.jf.dexlib2.iface.*;
 import org.jf.dexlib2.iface.instruction.Instruction;
 import org.jf.dexlib2.iface.instruction.formats.Instruction21c;
@@ -79,8 +80,15 @@ public class ClassDefinition {
                             case SPUT_SHORT:
                             case SPUT_WIDE: {
                                 Instruction21c ins = (Instruction21c)instruction;
-                                FieldReference fieldRef = (FieldReference)ins.getReference();
-                                if (fieldRef.getDefiningClass().equals((classDef.getType()))) {
+                                FieldReference fieldRef = null;
+                                try {
+                                    fieldRef = (FieldReference)ins.getReference();
+                                } catch (InvalidItemIndex ex) {
+                                    // just ignore it for now. We'll deal with it later, when processing the instructions
+                                    // themselves
+                                }
+                                if (fieldRef != null &&
+                                        fieldRef.getDefiningClass().equals((classDef.getType()))) {
                                     fieldsSetInStaticConstructor.add(ReferenceUtil.getShortFieldDescriptor(fieldRef));
                                 }
                                 break;

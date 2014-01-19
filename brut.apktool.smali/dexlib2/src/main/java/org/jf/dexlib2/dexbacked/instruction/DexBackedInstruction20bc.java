@@ -32,6 +32,7 @@
 package org.jf.dexlib2.dexbacked.instruction;
 
 import org.jf.dexlib2.Opcode;
+import org.jf.dexlib2.ReferenceType;
 import org.jf.dexlib2.dexbacked.DexBackedDexFile;
 import org.jf.dexlib2.dexbacked.reference.DexBackedReference;
 import org.jf.dexlib2.iface.instruction.formats.Instruction20bc;
@@ -51,7 +52,13 @@ public class DexBackedInstruction20bc extends DexBackedInstruction implements In
     @Nonnull
     @Override
     public Reference getReference() {
-        int refType = (dexFile.readUbyte(instructionStart + 1) >>> 6) + 1;
-        return DexBackedReference.makeReference(dexFile, refType, dexFile.readUshort(instructionStart + 2));
+        int referenceType = getReferenceType();
+        return DexBackedReference.makeReference(dexFile, referenceType, dexFile.readUshort(instructionStart + 2));
+    }
+
+    @Override public int getReferenceType() {
+        int referenceType = (dexFile.readUbyte(instructionStart + 1) >>> 6) + 1;
+        ReferenceType.validateReferenceType(referenceType);
+        return referenceType;
     }
 }

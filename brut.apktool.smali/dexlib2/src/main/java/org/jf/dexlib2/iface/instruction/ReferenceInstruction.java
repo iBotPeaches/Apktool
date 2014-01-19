@@ -37,4 +37,5 @@ import javax.annotation.Nonnull;
 
 public interface ReferenceInstruction extends Instruction {
     @Nonnull Reference getReference();
+    int getReferenceType();
 }

@@ -69,7 +69,10 @@ public class Opcodes {
             case 0x300:
                 return Opcode.ARRAY_PAYLOAD;
             default:
-                return opcodesByValue[opcodeValue];
+                if (opcodeValue >= 0 && opcodeValue < opcodesByValue.length) {
+                    return opcodesByValue[opcodeValue];
+                }
+                return null;
         }
     }
 }

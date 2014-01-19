@@ -184,7 +184,7 @@ public class DexBackedDexFile extends BaseDexBuffer implements DexFile {
 
     public int getMethodIdItemOffset(int methodIndex) {
         if (methodIndex < 0 || methodIndex >= methodCount) {
-            throw new InvalidItemIndex(methodIndex, "Method findex out of bounds: %d", methodIndex);
+            throw new InvalidItemIndex(methodIndex, "Method index out of bounds: %d", methodIndex);
         }
         return methodStartOffset + methodIndex*MethodIdItem.ITEM_SIZE;
     }

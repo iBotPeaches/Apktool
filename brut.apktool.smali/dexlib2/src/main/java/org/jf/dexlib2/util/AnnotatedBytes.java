@@ -34,6 +34,8 @@ package org.jf.dexlib2.util;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+
+import org.jf.util.ExceptionWithContext;
 import org.jf.util.Hex;
 import org.jf.util.TwoColumnOutput;
 
@@ -78,6 +80,9 @@ public class AnnotatedBytes {
      */
     private int hexCols = 8;
 
+    private int startLimit = -1;
+    private int endLimit = -1;
+
     public AnnotatedBytes(int width) {
         this.outputWidth = width;
     }
@@ -115,7 +120,16 @@ public class AnnotatedBytes {
      * @param formatArgs format arguments to pass to String.format
      */
     public void annotate(int length, @Nonnull String msg, Object... formatArgs) {
-        String formattedMsg = String.format(msg, formatArgs);
+        if (startLimit != -1 && endLimit != -1 && (cursor < startLimit || cursor >= endLimit)) {
+            throw new ExceptionWithContext("Annotating outside the parent bounds");
+        }
+
+        String formattedMsg;
+        if (formatArgs != null && formatArgs.length > 0) {
+            formattedMsg = String.format(msg, formatArgs);
+        } else {
+            formattedMsg = msg;
+        }
         int exclusiveEndOffset = cursor + length;
 
         AnnotationEndpoint endPoint = null;
@@ -129,19 +143,20 @@ public class AnnotatedBytes {
                 AnnotationEndpoint previousAnnotations = previousEntry.getValue();
                 AnnotationItem previousRangeAnnotation = previousAnnotations.rangeAnnotation;
                 if (previousRangeAnnotation != null) {
-                    throw new IllegalStateException(
-                            String.format("Cannot add annotation %s, due to existing annotation %s",
+                    throw new ExceptionWithContext(
+                            "Cannot add annotation %s, due to existing annotation %s",
                             formatAnnotation(cursor, cursor + length, formattedMsg),
-                            formatAnnotation(previousEntry.getKey(), previousRangeAnnotation.annotation)));
+                            formatAnnotation(previousEntry.getKey(),
+                                previousRangeAnnotation.annotation));
                 }
             }
         } else if (length > 0) {
             AnnotationItem existingRangeAnnotation = startPoint.rangeAnnotation;
             if (existingRangeAnnotation != null) {
-                throw new IllegalStateException(
-                        String.format("Cannot add annotation %s, due to existing annotation %s",
+                throw new ExceptionWithContext(
+                        "Cannot add annotation %s, due to existing annotation %s",
                                 formatAnnotation(cursor, cursor + length, formattedMsg),
-                                formatAnnotation(cursor, existingRangeAnnotation.annotation)));
+                                formatAnnotation(cursor, existingRangeAnnotation.annotation));
             }
         }
 
@@ -156,23 +171,23 @@ public class AnnotatedBytes {
                     AnnotationEndpoint nextEndpoint = nextEntry.getValue();
                     AnnotationItem nextRangeAnnotation = nextEndpoint.rangeAnnotation;
                     if (nextRangeAnnotation != null) {
-                        throw new IllegalStateException(
-                                String.format("Cannot add annotation %s, due to existing annotation %s",
+                        throw new ExceptionWithContext(
+                                "Cannot add annotation %s, due to existing annotation %s",
                                         formatAnnotation(cursor, cursor + length, formattedMsg),
-                                        formatAnnotation(nextKey, nextRangeAnnotation.annotation)));
+                                        formatAnnotation(nextKey, nextRangeAnnotation.annotation));
                     }
                     if (nextEndpoint.pointAnnotations.size() > 0) {
-                        throw new IllegalStateException(
-                                String.format("Cannot add annotation %s, due to existing annotation %s",
+                        throw new ExceptionWithContext(
+                                "Cannot add annotation %s, due to existing annotation %s",
                                         formatAnnotation(cursor, cursor + length, formattedMsg),
                                         formatAnnotation(nextKey, nextKey,
-                                                nextEndpoint.pointAnnotations.get(0).annotation)));
+                                            nextEndpoint.pointAnnotations.get(0).annotation));
                     }
                     // There are no annotations on this endpoint. This "shouldn't" happen. We can still throw an exception.
-                    throw new IllegalStateException(
-                            String.format("Cannot add annotation %s, due to existing annotation endpoint at %d",
+                    throw new ExceptionWithContext(
+                            "Cannot add annotation %s, due to existing annotation endpoint at %d",
                                     formatAnnotation(cursor, cursor + length, formattedMsg),
-                                    nextKey));
+                                    nextKey);
                 }
 
                 if (nextKey == exclusiveEndOffset) {
@@ -311,5 +326,15 @@ public class AnnotatedBytes {
             String left = Hex.dump(data, lastKey, data.length - lastKey, lastKey, hexCols, 6);
             twoc.write(left, "");
         }
+    }
+
+    public void setLimit(int start, int end) {
+        this.startLimit = start;
+        this.endLimit = end;
+    }
+
+    public void clearLimit() {
+        this.startLimit = -1;
+        this.endLimit = -1;
     }
 }

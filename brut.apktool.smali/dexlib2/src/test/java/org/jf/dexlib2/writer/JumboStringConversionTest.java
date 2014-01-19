@@ -37,6 +37,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.jf.dexlib2.Opcode;
 import org.jf.dexlib2.Opcodes;
+import org.jf.dexlib2.ReferenceType;
 import org.jf.dexlib2.builder.MethodImplementationBuilder;
 import org.jf.dexlib2.builder.instruction.BuilderInstruction10x;
 import org.jf.dexlib2.builder.instruction.BuilderInstruction21c;
@@ -135,6 +136,8 @@ public class JumboStringConversionTest {
                 @Nonnull @Override public Reference getReference() {
                     return ref;
                 }
+
+                @Override public int getReferenceType() { return ReferenceType.STRING; }
 
                 @Override public Opcode getOpcode() {
                     return Opcode.CONST_STRING;

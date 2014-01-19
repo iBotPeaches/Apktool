@@ -67,6 +67,7 @@ public class ImmutableInstruction31c extends ImmutableInstruction implements Ins
 
     @Override public int getRegisterA() { return registerA; }
     @Nonnull @Override public ImmutableReference getReference() { return reference; }
+    @Override public int getReferenceType() { return opcode.referenceType; }
 
     @Override public Format getFormat() { return FORMAT; }
 }

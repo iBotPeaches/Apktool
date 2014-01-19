@@ -1,5 +1,5 @@
 v2.0.0 (TBA)
--Updated to smali/baksmali to v2.0.0
+-Updated to smali/baksmali to v2.0.3
 -Updated to Gradle 1.8
 -Fixed (issue #8)   - Correctly uses -c to retain original manifest and META-INF. (Thanks M1cha)
 -Fixed (issue #63)  - Correctly handles apk's that have unknown files outside of the standard aapt allowed resources.

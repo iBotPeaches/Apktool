@@ -38,9 +38,9 @@ import org.jf.dexlib2.iface.instruction.formats.UnknownInstruction;
 public class ImmutableUnknownInstruction extends ImmutableInstruction implements UnknownInstruction {
     public static final Format FORMAT = Format.Format10x;
 
-    protected final short originalOpcode;
+    protected final int originalOpcode;
 
-    public ImmutableUnknownInstruction(short originalOpcode) {
+    public ImmutableUnknownInstruction(int originalOpcode) {
         super(Opcode.NOP);
         this.originalOpcode = originalOpcode;
     }
@@ -53,5 +53,5 @@ public class ImmutableUnknownInstruction extends ImmutableInstruction implements
     }
 
     @Override public Format getFormat() { return FORMAT; }
-    @Override public short getOriginalOpcode() { return originalOpcode; }
+    @Override public int getOriginalOpcode() { return originalOpcode; }
 }

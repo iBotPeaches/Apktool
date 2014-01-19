@@ -43,7 +43,12 @@ public class DexBackedUnknownInstruction extends DexBackedInstruction implements
         super(dexFile, Opcode.NOP, instructionStart);
     }
 
-    @Override public short getOriginalOpcode() {
-        return (short)dexFile.readUbyte(instructionStart);
+    @Override public int getOriginalOpcode() {
+        int opcode = dexFile.readUbyte(instructionStart);
+        if (opcode == 0) {
+            opcode = dexFile.readUshort(instructionStart);
+        }
+
+        return opcode;
     }
 }

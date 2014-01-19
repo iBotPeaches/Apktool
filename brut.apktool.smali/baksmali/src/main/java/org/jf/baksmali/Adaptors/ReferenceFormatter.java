@@ -57,6 +57,9 @@ public class ReferenceFormatter {
                 return;
             case ReferenceType.FIELD:
                 ReferenceUtil.writeFieldDescriptor(writer, (FieldReference)reference);
+                return;
+            default:
+                throw new IllegalStateException("Unknown reference type");
         }
     }
 }

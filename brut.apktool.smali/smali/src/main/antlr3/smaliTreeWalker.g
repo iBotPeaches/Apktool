@@ -840,13 +840,13 @@ insn_format21c_string
 
 insn_format21c_type
   : //e.g. const-class v2, org/jf/HelloWorld2/HelloWorld2
-    ^(I_STATEMENT_FORMAT21c_TYPE INSTRUCTION_FORMAT21c_TYPE REGISTER reference_type_descriptor)
+    ^(I_STATEMENT_FORMAT21c_TYPE INSTRUCTION_FORMAT21c_TYPE REGISTER nonvoid_type_descriptor)
     {
       Opcode opcode = opcodes.getOpcodeByName($INSTRUCTION_FORMAT21c_TYPE.text);
       short regA = parseRegister_byte($REGISTER.text);
 
       $method::methodBuilder.addInstruction(new BuilderInstruction21c(opcode, regA,
-              dexBuilder.internTypeReference($reference_type_descriptor.type)));
+              dexBuilder.internTypeReference($nonvoid_type_descriptor.type)));
     };
 
 insn_format21ih

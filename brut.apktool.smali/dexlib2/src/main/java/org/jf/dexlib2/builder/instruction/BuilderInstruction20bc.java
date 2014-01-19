@@ -33,6 +33,7 @@ package org.jf.dexlib2.builder.instruction;
 
 import org.jf.dexlib2.Format;
 import org.jf.dexlib2.Opcode;
+import org.jf.dexlib2.ReferenceType;
 import org.jf.dexlib2.builder.BuilderInstruction;
 import org.jf.dexlib2.iface.instruction.formats.Instruction20bc;
 import org.jf.dexlib2.iface.reference.Reference;
@@ -56,6 +57,7 @@ public class BuilderInstruction20bc extends BuilderInstruction implements Instru
 
     @Override public int getVerificationError() { return verificationError; }
     @Nonnull @Override public Reference getReference() { return reference; }
+    @Override public int getReferenceType() { return ReferenceType.getReferenceType(reference); }
 
     @Override public Format getFormat() { return FORMAT; }
 }

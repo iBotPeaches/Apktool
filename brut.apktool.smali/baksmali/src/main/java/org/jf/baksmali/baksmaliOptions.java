@@ -37,7 +37,9 @@ import org.jf.dexlib2.analysis.InlineMethodResolver;
 import org.jf.dexlib2.util.SyntheticAccessorResolver;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class baksmaliOptions {
     // register info values
@@ -58,12 +60,16 @@ public class baksmaliOptions {
     public List<String> bootClassPathEntries = Lists.newArrayList();
     public List<String> extraClassPathEntries = Lists.newArrayList();
 
+    public Map<String,String> resourceIdFileEntries = new HashMap<String,String>();
+    public Map<Integer,String> resourceIds = new HashMap<Integer,String>();
+
     public boolean noParameterRegisters = false;
     public boolean useLocalsDirective = false;
     public boolean useSequentialLabels = false;
     public boolean outputDebugInfo = true;
     public boolean addCodeOffsets = false;
     public boolean noAccessorComments = false;
+    public boolean allowOdex = false;
     public boolean deodex = false;
     public boolean ignoreErrors = false;
     public boolean checkPackagePrivateAccess = false;
@@ -83,5 +89,12 @@ public class baksmaliOptions {
             extraClassPath = extraClassPath.substring(1);
         }
         extraClassPathEntries.addAll(Arrays.asList(extraClassPath.split(":")));
+    }
+
+    public void setResourceIdFiles(String resourceIdFiles) {
+        for (String resourceIdFile: resourceIdFiles.split(":")) {
+            String[] entry = resourceIdFile.split("=");
+            resourceIdFileEntries.put(entry[1], entry[0]);
+        }
     }
 }

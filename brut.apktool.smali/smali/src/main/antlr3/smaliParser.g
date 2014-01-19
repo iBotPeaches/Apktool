@@ -922,8 +922,8 @@ insn_format21c_string
 
 insn_format21c_type
   : //e.g. const-class v2, Lorg/jf/HelloWorld2/HelloWorld2;
-    INSTRUCTION_FORMAT21c_TYPE REGISTER COMMA reference_type_descriptor
-    -> ^(I_STATEMENT_FORMAT21c_TYPE[$start, "I_STATEMENT_FORMAT21c"] INSTRUCTION_FORMAT21c_TYPE REGISTER reference_type_descriptor);
+    INSTRUCTION_FORMAT21c_TYPE REGISTER COMMA nonvoid_type_descriptor
+    -> ^(I_STATEMENT_FORMAT21c_TYPE[$start, "I_STATEMENT_FORMAT21c"] INSTRUCTION_FORMAT21c_TYPE REGISTER nonvoid_type_descriptor);
 
 insn_format21ih
   : //e.g. const/high16 v1, 1234

@@ -92,6 +92,7 @@ public class ImmutableInstruction35c extends ImmutableInstruction implements Ins
     @Override public int getRegisterF() { return registerF; }
     @Override public int getRegisterG() { return registerG; }
     @Nonnull @Override public ImmutableReference getReference() { return reference; }
+    @Override public int getReferenceType() { return opcode.referenceType; }
 
     @Override public Format getFormat() { return FORMAT; }
 }

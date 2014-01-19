@@ -435,6 +435,14 @@ public class MutableMethodImplementation implements MethodImplementation {
                         }
                         case SPARSE_SWITCH_PAYLOAD:
                         case PACKED_SWITCH_PAYLOAD:
+                            if (((BuilderSwitchPayload)instruction).referrer == null) {
+                                // if the switch payload isn't referenced, just remove it
+                                removeInstruction(index);
+                                index--;
+                                madeChanges = true;
+                                break;
+                            }
+                            // intentional fall-through
                         case ARRAY_PAYLOAD: {
                             if ((location.codeAddress & 0x01) != 0) {
                                 int previousIndex = location.index - 1;
