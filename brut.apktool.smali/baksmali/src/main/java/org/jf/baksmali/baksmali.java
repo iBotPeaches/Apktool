@@ -34,6 +34,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import org.jf.baksmali.Adaptors.ClassDefinition;
 import org.jf.dexlib2.analysis.ClassPath;
+import org.jf.dexlib2.analysis.CustomInlineMethodResolver;
 import org.jf.dexlib2.iface.ClassDef;
 import org.jf.dexlib2.iface.DexFile;
 import org.jf.dexlib2.util.SyntheticAccessorResolver;
@@ -67,6 +68,11 @@ public class baksmali {
                 options.classPath = ClassPath.fromClassPath(options.bootClassPathDirs,
                         Iterables.concat(options.bootClassPathEntries, extraClassPathEntries), dexFile,
                         options.apiLevel);
+
+                if (options.customInlineDefinitions != null) {
+                    options.inlineResolver = new CustomInlineMethodResolver(options.classPath,
+                            options.customInlineDefinitions);
+                }
             } catch (Exception ex) {
                 System.err.println("\n\nError occurred while loading boot class path files. Aborting.");
                 ex.printStackTrace(System.err);

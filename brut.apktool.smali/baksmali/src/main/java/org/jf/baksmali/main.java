@@ -31,7 +31,6 @@ package org.jf.baksmali;
 import com.google.common.collect.Lists;
 import org.apache.commons.cli.*;
 import org.jf.dexlib2.DexFileFactory;
-import org.jf.dexlib2.analysis.CustomInlineMethodResolver;
 import org.jf.dexlib2.analysis.InlineMethodResolver;
 import org.jf.dexlib2.dexbacked.DexBackedDexFile;
 import org.jf.dexlib2.dexbacked.DexBackedOdexFile;
@@ -217,7 +216,7 @@ public class main {
                     options.ignoreErrors = true;
                     break;
                 case 'T':
-                    options.inlineResolver = new CustomInlineMethodResolver(options.classPath, new File(commandLine.getOptionValue("T")));
+                    options.customInlineDefinitions = new File(commandLine.getOptionValue("T"));
                     break;
                 default:
                     assert false;
@@ -270,7 +269,7 @@ public class main {
             }
         }
 
-        if (options.inlineResolver == null && dexFile instanceof DexBackedOdexFile) {
+        if (options.customInlineDefinitions == null && dexFile instanceof DexBackedOdexFile) {
             options.inlineResolver =
                     InlineMethodResolver.createInlineMethodResolver(((DexBackedOdexFile)dexFile).getOdexVersion());
         }
