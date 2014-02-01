@@ -34,16 +34,79 @@ package org.jf.util;
 import junit.framework.Assert;
 import org.junit.Test;
 
+import java.nio.charset.Charset;
+
 public class ClassFileNameHandlerTest {
+    private final Charset UTF8 = Charset.forName("UTF-8");
+
     @Test
-    public void testShortedPathComponent() {
+    public void test1ByteEncodings() {
         StringBuilder sb = new StringBuilder();
-        for (int i=0; i<300; i++) {
+        for (int i=0; i<100; i++) {
             sb.append((char)i);
         }
 
-        String result = ClassFileNameHandler.shortenPathComponent(sb.toString(), 255);
+        String result = ClassFileNameHandler.shortenPathComponent(sb.toString(), 5);
+        Assert.assertEquals(95, result.getBytes(UTF8).length);
+        Assert.assertEquals(95, result.length());
+    }
 
-        Assert.assertEquals(255, result.length());
+    @Test
+    public void test2ByteEncodings() {
+        StringBuilder sb = new StringBuilder();
+        for (int i=0x80; i<0x80+100; i++) {
+            sb.append((char)i);
+        }
+
+        // remove a total of 3 2-byte characters, and then add back in the 1-byte '#'
+        String result = ClassFileNameHandler.shortenPathComponent(sb.toString(), 4);
+        Assert.assertEquals(200, sb.toString().getBytes(UTF8).length);
+        Assert.assertEquals(195, result.getBytes(UTF8).length);
+        Assert.assertEquals(98, result.length());
+
+        // remove a total of 3 2-byte characters, and then add back in the 1-byte '#'
+        result = ClassFileNameHandler.shortenPathComponent(sb.toString(), 5);
+        Assert.assertEquals(200, sb.toString().getBytes(UTF8).length);
+        Assert.assertEquals(195, result.getBytes(UTF8).length);
+        Assert.assertEquals(98, result.length());
+    }
+
+    @Test
+    public void test3ByteEncodings() {
+        StringBuilder sb = new StringBuilder();
+        for (int i=0x800; i<0x800+100; i++) {
+            sb.append((char)i);
+        }
+
+        // remove a total of 3 3-byte characters, and then add back in the 1-byte '#'
+        String result = ClassFileNameHandler.shortenPathComponent(sb.toString(), 6);
+        Assert.assertEquals(300, sb.toString().getBytes(UTF8).length);
+        Assert.assertEquals(292, result.getBytes(UTF8).length);
+        Assert.assertEquals(98, result.length());
+
+        // remove a total of 3 3-byte characters, and then add back in the 1-byte '#'
+        result = ClassFileNameHandler.shortenPathComponent(sb.toString(), 7);
+        Assert.assertEquals(300, sb.toString().getBytes(UTF8).length);
+        Assert.assertEquals(292, result.getBytes(UTF8).length);
+        Assert.assertEquals(98, result.length());
+    }
+
+    public void test4ByteEncodings() {
+        StringBuilder sb = new StringBuilder();
+        for (int i=0x10000; i<0x10000+100; i++) {
+            sb.appendCodePoint(i);
+        }
+
+        // we remove 3 codepoints == 6 characters == 12 bytes, and then add back in the 1-byte '#'
+        String result = ClassFileNameHandler.shortenPathComponent(sb.toString(), 8);
+        Assert.assertEquals(400, sb.toString().getBytes(UTF8).length);
+        Assert.assertEquals(389, result.getBytes(UTF8).length);
+        Assert.assertEquals(98, result.length());
+
+        // we remove 3 codepoints == 6 characters == 12 bytes, and then add back in the 1-byte '#'
+        result = ClassFileNameHandler.shortenPathComponent(sb.toString(), 7);
+        Assert.assertEquals(400, sb.toString().getBytes(UTF8).length);
+        Assert.assertEquals(3892, result.getBytes(UTF8).length);
+        Assert.assertEquals(98, result.length());
     }
 }

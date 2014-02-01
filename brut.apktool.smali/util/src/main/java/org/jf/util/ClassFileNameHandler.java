@@ -33,7 +33,9 @@ import ds.tree.RadixTreeImpl;
 
 import javax.annotation.Nonnull;
 import java.io.*;
+import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
+import java.nio.IntBuffer;
 import java.util.regex.Pattern;
 
 /**
@@ -87,8 +89,9 @@ public class ClassFileNameHandler {
                     packageElement += "#";
                 }
 
-                if (packageElement.length() > MAX_FILENAME_LENGTH) {
-                    packageElement = shortenPathComponent(packageElement, MAX_FILENAME_LENGTH);
+                int utf8Length = utf8Length(packageElement);
+                if (utf8Length > MAX_FILENAME_LENGTH) {
+                    packageElement = shortenPathComponent(packageElement, utf8Length - MAX_FILENAME_LENGTH);
                 }
 
                 packageElements[elementIndex++] = packageElement;
@@ -109,8 +112,9 @@ public class ClassFileNameHandler {
             packageElement += "#";
         }
 
-        if ((packageElement.length() + fileExtension.length()) > MAX_FILENAME_LENGTH) {
-            packageElement = shortenPathComponent(packageElement, MAX_FILENAME_LENGTH - fileExtension.length());
+        int utf8Length = utf8Length(packageElement) + utf8Length(fileExtension);
+        if (utf8Length > MAX_FILENAME_LENGTH) {
+            packageElement = shortenPathComponent(packageElement, utf8Length - MAX_FILENAME_LENGTH);
         }
 
         packageElements[elementIndex] = packageElement;
@@ -118,12 +122,87 @@ public class ClassFileNameHandler {
         return top.addUniqueChild(packageElements, 0);
     }
 
-    @Nonnull
-    static String shortenPathComponent(@Nonnull String pathComponent, int maxLength) {
-        int toRemove = pathComponent.length() - maxLength + 1;
+    private static int utf8Length(String str) {
+        int utf8Length = 0;
+        int i=0;
+        while (i<str.length()) {
+            int c = str.codePointAt(i);
+            utf8Length += utf8Length(c);
+            i += Character.charCount(c);
+        }
+        return utf8Length;
+    }
 
-        int firstIndex = (pathComponent.length()/2) - (toRemove/2);
-        return pathComponent.substring(0, firstIndex) + "#" + pathComponent.substring(firstIndex+toRemove);
+    private static int utf8Length(int codePoint) {
+        if (codePoint < 0x80) {
+            return 1;
+        } else if (codePoint < 0x800) {
+            return 2;
+        } else if (codePoint < 0x10000) {
+            return 3;
+        } else {
+            return 4;
+        }
+    }
+
+    /**
+     * Shortens an individual file/directory name, removing the necessary number of code points
+     * from the middle of the string such that the utf-8 encoding of the string is at least
+     * bytesToRemove bytes shorter than the original.
+     *
+     * The removed codePoints in the middle of the string will be replaced with a # character.
+     */
+    @Nonnull
+    static String shortenPathComponent(@Nonnull String pathComponent, int bytesToRemove) {
+        // We replace the removed part with a #, so we need to remove 1 extra char
+        bytesToRemove++;
+
+        int[] codePoints;
+        try {
+            IntBuffer intBuffer = ByteBuffer.wrap(pathComponent.getBytes("UTF-32BE")).asIntBuffer();
+            codePoints = new int[intBuffer.limit()];
+            intBuffer.get(codePoints);
+        } catch (UnsupportedEncodingException ex) {
+            throw new RuntimeException(ex);
+        }
+
+        int midPoint = codePoints.length/2;
+        int delta = 0;
+
+        int firstEnd = midPoint; // exclusive
+        int secondStart = midPoint+1; // inclusive
+        int bytesRemoved = utf8Length(codePoints[midPoint]);
+
+        // if we have an even number of codepoints, start by removing both middle characters,
+        // unless just removing the first already removes enough bytes
+        if (((codePoints.length % 2) == 0) && bytesRemoved < bytesToRemove) {
+            bytesRemoved += utf8Length(codePoints[secondStart]);
+            secondStart++;
+        }
+
+        while ((bytesRemoved < bytesToRemove) &&
+                (firstEnd > 0 || secondStart < codePoints.length)) {
+            if (firstEnd > 0) {
+                firstEnd--;
+                bytesRemoved += utf8Length(codePoints[firstEnd]);
+            }
+
+            if (bytesRemoved < bytesToRemove && secondStart < codePoints.length) {
+                bytesRemoved += utf8Length(codePoints[secondStart]);
+                secondStart++;
+            }
+        }
+
+        StringBuilder sb = new StringBuilder();
+        for (int i=0; i<firstEnd; i++) {
+            sb.appendCodePoint(codePoints[i]);
+        }
+        sb.append('#');
+        for (int i=secondStart; i<codePoints.length; i++) {
+            sb.appendCodePoint(codePoints[i]);
+        }
+
+        return sb.toString();
     }
 
     private static boolean testForWindowsReservedFileNames(File path) {
