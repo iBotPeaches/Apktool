@@ -1493,8 +1493,11 @@ public class MethodAnalyzer {
         Instruction deodexedInstruction;
 
         int startRegister = instruction.getStartRegister();
-        int registerCount = instruction.getRegisterCount();
-        if (registerCount == 1 && startRegister < 16) {
+        // hack: we should be using instruction.getRegisterCount, but some tweaked versions of dalvik appear
+        // to generate invoke-object-init/range instructions with an invalid register count. We know it should
+        // always be 1, so just use that.
+        int registerCount = 1;
+        if (startRegister < 16) {
             deodexedInstruction = new ImmutableInstruction35c(Opcode.INVOKE_DIRECT,
                     registerCount, startRegister, 0, 0, 0, 0, instruction.getReference());
         } else {
