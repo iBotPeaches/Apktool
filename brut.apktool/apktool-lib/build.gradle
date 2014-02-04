@@ -16,26 +16,11 @@
 
 import org.apache.tools.ant.filters.*
 
-// release
-if (!('release' in gradle.startParameter.taskNames)) {
-  ant.loadfile(srcFile: "../../.git/refs/heads/master", property: fullrev, failonerror: false);
-  if (ant.properties[fullrev] == null) {
-    gitrev_version = "SNAPSHOT_DEV";
-    println "Building SNAPSHOT (no .git folder found)";
-  } else {
-    gitrev_version = ant.properties[fullrev].substring(0,10);
-    println "Building SNAPSHOT: " + gitrev_version;
-  }
-} else {
-  gitrev_version = '';
-  println "Building RELEASE: " + apktoolversion;
-}
-
 processResources {
   from('src/main/resources/properties') {
     include '**/*.properties'
     into 'properties'
-    filter(ReplaceTokens, tokens: [version: apktoolversion, gitrev: gitrev_version] )
+    filter(ReplaceTokens, tokens: [version: project.apktool_version, gitrev: project.hash] )
   }
   from('src/main/resources/') {
     include '**/*.jar'
@@ -43,10 +28,12 @@ processResources {
   
   includeEmptyDirs = false
 }
+
 dependencies {
   compile ("junit:junit:4.10") {
     exclude(module: 'hamcrest-core')
 }
+
 compile project(':brut.j.dir'), 
 	   project(':brut.j.util'), 
 	   project(':brut.j.common'), 

@@ -13,8 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
-version = apktoolversion
 apply plugin: 'fatjar'
 
 configurations {
@@ -35,7 +33,7 @@ gradle.taskGraph.whenReady {
 }
 
 task proguard(type: JavaExec, dependsOn: fatJar) {
-    def outFile = jar.destinationDir.getPath() + '/' + jar.baseName + '-' + jar.version + '-small' + '.' + jar.extension
+    def outFile = jar.destinationDir.getPath() + '/' + "apktool" + '-' + project.apktool_version + '-small' + '.' + jar.extension
     inputs.file jar.archivePath
     outputs.file outFile
 

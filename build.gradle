@@ -13,14 +13,60 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 apply plugin: 'java'
 apply plugin: 'maven'
-apply plugin: 'license'
 
-ext.apktoolversion = '2.0.0-Beta8'
-ext.fullrev = '';
-ext.gitrev_version = '';
+def apktoolversion_major = '2.0.0'
+def apktoolversion_minor = 'Beta8';
+
+if (!('release' in gradle.startParameter.taskNames)) {
+  def hash = getCheckedOutGitCommitHash();
+  
+  if (hash == null) {
+    project.ext.set("hash", "dirty")
+    project.ext.set("apktool_version", apktoolversion_major + "-dirty")
+    println "Building SNAPSHOT (no .git folder found)";
+  } else {
+    project.ext.set("hash", hash);
+    project.ext.set("apktool_version", apktoolversion_major + "-" + hash + "-SNAPSHOT");
+    println "Building SNAPSHOT (" + getCheckedOutBranch() + "): " + hash;
+  }
+} else {
+  project.ext.set("hash", "")
+  project.ext.set("apktool_version", apktoolversion_major + "-" + apktoolversion_minor);
+  println "Building RELEASE (" + getCheckedOutBranch() + "): " + apktoolversion_major + "-" + apktoolversion_minor;
+}
+
+// https://gist.github.com/JonasGroeger/7620911
+def getCheckedOutGitCommitHash() {
+    def gitFolder = "$projectDir/.git/"
+    def takeFromHash = 6
+    
+    def head
+    try {
+      head = new File(gitFolder + "HEAD").text.split(":")
+    } catch(Exception e) {
+      return null;
+    }
+ 
+    def isCommit = head.length == 1
+    if(isCommit) return head[0].trim().take(takeFromHash) 
+ 
+    def refHead = new File(gitFolder + head[1].trim())
+    refHead.text.trim().take takeFromHash
+}
+
+def getCheckedOutBranch() {
+    def gitFolder = "$projectDir/.git/"
+    
+    def head
+    try {
+      head = new File(gitFolder + "HEAD").text.split("/")
+    } catch(Exception e) {
+      return "";
+    }
+    return head[2].trim();
+}
 
 repositories {
   mavenCentral()
@@ -37,22 +83,11 @@ build.doFirst {
     } 
 }
 
-
-class Compatibility {
-  String version
-  Compatibility(String versionValue) {
-    def matcher = (versionValue =~ /Java (\d)/)
-    version = matcher[0][1]
-  }
-  String toString() { version }
-}
-
 task wrapper(type: Wrapper) {
   gradleVersion = '1.8'
 }
 
-// If anyone uses this outside of GoogleCode (Apktool) developers. I will hunt you down and hurt you.
-// This is for official releases only. 
+// used for official releases only. Please don't use
 task release {
 }
 
@@ -61,7 +96,6 @@ buildscript {
     mavenCentral()
   }
   dependencies {
-    classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.5.0'
     classpath 'eu.appsatori:gradle-fatjar-plugin:0.2-rc1'
   }
 }
