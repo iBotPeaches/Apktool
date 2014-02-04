@@ -31,14 +31,14 @@
 
 apply plugin: 'idea'
 
-version = '2.0.2'
+version = '2.0.3'
 
 def jarVersion = version
 
 if (!('release' in gradle.startParameter.taskNames)) {
     def versionSuffix
     try {
-        def git = org.eclipse.jgit.api.Git.open(file('.'))
+        def git = org.eclipse.jgit.api.Git.open(file('../.'))
         def head = git.getRepository().getRef("HEAD")
         versionSuffix = head.getObjectId().abbreviate(8).name()
 
