@@ -651,10 +651,7 @@ public class Androlib {
 	}
 
 	public static String getVersion() {
-		String version = ApktoolProperties.get("application.version");
-		return version.endsWith("-SNAPSHOT") ? version.substring(0,
-				version.length() - 9)
-				+ '.' + ApktoolProperties.get("git.commit.id.abbrev") : version;
+		return ApktoolProperties.get("application.version");
 	}
 
 	private File[] parseUsesFramework(Map<String, Object> usesFramework)

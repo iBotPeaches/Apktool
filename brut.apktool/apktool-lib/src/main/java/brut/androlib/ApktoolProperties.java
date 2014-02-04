@@ -62,7 +62,6 @@ public class ApktoolProperties {
         }
         sProps.put("baksmaliVersion", version);
 
-
         templateStream = main.class.getClassLoader().getResourceAsStream("smali.properties");
         properties = new Properties();
         version = "(unknown)";
