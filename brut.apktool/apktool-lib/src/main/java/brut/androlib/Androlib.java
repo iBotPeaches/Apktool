@@ -217,9 +217,10 @@ public class Androlib {
 		// options.setIndent(4);
 		Yaml yaml = new Yaml(options);
 
-		FileWriter writer = null;
+		Writer writer = null;
 		try {
-			writer = new FileWriter(new File(mOutDir, "apktool.yml"));
+            writer = new BufferedWriter(new OutputStreamWriter(
+                    new FileOutputStream(new File(mOutDir, "apktool.yml")), "UTF-8"));
 			yaml.dump(meta, writer);
 		} catch (IOException ex) {
 			throw new AndrolibException(ex);
@@ -555,8 +556,7 @@ public class Androlib {
                 zip_properties.put("encoding", "UTF-8");
 
                 // create filesystem
-                Path path = Paths.get(outFile.getAbsolutePath());
-                URI apkFileSystem = new URI("jar", path.toUri().toString(), null);
+                URI apkFileSystem = new URI("jar", outFile.toURI().toString(), null);
 
                 // loop through files inside
                 for (Map.Entry<String,String> entry : files.entrySet()) {
