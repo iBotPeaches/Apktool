@@ -327,9 +327,9 @@ public class StringBlock {
 	private int[] m_styles;
 	private boolean m_isUTF8;
 	private int[] m_stringOwns;
-	private static final CharsetDecoder UTF16LE_DECODER = Charset.forName(
+	private final CharsetDecoder UTF16LE_DECODER = Charset.forName(
 			"UTF-16LE").newDecoder();
-	private static final CharsetDecoder UTF8_DECODER = Charset.forName("UTF-8")
+	private final CharsetDecoder UTF8_DECODER = Charset.forName("UTF-8")
 			.newDecoder();
 	private static final Logger LOGGER = Logger.getLogger(StringBlock.class
 			.getName());
