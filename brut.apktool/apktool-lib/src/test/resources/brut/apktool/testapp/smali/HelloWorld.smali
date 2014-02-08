@@ -7,7 +7,7 @@
 
     sget-object v0, Ljava/lang/System;->out:Ljava/io/PrintStream;
 
-    const-string	v1, "Hello World!"
+    const/high16 v1, 0x7f020000
 
     invoke-virtual {v0, v1}, Ljava/io/PrintStream;->println(Ljava/lang/String;)V
 
