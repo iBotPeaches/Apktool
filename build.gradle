@@ -92,12 +92,15 @@ task release {
 }
 
 buildscript {
-  repositories {
-    mavenCentral()
-  }
-  dependencies {
-    classpath 'eu.appsatori:gradle-fatjar-plugin:0.2-rc1'
-  }
+    repositories {
+        mavenCentral()
+    }
+    tasks.withType(Compile) {
+        options.encoding = "UTF-8"
+    }
+    dependencies {
+        classpath 'eu.appsatori:gradle-fatjar-plugin:0.2-rc1'
+    }
 }
 
 subprojects {
