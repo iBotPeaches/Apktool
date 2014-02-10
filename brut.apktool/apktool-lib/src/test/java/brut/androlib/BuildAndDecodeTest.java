@@ -46,7 +46,7 @@ public class BuildAndDecodeTest {
         LOGGER.info("Building testapp.apk...");
         File testApk = new File(sTmpDir, "testapp.apk");
         new Androlib().build(sTestOrigDir, testApk,
-                BuildAndDecodeTest.returnStock(),"");
+                TestUtils.returnStockHashMap(),"");
 
         LOGGER.info("Decoding testapp.apk...");
         ApkDecoder apkDecoder = new ApkDecoder(testApk);
@@ -62,11 +62,6 @@ public class BuildAndDecodeTest {
     @Test
     public void buildAndDecodeTest() throws BrutException {
         assertTrue(sTestNewDir.isDirectory());
-    }
-
-    @Test
-    public void isAaptInstalledTest() throws Exception {
-        assertEquals(true, isAaptPresent());
     }
 
     @Test
@@ -219,21 +214,6 @@ public class BuildAndDecodeTest {
         compareLibsFolder("libs");
     }
 
-    private static boolean isAaptPresent() throws Exception {
-        boolean result = true;
-        try {
-            Process proc = Runtime.getRuntime().exec("aapt");
-            BufferedReader br = new BufferedReader(new InputStreamReader(
-                    proc.getErrorStream()));
-            String line = null;
-            while ((line = br.readLine()) != null) {
-            }
-        } catch (Exception ex) {
-            result = false;
-        }
-        return result;
-    }
-
     private boolean compareBinaryFolder(String path, boolean res) throws BrutException, IOException {
 
         String tmp = "";
@@ -296,18 +276,6 @@ public class BuildAndDecodeTest {
 
         assertTrue(path + ": " + diff.getAllDifferences().toString(),
                 diff.similar());
-    }
-
-    private static HashMap<String, Boolean> returnStock() throws BrutException {
-        HashMap<String, Boolean> tmp = new HashMap<String, Boolean>();
-        tmp.put("forceBuildAll", false);
-        tmp.put("debug", false);
-        tmp.put("verbose", false);
-        tmp.put("framework", false);
-        tmp.put("update", false);
-        tmp.put("copyOriginal", false);
-
-        return tmp;
     }
 
     private static ExtFile sTmpDir;
