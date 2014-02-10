@@ -28,48 +28,48 @@ import org.xmlpull.v1.XmlSerializer;
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
 public abstract class ResScalarValue extends ResValue implements
-		ResXmlEncodable, ResValuesXmlSerializable {
-	protected final String mType;
-	protected final String mRawValue;
+        ResXmlEncodable, ResValuesXmlSerializable {
+    protected final String mType;
+    protected final String mRawValue;
 
-	protected ResScalarValue(String type, String rawValue) {
-		mType = type;
-		mRawValue = rawValue;
-	}
+    protected ResScalarValue(String type, String rawValue) {
+        mType = type;
+        mRawValue = rawValue;
+    }
 
-	@Override
-	public String encodeAsResXmlAttr() throws AndrolibException {
-		if (mRawValue != null) {
-			return mRawValue;
-		}
-		return encodeAsResXml();
-	}
+    @Override
+    public String encodeAsResXmlAttr() throws AndrolibException {
+        if (mRawValue != null) {
+            return mRawValue;
+        }
+        return encodeAsResXml();
+    }
 
-	public String encodeAsResXmlItemValue() throws AndrolibException {
-		return encodeAsResXmlValue();
-	}
+    public String encodeAsResXmlItemValue() throws AndrolibException {
+        return encodeAsResXmlValue();
+    }
 
-	@Override
-	public String encodeAsResXmlValue() throws AndrolibException {
-		if (mRawValue != null) {
-			return mRawValue;
-		}
-		return encodeAsResXml();
-	}
+    @Override
+    public String encodeAsResXmlValue() throws AndrolibException {
+        if (mRawValue != null) {
+            return mRawValue;
+        }
+        return encodeAsResXml();
+    }
 
     public String encodeAsResXmlNonEscapedItemValue() throws AndrolibException {
         return encodeAsResXmlValue().replace("&amp;", "&").replace("&lt;","<");
     }
 
-	@Override
-	public void serializeToResValuesXml(XmlSerializer serializer,
-			ResResource res) throws IOException, AndrolibException {
-		String type = res.getResSpec().getType().getName();
-		boolean item = !"reference".equals(mType) && !type.equals(mType);
+    @Override
+    public void serializeToResValuesXml(XmlSerializer serializer,
+                                        ResResource res) throws IOException, AndrolibException {
+        String type = res.getResSpec().getType().getName();
+        boolean item = !"reference".equals(mType) && !type.equals(mType);
 
-		String body = encodeAsResXmlValue();
+        String body = encodeAsResXmlValue();
 
-		// check for resource reference
+        // check for resource reference
         if (!type.equalsIgnoreCase("color")) {
             if (body.contains("@")) {
                 if (!res.getFilePath().contains("string")) {
@@ -78,31 +78,31 @@ public abstract class ResScalarValue extends ResValue implements
             }
         }
 
-		// check for using attrib as node or item
-		String tagName = item ? "item" : type;
+        // check for using attrib as node or item
+        String tagName = item ? "item" : type;
 
-		serializer.startTag(null, tagName);
-		if (item) {
-			serializer.attribute(null, "type", type);
-		}
-		serializer.attribute(null, "name", res.getResSpec().getName());
+        serializer.startTag(null, tagName);
+        if (item) {
+            serializer.attribute(null, "type", type);
+        }
+        serializer.attribute(null, "name", res.getResSpec().getName());
 
-		serializeExtraXmlAttrs(serializer, res);
+        serializeExtraXmlAttrs(serializer, res);
 
-		if (!body.isEmpty()) {
-			serializer.ignorableWhitespace(body);
-		}
+        if (!body.isEmpty()) {
+            serializer.ignorableWhitespace(body);
+        }
 
-		serializer.endTag(null, tagName);
-	}
+        serializer.endTag(null, tagName);
+    }
 
-	public String getType() {
-		return mType;
-	}
+    public String getType() {
+        return mType;
+    }
 
-	protected void serializeExtraXmlAttrs(XmlSerializer serializer,
-			ResResource res) throws IOException {
-	}
+    protected void serializeExtraXmlAttrs(XmlSerializer serializer,
+                                          ResResource res) throws IOException {
+    }
 
-	protected abstract String encodeAsResXml() throws AndrolibException;
+    protected abstract String encodeAsResXml() throws AndrolibException;
 }

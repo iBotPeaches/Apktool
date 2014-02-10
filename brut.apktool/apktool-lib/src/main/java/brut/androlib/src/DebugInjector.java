@@ -30,30 +30,30 @@ public class DebugInjector {
     private int currParam;
     private int lastParam;
 
-	public static void inject(ListIterator<String> it, StringBuilder out)
-			throws AndrolibException {
-		new DebugInjector(it, out).inject();
-	}
+    public static void inject(ListIterator<String> it, StringBuilder out)
+            throws AndrolibException {
+        new DebugInjector(it, out).inject();
+    }
 
-	private DebugInjector(ListIterator<String> it, StringBuilder out) {
-		mIt = it;
-		mOut = out;
-	}
+    private DebugInjector(ListIterator<String> it, StringBuilder out) {
+        mIt = it;
+        mOut = out;
+    }
 
-	private void inject() throws AndrolibException {
-		String definition = nextAndAppend();
-		if (definition.contains(" abstract ")
-				|| definition.contains(" native ")) {
-			nextAndAppend();
-			return;
-		}
-		parseParamsNumber(definition);
+    private void inject() throws AndrolibException {
+        String definition = nextAndAppend();
+        if (definition.contains(" abstract ")
+                || definition.contains(" native ")) {
+            nextAndAppend();
+            return;
+        }
+        parseParamsNumber(definition);
 
-		boolean end = false;
-		while (!end) {
-			end = step();
-		}
-	}
+        boolean end = false;
+        while (!end) {
+            end = step();
+        }
+    }
 
     private void parseParamsNumber(String definition) throws AndrolibException {
         int pos = definition.indexOf('(');
@@ -78,34 +78,34 @@ public class DebugInjector {
         }
     }
 
-	private boolean step() {
-		String line = next();
-		if (line.isEmpty()) {
-			return false;
-		}
+    private boolean step() {
+        String line = next();
+        if (line.isEmpty()) {
+            return false;
+        }
 
-		switch (line.charAt(0)) {
-		case '#':
-			return processComment(line);
-		case ':':
-			append(line);
-			return false;
-		case '.':
-			return processDirective(line);
-		default:
-            if (! areParamsInjected) {
-                injectRemainingParams();
-            }
-			return processInstruction(line);
-		}
-	}
+        switch (line.charAt(0)) {
+            case '#':
+                return processComment(line);
+            case ':':
+                append(line);
+                return false;
+            case '.':
+                return processDirective(line);
+            default:
+                if (! areParamsInjected) {
+                    injectRemainingParams();
+                }
+                return processInstruction(line);
+        }
+    }
 
-	private boolean processComment(String line) {
-		if (mFirstInstruction) {
-			return false;
-		}
+    private boolean processComment(String line) {
+        if (mFirstInstruction) {
+            return false;
+        }
 
-		Matcher m = REGISTER_INFO_PATTERN.matcher(line);
+        Matcher m = REGISTER_INFO_PATTERN.matcher(line);
 
         while (m.find()) {
             String localName = m.group(1);
@@ -145,7 +145,7 @@ public class DebugInjector {
                     break;
                 case "Float":
                     localType = "F";
-                   break;
+                    break;
                 case "LongHi":
                 case "LongLo":
                     localType = "J";
@@ -167,11 +167,11 @@ public class DebugInjector {
                     .append('\n');
         }
 
-		return false;
-	}
+        return false;
+    }
 
-	private boolean processDirective(String line) {
-		String line2 = line.substring(1);
+    private boolean processDirective(String line) {
+        String line2 = line.substring(1);
         if (line2.startsWith("line ") || line2.startsWith("local ") || line2.startsWith("end local ")) {
             return false;
         }
@@ -191,54 +191,54 @@ public class DebugInjector {
             return false;
         }
 
-		append(line);
-		if (line2.equals("end method")) {
-			return true;
-		}
-		if (line2.startsWith("annotation ") || line2.equals("sparse-switch")
-				|| line2.startsWith("packed-switch ")
-				|| line2.startsWith("array-data ")) {
-			while (true) {
-				line2 = nextAndAppend();
-				if (line2.startsWith(".end ")) {
-					break;
-				}
-			}
-		}
-		return false;
-	}
+        append(line);
+        if (line2.equals("end method")) {
+            return true;
+        }
+        if (line2.startsWith("annotation ") || line2.equals("sparse-switch")
+                || line2.startsWith("packed-switch ")
+                || line2.startsWith("array-data ")) {
+            while (true) {
+                line2 = nextAndAppend();
+                if (line2.startsWith(".end ")) {
+                    break;
+                }
+            }
+        }
+        return false;
+    }
 
-	private boolean processInstruction(String line) {
-		if (mFirstInstruction) {
-			mOut.append(".prologue\n");
-			mFirstInstruction = false;
-		}
-		mOut.append(".line ").append(mIt.nextIndex()).append('\n').append(line)
-				.append('\n');
+    private boolean processInstruction(String line) {
+        if (mFirstInstruction) {
+            mOut.append(".prologue\n");
+            mFirstInstruction = false;
+        }
+        mOut.append(".line ").append(mIt.nextIndex()).append('\n').append(line)
+                .append('\n');
 
-		return false;
-	}
+        return false;
+    }
 
-	private String next() {
-		return mIt.next().split("//", 2)[1].trim();
-	}
+    private String next() {
+        return mIt.next().split("//", 2)[1].trim();
+    }
 
-	private String nextAndAppend() {
-		String line = next();
-		append(line);
-		return line;
-	}
+    private String nextAndAppend() {
+        String line = next();
+        append(line);
+        return line;
+    }
 
-	private void append(String append) {
-		mOut.append(append).append('\n');
-	}
+    private void append(String append) {
+        mOut.append(append).append('\n');
+    }
 
-	private final ListIterator<String> mIt;
-	private final StringBuilder mOut;
+    private final ListIterator<String> mIt;
+    private final StringBuilder mOut;
 
-	private boolean mFirstInstruction = true;
-	private final Set<String> mInitializedRegisters = new HashSet<String>();
+    private boolean mFirstInstruction = true;
+    private final Set<String> mInitializedRegisters = new HashSet<String>();
 
-	private static final Pattern REGISTER_INFO_PATTERN = Pattern
-			.compile("((?:p|v)\\d+)=\\(([^,)]+)([^)]*)\\);");
+    private static final Pattern REGISTER_INFO_PATTERN = Pattern
+            .compile("((?:p|v)\\d+)=\\(([^,)]+)([^)]*)\\);");
 }

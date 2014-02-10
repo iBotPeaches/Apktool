@@ -107,25 +107,25 @@ public class ApkDecoder {
             zef.close();
 
             switch (mDecodeResources) {
-            case DECODE_RESOURCES_NONE:
-                mAndrolib.decodeResourcesRaw(mApkFile, outDir);
-                break;
-            case DECODE_RESOURCES_FULL:
-                mAndrolib.decodeResourcesFull(mApkFile, outDir, getResTable());
-                break;
+                case DECODE_RESOURCES_NONE:
+                    mAndrolib.decodeResourcesRaw(mApkFile, outDir);
+                    break;
+                case DECODE_RESOURCES_FULL:
+                    mAndrolib.decodeResourcesFull(mApkFile, outDir, getResTable());
+                    break;
             }
         } else {
             // if there's no resources.asrc, decode the manifest without looking
             // up attribute references
             if (hasManifest()) {
                 switch (mDecodeResources) {
-                case DECODE_RESOURCES_NONE:
-                    mAndrolib.decodeManifestRaw(mApkFile, outDir);
-                    break;
-                case DECODE_RESOURCES_FULL:
-                    mAndrolib.decodeManifestFull(mApkFile, outDir,
-                            getResTable());
-                    break;
+                    case DECODE_RESOURCES_NONE:
+                        mAndrolib.decodeManifestRaw(mApkFile, outDir);
+                        break;
+                    case DECODE_RESOURCES_FULL:
+                        mAndrolib.decodeManifestFull(mApkFile, outDir,
+                                getResTable());
+                        break;
                 }
             }
         }

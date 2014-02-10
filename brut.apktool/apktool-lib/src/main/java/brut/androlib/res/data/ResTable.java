@@ -26,57 +26,57 @@ import java.util.*;
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
 public class ResTable {
-	private final AndrolibResources mAndRes;
+    private final AndrolibResources mAndRes;
 
-	private final Map<Integer, ResPackage> mPackagesById = new HashMap<Integer, ResPackage>();
-	private final Map<String, ResPackage> mPackagesByName = new HashMap<String, ResPackage>();
-	private final Set<ResPackage> mMainPackages = new LinkedHashSet<ResPackage>();
-	private final Set<ResPackage> mFramePackages = new LinkedHashSet<ResPackage>();
+    private final Map<Integer, ResPackage> mPackagesById = new HashMap<Integer, ResPackage>();
+    private final Map<String, ResPackage> mPackagesByName = new HashMap<String, ResPackage>();
+    private final Set<ResPackage> mMainPackages = new LinkedHashSet<ResPackage>();
+    private final Set<ResPackage> mFramePackages = new LinkedHashSet<ResPackage>();
 
-	private String mFrameTag;
+    private String mFrameTag;
     private String mPackageRenamed;
     private String mPackageOriginal;
     private int mPackageId;
     private boolean mAnalysisMode = false;
 
-	private Map<String, String> mSdkInfo = new LinkedHashMap<String, String>();
-	private Map<String, String> mVersionInfo = new LinkedHashMap<String, String>();
+    private Map<String, String> mSdkInfo = new LinkedHashMap<String, String>();
+    private Map<String, String> mVersionInfo = new LinkedHashMap<String, String>();
     private Map<String, String> mUnknownFiles = new LinkedHashMap<String, String>();
 
-	public ResTable() {
-		mAndRes = null;
-	}
+    public ResTable() {
+        mAndRes = null;
+    }
 
-	public ResTable(AndrolibResources andRes) {
-		mAndRes = andRes;
-	}
+    public ResTable(AndrolibResources andRes) {
+        mAndRes = andRes;
+    }
 
-	public ResResSpec getResSpec(int resID) throws AndrolibException {
-		return getResSpec(new ResID(resID));
-	}
+    public ResResSpec getResSpec(int resID) throws AndrolibException {
+        return getResSpec(new ResID(resID));
+    }
 
-	public ResResSpec getResSpec(ResID resID) throws AndrolibException {
-		return getPackage(resID.package_).getResSpec(resID);
-	}
+    public ResResSpec getResSpec(ResID resID) throws AndrolibException {
+        return getPackage(resID.package_).getResSpec(resID);
+    }
 
-	public Set<ResPackage> listMainPackages() {
-		return mMainPackages;
-	}
+    public Set<ResPackage> listMainPackages() {
+        return mMainPackages;
+    }
 
-	public Set<ResPackage> listFramePackages() {
-		return mFramePackages;
-	}
+    public Set<ResPackage> listFramePackages() {
+        return mFramePackages;
+    }
 
-	public ResPackage getPackage(int id) throws AndrolibException {
-		ResPackage pkg = mPackagesById.get(id);
-		if (pkg != null) {
-			return pkg;
-		}
-		if (mAndRes != null) {
-			return mAndRes.loadFrameworkPkg(this, id, mFrameTag);
-		}
-		throw new UndefinedResObject(String.format("package: id=%d", id));
-	}
+    public ResPackage getPackage(int id) throws AndrolibException {
+        ResPackage pkg = mPackagesById.get(id);
+        if (pkg != null) {
+            return pkg;
+        }
+        if (mAndRes != null) {
+            return mAndRes.loadFrameworkPkg(this, id, mFrameTag);
+        }
+        throw new UndefinedResObject(String.format("package: id=%d", id));
+    }
 
     public ResPackage getHighestSpecPackage() throws AndrolibException {
         int id = 0;
@@ -91,52 +91,52 @@ public class ResTable {
         return (id == 0) ? getPackage(1) : getPackage(id);
     }
 
-	public ResPackage getPackage(String name) throws AndrolibException {
-		ResPackage pkg = mPackagesByName.get(name);
-		if (pkg == null) {
-			throw new UndefinedResObject("package: name=" + name);
-		}
-		return pkg;
-	}
+    public ResPackage getPackage(String name) throws AndrolibException {
+        ResPackage pkg = mPackagesByName.get(name);
+        if (pkg == null) {
+            throw new UndefinedResObject("package: name=" + name);
+        }
+        return pkg;
+    }
 
-	public boolean hasPackage(int id) {
-		return mPackagesById.containsKey(id);
-	}
+    public boolean hasPackage(int id) {
+        return mPackagesById.containsKey(id);
+    }
 
-	public boolean hasPackage(String name) {
-		return mPackagesByName.containsKey(name);
-	}
+    public boolean hasPackage(String name) {
+        return mPackagesByName.containsKey(name);
+    }
 
-	public ResValue getValue(String package_, String type, String name)
-			throws AndrolibException {
-		return getPackage(package_).getType(type).getResSpec(name)
-				.getDefaultResource().getValue();
-	}
+    public ResValue getValue(String package_, String type, String name)
+            throws AndrolibException {
+        return getPackage(package_).getType(type).getResSpec(name)
+                .getDefaultResource().getValue();
+    }
 
-	public void addPackage(ResPackage pkg, boolean main)
-			throws AndrolibException {
-		Integer id = pkg.getId();
-		if (mPackagesById.containsKey(id)) {
-			throw new AndrolibException("Multiple packages: id="
-					+ id.toString());
-		}
-		String name = pkg.getName();
-		if (mPackagesByName.containsKey(name)) {
-			throw new AndrolibException("Multiple packages: name=" + name);
-		}
+    public void addPackage(ResPackage pkg, boolean main)
+            throws AndrolibException {
+        Integer id = pkg.getId();
+        if (mPackagesById.containsKey(id)) {
+            throw new AndrolibException("Multiple packages: id="
+                    + id.toString());
+        }
+        String name = pkg.getName();
+        if (mPackagesByName.containsKey(name)) {
+            throw new AndrolibException("Multiple packages: name=" + name);
+        }
 
-		mPackagesById.put(id, pkg);
-		mPackagesByName.put(name, pkg);
-		if (main) {
-			mMainPackages.add(pkg);
-		} else {
-			mFramePackages.add(pkg);
-		}
-	}
+        mPackagesById.put(id, pkg);
+        mPackagesByName.put(name, pkg);
+        if (main) {
+            mMainPackages.add(pkg);
+        } else {
+            mFramePackages.add(pkg);
+        }
+    }
 
-	public void setFrameTag(String tag) {
-		mFrameTag = tag;
-	}
+    public void setFrameTag(String tag) {
+        mFrameTag = tag;
+    }
 
     public void setAnalysisMode(boolean mode) {
         mAnalysisMode = mode;
@@ -153,30 +153,30 @@ public class ResTable {
     public void setPackageId(int id) {
         mPackageId = id;
     }
-	
-	public void clearSdkInfo() {
-	  mSdkInfo.clear();
-	}
 
-	public void addSdkInfo(String key, String value) {
-		mSdkInfo.put(key, value);
-	}
-	
-	public void addVersionInfo(String key, String value) {
-	  mVersionInfo.put(key, value);
-	}
+    public void clearSdkInfo() {
+        mSdkInfo.clear();
+    }
+
+    public void addSdkInfo(String key, String value) {
+        mSdkInfo.put(key, value);
+    }
+
+    public void addVersionInfo(String key, String value) {
+        mVersionInfo.put(key, value);
+    }
 
     public void addUnknownFileInfo(String file, String value) {
         mUnknownFiles.put(file,value);
     }
 
-	public Map<String, String> getVersionInfo() {
-	  return mVersionInfo;
-	}
-	
-	public Map<String, String> getSdkInfo() {
-	  return mSdkInfo;
-	}
+    public Map<String, String> getVersionInfo() {
+        return mVersionInfo;
+    }
+
+    public Map<String, String> getSdkInfo() {
+        return mSdkInfo;
+    }
 
     public boolean getAnalysisMode() {
         return mAnalysisMode;

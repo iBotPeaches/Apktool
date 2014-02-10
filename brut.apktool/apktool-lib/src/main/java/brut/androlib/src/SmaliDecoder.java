@@ -41,23 +41,23 @@ import java.nio.file.attribute.BasicFileAttributes;
  */
 public class SmaliDecoder {
 
-	public static void decode(File apkFile, File outDir, boolean debug, String debugLinePrefix,
-			boolean bakdeb, int api) throws AndrolibException {
-		new SmaliDecoder(apkFile, outDir, debug, debugLinePrefix, bakdeb, api).decode();
-	}
+    public static void decode(File apkFile, File outDir, boolean debug, String debugLinePrefix,
+                              boolean bakdeb, int api) throws AndrolibException {
+        new SmaliDecoder(apkFile, outDir, debug, debugLinePrefix, bakdeb, api).decode();
+    }
 
-	private SmaliDecoder(File apkFile, File outDir, boolean debug, String debugLinePrefix,
-			boolean bakdeb, int api) {
-		mApkFile = apkFile;
-		mOutDir = outDir.toPath();
-		mDebug = debug;
+    private SmaliDecoder(File apkFile, File outDir, boolean debug, String debugLinePrefix,
+                         boolean bakdeb, int api) {
+        mApkFile = apkFile;
+        mOutDir = outDir.toPath();
+        mDebug = debug;
         mDebugLinePrefix = debugLinePrefix;
-		mBakDeb = bakdeb;
+        mBakDeb = bakdeb;
         mApi    = api;
-	}
+    }
 
-	private void decode() throws AndrolibException {
-		try {
+    private void decode() throws AndrolibException {
+        try {
             ClassPath.dontLoadClassPath = mDebug;
 
             baksmaliOptions options = new baksmaliOptions();
@@ -106,16 +106,16 @@ public class SmaliDecoder {
             if (mDebug) {
                 Files.walkFileTree(mOutDir, new SmaliFileVisitor());
             }
-		} catch (IOException ex) {
-			throw new AndrolibException(ex);
-		}
-	}
+        } catch (IOException ex) {
+            throw new AndrolibException(ex);
+        }
+    }
 
-	private final File mApkFile;
-	private final Path mOutDir;
-	private final boolean mDebug;
+    private final File mApkFile;
+    private final Path mOutDir;
+    private final boolean mDebug;
     private final String mDebugLinePrefix;
-	private final boolean mBakDeb;
+    private final boolean mBakDeb;
     private final int mApi;
 
 

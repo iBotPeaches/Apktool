@@ -36,37 +36,37 @@ import org.jf.dexlib2.writer.io.FileDataStore;
  */
 public class SmaliBuilder {
 
-	public static void build(ExtFile smaliDir, File dexFile,
-			HashMap<String, Boolean> flags) throws AndrolibException {
-		new SmaliBuilder(smaliDir, dexFile, flags).build();
-	}
+    public static void build(ExtFile smaliDir, File dexFile,
+                             HashMap<String, Boolean> flags) throws AndrolibException {
+        new SmaliBuilder(smaliDir, dexFile, flags).build();
+    }
 
-	private SmaliBuilder(ExtFile smaliDir, File dexFile,
-			HashMap<String, Boolean> flags) {
-		mSmaliDir = smaliDir;
-		mDexFile = dexFile;
-		mFlags = flags;
-	}
+    private SmaliBuilder(ExtFile smaliDir, File dexFile,
+                         HashMap<String, Boolean> flags) {
+        mSmaliDir = smaliDir;
+        mDexFile = dexFile;
+        mFlags = flags;
+    }
 
-	private void build() throws AndrolibException {
-		try {
+    private void build() throws AndrolibException {
+        try {
             DexBuilder dexBuilder = DexBuilder.makeDexBuilder();
 
             for (String fileName : mSmaliDir.getDirectory().getFiles(true)) {
-				buildFile(fileName, dexBuilder);
-			}
+                buildFile(fileName, dexBuilder);
+            }
             dexBuilder.writeTo(new FileDataStore( new File(mDexFile.getAbsolutePath())));
-		} catch (IOException | DirectoryException ex) {
-			throw new AndrolibException(ex);
-		}
-	}
+        } catch (IOException | DirectoryException ex) {
+            throw new AndrolibException(ex);
+        }
+    }
 
-	private void buildFile(String fileName, DexBuilder dexBuilder) throws AndrolibException,
-			IOException {
-		File inFile = new File(mSmaliDir, fileName);
-		InputStream inStream = new FileInputStream(inFile);
+    private void buildFile(String fileName, DexBuilder dexBuilder) throws AndrolibException,
+            IOException {
+        File inFile = new File(mSmaliDir, fileName);
+        InputStream inStream = new FileInputStream(inFile);
 
-		if (fileName.endsWith(".smali")) {
+        if (fileName.endsWith(".smali")) {
             try {
                 if (!SmaliMod.assembleSmaliFile(inFile,dexBuilder, false, false)) {
                     throw new AndrolibException("Could not smali file: " + fileName);
@@ -74,41 +74,41 @@ public class SmaliBuilder {
             } catch (IOException | RecognitionException ex) {
                 throw new AndrolibException(ex);
             }
-			return;
-		}
-		if (!fileName.endsWith(".java")) {
-			LOGGER.warning("Unknown file type, ignoring: " + inFile);
-			return;
-		}
+            return;
+        }
+        if (!fileName.endsWith(".java")) {
+            LOGGER.warning("Unknown file type, ignoring: " + inFile);
+            return;
+        }
 
-		StringBuilder out = new StringBuilder();
-		List<String> lines = IOUtils.readLines(inStream);
+        StringBuilder out = new StringBuilder();
+        List<String> lines = IOUtils.readLines(inStream);
 
-		if (!mFlags.get("debug")) {
-			final String[] linesArray = lines.toArray(new String[0]);
-			for (int i = 1; i < linesArray.length - 1; i++) {
-				out.append(linesArray[i].split("//", 2)[1]).append('\n');
-			}
-		} else {
-			lines.remove(lines.size() - 1);
-			ListIterator<String> it = lines.listIterator(1);
+        if (!mFlags.get("debug")) {
+            final String[] linesArray = lines.toArray(new String[0]);
+            for (int i = 1; i < linesArray.length - 1; i++) {
+                out.append(linesArray[i].split("//", 2)[1]).append('\n');
+            }
+        } else {
+            lines.remove(lines.size() - 1);
+            ListIterator<String> it = lines.listIterator(1);
 
-			out.append(".source \"").append(inFile.getName()).append("\"\n");
-			while (it.hasNext()) {
-				String line = it.next().split("//", 2)[1].trim();
-				if (line.isEmpty() || line.charAt(0) == '#'
-						|| line.startsWith(".source")) {
-					continue;
-				}
-				if (line.startsWith(".method ")) {
-					it.previous();
-					DebugInjector.inject(it, out);
-					continue;
-				}
+            out.append(".source \"").append(inFile.getName()).append("\"\n");
+            while (it.hasNext()) {
+                String line = it.next().split("//", 2)[1].trim();
+                if (line.isEmpty() || line.charAt(0) == '#'
+                        || line.startsWith(".source")) {
+                    continue;
+                }
+                if (line.startsWith(".method ")) {
+                    it.previous();
+                    DebugInjector.inject(it, out);
+                    continue;
+                }
 
-				out.append(line).append('\n');
-			}
-		}
+                out.append(line).append('\n');
+            }
+        }
 
         try {
             if (!SmaliMod.assembleSmaliFile(out.toString(),dexBuilder, false, false, inFile)) {
@@ -117,12 +117,12 @@ public class SmaliBuilder {
         } catch (IOException | RecognitionException ex) {
             throw new AndrolibException(ex);
         }
-	}
+    }
 
-	private final ExtFile mSmaliDir;
-	private final File mDexFile;
-	private final HashMap<String, Boolean> mFlags;
+    private final ExtFile mSmaliDir;
+    private final File mDexFile;
+    private final HashMap<String, Boolean> mFlags;
 
-	private final static Logger LOGGER = Logger.getLogger(SmaliBuilder.class
-			.getName());
+    private final static Logger LOGGER = Logger.getLogger(SmaliBuilder.class
+            .getName());
 }
