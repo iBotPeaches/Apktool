@@ -121,6 +121,11 @@ public final class ResXmlEncoders {
 					break;
 				default:
 					if (!isPrintableChar(c)) {
+
+                        // lets not write trailing \u0000 if we are at end of string
+                        if ((out.length() + 1) == str.length() && c == '\u0000') {
+                            continue;
+                        }
 						out.append(String.format("\\u%04x", (int) c));
 						continue;
 					}
@@ -132,7 +137,6 @@ public final class ResXmlEncoders {
 		if (enclose || wasSpace) {
 			out.insert(startPos, '"').append('"');
 		}
-
 		return out.toString();
 	}
 
