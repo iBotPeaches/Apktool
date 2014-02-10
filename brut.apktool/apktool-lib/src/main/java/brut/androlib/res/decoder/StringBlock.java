@@ -21,6 +21,7 @@ import brut.util.ExtDataInput;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.*;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -52,9 +53,8 @@ public class StringBlock {
 		block.m_isUTF8 = (flags & UTF8_FLAG) != 0;
 		block.m_stringOffsets = reader.readIntArray(stringCount);
 		block.m_stringOwns = new int[stringCount];
-		for (int i = 0; i < stringCount; i++) {
-			block.m_stringOwns[i] = -1;
-		}
+        Arrays.fill(block.m_stringOwns, -1);
+
 		if (styleOffsetCount != 0) {
 			block.m_styleOffsets = reader.readIntArray(styleOffsetCount);
 		}
@@ -91,33 +91,20 @@ public class StringBlock {
 	 * Returns raw string (without any styling information) at specified index.
 	 */
 	public String getString(int index) {
-		if (index < 0 || m_stringOffsets == null
-				|| index >= m_stringOffsets.length) {
+		if (index < 0 || m_stringOffsets == null || index >= m_stringOffsets.length) {
 			return null;
 		}
 		int offset = m_stringOffsets[index];
 		int length;
 
-		if (!m_isUTF8) {
-			length = getShort(m_strings, offset) * 2;
-			offset += 2;
+		if (m_isUTF8) {
+            int[] val = getUtf8(m_strings, offset);
+            offset = val[0];
+            length = val[1];
 		} else {
-			int val = m_strings[offset];
-			if ((val & 0x80) != 0) {
-				offset += 2;
-			} else {
-				offset += 1;
-			}
-			val = m_strings[offset];
-			if ((val & 0x80) != 0) {
-				offset += 2;
-			} else {
-				offset += 1;
-			}
-			length = 0;
-			while (m_strings[offset + length] != 0) {
-				length++;
-			}
+            int[] val = getUtf16(m_strings, offset);
+            offset += val[0];
+            length = val[1];
 		}
 		return decodeString(offset, length);
 	}
@@ -309,17 +296,38 @@ public class StringBlock {
 		}
 	}
 
-	private static final int[] getVarint(byte[] array, int offset) {
-		int val = array[offset];
-		boolean more = (val & 0x80) != 0;
-		val &= 0x7f;
+	private static final int[] getUtf8(byte[] array, int offset) {
+        int val = array[offset];
+        int length;
 
-		if (!more) {
-			return new int[] { val, 1 };
-		} else {
-			return new int[] { val << 8 | array[offset + 1] & 0xff, 2 };
-		}
+        if ((val & 0x80) != 0) {
+            offset += 2;
+        } else {
+            offset += 1;
+        }
+        val = array[offset];
+        if ((val & 0x80) != 0) {
+            offset += 2;
+        } else {
+            offset += 1;
+        }
+        length = 0;
+        while (array[offset + length] != 0) {
+            length++;
+        }
+	    return new int[] { offset, length};
 	}
+
+    private static final int[] getUtf16(byte[] array, int offset) {
+        int val = ((array[offset + 1] & 0xFF) << 8 | array[offset] & 0xFF);
+
+        if (val == 0x8000) {
+            int high = (array[offset + 3] & 0xFF) << 8;
+            int low = (array[offset + 2] & 0xFF);
+            return new int[] {4, (high + low) * 2};
+        }
+        return new int[] {2, val * 2};
+    }
 
 	private int[] m_stringOffsets;
 	private byte[] m_strings;
@@ -333,6 +341,8 @@ public class StringBlock {
 			.newDecoder();
 	private static final Logger LOGGER = Logger.getLogger(StringBlock.class
 			.getName());
+
+    // ResChunk_header = header.type (0x0001) + header.headerSize (0x001C)
 	private static final int CHUNK_TYPE = 0x001C0001;
 	private static final int UTF8_FLAG = 0x00000100;
 }
