@@ -11,8 +11,12 @@ A couple of quick tips to ease the submission process.
 
  * [Building](http://code.google.com/p/android-apktool/wiki/BuildApktool) via Gradle will automatically run unit-tests. The build will end if any test fails.
 
- * A tab counts as 4 spaces and we use 4 spaces.
-
- * [IntelliJ IDEA](http://www.jetbrains.com/idea/) is our IDE of choice. It has built in debugger support along with Gradle integration
+ * [IntelliJ IDEA](http://www.jetbrains.com/idea/) is our IDE of choice. It has built in debugger support along with Gradle integration.
 
  * For changes to smali/baksmali please see their [page](http://code.google.com/p/smali/) for more information.
+
+
+## Code Styles
+ * A rough guideline based on [AOSP Guidelines](https://source.android.com/source/code-style.html).
+ * A tab counts as 4 spaces and we use 4 spaces.
+ * Our right margin is 120 characters long.

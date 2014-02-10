@@ -62,8 +62,7 @@ public class StringBlock {
             int size = ((stylesOffset == 0) ? chunkSize : stylesOffset)
                     - stringsOffset;
             if ((size % 4) != 0) {
-                throw new IOException("String data size is not multiple of 4 ("
-                        + size + ").");
+                throw new IOException("String data size is not multiple of 4 (" + size + ").");
             }
             block.m_strings = new byte[size];
             reader.readFully(block.m_strings);
@@ -71,8 +70,7 @@ public class StringBlock {
         if (stylesOffset != 0) {
             int size = (chunkSize - stylesOffset);
             if ((size % 4) != 0) {
-                throw new IOException("Style data size is not multiple of 4 ("
-                        + size + ").");
+                throw new IOException("Style data size is not multiple of 4 (" + size + ").");
             }
             block.m_styles = reader.readIntArray(size / 4);
         }
@@ -151,16 +149,14 @@ public class StringBlock {
                     break;
                 }
                 if (offset <= end) {
-                    html.append(ResXmlEncoders.escapeXmlChars(raw.substring(
-                            offset, end + 1)));
+                    html.append(ResXmlEncoders.escapeXmlChars(raw.substring(offset, end + 1)));
                     offset = end + 1;
                 }
                 outputStyleTag(getString(style[last]), html, true);
             }
             depth = j + 1;
             if (offset < start) {
-                html.append(ResXmlEncoders.escapeXmlChars(raw.substring(offset,
-                        start)));
+                html.append(ResXmlEncoders.escapeXmlChars(raw.substring(offset, start)));
                 offset = start;
             }
             if (i == -1) {
@@ -188,8 +184,7 @@ public class StringBlock {
                 boolean loop = true;
                 while (loop) {
                     int pos2 = tag.indexOf('=', pos + 1);
-                    builder.append(' ').append(tag.substring(pos + 1, pos2))
-                            .append("=\"");
+                    builder.append(' ').append(tag.substring(pos + 1, pos2)).append("=\"");
                     pos = tag.indexOf(';', pos2 + 1);
 
                     String val;
@@ -200,8 +195,7 @@ public class StringBlock {
                         val = tag.substring(pos2 + 1);
                     }
 
-                    builder.append(ResXmlEncoders.escapeXmlChars(val)).append(
-                            '"');
+                    builder.append(ResXmlEncoders.escapeXmlChars(val)).append('"');
                 }
             }
         }
@@ -245,8 +239,7 @@ public class StringBlock {
      * start index in string * third int is tag end index in string
      */
     private int[] getStyle(int index) {
-        if (m_styleOffsets == null || m_styles == null
-                || index >= m_styleOffsets.length) {
+        if (m_styleOffsets == null || m_styles == null|| index >= m_styleOffsets.length) {
             return null;
         }
         int offset = m_styleOffsets[index] / 4;
@@ -335,12 +328,10 @@ public class StringBlock {
     private int[] m_styles;
     private boolean m_isUTF8;
     private int[] m_stringOwns;
-    private final CharsetDecoder UTF16LE_DECODER = Charset.forName(
-            "UTF-16LE").newDecoder();
-    private final CharsetDecoder UTF8_DECODER = Charset.forName("UTF-8")
-            .newDecoder();
-    private static final Logger LOGGER = Logger.getLogger(StringBlock.class
-            .getName());
+
+    private final CharsetDecoder UTF16LE_DECODER = Charset.forName("UTF-16LE").newDecoder();
+    private final CharsetDecoder UTF8_DECODER = Charset.forName("UTF-8").newDecoder();
+    private static final Logger LOGGER = Logger.getLogger(StringBlock.class.getName());
 
     // ResChunk_header = header.type (0x0001) + header.headerSize (0x001C)
     private static final int CHUNK_TYPE = 0x001C0001;
