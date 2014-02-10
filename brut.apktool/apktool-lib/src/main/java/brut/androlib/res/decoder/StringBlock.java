@@ -184,18 +184,27 @@ public class StringBlock {
                 boolean loop = true;
                 while (loop) {
                     int pos2 = tag.indexOf('=', pos + 1);
-                    builder.append(' ').append(tag.substring(pos + 1, pos2)).append("=\"");
-                    pos = tag.indexOf(';', pos2 + 1);
 
-                    String val;
-                    if (pos != -1) {
-                        val = tag.substring(pos2 + 1, pos);
+                    // malformed style information will cause crash. so
+                    // prematurely end style tags, if recreation
+                    // cannot be created.
+                    if (pos2 != -1) {
+                        builder.append(' ').append(tag.substring(pos + 1, pos2)).append("=\"");
+                        pos = tag.indexOf(';', pos2 + 1);
+
+                        String val;
+                        if (pos != -1) {
+                            val = tag.substring(pos2 + 1, pos);
+                        } else {
+                            loop = false;
+                            val = tag.substring(pos2 + 1);
+                        }
+
+                        builder.append(ResXmlEncoders.escapeXmlChars(val)).append('"');
                     } else {
                         loop = false;
-                        val = tag.substring(pos2 + 1);
                     }
 
-                    builder.append(ResXmlEncoders.escapeXmlChars(val)).append('"');
                 }
             }
         }
