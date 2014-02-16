@@ -4,6 +4,8 @@ isFrameworkApk: false
 usesFramework:
   ids:
   - 1
+packageInfo:
+  forced-package-id: '127'
 versionInfo:
   versionCode: '1'
   versionName: '1.0'
@@ -11,3 +13,4 @@ compressionType: false
 unknownFiles:
   hidden.file: '8'
   unk_folder/unknown_file: '8'
+  lib_bug603/bug603: '8'

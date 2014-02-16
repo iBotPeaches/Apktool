@@ -20,7 +20,7 @@ import brut.common.BrutException;
 import brut.directory.FileDirectory;
 import brut.util.OS;
 import java.io.*;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -212,6 +212,22 @@ public class BuildAndDecodeTest {
     @Test
     public void libsTest() throws BrutException, IOException {
         compareLibsFolder("libs");
+    }
+
+    @Test
+    public void unknownFolderTest() throws BrutException, IOException {
+        compareUnknownFiles();
+    }
+
+    private void compareUnknownFiles() throws BrutException, IOException {
+        Map<String, Object> control = new Androlib().readMetaFile(sTestOrigDir);
+        Map<String, Object> test = new Androlib().readMetaFile(sTestNewDir);
+        assertTrue(control.containsKey("unknownFiles"));
+        assertTrue(test.containsKey("unknownFiles"));
+
+        Map<String, String> control_files = (Map<String, String>)control.get("unknownFiles");
+        Map<String, String> test_files = (Map<String, String>)test.get("unknownFiles");
+        assertTrue(control_files.size() == test_files.size());
     }
 
     private boolean compareBinaryFolder(String path, boolean res) throws BrutException, IOException {
