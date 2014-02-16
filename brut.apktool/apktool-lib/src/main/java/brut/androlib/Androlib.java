@@ -137,7 +137,7 @@ public class Androlib {
 
     private boolean isAPKFileNames(String file) {
         for (String apkFile : APK_STANDARD_ALL_FILENAMES) {
-            if (apkFile.equals(file) || file.startsWith(apkFile)) {
+            if (apkFile.equals(file) || file.startsWith(apkFile + "/")) {
                 return true;
             }
         }
@@ -146,7 +146,7 @@ public class Androlib {
 
     public void decodeUnknownFiles(ExtFile apkFile, File outDir, ResTable resTable)
             throws AndrolibException {
-        LOGGER.info("Copying unknown files/dir...");
+        LOGGER.info("Copying unknown files...");
         File unknownOut = new File(outDir, UNK_DIRNAME);
         ZipEntry invZipFile;
 
