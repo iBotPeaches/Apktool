@@ -232,10 +232,10 @@ public class InstructionMethodItem<T extends Instruction> extends MethodItem {
                 writer.write(", ");
                 writeLiteral(writer);
                 if (instruction.getOpcode().setsWideRegister()) {
-                    writeDouble(writer);
+                    writeCommentIfLikelyDouble(writer);
                 } else {
-                    writeResourceId(writer);
-                    writeFloat(writer);
+                    boolean isResourceId = writeCommentIfResourceId(writer);
+                    if (!isResourceId) writeCommentIfLikelyFloat(writer);
                 }
                 return true;
             case Format21t:
@@ -441,11 +441,11 @@ public class InstructionMethodItem<T extends Instruction> extends MethodItem {
         LongRenderer.writeSignedIntOrLongTo(writer, ((WideLiteralInstruction)instruction).getWideLiteral());
     }
 
-    protected void writeFloat(IndentingWriter writer) throws IOException {
-        writeFloat(writer, ((NarrowLiteralInstruction)instruction).getNarrowLiteral());
+    protected void writeCommentIfLikelyFloat(IndentingWriter writer) throws IOException {
+        writeCommentIfLikelyFloat(writer, ((NarrowLiteralInstruction)instruction).getNarrowLiteral());
     }
 
-    protected void writeFloat(IndentingWriter writer, int val) throws IOException {
+    protected void writeCommentIfLikelyFloat(IndentingWriter writer, int val) throws IOException {
         if (NumberUtils.isLikelyFloat(val)) {
             writer.write("    # ");
             float fval = Float.intBitsToFloat(val);
@@ -468,11 +468,11 @@ public class InstructionMethodItem<T extends Instruction> extends MethodItem {
         }
     }
 
-    protected void writeDouble(IndentingWriter writer) throws IOException {
-        writeDouble(writer, ((WideLiteralInstruction)instruction).getWideLiteral());
+    protected void writeCommentIfLikelyDouble(IndentingWriter writer) throws IOException {
+        writeCommentIfLikelyDouble(writer, ((WideLiteralInstruction)instruction).getWideLiteral());
     }
 
-    protected void writeDouble(IndentingWriter writer, long val) throws IOException {
+    protected void writeCommentIfLikelyDouble(IndentingWriter writer, long val) throws IOException {
         if (NumberUtils.isLikelyDouble(val)) {
             writer.write("    # ");
             double dval = Double.longBitsToDouble(val);
@@ -493,17 +493,18 @@ public class InstructionMethodItem<T extends Instruction> extends MethodItem {
         }
     }
 
-    protected void writeResourceId(IndentingWriter writer) throws IOException {
-        writeResourceId(writer, ((NarrowLiteralInstruction)instruction).getNarrowLiteral());
+    protected boolean writeCommentIfResourceId(IndentingWriter writer) throws IOException {
+        return writeCommentIfResourceId(writer, ((NarrowLiteralInstruction)instruction).getNarrowLiteral());
     }
 
-    protected void writeResourceId(IndentingWriter writer, int val) throws IOException {
+    protected boolean writeCommentIfResourceId(IndentingWriter writer, int val) throws IOException {
         Map<Integer,String> resourceIds = methodDef.classDef.options.resourceIds;
         String resource = resourceIds.get(Integer.valueOf(val));
         if (resource != null) {
             writer.write("    # ");
             writer.write(resource);
         }
+        return (resource != null);
     }
 
     protected void writeFieldOffset(IndentingWriter writer) throws IOException {

@@ -85,7 +85,7 @@ public class PackedSwitchMethodItem extends InstructionMethodItem<PackedSwitchPa
         int key = firstKey;
         for (PackedSwitchTarget target: targets) {
             target.writeTargetTo(writer);
-            writeResourceId(writer, key);
+            writeCommentIfResourceId(writer, key);
             writer.write('\n');
             key++;
         }

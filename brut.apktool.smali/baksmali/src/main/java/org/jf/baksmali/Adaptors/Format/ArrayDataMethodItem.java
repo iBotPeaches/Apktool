@@ -66,10 +66,11 @@ public class ArrayDataMethodItem extends InstructionMethodItem<ArrayPayload> {
             LongRenderer.writeSignedIntOrLongTo(writer, number.longValue());
             writer.write(suffix);
             if (elementWidth == 8) {
-                writeDouble(writer, number.longValue());
+                writeCommentIfLikelyDouble(writer, number.longValue());
             } else if (elementWidth == 4) {
-                writeResourceId(writer, number.intValue());
-                writeFloat(writer, number.intValue());
+                int value = number.intValue();
+                boolean isResourceId = writeCommentIfResourceId(writer, value);
+                if (!isResourceId) writeCommentIfLikelyFloat(writer, value);
             }
             writer.write("\n");
         }
