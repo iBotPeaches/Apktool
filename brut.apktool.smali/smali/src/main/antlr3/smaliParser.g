@@ -129,8 +129,10 @@ tokens {
   OPEN_BRACE;
   OPEN_PAREN;
   PACKED_SWITCH_DIRECTIVE;
-  PARAM_LIST;
-  PARAM_LIST_OR_ID;
+  PARAM_LIST_END;
+  PARAM_LIST_START;
+  PARAM_LIST_OR_ID_END;
+  PARAM_LIST_OR_ID_START;
   PARAMETER_DIRECTIVE;
   POSITIVE_INTEGER_LITERAL;
   PRIMITIVE_TYPE;
@@ -530,6 +532,9 @@ registers_directive
       $statements_and_directives::hasRegistersDirective=true;
     };
 
+param_list_or_id
+  : PARAM_LIST_OR_ID_START PRIMITIVE_TYPE+ PARAM_LIST_OR_ID_END;
+
 /*identifiers are much more general than most languages. Any of the below can either be
 the indicated type OR an identifier, depending on the context*/
 simple_name
@@ -543,7 +548,7 @@ simple_name
   | BOOL_LITERAL -> SIMPLE_NAME[$BOOL_LITERAL]
   | NULL_LITERAL -> SIMPLE_NAME[$NULL_LITERAL]
   | REGISTER -> SIMPLE_NAME[$REGISTER]
-  | PARAM_LIST_OR_ID -> SIMPLE_NAME[$PARAM_LIST_OR_ID]
+  | param_list_or_id -> { adaptor.create(SIMPLE_NAME, $param_list_or_id.text) }
   | PRIMITIVE_TYPE -> SIMPLE_NAME[$PRIMITIVE_TYPE]
   | VOID_TYPE -> SIMPLE_NAME[$VOID_TYPE]
   | ANNOTATION_VISIBILITY -> SIMPLE_NAME[$ANNOTATION_VISIBILITY]
@@ -582,8 +587,8 @@ method_prototype
     -> ^(I_METHOD_PROTOTYPE[$start, "I_METHOD_PROTOTYPE"] ^(I_METHOD_RETURN_TYPE type_descriptor) param_list?);
 
 param_list
-  : PARAM_LIST -> { parseParamList((CommonToken)$PARAM_LIST) }
-  | PARAM_LIST_OR_ID -> { parseParamList((CommonToken)$PARAM_LIST_OR_ID) }
+  : PARAM_LIST_START nonvoid_type_descriptor* PARAM_LIST_END -> nonvoid_type_descriptor*
+  | PARAM_LIST_OR_ID_START PRIMITIVE_TYPE* PARAM_LIST_OR_ID_END -> PRIMITIVE_TYPE*
   | nonvoid_type_descriptor*;
 
 type_descriptor

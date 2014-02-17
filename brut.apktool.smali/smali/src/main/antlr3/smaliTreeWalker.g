@@ -465,10 +465,10 @@ method returns[BuilderMethod ret]
   };
 
 method_prototype returns[List<String> parameters, String returnType]
-  : ^(I_METHOD_PROTOTYPE ^(I_METHOD_RETURN_TYPE type_descriptor) field_type_list)
+  : ^(I_METHOD_PROTOTYPE ^(I_METHOD_RETURN_TYPE type_descriptor) method_type_list)
   {
     $returnType = $type_descriptor.type;
-    $parameters = $field_type_list.types;
+    $parameters = $method_type_list.types;
   };
 
 method_name_and_prototype returns[String name, List<SmaliMethodParameter> parameters, String returnType]
@@ -488,7 +488,7 @@ method_name_and_prototype returns[String name, List<SmaliMethodParameter> parame
     $returnType = $method_prototype.returnType;
   };
 
-field_type_list returns[List<String> types]
+method_type_list returns[List<String> types]
   @init
   {
     $types = Lists.newArrayList();
