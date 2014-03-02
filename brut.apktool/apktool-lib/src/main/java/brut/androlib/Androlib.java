@@ -20,6 +20,8 @@ import brut.androlib.java.AndrolibJava;
 import brut.androlib.res.AndrolibResources;
 import brut.androlib.res.data.ResPackage;
 import brut.androlib.res.data.ResTable;
+import brut.androlib.res.data.ResUnknownFiles;
+import brut.androlib.res.decoder.ResFileDecoder;
 import brut.androlib.res.util.ExtFile;
 import brut.androlib.src.SmaliBuilder;
 import brut.androlib.src.SmaliDecoder;
@@ -44,6 +46,7 @@ import org.yaml.snakeyaml.Yaml;
  */
 public class Androlib {
     private final AndrolibResources mAndRes = new AndrolibResources();
+    protected final ResUnknownFiles mResUnknownFiles = new ResUnknownFiles();
 
     public ResTable getResTable(ExtFile apkFile) throws AndrolibException {
         return mAndRes.getResTable(apkFile, true);
@@ -172,7 +175,7 @@ public class Androlib {
                         // lets record the name of the file, and its compression type
                         // so that we may re-include it the same way
                         if (invZipFile != null) {
-                            resTable.addUnknownFileInfo(invZipFile.getName(), String.valueOf(invZipFile.getMethod()));
+                            mResUnknownFiles.addUnknownFileInfo(invZipFile.getName(), String.valueOf(invZipFile.getMethod()));
                         }
                     } catch (NullPointerException ignored) {
 

@@ -21,6 +21,7 @@ import brut.androlib.err.OutDirExistsException;
 import brut.androlib.res.AndrolibResources;
 import brut.androlib.res.data.ResPackage;
 import brut.androlib.res.data.ResTable;
+import brut.androlib.res.data.ResUnknownFiles;
 import brut.androlib.res.util.ExtFile;
 import brut.common.BrutException;
 import brut.directory.DirectoryException;
@@ -340,7 +341,7 @@ public class ApkDecoder {
 
     private void putUnknownInfo(Map<String, Object> meta)
             throws AndrolibException {
-        Map<String,String> info = getResTable().getUnknownFiles();
+        Map<String,String> info = mAndrolib.mResUnknownFiles.getUnknownFiles();
         if (info.size() > 0) {
             meta.put("unknownFiles", info);
         }
