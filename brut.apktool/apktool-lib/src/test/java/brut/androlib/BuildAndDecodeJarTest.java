@@ -64,5 +64,5 @@ public class BuildAndDecodeJarTest {
     private static ExtFile sTestOrigDir;
     private static ExtFile sTestNewDir;
 
-    private final static Logger LOGGER = Logger.getLogger(BuildAndDecodeTest.class.getName());
+    private final static Logger LOGGER = Logger.getLogger(BuildAndDecodeJarTest.class.getName());
 }
