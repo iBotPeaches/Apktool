@@ -184,8 +184,8 @@ final public class AndrolibResources {
         resTable.setPackageId(resPackage.getId());
         resTable.setPackageOriginal(mPackageOriginal);
 
-        if (mPackageOriginal.equalsIgnoreCase(mPackageRenamed) || "android".equalsIgnoreCase(mPackageRenamed)
-                || "com.htc".equalsIgnoreCase(mPackageRenamed)) {
+        if (mPackageOriginal.equalsIgnoreCase(mPackageRenamed) ||
+                Arrays.asList(IGNORED_PACKAGES).contains(mPackageOriginal)) {
             LOGGER.info("Regular manifest package...");
         } else {
             try {
@@ -851,4 +851,6 @@ final public class AndrolibResources {
 
     private File mAaptBinary = null;
 
+    private final static String[] IGNORED_PACKAGES = new String[] {
+            "android", "com.htc", "miui" };
 }
