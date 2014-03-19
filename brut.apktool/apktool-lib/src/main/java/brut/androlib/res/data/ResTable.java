@@ -90,6 +90,16 @@ public class ResTable {
         return (id == 0) ? getPackage(1) : getPackage(id);
     }
 
+    public ResPackage getCurrentResPackage() throws AndrolibException {
+        ResPackage pkg = mPackagesById.get(mPackageId);
+
+        if (pkg != null) {
+            return pkg;
+        } else {
+            return getHighestSpecPackage();
+        }
+    }
+
     public ResPackage getPackage(String name) throws AndrolibException {
         ResPackage pkg = mPackagesByName.get(name);
         if (pkg == null) {

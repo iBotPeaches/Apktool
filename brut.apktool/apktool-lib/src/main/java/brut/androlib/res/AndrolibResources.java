@@ -177,20 +177,23 @@ final public class AndrolibResources {
             throws AndrolibException {
 
         // compare resources.arsc package name to the one present in AndroidManifest
-        ResPackage resPackage = resTable.getHighestSpecPackage();
+        ResPackage resPackage = resTable.getCurrentResPackage();
         mPackageOriginal = resPackage.getName();
         mPackageRenamed = resTable.getPackageRenamed();
 
         resTable.setPackageId(resPackage.getId());
         resTable.setPackageOriginal(mPackageOriginal);
 
+        // 1) Check if mPackageOriginal === mPackageRenamed
+        // 2) Check if mPackageOriginal is ignored via IGNORED_PACKAGES
+        // 2a) If its ignored, make sure the mPackageRenamed isn't explicitly allowed
         if (mPackageOriginal.equalsIgnoreCase(mPackageRenamed) ||
-                Arrays.asList(IGNORED_PACKAGES).contains(mPackageOriginal)) {
+                (Arrays.asList(IGNORED_PACKAGES).contains(mPackageOriginal) &&
+                ! Arrays.asList(ALLOWED_PACKAGES).contains(mPackageRenamed))) {
             LOGGER.info("Regular manifest package...");
         } else {
             try {
-
-                LOGGER.info("Renamed manifest package found! Fixing...");
+                LOGGER.info("Renamed manifest package found! Replacing " + mPackageRenamed + " with " + mPackageOriginal);
                 Document doc = loadDocument(filePath);
 
                 // Get the manifest line
@@ -853,4 +856,7 @@ final public class AndrolibResources {
 
     private final static String[] IGNORED_PACKAGES = new String[] {
             "android", "com.htc", "miui" };
+
+    private final static String[] ALLOWED_PACKAGES = new String[] {
+            "com.miui" };
 }
