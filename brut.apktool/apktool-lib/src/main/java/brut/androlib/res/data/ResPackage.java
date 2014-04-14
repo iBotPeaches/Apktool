@@ -23,197 +23,207 @@ import brut.androlib.res.data.value.ResValueFactory;
 import brut.androlib.res.xml.ResValuesXmlSerializable;
 import brut.util.Duo;
 import java.util.*;
+import java.util.logging.Logger;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
 public class ResPackage {
-	private final ResTable mResTable;
-	private final int mId;
-	private final String mName;
-	private final Map<ResID, ResResSpec> mResSpecs = new LinkedHashMap<ResID, ResResSpec>();
-	private final Map<ResConfigFlags, ResConfig> mConfigs = new LinkedHashMap<ResConfigFlags, ResConfig>();
-	private final Map<String, ResType> mTypes = new LinkedHashMap<String, ResType>();
-	private final Set<ResID> mSynthesizedRes = new HashSet<ResID>();
+    private final ResTable mResTable;
+    private final int mId;
+    private final String mName;
+    private final Map<ResID, ResResSpec> mResSpecs = new LinkedHashMap<ResID, ResResSpec>();
+    private final Map<ResConfigFlags, ResConfig> mConfigs = new LinkedHashMap<ResConfigFlags, ResConfig>();
+    private final Map<String, ResType> mTypes = new LinkedHashMap<String, ResType>();
+    private final Set<ResID> mSynthesizedRes = new HashSet<ResID>();
 
-	private ResValueFactory mValueFactory;
+    private ResValueFactory mValueFactory;
 
-	public ResPackage(ResTable resTable, int id, String name) {
-		this.mResTable = resTable;
-		this.mId = id;
-		this.mName = name;
-	}
+    public ResPackage(ResTable resTable, int id, String name) {
+        this.mResTable = resTable;
+        this.mId = id;
+        this.mName = name;
+    }
 
-	public List<ResResSpec> listResSpecs() {
-		return new ArrayList<ResResSpec>(mResSpecs.values());
-	}
+    public List<ResResSpec> listResSpecs() {
+        return new ArrayList<ResResSpec>(mResSpecs.values());
+    }
 
-	public boolean hasResSpec(ResID resID) {
-		return mResSpecs.containsKey(resID);
-	}
+    public boolean hasResSpec(ResID resID) {
+        return mResSpecs.containsKey(resID);
+    }
 
-	public ResResSpec getResSpec(ResID resID) throws UndefinedResObject {
-		ResResSpec spec = mResSpecs.get(resID);
-		if (spec == null) {
-			throw new UndefinedResObject("resource spec: " + resID.toString());
-		}
-		return spec;
-	}
+    public ResResSpec getResSpec(ResID resID) throws UndefinedResObject {
+        ResResSpec spec = mResSpecs.get(resID);
+        if (spec == null) {
+            throw new UndefinedResObject("resource spec: " + resID.toString());
+        }
+        return spec;
+    }
 
-	public List<ResConfig> getConfigs() {
-		return new ArrayList<ResConfig>(mConfigs.values());
-	}
+    public List<ResConfig> getConfigs() {
+        return new ArrayList<ResConfig>(mConfigs.values());
+    }
 
-	public boolean hasConfig(ResConfigFlags flags) {
-		return mConfigs.containsKey(flags);
-	}
+    public boolean hasConfig(ResConfigFlags flags) {
+        return mConfigs.containsKey(flags);
+    }
 
-	public ResConfig getConfig(ResConfigFlags flags) throws AndrolibException {
-		ResConfig config = mConfigs.get(flags);
-		if (config == null) {
-			throw new UndefinedResObject("config: " + flags);
-		}
-		return config;
-	}
+    public ResConfig getConfig(ResConfigFlags flags) throws AndrolibException {
+        ResConfig config = mConfigs.get(flags);
+        if (config == null) {
+            throw new UndefinedResObject("config: " + flags);
+        }
+        return config;
+    }
 
-	public ResConfig getOrCreateConfig(ResConfigFlags flags)
-			throws AndrolibException {
-		ResConfig config = mConfigs.get(flags);
-		if (config == null) {
-			config = new ResConfig(flags);
-			mConfigs.put(flags, config);
-		}
-		return config;
-	}
+    public int getResSpecCount() {
+        return mResSpecs.size();
+    }
 
-	public List<ResType> listTypes() {
-		return new ArrayList<ResType>(mTypes.values());
-	}
+    public ResConfig getOrCreateConfig(ResConfigFlags flags)
+            throws AndrolibException {
+        ResConfig config = mConfigs.get(flags);
+        if (config == null) {
+            config = new ResConfig(flags);
+            mConfigs.put(flags, config);
+        }
+        return config;
+    }
 
-	public boolean hasType(String typeName) {
-		return mTypes.containsKey(typeName);
-	}
+    public List<ResType> listTypes() {
+        return new ArrayList<ResType>(mTypes.values());
+    }
 
-	public ResType getType(String typeName) throws AndrolibException {
-		ResType type = mTypes.get(typeName);
-		if (type == null) {
-			throw new UndefinedResObject("type: " + typeName);
-		}
-		return type;
-	}
+    public boolean hasType(String typeName) {
+        return mTypes.containsKey(typeName);
+    }
 
-	public Set<ResResource> listFiles() {
-		Set<ResResource> ret = new HashSet<ResResource>();
-		for (ResResSpec spec : mResSpecs.values()) {
-			for (ResResource res : spec.listResources()) {
-				if (res.getValue() instanceof ResFileValue) {
-					ret.add(res);
-				}
-			}
-		}
-		return ret;
-	}
+    public ResType getType(String typeName) throws AndrolibException {
+        ResType type = mTypes.get(typeName);
+        if (type == null) {
+            throw new UndefinedResObject("type: " + typeName);
+        }
+        return type;
+    }
 
-	public Collection<ResValuesFile> listValuesFiles() {
-		Map<Duo<ResType, ResConfig>, ResValuesFile> ret = new HashMap<Duo<ResType, ResConfig>, ResValuesFile>();
-		for (ResResSpec spec : mResSpecs.values()) {
-			for (ResResource res : spec.listResources()) {
-				if (res.getValue() instanceof ResValuesXmlSerializable) {
-					ResType type = res.getResSpec().getType();
-					ResConfig config = res.getConfig();
-					Duo<ResType, ResConfig> key = new Duo<ResType, ResConfig>(
-							type, config);
-					ResValuesFile values = ret.get(key);
-					if (values == null) {
-						values = new ResValuesFile(this, type, config);
-						ret.put(key, values);
-					}
-					values.addResource(res);
-				}
-			}
-		}
-		return ret.values();
-	}
+    public Set<ResResource> listFiles() {
+        Set<ResResource> ret = new HashSet<ResResource>();
+        for (ResResSpec spec : mResSpecs.values()) {
+            for (ResResource res : spec.listResources()) {
+                if (res.getValue() instanceof ResFileValue) {
+                    ret.add(res);
+                }
+            }
+        }
+        return ret;
+    }
 
-	public ResTable getResTable() {
-		return mResTable;
-	}
+    public Collection<ResValuesFile> listValuesFiles() {
+        Map<Duo<ResType, ResConfig>, ResValuesFile> ret = new HashMap<Duo<ResType, ResConfig>, ResValuesFile>();
+        for (ResResSpec spec : mResSpecs.values()) {
+            for (ResResource res : spec.listResources()) {
+                if (res.getValue() instanceof ResValuesXmlSerializable) {
+                    ResType type = res.getResSpec().getType();
+                    ResConfig config = res.getConfig();
+                    Duo<ResType, ResConfig> key = new Duo<ResType, ResConfig>(
+                            type, config);
+                    ResValuesFile values = ret.get(key);
+                    if (values == null) {
+                        values = new ResValuesFile(this, type, config);
+                        ret.put(key, values);
+                    }
+                    values.addResource(res);
+                }
+            }
+        }
+        return ret.values();
+    }
 
-	public int getId() {
-		return mId;
-	}
+    public ResTable getResTable() {
+        return mResTable;
+    }
 
-	public String getName() {
-		return mName;
-	}
+    public int getId() {
+        return mId;
+    }
 
-	boolean isSynthesized(ResID resId) {
-		return mSynthesizedRes.contains(resId);
-	}
+    public String getName() {
+        return mName;
+    }
 
-	public void addResSpec(ResResSpec spec) throws AndrolibException {
-		if (mResSpecs.put(spec.getId(), spec) != null) {
-			throw new AndrolibException("Multiple resource specs: " + spec);
-		}
-	}
+    boolean isSynthesized(ResID resId) {
+        return mSynthesizedRes.contains(resId);
+    }
 
-	public void addConfig(ResConfig config) throws AndrolibException {
-		if (mConfigs.put(config.getFlags(), config) != null) {
-			throw new AndrolibException("Multiple configs: " + config);
-		}
-	}
+    public void addResSpec(ResResSpec spec) throws AndrolibException {
+        if (mResSpecs.put(spec.getId(), spec) != null) {
+            throw new AndrolibException("Multiple resource specs: " + spec);
+        }
+    }
 
-	public void addType(ResType type) throws AndrolibException {
-		if (mTypes.put(type.getName(), type) != null) {
-			throw new AndrolibException("Multiple types: " + type);
-		}
-	}
+    public void addConfig(ResConfig config) throws AndrolibException {
+        if (mConfigs.put(config.getFlags(), config) != null) {
+            throw new AndrolibException("Multiple configs: " + config);
+        }
+    }
 
-	public void addResource(ResResource res) {
-	}
+    public void addType(ResType type) throws AndrolibException {
+        if (mTypes.containsKey(type.getName())) {
+            LOGGER.warning("Multiple types detected! " + type + " ignored!");
+        } else {
+            mTypes.put(type.getName(), type);
+        }
+    }
 
-	public void addSynthesizedRes(int resId) {
-		mSynthesizedRes.add(new ResID(resId));
-	}
+    public void addResource(ResResource res) {
+    }
 
-	@Override
-	public String toString() {
-		return mName;
-	}
+    public void addSynthesizedRes(int resId) {
+        mSynthesizedRes.add(new ResID(resId));
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		final ResPackage other = (ResPackage) obj;
-		if (this.mResTable != other.mResTable
-				&& (this.mResTable == null || !this.mResTable
-						.equals(other.mResTable))) {
-			return false;
-		}
-		if (this.mId != other.mId) {
-			return false;
-		}
-		return true;
-	}
+    @Override
+    public String toString() {
+        return mName;
+    }
 
-	@Override
-	public int hashCode() {
-		int hash = 17;
-		hash = 31 * hash
-				+ (this.mResTable != null ? this.mResTable.hashCode() : 0);
-		hash = 31 * hash + this.mId;
-		return hash;
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final ResPackage other = (ResPackage) obj;
+        if (this.mResTable != other.mResTable
+                && (this.mResTable == null || !this.mResTable
+                .equals(other.mResTable))) {
+            return false;
+        }
+        if (this.mId != other.mId) {
+            return false;
+        }
+        return true;
+    }
 
-	public ResValueFactory getValueFactory() {
-		if (mValueFactory == null) {
-			mValueFactory = new ResValueFactory(this);
-		}
-		return mValueFactory;
-	}
+    @Override
+    public int hashCode() {
+        int hash = 17;
+        hash = 31 * hash
+                + (this.mResTable != null ? this.mResTable.hashCode() : 0);
+        hash = 31 * hash + this.mId;
+        return hash;
+    }
+
+    public ResValueFactory getValueFactory() {
+        if (mValueFactory == null) {
+            mValueFactory = new ResValueFactory(this);
+        }
+        return mValueFactory;
+    }
+
+    private final static Logger LOGGER = Logger
+            .getLogger(ResPackage.class.getName());
 }

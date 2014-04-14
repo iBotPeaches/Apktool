@@ -32,110 +32,122 @@ import org.xmlpull.v1.*;
  */
 public abstract class TestUtils {
 
-	public static Map<String, String> parseStringsXml(File file)
-			throws BrutException {
-		try {
-			XmlPullParser xpp = XmlPullParserFactory.newInstance()
-					.newPullParser();
-			xpp.setInput(new FileReader(file));
+    public static Map<String, String> parseStringsXml(File file)
+            throws BrutException {
+        try {
+            XmlPullParser xpp = XmlPullParserFactory.newInstance()
+                    .newPullParser();
+            xpp.setInput(new FileReader(file));
 
-			int eventType;
-			String key = null;
-			Map<String, String> map = new HashMap<String, String>();
-			while ((eventType = xpp.next()) != XmlPullParser.END_DOCUMENT) {
-				switch (eventType) {
-				case XmlPullParser.START_TAG:
-					if ("string".equals(xpp.getName())) {
-						int attrCount = xpp.getAttributeCount();
-						for (int i = 0; i < attrCount; i++) {
-							if ("name".equals(xpp.getAttributeName(i))) {
-								key = xpp.getAttributeValue(i);
-								break;
-							}
-						}
-					}
-					break;
-				case XmlPullParser.END_TAG:
-					if ("string".equals(xpp.getName())) {
-						key = null;
-					}
-					break;
-				case XmlPullParser.TEXT:
-					if (key != null) {
-						map.put(key, xpp.getText());
-					}
-					break;
-				}
-			}
+            int eventType;
+            String key = null;
+            Map<String, String> map = new HashMap<String, String>();
+            while ((eventType = xpp.next()) != XmlPullParser.END_DOCUMENT) {
+                switch (eventType) {
+                    case XmlPullParser.START_TAG:
+                        if ("string".equals(xpp.getName())) {
+                            int attrCount = xpp.getAttributeCount();
+                            for (int i = 0; i < attrCount; i++) {
+                                if ("name".equals(xpp.getAttributeName(i))) {
+                                    key = xpp.getAttributeValue(i);
+                                    break;
+                                }
+                            }
+                        }
+                        break;
+                    case XmlPullParser.END_TAG:
+                        if ("string".equals(xpp.getName())) {
+                            key = null;
+                        }
+                        break;
+                    case XmlPullParser.TEXT:
+                        if (key != null) {
+                            map.put(key, xpp.getText());
+                        }
+                        break;
+                }
+            }
 
-			return map;
-		} catch (IOException ex) {
-			throw new BrutException(ex);
-		} catch (XmlPullParserException ex) {
-			throw new BrutException(ex);
-		}
-	}
+            return map;
+        } catch (IOException ex) {
+            throw new BrutException(ex);
+        } catch (XmlPullParserException ex) {
+            throw new BrutException(ex);
+        }
+    }
 
-	/*
-	 * TODO: move to brut.util.Jar - it's not possible for now, because below
-	 * implementation uses brut.dir. I think I should merge all my projects to
-	 * single brut.common .
-	 */
-	public static void copyResourceDir(Class class_, String dirPath, File out)
-			throws BrutException {
-		if (!out.exists()) {
-			out.mkdirs();
-		}
-		copyResourceDir(class_, dirPath, new FileDirectory(out));
-	}
+    public static HashMap<String, Boolean> returnStockHashMap() throws BrutException {
+        HashMap<String, Boolean> tmp = new HashMap<String, Boolean>();
+        tmp.put("forceBuildAll", false);
+        tmp.put("debug", false);
+        tmp.put("verbose", false);
+        tmp.put("framework", false);
+        tmp.put("update", false);
+        tmp.put("copyOriginal", false);
 
-	public static void copyResourceDir(Class class_, String dirPath,
-			Directory out) throws BrutException {
-		if (class_ == null) {
-			class_ = Class.class;
-		}
+        return tmp;
+    }
 
-		URL dirURL = class_.getClassLoader().getResource(dirPath);
-		if (dirURL != null && dirURL.getProtocol().equals("file")) {
-			DirUtil.copyToDir(new FileDirectory(dirURL.getFile()), out);
-			return;
-		}
+    /*
+     * TODO: move to brut.util.Jar - it's not possible for now, because below
+     * implementation uses brut.dir. I think I should merge all my projects to
+     * single brut.common .
+     */
+    public static void copyResourceDir(Class class_, String dirPath, File out)
+            throws BrutException {
+        if (!out.exists()) {
+            out.mkdirs();
+        }
+        copyResourceDir(class_, dirPath, new FileDirectory(out));
+    }
 
-		if (dirURL == null) {
-			String className = class_.getName().replace(".", "/") + ".class";
-			dirURL = class_.getClassLoader().getResource(className);
-		}
+    public static void copyResourceDir(Class class_, String dirPath,
+                                       Directory out) throws BrutException {
+        if (class_ == null) {
+            class_ = Class.class;
+        }
 
-		if (dirURL.getProtocol().equals("jar")) {
-			String jarPath;
-			try {
-				jarPath = URLDecoder.decode(
-						dirURL.getPath().substring(5,
-								dirURL.getPath().indexOf("!")), "UTF-8");
-			} catch (UnsupportedEncodingException ex) {
-				throw new BrutException(ex);
-			}
-			DirUtil.copyToDir(new FileDirectory(jarPath), out);
-		}
-	}
+        URL dirURL = class_.getClassLoader().getResource(dirPath);
+        if (dirURL != null && dirURL.getProtocol().equals("file")) {
+            DirUtil.copyToDir(new FileDirectory(dirURL.getFile()), out);
+            return;
+        }
 
-	public static class ResValueElementQualifier implements ElementQualifier {
+        if (dirURL == null) {
+            String className = class_.getName().replace(".", "/") + ".class";
+            dirURL = class_.getClassLoader().getResource(className);
+        }
 
-		@Override
-		public boolean qualifyForComparison(Element control, Element test) {
-			String controlType = control.getTagName();
-			if ("item".equals(controlType)) {
-				controlType = control.getAttribute("type");
-			}
+        if (dirURL.getProtocol().equals("jar")) {
+            String jarPath;
+            try {
+                jarPath = URLDecoder.decode(
+                        dirURL.getPath().substring(5,
+                                dirURL.getPath().indexOf("!")), "UTF-8");
+            } catch (UnsupportedEncodingException ex) {
+                throw new BrutException(ex);
+            }
+            DirUtil.copyToDir(new FileDirectory(jarPath), out);
+        }
+    }
 
-			String testType = test.getTagName();
-			if ("item".equals(testType)) {
-				testType = test.getAttribute("type");
-			}
+    public static class ResValueElementQualifier implements ElementQualifier {
 
-			return controlType.equals(testType)
-					&& control.getAttribute("name").equals(
-							test.getAttribute("name"));
-		}
-	}
+        @Override
+        public boolean qualifyForComparison(Element control, Element test) {
+            String controlType = control.getTagName();
+            if ("item".equals(controlType)) {
+                controlType = control.getAttribute("type");
+            }
+
+            String testType = test.getTagName();
+            if ("item".equals(testType)) {
+                testType = test.getAttribute("type");
+            }
+
+            return controlType.equals(testType)
+                    && control.getAttribute("name").equals(
+                    test.getAttribute("name"));
+        }
+    }
 }

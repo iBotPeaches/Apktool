@@ -45,7 +45,7 @@ import static org.jf.smali.smaliParser.*;
         }
         catch (java.io.IOException e) {
             System.err.println("shouldn't happen: " + e.getMessage());
-            return Token.EOF_TOKEN;
+            return newToken(EOF);
         }
     }
 
@@ -254,8 +254,8 @@ Type = {PrimitiveType} | {ClassDescriptor} | {ArrayDescriptor}
     ".catch" { return newToken(CATCH_DIRECTIVE); }
     ".catchall" { return newToken(CATCHALL_DIRECTIVE); }
     ".line" { return newToken(LINE_DIRECTIVE); }
-    ".parameter" { return newToken(PARAMETER_DIRECTIVE); }
-    ".end parameter" { return newToken(END_PARAMETER_DIRECTIVE); }
+    ".param" { return newToken(PARAMETER_DIRECTIVE); }
+    ".end param" { return newToken(END_PARAMETER_DIRECTIVE); }
     ".local" { return newToken(LOCAL_DIRECTIVE); }
     ".end local" { return newToken(END_LOCAL_DIRECTIVE); }
     ".restart local" { return newToken(RESTART_LOCAL_DIRECTIVE); }
@@ -377,8 +377,6 @@ Type = {PrimitiveType} | {ClassDescriptor} | {ArrayDescriptor}
     "vtable@0x" {HexDigit}+ { return newToken(VTABLE_INDEX); }
     "field@0x" {HexDigit}+ { return newToken(FIELD_OFFSET); }
 
-    "+" {Integer} { return newToken(OFFSET); }
-
     # [^\r\n]* { return newToken(LINE_COMMENT, true); }
 }
 
@@ -447,8 +445,12 @@ Type = {PrimitiveType} | {ClassDescriptor} | {ArrayDescriptor}
         return newToken(INSTRUCTION_FORMAT21c_TYPE);
     }
 
-    "const/high16" | "const-wide/high16" {
-        return newToken(INSTRUCTION_FORMAT21h);
+    "const/high16" {
+        return newToken(INSTRUCTION_FORMAT21ih);
+    }
+
+    "const-wide/high16" {
+        return newToken(INSTRUCTION_FORMAT21lh);
     }
 
     "const/16" | "const-wide/16" {
@@ -574,51 +576,8 @@ Type = {PrimitiveType} | {ClassDescriptor} | {ArrayDescriptor}
         return newToken(INSTRUCTION_FORMAT3rms_METHOD);
     }
 
-    "check-cast/jumbo" | "new-instance/jumbo" | "const-class/jumbo" {
-        return newToken(INSTRUCTION_FORMAT41c_TYPE);
-    }
-
-    "sget/jumbo" | "sget-wide/jumbo" | "sget-object/jumbo" | "sget-boolean/jumbo" | "sget-byte/jumbo" |
-    "sget-char/jumbo" | "sget-short/jumbo" | "sput/jumbo" | "sput-wide/jumbo" | "sput-object/jumbo" |
-    "sput-boolean/jumbo" | "sput-byte/jumbo" | "sput-char/jumbo" | "sput-short/jumbo" {
-        return newToken(INSTRUCTION_FORMAT41c_FIELD);
-    }
-
-    "sget-volatile/jumbo" | "sget-wide-volatile/jumbo" | "sget-object-volatile/jumbo" | "sput-volatile/jumbo" |
-    "sput-wide-volatile/jumbo" | "sput-object-volatile/jumbo" {
-        return newToken(INSTRUCTION_FORMAT41c_FIELD_ODEX);
-    }
-
     "const-wide" {
         return newToken(INSTRUCTION_FORMAT51l);
-    }
-
-    "instance-of/jumbo" | "new-array/jumbo" {
-        return newToken(INSTRUCTION_FORMAT52c_TYPE);
-    }
-
-    "iget/jumbo" | "iget-wide/jumbo" | "iget-object/jumbo" | "iget-boolean/jumbo" | "iget-byte/jumbo" |
-    "iget-char/jumbo" | "iget-short/jumbo" | "iput/jumbo" | "iput-wide/jumbo" | "iput-object/jumbo" |
-    "iput-boolean/jumbo" | "iput-byte/jumbo" | "iput-char/jumbo" | "iput-short/jumbo" {
-        return newToken(INSTRUCTION_FORMAT52c_FIELD);
-    }
-
-    "iget-volatile/jumbo" | "iget-wide-volatile/jumbo" | "iget-object-volatile/jumbo" | "iput-volatile/jumbo" |
-    "iput-wide-volatile/jumbo" | "iput-object-volatile/jumbo" {
-        return newToken(INSTRUCTION_FORMAT52c_FIELD_ODEX);
-    }
-
-    "invoke-virtual/jumbo" | "invoke-super/jumbo" | "invoke-direct/jumbo" | "invoke-static/jumbo" |
-    "invoke-interface/jumbo" {
-        return newToken(INSTRUCTION_FORMAT5rc_METHOD);
-    }
-
-    "invoke-object-init/jumbo" {
-        return newToken(INSTRUCTION_FORMAT5rc_METHOD_ODEX);
-    }
-
-    "filled-new-array/jumbo" {
-        return newToken(INSTRUCTION_FORMAT5rc_TYPE);
     }
 }
 
@@ -631,7 +590,7 @@ Type = {PrimitiveType} | {ClassDescriptor} | {ArrayDescriptor}
     {PrimitiveType} {PrimitiveType}+ { return newToken(PARAM_LIST_OR_ID); }
     {Type} {Type}+ { return newToken(PARAM_LIST); }
     {SimpleName} { return newToken(SIMPLE_NAME); }
-    "<init>" | "<clinit>" { return newToken(METHOD_NAME); }
+    "<" {SimpleName} ">" { return newToken(MEMBER_NAME); }
 }
 
 /*Symbols/Whitespace/EOF*/

@@ -28,22 +28,25 @@
 
 package org.jf.smali;
 
-import org.antlr.runtime.*;
+import com.google.common.collect.Lists;
+import org.antlr.runtime.CommonTokenStream;
+import org.antlr.runtime.Token;
+import org.antlr.runtime.TokenSource;
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.apache.commons.cli.*;
-import org.jf.dexlib.Code.Opcode;
-import org.jf.dexlib.CodeItem;
-import org.jf.dexlib.DexFile;
-import org.jf.dexlib.Util.ByteArrayAnnotatedOutput;
+import org.jf.dexlib2.writer.builder.DexBuilder;
+import org.jf.dexlib2.writer.io.FileDataStore;
 import org.jf.util.ConsoleUtil;
 import org.jf.util.SmaliHelpFormatter;
 
+import javax.annotation.Nonnull;
 import java.io.*;
-import java.util.LinkedHashSet;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * Main class for smali. It recognizes enough options to be able to dispatch
@@ -64,14 +67,19 @@ public class main {
         buildOptions();
 
         InputStream templateStream = main.class.getClassLoader().getResourceAsStream("smali.properties");
-        Properties properties = new Properties();
-        String version = "(unknown)";
-        try {
-            properties.load(templateStream);
-            version = properties.getProperty("application.version");
-        } catch (IOException ex) {
+        if (templateStream != null) {
+            Properties properties = new Properties();
+            String version = "(unknown)";
+            try {
+                properties.load(templateStream);
+                version = properties.getProperty("application.version");
+            } catch (IOException ex) {
+                // just eat it
+            }
+            VERSION = version;
+        } else {
+            VERSION = "[unknown version]";
         }
-        VERSION = version;
     }
 
 
@@ -98,18 +106,14 @@ public class main {
             return;
         }
 
+        int jobs = -1;
         boolean allowOdex = false;
-        boolean sort = false;
-        boolean jumboInstructions = false;
-        boolean fixGoto = true;
         boolean verboseErrors = false;
         boolean printTokens = false;
 
-        boolean apiSet = false;
-        int apiLevel = 14;
+        int apiLevel = 15;
 
         String outputDexFile = "out.dex";
-        String dumpFileName = null;
 
         String[] remainingArgs = commandLine.getArgs();
 
@@ -140,19 +144,9 @@ public class main {
                     break;
                 case 'a':
                     apiLevel = Integer.parseInt(commandLine.getOptionValue("a"));
-                    apiSet = true;
                     break;
-                case 'D':
-                    dumpFileName = commandLine.getOptionValue("D", outputDexFile + ".dump");
-                    break;
-                case 'S':
-                    sort = true;
-                    break;
-                case 'J':
-                    jumboInstructions = true;
-                    break;
-                case 'G':
-                    fixGoto = false;
+                case 'j':
+                    jobs = Integer.parseInt(commandLine.getOptionValue("j"));
                     break;
                 case 'V':
                     verboseErrors = true;
@@ -187,62 +181,52 @@ public class main {
                     }
             }
 
-            Opcode.updateMapsForApiLevel(apiLevel, jumboInstructions);
-
-            DexFile dexFile = new DexFile();
-
-            if (apiSet && apiLevel >= 14) {
-                dexFile.HeaderItem.setVersion(36);
+            if (jobs <= 0) {
+                jobs = Runtime.getRuntime().availableProcessors();
+                if (jobs > 6) {
+                    jobs = 6;
+                }
             }
 
             boolean errors = false;
 
-            for (File file: filesToProcess) {
-                if (!assembleSmaliFile(file, dexFile, verboseErrors, printTokens, allowOdex, apiLevel)) {
-                    errors = true;
+            final DexBuilder dexBuilder = DexBuilder.makeDexBuilder(apiLevel);
+            ExecutorService executor = Executors.newFixedThreadPool(jobs);
+            List<Future<Boolean>> tasks = Lists.newArrayList();
+
+            final boolean finalVerboseErrors = verboseErrors;
+            final boolean finalPrintTokens = printTokens;
+            final boolean finalAllowOdex = allowOdex;
+            final int finalApiLevel = apiLevel;
+            for (final File file: filesToProcess) {
+                tasks.add(executor.submit(new Callable<Boolean>() {
+                    @Override public Boolean call() throws Exception {
+                        return assembleSmaliFile(file, dexBuilder, finalVerboseErrors, finalPrintTokens,
+                                finalAllowOdex, finalApiLevel);
+                    }
+                }));
+            }
+
+            for (Future<Boolean> task: tasks) {
+                while(true) {
+                    try {
+                        if (!task.get()) {
+                            errors = true;
+                        }
+                    } catch (InterruptedException ex) {
+                        continue;
+                    }
+                    break;
                 }
             }
+
+            executor.shutdown();
 
             if (errors) {
                 System.exit(1);
             }
 
-
-            if (sort) {
-                dexFile.setSortAllItems(true);
-            }
-
-            if (fixGoto) {
-                fixInstructions(dexFile, true, fixGoto);
-            }
-
-            dexFile.place();
-
-            ByteArrayAnnotatedOutput out = new ByteArrayAnnotatedOutput();
-
-            if (dumpFileName != null) {
-                out.enableAnnotations(120, true);
-            }
-
-            dexFile.writeTo(out);
-
-            byte[] bytes = out.toByteArray();
-
-            DexFile.calcSignature(bytes);
-            DexFile.calcChecksum(bytes);
-
-            if (dumpFileName != null) {
-                out.finishAnnotating();
-
-                FileWriter fileWriter = new FileWriter(dumpFileName);
-                out.writeAnnotationsTo(fileWriter);
-                fileWriter.close();
-            }
-
-            FileOutputStream fileOutputStream = new FileOutputStream(outputDexFile);
-
-            fileOutputStream.write(bytes);
-            fileOutputStream.close();
+            dexBuilder.writeTo(new FileDataStore(new File(outputDexFile)));
         } catch (RuntimeException ex) {
             System.err.println("\nUNEXPECTED TOP-LEVEL EXCEPTION:");
             ex.printStackTrace();
@@ -254,31 +238,24 @@ public class main {
         }
     }
 
-    private static void getSmaliFilesInDir(File dir, Set<File> smaliFiles) {
-        for(File file: dir.listFiles()) {
-            if (file.isDirectory()) {
-                getSmaliFilesInDir(file, smaliFiles);
-            } else if (file.getName().endsWith(".smali")) {
-                smaliFiles.add(file);
+    private static void getSmaliFilesInDir(@Nonnull File dir, @Nonnull Set<File> smaliFiles) {
+        File[] files = dir.listFiles();
+        if (files != null) {
+            for(File file: files) {
+                if (file.isDirectory()) {
+                    getSmaliFilesInDir(file, smaliFiles);
+                } else if (file.getName().endsWith(".smali")) {
+                    smaliFiles.add(file);
+                }
             }
         }
     }
 
-    private static void fixInstructions(DexFile dexFile, boolean fixJumbo, boolean fixGoto) {
-        dexFile.place();
-
-        for (CodeItem codeItem: dexFile.CodeItemsSection.getItems()) {
-            codeItem.fixInstructions(fixJumbo, fixGoto);
-        }
-    }
-
-    private static boolean assembleSmaliFile(File smaliFile, DexFile dexFile, boolean verboseErrors,
+    private static boolean assembleSmaliFile(File smaliFile, DexBuilder dexBuilder, boolean verboseErrors,
                                              boolean printTokens, boolean allowOdex, int apiLevel)
             throws Exception {
         CommonTokenStream tokens;
 
-
-        boolean lexerErrors = false;
         LexerErrorInterface lexer;
 
         FileInputStream fis = new FileInputStream(smaliFile.getAbsolutePath());
@@ -312,21 +289,17 @@ public class main {
             return false;
         }
 
-        CommonTree t = (CommonTree) result.getTree();
+        CommonTree t = result.getTree();
 
         CommonTreeNodeStream treeStream = new CommonTreeNodeStream(t);
         treeStream.setTokenStream(tokens);
 
         smaliTreeWalker dexGen = new smaliTreeWalker(treeStream);
         dexGen.setVerboseErrors(verboseErrors);
-        dexGen.dexFile = dexFile;
+        dexGen.setDexBuilder(dexBuilder);
         dexGen.smali_file();
 
-        if (dexGen.getNumberOfSyntaxErrors() > 0) {
-            return false;
-        }
-
-        return true;
+        return dexGen.getNumberOfSyntaxErrors() == 0;
     }
 
 
@@ -361,6 +334,7 @@ public class main {
         System.exit(0);
     }
 
+    @SuppressWarnings("AccessStaticViaInstance")
     private static void buildOptions() {
         Option versionOption = OptionBuilder.withLongOpt("version")
                 .withDescription("prints the version then exits")
@@ -384,31 +358,17 @@ public class main {
 
         Option apiLevelOption = OptionBuilder.withLongOpt("api-level")
                 .withDescription("The numeric api-level of the file to generate, e.g. 14 for ICS. If not " +
-                        "specified, it defaults to 14 (ICS).")
+                        "specified, it defaults to 15 (ICS).")
                 .hasArg()
                 .withArgName("API_LEVEL")
                 .create("a");
 
-        Option dumpOption = OptionBuilder.withLongOpt("dump-to")
-                .withDescription("additionally writes a dump of written dex file to FILE (<dexfile>.dump by default)")
-                .hasOptionalArg()
-                .withArgName("FILE")
-                .create("D");
-
-        Option sortOption = OptionBuilder.withLongOpt("sort")
-                .withDescription("sort the items in the dex file into a canonical order before writing")
-                .create("S");
-
-        Option jumboInstructionsOption = OptionBuilder.withLongOpt("jumbo-instructions")
-                .withDescription("adds support for the jumbo opcodes that were temporarily available around the" +
-                        " ics timeframe. Note that support for these opcodes was removed from newer version of" +
-                        " dalvik. You shouldn't use this option unless you know the dex file will only be used on a" +
-                        " device that supports these opcodes.")
-                .create("J");
-
-        Option noFixGotoOption = OptionBuilder.withLongOpt("no-fix-goto")
-                .withDescription("Don't replace goto type instructions with a larger version where appropriate")
-                .create("G");
+        Option jobsOption = OptionBuilder.withLongOpt("jobs")
+                .withDescription("The number of threads to use. Defaults to the number of cores available, up to a " +
+                        "maximum of 6")
+                .hasArg()
+                .withArgName("NUM_THREADS")
+                .create("j");
 
         Option verboseErrorsOption = OptionBuilder.withLongOpt("verbose-errors")
                 .withDescription("Generate verbose error messages")
@@ -423,11 +383,8 @@ public class main {
         basicOptions.addOption(outputOption);
         basicOptions.addOption(allowOdexOption);
         basicOptions.addOption(apiLevelOption);
+        basicOptions.addOption(jobsOption);
 
-        debugOptions.addOption(dumpOption);
-        debugOptions.addOption(sortOption);
-        debugOptions.addOption(jumboInstructionsOption);
-        debugOptions.addOption(noFixGotoOption);
         debugOptions.addOption(verboseErrorsOption);
         debugOptions.addOption(printTokensOption);
 

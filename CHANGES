@@ -1,11 +1,47 @@
-v1.5.3 (TBA)
--Updated to smali/baksmali to v1.4.2
+v2.0.0 (TBA)
+-Updated to smali/baksmali to v2.0.3
+-Updated to Gradle 1.8
+-Fixed (issue #8)   - Correctly uses -c to retain original manifest and META-INF. (Thanks M1cha)
+-Fixed (issue #63)  - Correctly handles apk's that have unknown files outside of the standard aapt allowed resources.
+-Fixed (issue #202) - Includes modified aapt to force package id on build. (Thanks M1cha)
+-Fixed (issue #403) - Uses new usage output to cleanup organization of features.
+-Fixed (issue #359) - Correctly handles malformed 9patch images. (Thanks Felipe Richards)
+-Fixed (issue #401) - Uses versionInfo meta to correctly parse versionName and versionCode.
+-Fixed (issue #440) - Include aapt binaries within Apktool to have closer control over build.
+-Fixed (issue #439) - Correctly handles apk's that have have the general access bit enabled for encryption.
+-Fixed (issue #339) - Re-enables debug mode ( -d flag) to fix smali debugging. (Thanks Ryszard)
+-Fixed (issue #177) - Adapted output of smali to make breakpoint setting easier in different IDEs. (Thanks Ryszard)
+-Fixed (issue #391) - Fixes characters (& and <) from being double escaped in <item>'s of arrays.xml
+-Fixed (issue #260) - Fixes "Multiple substitution" errors with positional and exactly 1 non-positional argument.
+-Fixed (issue #427) - Correctly handles `--frame-path` on [b]uild
 -Fixed (issue #396) - Correctly handle android:debuggable while in debug mode.
 -Fixed (issue #340) - Fixed superclass errors on debug mode.
--Updated to Gradle 1.4
+-Fixed (issue #458) - Fixed pkg id not being correctly set in framework files.
+-Fixed (issue #469) - Added (-m / --match-original)
+-Fixed (issue #326) - Fixed PNG increasing brightness on build (Thanks Christiaan)
+-Fixed (issue #448) - Merge smali2 into Apktool
+-Fixed (issue #496) - Fixes Windows builds caused by java.nio problems
+-Fixed (issue #510) - Any error output is sent stderr instead of stdout
+-Fixed (issue #426) - Filename too long (JesusFreke)
+-Fixed (issue #524) - INSTALL_FAILED_DEXOPT fix (JesusFreke)
+-Fixed (issue #473) - multiple package frameworks are treated correctly.
+-Fixed (issue #531) - JAR disassembling borking is fixed
+-Fixed (issue #550) - Correctly labels incorrect type handling of <array>
+-Fixed (issue #571) - Fixed truncated strings (Thanks jtmuhone)
+-Fixed (issue #578) - Fixed apk's with multiple empty types via ignoring them
+-Fixed (issue #589) - Fixed apk's with one package named "android" from improper decoding.
+-Fixed (issue #601) - Make StringBlock thread safe (Thanks aluedeke)
+-Fixed (issue #238) - Fixed truncated UTF-16 strings
+-Fixed (issue #584) - Fixed horrible spacing, aligned for 4 spaces.
+-Fixed (issue #196) - Fixed style crash due to malformed styles.
+-Fixed (issue #603) - Fixed unknown files prefixed with common name from being ignored.
+-Fixed (issue #606) - Fixed unknown files being ignored when -r is used.
+-Fixed (issue #609) - Fixed handling renamed manifests with ("android", "com.htc" and "miui").
+-Fixed issue with non-URI standard characters in apk name (Thanks rover12421)
+-Added output to list Apktool version to help debugging.
 -Updated known bytes for configurations to 38 (from addition of layout direction)
 -Fixed NPE when handling odex apks even with --no-src specified. (Thanks Rodrigo Chiossi)
--Fixed (issue #427) - Correctly handles `--frame-path` on [b]uild
+-Fixed locale problems when locale changes meaning of default letters in windows .bat script (Thanks Adem666)
 
 v1.5.2 (Released February 2 - 2013) Codename: Bug Fixes
 -Fixed (issue #299) - output smali filename errors to screen during rebuild instead of filestream

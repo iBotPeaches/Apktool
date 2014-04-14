@@ -29,11 +29,19 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
  
+configurations {
+    proguard
+}
+
 dependencies {
     compile project(':brut.apktool.smali:util')
-    compile project(':brut.apktool.smali:dexlib')
-    compile 'commons-cli:commons-cli:1.2'
-    compile 'com.google.code.findbugs:jsr305:1.3.9'
+    compile project(':brut.apktool.smali:dexlib2')
+    compile depends.commons_cli
+    compile depends.guava
+
+    testCompile depends.junit
+
+    proguard depends.proguard
 }
 
 processResources.inputs.property('version', version)
@@ -46,4 +54,28 @@ jar {
     manifest {
         attributes("Main-Class": "org.jf.baksmali.main")
     }
+
+    doLast {
+        //ant.symlink(link: file("${destinationDir}/baksmali.jar"), resource: archivePath, overwrite: true)
+    }
 }
+
+task proguard(type: JavaExec, dependsOn: jar) {
+    def outFile = jar.destinationDir.getPath() + '/' + jar.baseName + '-' + jar.version + '-small' + '.' + jar.extension
+    inputs.file jar.archivePath
+    outputs.file outFile
+
+    classpath = configurations.proguard
+    main = 'proguard.ProGuard'
+    args '-injars ' + jar.archivePath
+    args '-outjars ' + outFile
+    args '-libraryjars ' + System.properties['java.home'] + '/lib/rt.jar'
+    args '-dontobfuscate'
+    args '-dontoptimize'
+    args '-keep public class org.jf.baksmali.main { public static void main(java.lang.String[]); }'
+    args '-keepclassmembers enum * { public static **[] values(); public static ** valueOf(java.lang.String); }'
+    args '-dontwarn com.google.common.**'
+    args '-dontnote com.google.common.**'
+}
+
+tasks.getByPath(':release').dependsOn(proguard)

@@ -23,8 +23,8 @@
 .catch
 .catchall
 .line
-.parameter
-.end parameter
+.param
+.end param
 .local
 .end local
 .restart local
@@ -52,5 +52,7 @@
 .
 .1234.1234
 .
+.parameter
+.end parameter
 
 

@@ -20,7 +20,8 @@ import java.io.*;
 import org.antlr.runtime.*;
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
-import org.jf.dexlib.DexFile;
+import org.apache.commons.io.IOUtils;
+import org.jf.dexlib2.writer.builder.DexBuilder;
 import org.jf.smali.*;
 
 /**
@@ -28,58 +29,73 @@ import org.jf.smali.*;
  */
 public class SmaliMod {
 
-	public static boolean assembleSmaliFile(InputStream smaliStream,
-			String name, DexFile dexFile, boolean verboseErrors,
-			boolean oldLexer, boolean printTokens) throws IOException,
-			RecognitionException {
-		CommonTokenStream tokens;
+    public static boolean assembleSmaliFile(String smali, DexBuilder dexBuilder, boolean verboseErrors,
+                                            boolean printTokens, File smaliFile) throws IOException, RuntimeException, RecognitionException {
 
-		boolean lexerErrors = false;
-		LexerErrorInterface lexer;
+        InputStream is = new ByteArrayInputStream(smali.getBytes());
+        return assembleSmaliFile(is, dexBuilder, verboseErrors, printTokens, smaliFile);
+    }
 
-		InputStreamReader reader = new InputStreamReader(smaliStream, "UTF-8");
+    public static boolean assembleSmaliFile(InputStream is,DexBuilder dexBuilder, boolean verboseErrors,
+                                            boolean printTokens, File smaliFile) throws IOException, RecognitionException {
 
-		lexer = new smaliFlexLexer(reader);
-		tokens = new CommonTokenStream((TokenSource) lexer);
+        // copy our filestream into a tmp file, so we don't overwrite
+        File tmp = File.createTempFile("BRUT",".bak");
+        tmp.deleteOnExit();
 
-		if (printTokens) {
-			tokens.getTokens();
+        OutputStream os = new FileOutputStream(tmp);
+        IOUtils.copy(is, os);
+        os.close();
 
-			for (int i = 0; i < tokens.size(); i++) {
-				Token token = tokens.get(i);
-				if (token.getChannel() == BaseRecognizer.HIDDEN) {
-					continue;
-				}
+        return assembleSmaliFile(tmp,dexBuilder, verboseErrors, printTokens);
+    }
 
-				System.out.println(smaliParser.tokenNames[token.getType()]
-						+ ": " + token.getText());
-			}
-		}
+    public static boolean assembleSmaliFile(File smaliFile,DexBuilder dexBuilder, boolean verboseErrors,
+                                            boolean printTokens) throws IOException, RecognitionException {
 
-		smaliParser parser = new smaliParser(tokens);
-		parser.setVerboseErrors(verboseErrors);
+        CommonTokenStream tokens;
+        LexerErrorInterface lexer;
 
-		smaliParser.smali_file_return result = parser.smali_file();
+        InputStream is = new FileInputStream(smaliFile);
+        InputStreamReader reader = new InputStreamReader(is, "UTF-8");
 
-		if (parser.getNumberOfSyntaxErrors() > 0
-				|| lexer.getNumberOfSyntaxErrors() > 0) {
-			return false;
-		}
+        lexer = new smaliFlexLexer(reader);
+        ((smaliFlexLexer)lexer).setSourceFile(smaliFile);
+        tokens = new CommonTokenStream((TokenSource) lexer);
 
-		CommonTree t = (CommonTree) result.getTree();
+        if (printTokens) {
+            tokens.getTokens();
 
-		CommonTreeNodeStream treeStream = new CommonTreeNodeStream(t);
-		treeStream.setTokenStream(tokens);
+            for (int i=0; i<tokens.size(); i++) {
+                Token token = tokens.get(i);
+                if (token.getChannel() == smaliParser.HIDDEN) {
+                    continue;
+                }
 
-		smaliTreeWalker dexGen = new smaliTreeWalker(treeStream);
+                System.out.println(smaliParser.tokenNames[token.getType()] + ": " + token.getText());
+            }
+        }
 
-		dexGen.dexFile = dexFile;
-		dexGen.smali_file();
+        smaliParser parser = new smaliParser(tokens);
+        parser.setVerboseErrors(verboseErrors);
 
-		if (dexGen.getNumberOfSyntaxErrors() > 0) {
-			return false;
-		}
+        smaliParser.smali_file_return result = parser.smali_file();
 
-		return true;
-	}
+        if (parser.getNumberOfSyntaxErrors() > 0 || lexer.getNumberOfSyntaxErrors() > 0) {
+            return false;
+        }
+
+        CommonTree t = (CommonTree) result.getTree();
+
+        CommonTreeNodeStream treeStream = new CommonTreeNodeStream(t);
+        treeStream.setTokenStream(tokens);
+
+        smaliTreeWalker dexGen = new smaliTreeWalker(treeStream);
+
+        dexGen.setVerboseErrors(verboseErrors);
+        dexGen.setDexBuilder(dexBuilder);
+        dexGen.smali_file();
+
+        return dexGen.getNumberOfSyntaxErrors() == 0;
+    }
 }

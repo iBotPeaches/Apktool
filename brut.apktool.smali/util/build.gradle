@@ -30,6 +30,8 @@
  */
 
 dependencies {
-    compile 'commons-cli:commons-cli:1.2'
-    testCompile 'junit:junit:4.6'
+    compile depends.commons_cli
+    compile depends.findbugs
+    compile depends.guava
+    testCompile depends.junit
 }

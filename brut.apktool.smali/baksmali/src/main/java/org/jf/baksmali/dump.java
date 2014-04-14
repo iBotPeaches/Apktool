@@ -28,79 +28,43 @@
 
 package org.jf.baksmali;
 
-import org.jf.dexlib.DexFile;
-import org.jf.dexlib.Util.ByteArrayAnnotatedOutput;
+import org.jf.dexlib2.Opcodes;
+import org.jf.dexlib2.dexbacked.DexBackedDexFile;
+import org.jf.dexlib2.dexbacked.raw.RawDexFile;
+import org.jf.dexlib2.dexbacked.raw.util.DexAnnotator;
+import org.jf.util.ConsoleUtil;
 
-import java.io.FileOutputStream;
+import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 
 public class dump {
-    public static void dump(DexFile dexFile, String dumpFileName, String outputDexFileName, boolean sort)
-            throws IOException {
-
-        if (sort) {
-            //sort all items, to guarantee a unique ordering
-            dexFile.setSortAllItems(true);
-        } else {
-            //don't change the order
-            dexFile.setInplace(true);
-        }
-
-        ByteArrayAnnotatedOutput out = new ByteArrayAnnotatedOutput();
-
+    public static void dump(DexBackedDexFile dexFile, String dumpFileName, int apiLevel) throws IOException {
         if (dumpFileName != null) {
-            out.enableAnnotations(120, true);
-        }
-
-        dexFile.place();
-        dexFile.writeTo(out);
-
-        //write the dump
-        if (dumpFileName != null) {
-            out.finishAnnotating();
-            FileWriter writer = null;
-
+            Writer writer = null;
 
             try {
-                writer = new FileWriter(dumpFileName);
-                out.writeAnnotationsTo(writer);
+                writer = new BufferedWriter(new FileWriter(dumpFileName));
+
+                int consoleWidth = ConsoleUtil.getConsoleWidth();
+                if (consoleWidth <= 0) {
+                    consoleWidth = 120;
+                }
+
+                RawDexFile rawDexFile = new RawDexFile(new Opcodes(apiLevel), dexFile);
+                DexAnnotator annotator = new DexAnnotator(rawDexFile, consoleWidth);
+                annotator.writeAnnotations(writer);
             } catch (IOException ex) {
-                System.err.println("\n\nThere was an error while dumping the dex file to " + dumpFileName);
-                ex.printStackTrace();
+                System.err.println("There was an error while dumping the dex file to " + dumpFileName);
+                ex.printStackTrace(System.err);
             } finally {
                 if (writer != null) {
                     try {
                         writer.close();
                     } catch (IOException ex) {
-                        System.err.println("\n\nThere was an error while closing the dump file " + dumpFileName);
-                        ex.printStackTrace();
-                    }
-                }
-            }
-        }
-
-        //rewrite the dex file
-        if (outputDexFileName != null) {
-            byte[] bytes = out.toByteArray();
-
-            DexFile.calcSignature(bytes);
-            DexFile.calcChecksum(bytes);
-
-            FileOutputStream fileOutputStream = null;
-            try {
-                fileOutputStream = new FileOutputStream(outputDexFileName);
-                fileOutputStream.write(bytes);
-            } catch (IOException ex) {
-                System.err.println("\n\nThere was an error while writing the dex file " + outputDexFileName);
-                ex.printStackTrace();
-            } finally {
-                if (fileOutputStream != null) {
-                    try {
-                        fileOutputStream.close();
-                    } catch (IOException ex) {
-                        System.err.println("\n\nThere was an error while closing the dex file " + outputDexFileName);
-                        ex.printStackTrace();
+                        System.err.println("There was an error while closing the dump file " + dumpFileName);
+                        ex.printStackTrace(System.err);
                     }
                 }
             }

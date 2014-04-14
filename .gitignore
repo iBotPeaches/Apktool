@@ -25,3 +25,5 @@ build/
 *.setting
 bin/
 *.iml
+.idea/*
+/out

@@ -31,6 +31,7 @@ package org.jf.util;
 import ds.tree.RadixTree;
 import ds.tree.RadixTreeImpl;
 
+import javax.annotation.Nonnull;
 import java.io.*;
 import java.nio.CharBuffer;
 import java.util.regex.Pattern;
@@ -41,6 +42,9 @@ import java.util.regex.Pattern;
  * class name to distinguish it from another class with a name that differes only by case. i.e. a.smali and a_2.smali
  */
 public class ClassFileNameHandler {
+    // we leave an extra 10 characters to allow for a numeric suffix to be added, if it's needed
+    private static final int MAX_FILENAME_LENGTH = 245;
+
     private PackageNameEntry top;
     private String fileExtension;
     private boolean modifyWindowsReservedFilenames;
@@ -83,6 +87,10 @@ public class ClassFileNameHandler {
                     packageElement += "#";
                 }
 
+                if (packageElement.length() > MAX_FILENAME_LENGTH) {
+                    packageElement = shortenPathComponent(packageElement, MAX_FILENAME_LENGTH);
+                }
+
                 packageElements[elementIndex++] = packageElement;
                 elementStart = ++i;
             }
@@ -101,28 +109,44 @@ public class ClassFileNameHandler {
             packageElement += "#";
         }
 
+        if ((packageElement.length() + fileExtension.length()) > MAX_FILENAME_LENGTH) {
+            packageElement = shortenPathComponent(packageElement, MAX_FILENAME_LENGTH - fileExtension.length());
+        }
+
         packageElements[elementIndex] = packageElement;
 
         return top.addUniqueChild(packageElements, 0);
     }
 
-    private static boolean testForWindowsReservedFileNames(File path) {
-        File f = new File(path, "aux.smali");
-        if (f.exists()) {
-            return false;
-        }
+    @Nonnull
+    static String shortenPathComponent(@Nonnull String pathComponent, int maxLength) {
+        int toRemove = pathComponent.length() - maxLength + 1;
 
-        try {
-            FileWriter writer = new FileWriter(f);
-//            writer.write("test");
-            writer.flush();
-            writer.close();
-            f.delete(); //doesn't throw IOException
-            return false;
-        } catch (IOException ex) {
-            //if an exception occured, it's likely that we're on a windows system.
-            return true;
+        int firstIndex = (pathComponent.length()/2) - (toRemove/2);
+        return pathComponent.substring(0, firstIndex) + "#" + pathComponent.substring(firstIndex+toRemove);
+    }
+
+    private static boolean testForWindowsReservedFileNames(File path) {
+        String[] reservedNames = new String[]{"aux", "con", "com1", "com9", "lpt1", "com9"};
+
+        for (String reservedName: reservedNames) {
+            File f = new File(path, reservedName + ".smali");
+            if (f.exists()) {
+                continue;
+            }
+
+            try {
+                FileWriter writer = new FileWriter(f);
+                writer.write("test");
+                writer.flush();
+                writer.close();
+                f.delete(); //doesn't throw IOException
+            } catch (IOException ex) {
+                //if an exception occurred, it's likely that we're on a windows system.
+                return true;
+            }
         }
+        return false;
     }
 
     private static Pattern reservedFileNameRegex = Pattern.compile("^CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9]$",
@@ -159,7 +183,7 @@ public class ClassFileNameHandler {
         }
 
         @Override
-        public File addUniqueChild(String[] pathElements, int pathElementsIndex) {
+        public synchronized File addUniqueChild(String[] pathElements, int pathElementsIndex) {
             String elementName;
             String elementNameLower;
 
@@ -241,7 +265,6 @@ public class ClassFileNameHandler {
                     return existingEntry.addUniqueChild(pathElements, pathElementsIndex+1);
                 }
             }
-
 
             if (pathElementsIndex == pathElements.length - 1) {
                 String fileName;

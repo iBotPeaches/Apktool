@@ -16,6 +16,9 @@
 
 package brut.androlib;
 
+import org.jf.baksmali.baksmali;
+import org.jf.smali.main;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -25,52 +28,56 @@ import java.util.logging.Logger;
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
 public class ApktoolProperties {
-	public static String get(String key) {
-		return get().getProperty(key);
-	}
+    public static String get(String key) {
+        return get().getProperty(key);
+    }
 
-	public static Properties get() {
-		if (sProps == null) {
-			loadProps();
-		}
-		return sProps;
-	}
+    public static Properties get() {
+        if (sProps == null) {
+            loadProps();
+        }
+        return sProps;
+    }
 
-	private static void loadProps() {
-		InputStream in = ApktoolProperties.class
-				.getResourceAsStream("/properties/apktool.properties");
-		sProps = new Properties();
-		try {
-			sProps.load(in);
-			in.close();
-		} catch (IOException ex) {
-			LOGGER.warning("Can't load properties.");
-		}
+    private static void loadProps() {
+        InputStream in = ApktoolProperties.class.getResourceAsStream("/properties/apktool.properties");
+        sProps = new Properties();
+        try {
+            sProps.load(in);
+            in.close();
+        } catch (IOException ex) {
+            LOGGER.warning("Can't load properties.");
+        }
 
-		InputStream templateStream = ApktoolProperties.class
-				.getResourceAsStream("/properties/baksmali.properties");
-		Properties properties = new Properties();
-		String version = "(unknown)";
-		try {
-			properties.load(templateStream);
-			version = properties.getProperty("application.version");
-		} catch (IOException ex) {
-		}
-		sProps.put("baksmaliVersion", version);
-		templateStream = ApktoolProperties.class
-				.getResourceAsStream("/properties/smali.properties");
-		properties = new Properties();
-		version = "(unknown)";
-		try {
-			properties.load(templateStream);
-			version = properties.getProperty("application.version");
-		} catch (IOException ex) {
-		}
-		sProps.put("smaliVersion", version);
-	}
+        InputStream templateStream = baksmali.class.getClassLoader().getResourceAsStream("baksmali.properties");
+        Properties properties = new Properties();
+        String version = "(unknown)";
 
-	private static Properties sProps;
+        if (templateStream != null) {
+            try {
+                properties.load(templateStream);
+                version = properties.getProperty("application.version");
+            } catch (IOException ignored) {
+            }
+        }
+        sProps.put("baksmaliVersion", version);
 
-	private static final Logger LOGGER = Logger
-			.getLogger(ApktoolProperties.class.getName());
+        templateStream = main.class.getClassLoader().getResourceAsStream("smali.properties");
+        properties = new Properties();
+        version = "(unknown)";
+
+        if (templateStream != null) {
+            try {
+                properties.load(templateStream);
+                version = properties.getProperty("application.version");
+            } catch (IOException ignored) {
+            }
+        }
+        sProps.put("smaliVersion", version);
+    }
+
+    private static Properties sProps;
+
+    private static final Logger LOGGER = Logger
+            .getLogger(ApktoolProperties.class.getName());
 }

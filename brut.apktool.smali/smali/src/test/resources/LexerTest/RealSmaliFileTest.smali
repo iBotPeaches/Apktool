@@ -100,7 +100,7 @@
 # direct methods
 .method constructor <init>(Lcom/android/internal/telephony/cdma/CDMAPhone;)V
     .registers 2
-    .parameter "phone"
+    .param p1, phone
 
     .prologue
     .line 42
@@ -112,7 +112,7 @@
 
 .method protected getEFPath(I)Ljava/lang/String;
     .registers 3
-    .parameter "efid"
+    .param p1, efid
 
     .prologue
     .line 71
@@ -145,7 +145,7 @@
 
 .method CardStateFromRILInt(I)Lcom/android/internal/telephony/IccCardStatus$CardState;
     .registers 6
-    .parameter "state"
+    .param p1, state
 
     .prologue
     .line 59
@@ -214,11 +214,11 @@
 
 .method public setCallForwardingOption(IILjava/lang/String;ILandroid/os/Message;)V
     .registers 13
-    .parameter "commandInterfaceCFAction"
-    .parameter "commandInterfaceCFReason"
-    .parameter "dialingNumber"
-    .parameter "timerSeconds"
-    .parameter "onComplete"
+    .param p1, commandInterfaceCFAction
+    .param p2, commandInterfaceCFReason
+    .param p3, dialingNumber
+    .param p4, timerSeconds
+    .param p5, onComplete
 
     .prologue
     const/4 v3, 0x1

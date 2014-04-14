@@ -29,16 +29,17 @@
 package org.jf.baksmali.Adaptors.EncodedValue;
 
 import org.jf.util.IndentingWriter;
-import org.jf.dexlib.EncodedValue.ArrayEncodedValue;
-import org.jf.dexlib.EncodedValue.EncodedValue;
+import org.jf.dexlib2.iface.value.ArrayEncodedValue;
+import org.jf.dexlib2.iface.value.EncodedValue;
 
 import java.io.IOException;
+import java.util.Collection;
 
 public class ArrayEncodedValueAdaptor {
-    public static void writeTo(IndentingWriter writer, ArrayEncodedValue encodedArray) throws IOException {
+    public static void writeTo(IndentingWriter writer, ArrayEncodedValue arrayEncodedValue) throws IOException {
         writer.write('{');
-        EncodedValue[] values = encodedArray.values;
-        if (values == null || values.length == 0) {
+        Collection<? extends EncodedValue> values = arrayEncodedValue.getValue();
+        if (values.size() == 0) {
             writer.write('}');
             return;
         }
@@ -46,7 +47,7 @@ public class ArrayEncodedValueAdaptor {
         writer.write('\n');
         writer.indent(4);
         boolean first = true;
-        for (EncodedValue encodedValue: encodedArray.values) {
+        for (EncodedValue encodedValue: values) {
             if (!first) {
                 writer.write(",\n");
             }

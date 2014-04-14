@@ -66,23 +66,36 @@ idea {
 
 dependencies {
     compile project(':brut.apktool.smali:util')
-    compile project(':brut.apktool.smali:dexlib')
-    compile 'org.antlr:antlr-runtime:3.2'
-    compile 'commons-cli:commons-cli:1.2'
-    compile 'com.google.guava:guava:13.0.1'
+    compile project(':brut.apktool.smali:dexlib2')
+    compile depends.antlr_runtime
+    compile depends.commons_cli
 
-    testCompile 'junit:junit:4.6'
+    testCompile depends.junit
 
-    antlr3 'org.antlr:antlr:3.2'
-    jflex 'de.jflex:jflex:1.4.3'
+    antlr3 depends.antlr
+    jflex depends.jflex
+    proguard depends.proguard
 }
 
-task generateAntlrSource(type: JavaExec) {
+task generateParserAntlrSource(type: JavaExec) {
     inputs.dir file(antlrSource)
     outputs.dir file(antlrOutput)
 
     mkdir(antlrOutput)
-    def grammars = fileTree(antlrSource).include('**/*.g')
+    def grammars = fileTree(antlrSource).include('**/smaliParser.g')
+
+    classpath = configurations.antlr3
+    main = 'org.antlr.Tool'
+    args '-fo', relativePath("${antlrOutput}/org/jf/smali")
+    args grammars.files
+}
+
+task generateTreeWalkerAntlrSource(type: JavaExec) {
+    inputs.dir file(antlrSource)
+    outputs.dir file(antlrOutput)
+
+    mkdir(antlrOutput)
+    def grammars = fileTree(antlrSource).include('**/smaliTreeWalker.g')
 
     classpath = configurations.antlr3
     main = 'org.antlr.Tool'
@@ -117,7 +130,7 @@ task generateJflexSource(type: JavaExec) {
     args grammars.files.join(' ')
 }
 
-compileJava.dependsOn generateAntlrSource, generateJflexSource
+compileJava.dependsOn generateParserAntlrSource, generateTreeWalkerAntlrSource, generateJflexSource
 compileTestJava.dependsOn generateTestAntlrSource
 
 // build a jar containing all dependencies
@@ -127,7 +140,31 @@ jar {
     manifest {
         attributes("Main-Class": "org.jf.smali.main")
     }
+
+    doLast {
+        // ant.symlink(link: file("${destinationDir}/smali.jar"), resource: archivePath, overwrite: true)
+    }
 }
 
 processResources.inputs.property('version', version)
 processResources.expand('version': version)
+
+task proguard(type: JavaExec, dependsOn: jar) {
+    def outFile = jar.destinationDir.getPath() + '/' + jar.baseName + '-' + jar.version + '-small' + '.' + jar.extension
+    inputs.file jar.archivePath
+    outputs.file outFile
+
+    classpath = configurations.proguard
+    main = 'proguard.ProGuard'
+    args "-injars ${jar.archivePath}(!**/TestStringTemplate*.class)"
+    args "-outjars ${outFile}"
+    args "-libraryjars ${System.properties['java.home']}/lib/rt.jar"
+    args '-dontobfuscate'
+    args '-dontoptimize'
+    args '-keep public class org.jf.smali.main { public static void main(java.lang.String[]); }'
+    args '-keepclassmembers enum * { public static **[] values(); public static ** valueOf(java.lang.String); }'
+    args '-dontwarn com.google.common.**'
+    args '-dontnote com.google.common.**'
+}
+
+tasks.getByPath(':release').dependsOn(proguard)

@@ -29,14 +29,14 @@
 package org.jf.baksmali.Renderers;
 
 import org.jf.util.IndentingWriter;
-import org.jf.dexlib.Util.Utf8Utils;
+import org.jf.util.StringUtils;
 
 import java.io.IOException;
 
 public class CharRenderer {
     public static void writeTo(IndentingWriter writer, char val) throws IOException {
         writer.write('\'');
-        Utf8Utils.writeEscapedChar(writer, val);
+        StringUtils.writeEscapedChar(writer, val);
         writer.write('\'');
     }
 }

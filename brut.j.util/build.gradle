@@ -15,6 +15,8 @@
  */
 
 dependencies {
-  compile project(':brut.j.common'), "commons-io:commons-io:2.4"
+  compile project(':brut.j.common')
+  compile "commons-io:commons-io:2.4",
+          "org.apache.commons:commons-compress:1.4.1"
   testCompile "junit:junit:3.8.1"
 }

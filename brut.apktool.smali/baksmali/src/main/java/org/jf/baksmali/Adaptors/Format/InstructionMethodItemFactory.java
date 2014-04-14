@@ -29,37 +29,39 @@
 package org.jf.baksmali.Adaptors.Format;
 
 import org.jf.baksmali.Adaptors.MethodDefinition;
-import org.jf.dexlib.Code.Format.*;
-import org.jf.dexlib.Code.Instruction;
-import org.jf.dexlib.Code.OffsetInstruction;
-import org.jf.dexlib.CodeItem;
+import org.jf.dexlib2.analysis.UnresolvedOdexInstruction;
+import org.jf.dexlib2.iface.instruction.Instruction;
+import org.jf.dexlib2.iface.instruction.OffsetInstruction;
+import org.jf.dexlib2.iface.instruction.formats.ArrayPayload;
+import org.jf.dexlib2.iface.instruction.formats.PackedSwitchPayload;
+import org.jf.dexlib2.iface.instruction.formats.SparseSwitchPayload;
 
 public class InstructionMethodItemFactory {
     private InstructionMethodItemFactory() {
     }
 
     public static InstructionMethodItem makeInstructionFormatMethodItem(
-            MethodDefinition methodDefinition, CodeItem codeItem, int codeAddress, Instruction instruction) {
+            MethodDefinition methodDef, int codeAddress, Instruction instruction) {
+
         if (instruction instanceof OffsetInstruction) {
-            return new OffsetInstructionFormatMethodItem(methodDefinition.getLabelCache(), codeItem,
-                    codeAddress, (OffsetInstruction)instruction);
+            return new OffsetInstructionFormatMethodItem(methodDef.classDef.options, methodDef, codeAddress,
+                    (OffsetInstruction)instruction);
         }
 
-        switch (instruction.getFormat()) {
-            case ArrayData:
-                return new ArrayDataMethodItem(codeItem, codeAddress,
-                        (ArrayDataPseudoInstruction)instruction);
-            case PackedSwitchData:
-                return new PackedSwitchMethodItem(methodDefinition, codeItem, codeAddress,
-                        (PackedSwitchDataPseudoInstruction)instruction);
-            case SparseSwitchData:
-                return new SparseSwitchMethodItem(methodDefinition, codeItem, codeAddress,
-                        (SparseSwitchDataPseudoInstruction)instruction);
-            case UnresolvedOdexInstruction:
-                return new UnresolvedOdexInstructionMethodItem(codeItem, codeAddress,
-                        (UnresolvedOdexInstruction)instruction);
+        if (instruction instanceof UnresolvedOdexInstruction) {
+            return new UnresolvedOdexInstructionMethodItem(methodDef, codeAddress,
+                    (UnresolvedOdexInstruction)instruction);
+        }
+
+        switch (instruction.getOpcode().format) {
+            case ArrayPayload:
+                return new ArrayDataMethodItem(methodDef, codeAddress, (ArrayPayload)instruction);
+            case PackedSwitchPayload:
+                return new PackedSwitchMethodItem(methodDef, codeAddress, (PackedSwitchPayload)instruction);
+            case SparseSwitchPayload:
+                return new SparseSwitchMethodItem(methodDef, codeAddress, (SparseSwitchPayload)instruction);
             default:
-                return new InstructionMethodItem<Instruction>(codeItem, codeAddress, instruction);
+                return new InstructionMethodItem<Instruction>(methodDef, codeAddress, instruction);
         }
     }
 }

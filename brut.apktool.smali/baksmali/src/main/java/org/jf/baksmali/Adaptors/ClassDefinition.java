@@ -28,81 +28,77 @@
 
 package org.jf.baksmali.Adaptors;
 
-import org.jf.dexlib.Util.Utf8Utils;
-import org.jf.util.CommentingIndentingWriter;
+import com.google.common.collect.Lists;
+import org.jf.baksmali.baksmaliOptions;
+import org.jf.dexlib2.AccessFlags;
+import org.jf.dexlib2.dexbacked.DexBackedClassDef;
+import org.jf.dexlib2.dexbacked.DexBackedDexFile.InvalidItemIndex;
+import org.jf.dexlib2.iface.*;
+import org.jf.dexlib2.iface.instruction.Instruction;
+import org.jf.dexlib2.iface.instruction.formats.Instruction21c;
+import org.jf.dexlib2.iface.reference.FieldReference;
+import org.jf.dexlib2.util.ReferenceUtil;
 import org.jf.util.IndentingWriter;
-import org.jf.dexlib.*;
-import org.jf.dexlib.Code.Analysis.ValidationException;
-import org.jf.dexlib.Code.Format.Instruction21c;
-import org.jf.dexlib.Code.Format.Instruction41c;
-import org.jf.dexlib.Code.Instruction;
-import org.jf.dexlib.EncodedValue.EncodedValue;
-import org.jf.dexlib.Util.AccessFlags;
-import org.jf.dexlib.Util.SparseArray;
+import org.jf.util.StringUtils;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 import java.io.IOException;
-import java.util.List;
+import java.util.*;
 
 public class ClassDefinition {
-    private ClassDefItem classDefItem;
-    @Nullable
-    private ClassDataItem classDataItem;
-
-    private SparseArray<FieldIdItem> fieldsSetInStaticConstructor;
+    @Nonnull public final baksmaliOptions options;
+    @Nonnull public final ClassDef classDef;
+    @Nonnull private final HashSet<String> fieldsSetInStaticConstructor;
 
     protected boolean validationErrors;
 
-    public ClassDefinition(ClassDefItem classDefItem) {
-        this.classDefItem = classDefItem;
-        this.classDataItem = classDefItem.getClassData();
-        findFieldsSetInStaticConstructor();
+    public ClassDefinition(@Nonnull baksmaliOptions options, @Nonnull ClassDef classDef) {
+        this.options = options;
+        this.classDef = classDef;
+        fieldsSetInStaticConstructor = findFieldsSetInStaticConstructor();
     }
 
     public boolean hadValidationErrors() {
         return validationErrors;
     }
 
-    private void findFieldsSetInStaticConstructor() {
-        fieldsSetInStaticConstructor = new SparseArray<FieldIdItem>();
+    @Nonnull
+    private HashSet<String> findFieldsSetInStaticConstructor() {
+        HashSet<String> fieldsSetInStaticConstructor = new HashSet<String>();
 
-        if (classDataItem == null) {
-            return;
-        }
-
-        for (ClassDataItem.EncodedMethod directMethod: classDataItem.getDirectMethods()) {
-            if (directMethod.method.getMethodName().getStringValue().equals("<clinit>") &&
-                    directMethod.codeItem != null) {
-                for (Instruction instruction: directMethod.codeItem.getInstructions()) {
-                    switch (instruction.opcode) {
-                        case SPUT:
-                        case SPUT_BOOLEAN:
-                        case SPUT_BYTE:
-                        case SPUT_CHAR:
-                        case SPUT_OBJECT:
-                        case SPUT_SHORT:
-                        case SPUT_WIDE: {
-                            Instruction21c ins = (Instruction21c)instruction;
-                            FieldIdItem fieldIdItem = (FieldIdItem)ins.getReferencedItem();
-                            fieldsSetInStaticConstructor.put(fieldIdItem.getIndex(), fieldIdItem);
-                            break;
-                        }
-                        case SPUT_JUMBO:
-                        case SPUT_BOOLEAN_JUMBO:
-                        case SPUT_BYTE_JUMBO:
-                        case SPUT_CHAR_JUMBO:
-                        case SPUT_OBJECT_JUMBO:
-                        case SPUT_SHORT_JUMBO:
-                        case SPUT_WIDE_JUMBO: {
-                            Instruction41c ins = (Instruction41c)instruction;
-                            FieldIdItem fieldIdItem = (FieldIdItem)ins.getReferencedItem();
-                            fieldsSetInStaticConstructor.put(fieldIdItem.getIndex(), fieldIdItem);
-                            break;
+        for (Method method: classDef.getDirectMethods()) {
+            if (method.getName().equals("<clinit>")) {
+                MethodImplementation impl = method.getImplementation();
+                if (impl != null) {
+                    for (Instruction instruction: impl.getInstructions()) {
+                        switch (instruction.getOpcode()) {
+                            case SPUT:
+                            case SPUT_BOOLEAN:
+                            case SPUT_BYTE:
+                            case SPUT_CHAR:
+                            case SPUT_OBJECT:
+                            case SPUT_SHORT:
+                            case SPUT_WIDE: {
+                                Instruction21c ins = (Instruction21c)instruction;
+                                FieldReference fieldRef = null;
+                                try {
+                                    fieldRef = (FieldReference)ins.getReference();
+                                } catch (InvalidItemIndex ex) {
+                                    // just ignore it for now. We'll deal with it later, when processing the instructions
+                                    // themselves
+                                }
+                                if (fieldRef != null &&
+                                        fieldRef.getDefiningClass().equals((classDef.getType()))) {
+                                    fieldsSetInStaticConstructor.add(ReferenceUtil.getShortFieldDescriptor(fieldRef));
+                                }
+                                break;
+                            }
                         }
                     }
                 }
             }
         }
+        return fieldsSetInStaticConstructor;
     }
 
     public void writeTo(IndentingWriter writer) throws IOException {
@@ -111,238 +107,219 @@ public class ClassDefinition {
         writeSourceFile(writer);
         writeInterfaces(writer);
         writeAnnotations(writer);
-        writeStaticFields(writer);
-        writeInstanceFields(writer);
-        writeDirectMethods(writer);
-        writeVirtualMethods(writer);
+        Set<String> staticFields = writeStaticFields(writer);
+        writeInstanceFields(writer, staticFields);
+        Set<String> directMethods = writeDirectMethods(writer);
+        writeVirtualMethods(writer, directMethods);
     }
 
     private void writeClass(IndentingWriter writer) throws IOException {
         writer.write(".class ");
         writeAccessFlags(writer);
-        writer.write(classDefItem.getClassType().getTypeDescriptor());
+        writer.write(classDef.getType());
         writer.write('\n');
     }
 
     private void writeAccessFlags(IndentingWriter writer) throws IOException {
-        for (AccessFlags accessFlag: AccessFlags.getAccessFlagsForClass(classDefItem.getAccessFlags())) {
+        for (AccessFlags accessFlag: AccessFlags.getAccessFlagsForClass(classDef.getAccessFlags())) {
             writer.write(accessFlag.toString());
             writer.write(' ');
         }
     }
 
     private void writeSuper(IndentingWriter writer) throws IOException {
-        TypeIdItem superClass = classDefItem.getSuperclass();
+        String superClass = classDef.getSuperclass();
         if (superClass != null) {
             writer.write(".super ");
-            writer.write(superClass.getTypeDescriptor());
+            writer.write(superClass);
             writer.write('\n');
         }
     }
 
     private void writeSourceFile(IndentingWriter writer) throws IOException {
-        StringIdItem sourceFile = classDefItem.getSourceFile();
+        String sourceFile = classDef.getSourceFile();
         if (sourceFile != null) {
             writer.write(".source \"");
-            Utf8Utils.writeEscapedString(writer, sourceFile.getStringValue());
+            StringUtils.writeEscapedString(writer, sourceFile);
             writer.write("\"\n");
         }
     }
 
     private void writeInterfaces(IndentingWriter writer) throws IOException {
-        TypeListItem interfaceList = classDefItem.getInterfaces();
-        if (interfaceList == null) {
-            return;
-        }
+        List<String> interfaces = Lists.newArrayList(classDef.getInterfaces());
+        Collections.sort(interfaces);
 
-        List<TypeIdItem> interfaces = interfaceList.getTypes();
-        if (interfaces == null || interfaces.size() == 0) {
-            return;
-        }
-
-        writer.write('\n');
-        writer.write("# interfaces\n");
-        for (TypeIdItem typeIdItem: interfaceList.getTypes()) {
-            writer.write(".implements ");
-            writer.write(typeIdItem.getTypeDescriptor());
+        if (interfaces.size() != 0) {
             writer.write('\n');
+            writer.write("# interfaces\n");
+            for (String interfaceName: interfaces) {
+                writer.write(".implements ");
+                writer.write(interfaceName);
+                writer.write('\n');
+            }
         }
     }
 
     private void writeAnnotations(IndentingWriter writer) throws IOException {
-        AnnotationDirectoryItem annotationDirectory = classDefItem.getAnnotations();
-        if (annotationDirectory == null) {
-            return;
+        Collection<? extends Annotation> classAnnotations = classDef.getAnnotations();
+        if (classAnnotations.size() != 0) {
+            writer.write("\n\n");
+            writer.write("# annotations\n");
+            AnnotationFormatter.writeTo(writer, classAnnotations);
         }
-
-        AnnotationSetItem annotationSet = annotationDirectory.getClassAnnotations();
-        if (annotationSet == null) {
-            return;
-        }
-
-        writer.write("\n\n");
-        writer.write("# annotations\n");
-        AnnotationFormatter.writeTo(writer, annotationSet);
     }
 
-    private void writeStaticFields(IndentingWriter writer) throws IOException {
-        if (classDataItem == null) {
-            return;
-        }
-        //if classDataItem is not null, then classDefItem won't be null either
-        assert(classDefItem != null);
+    private Set<String> writeStaticFields(IndentingWriter writer) throws IOException {
+        boolean wroteHeader = false;
+        Set<String> writtenFields = new HashSet<String>();
 
-        EncodedArrayItem encodedStaticInitializers = classDefItem.getStaticFieldInitializers();
-
-        EncodedValue[] staticInitializers;
-        if (encodedStaticInitializers != null) {
-            staticInitializers = encodedStaticInitializers.getEncodedArray().values;
+        Iterable<? extends Field> staticFields;
+        if (classDef instanceof DexBackedClassDef) {
+            staticFields = ((DexBackedClassDef)classDef).getStaticFields(false);
         } else {
-            staticInitializers = new EncodedValue[0];
+            staticFields = classDef.getStaticFields();
         }
 
-        List<ClassDataItem.EncodedField> encodedFields = classDataItem.getStaticFields();
-        if (encodedFields.size() == 0) {
-            return;
+        for (Field field: staticFields) {
+            if (!wroteHeader) {
+                writer.write("\n\n");
+                writer.write("# static fields");
+                wroteHeader = true;
+            }
+            writer.write('\n');
+
+            boolean setInStaticConstructor;
+            IndentingWriter fieldWriter = writer;
+            String fieldString = ReferenceUtil.getShortFieldDescriptor(field);
+            if (!writtenFields.add(fieldString)) {
+                writer.write("# duplicate field ignored\n");
+                fieldWriter = new CommentingIndentingWriter(writer);
+                System.err.println(String.format("Ignoring duplicate field: %s->%s", classDef.getType(), fieldString));
+                setInStaticConstructor = false;
+            } else {
+                setInStaticConstructor = fieldsSetInStaticConstructor.contains(fieldString);
+            }
+            FieldDefinition.writeTo(fieldWriter, field, setInStaticConstructor);
+        }
+        return writtenFields;
+    }
+
+    private void writeInstanceFields(IndentingWriter writer, Set<String> staticFields) throws IOException {
+        boolean wroteHeader = false;
+        Set<String> writtenFields = new HashSet<String>();
+
+        Iterable<? extends Field> instanceFields;
+        if (classDef instanceof DexBackedClassDef) {
+            instanceFields = ((DexBackedClassDef)classDef).getInstanceFields(false);
+        } else {
+            instanceFields = classDef.getInstanceFields();
         }
 
-        writer.write("\n\n");
-        writer.write("# static fields\n");
-
-        for (int i=0; i<encodedFields.size(); i++) {
-            if (i > 0) {
-                writer.write('\n');
+        for (Field field: instanceFields) {
+            if (!wroteHeader) {
+                writer.write("\n\n");
+                writer.write("# instance fields");
+                wroteHeader = true;
             }
-
-            ClassDataItem.EncodedField field = encodedFields.get(i);
-            EncodedValue encodedValue = null;
-            if (i < staticInitializers.length) {
-                encodedValue = staticInitializers[i];
-            }
-            AnnotationSetItem fieldAnnotations = null;
-            AnnotationDirectoryItem annotations = classDefItem.getAnnotations();
-            if (annotations != null) {
-                fieldAnnotations = annotations.getFieldAnnotations(field.field);
-            }
+            writer.write('\n');
 
             IndentingWriter fieldWriter = writer;
-            // the encoded fields are sorted, so we just have to compare with the previous one to detect duplicates
-            if (i > 0 && field.equals(encodedFields.get(i-1))) {
-                fieldWriter = new CommentingIndentingWriter(writer, "#");
-                fieldWriter.write("Ignoring field with duplicate signature\n");
-                System.err.println(String.format("Warning: class %s has duplicate static field %s, Ignoring.",
-                        classDefItem.getClassType().getTypeDescriptor(), field.field.getShortFieldString()));
+            String fieldString = ReferenceUtil.getShortFieldDescriptor(field);
+            if (!writtenFields.add(fieldString)) {
+                writer.write("# duplicate field ignored\n");
+                fieldWriter = new CommentingIndentingWriter(writer);
+                System.err.println(String.format("Ignoring duplicate field: %s->%s", classDef.getType(), fieldString));
+            } else if (staticFields.contains(fieldString)) {
+                System.err.println(String.format("Duplicate static+instance field found: %s->%s",
+                        classDef.getType(), fieldString));
+                System.err.println("You will need to rename one of these fields, including all references.");
+
+                writer.write("# There is both a static and instance field with this signature.\n" +
+                             "# You will need to rename one of these fields, including all references.\n");
             }
-
-            boolean setInStaticConstructor =
-                    fieldsSetInStaticConstructor.get(field.field.getIndex()) != null;
-
-            FieldDefinition.writeTo(fieldWriter, field, encodedValue, fieldAnnotations, setInStaticConstructor);
+            FieldDefinition.writeTo(fieldWriter, field, false);
         }
     }
 
-    private void writeInstanceFields(IndentingWriter writer) throws IOException {
-        if (classDataItem == null) {
-            return;
+    private Set<String> writeDirectMethods(IndentingWriter writer) throws IOException {
+        boolean wroteHeader = false;
+        Set<String> writtenMethods = new HashSet<String>();
+
+        Iterable<? extends Method> directMethods;
+        if (classDef instanceof DexBackedClassDef) {
+            directMethods = ((DexBackedClassDef)classDef).getDirectMethods(false);
+        } else {
+            directMethods = classDef.getDirectMethods();
         }
 
-        List<ClassDataItem.EncodedField> encodedFields = classDataItem.getInstanceFields();
-        if (encodedFields.size() == 0) {
-            return;
-        }
-
-        writer.write("\n\n");
-        writer.write("# instance fields\n");
-        for (int i=0; i<encodedFields.size(); i++) {
-            ClassDataItem.EncodedField field = encodedFields.get(i);
-
-            if (i > 0) {
-                writer.write('\n');
+        for (Method method: directMethods) {
+            if (!wroteHeader) {
+                writer.write("\n\n");
+                writer.write("# direct methods");
+                wroteHeader = true;
             }
+            writer.write('\n');
 
-            AnnotationSetItem fieldAnnotations = null;
-            AnnotationDirectoryItem annotations = classDefItem.getAnnotations();
-            if (annotations != null) {
-                fieldAnnotations = annotations.getFieldAnnotations(field.field);
-            }
-
-            IndentingWriter fieldWriter = writer;
-            // the encoded fields are sorted, so we just have to compare with the previous one to detect duplicates
-            if (i > 0 && field.equals(encodedFields.get(i-1))) {
-                fieldWriter = new CommentingIndentingWriter(writer, "#");
-                fieldWriter.write("Ignoring field with duplicate signature\n");
-                System.err.println(String.format("Warning: class %s has duplicate instance field %s, Ignoring.",
-                        classDefItem.getClassType().getTypeDescriptor(), field.field.getShortFieldString()));
-            }
-
-            FieldDefinition.writeTo(fieldWriter, field, null, fieldAnnotations, false);
-        }
-    }
-
-    private void writeDirectMethods(IndentingWriter writer) throws IOException {
-        if (classDataItem == null) {
-            return;
-        }
-
-        List<ClassDataItem.EncodedMethod> directMethods = classDataItem.getDirectMethods();
-        if (directMethods.size() == 0) {
-            return;
-        }
-
-        writer.write("\n\n");
-        writer.write("# direct methods\n");
-        writeMethods(writer, directMethods);
-    }
-
-    private void writeVirtualMethods(IndentingWriter writer) throws IOException {
-        if (classDataItem == null) {
-            return;
-        }
-
-        List<ClassDataItem.EncodedMethod> virtualMethods = classDataItem.getVirtualMethods();
-
-        if (virtualMethods.size() == 0) {
-            return;
-        }
-
-        writer.write("\n\n");
-        writer.write("# virtual methods\n");
-        writeMethods(writer, virtualMethods);
-    }
-
-    private void writeMethods(IndentingWriter writer, List<ClassDataItem.EncodedMethod> methods) throws IOException {
-        for (int i=0; i<methods.size(); i++) {
-            ClassDataItem.EncodedMethod method = methods.get(i);
-            if (i > 0) {
-                writer.write('\n');
-            }
-
-            AnnotationSetItem methodAnnotations = null;
-            AnnotationSetRefList parameterAnnotations = null;
-            AnnotationDirectoryItem annotations = classDefItem.getAnnotations();
-            if (annotations != null) {
-                methodAnnotations = annotations.getMethodAnnotations(method.method);
-                parameterAnnotations = annotations.getParameterAnnotations(method.method);
-            }
+            // TODO: check for method validation errors
+            String methodString = ReferenceUtil.getShortMethodDescriptor(method);
 
             IndentingWriter methodWriter = writer;
-            // the encoded methods are sorted, so we just have to compare with the previous one to detect duplicates
-            if (i > 0 && method.equals(methods.get(i-1))) {
-                methodWriter = new CommentingIndentingWriter(writer, "#");
-                methodWriter.write("Ignoring method with duplicate signature\n");
-                System.err.println(String.format("Warning: class %s has duplicate method %s, Ignoring.",
-                        classDefItem.getClassType().getTypeDescriptor(), method.method.getShortMethodString()));
+            if (!writtenMethods.add(methodString)) {
+                writer.write("# duplicate method ignored\n");
+                methodWriter = new CommentingIndentingWriter(writer);
             }
 
-            MethodDefinition methodDefinition = new MethodDefinition(method);
-            methodDefinition.writeTo(methodWriter, methodAnnotations, parameterAnnotations);
+            MethodImplementation methodImpl = method.getImplementation();
+            if (methodImpl == null) {
+                MethodDefinition.writeEmptyMethodTo(methodWriter, method, options);
+            } else {
+                MethodDefinition methodDefinition = new MethodDefinition(this, method, methodImpl);
+                methodDefinition.writeTo(methodWriter);
+            }
+        }
+        return writtenMethods;
+    }
 
-            ValidationException validationException = methodDefinition.getValidationException();
-            if (validationException != null) {
-                System.err.println(String.format("Error while disassembling method %s. Continuing.",
-                        method.method.getMethodString()));
-                validationException.printStackTrace(System.err);
-                this.validationErrors = true;
+    private void writeVirtualMethods(IndentingWriter writer, Set<String> directMethods) throws IOException {
+        boolean wroteHeader = false;
+        Set<String> writtenMethods = new HashSet<String>();
+
+        Iterable<? extends Method> virtualMethods;
+        if (classDef instanceof DexBackedClassDef) {
+            virtualMethods = ((DexBackedClassDef)classDef).getVirtualMethods(false);
+        } else {
+            virtualMethods = classDef.getVirtualMethods();
+        }
+
+        for (Method method: virtualMethods) {
+            if (!wroteHeader) {
+                writer.write("\n\n");
+                writer.write("# virtual methods");
+                wroteHeader = true;
+            }
+            writer.write('\n');
+
+            // TODO: check for method validation errors
+            String methodString = ReferenceUtil.getShortMethodDescriptor(method);
+
+            IndentingWriter methodWriter = writer;
+            if (!writtenMethods.add(methodString)) {
+                writer.write("# duplicate method ignored\n");
+                methodWriter = new CommentingIndentingWriter(writer);
+            } else if (directMethods.contains(methodString)) {
+                writer.write("# There is both a direct and virtual method with this signature.\n" +
+                             "# You will need to rename one of these methods, including all references.\n");
+                System.err.println(String.format("Duplicate direct+virtual method found: %s->%s",
+                        classDef.getType(), methodString));
+                System.err.println("You will need to rename one of these methods, including all references.");
+            }
+
+            MethodImplementation methodImpl = method.getImplementation();
+            if (methodImpl == null) {
+                MethodDefinition.writeEmptyMethodTo(methodWriter, method, options);
+            } else {
+                MethodDefinition methodDefinition = new MethodDefinition(this, method, methodImpl);
+                methodDefinition.writeTo(methodWriter);
             }
         }
     }
