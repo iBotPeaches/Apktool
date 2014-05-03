@@ -40,7 +40,7 @@ public class BuildAndDecodeJarTest {
         LOGGER.info("Unpacking testjar...");
         TestUtils.copyResourceDir(BuildAndDecodeJarTest.class, "brut/apktool/testjar/", sTestOrigDir);
 
-        LOGGER.info("Building testjar.apk...");
+        LOGGER.info("Building testjar.jar...");
         File testJar = new File(sTmpDir, "testjar.jar");
         new Androlib().build(sTestOrigDir, testJar, TestUtils.returnStockHashMap(),"");
 
