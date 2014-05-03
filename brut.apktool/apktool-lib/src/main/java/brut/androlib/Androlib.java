@@ -560,31 +560,28 @@ public class Androlib {
 
                 // create filesystem
                 Path path = Paths.get(outFile.getAbsolutePath());
-                URI apkFileSystem = new URI("jar", outFile.toURI().toString(), null);
 
                 // loop through files inside
                 for (Map.Entry<String,String> entry : files.entrySet()) {
 
                     file = new File(mPath.toFile(), entry.getKey());
                     if (file.isFile() && file.exists()) {
-                        insertFolder(apkFileSystem, zip_properties, file.getParentFile(), entry.getValue(), mPath.toAbsolutePath());
-                        insertFile(apkFileSystem, zip_properties, file, entry.getValue(), mPath.toAbsolutePath());
+                        insertFolder(path, zip_properties, file.getParentFile(), entry.getValue(), mPath.toAbsolutePath());
+                        insertFile(path, zip_properties, file, entry.getValue(), mPath.toAbsolutePath());
                     }
                 }
             } catch (IOException ex) {
-                throw new AndrolibException(ex);
-            } catch (URISyntaxException ex) {
                 throw new AndrolibException(ex);
             }
         }
     }
 
-    private void insertFile(URI apkFileSystem, Map<String,String> zip_properties, File insert, String method, Path location)
+    private void insertFile(Path apkPath, Map<String,String> zip_properties, File insert, String method, Path location)
             throws AndrolibException, IOException {
 
         // ZipFileSystem only writes at .close()
         // http://mail.openjdk.java.net/pipermail/nio-dev/2012-July/001764.html
-        try(FileSystem fs = FileSystems.newFileSystem(apkFileSystem, zip_properties)) {
+        try(FileSystem fs = FileSystems.newFileSystem(apkPath, null)) {
 
             Path root = fs.getPath("/");
 
@@ -597,10 +594,10 @@ public class Androlib {
         }
     }
 
-    private void insertFolder(URI apkFileSystem, Map<String,String> zip_properties, File insert, String method, Path location)
+    private void insertFolder(Path apkPath, Map<String,String> zip_properties, File insert, String method, Path location)
             throws AndrolibException, IOException {
 
-        try(FileSystem fs = FileSystems.newFileSystem(apkFileSystem, zip_properties)) {
+        try(FileSystem fs = FileSystems.newFileSystem(apkPath, null)) {
 
             Path root = fs.getPath("/");
             Path dest = fs.getPath(root.toString(), insert.getAbsolutePath().replace(location.toString(),""));
