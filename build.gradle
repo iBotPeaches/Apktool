@@ -62,10 +62,11 @@ def getCheckedOutBranch() {
     def head
     try {
       head = new File(gitFolder + "HEAD").text.split("/")
+      return head[2].trim();
     } catch(Exception e) {
       return "";
     }
-    return head[2].trim();
+    return "SNAPSHOT";
 }
 
 repositories {

@@ -1,0 +1,16 @@
+env:
+   - TERM=dumb
+language: java
+jdk:
+  - openjdk7
+  - oraclejdk7
+before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq libstdc++6:i386 lib32z1 expect
+script: "./gradlew build fatJar proguard"
+branches:
+  only:
+    - master
+    - stable
+notifications:
+  email: false
