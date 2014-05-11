@@ -12,5 +12,3 @@ branches:
   only:
     - master
     - stable
-notifications:
-  email: false
