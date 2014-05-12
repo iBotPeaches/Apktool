@@ -79,7 +79,6 @@ public class AXmlResourceParser implements XmlResourceParser {
             return;
         }
         m_operational = false;
-        // m_reader.close();
         m_reader = null;
         m_strings = null;
         m_resourceIDs = null;
@@ -91,8 +90,7 @@ public class AXmlResourceParser implements XmlResourceParser {
     @Override
     public int next() throws XmlPullParserException, IOException {
         if (m_reader == null) {
-            throw new XmlPullParserException("Parser is not opened.", this,
-                    null);
+            throw new XmlPullParserException("Parser is not opened.", this, null);
         }
         try {
             doNext();
@@ -115,8 +113,7 @@ public class AXmlResourceParser implements XmlResourceParser {
             eventType = next();
         }
         if (eventType != START_TAG && eventType != END_TAG) {
-            throw new XmlPullParserException("Expected start or end tag.",
-                    this, null);
+            throw new XmlPullParserException("Expected start or end tag.", this, null);
         }
         return eventType;
     }
@@ -124,37 +121,29 @@ public class AXmlResourceParser implements XmlResourceParser {
     @Override
     public String nextText() throws XmlPullParserException, IOException {
         if (getEventType() != START_TAG) {
-            throw new XmlPullParserException(
-                    "Parser must be on START_TAG to read next text.", this,
-                    null);
+            throw new XmlPullParserException("Parser must be on START_TAG to read next text.", this, null);
         }
         int eventType = next();
         if (eventType == TEXT) {
             String result = getText();
             eventType = next();
             if (eventType != END_TAG) {
-                throw new XmlPullParserException(
-                        "Event TEXT must be immediately followed by END_TAG.",
-                        this, null);
+                throw new XmlPullParserException("Event TEXT must be immediately followed by END_TAG.", this, null);
             }
             return result;
         } else if (eventType == END_TAG) {
             return "";
         } else {
-            throw new XmlPullParserException(
-                    "Parser must be on START_TAG or TEXT to read text.", this,
-                    null);
+            throw new XmlPullParserException("Parser must be on START_TAG or TEXT to read text.", this, null);
         }
     }
 
     @Override
     public void require(int type, String namespace, String name)
             throws XmlPullParserException, IOException {
-        if (type != getEventType()
-                || (namespace != null && !namespace.equals(getNamespace()))
+        if (type != getEventType() || (namespace != null && !namespace.equals(getNamespace()))
                 || (name != null && !name.equals(getName()))) {
-            throw new XmlPullParserException(TYPES[type] + " is expected.",
-                    this, null);
+            throw new XmlPullParserException(TYPES[type] + " is expected.", this, null);
         }
     }
 
@@ -351,15 +340,14 @@ public class AXmlResourceParser implements XmlResourceParser {
                 return mAttrDecoder.decode(
                         valueType,
                         valueData,
-                        valueRaw == -1 ? null : ResXmlEncoders
-                                .escapeXmlChars(m_strings.getString(valueRaw)),
+                        valueRaw == -1 ? null : ResXmlEncoders.escapeXmlChars(m_strings.getString(valueRaw)),
                         getAttributeNameResource(index));
             } catch (AndrolibException ex) {
                 setFirstError(ex);
-                LOGGER.log(Level.WARNING, String.format(
-                        "Could not decode attr value, using undecoded value "
+                LOGGER.log(Level.WARNING, String.format("Could not decode attr value, using undecoded value "
                                 + "instead: ns=%s, name=%s, value=0x%08x",
-                        getAttributePrefix(index), getAttributeName(index),
+                        getAttributePrefix(index),
+                        getAttributeName(index),
                         valueData), ex);
             }
         }
@@ -386,8 +374,7 @@ public class AXmlResourceParser implements XmlResourceParser {
     public int getAttributeIntValue(int index, int defaultValue) {
         int offset = getAttributeOffset(index);
         int valueType = m_attributes[offset + ATTRIBUTE_IX_VALUE_TYPE];
-        if (valueType >= TypedValue.TYPE_FIRST_INT
-                && valueType <= TypedValue.TYPE_LAST_INT) {
+        if (valueType >= TypedValue.TYPE_FIRST_INT && valueType <= TypedValue.TYPE_LAST_INT) {
             return m_attributes[offset + ATTRIBUTE_IX_VALUE_DATA];
         }
         return defaultValue;
@@ -418,8 +405,7 @@ public class AXmlResourceParser implements XmlResourceParser {
     }
 
     @Override
-    public boolean getAttributeBooleanValue(String namespace, String attribute,
-                                            boolean defaultValue) {
+    public boolean getAttributeBooleanValue(String namespace, String attribute, boolean defaultValue) {
         int index = findAttribute(namespace, attribute);
         if (index == -1) {
             return defaultValue;
@@ -428,8 +414,7 @@ public class AXmlResourceParser implements XmlResourceParser {
     }
 
     @Override
-    public float getAttributeFloatValue(String namespace, String attribute,
-                                        float defaultValue) {
+    public float getAttributeFloatValue(String namespace, String attribute, float defaultValue) {
         int index = findAttribute(namespace, attribute);
         if (index == -1) {
             return defaultValue;
@@ -438,8 +423,7 @@ public class AXmlResourceParser implements XmlResourceParser {
     }
 
     @Override
-    public int getAttributeIntValue(String namespace, String attribute,
-                                    int defaultValue) {
+    public int getAttributeIntValue(String namespace, String attribute, int defaultValue) {
         int index = findAttribute(namespace, attribute);
         if (index == -1) {
             return defaultValue;
@@ -448,8 +432,7 @@ public class AXmlResourceParser implements XmlResourceParser {
     }
 
     @Override
-    public int getAttributeUnsignedIntValue(String namespace, String attribute,
-                                            int defaultValue) {
+    public int getAttributeUnsignedIntValue(String namespace, String attribute, int defaultValue) {
         int index = findAttribute(namespace, attribute);
         if (index == -1) {
             return defaultValue;
@@ -458,8 +441,7 @@ public class AXmlResourceParser implements XmlResourceParser {
     }
 
     @Override
-    public int getAttributeResourceValue(String namespace, String attribute,
-                                         int defaultValue) {
+    public int getAttributeResourceValue(String namespace, String attribute, int defaultValue) {
         int index = findAttribute(namespace, attribute);
         if (index == -1) {
             return defaultValue;
@@ -468,15 +450,13 @@ public class AXmlResourceParser implements XmlResourceParser {
     }
 
     @Override
-    public int getAttributeListValue(int index, String[] options,
-                                     int defaultValue) {
+    public int getAttributeListValue(int index, String[] options, int defaultValue) {
         // TODO implement
         return 0;
     }
 
     @Override
-    public int getAttributeListValue(String namespace, String attribute,
-                                     String[] options, int defaultValue) {
+    public int getAttributeListValue(String namespace, String attribute, String[] options, int defaultValue) {
         // TODO implement
         return 0;
     }
@@ -524,8 +504,8 @@ public class AXmlResourceParser implements XmlResourceParser {
     }
 
     @Override
-    public void defineEntityReplacementText(String entityName,
-                                            String replacementText) throws XmlPullParserException {
+    public void defineEntityReplacementText(String entityName, String replacementText)
+            throws XmlPullParserException {
         throw new XmlPullParserException(E_NOT_SUPPORTED);
     }
 
@@ -780,54 +760,17 @@ public class AXmlResourceParser implements XmlResourceParser {
         private int m_depth;
     }
 
-    // ///////////////////////////////// package-visible
-    // final void fetchAttributes(int[] styleableIDs,TypedArray result) {
-    // result.resetIndices();
-    // if (m_attributes==null || m_resourceIDs==null) {
-    // return;
-    // }
-    // boolean needStrings=false;
-    // for (int i=0,e=styleableIDs.length;i!=e;++i) {
-    // int id=styleableIDs[i];
-    // for (int o=0;o!=m_attributes.length;o+=ATTRIBUTE_LENGHT) {
-    // int name=m_attributes[o+ATTRIBUTE_IX_NAME];
-    // if (name>=m_resourceIDs.length ||
-    // m_resourceIDs[name]!=id)
-    // {
-    // continue;
-    // }
-    // int valueType=m_attributes[o+ATTRIBUTE_IX_VALUE_TYPE];
-    // int valueData;
-    // int assetCookie;
-    // if (valueType==TypedValue.TYPE_STRING) {
-    // valueData=m_attributes[o+ATTRIBUTE_IX_VALUE_STRING];
-    // assetCookie=-1;
-    // needStrings=true;
-    // } else {
-    // valueData=m_attributes[o+ATTRIBUTE_IX_VALUE_DATA];
-    // assetCookie=0;
-    // }
-    // result.addValue(i,valueType,valueData,assetCookie,id,0);
-    // }
-    // }
-    // if (needStrings) {
-    // result.setStrings(m_strings);
-    // }
-    // }
     final StringBlock getStrings() {
         return m_strings;
     }
 
-    // /////////////////////////////////
     private final int getAttributeOffset(int index) {
         if (m_event != START_TAG) {
-            throw new IndexOutOfBoundsException(
-                    "Current event is not START_TAG.");
+            throw new IndexOutOfBoundsException("Current event is not START_TAG.");
         }
         int offset = index * ATTRIBUTE_LENGTH;
         if (offset >= m_attributes.length) {
-            throw new IndexOutOfBoundsException("Invalid attribute index ("
-                    + index + ").");
+            throw new IndexOutOfBoundsException("Invalid attribute index (" + index + ").");
         }
         return offset;
     }
@@ -843,8 +786,7 @@ public class AXmlResourceParser implements XmlResourceParser {
         int uri = (namespace != null) ? m_strings.find(namespace) : -1;
         for (int o = 0; o != m_attributes.length; o += ATTRIBUTE_LENGTH) {
             if (name == m_attributes[o + ATTRIBUTE_IX_NAME]
-                    && (uri == -1 || uri == m_attributes[o
-                    + ATTRIBUTE_IX_NAMESPACE_URI])) {
+                    && (uri == -1 || uri == m_attributes[o + ATTRIBUTE_IX_NAMESPACE_URI])) {
                 return o / ATTRIBUTE_LENGTH;
             }
         }
@@ -866,6 +808,7 @@ public class AXmlResourceParser implements XmlResourceParser {
         // Delayed initialization.
         if (m_strings == null) {
             m_reader.skipCheckInt(CHUNK_AXML_FILE);
+
 			/*
 			 * chunkSize
 			 */
@@ -889,8 +832,7 @@ public class AXmlResourceParser implements XmlResourceParser {
             }
 
             // Fake END_DOCUMENT event.
-            if (event == END_TAG && m_namespaces.getDepth() == 1
-                    && m_namespaces.getCurrentCount() == 0) {
+            if (event == END_TAG && m_namespaces.getDepth() == 1 && m_namespaces.getCurrentCount() == 0) {
                 m_event = END_DOCUMENT;
                 break;
             }
@@ -906,8 +848,7 @@ public class AXmlResourceParser implements XmlResourceParser {
             if (chunkType == CHUNK_RESOURCEIDS) {
                 int chunkSize = m_reader.readInt();
                 if (chunkSize < 8 || (chunkSize % 4) != 0) {
-                    throw new IOException("Invalid resource ids size ("
-                            + chunkSize + ").");
+                    throw new IOException("Invalid resource ids size (" + chunkSize + ").");
                 }
                 m_resourceIDs = m_reader.readIntArray(chunkSize / 4 - 2);
                 continue;
@@ -928,8 +869,7 @@ public class AXmlResourceParser implements XmlResourceParser {
             int lineNumber = m_reader.readInt();
 			/* 0xFFFFFFFF */m_reader.skipInt();
 
-            if (chunkType == CHUNK_XML_START_NAMESPACE
-                    || chunkType == CHUNK_XML_END_NAMESPACE) {
+            if (chunkType == CHUNK_XML_START_NAMESPACE || chunkType == CHUNK_XML_END_NAMESPACE) {
                 if (chunkType == CHUNK_XML_START_NAMESPACE) {
                     int prefix = m_reader.readInt();
                     int uri = m_reader.readInt();
@@ -954,9 +894,8 @@ public class AXmlResourceParser implements XmlResourceParser {
                 m_classAttribute = m_reader.readInt();
                 m_styleAttribute = (m_classAttribute >>> 16) - 1;
                 m_classAttribute = (m_classAttribute & 0xFFFF) - 1;
-                m_attributes = m_reader.readIntArray(attributeCount
-                        * ATTRIBUTE_LENGTH);
-                for (int i = ATTRIBUTE_IX_VALUE_TYPE; i < m_attributes.length;) {
+                m_attributes = m_reader.readIntArray(attributeCount * ATTRIBUTE_LENGTH);
+                for (int i = ATTRIBUTE_IX_VALUE_TYPE; i < m_attributes.length; ) {
                     m_attributes[i] = (m_attributes[i] >>> 24);
                     i += ATTRIBUTE_LENGTH;
                 }
@@ -1012,8 +951,7 @@ public class AXmlResourceParser implements XmlResourceParser {
     private int m_classAttribute;
     private int m_styleAttribute;
 
-    private final static Logger LOGGER = Logger
-            .getLogger(AXmlResourceParser.class.getName());
+    private final static Logger LOGGER = Logger.getLogger(AXmlResourceParser.class.getName());
     private static final String E_NOT_SUPPORTED = "Method is not supported.";
     private static final int ATTRIBUTE_IX_NAMESPACE_URI = 0,
             ATTRIBUTE_IX_NAME = 1, ATTRIBUTE_IX_VALUE_STRING = 2,
