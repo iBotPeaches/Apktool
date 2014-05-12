@@ -66,7 +66,7 @@ public class ExtDataInput extends DataInputDelegate {
         }
     }
 
-    public String readNulEndedString(int length, boolean fixed)
+    public String readNullEndedString(int length, boolean fixed)
             throws IOException {
         StringBuilder string = new StringBuilder(16);
         while(length-- != 0) {
