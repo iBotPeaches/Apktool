@@ -219,6 +219,7 @@ public class BuildAndDecodeTest {
         compareUnknownFiles();
     }
 
+    @SuppressWarnings("unchecked")
     private void compareUnknownFiles() throws BrutException, IOException {
         Map<String, Object> control = new Androlib().readMetaFile(sTestOrigDir);
         Map<String, Object> test = new Androlib().readMetaFile(sTestNewDir);
