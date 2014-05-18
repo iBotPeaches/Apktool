@@ -855,7 +855,7 @@ final public class AndrolibResources {
     private File mAaptBinary = null;
 
     private final static String[] IGNORED_PACKAGES = new String[] {
-            "android", "com.htc", "miui", "com.lge" };
+            "android", "com.htc", "miui", "com.lge", "com.lge.internal" };
 
     private final static String[] ALLOWED_PACKAGES = new String[] {
             "com.miui" };
