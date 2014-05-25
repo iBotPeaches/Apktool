@@ -66,8 +66,7 @@ public class ResArrayValue extends ResBagValue implements
             return null;
         }
         String type = mItems[0].getType();
-        for (int i = 1; i < mItems.length; i++) {
-
+        for (int i = 0; i < mItems.length; i++) {
             if (mItems[i].encodeAsResXmlItemValue().startsWith("@string")) {
                 return "string";
             } else if (mItems[i].encodeAsResXmlItemValue().startsWith("@drawable")) {

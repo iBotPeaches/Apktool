@@ -23,4 +23,9 @@
         <item>10.0sp</item>
         <item>#ff123456</item>
     </array>
+    <string-array name="issue_409">
+        <item>@string/test1</item>
+        <item>foo</item>
+        <item>foo2</item>
+    </string-array>
 </resources>
