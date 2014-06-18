@@ -18,6 +18,7 @@ package brut.androlib.res.decoder;
 
 import brut.androlib.AndrolibException;
 import brut.androlib.res.data.ResPackage;
+import brut.androlib.res.data.ResResSpec;
 import brut.androlib.res.data.value.ResAttr;
 import brut.androlib.res.data.value.ResScalarValue;
 
@@ -38,6 +39,20 @@ public class ResAttrDecoder {
         }
 
         return decoded != null ? decoded : resValue.encodeAsResXmlAttr();
+    }
+
+    public String decodeManifestAttr(int attrResId)
+        throws AndrolibException {
+
+        if (attrResId != 0) {
+            ResResSpec resResSpec = getCurrentPackage().getResTable().getResSpec(attrResId);
+
+            if (resResSpec != null) {
+                return resResSpec.getName();
+            }
+        }
+
+        return null;
     }
 
     public ResPackage getCurrentPackage() throws AndrolibException {

@@ -40,6 +40,7 @@ v2.0.0 (TBA)
 -Fixed (issue #626) - Fixed handling strange characters with unknown files.
 -Fixed (issue #630) - Fixed handling renamed manifests with ("com.lge")
 -Fixed (issue #409) - Fixed array items incorrectly typed.
+-Fixed (issue #512) - Fixed AndroidManifest missing attributes.
 -Fixed issue with non-URI standard characters in apk name (Thanks rover12421)
 -Added output to list Apktool version to help debugging.
 -Updated known bytes for configurations to 38 (from addition of layout direction)

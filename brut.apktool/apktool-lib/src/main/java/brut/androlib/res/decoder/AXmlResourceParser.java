@@ -282,7 +282,22 @@ public class AXmlResourceParser implements XmlResourceParser {
         if (namespace == -1) {
             return "";
         }
-        return m_strings.getString(namespace);
+
+        // hacky: if the attribute names are proguarded, then so are the namespace
+        // I don't know where these are located yet in the file, but it is always
+        // this.android_ns in testing, so we will default to that for now.
+        // @todo figure out where proguarded namespaces are stored.
+        String value = m_strings.getString(namespace);
+
+        if (value.length() == 0) {
+            int offsetName = getAttributeOffset(index);
+            int name = m_attributes[offsetName + ATTRIBUTE_IX_NAME];
+            if (m_strings.getString(name).length() == 0) {
+                value = android_ns;
+            }
+        }
+
+        return value;
     }
 
     @Override
@@ -303,7 +318,21 @@ public class AXmlResourceParser implements XmlResourceParser {
         if (name == -1) {
             return "";
         }
-        return m_strings.getString(name);
+
+        String value = m_strings.getString(name);
+
+        // some attributes will return "", we must rely on the resource_id and refer to the frameworks
+        // to match the resource id to the name. ex: 0x101021C = versionName
+        if (value.length() != 0) {
+            return value;
+        } else {
+            try {
+                value = mAttrDecoder.decodeManifestAttr(getAttributeNameResource(index));
+            } catch (AndrolibException e) {
+                value = "";
+            }
+            return value;
+        }
     }
 
     @Override
@@ -941,6 +970,7 @@ public class AXmlResourceParser implements XmlResourceParser {
     private StringBlock m_strings;
     private int[] m_resourceIDs;
     private NamespaceStack m_namespaces = new NamespaceStack();
+    private String android_ns = "http://schemas.android.com/apk/res/android";
     private boolean m_decreaseDepth;
     private int m_event;
     private int m_lineNumber;
