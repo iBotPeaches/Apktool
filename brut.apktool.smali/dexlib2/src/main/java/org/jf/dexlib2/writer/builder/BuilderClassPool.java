@@ -419,6 +419,7 @@ public class BuilderClassPool implements ClassSection<BuilderStringReference, Bu
                 SetSourceFile setSourceFile = (SetSourceFile)debugItem;
                 writer.writeSetSourceFile(setSourceFile.getCodeAddress(),
                         checkStringReference(setSourceFile.getSourceFileReference()));
+                break;
             }
             default:
                 throw new ExceptionWithContext("Unexpected debug item type: %d", debugItem.getDebugItemType());
