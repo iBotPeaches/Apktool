@@ -31,11 +31,15 @@
 
 package org.jf.dexlib2.writer;
 
-import com.google.common.collect.*;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Ordering;
 import org.jf.dexlib2.AccessFlags;
 import org.jf.dexlib2.Opcode;
 import org.jf.dexlib2.ReferenceType;
 import org.jf.dexlib2.base.BaseAnnotation;
+import org.jf.dexlib2.base.BaseAnnotationElement;
 import org.jf.dexlib2.builder.MutableMethodImplementation;
 import org.jf.dexlib2.builder.instruction.BuilderInstruction31c;
 import org.jf.dexlib2.dexbacked.raw.*;
@@ -48,7 +52,10 @@ import org.jf.dexlib2.iface.instruction.Instruction;
 import org.jf.dexlib2.iface.instruction.OneRegisterInstruction;
 import org.jf.dexlib2.iface.instruction.ReferenceInstruction;
 import org.jf.dexlib2.iface.instruction.formats.*;
-import org.jf.dexlib2.iface.reference.*;
+import org.jf.dexlib2.iface.reference.FieldReference;
+import org.jf.dexlib2.iface.reference.MethodReference;
+import org.jf.dexlib2.iface.reference.StringReference;
+import org.jf.dexlib2.iface.reference.TypeReference;
 import org.jf.dexlib2.util.InstructionUtil;
 import org.jf.dexlib2.util.MethodUtil;
 import org.jf.dexlib2.writer.io.DeferredOutputStream;
@@ -81,7 +88,8 @@ public abstract class DexWriter<
         AnnotationKey extends Annotation, AnnotationSetKey,
         TypeListKey,
         FieldKey, MethodKey,
-        EncodedValue, AnnotationElement> {
+        EncodedValue,
+        AnnotationElement extends org.jf.dexlib2.iface.AnnotationElement> {
     public static final int NO_INDEX = -1;
     public static final int NO_OFFSET = 0;
 
@@ -552,7 +560,9 @@ public abstract class DexWriter<
             writer.writeUbyte(annotationSection.getVisibility(key));
             writer.writeUleb128(typeSection.getItemIndex(annotationSection.getType(key)));
 
-            Collection<? extends AnnotationElement> elements = annotationSection.getElements(key);
+            Collection<? extends AnnotationElement> elements = Ordering.from(BaseAnnotationElement.BY_NAME)
+                    .immutableSortedCopy(annotationSection.getElements(key));
+
             writer.writeUleb128(elements.size());
 
             for (AnnotationElement element: elements) {
