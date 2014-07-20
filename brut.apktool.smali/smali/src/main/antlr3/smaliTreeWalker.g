@@ -501,17 +501,29 @@ method_type_list returns[List<String> types]
     )*;
 
 
-fully_qualified_method returns[ImmutableMethodReference methodReference]
-  : reference_type_descriptor SIMPLE_NAME method_prototype
+method_reference returns[ImmutableMethodReference methodReference]
+  : reference_type_descriptor? SIMPLE_NAME method_prototype
   {
-    $methodReference = new ImmutableMethodReference($reference_type_descriptor.type, $SIMPLE_NAME.text,
+    String type;
+    if ($reference_type_descriptor.type == null) {
+        type = classType;
+    } else {
+        type = $reference_type_descriptor.type;
+    }
+    $methodReference = new ImmutableMethodReference(type, $SIMPLE_NAME.text,
              $method_prototype.parameters, $method_prototype.returnType);
   };
 
-fully_qualified_field returns[ImmutableFieldReference fieldReference]
-  : reference_type_descriptor SIMPLE_NAME nonvoid_type_descriptor
+field_reference returns[ImmutableFieldReference fieldReference]
+  : reference_type_descriptor? SIMPLE_NAME nonvoid_type_descriptor
   {
-    $fieldReference = new ImmutableFieldReference($reference_type_descriptor.type, $SIMPLE_NAME.text,
+    String type;
+    if ($reference_type_descriptor.type == null) {
+        type = classType;
+    } else {
+        type = $reference_type_descriptor.type;
+    }
+    $fieldReference = new ImmutableFieldReference(type, $SIMPLE_NAME.text,
             $nonvoid_type_descriptor.type);
   };
 
@@ -688,13 +700,13 @@ verification_error_reference returns[ImmutableReference reference]
   {
     $reference = new ImmutableTypeReference($CLASS_DESCRIPTOR.text);
   }
-  | fully_qualified_field
+  | field_reference
   {
-    $reference = $fully_qualified_field.fieldReference;
+    $reference = $field_reference.fieldReference;
   }
-  | fully_qualified_method
+  | method_reference
   {
-    $reference = $fully_qualified_method.methodReference;
+    $reference = $method_reference.methodReference;
   };
 
 verification_error_type returns[int verificationError]
@@ -816,12 +828,12 @@ insn_format20t
 
 insn_format21c_field
   : //e.g. sget_object v0, java/lang/System/out LJava/io/PrintStream;
-    ^(I_STATEMENT_FORMAT21c_FIELD inst=(INSTRUCTION_FORMAT21c_FIELD | INSTRUCTION_FORMAT21c_FIELD_ODEX) REGISTER fully_qualified_field)
+    ^(I_STATEMENT_FORMAT21c_FIELD inst=(INSTRUCTION_FORMAT21c_FIELD | INSTRUCTION_FORMAT21c_FIELD_ODEX) REGISTER field_reference)
     {
       Opcode opcode = opcodes.getOpcodeByName($inst.text);
       short regA = parseRegister_byte($REGISTER.text);
 
-      ImmutableFieldReference fieldReference = $fully_qualified_field.fieldReference;
+      ImmutableFieldReference fieldReference = $field_reference.fieldReference;
 
       $method::methodBuilder.addInstruction(new BuilderInstruction21c(opcode, regA,
               dexBuilder.internFieldReference(fieldReference)));
@@ -911,13 +923,13 @@ insn_format22b
 
 insn_format22c_field
   : //e.g. iput-object v1, v0, org/jf/HelloWorld2/HelloWorld2.helloWorld Ljava/lang/String;
-    ^(I_STATEMENT_FORMAT22c_FIELD inst=(INSTRUCTION_FORMAT22c_FIELD | INSTRUCTION_FORMAT22c_FIELD_ODEX) registerA=REGISTER registerB=REGISTER fully_qualified_field)
+    ^(I_STATEMENT_FORMAT22c_FIELD inst=(INSTRUCTION_FORMAT22c_FIELD | INSTRUCTION_FORMAT22c_FIELD_ODEX) registerA=REGISTER registerB=REGISTER field_reference)
     {
       Opcode opcode = opcodes.getOpcodeByName($inst.text);
       byte regA = parseRegister_nibble($registerA.text);
       byte regB = parseRegister_nibble($registerB.text);
 
-      ImmutableFieldReference fieldReference = $fully_qualified_field.fieldReference;
+      ImmutableFieldReference fieldReference = $field_reference.fieldReference;
 
       $method::methodBuilder.addInstruction(new BuilderInstruction22c(opcode, regA, regB,
               dexBuilder.internFieldReference(fieldReference)));
@@ -1038,7 +1050,7 @@ insn_format32x
 
 insn_format35c_method
   : //e.g. invoke-virtual {v0,v1} java/io/PrintStream/print(Ljava/lang/Stream;)V
-    ^(I_STATEMENT_FORMAT35c_METHOD INSTRUCTION_FORMAT35c_METHOD register_list fully_qualified_method)
+    ^(I_STATEMENT_FORMAT35c_METHOD INSTRUCTION_FORMAT35c_METHOD register_list method_reference)
     {
       Opcode opcode = opcodes.getOpcodeByName($INSTRUCTION_FORMAT35c_METHOD.text);
 
@@ -1046,7 +1058,7 @@ insn_format35c_method
       byte[] registers = $register_list.registers;
       byte registerCount = $register_list.registerCount;
 
-      ImmutableMethodReference methodReference = $fully_qualified_method.methodReference;
+      ImmutableMethodReference methodReference = $method_reference.methodReference;
 
       $method::methodBuilder.addInstruction(new BuilderInstruction35c(opcode, registerCount, registers[0], registers[1],
               registers[2], registers[3], registers[4], dexBuilder.internMethodReference(methodReference)));
@@ -1068,7 +1080,7 @@ insn_format35c_type
 
 insn_format3rc_method
   : //e.g. invoke-virtual/range {v25..v26} java/lang/StringBuilder/append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-    ^(I_STATEMENT_FORMAT3rc_METHOD INSTRUCTION_FORMAT3rc_METHOD register_range fully_qualified_method)
+    ^(I_STATEMENT_FORMAT3rc_METHOD INSTRUCTION_FORMAT3rc_METHOD register_range method_reference)
     {
       Opcode opcode = opcodes.getOpcodeByName($INSTRUCTION_FORMAT3rc_METHOD.text);
       int startRegister = $register_range.startRegister;
@@ -1076,7 +1088,7 @@ insn_format3rc_method
 
       int registerCount = endRegister-startRegister+1;
 
-      ImmutableMethodReference methodReference = $fully_qualified_method.methodReference;
+      ImmutableMethodReference methodReference = $method_reference.methodReference;
 
       $method::methodBuilder.addInstruction(new BuilderInstruction3rc(opcode, startRegister, registerCount,
               dexBuilder.internMethodReference(methodReference)));
@@ -1259,19 +1271,19 @@ subannotation returns[String annotationType, List<AnnotationElement> elements]
     };
 
 field_literal returns[FieldReference value]
-  : ^(I_ENCODED_FIELD fully_qualified_field)
+  : ^(I_ENCODED_FIELD field_reference)
     {
-      $value = $fully_qualified_field.fieldReference;
+      $value = $field_reference.fieldReference;
     };
 
 method_literal returns[MethodReference value]
-  : ^(I_ENCODED_METHOD fully_qualified_method)
+  : ^(I_ENCODED_METHOD method_reference)
     {
-      $value = $fully_qualified_method.methodReference;
+      $value = $method_reference.methodReference;
     };
 
 enum_literal returns[FieldReference value]
-  : ^(I_ENCODED_ENUM fully_qualified_field)
+  : ^(I_ENCODED_ENUM field_reference)
     {
-      $value = $fully_qualified_field.fieldReference;
+      $value = $field_reference.fieldReference;
     };
