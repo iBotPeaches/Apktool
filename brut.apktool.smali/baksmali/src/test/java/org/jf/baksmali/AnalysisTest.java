@@ -40,6 +40,7 @@ import org.jf.dexlib2.analysis.ClassPath;
 import org.jf.dexlib2.iface.ClassDef;
 import org.jf.dexlib2.iface.DexFile;
 import org.jf.util.IndentingWriter;
+import org.jf.util.TextUtils;
 import org.junit.Test;
 
 import javax.annotation.Nonnull;
@@ -105,9 +106,8 @@ public class AnalysisTest {
                     className.substring(1, className.length() - 1));
             String smaliContents = readResource(smaliPath);
 
-            String newline = System.getProperty("line.separator");
-            Assert.assertEquals(smaliContents.replace("\r", "").replace("\n", newline),
-                    stringWriter.toString().replace("\r", "").replace("\n", newline));
+            Assert.assertEquals(TextUtils.normalizeNewlines(smaliContents),
+                    TextUtils.normalizeNewlines(stringWriter.toString()));
         }
     }
 
