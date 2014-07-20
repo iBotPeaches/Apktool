@@ -1645,11 +1645,14 @@ public class MethodAnalyzer {
 
             // methodClass is now the first accessible class found. Now. we need to make sure that the method is
             // actually valid for this class
-            resolvedMethod = classPath.getClass(methodClass.getType()).getMethodByVtableIndex(methodIndex);
-            if (resolvedMethod == null) {
+            MethodReference newResolvedMethod =
+                    classPath.getClass(methodClass.getType()).getMethodByVtableIndex(methodIndex);
+            if (newResolvedMethod == null) {
+                // TODO: fix NPE here
                 throw new ExceptionWithContext("Couldn't find accessible class while resolving method %s",
                         ReferenceUtil.getMethodDescriptor(resolvedMethod, true));
             }
+            resolvedMethod = newResolvedMethod;
             resolvedMethod = new ImmutableMethodReference(methodClass.getType(), resolvedMethod.getName(),
                     resolvedMethod.getParameterTypes(), resolvedMethod.getReturnType());
         }
