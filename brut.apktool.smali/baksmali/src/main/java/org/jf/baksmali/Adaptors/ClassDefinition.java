@@ -165,7 +165,13 @@ public class ClassDefinition {
         if (classAnnotations.size() != 0) {
             writer.write("\n\n");
             writer.write("# annotations\n");
-            AnnotationFormatter.writeTo(writer, classAnnotations);
+
+            String containingClass = null;
+            if (options.useImplicitReferences) {
+                containingClass = classDef.getType();
+            }
+
+            AnnotationFormatter.writeTo(writer, classAnnotations, containingClass);
         }
     }
 
@@ -199,7 +205,7 @@ public class ClassDefinition {
             } else {
                 setInStaticConstructor = fieldsSetInStaticConstructor.contains(fieldString);
             }
-            FieldDefinition.writeTo(fieldWriter, field, setInStaticConstructor);
+            FieldDefinition.writeTo(options, fieldWriter, field, setInStaticConstructor);
         }
         return writtenFields;
     }
@@ -237,7 +243,7 @@ public class ClassDefinition {
                 writer.write("# There is both a static and instance field with this signature.\n" +
                              "# You will need to rename one of these fields, including all references.\n");
             }
-            FieldDefinition.writeTo(fieldWriter, field, false);
+            FieldDefinition.writeTo(options, fieldWriter, field, false);
         }
     }
 
@@ -261,7 +267,7 @@ public class ClassDefinition {
             writer.write('\n');
 
             // TODO: check for method validation errors
-            String methodString = ReferenceUtil.getShortMethodDescriptor(method);
+            String methodString = ReferenceUtil.getMethodDescriptor(method, true);
 
             IndentingWriter methodWriter = writer;
             if (!writtenMethods.add(methodString)) {
@@ -300,7 +306,7 @@ public class ClassDefinition {
             writer.write('\n');
 
             // TODO: check for method validation errors
-            String methodString = ReferenceUtil.getShortMethodDescriptor(method);
+            String methodString = ReferenceUtil.getMethodDescriptor(method, true);
 
             IndentingWriter methodWriter = writer;
             if (!writtenMethods.add(methodString)) {

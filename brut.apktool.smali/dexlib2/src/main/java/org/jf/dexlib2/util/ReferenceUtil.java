@@ -34,27 +34,22 @@ package org.jf.dexlib2.util;
 import org.jf.dexlib2.iface.reference.*;
 import org.jf.util.StringUtils;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.Writer;
 
 public final class ReferenceUtil {
-    public static String getShortMethodDescriptor(MethodReference methodReference) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(methodReference.getName());
-        sb.append('(');
-        for (CharSequence paramType: methodReference.getParameterTypes()) {
-            sb.append(paramType);
-        }
-        sb.append(')');
-        sb.append(methodReference.getReturnType());
-        return sb.toString();
+    public static String getMethodDescriptor(MethodReference methodReference) {
+        return getMethodDescriptor(methodReference, false);
     }
 
-    public static String getMethodDescriptor(MethodReference methodReference) {
+    public static String getMethodDescriptor(MethodReference methodReference, boolean useImplicitReference) {
         StringBuilder sb = new StringBuilder();
-        sb.append(methodReference.getDefiningClass());
-        sb.append("->");
+        if (!useImplicitReference) {
+            sb.append(methodReference.getDefiningClass());
+            sb.append("->");
+        }
         sb.append(methodReference.getName());
         sb.append('(');
         for (CharSequence paramType: methodReference.getParameterTypes()) {
@@ -66,8 +61,15 @@ public final class ReferenceUtil {
     }
 
     public static void writeMethodDescriptor(Writer writer, MethodReference methodReference) throws IOException {
-        writer.write(methodReference.getDefiningClass());
-        writer.write("->");
+        writeMethodDescriptor(writer, methodReference, false);
+    }
+
+    public static void writeMethodDescriptor(Writer writer, MethodReference methodReference,
+                                             boolean useImplicitReference) throws IOException {
+        if (!useImplicitReference) {
+            writer.write(methodReference.getDefiningClass());
+            writer.write("->");
+        }
         writer.write(methodReference.getName());
         writer.write('(');
         for (CharSequence paramType: methodReference.getParameterTypes()) {
@@ -78,9 +80,15 @@ public final class ReferenceUtil {
     }
 
     public static String getFieldDescriptor(FieldReference fieldReference) {
+        return getFieldDescriptor(fieldReference, false);
+    }
+
+    public static String getFieldDescriptor(FieldReference fieldReference, boolean useImplicitReference) {
         StringBuilder sb = new StringBuilder();
-        sb.append(fieldReference.getDefiningClass());
-        sb.append("->");
+        if (!useImplicitReference) {
+            sb.append(fieldReference.getDefiningClass());
+            sb.append("->");
+        }
         sb.append(fieldReference.getName());
         sb.append(':');
         sb.append(fieldReference.getType());
@@ -96,15 +104,27 @@ public final class ReferenceUtil {
     }
 
     public static void writeFieldDescriptor(Writer writer, FieldReference fieldReference) throws IOException {
-        writer.write(fieldReference.getDefiningClass());
-        writer.write("->");
+        writeFieldDescriptor(writer, fieldReference, false);
+    }
+
+    public static void writeFieldDescriptor(Writer writer, FieldReference fieldReference,
+                                            boolean implicitReference) throws IOException {
+        if (!implicitReference) {
+            writer.write(fieldReference.getDefiningClass());
+            writer.write("->");
+        }
         writer.write(fieldReference.getName());
         writer.write(':');
         writer.write(fieldReference.getType());
     }
 
     @Nullable
-    public static String getReferenceString(Reference reference) {
+    public static String getReferenceString(@Nonnull Reference reference) {
+        return getReferenceString(reference, null);
+    }
+
+    @Nullable
+    public static String getReferenceString(@Nonnull Reference reference, @Nullable String containingClass) {
         if (reference instanceof StringReference) {
             return String.format("\"%s\"", StringUtils.escapeString(((StringReference)reference).getString()));
         }
@@ -112,10 +132,14 @@ public final class ReferenceUtil {
             return ((TypeReference)reference).getType();
         }
         if (reference instanceof FieldReference) {
-            return getFieldDescriptor((FieldReference)reference);
+            FieldReference fieldReference = (FieldReference)reference;
+            boolean useImplicitReference = fieldReference.getDefiningClass().equals(containingClass);
+            return getFieldDescriptor((FieldReference)reference, useImplicitReference);
         }
         if (reference instanceof MethodReference) {
-            return getMethodDescriptor((MethodReference)reference);
+            MethodReference methodReference = (MethodReference)reference;
+            boolean useImplicitReference = methodReference.getDefiningClass().equals(containingClass);
+            return getMethodDescriptor((MethodReference)reference, useImplicitReference);
         }
         return null;
     }

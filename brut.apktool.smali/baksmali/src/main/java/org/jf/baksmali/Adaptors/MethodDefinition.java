@@ -56,6 +56,7 @@ import org.jf.util.IndentingWriter;
 import org.jf.util.SparseIntArray;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.*;
 
@@ -148,7 +149,13 @@ public class MethodDefinition {
 
         writer.indent(4);
         writeParameters(writer, method, methodParameters, options);
-        AnnotationFormatter.writeTo(writer, method.getAnnotations());
+
+        String containingClass = null;
+        if (options.useImplicitReferences) {
+            containingClass = method.getDefiningClass();
+        }
+        AnnotationFormatter.writeTo(writer, method.getAnnotations(), containingClass);
+
         writer.deindent(4);
         writer.write(".end method\n");
     }
@@ -191,7 +198,11 @@ public class MethodDefinition {
                     parameterRegisterCount);
         }
 
-        AnnotationFormatter.writeTo(writer, method.getAnnotations());
+        String containingClass = null;
+        if (classDef.options.useImplicitReferences) {
+            containingClass = method.getDefiningClass();
+        }
+        AnnotationFormatter.writeTo(writer, method.getAnnotations(), containingClass);
 
         writer.write('\n');
 
@@ -264,7 +275,12 @@ public class MethodDefinition {
                 writer.write("\n");
                 if (annotations.size() > 0) {
                     writer.indent(4);
-                    AnnotationFormatter.writeTo(writer, annotations);
+
+                    String containingClass = null;
+                    if (options.useImplicitReferences) {
+                        containingClass = method.getDefiningClass();
+                    }
+                    AnnotationFormatter.writeTo(writer, annotations, containingClass);
                     writer.deindent(4);
                     writer.write(".end param\n");
                 }
@@ -517,6 +533,14 @@ public class MethodDefinition {
             labelMethodItem.setLabelSequence(labelSequence);
             nextLabelSequenceByType.put(labelMethodItem.getLabelPrefix(), labelSequence + 1);
         }
+    }
+
+    @Nullable
+    private String getContainingClassForImplicitReference() {
+        if (classDef.options.useImplicitReferences) {
+            return classDef.classDef.getType();
+        }
+        return null;
     }
 
     public static class LabelCache {

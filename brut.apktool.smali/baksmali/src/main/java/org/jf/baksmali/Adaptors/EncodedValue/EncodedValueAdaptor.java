@@ -29,22 +29,26 @@
 package org.jf.baksmali.Adaptors.EncodedValue;
 
 import org.jf.baksmali.Adaptors.ReferenceFormatter;
+import org.jf.baksmali.Renderers.*;
 import org.jf.dexlib2.ValueType;
 import org.jf.dexlib2.iface.value.*;
 import org.jf.dexlib2.util.ReferenceUtil;
 import org.jf.util.IndentingWriter;
-import org.jf.baksmali.Renderers.*;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.IOException;
 
 public abstract class EncodedValueAdaptor {
-    public static void writeTo(IndentingWriter writer, EncodedValue encodedValue) throws IOException {
+    public static void writeTo(@Nonnull IndentingWriter writer, @Nonnull EncodedValue encodedValue,
+                               @Nullable String containingClass)
+            throws IOException {
         switch (encodedValue.getValueType()) {
             case ValueType.ANNOTATION:
-                AnnotationEncodedValueAdaptor.writeTo(writer, (AnnotationEncodedValue)encodedValue);
+                AnnotationEncodedValueAdaptor.writeTo(writer, (AnnotationEncodedValue)encodedValue, containingClass);
                 return;
             case ValueType.ARRAY:
-                ArrayEncodedValueAdaptor.writeTo(writer, (ArrayEncodedValue)encodedValue);
+                ArrayEncodedValueAdaptor.writeTo(writer, (ArrayEncodedValue)encodedValue, containingClass);
                 return;
             case ValueType.BOOLEAN:
                 BooleanRenderer.writeTo(writer, ((BooleanEncodedValue)encodedValue).getValue());
@@ -59,11 +63,21 @@ public abstract class EncodedValueAdaptor {
                 DoubleRenderer.writeTo(writer, ((DoubleEncodedValue)encodedValue).getValue());
                 return;
             case ValueType.ENUM:
+                EnumEncodedValue enumEncodedValue = (EnumEncodedValue)encodedValue;
+                boolean useImplicitReference = false;
+                if (enumEncodedValue.getValue().getDefiningClass().equals(containingClass)) {
+                    useImplicitReference = true;
+                }
                 writer.write(".enum ");
-                ReferenceUtil.writeFieldDescriptor(writer, ((EnumEncodedValue)encodedValue).getValue());
+                ReferenceUtil.writeFieldDescriptor(writer, enumEncodedValue.getValue(), useImplicitReference);
                 return;
             case ValueType.FIELD:
-                ReferenceUtil.writeFieldDescriptor(writer, ((FieldEncodedValue)encodedValue).getValue());
+                FieldEncodedValue fieldEncodedValue = (FieldEncodedValue)encodedValue;
+                useImplicitReference = false;
+                if (fieldEncodedValue.getValue().getDefiningClass().equals(containingClass)) {
+                    useImplicitReference = true;
+                }
+                ReferenceUtil.writeFieldDescriptor(writer, fieldEncodedValue.getValue(), useImplicitReference);
                 return;
             case ValueType.FLOAT:
                 FloatRenderer.writeTo(writer, ((FloatEncodedValue)encodedValue).getValue());
@@ -75,7 +89,12 @@ public abstract class EncodedValueAdaptor {
                 LongRenderer.writeTo(writer, ((LongEncodedValue)encodedValue).getValue());
                 return;
             case ValueType.METHOD:
-                ReferenceUtil.writeMethodDescriptor(writer, ((MethodEncodedValue)encodedValue).getValue());
+                MethodEncodedValue methodEncodedValue = (MethodEncodedValue)encodedValue;
+                useImplicitReference = false;
+                if (methodEncodedValue.getValue().getDefiningClass().equals(containingClass)) {
+                    useImplicitReference = true;
+                }
+                ReferenceUtil.writeMethodDescriptor(writer, methodEncodedValue.getValue(), useImplicitReference);
                 return;
             case ValueType.NULL:
                 writer.write("null");

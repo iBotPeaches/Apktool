@@ -91,6 +91,7 @@ public class AnalysisTest {
             options.registerInfo = baksmaliOptions.ALL | baksmaliOptions.FULLMERGE;
             options.classPath = new ClassPath();
         }
+        options.useImplicitReferences = false;
 
         for (ClassDef classDef: dexFile.getClasses()) {
             StringWriter stringWriter = new StringWriter();

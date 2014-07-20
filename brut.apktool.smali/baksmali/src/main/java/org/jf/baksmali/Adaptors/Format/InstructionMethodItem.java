@@ -41,6 +41,8 @@ import org.jf.dexlib2.iface.instruction.*;
 import org.jf.dexlib2.iface.instruction.formats.Instruction20bc;
 import org.jf.dexlib2.iface.instruction.formats.Instruction31t;
 import org.jf.dexlib2.iface.instruction.formats.UnknownInstruction;
+import org.jf.dexlib2.iface.reference.FieldReference;
+import org.jf.dexlib2.iface.reference.MethodReference;
 import org.jf.dexlib2.iface.reference.Reference;
 import org.jf.dexlib2.util.ReferenceUtil;
 import org.jf.util.ExceptionWithContext;
@@ -102,7 +104,13 @@ public class InstructionMethodItem<T extends Instruction> extends MethodItem {
             ReferenceInstruction referenceInstruction = (ReferenceInstruction)instruction;
             try {
                 Reference reference = referenceInstruction.getReference();
-                referenceString = ReferenceUtil.getReferenceString(reference);
+
+                String classContext = null;
+                if (methodDef.classDef.options.useImplicitReferences) {
+                    classContext = methodDef.method.getDefiningClass();
+                }
+
+                referenceString = ReferenceUtil.getReferenceString(reference, classContext);
                 assert referenceString != null;
             } catch (InvalidItemIndex ex) {
                 writer.write("#");

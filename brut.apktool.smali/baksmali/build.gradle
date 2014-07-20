@@ -40,6 +40,7 @@ dependencies {
     compile depends.guava
 
     testCompile depends.junit
+    testCompile project(':smali')
 
     proguard depends.proguard
 }

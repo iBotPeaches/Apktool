@@ -1637,7 +1637,7 @@ public class MethodAnalyzer {
                 String superclass = methodClass.getSuperclass();
                 if (superclass == null) {
                     throw new ExceptionWithContext("Couldn't find accessible class while resolving method %s",
-                            ReferenceUtil.getShortMethodDescriptor(resolvedMethod));
+                            ReferenceUtil.getMethodDescriptor(resolvedMethod, true));
                 }
 
                 methodClass = classPath.getClassDef(superclass);
@@ -1648,7 +1648,7 @@ public class MethodAnalyzer {
             resolvedMethod = classPath.getClass(methodClass.getType()).getMethodByVtableIndex(methodIndex);
             if (resolvedMethod == null) {
                 throw new ExceptionWithContext("Couldn't find accessible class while resolving method %s",
-                        ReferenceUtil.getShortMethodDescriptor(resolvedMethod));
+                        ReferenceUtil.getMethodDescriptor(resolvedMethod, true));
             }
             resolvedMethod = new ImmutableMethodReference(methodClass.getType(), resolvedMethod.getName(),
                     resolvedMethod.getParameterTypes(), resolvedMethod.getReturnType());

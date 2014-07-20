@@ -205,6 +205,9 @@ public class main {
                     String rif = commandLine.getOptionValue("i");
                     options.setResourceIdFiles(rif);
                     break;
+                case 't':
+                    options.useImplicitReferences = false;
+                    break;
                 case 'N':
                     disassemble = false;
                     break;
@@ -420,6 +423,10 @@ public class main {
                 .withArgName("FILES")
                 .create("i");
 
+        Option noImplicitReferencesOption = OptionBuilder.withLongOpt("no-implicit-references")
+                .withDescription("Don't use implicit (type-less) method and field references")
+                .create("t");
+
         Option dumpOption = OptionBuilder.withLongOpt("dump-to")
                 .withDescription("dumps the given dex file into a single annotated dump file named FILE" +
                         " (<dexfile>.dump by default), along with the normal disassembly")
@@ -459,6 +466,7 @@ public class main {
         basicOptions.addOption(apiLevelOption);
         basicOptions.addOption(jobsOption);
         basicOptions.addOption(resourceIdFilesOption);
+        basicOptions.addOption(noImplicitReferencesOption);
 
         debugOptions.addOption(dumpOption);
         debugOptions.addOption(ignoreErrorsOption);

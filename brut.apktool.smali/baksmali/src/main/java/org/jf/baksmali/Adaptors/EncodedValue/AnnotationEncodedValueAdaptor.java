@@ -32,28 +32,32 @@ import org.jf.dexlib2.iface.AnnotationElement;
 import org.jf.dexlib2.iface.value.AnnotationEncodedValue;
 import org.jf.util.IndentingWriter;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.Collection;
 
 public abstract class AnnotationEncodedValueAdaptor {
 
-    public static void writeTo(IndentingWriter writer, AnnotationEncodedValue annotationEncodedValue)
-                               throws IOException {
+    public static void writeTo(@Nonnull IndentingWriter writer,
+                               @Nonnull AnnotationEncodedValue annotationEncodedValue,
+                               @Nullable String containingClass) throws IOException {
         writer.write(".subannotation ");
         writer.write(annotationEncodedValue.getType());
         writer.write('\n');
 
-        writeElementsTo(writer, annotationEncodedValue.getElements());
+        writeElementsTo(writer, annotationEncodedValue.getElements(), containingClass);
         writer.write(".end subannotation");
     }
 
-    public static void writeElementsTo(IndentingWriter writer,
-                                       Collection<? extends AnnotationElement> annotationElements) throws IOException {
+    public static void writeElementsTo(@Nonnull IndentingWriter writer,
+                                       @Nonnull Collection<? extends AnnotationElement> annotationElements,
+                                       @Nullable String containingClass) throws IOException {
         writer.indent(4);
         for (AnnotationElement annotationElement: annotationElements) {
             writer.write(annotationElement.getName());
             writer.write(" = ");
-            EncodedValueAdaptor.writeTo(writer, annotationElement.getValue());
+            EncodedValueAdaptor.writeTo(writer, annotationElement.getValue(), containingClass);
             writer.write('\n');
         }
         writer.deindent(4);
