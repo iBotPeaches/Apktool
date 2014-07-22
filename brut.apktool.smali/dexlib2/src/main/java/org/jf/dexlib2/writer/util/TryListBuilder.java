@@ -166,7 +166,6 @@ public class TryListBuilder<EH extends ExceptionHandler>
                 String existingType = existingHandler.getExceptionType();
                 String newType = handler.getExceptionType();
 
-                // Don't add it if we already have a handler of the same type
                 if (existingType == null) {
                     if (newType == null) {
                         if (existingHandler.getHandlerCodeAddress() != handler.getHandlerCodeAddress()) {
@@ -176,10 +175,9 @@ public class TryListBuilder<EH extends ExceptionHandler>
                         return;
                     }
                 } else if (existingType.equals(newType)) {
-                    if (existingHandler.getHandlerCodeAddress() != handler.getHandlerCodeAddress()) {
-                        throw new InvalidTryException(
-                                "Multiple overlapping catches for %s with different handlers", existingType);
-                    }
+                    // dalvik doesn't reject cases when there are multiple catches with the same exception
+                    // but different handlers. In practice, the first handler "wins". Since the later
+                    // handler will never be used, we don't add it.
                     return;
                 }
             }

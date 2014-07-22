@@ -449,12 +449,8 @@ public class TryListBuilderTest {
         TryListBuilder tlb = new TryListBuilder();
 
         tlb.addHandler(5, 10, new ImmutableExceptionHandler("LException1;", 5));
-        try {
-            tlb.addHandler(0, 15, new ImmutableExceptionHandler("LException1;", 6));
-        } catch (TryListBuilder.InvalidTryException ex) {
-            return;
-        }
-        Assert.fail();
+        tlb.addHandler(0, 15, new ImmutableExceptionHandler("LException1;", 6));
+        // no exception should be thrown...
     }
 
     @Test
