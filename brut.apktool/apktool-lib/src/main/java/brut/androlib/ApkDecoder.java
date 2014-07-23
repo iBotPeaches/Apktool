@@ -69,6 +69,10 @@ public class ApkDecoder {
         mApi = api;
     }
 
+    public int getApi() {
+        return mApi;
+    }
+
     public void decode() throws AndrolibException, IOException {
         File outDir = getOutDir();
 
