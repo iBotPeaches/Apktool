@@ -503,8 +503,9 @@ public class InstructionMethodItem<T extends Instruction> extends MethodItem {
         if (resource != null) {
             writer.write("    # ");
             writer.write(resource);
+            return true;
         }
-        return (resource != null);
+        return false;
     }
 
     protected void writeFieldOffset(IndentingWriter writer) throws IOException {
