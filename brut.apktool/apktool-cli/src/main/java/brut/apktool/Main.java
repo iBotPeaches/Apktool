@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.logging.*;
 
+import brut.directory.DirectoryException;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
@@ -186,6 +187,9 @@ public class Main {
             System.exit(1);
         } catch (IOException ex) {
             System.err.println("Could not modify file. Please ensure you have permission.");
+            System.exit(1);
+        } catch (DirectoryException ex) {
+            System.err.println("Could not modify internal dex files. Please ensure you have permission.");
             System.exit(1);
         }
 
