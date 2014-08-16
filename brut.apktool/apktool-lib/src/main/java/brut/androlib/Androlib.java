@@ -71,7 +71,12 @@ public class Androlib {
     public void decodeSourcesSmali(File apkFile, File outDir, String filename, boolean debug, String debugLinePrefix,
                                    boolean bakdeb, int api) throws AndrolibException {
         try {
-            File smaliDir = new File(outDir, SMALI_DIRNAME + "_" + filename.substring(0, filename.indexOf(".")));
+            File smaliDir;
+            if (filename.equalsIgnoreCase("classes.dex")) {
+                smaliDir = new File(outDir, SMALI_DIRNAME);
+            } else {
+                smaliDir = new File(outDir, SMALI_DIRNAME + "_" + filename.substring(0, filename.indexOf(".")));
+            }
             OS.rmdir(smaliDir);
             smaliDir.mkdirs();
             LOGGER.info("Baksmaling " + filename + "...");
