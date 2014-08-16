@@ -46,16 +46,21 @@ import java.util.zip.ZipFile;
 public final class DexFileFactory {
     @Nonnull
     public static DexBackedDexFile loadDexFile(String path, int api) throws IOException {
-        return loadDexFile(new File(path), new Opcodes(api));
+        return loadDexFile(new File(path), "classes.dex", new Opcodes(api));
     }
 
     @Nonnull
     public static DexBackedDexFile loadDexFile(File dexFile, int api) throws IOException {
-        return loadDexFile(dexFile, new Opcodes(api));
+        return loadDexFile(dexFile, "classes.dex", new Opcodes(api));
     }
 
     @Nonnull
-    public static DexBackedDexFile loadDexFile(File dexFile, @Nonnull Opcodes opcodes) throws IOException {
+    public static DexBackedDexFile loadDexFile(File dexFile, String dexEntry, int api) throws IOException {
+        return loadDexFile(dexFile, dexEntry, new Opcodes(api));
+    }
+
+    @Nonnull
+    public static DexBackedDexFile loadDexFile(File dexFile, String filename, @Nonnull Opcodes opcodes) throws IOException {
         ZipFile zipFile = null;
         boolean isZipFile = false;
         try {
@@ -63,16 +68,16 @@ public final class DexFileFactory {
             // if we get here, it's safe to assume we have a zip file
             isZipFile = true;
 
-            ZipEntry zipEntry = zipFile.getEntry("classes.dex");
+            ZipEntry zipEntry = zipFile.getEntry(filename);
             if (zipEntry == null) {
                 throw new NoClassesDexException("zip file %s does not contain a classes.dex file", dexFile.getName());
             }
             long fileLength = zipEntry.getSize();
             if (fileLength < 40) {
                 throw new ExceptionWithContext(
-                        "The classes.dex file in %s is too small to be a valid dex file", dexFile.getName());
+                        "The " + filename + " file in %s is too small to be a valid dex file", dexFile.getName());
             } else if (fileLength > Integer.MAX_VALUE) {
-                throw new ExceptionWithContext("The classes.dex file in %s is too large to read in", dexFile.getName());
+                throw new ExceptionWithContext("The " + filename + " file in %s is too large to read in", dexFile.getName());
             }
             byte[] dexBytes = new byte[(int)fileLength];
             ByteStreams.readFully(zipFile.getInputStream(zipEntry), dexBytes);
