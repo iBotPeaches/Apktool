@@ -164,7 +164,6 @@ public class Androlib {
                 if (!isAPKFileNames(file) && !file.endsWith(".dex")) {
 
                     // copy file out of archive into special "unknown" folder
-                    // to be re-included on build
                     unk.copyToDir(unknownOut, file);
                     try {
                         // ignore encryption
@@ -176,9 +175,7 @@ public class Androlib {
                         if (invZipFile != null) {
                             mResUnknownFiles.addUnknownFileInfo(invZipFile.getName(), String.valueOf(invZipFile.getMethod()));
                         }
-                    } catch (NullPointerException ignored) {
-
-                    }
+                    } catch (NullPointerException ignored) { }
                 }
             }
             apkZipFile.close();
@@ -216,7 +213,6 @@ public class Androlib {
             throws AndrolibException {
         DumperOptions options = new DumperOptions();
         options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-        // options.setIndent(4);
         Yaml yaml = new Yaml(options);
 
         Writer writer = null;
@@ -230,8 +226,7 @@ public class Androlib {
             if (writer != null) {
                 try {
                     writer.close();
-                } catch (IOException ex) {
-                }
+                } catch (IOException ex) { }
             }
         }
     }
@@ -249,14 +244,12 @@ public class Androlib {
             if (in != null) {
                 try {
                     in.close();
-                } catch (IOException ex) {
-                }
+                } catch (IOException ex) { }
             }
         }
     }
 
-    public void build(File appDir, File outFile, HashMap<String, Boolean> flags, String aaptPath)
-            throws BrutException {
+    public void build(File appDir, File outFile, HashMap<String, Boolean> flags, String aaptPath) throws BrutException {
         build(new ExtFile(appDir), outFile, flags, aaptPath);
     }
 
@@ -279,8 +272,7 @@ public class Androlib {
 
         if (outFile == null) {
             String outFileName = (String) meta.get("apkFileName");
-            outFile = new File(appDir, "dist" + File.separator
-                    + (outFileName == null ? "out.apk" : outFileName));
+            outFile = new File(appDir, "dist" + File.separator + (outFileName == null ? "out.apk" : outFileName));
         }
 
         new File(appDir, APK_DIRNAME).mkdirs();
@@ -298,7 +290,9 @@ public class Androlib {
 
     public void buildSources(File appDir, HashMap<String, Boolean> flags)
             throws AndrolibException {
-        if (!buildSourcesRaw(appDir, "classes.dex", flags) && !buildSourcesSmali(appDir, "smali", "classes.dex", flags) && !buildSourcesJava(appDir, flags)) {
+        if (!buildSourcesRaw(appDir, "classes.dex", flags)
+                && !buildSourcesSmali(appDir, "smali", "classes.dex", flags)
+                && !buildSourcesJava(appDir, flags)) {
             LOGGER.warning("Could not find sources");
         }
     }
@@ -312,7 +306,9 @@ public class Androlib {
                 if (name.startsWith("smali_")) {
                     String filename = name.substring(name.indexOf("_") + 1) + ".dex";
 
-                    if (!buildSourcesRaw(appDir, filename, flags) && !buildSourcesSmali(appDir, name, filename, flags) && !buildSourcesJava(appDir, flags)) {
+                    if (!buildSourcesRaw(appDir, filename, flags)
+                            && !buildSourcesSmali(appDir, name, filename, flags)
+                            && !buildSourcesJava(appDir, flags)) {
                         LOGGER.warning("Could not find sources");
                     }
                 }
