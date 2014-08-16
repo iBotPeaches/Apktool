@@ -165,7 +165,6 @@ public class ApkDecoder {
                     }
                 }
             }
-
         }
 
         mAndrolib.decodeRawFiles(mApkFile, outDir);

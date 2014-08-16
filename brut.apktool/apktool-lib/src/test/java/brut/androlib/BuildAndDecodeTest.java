@@ -40,13 +40,11 @@ public class BuildAndDecodeTest {
         sTestOrigDir = new ExtFile(sTmpDir, "testapp-orig");
         sTestNewDir = new ExtFile(sTmpDir, "testapp-new");
         LOGGER.info("Unpacking testapp...");
-        TestUtils.copyResourceDir(BuildAndDecodeTest.class,
-                "brut/apktool/testapp/", sTestOrigDir);
+        TestUtils.copyResourceDir(BuildAndDecodeTest.class, "brut/apktool/testapp/", sTestOrigDir);
 
         LOGGER.info("Building testapp.apk...");
         File testApk = new File(sTmpDir, "testapp.apk");
-        new Androlib().build(sTestOrigDir, testApk,
-                TestUtils.returnStockHashMap(),"");
+        new Androlib().build(sTestOrigDir, testApk, TestUtils.returnStockHashMap(),"");
 
         LOGGER.info("Decoding testapp.apk...");
         ApkDecoder apkDecoder = new ApkDecoder(testApk);
@@ -219,8 +217,19 @@ public class BuildAndDecodeTest {
         compareUnknownFiles();
     }
 
+    @Test
+    public void multipleDexTest() throws BrutException, IOException {
+        compareBinaryFolder("/smali_classes2", false);
+    }
+
+    @Test
+    public void singleDexTest() throws BrutException, IOException {
+        compareBinaryFolder("/smali", false);
+    }
+
     @SuppressWarnings("unchecked")
-    private void compareUnknownFiles() throws BrutException, IOException {
+    private void compareUnknownFiles()
+            throws BrutException, IOException {
         Map<String, Object> control = new Androlib().readMetaFile(sTestOrigDir);
         Map<String, Object> test = new Androlib().readMetaFile(sTestNewDir);
         assertTrue(control.containsKey("unknownFiles"));
@@ -231,8 +240,8 @@ public class BuildAndDecodeTest {
         assertTrue(control_files.size() == test_files.size());
     }
 
-    private boolean compareBinaryFolder(String path, boolean res) throws BrutException, IOException {
-
+    private boolean compareBinaryFolder(String path, boolean res)
+            throws BrutException, IOException {
         String tmp = "";
         if (res) {
             tmp = File.separatorChar + "res" + File.separatorChar;
@@ -265,8 +274,7 @@ public class BuildAndDecodeTest {
     }
 
     private void compareValuesFiles(String path) throws BrutException {
-        compareXmlFiles("res/" + path, new ElementNameAndAttributeQualifier(
-                "name"));
+        compareXmlFiles("res/" + path, new ElementNameAndAttributeQualifier("name"));
     }
 
     private void compareXmlFiles(String path) throws BrutException {
@@ -291,14 +299,12 @@ public class BuildAndDecodeTest {
             diff.overrideElementQualifier(qualifier);
         }
 
-        assertTrue(path + ": " + diff.getAllDifferences().toString(),
-                diff.similar());
+        assertTrue(path + ": " + diff.getAllDifferences().toString(), diff.similar());
     }
 
     private static ExtFile sTmpDir;
     private static ExtFile sTestOrigDir;
     private static ExtFile sTestNewDir;
 
-    private final static Logger LOGGER = Logger
-            .getLogger(BuildAndDecodeTest.class.getName());
+    private final static Logger LOGGER = Logger.getLogger(BuildAndDecodeTest.class.getName());
 }
