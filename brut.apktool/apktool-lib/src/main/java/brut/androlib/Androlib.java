@@ -185,11 +185,11 @@ public class Androlib {
             // loop all items in container recursively, ignoring any that are pre-defined by aapt
             Set<String> files = unk.getFiles(true);
             for (String file : files) {
-                if (!isAPKFileNames(file)) {
+                if (!isAPKFileNames(file) && !file.endsWith(".dex")) {
 
                     // copy file out of archive into special "unknown" folder
                     // to be re-included on build
-                    unk.copyToDir(unknownOut,file);
+                    unk.copyToDir(unknownOut, file);
                     try {
                         // ignore encryption
                         apkZipFile.getEntry(file).getGeneralPurposeBit().useEncryption(false);
@@ -309,6 +309,7 @@ public class Androlib {
 
         new File(appDir, APK_DIRNAME).mkdirs();
         buildSources(appDir, flags);
+        buildNonDefaultSources(appDir, flags);
         buildResources(appDir, flags, (Map<String, Object>) meta.get("usesFramework"));
         buildLib(appDir, flags);
         buildCopyOriginalFiles(appDir, flags);
@@ -321,44 +322,61 @@ public class Androlib {
 
     public void buildSources(File appDir, HashMap<String, Boolean> flags)
             throws AndrolibException {
-        if (!buildSourcesRaw(appDir, flags)
-                && !buildSourcesSmali(appDir, flags)
-                && !buildSourcesJava(appDir, flags)) {
+        if (!buildSourcesRaw(appDir, "classes.dex", flags) && !buildSourcesSmali(appDir, "smali", "classes.dex", flags) && !buildSourcesJava(appDir, flags)) {
             LOGGER.warning("Could not find sources");
         }
     }
 
-    public boolean buildSourcesRaw(File appDir, HashMap<String, Boolean> flags)
+    public void buildNonDefaultSources(ExtFile appDir, HashMap<String, Boolean> flags)
             throws AndrolibException {
         try {
-            File working = new File(appDir, "classes.dex");
-            if (!working.exists()) {
-                return false;
+            Map<String, Directory> dirs = appDir.getDirectory().getDirs();
+            for (Map.Entry<String, Directory> directory : dirs.entrySet()) {
+                String name = directory.getKey();
+                if (name.startsWith("smali_")) {
+                    String filename = name.substring(name.indexOf("_") + 1) + ".dex";
+
+                    if (!buildSourcesRaw(appDir, filename, flags) && !buildSourcesSmali(appDir, name, filename, flags) && !buildSourcesJava(appDir, flags)) {
+                        LOGGER.warning("Could not find sources");
+                    }
+                }
             }
-            File stored = new File(appDir, APK_DIRNAME + "/classes.dex");
-            if (flags.get("forceBuildAll") || isModified(working, stored)) {
-                LOGGER.info("Copying classes.dex file...");
-                BrutIO.copyAndClose(new FileInputStream(working),
-                        new FileOutputStream(stored));
-            }
-            return true;
-        } catch (IOException ex) {
+        } catch(DirectoryException ex) {
             throw new AndrolibException(ex);
         }
     }
 
-    public boolean buildSourcesSmali(File appDir, HashMap<String, Boolean> flags)
+    public boolean buildSourcesRaw(File appDir, String filename, HashMap<String, Boolean> flags)
             throws AndrolibException {
-        ExtFile smaliDir = new ExtFile(appDir, "smali");
+        File working = new File(appDir, filename);
+        if (!working.exists()) {
+            return false;
+        }
+        File stored = new File(appDir, APK_DIRNAME + "/" + filename);
+        if (flags.get("forceBuildAll") || isModified(working, stored)) {
+            LOGGER.info("Copying " + appDir.toString() + " " + filename + " file...");
+            try {
+                BrutIO.copyAndClose(new FileInputStream(working), new FileOutputStream(stored));
+                return true;
+            } catch (IOException ex) {
+                throw new AndrolibException(ex);
+            }
+        }
+        return true;
+    }
+
+    public boolean buildSourcesSmali(File appDir, String folder, String filename, HashMap<String, Boolean> flags)
+            throws AndrolibException {
+        ExtFile smaliDir = new ExtFile(appDir, folder);
         if (!smaliDir.exists()) {
             return false;
         }
-        File dex = new File(appDir, APK_DIRNAME + "/classes.dex");
+        File dex = new File(appDir, APK_DIRNAME + "/" + filename);
         if (!flags.get("forceBuildAll")) {
             LOGGER.info("Checking whether sources has changed...");
         }
         if (flags.get("forceBuildAll") || isModified(smaliDir, dex)) {
-            LOGGER.info("Smaling...");
+            LOGGER.info("Smaling " + folder + " folder into " + filename +"...");
             dex.delete();
             SmaliBuilder.build(smaliDir, dex, flags);
         }
@@ -385,8 +403,7 @@ public class Androlib {
 
     public void buildResources(ExtFile appDir, HashMap<String, Boolean> flags, Map<String, Object> usesFramework)
             throws BrutException {
-        if (!buildResourcesRaw(appDir, flags)
-                && !buildResourcesFull(appDir, flags, usesFramework)
+        if (!buildResourcesRaw(appDir, flags) && !buildResourcesFull(appDir, flags, usesFramework)
                 && !buildManifest(appDir, flags, usesFramework)) {
             LOGGER.warning("Could not find resources");
         }
@@ -727,8 +744,7 @@ public class Androlib {
     private String mAaptPath = null;
     private Path mPath = null;
 
-    private final static Logger LOGGER = Logger.getLogger(Androlib.class
-            .getName());
+    private final static Logger LOGGER = Logger.getLogger(Androlib.class.getName());
 
     private final static String SMALI_DIRNAME = "smali";
     private final static String APK_DIRNAME = "build/apk";
@@ -742,5 +758,5 @@ public class Androlib {
     private final static String[] APK_MANIFEST_FILENAMES = new String[] {
             "AndroidManifest.xml" };
     private final static String[] APK_STANDARD_ALL_FILENAMES = new String[] {
-            "classes.dex", "AndroidManifest.xml", "resources.arsc","res","lib", "libs","assets","META-INF" };
+            "classes.dex", "AndroidManifest.xml", "resources.arsc", "res", "lib", "libs", "assets", "META-INF" };
 }
