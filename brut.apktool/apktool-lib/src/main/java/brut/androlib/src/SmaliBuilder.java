@@ -36,13 +36,12 @@ import org.jf.dexlib2.writer.io.FileDataStore;
  */
 public class SmaliBuilder {
 
-    public static void build(ExtFile smaliDir, File dexFile,
-                             HashMap<String, Boolean> flags) throws AndrolibException {
+    public static void build(ExtFile smaliDir, File dexFile, HashMap<String, Boolean> flags)
+            throws AndrolibException {
         new SmaliBuilder(smaliDir, dexFile, flags).build();
     }
 
-    private SmaliBuilder(ExtFile smaliDir, File dexFile,
-                         HashMap<String, Boolean> flags) {
+    private SmaliBuilder(ExtFile smaliDir, File dexFile, HashMap<String, Boolean> flags) {
         mSmaliDir = smaliDir;
         mDexFile = dexFile;
         mFlags = flags;
@@ -61,8 +60,8 @@ public class SmaliBuilder {
         }
     }
 
-    private void buildFile(String fileName, DexBuilder dexBuilder) throws AndrolibException,
-            IOException {
+    private void buildFile(String fileName, DexBuilder dexBuilder)
+            throws AndrolibException, IOException {
         File inFile = new File(mSmaliDir, fileName);
         InputStream inStream = new FileInputStream(inFile);
 
@@ -96,8 +95,7 @@ public class SmaliBuilder {
             out.append(".source \"").append(inFile.getName()).append("\"\n");
             while (it.hasNext()) {
                 String line = it.next().split("//", 2)[1].trim();
-                if (line.isEmpty() || line.charAt(0) == '#'
-                        || line.startsWith(".source")) {
+                if (line.isEmpty() || line.charAt(0) == '#' || line.startsWith(".source")) {
                     continue;
                 }
                 if (line.startsWith(".method ")) {
@@ -123,6 +121,5 @@ public class SmaliBuilder {
     private final File mDexFile;
     private final HashMap<String, Boolean> mFlags;
 
-    private final static Logger LOGGER = Logger.getLogger(SmaliBuilder.class
-            .getName());
+    private final static Logger LOGGER = Logger.getLogger(SmaliBuilder.class.getName());
 }

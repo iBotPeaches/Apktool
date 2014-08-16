@@ -41,15 +41,16 @@ import java.nio.file.attribute.BasicFileAttributes;
  */
 public class SmaliDecoder {
 
-    public static void decode(File apkFile, File outDir, boolean debug, String debugLinePrefix,
+    public static void decode(File apkFile, File outDir, String dexName, boolean debug, String debugLinePrefix,
                               boolean bakdeb, int api) throws AndrolibException {
-        new SmaliDecoder(apkFile, outDir, debug, debugLinePrefix, bakdeb, api).decode();
+        new SmaliDecoder(apkFile, outDir, dexName, debug, debugLinePrefix, bakdeb, api).decode();
     }
 
-    private SmaliDecoder(File apkFile, File outDir, boolean debug, String debugLinePrefix,
+    private SmaliDecoder(File apkFile, File outDir, String dexName, boolean debug, String debugLinePrefix,
                          boolean bakdeb, int api) {
         mApkFile = apkFile;
         mOutDir = outDir.toPath();
+        mDexFile = dexName;
         mDebug = debug;
         mDebugLinePrefix = debugLinePrefix;
         mBakDeb = bakdeb;
@@ -90,7 +91,7 @@ public class SmaliDecoder {
             }
 
             // create the dex
-            DexBackedDexFile dexFile = DexFileFactory.loadDexFile(mApkFile, mApi);
+            DexBackedDexFile dexFile = DexFileFactory.loadDexFile(mApkFile, mDexFile, mApi);
 
             if (dexFile.isOdexFile()) {
                 throw new AndrolibException("Warning: You are disassembling an odex file without deodexing it.");
@@ -115,9 +116,9 @@ public class SmaliDecoder {
     private final Path mOutDir;
     private final boolean mDebug;
     private final String mDebugLinePrefix;
+    private final String mDexFile;
     private final boolean mBakDeb;
     private final int mApi;
-
 
     private class SmaliFileVisitor extends SimpleFileVisitor<Path> {
         @Override
