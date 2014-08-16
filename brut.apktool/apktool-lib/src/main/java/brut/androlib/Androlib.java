@@ -58,48 +58,24 @@ public class Androlib {
         return mAndRes.getResTable(apkFile, loadMainPkg);
     }
 
-    public void decodeSourcesRaw(ExtFile apkFile, File outDir)
-            throws AndrolibException {
-        LOGGER.info("Copying raw classes.dex file...");
-        copySourceRaw(apkFile, outDir, "classes.dex");
-    }
-
-    public void decodeNonDefaultSourcesRaw(ExtFile apkFile, File outDir, String filename)
-            throws AndrolibException {
-        LOGGER.info("Copying raw " + filename + " file...");
-        copySourceRaw(apkFile, outDir, filename);
-    }
-
-
-    public void copySourceRaw(ExtFile apkFile, File outDir, String filename)
+    public void decodeSourcesRaw(ExtFile apkFile, File outDir, String filename)
             throws AndrolibException {
         try {
+            LOGGER.info("Copying raw classes.dex file...");
             apkFile.getDirectory().copyToDir(outDir, filename);
         } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
         }
     }
 
-    public void decodeSourcesSmali(File apkFile, File outDir, boolean debug, String debugLinePrefix,
+    public void decodeSourcesSmali(File apkFile, File outDir, String filename, boolean debug, String debugLinePrefix,
                                    boolean bakdeb, int api) throws AndrolibException {
-        try {
-            File smaliDir = new File(outDir, SMALI_DIRNAME);
-            OS.rmdir(smaliDir);
-            smaliDir.mkdirs();
-            LOGGER.info("Baksmaling classes.dex...");
-            SmaliDecoder.decode(apkFile, smaliDir, debug, debugLinePrefix, bakdeb, api);
-        } catch (BrutException ex) {
-            throw new AndrolibException(ex);
-        }
-    }
-
-    public void decodeNonDefaultSourcesSmali(File apkFile, File outDir, String filename, boolean debug,
-                                             String debugLinePrefix, boolean bakdeb, int api) throws AndrolibException {
         try {
             File smaliDir = new File(outDir, SMALI_DIRNAME + "_" + filename.substring(0, filename.indexOf(".")));
             OS.rmdir(smaliDir);
+            smaliDir.mkdirs();
             LOGGER.info("Baksmaling " + filename + "...");
-            SmaliDecoder.decode(apkFile, smaliDir, debug, debugLinePrefix, bakdeb, api);
+            SmaliDecoder.decode(apkFile, smaliDir, filename, debug, debugLinePrefix, bakdeb, api);
         } catch (BrutException ex) {
             throw new AndrolibException(ex);
         }

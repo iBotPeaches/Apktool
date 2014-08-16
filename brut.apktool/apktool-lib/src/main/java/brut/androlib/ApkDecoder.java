@@ -134,10 +134,10 @@ public class ApkDecoder {
         if (hasSources()) {
             switch (mDecodeSources) {
                 case DECODE_SOURCES_NONE:
-                    mAndrolib.decodeSourcesRaw(mApkFile, outDir);
+                    mAndrolib.decodeSourcesRaw(mApkFile, outDir, "classes.dex");
                     break;
                 case DECODE_SOURCES_SMALI:
-                    mAndrolib.decodeSourcesSmali(mApkFile, outDir, mDebug, mDebugLinePrefix, mBakDeb, mApi);
+                    mAndrolib.decodeSourcesSmali(mApkFile, outDir, "classes.dex", mDebug, mDebugLinePrefix, mBakDeb, mApi);
                     break;
                 case DECODE_SOURCES_JAVA:
                     mAndrolib.decodeSourcesJava(mApkFile, outDir, mDebug);
@@ -153,10 +153,10 @@ public class ApkDecoder {
                     if (! file.equalsIgnoreCase("classes.dex")) {
                         switch(mDecodeSources) {
                             case DECODE_SOURCES_NONE:
-                                mAndrolib.decodeNonDefaultSourcesRaw(mApkFile, outDir, file);
+                                mAndrolib.decodeSourcesRaw(mApkFile, outDir, file);
                                 break;
                             case DECODE_SOURCES_SMALI:
-                                mAndrolib.decodeNonDefaultSourcesSmali(mApkFile, outDir, file, mDebug, mDebugLinePrefix, mBakDeb, mApi);
+                                mAndrolib.decodeSourcesSmali(mApkFile, outDir, file, mDebug, mDebugLinePrefix, mBakDeb, mApi);
                                 break;
                             case DECODE_SOURCES_JAVA:
                                 mAndrolib.decodeSourcesJava(mApkFile, outDir, mDebug);
