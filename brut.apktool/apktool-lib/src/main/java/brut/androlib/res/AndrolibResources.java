@@ -839,15 +839,13 @@ final public class AndrolibResources {
     public static boolean sKeepBroken = false;
     public static String sFrameworkFolder = null;
 
-    private final static Logger LOGGER = Logger
-            .getLogger(AndrolibResources.class.getName());
+    private final static Logger LOGGER = Logger.getLogger(AndrolibResources.class.getName());
 
     private String mMinSdkVersion = null;
     private String mMaxSdkVersion = null;
     private String mTargetSdkVersion = null;
     private String mVersionCode = null;
     private String mVersionName = null;
-
     private String mPackageRenamed = null;
     private String mPackageOriginal = null;
     private String mPackageId = null;
