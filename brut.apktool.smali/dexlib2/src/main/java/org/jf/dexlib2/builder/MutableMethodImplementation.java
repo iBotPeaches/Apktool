@@ -213,8 +213,10 @@ public class MutableMethodImplementation implements MethodImplementation {
             return;
         }
         int codeAddress = instructionList.get(index).getCodeAddress();
+        MethodLocation newLoc = new MethodLocation(instruction, codeAddress, index);
+        instructionList.add(index, newLoc);
+        instruction.location = newLoc;
 
-        instructionList.add(index, new MethodLocation(instruction, codeAddress, index));
         codeAddress += instruction.getCodeUnits();
 
         for (int i=index+1; i<instructionList.size(); i++) {
