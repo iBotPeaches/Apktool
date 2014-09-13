@@ -208,6 +208,9 @@ public class main {
                 case 't':
                     options.useImplicitReferences = false;
                     break;
+                case 'e':
+                    options.dexEntry = commandLine.getOptionValue("e");
+                    break;
                 case 'N':
                     disassemble = false;
                     break;
@@ -251,7 +254,7 @@ public class main {
         }
 
         //Read in and parse the dex file
-        DexBackedDexFile dexFile = DexFileFactory.loadDexFile(dexFileFile, options.apiLevel);
+        DexBackedDexFile dexFile = DexFileFactory.loadDexFile(dexFileFile, options.dexEntry, options.apiLevel);
 
         if (dexFile.isOdexFile()) {
             if (!options.deodex) {
@@ -450,6 +453,12 @@ public class main {
                 .withArgName("FILE")
                 .create("T");
 
+        Option dexEntryOption = OptionBuilder.withLongOpt("dex-file")
+                .withDescription("looks for dex file named DEX_FILE, defaults to classes.dex")
+                .withArgName("DEX_FILE")
+                .hasArg()
+                .create("e");
+
         basicOptions.addOption(versionOption);
         basicOptions.addOption(helpOption);
         basicOptions.addOption(outputDirOption);
@@ -467,6 +476,7 @@ public class main {
         basicOptions.addOption(jobsOption);
         basicOptions.addOption(resourceIdFilesOption);
         basicOptions.addOption(noImplicitReferencesOption);
+        basicOptions.addOption(dexEntryOption);
 
         debugOptions.addOption(dumpOption);
         debugOptions.addOption(ignoreErrorsOption);
