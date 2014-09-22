@@ -28,4 +28,7 @@
         <item>foo</item>
         <item>foo2</item>
     </string-array>
+    <string-array name="issue_677" formatted="false">
+        <item>category=temp%temp%foo</item>
+    </string-array>
 </resources>

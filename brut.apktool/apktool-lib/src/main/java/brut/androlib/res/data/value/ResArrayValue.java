@@ -53,6 +53,16 @@ public class ResArrayValue extends ResBagValue implements
         type = (type == null ? "" : type + "-") + "array";
         serializer.startTag(null, type);
         serializer.attribute(null, "name", res.getResSpec().getName());
+
+        // lets check if we need to add formatted="false" to this array
+        for (int i = 0; i < mItems.length; i++) {
+            if (mItems[i].hasMultipleNonPositionalSubstitutions()) {
+                serializer.attribute(null, "formatted", "false");
+                break;
+            }
+        }
+
+        // add <item>'s
         for (int i = 0; i < mItems.length; i++) {
             serializer.startTag(null, "item");
             serializer.text(mItems[i].encodeAsResXmlNonEscapedItemValue());

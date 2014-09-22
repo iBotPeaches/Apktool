@@ -175,9 +175,15 @@ public final class ResXmlEncoders {
         }
         int pos;
         int pos2 = 0;
-        int length = str.length();
         List<Integer> nonPositional = new ArrayList<>();
         List<Integer> positional = new ArrayList<>();
+
+        if (str == null) {
+            return new Duo<>(nonPositional, positional);
+        }
+
+        int length = str.length();
+
         while ((pos = str.indexOf('%', pos2)) != -1) {
             pos2 = pos + 1;
             if (pos2 == length) {

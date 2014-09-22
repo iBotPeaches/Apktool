@@ -61,6 +61,10 @@ public abstract class ResScalarValue extends ResValue implements
         return encodeAsResXmlValue().replace("&amp;", "&").replace("&lt;","<");
     }
 
+    public boolean hasMultipleNonPositionalSubstitutions() throws AndrolibException {
+        return ResXmlEncoders.hasMultipleNonPositionalSubstitutions(mRawValue);
+    }
+
     @Override
     public void serializeToResValuesXml(XmlSerializer serializer,
                                         ResResource res) throws IOException, AndrolibException {
