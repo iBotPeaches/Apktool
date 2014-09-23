@@ -71,8 +71,7 @@ final public class AndrolibResources {
     public ResPackage loadMainPkg(ResTable resTable, ExtFile apkFile)
             throws AndrolibException {
         LOGGER.info("Loading resource table...");
-        ResPackage[] pkgs = getResPackagesFromApk(apkFile, resTable,
-                sKeepBroken);
+        ResPackage[] pkgs = getResPackagesFromApk(apkFile, resTable, sKeepBroken);
         ResPackage pkg = null;
 
         // @todo handle multiple packages using findPackageWithMostResSpecs()
@@ -92,31 +91,27 @@ final public class AndrolibResources {
         }
 
         if (pkg == null) {
-            throw new AndrolibException(
-                    "Arsc files with zero or multiple packages");
+            throw new AndrolibException("Arsc files with zero or multiple packages");
         }
 
         resTable.addPackage(pkg, true);
         return pkg;
     }
 
-    public ResPackage loadFrameworkPkg(ResTable resTable, int id,
-                                       String frameTag) throws AndrolibException {
+    public ResPackage loadFrameworkPkg(ResTable resTable, int id, String frameTag)
+            throws AndrolibException {
         File apk = getFrameworkApk(id, frameTag);
 
         LOGGER.info("Loading resource table from file: " + apk);
-        ResPackage[] pkgs = getResPackagesFromApk(new ExtFile(apk), resTable,
-                true);
+        ResPackage[] pkgs = getResPackagesFromApk(new ExtFile(apk), resTable, true);
 
         if (pkgs.length != 1) {
-            throw new AndrolibException(
-                    "Arsc files with zero or multiple packages");
+            throw new AndrolibException("Arsc files with zero or multiple packages");
         }
 
         ResPackage pkg = pkgs[0];
         if (pkg.getId() != id) {
-            throw new AndrolibException("Expected pkg of id: "
-                    + String.valueOf(id) + ", got: " + pkg.getId());
+            throw new AndrolibException("Expected pkg of id: " + String.valueOf(id) + ", got: " + pkg.getId());
         }
 
         resTable.addPackage(pkg, false);
@@ -142,8 +137,7 @@ final public class AndrolibResources {
             out = new FileDirectory(outDir);
 
             LOGGER.info("Decoding AndroidManifest.xml with only framework resources...");
-            fileDecoder.decodeManifest(inApk, "AndroidManifest.xml", out,
-                    "AndroidManifest.xml");
+            fileDecoder.decodeManifest(inApk, "AndroidManifest.xml", out, "AndroidManifest.xml");
 
         } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
@@ -244,8 +238,7 @@ final public class AndrolibResources {
 
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-        Document doc = docBuilder.parse(filename);
-        return doc;
+        return docBuilder.parse(filename);
     }
 
     private void saveDocument(String filename, Document doc)
@@ -266,8 +259,7 @@ final public class AndrolibResources {
         ResFileDecoder fileDecoder = duo.m1;
         ResAttrDecoder attrDecoder = duo.m2.getAttrDecoder();
 
-        attrDecoder.setCurrentPackage(resTable.listMainPackages().iterator()
-                .next());
+        attrDecoder.setCurrentPackage(resTable.listMainPackages().iterator().next());
 
         Directory inApk, in = null, out;
         try {
@@ -276,8 +268,7 @@ final public class AndrolibResources {
 
             LOGGER.info("Decoding AndroidManifest.xml with resources...");
 
-            fileDecoder.decodeManifest(inApk, "AndroidManifest.xml", out,
-                    "AndroidManifest.xml");
+            fileDecoder.decodeManifest(inApk, "AndroidManifest.xml", out, "AndroidManifest.xml");
 
             // Remove versionName / versionCode (aapt API 16)
             if (!resTable.getAnalysisMode()) {
@@ -347,8 +338,7 @@ final public class AndrolibResources {
         }
     }
 
-    public void aaptPackage(File apkFile, File manifest, File resDir,
-                            File rawDir, File assetDir, File[] include,
+    public void aaptPackage(File apkFile, File manifest, File resDir, File rawDir, File assetDir, File[] include,
                             HashMap<String, Boolean> flags, String aaptPath)
             throws AndrolibException {
 
@@ -356,7 +346,7 @@ final public class AndrolibResources {
         List<String> cmd = new ArrayList<String>();
 
         // path for aapt binary
-        if (!aaptPath.isEmpty()) {
+        if (! aaptPath.isEmpty()) {
             File aaptFile = new File(aaptPath);
             if (aaptFile.canRead() && aaptFile.exists()) {
                 aaptFile.setExecutable(true);
@@ -477,7 +467,7 @@ final public class AndrolibResources {
     public boolean detectWhetherAppIsFramework(File appDir)
             throws AndrolibException {
         File publicXml = new File(appDir, "res/values/public.xml");
-        if (!publicXml.exists()) {
+        if (! publicXml.exists()) {
             return false;
         }
 
@@ -511,11 +501,9 @@ final public class AndrolibResources {
 
         AXmlResourceParser axmlParser = new AXmlResourceParser();
         axmlParser.setAttrDecoder(new ResAttrDecoder());
-        decoders.setDecoder("xml", new XmlPullStreamDecoder(axmlParser,
-                getResXmlSerializer()));
+        decoders.setDecoder("xml", new XmlPullStreamDecoder(axmlParser, getResXmlSerializer()));
 
-        return new Duo<ResFileDecoder, AXmlResourceParser>(new ResFileDecoder(
-                decoders), axmlParser);
+        return new Duo<ResFileDecoder, AXmlResourceParser>(new ResFileDecoder(decoders), axmlParser);
     }
 
     public Duo<ResFileDecoder, AXmlResourceParser> getManifestFileDecoder() {
@@ -523,19 +511,15 @@ final public class AndrolibResources {
 
         AXmlResourceParser axmlParser = new AXmlResourceParser();
 
-        decoders.setDecoder("xml", new XmlPullStreamDecoder(axmlParser,
-                getResXmlSerializer()));
+        decoders.setDecoder("xml", new XmlPullStreamDecoder(axmlParser,getResXmlSerializer()));
 
-        return new Duo<ResFileDecoder, AXmlResourceParser>(new ResFileDecoder(
-                decoders), axmlParser);
+        return new Duo<ResFileDecoder, AXmlResourceParser>(new ResFileDecoder(decoders), axmlParser);
     }
 
     public ExtMXSerializer getResXmlSerializer() {
         ExtMXSerializer serial = new ExtMXSerializer();
-        serial.setProperty(ExtXmlSerializer.PROPERTY_SERIALIZER_INDENTATION,
-                "    ");
-        serial.setProperty(ExtXmlSerializer.PROPERTY_SERIALIZER_LINE_SEPARATOR,
-                System.getProperty("line.separator"));
+        serial.setProperty(ExtXmlSerializer.PROPERTY_SERIALIZER_INDENTATION, "    ");
+        serial.setProperty(ExtXmlSerializer.PROPERTY_SERIALIZER_LINE_SEPARATOR, System.getProperty("line.separator"));
         serial.setProperty(ExtXmlSerializer.PROPERTY_DEFAULT_ENCODING, "utf-8");
         serial.setDisabledAttrEscape(true);
         return serial;
@@ -553,8 +537,7 @@ final public class AndrolibResources {
                 if (valuesFile.isSynthesized(res)) {
                     continue;
                 }
-                ((ResValuesXmlSerializable) res.getValue())
-                        .serializeToResValuesXml(serial, res);
+                ((ResValuesXmlSerializable) res.getValue()).serializeToResValuesXml(serial, res);
             }
 
             serial.endTag(null, "resources");
@@ -562,12 +545,8 @@ final public class AndrolibResources {
             serial.endDocument();
             serial.flush();
             outStream.close();
-        } catch (IOException ex) {
-            throw new AndrolibException("Could not generate: "
-                    + valuesFile.getPath(), ex);
-        } catch (DirectoryException ex) {
-            throw new AndrolibException("Could not generate: "
-                    + valuesFile.getPath(), ex);
+        } catch (IOException | DirectoryException ex) {
+            throw new AndrolibException("Could not generate: " + valuesFile.getPath(), ex);
         }
     }
 
@@ -583,8 +562,7 @@ final public class AndrolibResources {
                 serial.startTag(null, "public");
                 serial.attribute(null, "type", spec.getType().getName());
                 serial.attribute(null, "name", spec.getName());
-                serial.attribute(null, "id",
-                        String.format("0x%08x", spec.getId().id));
+                serial.attribute(null, "id", String.format("0x%08x", spec.getId().id));
                 serial.endTag(null, "public");
             }
 
@@ -592,24 +570,18 @@ final public class AndrolibResources {
             serial.endDocument();
             serial.flush();
             outStream.close();
-        } catch (IOException ex) {
-            throw new AndrolibException("Could not generate public.xml file",
-                    ex);
-        } catch (DirectoryException ex) {
-            throw new AndrolibException("Could not generate public.xml file",
-                    ex);
+        } catch (IOException | DirectoryException ex) {
+            throw new AndrolibException("Could not generate public.xml file", ex);
         }
     }
 
-    private ResPackage[] getResPackagesFromApk(ExtFile apkFile,
-                                               ResTable resTable, boolean keepBroken) throws AndrolibException {
+    private ResPackage[] getResPackagesFromApk(ExtFile apkFile,ResTable resTable, boolean keepBroken)
+            throws AndrolibException {
         try {
-            return ARSCDecoder.decode(
-                    apkFile.getDirectory().getFileInput("resources.arsc"),
-                    false, keepBroken, resTable).getPackages();
+            return ARSCDecoder.decode(apkFile.getDirectory().getFileInput("resources.arsc"),false,
+                    keepBroken, resTable).getPackages();
         } catch (DirectoryException ex) {
-            throw new AndrolibException(
-                    "Could not load resources.arsc from file: " + apkFile, ex);
+            throw new AndrolibException("Could not load resources.arsc from file: " + apkFile, ex);
         }
     }
 
@@ -631,29 +603,12 @@ final public class AndrolibResources {
         }
 
         if (id == 1) {
-            InputStream in = null;
-            OutputStream out = null;
-            try {
-                in = AndrolibResources.class
-                        .getResourceAsStream("/brut/androlib/android-framework.jar");
-                out = new FileOutputStream(apk);
+            try (InputStream in = AndrolibResources.class.getResourceAsStream("/brut/androlib/android-framework.jar");
+                 OutputStream out = new FileOutputStream(apk)) {
                 IOUtils.copy(in, out);
                 return apk;
             } catch (IOException ex) {
                 throw new AndrolibException(ex);
-            } finally {
-                if (in != null) {
-                    try {
-                        in.close();
-                    } catch (IOException ex) {
-                    }
-                }
-                if (out != null) {
-                    try {
-                        out.close();
-                    } catch (IOException ex) {
-                    }
-                }
             }
         }
 
@@ -675,8 +630,7 @@ final public class AndrolibResources {
             in = zip.getInputStream(entry);
             byte[] data = IOUtils.toByteArray(in);
 
-            ARSCData arsc = ARSCDecoder.decode(new ByteArrayInputStream(data),
-                    true, true);
+            ARSCData arsc = ARSCDecoder.decode(new ByteArrayInputStream(data), true, true);
             publicizeResources(data, arsc.getFlagsOffsets());
 
             File outFile = new File(getFrameworkDir(), String.valueOf(arsc
@@ -720,38 +674,18 @@ final public class AndrolibResources {
     public void publicizeResources(File arscFile) throws AndrolibException {
         byte[] data = new byte[(int) arscFile.length()];
 
-        InputStream in = null;
-        OutputStream out = null;
-        try {
-            in = new FileInputStream(arscFile);
+        try(InputStream in = new FileInputStream(arscFile);
+            OutputStream out = new FileOutputStream(arscFile)) {
             in.read(data);
-
             publicizeResources(data);
-
-            out = new FileOutputStream(arscFile);
             out.write(data);
-        } catch (IOException ex) {
+        } catch (IOException ex){
             throw new AndrolibException(ex);
-        } finally {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (IOException ex) {
-                }
-            }
-            if (out != null) {
-                try {
-                    out.close();
-                } catch (IOException ex) {
-                }
-            }
         }
     }
 
     public void publicizeResources(byte[] arsc) throws AndrolibException {
-        publicizeResources(arsc,
-                ARSCDecoder.decode(new ByteArrayInputStream(arsc), true, true)
-                        .getFlagsOffsets());
+        publicizeResources(arsc, ARSCDecoder.decode(new ByteArrayInputStream(arsc), true, true).getFlagsOffsets());
     }
 
     public void publicizeResources(byte[] arsc, FlagsOffset[] flagsOffsets)
@@ -773,7 +707,8 @@ final public class AndrolibResources {
         if (sFrameworkFolder != null) {
             path = sFrameworkFolder;
         } else if (OSDetection.isMacOSX()) {
-            path = System.getProperty("user.home") + File.separatorChar + "Library" + File.separatorChar + "apktool" + File.separatorChar + "framework";
+            path = System.getProperty("user.home") + File.separatorChar + "Library" + File.separatorChar +
+                    "apktool" + File.separatorChar + "framework";
         } else {
             path = System.getProperty("user.home") + File.separatorChar + "apktool" + File.separatorChar + "framework";
         }
@@ -782,8 +717,7 @@ final public class AndrolibResources {
         if (!dir.exists()) {
             if (!dir.mkdirs()) {
                 if (sFrameworkFolder != null) {
-                    System.err.println("Can't create Framework directory: "
-                            + dir);
+                    System.err.println("Can't create Framework directory: " + dir);
                 }
                 throw new AndrolibException("Can't create directory: " + dir);
             }
@@ -803,14 +737,11 @@ final public class AndrolibResources {
     public File getAaptBinaryFile() throws AndrolibException {
         try {
             if (OSDetection.isMacOSX()) {
-                mAaptBinary = Jar
-                        .getResourceAsFile("/prebuilt/aapt/macosx/aapt");
+                mAaptBinary = Jar.getResourceAsFile("/prebuilt/aapt/macosx/aapt");
             } else if (OSDetection.isUnix()) {
-                mAaptBinary = Jar
-                        .getResourceAsFile("/prebuilt/aapt/linux/aapt");
+                mAaptBinary = Jar.getResourceAsFile("/prebuilt/aapt/linux/aapt");
             } else if (OSDetection.isWindows()) {
-                mAaptBinary = Jar
-                        .getResourceAsFile("/prebuilt/aapt/windows/aapt.exe");
+                mAaptBinary = Jar.getResourceAsFile("/prebuilt/aapt/windows/aapt.exe");
             } else {
                 LOGGER.warning("Unknown Operating System: " + OSDetection.returnOS());
                 return null;
@@ -828,8 +759,7 @@ final public class AndrolibResources {
 
     public File getAndroidResourcesFile() throws AndrolibException {
         try {
-            return Jar
-                    .getResourceAsFile("/brut/androlib/android-framework.jar");
+            return Jar.getResourceAsFile("/brut/androlib/android-framework.jar");
         } catch (BrutException ex) {
             throw new AndrolibException(ex);
         }

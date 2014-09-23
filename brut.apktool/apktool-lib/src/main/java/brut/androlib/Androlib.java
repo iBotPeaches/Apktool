@@ -445,11 +445,7 @@ public class Androlib {
                 apkFile.delete();
             }
             return true;
-        } catch (IOException ex) {
-            throw new AndrolibException(ex);
-        } catch (DirectoryException ex) {
-            throw new AndrolibException(ex);
-        } catch (BrutException ex) {
+        } catch (IOException | BrutException ex) {
             throw new AndrolibException(ex);
         }
     }
@@ -504,9 +500,7 @@ public class Androlib {
 
             }
             return true;
-        } catch (IOException ex) {
-            throw new AndrolibException(ex);
-        } catch (DirectoryException ex) {
+        } catch (IOException | DirectoryException ex) {
             throw new AndrolibException(ex);
         } catch (AndrolibException ex) {
             LOGGER.warning("Parse AndroidManifest.xml failed, treat it as raw file.");
