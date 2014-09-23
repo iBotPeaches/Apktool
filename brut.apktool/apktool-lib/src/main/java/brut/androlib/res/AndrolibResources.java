@@ -818,8 +818,12 @@ final public class AndrolibResources {
         } catch (BrutException ex) {
             throw new AndrolibException(ex);
         }
-        mAaptBinary.setExecutable(true);
-        return mAaptBinary;
+        if (mAaptBinary.setExecutable(true)) {
+            return mAaptBinary;
+        }
+
+        System.err.println("Can't set aapt binary as executable");
+        throw new AndrolibException("Can't set aapt binary as executable");
     }
 
     public File getAndroidResourcesFile() throws AndrolibException {
