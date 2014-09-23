@@ -714,14 +714,21 @@ final public class AndrolibResources {
         }
 
         File dir = new File(path);
-        if (!dir.exists()) {
-            if (!dir.mkdirs()) {
+
+        if (dir.getParentFile().isFile()) {
+            System.err.println("Please remove file at " + dir.getParentFile());
+            System.exit(1);
+        }
+
+        if (! dir.exists()) {
+            if (! dir.mkdirs()) {
                 if (sFrameworkFolder != null) {
                     System.err.println("Can't create Framework directory: " + dir);
                 }
                 throw new AndrolibException("Can't create directory: " + dir);
             }
         }
+
         return dir;
     }
 
