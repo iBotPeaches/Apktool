@@ -43,6 +43,7 @@ v2.0.0 (TBA)
 -Fixed (issue #512) - Fixed AndroidManifest missing attributes.
 -Fixed (issue #677) - Fixed ignoring formatted attribute in <string-array>.
 -Fixed (issue #675) - Fixed multiple overlapping catches.
+-Fixed (issue #684) - Fixed issue with multiple ResPackages in ARSC file.
 -Fixed issue with APKs with multiple dex files.
 -Fixed issue with using Apktool without smali/baksmali for ApktoolProperties (Thanks teprrr)
 -Fixed issue with non-URI standard characters in apk name (Thanks rover12421)

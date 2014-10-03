@@ -74,7 +74,6 @@ final public class AndrolibResources {
         ResPackage[] pkgs = getResPackagesFromApk(apkFile, resTable, sKeepBroken);
         ResPackage pkg = null;
 
-        // @todo handle multiple packages using findPackageWithMostResSpecs()
         switch (pkgs.length) {
             case 1:
                 pkg = pkgs[0];
@@ -83,19 +82,40 @@ final public class AndrolibResources {
                 if (pkgs[0].getName().equals("android")) {
                     LOGGER.warning("Skipping \"android\" package group");
                     pkg = pkgs[1];
+                    break;
                 } else if (pkgs[0].getName().equals("com.htc")) {
                     LOGGER.warning("Skipping \"htc\" package group");
                     pkg = pkgs[1];
+                    break;
                 }
+
+            default:
+                pkg = selectPkgWithMostResSpecs(pkgs);
                 break;
         }
 
         if (pkg == null) {
-            throw new AndrolibException("Arsc files with zero or multiple packages");
+            throw new AndrolibException("arsc files with zero packages or no arsc file found.");
         }
 
         resTable.addPackage(pkg, true);
         return pkg;
+    }
+
+    public ResPackage selectPkgWithMostResSpecs(ResPackage[] pkgs)
+        throws AndrolibException {
+        int id = 0;
+        int value = 0;
+
+        for (ResPackage resPackage : pkgs) {
+            if (resPackage.getResSpecCount() > value && ! resPackage.getName().equalsIgnoreCase("android")) {
+                value = resPackage.getResSpecCount();
+                id = resPackage.getId();
+            }
+        }
+
+        // if id is still 0, we only have one pkgId which is "android" -> 1
+        return (id == 0) ? pkgs[0] : pkgs[1];
     }
 
     public ResPackage loadFrameworkPkg(ResTable resTable, int id, String frameTag)
@@ -105,11 +125,15 @@ final public class AndrolibResources {
         LOGGER.info("Loading resource table from file: " + apk);
         ResPackage[] pkgs = getResPackagesFromApk(new ExtFile(apk), resTable, true);
 
-        if (pkgs.length != 1) {
+        ResPackage pkg;
+        if (pkgs.length > 1) {
+            pkg = selectPkgWithMostResSpecs(pkgs);
+        } else if (pkgs.length == 0) {
             throw new AndrolibException("Arsc files with zero or multiple packages");
+        } else {
+            pkg = pkgs[0];
         }
 
-        ResPackage pkg = pkgs[0];
         if (pkg.getId() != id) {
             throw new AndrolibException("Expected pkg of id: " + String.valueOf(id) + ", got: " + pkg.getId());
         }
