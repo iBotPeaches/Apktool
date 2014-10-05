@@ -41,10 +41,12 @@ public class StringBlock {
      * be at the chunk type.
      */
     public static StringBlock read(ExtDataInput reader) throws IOException {
-        reader.skipCheckInt(CHUNK_TYPE);
+        reader.skipCheckChunkTypeInt(CHUNK_STRINGPOOL_TYPE, CHUNK_NULL_TYPE);
         int chunkSize = reader.readInt();
+
+        // ResStringPool_header
         int stringCount = reader.readInt();
-        int styleOffsetCount = reader.readInt();
+        int styleCount = reader.readInt();
         int flags = reader.readInt();
         int stringsOffset = reader.readInt();
         int stylesOffset = reader.readInt();
@@ -55,12 +57,11 @@ public class StringBlock {
         block.m_stringOwns = new int[stringCount];
         Arrays.fill(block.m_stringOwns, -1);
 
-        if (styleOffsetCount != 0) {
-            block.m_styleOffsets = reader.readIntArray(styleOffsetCount);
+        if (styleCount != 0) {
+            block.m_styleOffsets = reader.readIntArray(styleCount);
         }
         {
-            int size = ((stylesOffset == 0) ? chunkSize : stylesOffset)
-                    - stringsOffset;
+            int size = ((stylesOffset == 0) ? chunkSize : stylesOffset) - stringsOffset;
             if ((size % 4) != 0) {
                 throw new IOException("String data size is not multiple of 4 (" + size + ").");
             }
@@ -238,7 +239,6 @@ public class StringBlock {
         return -1;
     }
 
-    // /////////////////////////////////////////// implementation
     private StringBlock() {
     }
 
@@ -343,6 +343,7 @@ public class StringBlock {
     private static final Logger LOGGER = Logger.getLogger(StringBlock.class.getName());
 
     // ResChunk_header = header.type (0x0001) + header.headerSize (0x001C)
-    private static final int CHUNK_TYPE = 0x001C0001;
+    private static final int CHUNK_STRINGPOOL_TYPE = 0x001C0001;
+    private static final int CHUNK_NULL_TYPE = 0x00000000;
     private static final int UTF8_FLAG = 0x00000100;
 }
