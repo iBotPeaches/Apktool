@@ -61,8 +61,7 @@ public class StringBlock {
             block.m_styleOffsets = reader.readIntArray(styleCount);
         }
         {
-            int size = ((stylesOffset == 0) ? chunkSize : stylesOffset)
-                    - stringsOffset;
+            int size = ((stylesOffset == 0) ? chunkSize : stylesOffset) - stringsOffset;
             if ((size % 4) != 0) {
                 throw new IOException("String data size is not multiple of 4 (" + size + ").");
             }
@@ -240,7 +239,6 @@ public class StringBlock {
         return -1;
     }
 
-    // /////////////////////////////////////////// implementation
     private StringBlock() {
     }
 
