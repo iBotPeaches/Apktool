@@ -17,7 +17,7 @@ apply plugin: 'java'
 apply plugin: 'maven'
 
 def apktoolversion_major = '2.0.0'
-def apktoolversion_minor = 'RC1';
+def apktoolversion_minor = 'RC2';
 
 if (!('release' in gradle.startParameter.taskNames)) {
   def hash = getCheckedOutGitCommitHash();
