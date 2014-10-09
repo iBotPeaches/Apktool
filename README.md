@@ -13,6 +13,7 @@ It is NOT intended for piracy and other non-legal uses. It could be used for loc
 - [#apktool on freenode](http://webchat.freenode.net/?channels=apktool)
 
 #### Links
+- [Downloads](https://code.google.com/p/android-apktool/wiki/DownloadInstructions)
 - [How to Build](https://code.google.com/p/android-apktool/wiki/BuildApktool)
 - [Wiki](http://code.google.com/p/android-apktool/w/list)
 - [Bug Reports](http://code.google.com/p/android-apktool/issues/list)
