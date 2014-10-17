@@ -229,6 +229,9 @@ public class ResConfigFlags {
             case UI_MODE_TYPE_APPLIANCE:
                 ret.append("-appliance");
                 break;
+            case UI_MODE_TYPE_WATCH:
+                ret.append("-watch");
+                break;
         }
         switch (uiMode & MASK_UI_MODE_NIGHT) {
             case UI_MODE_NIGHT_YES:
@@ -341,15 +344,13 @@ public class ResConfigFlags {
     }
 
     private short getNaturalSdkVersionRequirement() {
-        if (smallestScreenWidthDp != 0 || screenWidthDp != 0
-                || screenHeightDp != 0) {
+        if (smallestScreenWidthDp != 0 || screenWidthDp != 0 || screenHeightDp != 0) {
             return SDK_HONEYCOMB_MR2;
         }
         if ((uiMode & (MASK_UI_MODE_TYPE | MASK_UI_MODE_NIGHT)) != UI_MODE_NIGHT_ANY) {
             return SDK_FROYO;
         }
-        if ((screenLayout & (MASK_SCREENSIZE | MASK_SCREENLONG)) != SCREENSIZE_ANY
-                || density != DENSITY_DEFAULT) {
+        if ((screenLayout & (MASK_SCREENSIZE | MASK_SCREENLONG)) != SCREENSIZE_ANY || density != DENSITY_DEFAULT) {
             return SDK_DONUT;
         }
         return 0;
@@ -473,16 +474,19 @@ public class ResConfigFlags {
     public final static byte UI_MODE_TYPE_CAR = 0x03;
     public final static byte UI_MODE_TYPE_TELEVISION = 0x04;
     public final static byte UI_MODE_TYPE_APPLIANCE = 0x05;
+    public final static byte UI_MODE_TYPE_WATCH = 0x06;
+
+    // start - miui
     public final static byte UI_MODE_TYPE_SMALLUI = 0x0c;
     public final static byte UI_MODE_TYPE_MEDIUMUI = 0x0d;
     public final static byte UI_MODE_TYPE_LARGEUI = 0x0e;
     public final static byte UI_MODE_TYPE_HUGEUI = 0x0f;
+    // end - miui
 
     public final static byte MASK_UI_MODE_NIGHT = 0x30;
     public final static byte UI_MODE_NIGHT_ANY = 0x00;
     public final static byte UI_MODE_NIGHT_NO = 0x10;
     public final static byte UI_MODE_NIGHT_YES = 0x20;
 
-    private static final Logger LOGGER = Logger.getLogger(ResConfigFlags.class
-            .getName());
+    private static final Logger LOGGER = Logger.getLogger(ResConfigFlags.class.getName());
 }
