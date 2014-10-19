@@ -52,14 +52,20 @@ public class ResStyleValue extends ResBagValue implements
         }
         for (int i = 0; i < mItems.length; i++) {
             ResResSpec spec = mItems[i].m1.getReferent();
+            String name = null;
+            String value = null;
 
+            String resource = spec.getDefaultResource().getValue().toString();
             // hacky-fix remove bad ReferenceVars
-            if (spec.getDefaultResource().getValue().toString()
-                    .contains("ResReferenceValue@")) {
+            if (resource.contains("ResReferenceValue@")) {
                 continue;
+            } else if (resource.contains("ResStringValue@")) {
+                name = "@" + spec.getFullName(res.getResSpec().getPackage(), false);
+            } else {
+                ResAttr attr = (ResAttr) spec.getDefaultResource().getValue();
+                value = attr.convertToResXmlFormat(mItems[i].m2);
+                name = spec.getFullName(res.getResSpec().getPackage(), true);
             }
-            ResAttr attr = (ResAttr) spec.getDefaultResource().getValue();
-            String value = attr.convertToResXmlFormat(mItems[i].m2);
 
             if (value == null) {
                 value = mItems[i].m2.encodeAsResXmlValue();
@@ -70,8 +76,7 @@ public class ResStyleValue extends ResBagValue implements
             }
 
             serializer.startTag(null, "item");
-            serializer.attribute(null, "name",
-                    spec.getFullName(res.getResSpec().getPackage(), true));
+            serializer.attribute(null, "name", name);
             serializer.text(value);
             serializer.endTag(null, "item");
         }
