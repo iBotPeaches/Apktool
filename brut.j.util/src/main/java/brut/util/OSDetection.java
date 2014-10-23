@@ -1,5 +1,5 @@
 /**
- *  Copyright 2010 Ryszard Wiśniewski <brut.alll@gmail.com>
+ *  Copyright 2014 Ryszard Wiśniewski <brut.alll@gmail.com>
  *  Copyright 2013 Connor Tumbleson <connor.tumbleson@gmail.com>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");

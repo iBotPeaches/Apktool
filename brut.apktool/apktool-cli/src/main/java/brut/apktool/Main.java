@@ -1,5 +1,5 @@
 /**
- *  Copyright 2011 Ryszard Wiśniewski <brut.alll@gmail.com>
+ *  Copyright 2014 Ryszard Wiśniewski <brut.alll@gmail.com>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -463,7 +463,7 @@ public class Main {
                 "Apktool v" + Androlib.getVersion() + " - a tool for reengineering Android apk files\n" +
                         "with smali v" + ApktoolProperties.get("smaliVersion") +
                         " and baksmali v" + ApktoolProperties.get("baksmaliVersion") + "\n" +
-                        "Copyright 2010 Ryszard Wiśniewski <brut.alll@gmail.com>\n" +
+                        "Copyright 2014 Ryszard Wiśniewski <brut.alll@gmail.com>\n" +
                         "Updated by Connor Tumbleson <connor.tumbleson@gmail.com>" );
         if (isAdvanceMode()) {
             System.out.println("Apache License 2.0 (http://www.apache.org/licenses/LICENSE-2.0)\n");
