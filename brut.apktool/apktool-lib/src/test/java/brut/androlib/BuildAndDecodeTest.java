@@ -256,7 +256,7 @@ public class BuildAndDecodeTest {
             // hacky fix - load test by changing name of control
             File test =  new File(control.toString().replace("testapp-orig", "testapp-new"));
 
-            if (test.isFile()) {
+            if (test.isFile() && control.isFile()) {
                 if (control.hashCode() != test.hashCode()) {
                     return false;
                 }

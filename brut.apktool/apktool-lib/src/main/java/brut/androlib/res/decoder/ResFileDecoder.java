@@ -24,6 +24,7 @@ import brut.androlib.res.data.value.ResFileValue;
 import brut.directory.DirUtil;
 import brut.directory.Directory;
 import brut.directory.DirectoryException;
+
 import java.io.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -106,25 +107,13 @@ public class ResFileDecoder {
 
     public void decode(Directory inDir, String inFileName, Directory outDir,
                        String outFileName, String decoder) throws AndrolibException {
-        InputStream in = null;
-        OutputStream out = null;
-        try {
-            in = inDir.getFileInput(inFileName);
-            out = outDir.getFileOutput(outFileName);
+        try (
+                InputStream in = inDir.getFileInput(inFileName);
+                OutputStream out = outDir.getFileOutput(outFileName)
+        ) {
             mDecoders.decode(in, out, decoder);
-        } catch (DirectoryException ex) {
+        } catch (DirectoryException | IOException ex) {
             throw new AndrolibException(ex);
-        } finally {
-            try {
-                if (in != null) {
-                    in.close();
-                }
-                if (out != null) {
-                    out.close();
-                }
-            } catch (IOException ex) {
-                throw new AndrolibException(ex);
-            }
         }
     }
 
@@ -138,29 +127,15 @@ public class ResFileDecoder {
 
     public void decodeManifest(Directory inDir, String inFileName,
                                Directory outDir, String outFileName) throws AndrolibException {
-        InputStream in = null;
-        OutputStream out = null;
-        try {
-            in = inDir.getFileInput(inFileName);
-            out = outDir.getFileOutput(outFileName);
-            ((XmlPullStreamDecoder) mDecoders.getDecoder("xml"))
-                    .decodeManifest(in, out);
-        } catch (DirectoryException ex) {
+        try (
+                InputStream in = inDir.getFileInput(inFileName);
+                OutputStream out = outDir.getFileOutput(outFileName)
+        ) {
+            ((XmlPullStreamDecoder) mDecoders.getDecoder("xml")).decodeManifest(in, out);
+        } catch (DirectoryException | IOException ex) {
             throw new AndrolibException(ex);
-        } finally {
-            try {
-                if (in != null) {
-                    in.close();
-                }
-                if (out != null) {
-                    out.close();
-                }
-            } catch (IOException ex) {
-                throw new AndrolibException(ex);
-            }
         }
     }
 
-    private final static Logger LOGGER = Logger.getLogger(ResFileDecoder.class
-            .getName());
+    private final static Logger LOGGER = Logger.getLogger(ResFileDecoder.class.getName());
 }
