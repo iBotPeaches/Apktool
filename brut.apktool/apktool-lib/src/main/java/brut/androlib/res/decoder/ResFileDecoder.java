@@ -21,6 +21,7 @@ import brut.androlib.err.CantFind9PatchChunk;
 import brut.androlib.res.data.ResResource;
 import brut.androlib.res.data.value.ResBoolValue;
 import brut.androlib.res.data.value.ResFileValue;
+import brut.directory.DirUtil;
 import brut.directory.Directory;
 import brut.directory.DirectoryException;
 import java.io.*;
@@ -61,12 +62,18 @@ public class ResFileDecoder {
                 return;
             }
             if (typeName.equals("drawable") || typeName.equals("mipmap")) {
-                if (inFileName.toLowerCase().endsWith(".9." + ext)) {
+                if (inFileName.toLowerCase().endsWith(".9" + ext)) {
                     outFileName = outResName + ".9" + ext;
 
                     // check for htc .r.9.png
                     if (inFileName.toLowerCase().endsWith(".r.9" + ext)) {
                         outFileName = outResName + ".r.9" + ext;
+                    }
+
+                    // check for samsung qmg
+                    if (inFileName.toLowerCase().endsWith(".qmg")) {
+                        copyRaw(inDir, outDir, outFileName);
+                        return;
                     }
 
                     try {
@@ -118,6 +125,14 @@ public class ResFileDecoder {
             } catch (IOException ex) {
                 throw new AndrolibException(ex);
             }
+        }
+    }
+
+    public void copyRaw(Directory inDir, Directory outDir, String filename) throws AndrolibException {
+        try {
+            DirUtil.copyToDir(inDir, outDir, filename);
+        } catch (DirectoryException ex) {
+            throw new AndrolibException(ex);
         }
     }
 
