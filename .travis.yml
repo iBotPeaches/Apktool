@@ -7,7 +7,7 @@ jdk:
 before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -qq libstdc++6:i386 lib32z1 expect
-script: "./gradlew build fatJar proguard"
+script: ./scripts/travis-ci/run-tests.sh
 branches:
   only:
     - master

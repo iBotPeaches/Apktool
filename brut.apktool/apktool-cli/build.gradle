@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-apply plugin: 'fatjar'
+apply plugin: 'eu.appsatori.fatjar'
 
 configurations {
     proguard
@@ -21,7 +21,7 @@ configurations {
 
 dependencies {
   compile project(':brut.apktool:apktool-lib')
-  proguard 'net.sf.proguard:proguard-base:4.8'
+  proguard depends.proguard
 }
 
 gradle.taskGraph.whenReady {

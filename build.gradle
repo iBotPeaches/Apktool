@@ -15,77 +15,47 @@
  */
 apply plugin: 'java'
 apply plugin: 'maven'
+apply from: 'gradle/functions.gradle'
 
 def apktoolversion_major = '2.0.0'
 def apktoolversion_minor = 'RC2';
 
-if (!('release' in gradle.startParameter.taskNames)) {
-  def hash = getCheckedOutGitCommitHash();
-  
-  if (hash == null) {
-    project.ext.set("hash", "dirty")
-    project.ext.set("apktool_version", apktoolversion_major + "-dirty")
-    println "Building SNAPSHOT (no .git folder found)";
-  } else {
-    project.ext.set("hash", hash);
-    project.ext.set("apktool_version", apktoolversion_major + "-" + hash + "-SNAPSHOT");
-    println "Building SNAPSHOT (" + getCheckedOutBranch() + "): " + hash;
-  }
-} else {
-  project.ext.set("hash", "")
-  project.ext.set("apktool_version", apktoolversion_major + "-" + apktoolversion_minor);
-  println "Building RELEASE (" + getCheckedOutBranch() + "): " + apktoolversion_major + "-" + apktoolversion_minor;
-}
-
-// https://gist.github.com/JonasGroeger/7620911
-def getCheckedOutGitCommitHash() {
-    def gitFolder = "$projectDir/.git/"
-    def takeFromHash = 6
-    
-    def head
-    try {
-      head = new File(gitFolder + "HEAD").text.split(":")
-    } catch(Exception e) {
-      return null;
-    }
- 
-    def isCommit = head.length == 1
-    if(isCommit) return head[0].trim().take(takeFromHash) 
- 
-    def refHead = new File(gitFolder + head[1].trim())
-    refHead.text.trim().take takeFromHash
-}
-
-def getCheckedOutBranch() {
-    def gitFolder = "$projectDir/.git/"
-    
-    def head
-    try {
-      head = new File(gitFolder + "HEAD").text.split("/")
-      return head[2].trim();
-    } catch(Exception e) {
-      return "";
-    }
-    return "SNAPSHOT";
-}
-
-repositories {
-  mavenCentral()
-}
-
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
+if (!('release' in gradle.startParameter.taskNames)) {
+    def hash = getCheckedOutGitCommitHash();
+
+    if (hash == null) {
+        project.ext.set("hash", "dirty")
+        project.ext.set("apktool_version", apktoolversion_major + "-dirty")
+        println "Building SNAPSHOT (no .git folder found)";
+    } else {
+        project.ext.set("hash", hash);
+        project.ext.set("apktool_version", apktoolversion_major + "-" + hash + "-SNAPSHOT");
+        println "Building SNAPSHOT (" + getCheckedOutBranch() + "): " + hash;
+    }
+} else {
+    project.ext.set("hash", "")
+    project.ext.set("apktool_version", apktoolversion_major + "-" + apktoolversion_minor);
+    println "Building RELEASE (" + getCheckedOutBranch() + "): " + apktoolversion_major + "-" + apktoolversion_minor;
+}
+
 build.doFirst {
     def javaVersion = System.getProperty("java.version")
+
     //fail the build if we don't have the expected Java version
     if (!javaVersion.startsWith("1.7")) {
-        throw new GradleException("You can fix this problem!\nWe found a " + javaVersion + " JDK\nPlease update JAVA_HOME to use a 1.7 JDK\nCurrently it is set to: " + System.getProperty("java.home"));
-    } 
+        throw new GradleException("You can fix this problem!\n" +
+                "We found a " + javaVersion + " JDK\n" +
+                "Please update JAVA_HOME to use a 1.7 JDK\n" +
+                "Currently it is set to: " + System.getProperty("java.home")
+        );
+    }
 }
 
 task wrapper(type: Wrapper) {
-  gradleVersion = '1.10'
+    gradleVersion = '2.1'
 }
 
 // used for official releases only. Please don't use
@@ -94,44 +64,52 @@ task release {
 
 buildscript {
     repositories {
-        mavenCentral()
+        jcenter()
     }
-    tasks.withType(Compile) {
+    tasks.withType(JavaCompile) {
         options.encoding = "UTF-8"
+        options.incremental = true
     }
     dependencies {
-        classpath 'eu.appsatori:gradle-fatjar-plugin:0.2-rc1'
+        classpath 'eu.appsatori:gradle-fatjar-plugin:0.3'
     }
 }
 
 subprojects {
-  apply plugin: 'java'
-  apply plugin: 'maven'
-  apply plugin: 'idea'
-  
-  ext {
-        depends = [guava: 'com.google.guava:guava:14.0',
-                   findbugs: 'com.google.code.findbugs:jsr305:1.3.9',
-                   junit: 'junit:junit:4.6',
-                   antlr_runtime: 'org.antlr:antlr-runtime:3.5',
-                   antlr: 'org.antlr:antlr:3.5',
-                   commons_cli: 'commons-cli:commons-cli:1.2',
-                   jflex: 'de.jflex:jflex:1.4.3',
-                   proguard: 'net.sf.proguard:proguard-base:4.8'
-         ]
-  }
-    
-  repositories {
-    mavenCentral()
-  }
-  
-  dependencies {
-    testCompile 'junit:junit:4.8.2'
-  }
-  
-  test {
-    testLogging {
-      exceptionFormat = 'full'
+    apply plugin: 'java'
+    apply plugin: 'maven'
+    apply plugin: 'idea'
+
+    ext {
+        depends = [
+                antlr: 'org.antlr:antlr:3.5',
+                antlr_runtime: 'org.antlr:antlr-runtime:3.5',
+                commons_cli: 'commons-cli:commons-cli:1.2',
+                commons_compress: 'org.apache.commons:commons-compress:1.4.1',
+                commons_io: 'commons-io:commons-io:2.4',
+                commons_lang: 'org.apache.commons:commons-lang3:3.1',
+                findbugs: 'com.google.code.findbugs:jsr305:1.3.9',
+                guava: 'com.google.guava:guava:14.0',
+                jflex: 'de.jflex:jflex:1.4.3',
+                junit: 'junit:junit:4.6',
+                proguard: 'net.sf.proguard:proguard-base:4.8',
+                snakeyaml: 'org.yaml:snakeyaml:1.12',
+                xmlpull: 'xpp3:xpp3:1.1.4c',
+                xmlunit: 'xmlunit:xmlunit:1.3',
+        ]
     }
-  }
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        testCompile depends.junit
+    }
+
+    test {
+        testLogging {
+            exceptionFormat = 'full'
+        }
+    }
 }

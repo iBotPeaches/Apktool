@@ -15,7 +15,7 @@
  */
 
 dependencies {
-  compile project(':brut.j.common'), 
-	  project(':brut.j.util')
-  testCompile "junit:junit:3.8.1"
+  compile project(':brut.j.common'),
+          project(':brut.j.util')
+  testCompile depends.junit
 }
