@@ -13,7 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 import org.apache.tools.ant.filters.*
 
 processResources {
@@ -30,21 +29,21 @@ processResources {
 }
 
 dependencies {
-  compile ("junit:junit:4.10") {
-    exclude(module: 'hamcrest-core')
-}
+    compile("junit:junit:4.10") {
+        exclude(module: 'hamcrest-core')
+    }
 
-compile project(':brut.j.dir'), 
-	   project(':brut.j.util'), 
-	   project(':brut.j.common'), 
-	   project(':brut.apktool.smali:util'),
-	   project(':brut.apktool.smali:dexlib2'), 
-	   project(':brut.apktool.smali:baksmali'),
-	   project(':brut.apktool.smali:smali'),
-	   "org.yaml:snakeyaml:1.12",
-	   "xpp3:xpp3:1.1.4c",
-	   "xmlunit:xmlunit:1.3",
-	   "com.google.guava:guava:12.0",
-	   "org.apache.commons:commons-lang3:3.1"
+    compile project(':brut.j.dir'),
+            project(':brut.j.util'),
+            project(':brut.j.common'),
+            project(':brut.apktool.smali:util'),
+            project(':brut.apktool.smali:dexlib2'),
+            project(':brut.apktool.smali:baksmali'),
+            project(':brut.apktool.smali:smali'),
+            depends.snakeyaml,
+            depends.xmlpull,
+            depends.guava,
+            depends.commons_lang
+
+    testCompile depends.xmlunit
 }
-	   
