@@ -21,7 +21,6 @@ import brut.androlib.res.AndrolibResources;
 import brut.androlib.res.data.ResPackage;
 import brut.androlib.res.data.ResTable;
 import brut.androlib.res.data.ResUnknownFiles;
-import brut.androlib.res.decoder.ResFileDecoder;
 import brut.androlib.res.util.ExtFile;
 import brut.androlib.src.SmaliBuilder;
 import brut.androlib.src.SmaliDecoder;
@@ -30,8 +29,6 @@ import brut.directory.*;
 import brut.util.BrutIO;
 import brut.util.OS;
 import java.io.*;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.file.*;
 import java.nio.file.Path;
 import java.util.*;
@@ -184,11 +181,7 @@ public class Androlib {
                 }
             }
             apkZipFile.close();
-        }
-        catch (DirectoryException ex) {
-            throw new AndrolibException(ex);
-        }
-        catch (IOException ex) {
+        } catch (DirectoryException | IOException ex) {
             throw new AndrolibException(ex);
         }
     }
@@ -220,37 +213,25 @@ public class Androlib {
         options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
         Yaml yaml = new Yaml(options);
 
-        Writer writer = null;
-        try {
-            writer = new BufferedWriter(new OutputStreamWriter(
-                    new FileOutputStream(new File(mOutDir, "apktool.yml")), "UTF-8"));
+        try (
+                Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
+                        new File(mOutDir, "apktool.yml")), "UTF-8"));
+        ) {
             yaml.dump(meta, writer);
         } catch (IOException ex) {
             throw new AndrolibException(ex);
-        } finally {
-            if (writer != null) {
-                try {
-                    writer.close();
-                } catch (IOException ex) { }
-            }
         }
     }
 
     public Map<String, Object> readMetaFile(ExtFile appDir)
             throws AndrolibException {
-        InputStream in = null;
-        try {
-            in = appDir.getDirectory().getFileInput("apktool.yml");
+        try(
+                InputStream in = appDir.getDirectory().getFileInput("apktool.yml");
+        ) {
             Yaml yaml = new Yaml();
             return (Map<String, Object>) yaml.load(in);
-        } catch (DirectoryException ex) {
+        } catch (DirectoryException | IOException ex) {
             throw new AndrolibException(ex);
-        } finally {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (IOException ex) { }
-            }
         }
     }
 
@@ -419,8 +400,7 @@ public class Androlib {
                 LOGGER.info("Checking whether resources has changed...");
             }
             File apkDir = new File(appDir, APK_DIRNAME);
-            if (flags.get("forceBuildAll")
-                    || isModified(newFiles(APP_RESOURCES_FILENAMES, appDir),
+            if (flags.get("forceBuildAll") || isModified(newFiles(APP_RESOURCES_FILENAMES, appDir),
                     newFiles(APK_RESOURCES_FILENAMES, apkDir))) {
                 LOGGER.info("Building resources...");
 
@@ -478,8 +458,7 @@ public class Androlib {
                 mAndRes.remove_application_debug(new File(apkDir,"AndroidManifest.xml").getAbsolutePath());
             }
 
-            if (flags.get("forceBuildAll")
-                    || isModified(newFiles(APK_MANIFEST_FILENAMES, appDir),
+            if (flags.get("forceBuildAll") || isModified(newFiles(APK_MANIFEST_FILENAMES, appDir),
                     newFiles(APK_MANIFEST_FILENAMES, apkDir))) {
                 LOGGER.info("Building AndroidManifest.xml...");
 
@@ -585,11 +564,11 @@ public class Androlib {
 
     private void insertFile(Path apkPath, Map<String,String> zip_properties, File insert, String method, Path location)
             throws AndrolibException, IOException {
-
         // ZipFileSystem only writes at .close()
         // http://mail.openjdk.java.net/pipermail/nio-dev/2012-July/001764.html
-        try(FileSystem fs = FileSystems.newFileSystem(apkPath, null)) {
-
+        try(
+                FileSystem fs = FileSystems.newFileSystem(apkPath, null)
+        ) {
             Path root = fs.getPath("/");
 
             // in order to get the path relative to the zip, we strip off the absolute path, minus what we
@@ -603,9 +582,9 @@ public class Androlib {
 
     private void insertFolder(Path apkPath, Map<String,String> zip_properties, File insert, String method, Path location)
             throws AndrolibException, IOException {
-
-        try(FileSystem fs = FileSystems.newFileSystem(apkPath, null)) {
-
+        try(
+                FileSystem fs = FileSystems.newFileSystem(apkPath, null)
+        ) {
             Path root = fs.getPath("/");
             Path dest = fs.getPath(root.toString(), insert.getAbsolutePath().replace(location.toString(),""));
             Path parent = dest.normalize();
@@ -635,8 +614,7 @@ public class Androlib {
         if (!assetDir.exists()) {
             assetDir = null;
         }
-        mAndRes.aaptPackage(outApk, null, null, new File(appDir, APK_DIRNAME),
-                assetDir, null, flags, mAaptPath);
+        mAndRes.aaptPackage(outApk, null, null, new File(appDir, APK_DIRNAME), assetDir, null, flags, mAaptPath);
     }
 
     public void publicizeResources(File arscFile) throws AndrolibException {
@@ -683,11 +661,7 @@ public class Androlib {
     }
 
     private boolean isModified(File working, File stored) {
-        if (!stored.exists()) {
-            return true;
-        }
-        return BrutIO.recursiveModifiedTime(working) > BrutIO
-                .recursiveModifiedTime(stored);
+        return ! stored.exists() || BrutIO.recursiveModifiedTime(working) > BrutIO .recursiveModifiedTime(stored);
     }
 
     private boolean isModified(File[] working, File[] stored) {
@@ -696,8 +670,7 @@ public class Androlib {
                 return true;
             }
         }
-        return BrutIO.recursiveModifiedTime(working) > BrutIO
-                .recursiveModifiedTime(stored);
+        return BrutIO.recursiveModifiedTime(working) > BrutIO.recursiveModifiedTime(stored);
     }
 
     private File[] newFiles(String[] names, File dir) {
