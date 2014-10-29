@@ -45,12 +45,9 @@ public class ZipExtFile extends ZipFile {
     }
 
     @Override
-    /**
-     * @author Panxiaobo
-     */
     public InputStream getInputStream(ZipArchiveEntry ze)
-            throws IOException, ZipException {
-        ze.getGeneralPurposeBit().useEncryption(false);
+            throws IOException {
+        ze.getGeneralPurposeBit().useEncryption(false);  // credit: Panxiaobo
         return super.getInputStream(ze);
     }
 
