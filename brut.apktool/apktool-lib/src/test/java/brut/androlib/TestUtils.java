@@ -76,18 +76,6 @@ public abstract class TestUtils {
         }
     }
 
-    public static HashMap<String, Boolean> returnStockHashMap() throws BrutException {
-        HashMap<String, Boolean> tmp = new HashMap<String, Boolean>();
-        tmp.put("forceBuildAll", false);
-        tmp.put("debug", false);
-        tmp.put("verbose", false);
-        tmp.put("framework", false);
-        tmp.put("update", false);
-        tmp.put("copyOriginal", false);
-
-        return tmp;
-    }
-
     /*
      * TODO: move to brut.util.Jar - it's not possible for now, because below
      * implementation uses brut.dir. I think I should merge all my projects to

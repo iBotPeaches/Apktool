@@ -36,15 +36,15 @@ import org.jf.dexlib2.writer.io.FileDataStore;
  */
 public class SmaliBuilder {
 
-    public static void build(ExtFile smaliDir, File dexFile, HashMap<String, Boolean> flags)
+    public static void build(ExtFile smaliDir, File dexFile, boolean debug)
             throws AndrolibException {
-        new SmaliBuilder(smaliDir, dexFile, flags).build();
+        new SmaliBuilder(smaliDir, dexFile, debug).build();
     }
 
-    private SmaliBuilder(ExtFile smaliDir, File dexFile, HashMap<String, Boolean> flags) {
+    private SmaliBuilder(ExtFile smaliDir, File dexFile, boolean debug) {
         mSmaliDir = smaliDir;
         mDexFile = dexFile;
-        mFlags = flags;
+        mDebug = debug;
     }
 
     private void build() throws AndrolibException {
@@ -83,7 +83,7 @@ public class SmaliBuilder {
         StringBuilder out = new StringBuilder();
         List<String> lines = IOUtils.readLines(inStream);
 
-        if (!mFlags.get("debug")) {
+        if (! mDebug) {
             final String[] linesArray = lines.toArray(new String[0]);
             for (int i = 1; i < linesArray.length - 1; i++) {
                 out.append(linesArray[i].split("//", 2)[1]).append('\n');
@@ -119,7 +119,7 @@ public class SmaliBuilder {
 
     private final ExtFile mSmaliDir;
     private final File mDexFile;
-    private final HashMap<String, Boolean> mFlags;
+    private final boolean mDebug;
 
     private final static Logger LOGGER = Logger.getLogger(SmaliBuilder.class.getName());
 }
