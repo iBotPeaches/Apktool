@@ -4,6 +4,7 @@ language: java
 jdk:
   - openjdk7
   - oraclejdk7
+  - oraclejdk8
 before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -qq libstdc++6:i386 lib32z1 expect
