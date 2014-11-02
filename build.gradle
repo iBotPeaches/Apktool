@@ -13,15 +13,17 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-apply plugin: 'java'
 apply plugin: 'maven'
 apply from: 'gradle/functions.gradle'
 
 def apktoolversion_major = '2.0.0'
 def apktoolversion_minor = 'RC2';
 
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
+allprojects {
+    apply plugin: 'java'
+    sourceCompatibility = 1.7
+    targetCompatibility = 1.7
+}
 
 if (!('release' in gradle.startParameter.taskNames)) {
     def hash = getCheckedOutGitCommitHash();
@@ -44,11 +46,11 @@ if (!('release' in gradle.startParameter.taskNames)) {
 build.doFirst {
     def javaVersion = System.getProperty("java.version")
 
-    //fail the build if we don't have the expected Java version
-    if (!javaVersion.startsWith("1.7")) {
+    //fail the build if we java 1.5 or 1.6.
+    if (javaVersion.startsWith("1.5") || javaVersion.startsWith("1.6")) {
         throw new GradleException("You can fix this problem!\n" +
                 "We found a " + javaVersion + " JDK\n" +
-                "Please update JAVA_HOME to use a 1.7 JDK\n" +
+                "Please update JAVA_HOME to use at least a 1.7 JDK\n" +
                 "Currently it is set to: " + System.getProperty("java.home")
         );
     }
