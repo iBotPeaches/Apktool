@@ -19,3 +19,11 @@ branches:
 matrix:
   allow_failures:
     - jdk: oraclejdk8
+notifications:
+  irc:
+    channels:
+      - "chat.freenode.net#apktool"
+    on_success: change
+    on_failure: always
+    template:
+      - "%{repository_name} (%{commit}) : %{duration} - %{message}"
