@@ -17,6 +17,7 @@
 package brut.androlib.res;
 
 import brut.androlib.AndrolibException;
+import brut.androlib.ApkOptions;
 import brut.androlib.err.CantFindFrameworkResException;
 import brut.androlib.res.data.*;
 import brut.androlib.res.decoder.*;
@@ -362,11 +363,11 @@ final public class AndrolibResources {
         }
     }
 
-    public void aaptPackage(File apkFile, File manifest, File resDir, File rawDir, File assetDir, File[] include,
-                            HashMap<String, Boolean> flags, String aaptPath)
+    public void aaptPackage(File apkFile, File manifest, File resDir, File rawDir, File assetDir, File[] include)
             throws AndrolibException {
 
         boolean customAapt = false;
+        String aaptPath = apkOptions.aaptPath;
         List<String> cmd = new ArrayList<String>();
 
         // path for aapt binary
@@ -377,7 +378,7 @@ final public class AndrolibResources {
                 cmd.add(aaptFile.getPath());
                 customAapt = true;
 
-                if (flags.get("verbose")) {
+                if (apkOptions.verbose) {
                     LOGGER.info(aaptFile.getPath() + " being used as aapt location.");
                 }
             } else {
@@ -399,19 +400,19 @@ final public class AndrolibResources {
 
         cmd.add("p");
 
-        if (flags.get("verbose")) { // output aapt verbose
+        if (apkOptions.verbose) { // output aapt verbose
             cmd.add("-v");
         }
-        if (flags.get("update")) {
+        if (apkOptions.updateFiles) {
             cmd.add("-u");
         }
-        if (flags.get("debug")) { // inject debuggable="true" into manifest
+        if (apkOptions.debugMode) { // inject debuggable="true" into manifest
             cmd.add("--debug-mode");
         }
 
         // force package id so that some frameworks build with correct id
         // disable if user adds own aapt (can't know if they have this feature)
-        if (mPackageId != null && customAapt == false) {
+        if (mPackageId != null && ! customAapt) {
             cmd.add("--forced-package-id");
             cmd.add(mPackageId);
         }
@@ -447,11 +448,11 @@ final public class AndrolibResources {
         cmd.add("-F");
         cmd.add(apkFile.getAbsolutePath());
 
-        if (flags.get("framework")) {
+        if (apkOptions.isFramework) {
             cmd.add("-x");
         }
 
-        if (!(flags.get("compression"))) {
+        if (! apkOptions.resourcesAreCompressed) {
             cmd.add("-0");
             cmd.add("arsc");
         }
@@ -479,7 +480,7 @@ final public class AndrolibResources {
         }
         try {
             OS.exec(cmd.toArray(new String[0]));
-            if (flags.get("verbose")) {
+            if (apkOptions.verbose) {
                 LOGGER.info("command ran: ");
                 LOGGER.info(cmd.toString());
             }
@@ -639,6 +640,10 @@ final public class AndrolibResources {
         throw new CantFindFrameworkResException(id);
     }
 
+    public void installFramework(File frameFile) throws AndrolibException {
+        installFramework(frameFile, apkOptions.frameworkTag);
+    }
+
     public void installFramework(File frameFile, String tag)
             throws AndrolibException {
         InputStream in = null;
@@ -728,8 +733,8 @@ final public class AndrolibResources {
         String path;
 
         // if a framework path was specified on the command line, use it
-        if (sFrameworkFolder != null) {
-            path = sFrameworkFolder;
+        if (apkOptions.frameworkFolderLocation != null) {
+            path = apkOptions.frameworkFolderLocation;
         } else if (OSDetection.isMacOSX()) {
             path = System.getProperty("user.home") + File.separatorChar + "Library" + File.separatorChar +
                     "apktool" + File.separatorChar + "framework";
@@ -739,14 +744,14 @@ final public class AndrolibResources {
 
         File dir = new File(path);
 
-        if (dir.getParentFile().isFile()) {
+        if (dir.getParentFile() != null && dir.getParentFile().isFile()) {
             System.err.println("Please remove file at " + dir.getParentFile());
             System.exit(1);
         }
 
         if (! dir.exists()) {
             if (! dir.mkdirs()) {
-                if (sFrameworkFolder != null) {
+                if (apkOptions.frameworkFolderLocation != null) {
                     System.err.println("Can't create Framework directory: " + dir);
                 }
                 throw new AndrolibException("Can't create directory: " + dir);
@@ -796,13 +801,10 @@ final public class AndrolibResources {
         }
     }
 
-    public void setFrameworkFolder(String path) {
-        sFrameworkFolder = path;
-    }
+    public ApkOptions apkOptions;
 
     // TODO: dirty static hack. I have to refactor decoding mechanisms.
     public static boolean sKeepBroken = false;
-    public static String sFrameworkFolder = null;
 
     private final static Logger LOGGER = Logger.getLogger(AndrolibResources.class.getName());
 

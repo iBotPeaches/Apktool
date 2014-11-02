@@ -42,7 +42,7 @@ public class BuildAndDecodeJarTest {
 
         LOGGER.info("Building testjar.jar...");
         File testJar = new File(sTmpDir, "testjar.jar");
-        new Androlib().build(sTestOrigDir, testJar, TestUtils.returnStockHashMap(),"");
+        new Androlib().build(sTestOrigDir, testJar);
 
         LOGGER.info("Decoding testjar.jar...");
         ApkDecoder apkDecoder = new ApkDecoder(testJar);

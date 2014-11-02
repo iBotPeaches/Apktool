@@ -202,7 +202,11 @@ public class ApkDecoder {
     }
 
     public void setTargetSdkVersion() throws AndrolibException, IOException {
-        Map<String, String> sdkInfo = mAndrolib.getResTable(mApkFile).getSdkInfo();
+        if (mResTable == null) {
+            mResTable = mAndrolib.getResTable(mApkFile);
+        }
+
+        Map<String, String> sdkInfo = mResTable.getSdkInfo();
         if (sdkInfo.get("targetSdkVersion") != null) {
             mApi = Integer.parseInt(sdkInfo.get("targetSdkVersion"));
         }
@@ -232,6 +236,7 @@ public class ApkDecoder {
     }
 
     public void setFrameworkDir(String dir) {
+        mAndrolib.apkOptions.frameworkFolderLocation = dir;
         mFrameworkDir = dir;
     }
 
@@ -244,7 +249,6 @@ public class ApkDecoder {
                         "Apk doesn't contain either AndroidManifest.xml file or resources.arsc file");
             }
             AndrolibResources.sKeepBroken = mKeepBrokenResources;
-            AndrolibResources.sFrameworkFolder = mFrameworkDir;
             mResTable = mAndrolib.getResTable(mApkFile, hasResources);
             mResTable.setFrameTag(mFrameTag);
         }

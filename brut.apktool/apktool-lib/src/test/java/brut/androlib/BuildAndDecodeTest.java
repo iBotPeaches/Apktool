@@ -44,7 +44,7 @@ public class BuildAndDecodeTest {
 
         LOGGER.info("Building testapp.apk...");
         File testApk = new File(sTmpDir, "testapp.apk");
-        new Androlib().build(sTestOrigDir, testApk, TestUtils.returnStockHashMap(),"");
+        new Androlib().build(sTestOrigDir, testApk);
 
         LOGGER.info("Decoding testapp.apk...");
         ApkDecoder apkDecoder = new ApkDecoder(testApk);

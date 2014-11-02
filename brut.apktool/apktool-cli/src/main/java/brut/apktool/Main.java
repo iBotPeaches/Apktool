@@ -16,10 +16,7 @@
 
 package brut.apktool;
 
-import brut.androlib.Androlib;
-import brut.androlib.AndrolibException;
-import brut.androlib.ApkDecoder;
-import brut.androlib.ApktoolProperties;
+import brut.androlib.*;
 import brut.androlib.err.CantFindFrameworkResException;
 import brut.androlib.err.InFileNotFoundException;
 import brut.androlib.err.OutDirExistsException;
@@ -27,7 +24,6 @@ import brut.common.BrutException;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.logging.*;
 
 import brut.directory.DirectoryException;
@@ -45,8 +41,7 @@ import org.apache.commons.cli.PosixParser;
  * @author Connor Tumbleson <connor.tumbleson@gmail.com>
  */
 public class Main {
-    public static void main(String[] args) throws IOException,
-            InterruptedException, BrutException {
+    public static void main(String[] args) throws IOException, InterruptedException, BrutException {
 
         // set verbosity default
         Verbosity verbosity = Verbosity.NORMAL;
@@ -198,37 +193,27 @@ public class Main {
     private static void cmdBuild(CommandLine cli) throws BrutException {
         String[] args = cli.getArgs();
         String appDirName = args.length < 2 ? "." : args[1];
-        String mAaptPath = "";
         File outFile = null;
-        Androlib instance = new Androlib();
-
-        // hold all the fields
-        HashMap<String, Boolean> flags = new HashMap<String, Boolean>();
-        flags.put("forceBuildAll", false);
-        flags.put("debug", false);
-        flags.put("verbose", false);
-        flags.put("framework", false);
-        flags.put("update", false);
-        flags.put("copyOriginal", false);
+        ApkOptions apkOptions = new ApkOptions();
 
         // check for build options
         if (cli.hasOption("f") || cli.hasOption("force-all")) {
-            flags.put("forceBuildAll", true);
+            apkOptions.forceBuildAll = true;
         }
         if (cli.hasOption("d") || cli.hasOption("debug")) {
-            flags.put("debug", true);
+            apkOptions.debugMode = true;
         }
         if (cli.hasOption("v") || cli.hasOption("verbose")) {
-            flags.put("verbose", true);
+            apkOptions.verbose = true;
         }
         if (cli.hasOption("a") || cli.hasOption("aapt")) {
-            mAaptPath = cli.getOptionValue("a");
+            apkOptions.aaptPath = cli.getOptionValue("a");
         }
         if (cli.hasOption("c") || cli.hasOption("copy-original")) {
-            flags.put("copyOriginal", true);
+            apkOptions.copyOriginalFiles = true;
         }
         if (cli.hasOption("p") || cli.hasOption("frame-path")) {
-            instance.setFrameworkFolder(cli.getOptionValue("p"));
+            apkOptions.frameworkFolderLocation = cli.getOptionValue("p");
         }
         if (cli.hasOption("o") || cli.hasOption("output")) {
             outFile = new File(cli.getOptionValue("o"));
@@ -237,23 +222,22 @@ public class Main {
         }
 
         // try and build apk
-        instance.build(new File(appDirName), outFile, flags,mAaptPath);
+        new Androlib(apkOptions).build(new File(appDirName), outFile);
     }
 
     private static void cmdInstallFramework(CommandLine cli)
             throws AndrolibException {
         int paraCount = cli.getArgList().size();
         String apkName = (String) cli.getArgList().get(paraCount - 1);
-        String tag = null;
-        String frame_path = null;
 
+        ApkOptions apkOptions = new ApkOptions();
         if (cli.hasOption("p") || cli.hasOption("frame-path")) {
-            frame_path = cli.getOptionValue("p");
+            apkOptions.frameworkFolderLocation = cli.getOptionValue("p");
         }
         if (cli.hasOption("t") || cli.hasOption("tag")) {
-            tag = cli.getOptionValue("t");
+            apkOptions.frameworkTag = cli.getOptionValue("t");
         }
-        new Androlib().installFramework(new File(apkName), tag, frame_path);
+        new Androlib(apkOptions).installFramework(new File(apkName));
     }
 
     private static void cmdPublicizeResources(CommandLine cli)
