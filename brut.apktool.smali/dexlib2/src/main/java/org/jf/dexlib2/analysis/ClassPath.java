@@ -59,7 +59,7 @@ public class ClassPath {
 
     @Nonnull private final TypeProto unknownClass;
     @Nonnull private HashMap<String, ClassDef> availableClasses = Maps.newHashMap();
-    private int api;
+    private boolean checkPackagePrivateAccess;
 
     /**
      * Creates a new ClassPath instance that can load classes from the given dex files
@@ -77,12 +77,22 @@ public class ClassPath {
      * @param api API level
      */
     public ClassPath(@Nonnull Iterable<DexFile> classPath, int api) {
+        this(Lists.newArrayList(classPath), api == 17);
+    }
+
+    /**
+     * Creates a new ClassPath instance that can load classes from the given dex files
+     *
+     * @param classPath An iterable of DexFile objects. When loading a class, these dex files will be searched in order
+     * @param checkPackagePrivateAccess Whether checkPackagePrivateAccess is needed, enabled for ONLY early API 17 by default
+     */
+    public ClassPath(@Nonnull Iterable<DexFile> classPath, boolean checkPackagePrivateAccess) {
         // add fallbacks for certain special classes that must be present
         Iterable<DexFile> dexFiles = Iterables.concat(classPath, Lists.newArrayList(getBasicClasses()));
 
         unknownClass = new UnknownClassProto(this);
         loadedClasses.put(unknownClass.getType(), unknownClass);
-        this.api = api;
+        this.checkPackagePrivateAccess = checkPackagePrivateAccess;
 
         loadPrimitiveType("Z");
         loadPrimitiveType("B");
@@ -154,20 +164,28 @@ public class ClassPath {
         return unknownClass;
     }
 
-    public int getApi() {
-        return api;
+    public boolean needCheckPackagePrivateAccess() {
+        return checkPackagePrivateAccess;
     }
 
     @Nonnull
     public static ClassPath fromClassPath(Iterable<String> classPathDirs, Iterable<String> classPath, DexFile dexFile,
                                           int api) {
+        return fromClassPath(classPathDirs, classPath, dexFile, api, api == 17);
+    }
+
+    @Nonnull
+    public static ClassPath fromClassPath(Iterable<String> classPathDirs, Iterable<String> classPath, DexFile dexFile,
+                                          int api, boolean checkPackagePrivateAccess) {
         ArrayList<DexFile> dexFiles = Lists.newArrayList();
 
         for (String classPathEntry: classPath) {
-            dexFiles.add(loadClassPathEntry(classPathDirs, classPathEntry, api));
+            try {
+                dexFiles.add(loadClassPathEntry(classPathDirs, classPathEntry, api));
+            } catch (ExceptionWithContext e){}
         }
         dexFiles.add(dexFile);
-        return new ClassPath(dexFiles, api);
+        return new ClassPath(dexFiles, checkPackagePrivateAccess);
     }
 
     private static final Pattern dalvikCacheOdexPattern = Pattern.compile("@([^@]+)@classes.dex$");

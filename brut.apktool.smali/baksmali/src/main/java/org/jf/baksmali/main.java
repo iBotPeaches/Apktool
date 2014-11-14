@@ -238,7 +238,7 @@ public class main {
             }
         }
 
-        if (options.apiLevel >= 17) {
+        if (options.apiLevel == 17) {
             options.checkPackagePrivateAccess = true;
         }
 

@@ -628,7 +628,7 @@ public class ClassProto implements TypeProto {
                 for (int i=0; i<vtable.size(); i++) {
                     Method superMethod = vtable.get(i);
                     if (methodSignaturesMatch(superMethod, virtualMethod)) {
-                        if (classPath.getApi() != 17 || canAccess(superMethod)) {
+                        if (!classPath.needCheckPackagePrivateAccess() || canAccess(superMethod)) {
                             if (replaceExisting) {
                                 vtable.set(i, virtualMethod);
                             }

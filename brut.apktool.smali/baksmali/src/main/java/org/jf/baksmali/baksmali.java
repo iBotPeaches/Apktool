@@ -67,7 +67,7 @@ public class baksmali {
 
                 options.classPath = ClassPath.fromClassPath(options.bootClassPathDirs,
                         Iterables.concat(options.bootClassPathEntries, extraClassPathEntries), dexFile,
-                        options.apiLevel);
+                        options.apiLevel, options.checkPackagePrivateAccess);
 
                 if (options.customInlineDefinitions != null) {
                     options.inlineResolver = new CustomInlineMethodResolver(options.classPath,
