@@ -168,6 +168,11 @@ public class BuildAndDecodeTest {
     }
 
     @Test
+    public void anyDpiTest() throws BrutException, IOException {
+        compareValuesFiles("values-watch/strings.xml");
+    }
+
+    @Test
     public void drawableNoDpiTest() throws BrutException, IOException {
         compareResFolder("drawable-nodpi");
     }
