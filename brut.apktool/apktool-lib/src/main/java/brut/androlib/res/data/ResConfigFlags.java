@@ -265,6 +265,9 @@ public class ResConfigFlags {
             case DENSITY_XXXHIGH:
                 ret.append("-xxxhdpi");
                 break;
+            case DENSITY_ANY:
+                ret.append("-anydpi");
+                break;
             case DENSITY_NONE:
                 ret.append("-nodpi");
                 break;
@@ -353,6 +356,9 @@ public class ResConfigFlags {
         if ((screenLayout & (MASK_SCREENSIZE | MASK_SCREENLONG)) != SCREENSIZE_ANY || density != DENSITY_DEFAULT) {
             return SDK_DONUT;
         }
+        if (density == DENSITY_ANY) {
+            return SDK_LOLLIPOP;
+        }
         return 0;
     }
 
@@ -402,7 +408,8 @@ public class ResConfigFlags {
     public final static byte SDK_JELLY_BEAN = 16;
     public final static byte SDK_JELLY_BEAN_MR1 = 17;
     public final static byte SDK_JELLY_BEAN_MR2 = 18;
-    public final static byte KITKAT = 19;
+    public final static byte SDK_KITKAT = 19;
+    public final static byte SDK_LOLLIPOP = 21;
 
     public final static byte ORIENTATION_ANY = 0;
     public final static byte ORIENTATION_PORT = 1;
@@ -423,9 +430,10 @@ public class ResConfigFlags {
     public final static int DENSITY_XHIGH = 320;
     public final static int DENSITY_XXHIGH = 480;
     public final static int DENSITY_XXXHIGH = 640;
-    public final static int DENSITY_NONE = 0xFFFF;
+    public final static int DENSITY_ANY = 0xFE;
+    public final static int DENSITY_NONE = 0xFF;
 
-    public final static int MNC_ZERO = 0xFFFF;
+    public final static int MNC_ZERO = 0xFF;
 
     public final static short MASK_LAYOUTDIR = 0xc0;
     public final static short SCREENLAYOUT_LAYOUTDIR_ANY = 0x00;
