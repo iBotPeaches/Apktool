@@ -162,9 +162,14 @@ public class BuildAndDecodeTest {
 
     @Test
     public void qualifiersTest() throws BrutException {
-        compareValuesFiles("values-mcc004-mnc4-en-rUS-ldrtl-sw100dp-w200dp-h300dp"
+        compareValuesFiles("values-mcc004-mnc04-en-rUS-ldrtl-sw100dp-w200dp-h300dp"
                 + "-xlarge-long-land-desk-night-xhdpi-finger-keyssoft-12key"
                 + "-navhidden-dpad/strings.xml");
+    }
+
+    @Test
+    public void shortendedMncTest() throws BrutException {
+        compareValuesFiles("values-mcc001-mnc01/strings.xml");
     }
 
     @Test
@@ -175,6 +180,11 @@ public class BuildAndDecodeTest {
     @Test
     public void drawableNoDpiTest() throws BrutException, IOException {
         compareResFolder("drawable-nodpi");
+    }
+
+    @Test
+    public void drawableAnyDpiTest() throws BrutException, IOException {
+        compareResFolder("drawable-anydpi");
     }
 
     @Test
@@ -205,6 +215,11 @@ public class BuildAndDecodeTest {
     @Test
     public void drawableXxhdpiTest() throws BrutException, IOException {
         compareResFolder("drawable-xxhdpi");
+    }
+
+    @Test
+    public void drawableXxxhdpiTest() throws BrutException, IOException {
+        compareResFolder("drawable-xxxhdpi");
     }
 
     @Test
