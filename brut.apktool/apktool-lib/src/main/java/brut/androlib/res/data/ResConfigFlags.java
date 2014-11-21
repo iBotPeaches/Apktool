@@ -144,7 +144,12 @@ public class ResConfigFlags {
             ret.append("-mcc").append(String.format("%03d", mcc));
             if (mcc != MNC_ZERO) {
                 if (mnc != 0 && mnc != -1) {
-                    ret.append("-mnc").append(mnc);
+                    ret.append("-mnc");
+                    if (mnc > 0 && mnc < 10) {
+                        ret.append(String.format("%02d", mnc));
+                    } else {
+                        ret.append(String.format("%03d", mnc));
+                    }
                 }
             }
         }
@@ -430,8 +435,8 @@ public class ResConfigFlags {
     public final static int DENSITY_XHIGH = 320;
     public final static int DENSITY_XXHIGH = 480;
     public final static int DENSITY_XXXHIGH = 640;
-    public final static int DENSITY_ANY = 0xFE;
-    public final static int DENSITY_NONE = 0xFF;
+    public final static int DENSITY_ANY = 0xFFFE;
+    public final static int DENSITY_NONE = 0xFFFF;
 
     public final static int MNC_ZERO = 0xFF;
 
