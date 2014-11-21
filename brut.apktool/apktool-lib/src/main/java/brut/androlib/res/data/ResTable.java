@@ -33,7 +33,6 @@ public class ResTable {
     private final Set<ResPackage> mMainPackages = new LinkedHashSet<ResPackage>();
     private final Set<ResPackage> mFramePackages = new LinkedHashSet<ResPackage>();
 
-    private String mFrameTag;
     private String mPackageRenamed;
     private String mPackageOriginal;
     private int mPackageId;
@@ -72,7 +71,7 @@ public class ResTable {
             return pkg;
         }
         if (mAndRes != null) {
-            return mAndRes.loadFrameworkPkg(this, id, mFrameTag);
+            return mAndRes.loadFrameworkPkg(this, id, mAndRes.apkOptions.frameworkTag);
         }
         throw new UndefinedResObject(String.format("package: id=%d", id));
     }
@@ -141,10 +140,6 @@ public class ResTable {
         } else {
             mFramePackages.add(pkg);
         }
-    }
-
-    public void setFrameTag(String tag) {
-        mFrameTag = tag;
     }
 
     public void setAnalysisMode(boolean mode) {

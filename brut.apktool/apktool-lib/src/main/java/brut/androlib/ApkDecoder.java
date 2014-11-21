@@ -225,10 +225,7 @@ public class ApkDecoder {
     }
 
     public void setFrameworkTag(String tag) throws AndrolibException {
-        mFrameTag = tag;
-        if (mResTable != null) {
-            getResTable().setFrameTag(tag);
-        }
+        mAndrolib.apkOptions.frameworkTag = tag;
     }
 
     public void setKeepBrokenResources(boolean keepBrokenResources) {
@@ -237,7 +234,6 @@ public class ApkDecoder {
 
     public void setFrameworkDir(String dir) {
         mAndrolib.apkOptions.frameworkFolderLocation = dir;
-        mFrameworkDir = dir;
     }
 
     public ResTable getResTable() throws AndrolibException {
@@ -250,7 +246,6 @@ public class ApkDecoder {
             }
             AndrolibResources.sKeepBroken = mKeepBrokenResources;
             mResTable = mAndrolib.getResTable(mApkFile, hasResources);
-            mResTable.setFrameTag(mFrameTag);
         }
         return mResTable;
     }
@@ -344,8 +339,8 @@ public class ApkDecoder {
         Map<String, Object> uses = new LinkedHashMap<String, Object>();
         uses.put("ids", ids);
 
-        if (mFrameTag != null) {
-            uses.put("tag", mFrameTag);
+        if (mAndrolib.apkOptions.frameworkTag != null) {
+            uses.put("tag", mAndrolib.apkOptions.frameworkTag);
         }
 
         meta.put("usesFramework", uses);
@@ -405,8 +400,6 @@ public class ApkDecoder {
     private short mDecodeSources = DECODE_SOURCES_SMALI;
     private short mDecodeResources = DECODE_RESOURCES_FULL;
     private String mDebugLinePrefix = "a=0;// ";
-    private String mFrameTag;
-    private String mFrameworkDir = null;
     private boolean mDebug = false;
     private boolean mForceDelete = false;
     private boolean mKeepBrokenResources = false;
