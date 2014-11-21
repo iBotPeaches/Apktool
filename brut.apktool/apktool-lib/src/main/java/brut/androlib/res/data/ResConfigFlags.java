@@ -352,6 +352,9 @@ public class ResConfigFlags {
     }
 
     private short getNaturalSdkVersionRequirement() {
+        if (density == DENSITY_ANY) {
+            return SDK_LOLLIPOP;
+        }
         if (smallestScreenWidthDp != 0 || screenWidthDp != 0 || screenHeightDp != 0) {
             return SDK_HONEYCOMB_MR2;
         }
@@ -360,9 +363,6 @@ public class ResConfigFlags {
         }
         if ((screenLayout & (MASK_SCREENSIZE | MASK_SCREENLONG)) != SCREENSIZE_ANY || density != DENSITY_DEFAULT) {
             return SDK_DONUT;
-        }
-        if (density == DENSITY_ANY) {
-            return SDK_LOLLIPOP;
         }
         return 0;
     }
@@ -438,7 +438,7 @@ public class ResConfigFlags {
     public final static int DENSITY_ANY = 0xFFFE;
     public final static int DENSITY_NONE = 0xFFFF;
 
-    public final static int MNC_ZERO = 0xFF;
+    public final static int MNC_ZERO = 0xFFFF;
 
     public final static short MASK_LAYOUTDIR = 0xc0;
     public final static short SCREENLAYOUT_LAYOUTDIR_ANY = 0x00;
