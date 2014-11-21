@@ -51,7 +51,11 @@ public class TypedValue {
      * container.
      */
     public static final int TYPE_FRACTION = 0x06;
-
+    /**
+     * The <var>data</var> holds a dynamic res table reference, which needs to be
+     * resolved before it can be used like TYPE_REFERENCE
+     */
+    public static final int TYPE_DYNAMIC_REFERENCE = 0x07;
     /**
      * Identifies the start of plain integer values. Any type value from this to
      * {@link #TYPE_LAST_INT} means the <var>data</var> field holds a generic
