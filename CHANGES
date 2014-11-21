@@ -48,6 +48,8 @@ v2.0.0 (TBA)
 -Fixed (issue #664) - Fixed issue with apks with large StringPools failing to decode.
 -Fixed (issue #447) - Fixed bad cast of ResStringValue to ResAtr by handling ResStringValue correctly (Thanks whydoubt)
 -Fixed (issue #689) - Fixed issue with hard coding extension as PNG.
+-Fixed (issue #653) - Added Android Lollipop support.
+-Fixed (issue #706) - Added support for TYPE_DYNAMIC_REFERENCE.
 -Fixed issue with APKs with multiple dex files.
 -Fixed issue with using Apktool without smali/baksmali for ApktoolProperties (Thanks teprrr)
 -Fixed issue with non-URI standard characters in apk name (Thanks rover12421)
