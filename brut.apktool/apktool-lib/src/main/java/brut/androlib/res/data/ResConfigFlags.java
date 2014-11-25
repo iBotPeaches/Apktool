@@ -144,7 +144,12 @@ public class ResConfigFlags {
             ret.append("-mcc").append(String.format("%03d", mcc));
             if (mcc != MNC_ZERO) {
                 if (mnc != 0 && mnc != -1) {
-                    ret.append("-mnc").append(mnc);
+                    ret.append("-mnc");
+                    if (mnc > 0 && mnc < 10) {
+                        ret.append(String.format("%02d", mnc));
+                    } else {
+                        ret.append(String.format("%03d", mnc));
+                    }
                 }
             }
         }
@@ -265,6 +270,9 @@ public class ResConfigFlags {
             case DENSITY_XXXHIGH:
                 ret.append("-xxxhdpi");
                 break;
+            case DENSITY_ANY:
+                ret.append("-anydpi");
+                break;
             case DENSITY_NONE:
                 ret.append("-nodpi");
                 break;
@@ -344,6 +352,9 @@ public class ResConfigFlags {
     }
 
     private short getNaturalSdkVersionRequirement() {
+        if (density == DENSITY_ANY) {
+            return SDK_LOLLIPOP;
+        }
         if (smallestScreenWidthDp != 0 || screenWidthDp != 0 || screenHeightDp != 0) {
             return SDK_HONEYCOMB_MR2;
         }
@@ -402,7 +413,8 @@ public class ResConfigFlags {
     public final static byte SDK_JELLY_BEAN = 16;
     public final static byte SDK_JELLY_BEAN_MR1 = 17;
     public final static byte SDK_JELLY_BEAN_MR2 = 18;
-    public final static byte KITKAT = 19;
+    public final static byte SDK_KITKAT = 19;
+    public final static byte SDK_LOLLIPOP = 21;
 
     public final static byte ORIENTATION_ANY = 0;
     public final static byte ORIENTATION_PORT = 1;
@@ -423,6 +435,7 @@ public class ResConfigFlags {
     public final static int DENSITY_XHIGH = 320;
     public final static int DENSITY_XXHIGH = 480;
     public final static int DENSITY_XXXHIGH = 640;
+    public final static int DENSITY_ANY = 0xFFFE;
     public final static int DENSITY_NONE = 0xFFFF;
 
     public final static int MNC_ZERO = 0xFFFF;

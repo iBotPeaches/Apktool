@@ -48,6 +48,8 @@ public class ResValueFactory {
                 return new ResFractionValue(value, rawValue);
             case TypedValue.TYPE_INT_BOOLEAN:
                 return new ResBoolValue(value != 0, rawValue);
+            case TypedValue.TYPE_DYNAMIC_REFERENCE:
+                return newReference(value, rawValue);
         }
 
         if (type >= TypedValue.TYPE_FIRST_COLOR_INT
