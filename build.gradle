@@ -17,7 +17,7 @@ apply plugin: 'maven'
 apply from: 'gradle/functions.gradle'
 
 def apktoolversion_major = '2.0.0'
-def apktoolversion_minor = 'RC2';
+def apktoolversion_minor = 'RC3';
 
 allprojects {
     apply plugin: 'java'
