@@ -83,6 +83,15 @@ public class ARSCDecoder {
     private ResPackage readPackage() throws IOException, AndrolibException {
         checkChunkType(Header.TYPE_PACKAGE);
         int id = (byte) mIn.readInt();
+
+        if (id == 0) {
+            // This means we are dealing with a Library Package, we should just temporarily
+            // set the packageId to the next available id . This will be set at runtime regardless, but
+            // for Apktool's use we need a non-zero packageId.
+            // AOSP indicates 0x02 is next, as 0x01 is system and 0x7F is private.
+            id = 2;
+        }
+
         String name = mIn.readNullEndedString(128, true);
 		/* typeStrings */mIn.skipInt();
 		/* lastPublicType */mIn.skipInt();
@@ -96,11 +105,33 @@ public class ARSCDecoder {
         mPkg = new ResPackage(mResTable, id, name);
 
         nextChunk();
+        while (mHeader.type == Header.TYPE_LIBRARY) {
+            readLibraryType();
+        }
+
         while (mHeader.type == Header.TYPE_TYPE) {
             readType();
         }
 
         return mPkg;
+    }
+
+    private void readLibraryType() throws AndrolibException, IOException {
+        checkChunkType(Header.TYPE_LIBRARY);
+        int libraryCount = mIn.readInt();
+
+        int packageId;
+        String packageName;
+
+        for (int i = 0; i < libraryCount; i++) {
+            packageId = mIn.readInt();
+            packageName = mIn.readNullEndedString(128, true);
+            LOGGER.info(String.format("Decoding Shared Library (%s), pkgId: %d", packageName, packageId));
+        }
+
+        while(nextChunk().type == Header.TYPE_CONFIG) {
+            readConfig();
+        }
     }
 
     private ResType readType() throws AndrolibException, IOException {
@@ -370,7 +401,7 @@ public class ARSCDecoder {
         }
 
         public final static short TYPE_NONE = -1, TYPE_TABLE = 0x0002,
-                TYPE_PACKAGE = 0x0200, TYPE_TYPE = 0x0202,
+                TYPE_PACKAGE = 0x0200, TYPE_TYPE = 0x0202, TYPE_LIBRARY = 0x0203,
                 TYPE_CONFIG = 0x0201;
     }
 
