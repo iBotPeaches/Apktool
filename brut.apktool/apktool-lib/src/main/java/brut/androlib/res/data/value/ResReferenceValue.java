@@ -45,15 +45,12 @@ public class ResReferenceValue extends ResIntValue {
         }
 
         ResResSpec spec = getReferent();
-        boolean newId = spec.hasDefaultResource()
-                && spec.getDefaultResource().getValue() instanceof ResIdValue;
+        boolean newId = spec.hasDefaultResource() && spec.getDefaultResource().getValue() instanceof ResIdValue;
 
         // generate the beginning to fix @android
         String mStart = (mTheme ? '?' : '@') + (newId ? "+" : "");
 
-        return mStart
-                + spec.getFullName(mPackage, mTheme
-                && spec.getType().getName().equals("attr"));
+        return mStart + spec.getFullName(mPackage, mTheme && spec.getType().getName().equals("attr"));
     }
 
     public ResResSpec getReferent() throws AndrolibException {

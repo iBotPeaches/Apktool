@@ -1,4 +1,4 @@
-package brut.androlib; /**
+/**
  *  Copyright 2014 Ryszard Wiśniewski <brut.alll@gmail.com>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,6 +13,7 @@ package brut.androlib; /**
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+package brut.androlib;
 
 public class ApkOptions {
     public boolean forceBuildAll = false;
