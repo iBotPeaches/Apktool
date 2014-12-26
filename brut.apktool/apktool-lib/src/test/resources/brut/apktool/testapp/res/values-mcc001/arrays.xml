@@ -31,4 +31,8 @@
     <string-array name="issue_677" formatted="false">
         <item>category=temp%temp%foo</item>
     </string-array>
+    <string-array name="issue_329">
+        <item>res/</item>
+        <item>view/</item>
+    </string-array>
 </resources>

@@ -26,6 +26,7 @@ import brut.common.BrutException;
 import brut.directory.DirectoryException;
 import brut.directory.ZipExtFile;
 import brut.util.OS;
+import com.google.common.base.Strings;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 
 import java.io.File;
@@ -98,6 +99,9 @@ public class ApkDecoder {
                     mAndrolib.decodeResourcesRaw(mApkFile, outDir);
                     break;
                 case DECODE_RESOURCES_FULL:
+                    if (hasManifest()) {
+                        mAndrolib.decodeManifestWithResources(mApkFile, outDir, getResTable());
+                    }
                     mAndrolib.decodeResourcesFull(mApkFile, outDir, getResTable());
                     break;
             }
@@ -359,6 +363,10 @@ public class ApkDecoder {
         int id = getResTable().getPackageId();
 
         HashMap<String, String> packages = new HashMap<String, String>();
+
+        if (Strings.isNullOrEmpty(original)) {
+            return;
+        }
 
         // only put rename-manifest-package into apktool.yml, if the change will be required
         if (!renamed.equalsIgnoreCase(original)) {

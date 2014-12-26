@@ -52,6 +52,7 @@ v2.0.0 (TBA)
 -Fixed (issue #706) - Added support for TYPE_DYNAMIC_REFERENCE.
 -Fixed (issue #685) - Fixed invalid attrs values with Android Lollipop.
 -Fixed (issue #713) - Fixed issue with packages that had shared library resources.
+-Fixed (issue #329) - Fixed issue with incorrectly identifying similarly named strings as ResFileValues.
 -Fixed issue with APKs with multiple dex files.
 -Fixed issue with using Apktool without smali/baksmali for ApktoolProperties (Thanks teprrr)
 -Fixed issue with non-URI standard characters in apk name (Thanks rover12421)

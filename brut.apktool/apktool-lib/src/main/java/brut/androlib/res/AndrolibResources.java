@@ -278,8 +278,9 @@ final public class AndrolibResources {
         transformer.transform(source, result);
     }
 
-    public void decode(ResTable resTable, ExtFile apkFile, File outDir)
+    public void decodeManifestWithResources(ResTable resTable, ExtFile apkFile, File outDir)
             throws AndrolibException {
+
         Duo<ResFileDecoder, AXmlResourceParser> duo = getResFileDecoder();
         ResFileDecoder fileDecoder = duo.m1;
         ResAttrDecoder attrDecoder = duo.m2.getAttrDecoder();
@@ -290,7 +291,6 @@ final public class AndrolibResources {
         try {
             inApk = apkFile.getDirectory();
             out = new FileDirectory(outDir);
-
             LOGGER.info("Decoding AndroidManifest.xml with resources...");
 
             fileDecoder.decodeManifest(inApk, "AndroidManifest.xml", out, "AndroidManifest.xml");
@@ -306,6 +306,24 @@ final public class AndrolibResources {
                 remove_manifest_versions(outDir.getAbsolutePath() + File.separator + "AndroidManifest.xml");
                 mPackageId = String.valueOf(resTable.getPackageId());
             }
+        } catch (DirectoryException ex) {
+            throw new AndrolibException(ex);
+        }
+    }
+
+    public void decode(ResTable resTable, ExtFile apkFile, File outDir)
+            throws AndrolibException {
+        Duo<ResFileDecoder, AXmlResourceParser> duo = getResFileDecoder();
+        ResFileDecoder fileDecoder = duo.m1;
+        ResAttrDecoder attrDecoder = duo.m2.getAttrDecoder();
+
+        attrDecoder.setCurrentPackage(resTable.listMainPackages().iterator().next());
+        Directory inApk, in = null, out;
+
+        try {
+            out = new FileDirectory(outDir);
+
+            inApk = apkFile.getDirectory();
             if (inApk.containsDir("res")) {
                 in = inApk.getDir("res");
             }
