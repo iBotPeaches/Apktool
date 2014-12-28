@@ -268,8 +268,7 @@ public class AnnotatedBytes {
     }
 
     /**
-     * Gets the width of the right side containing the annotations
-     * @return
+     * @return The width of the right side containing the annotations
      */
     public int getAnnotationWidth() {
         int leftWidth = 8 + (hexCols * 2) + (hexCols / 2);

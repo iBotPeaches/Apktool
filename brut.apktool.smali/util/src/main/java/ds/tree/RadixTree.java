@@ -57,7 +57,7 @@ public interface RadixTree<T> {
     /**
      * Delete a key and its associated value from the tree.
      * @param key The key of the node that need to be deleted
-     * @return
+     * @return True if the key was deleted, false if not found
      */
     public boolean delete(String key);
 

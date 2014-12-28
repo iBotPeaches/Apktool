@@ -48,8 +48,7 @@ public interface DebugItem {
     int getDebugItemType();
 
     /**
-     * The code address
-     * @return
+     * @return The code address
      */
     int getCodeAddress();
 }
