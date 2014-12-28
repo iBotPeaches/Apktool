@@ -63,14 +63,22 @@ subprojects {
     apply plugin: 'java'
     apply plugin: 'idea'
 
+    if (JavaVersion.current().isJava8Compatible()) {
+        allprojects {
+            tasks.withType(Javadoc) {
+                options.addStringOption('Xdoclint:none', '-quiet')
+            }
+        }
+    }
+
     version = parent.version
 
     ext {
-        depends = [guava: 'com.google.guava:guava:14.0',
+        depends = [guava: 'com.google.guava:guava:18.0',
                    findbugs: 'com.google.code.findbugs:jsr305:1.3.9',
                    junit: 'junit:junit:4.6',
-                   antlr_runtime: 'org.antlr:antlr-runtime:3.5',
-                   antlr: 'org.antlr:antlr:3.5',
+                   antlr_runtime: 'org.antlr:antlr-runtime:3.5.2',
+                   antlr: 'org.antlr:antlr:3.5.2',
                    commons_cli: 'commons-cli:commons-cli:1.2',
                    jflex: 'de.jflex:jflex:1.4.3',
                    proguard: 'net.sf.proguard:proguard-base:4.8'
