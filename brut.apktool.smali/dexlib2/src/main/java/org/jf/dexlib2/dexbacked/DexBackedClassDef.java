@@ -173,7 +173,7 @@ public class DexBackedClassDef extends BaseTypeReference implements ClassDef {
                             while (true) {
                                 if (++count > staticFieldCount) {
                                     instanceFieldsOffset = reader.getOffset();
-                                    return null;
+                                    return endOfData();
                                 }
 
                                 DexBackedField item = new DexBackedField(reader, DexBackedClassDef.this,
@@ -232,7 +232,7 @@ public class DexBackedClassDef extends BaseTypeReference implements ClassDef {
                             while (true) {
                                 if (++count > instanceFieldCount) {
                                     directMethodsOffset = reader.getOffset();
-                                    return null;
+                                    return endOfData();
                                 }
 
                                 DexBackedField item = new DexBackedField(reader, DexBackedClassDef.this,
@@ -301,7 +301,7 @@ public class DexBackedClassDef extends BaseTypeReference implements ClassDef {
                             while (true) {
                                 if (++count > directMethodCount) {
                                     virtualMethodsOffset = reader.getOffset();
-                                    return null;
+                                    return endOfData();
                                 }
 
                                 DexBackedMethod item = new DexBackedMethod(reader, DexBackedClassDef.this,
@@ -357,7 +357,7 @@ public class DexBackedClassDef extends BaseTypeReference implements ClassDef {
                         protected DexBackedMethod readNextItem(@Nonnull DexReader reader) {
                             while (true) {
                                 if (++count > virtualMethodCount) {
-                                    return null;
+                                    return endOfData();
                                 }
 
                                 DexBackedMethod item = new DexBackedMethod(reader, DexBackedClassDef.this,

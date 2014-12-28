@@ -76,7 +76,7 @@ public class DexBackedMethodImplementation implements MethodImplementation {
                     @Override
                     protected Instruction readNextItem(@Nonnull DexReader reader) {
                         if (reader.getOffset() >= endOffset) {
-                            return null;
+                            return endOfData();
                         }
 
                         Instruction instruction = DexBackedInstruction.readFrom(reader);
