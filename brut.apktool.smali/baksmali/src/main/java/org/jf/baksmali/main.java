@@ -211,6 +211,9 @@ public class main {
                 case 'e':
                     options.dexEntry = commandLine.getOptionValue("e");
                     break;
+                case 'k':
+                    options.checkPackagePrivateAccess = true;
+                    break;
                 case 'N':
                     disassemble = false;
                     break;
@@ -239,10 +242,6 @@ public class main {
             if (options.jobs > 6) {
                 options.jobs = 6;
             }
-        }
-
-        if (options.apiLevel == 17) {
-            options.checkPackagePrivateAccess = true;
         }
 
         String inputDexFileName = remainingArgs[0];
@@ -430,6 +429,12 @@ public class main {
                 .withDescription("Don't use implicit (type-less) method and field references")
                 .create("t");
 
+        Option checkPackagePrivateAccessOption = OptionBuilder.withLongOpt("check-package-private-access")
+                .withDescription("When deodexing, use the package-private access check when calculating vtable " +
+                        "indexes. It should only be needed for 4.2.0 odexes. The functionality was reverted for " +
+                        "4.2.1.")
+                .create("k");
+
         Option dumpOption = OptionBuilder.withLongOpt("dump-to")
                 .withDescription("dumps the given dex file into a single annotated dump file named FILE" +
                         " (<dexfile>.dump by default), along with the normal disassembly")
@@ -477,6 +482,7 @@ public class main {
         basicOptions.addOption(resourceIdFilesOption);
         basicOptions.addOption(noImplicitReferencesOption);
         basicOptions.addOption(dexEntryOption);
+        basicOptions.addOption(checkPackagePrivateAccessOption);
 
         debugOptions.addOption(dumpOption);
         debugOptions.addOption(ignoreErrorsOption);

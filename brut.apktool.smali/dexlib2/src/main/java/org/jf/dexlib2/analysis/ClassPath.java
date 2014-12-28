@@ -164,7 +164,7 @@ public class ClassPath {
         return unknownClass;
     }
 
-    public boolean needCheckPackagePrivateAccess() {
+    public boolean shouldCheckPackagePrivateAccess() {
         return checkPackagePrivateAccess;
     }
 
