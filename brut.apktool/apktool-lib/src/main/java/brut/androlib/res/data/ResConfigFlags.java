@@ -142,8 +142,8 @@ public class ResConfigFlags {
         StringBuilder ret = new StringBuilder();
         if (mcc != 0) {
             ret.append("-mcc").append(String.format("%03d", mcc));
-            if (mcc != MNC_ZERO) {
-                if (mnc != 0 && mnc != -1) {
+            if (mnc != MNC_ZERO) {
+                if (mnc != 0) {
                     ret.append("-mnc");
                     if (mnc > 0 && mnc < 10) {
                         ret.append(String.format("%02d", mnc));
@@ -151,6 +151,8 @@ public class ResConfigFlags {
                         ret.append(String.format("%03d", mnc));
                     }
                 }
+            } else {
+                ret.append("-mnc00");
             }
         }
         if (language[0] != '\00') {
@@ -438,7 +440,7 @@ public class ResConfigFlags {
     public final static int DENSITY_ANY = 0xFFFE;
     public final static int DENSITY_NONE = 0xFFFF;
 
-    public final static int MNC_ZERO = 0xFFFF;
+    public final static int MNC_ZERO = -1;
 
     public final static short MASK_LAYOUTDIR = 0xc0;
     public final static short SCREENLAYOUT_LAYOUTDIR_ANY = 0x00;

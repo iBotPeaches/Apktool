@@ -94,6 +94,11 @@ public class BuildAndDecodeTest {
     }
 
     @Test
+    public void bug702Test() throws BrutException {
+        compareValuesFiles("values-mcc001-mnc00/strings.xml");
+    }
+
+    @Test
     public void valuesDimensTest() throws BrutException {
         compareValuesFiles("values-mcc001/dimens.xml");
     }
