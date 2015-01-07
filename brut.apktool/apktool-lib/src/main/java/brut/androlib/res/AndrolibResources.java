@@ -748,19 +748,23 @@ final public class AndrolibResources {
     }
 
     private File getFrameworkDir() throws AndrolibException {
-        String path;
+        File dir;
 
         // if a framework path was specified on the command line, use it
         if (apkOptions.frameworkFolderLocation != null) {
-            path = apkOptions.frameworkFolderLocation;
-        } else if (OSDetection.isMacOSX()) {
-            path = System.getProperty("user.home") + File.separatorChar + "Library" + File.separatorChar +
-                    "apktool" + File.separatorChar + "framework";
+            dir = new File(apkOptions.frameworkFolderLocation);
         } else {
-            path = System.getProperty("user.home") + File.separatorChar + "apktool" + File.separatorChar + "framework";
-        }
+            File parentPath = new File(System.getProperty("user.home"));
+            if (!parentPath.canWrite()) {
+                parentPath = new File(System.getProperty("java.io.tmpdir"));
+            }
 
-        File dir = new File(path);
+            if (OSDetection.isMacOSX()) {
+                dir = new File(parentPath, String.format("Library%1$sapktool%1%sframework", File.separatorChar));
+            } else {
+                dir = new File(parentPath, String.format("apktool%1$sframework", File.separatorChar));
+            }
+        }
 
         if (dir.getParentFile() != null && dir.getParentFile().isFile()) {
             System.err.println("Please remove file at " + dir.getParentFile());
