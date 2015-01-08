@@ -31,9 +31,12 @@
 
 package org.jf.util;
 
+import com.google.common.base.Strings;
+import com.google.common.io.Files;
 import junit.framework.Assert;
 import org.junit.Test;
 
+import java.io.File;
 import java.nio.charset.Charset;
 
 public class ClassFileNameHandlerTest {
@@ -91,6 +94,7 @@ public class ClassFileNameHandlerTest {
         Assert.assertEquals(98, result.length());
     }
 
+    @Test
     public void test4ByteEncodings() {
         StringBuilder sb = new StringBuilder();
         for (int i=0x10000; i<0x10000+100; i++) {
@@ -101,12 +105,141 @@ public class ClassFileNameHandlerTest {
         String result = ClassFileNameHandler.shortenPathComponent(sb.toString(), 8);
         Assert.assertEquals(400, sb.toString().getBytes(UTF8).length);
         Assert.assertEquals(389, result.getBytes(UTF8).length);
-        Assert.assertEquals(98, result.length());
+        Assert.assertEquals(195, result.length());
 
-        // we remove 3 codepoints == 6 characters == 12 bytes, and then add back in the 1-byte '#'
+        // we remove 2 codepoints == 4 characters == 8 bytes, and then add back in the 1-byte '#'
         result = ClassFileNameHandler.shortenPathComponent(sb.toString(), 7);
         Assert.assertEquals(400, sb.toString().getBytes(UTF8).length);
-        Assert.assertEquals(3892, result.getBytes(UTF8).length);
-        Assert.assertEquals(98, result.length());
+        Assert.assertEquals(393, result.getBytes(UTF8).length);
+        Assert.assertEquals(197, result.length());
+    }
+
+    @Test
+    public void testMultipleLongNames() {
+        String filenameFragment = Strings.repeat("a", 512);
+
+        File tempDir = Files.createTempDir();
+        ClassFileNameHandler handler = new ClassFileNameHandler(tempDir, ".smali");
+
+        // put the differentiating character in the middle, where it will get stripped out by the filename shortening
+        // logic
+        File file1 = handler.getUniqueFilenameForClass("La/a/" + filenameFragment  + "1" + filenameFragment + ";");
+        checkFilename(tempDir, file1, "a", "a", Strings.repeat("a", 124) + "#" + Strings.repeat("a", 118) + ".smali");
+
+        File file2 = handler.getUniqueFilenameForClass("La/a/" + filenameFragment + "2" + filenameFragment + ";");
+        checkFilename(tempDir, file2, "a", "a", Strings.repeat("a", 124) + "#" + Strings.repeat("a", 118) + ".1.smali");
+
+        Assert.assertFalse(file1.getAbsolutePath().equals(file2.getAbsolutePath()));
+    }
+
+    @Test
+    public void testBasicFunctionality() {
+        File tempDir = Files.createTempDir();
+        ClassFileNameHandler handler = new ClassFileNameHandler(tempDir, ".smali");
+
+        File file = handler.getUniqueFilenameForClass("La/b/c/d;");
+        checkFilename(tempDir, file, "a", "b", "c", "d.smali");
+
+        file = handler.getUniqueFilenameForClass("La/b/c/e;");
+        checkFilename(tempDir, file, "a", "b", "c", "e.smali");
+
+        file = handler.getUniqueFilenameForClass("La/b/d/d;");
+        checkFilename(tempDir, file, "a", "b", "d", "d.smali");
+
+        file = handler.getUniqueFilenameForClass("La/b;");
+        checkFilename(tempDir, file, "a", "b.smali");
+
+        file = handler.getUniqueFilenameForClass("Lb;");
+        checkFilename(tempDir, file, "b.smali");
+    }
+
+    @Test
+    public void testCaseInsensitiveFilesystem() {
+        File tempDir = Files.createTempDir();
+        ClassFileNameHandler handler = new ClassFileNameHandler(tempDir, ".smali", false, false);
+
+        File file = handler.getUniqueFilenameForClass("La/b/c;");
+        checkFilename(tempDir, file, "a", "b", "c.smali");
+
+        file = handler.getUniqueFilenameForClass("La/b/C;");
+        checkFilename(tempDir, file, "a", "b", "C.1.smali");
+
+        file = handler.getUniqueFilenameForClass("La/B/c;");
+        checkFilename(tempDir, file, "a", "B.1", "c.smali");
+    }
+
+    @Test
+    public void testCaseSensitiveFilesystem() {
+        File tempDir = Files.createTempDir();
+        ClassFileNameHandler handler = new ClassFileNameHandler(tempDir, ".smali", true, false);
+
+        File file = handler.getUniqueFilenameForClass("La/b/c;");
+        checkFilename(tempDir, file, "a", "b", "c.smali");
+
+        file = handler.getUniqueFilenameForClass("La/b/C;");
+        checkFilename(tempDir, file, "a", "b", "C.smali");
+
+        file = handler.getUniqueFilenameForClass("La/B/c;");
+        checkFilename(tempDir, file, "a", "B", "c.smali");
+    }
+
+    @Test
+    public void testWindowsReservedFilenames() {
+        File tempDir = Files.createTempDir();
+        ClassFileNameHandler handler = new ClassFileNameHandler(tempDir, ".smali", false, true);
+
+        File file = handler.getUniqueFilenameForClass("La/con/c;");
+        checkFilename(tempDir, file, "a", "con#", "c.smali");
+
+        file = handler.getUniqueFilenameForClass("La/Con/c;");
+        checkFilename(tempDir, file, "a", "Con#.1", "c.smali");
+
+        file = handler.getUniqueFilenameForClass("La/b/PRN;");
+        checkFilename(tempDir, file, "a", "b", "PRN#.smali");
+
+        file = handler.getUniqueFilenameForClass("La/b/prN;");
+        checkFilename(tempDir, file, "a", "b", "prN#.1.smali");
+
+        file = handler.getUniqueFilenameForClass("La/b/com0;");
+        checkFilename(tempDir, file, "a", "b", "com0.smali");
+
+        for (String reservedName: new String[] {"con", "prn", "aux", "nul", "com1", "com9", "lpt1", "lpt9"}) {
+            file = handler.getUniqueFilenameForClass("L" + reservedName + ";");
+            checkFilename(tempDir, file, reservedName +"#.smali");
+        }
+    }
+
+    @Test
+    public void testIgnoringWindowsReservedFilenames() {
+        File tempDir = Files.createTempDir();
+        ClassFileNameHandler handler = new ClassFileNameHandler(tempDir, ".smali", true, false);
+
+        File file = handler.getUniqueFilenameForClass("La/con/c;");
+        checkFilename(tempDir, file, "a", "con", "c.smali");
+
+        file = handler.getUniqueFilenameForClass("La/Con/c;");
+        checkFilename(tempDir, file, "a", "Con", "c.smali");
+
+        file = handler.getUniqueFilenameForClass("La/b/PRN;");
+        checkFilename(tempDir, file, "a", "b", "PRN.smali");
+
+        file = handler.getUniqueFilenameForClass("La/b/prN;");
+        checkFilename(tempDir, file, "a", "b", "prN.smali");
+
+        file = handler.getUniqueFilenameForClass("La/b/com0;");
+        checkFilename(tempDir, file, "a", "b", "com0.smali");
+
+        for (String reservedName: new String[] {"con", "prn", "aux", "nul", "com1", "com9", "lpt1", "lpt9"}) {
+            file = handler.getUniqueFilenameForClass("L" + reservedName + ";");
+            checkFilename(tempDir, file, reservedName +".smali");
+        }
+    }
+
+    private void checkFilename(File base, File file, String... elements) {
+        for (int i=elements.length-1; i>=0; i--) {
+            Assert.assertEquals(elements[i], file.getName());
+            file = file.getParentFile();
+        }
+        Assert.assertEquals(base.getAbsolutePath(), file.getAbsolutePath());
     }
 }

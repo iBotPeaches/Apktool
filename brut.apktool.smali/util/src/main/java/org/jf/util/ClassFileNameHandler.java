@@ -28,33 +28,60 @@
 
 package org.jf.util;
 
-import ds.tree.RadixTree;
-import ds.tree.RadixTreeImpl;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.IntBuffer;
+import java.util.Collection;
 import java.util.regex.Pattern;
 
 /**
- * This class checks for case-insensitive file systems, and generates file names based on a given class name, that are
- * guaranteed to be unique. When "colliding" class names are found, it appends a numeric identifier to the end of the
- * class name to distinguish it from another class with a name that differes only by case. i.e. a.smali and a_2.smali
+ * This class handles the complexities of translating a class name into a file name. i.e. dealing with case insensitive
+ * file systems, windows reserved filenames, class names with extremely long package/class elements, etc.
+ *
+ * The types of transformations this class does include:
+ * - append a '#123' style numeric suffix if 2 physical representations collide
+ * - replace some number of characters in the middle with a '#' character name if an individual path element is too long
+ * - append a '#' if an individual path element would otherwise be considered a reserved filename
  */
 public class ClassFileNameHandler {
-    // we leave an extra 10 characters to allow for a numeric suffix to be added, if it's needed
-    private static final int MAX_FILENAME_LENGTH = 245;
+    private static final int MAX_FILENAME_LENGTH = 255;
+    // How many characters to reserve in the physical filename for numeric suffixes
+    // Dex files can currently only have 64k classes, so 5 digits plus 1 for an '#' should
+    // be sufficient to handle the case when every class has a conflicting name
+    private static final int NUMERIC_SUFFIX_RESERVE = 6;
 
-    private PackageNameEntry top;
+    private final int NO_VALUE = -1;
+    private final int CASE_INSENSITIVE = 0;
+    private final int CASE_SENSITIVE = 1;
+    private int forcedCaseSensitivity = NO_VALUE;
+
+    private DirectoryEntry top;
     private String fileExtension;
     private boolean modifyWindowsReservedFilenames;
 
     public ClassFileNameHandler(File path, String fileExtension) {
-        this.top = new PackageNameEntry(path);
+        this.top = new DirectoryEntry(path);
         this.fileExtension = fileExtension;
         this.modifyWindowsReservedFilenames = testForWindowsReservedFileNames(path);
+    }
+
+    // for testing
+    public ClassFileNameHandler(File path, String fileExtension, boolean caseSensitive,
+                                boolean modifyWindowsReservedFilenames) {
+        this.top = new DirectoryEntry(path);
+        this.fileExtension = fileExtension;
+        this.forcedCaseSensitivity = caseSensitive?CASE_SENSITIVE:CASE_INSENSITIVE;
+        this.modifyWindowsReservedFilenames = modifyWindowsReservedFilenames;
+    }
+
+    private int getMaxFilenameLength() {
+        return MAX_FILENAME_LENGTH - NUMERIC_SUFFIX_RESERVE;
     }
 
     public File getUniqueFilenameForClass(String className) {
@@ -71,7 +98,6 @@ public class ClassFileNameHandler {
             }
         }
 
-        String packageElement;
         String[] packageElements = new String[packageElementCount];
         int elementIndex = 0;
         int elementStart = 1;
@@ -83,18 +109,7 @@ public class ClassFileNameHandler {
                     throw new RuntimeException("Not a valid dalvik class name");
                 }
 
-                packageElement = className.substring(elementStart, i);
-
-                if (modifyWindowsReservedFilenames && isReservedFileName(packageElement)) {
-                    packageElement += "#";
-                }
-
-                int utf8Length = utf8Length(packageElement);
-                if (utf8Length > MAX_FILENAME_LENGTH) {
-                    packageElement = shortenPathComponent(packageElement, utf8Length - MAX_FILENAME_LENGTH);
-                }
-
-                packageElements[elementIndex++] = packageElement;
+                packageElements[elementIndex++] = className.substring(elementStart, i);
                 elementStart = ++i;
             }
         }
@@ -107,19 +122,29 @@ public class ClassFileNameHandler {
             throw new RuntimeException("Not a valid dalvik class name");
         }
 
-        packageElement = className.substring(elementStart, className.length()-1);
-        if (modifyWindowsReservedFilenames && isReservedFileName(packageElement)) {
-            packageElement += "#";
+        packageElements[elementIndex] = className.substring(elementStart, className.length()-1);
+
+        return addUniqueChild(top, packageElements, 0);
+    }
+
+    @Nonnull
+    private File addUniqueChild(@Nonnull DirectoryEntry parent, @Nonnull String[] packageElements,
+                                int packageElementIndex) {
+        if (packageElementIndex == packageElements.length - 1) {
+            FileEntry fileEntry = new FileEntry(parent, packageElements[packageElementIndex] + fileExtension);
+            parent.addChild(fileEntry);
+
+            String physicalName = fileEntry.getPhysicalName();
+
+            // the physical name should be set when adding it as a child to the parent
+            assert  physicalName != null;
+
+            return new File(parent.file, physicalName);
+        } else {
+            DirectoryEntry directoryEntry = new DirectoryEntry(parent, packageElements[packageElementIndex]);
+            directoryEntry = (DirectoryEntry)parent.addChild(directoryEntry);
+            return addUniqueChild(directoryEntry, packageElements, packageElementIndex+1);
         }
-
-        int utf8Length = utf8Length(packageElement) + utf8Length(fileExtension);
-        if (utf8Length > MAX_FILENAME_LENGTH) {
-            packageElement = shortenPathComponent(packageElement, utf8Length - MAX_FILENAME_LENGTH);
-        }
-
-        packageElements[elementIndex] = packageElement;
-
-        return top.addUniqueChild(packageElements, 0);
     }
 
     private static int utf8Length(String str) {
@@ -167,7 +192,6 @@ public class ClassFileNameHandler {
         }
 
         int midPoint = codePoints.length/2;
-        int delta = 0;
 
         int firstEnd = midPoint; // exclusive
         int secondStart = midPoint+1; // inclusive
@@ -228,166 +252,133 @@ public class ClassFileNameHandler {
         return false;
     }
 
-    private static Pattern reservedFileNameRegex = Pattern.compile("^CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9]$",
+    private static Pattern reservedFileNameRegex = Pattern.compile("^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(\\..*)?$",
             Pattern.CASE_INSENSITIVE);
     private static boolean isReservedFileName(String className) {
         return reservedFileNameRegex.matcher(className).matches();
     }
 
     private abstract class FileSystemEntry {
-        public final File file;
+        @Nullable public final DirectoryEntry parent;
+        @Nonnull public final String logicalName;
+        @Nullable protected String physicalName = null;
 
-        public FileSystemEntry(File file) {
-            this.file = file;
+        private FileSystemEntry(@Nullable DirectoryEntry parent, @Nonnull String logicalName) {
+            this.parent = parent;
+            this.logicalName = logicalName;
         }
 
-        public abstract File addUniqueChild(String[] pathElements, int pathElementsIndex);
+        @Nonnull public String getNormalizedName(boolean preserveCase) {
+            String elementName = logicalName;
+            if (!preserveCase && parent != null && !parent.isCaseSensitive()) {
+                elementName = elementName.toLowerCase();
+            }
 
-        public FileSystemEntry makeVirtual(File parent) {
-            return new VirtualGroupEntry(this, parent);
+            if (modifyWindowsReservedFilenames && isReservedFileName(elementName)) {
+                elementName = addSuffixBeforeExtension(elementName, "#");
+            }
+
+            int utf8Length = utf8Length(elementName);
+            if (utf8Length > getMaxFilenameLength()) {
+                elementName = shortenPathComponent(elementName, utf8Length - getMaxFilenameLength());
+            }
+            return elementName;
         }
+
+        @Nullable
+        public String getPhysicalName() {
+            return physicalName;
+        }
+
+        public void setSuffix(int suffix) {
+            if (suffix < 0 || suffix > 99999) {
+                throw new IllegalArgumentException("suffix must be in [0, 100000)");
+            }
+
+            if (this.physicalName != null) {
+                throw new IllegalStateException("The suffix can only be set once");
+            }
+            this.physicalName = makePhysicalName(suffix);
+        }
+
+        protected abstract String makePhysicalName(int suffix);
     }
 
-    private class PackageNameEntry extends FileSystemEntry {
-        //this contains the FileSystemEntries for all of this package's children
-        //the associated keys are all lowercase
-        private RadixTree<FileSystemEntry> children = new RadixTreeImpl<FileSystemEntry>();
+    private class DirectoryEntry extends FileSystemEntry {
+        @Nullable private File file = null;
+        private int caseSensitivity = forcedCaseSensitivity;
 
-        public PackageNameEntry(File parent, String name) {
-            super(new File(parent, name));
+        // maps a normalized (but not suffixed) entry name to 1 or more FileSystemEntries.
+        // Each FileSystemEntry asociated with a normalized entry name must have a distinct
+        // physical name
+        private final Multimap<String, FileSystemEntry> children = ArrayListMultimap.create();
+
+        public DirectoryEntry(@Nonnull File path) {
+            super(null, path.getName());
+            file = path;
+            physicalName = file.getName();
         }
 
-        public PackageNameEntry(File path) {
-            super(path);
+        public DirectoryEntry(@Nullable DirectoryEntry parent, @Nonnull String logicalName) {
+            super(parent, logicalName);
         }
 
-        @Override
-        public synchronized File addUniqueChild(String[] pathElements, int pathElementsIndex) {
-            String elementName;
-            String elementNameLower;
-
-            if (pathElementsIndex == pathElements.length - 1) {
-                elementName = pathElements[pathElementsIndex];
-                elementName += fileExtension;
-            } else {
-                elementName = pathElements[pathElementsIndex];
-            }
-            elementNameLower = elementName.toLowerCase();
-
-            FileSystemEntry existingEntry = children.find(elementNameLower);
-            if (existingEntry != null) {
-                FileSystemEntry virtualEntry = existingEntry;
-                //if there is already another entry with the same name but different case, we need to
-                //add a virtual group, and then add the existing entry and the new entry to that group
-                if (!(existingEntry instanceof VirtualGroupEntry)) {
-                    if (existingEntry.file.getName().equals(elementName)) {
-                        if (pathElementsIndex == pathElements.length - 1) {
-                            return existingEntry.file;
-                        } else {
-                            return existingEntry.addUniqueChild(pathElements, pathElementsIndex + 1);
-                        }
-                    } else {
-                        virtualEntry = existingEntry.makeVirtual(file);
-                        children.replace(elementNameLower, virtualEntry);
+        public FileSystemEntry addChild(FileSystemEntry entry) {
+            String normalizedChildName = entry.getNormalizedName(false);
+            Collection<FileSystemEntry> entries = children.get(normalizedChildName);
+            if (entry instanceof DirectoryEntry) {
+                for (FileSystemEntry childEntry: entries) {
+                    if (childEntry.logicalName.equals(entry.logicalName)) {
+                        return childEntry;
                     }
                 }
-
-                return virtualEntry.addUniqueChild(pathElements, pathElementsIndex);
             }
-
-            if (pathElementsIndex == pathElements.length - 1) {
-                ClassNameEntry classNameEntry = new ClassNameEntry(file, elementName);
-                children.insert(elementNameLower, classNameEntry);
-                return classNameEntry.file;
-            } else {
-                PackageNameEntry packageNameEntry = new PackageNameEntry(file, elementName);
-                children.insert(elementNameLower, packageNameEntry);
-                return packageNameEntry.addUniqueChild(pathElements, pathElementsIndex + 1);
-            }
-        }
-    }
-
-    /**
-     * A virtual group that groups together file system entries with the same name, differing only in case
-     */
-    private class VirtualGroupEntry extends FileSystemEntry {
-        //this contains the FileSystemEntries for all of the files/directories in this group
-        //the key is the unmodified name of the entry, before it is modified to be made unique (if needed).
-        private RadixTree<FileSystemEntry> groupEntries = new RadixTreeImpl<FileSystemEntry>();
-
-        //whether the containing directory is case sensitive or not.
-        //-1 = unset
-        //0 = false;
-        //1 = true;
-        private int isCaseSensitive = -1;
-
-        public VirtualGroupEntry(FileSystemEntry firstChild, File parent) {
-            super(parent);
-
-            //use the name of the first child in the group as-is
-            groupEntries.insert(firstChild.file.getName(), firstChild);
+            entry.setSuffix(entries.size());
+            entries.add(entry);
+            return entry;
         }
 
         @Override
-        public File addUniqueChild(String[] pathElements, int pathElementsIndex) {
-            String elementName = pathElements[pathElementsIndex];
-
-            if (pathElementsIndex == pathElements.length - 1) {
-                elementName = elementName + fileExtension;
+        protected String makePhysicalName(int suffix) {
+            if (suffix > 0) {
+                return getNormalizedName(true) + "." + Integer.toString(suffix);
             }
+            return getNormalizedName(true);
+        }
 
-            FileSystemEntry existingEntry = groupEntries.find(elementName);
-            if (existingEntry != null) {
-                if (pathElementsIndex == pathElements.length - 1) {
-                    return existingEntry.file;
-                } else {
-                    return existingEntry.addUniqueChild(pathElements, pathElementsIndex+1);
-                }
-            }
-
-            if (pathElementsIndex == pathElements.length - 1) {
-                String fileName;
-                if (!isCaseSensitive()) {
-                    fileName = pathElements[pathElementsIndex] + "." + (groupEntries.getSize()+1) + fileExtension;
-                } else {
-                    fileName = elementName;
-                }
-
-                ClassNameEntry classNameEntry = new ClassNameEntry(file, fileName);
-                groupEntries.insert(elementName, classNameEntry);
-                return classNameEntry.file;
-            } else {
-                String fileName;
-                if (!isCaseSensitive()) {
-                    fileName = pathElements[pathElementsIndex] + "." + (groupEntries.getSize()+1);
-                } else {
-                    fileName = elementName;
-                }
-
-                PackageNameEntry packageNameEntry = new PackageNameEntry(file, fileName);
-                groupEntries.insert(elementName, packageNameEntry);
-                return packageNameEntry.addUniqueChild(pathElements, pathElementsIndex + 1);
+        @Override
+        public void setSuffix(int suffix) {
+            super.setSuffix(suffix);
+            String physicalName = getPhysicalName();
+            if (parent != null && physicalName != null) {
+                file = new File(parent.file, physicalName);
             }
         }
 
-        private boolean isCaseSensitive() {
-            if (isCaseSensitive != -1) {
-                return isCaseSensitive == 1;
+        protected boolean isCaseSensitive() {
+            if (getPhysicalName() == null || file == null) {
+                throw new IllegalStateException("Must call setSuffix() first");
+            }
+
+            if (caseSensitivity != NO_VALUE) {
+                return caseSensitivity == CASE_SENSITIVE;
             }
 
             File path = file;
-
             if (path.exists() && path.isFile()) {
-                path = path.getParentFile();
+                if (!path.delete()) {
+                    throw new ExceptionWithContext("Can't delete %s to make it into a directory",
+                            path.getAbsolutePath());
+                }
             }
 
-            if ((!file.exists() && !file.mkdirs())) {
-                return false;
+            if (!path.exists() && !path.mkdirs()) {
+                throw new ExceptionWithContext("Couldn't create directory %s", path.getAbsolutePath());
             }
 
             try {
                 boolean result = testCaseSensitivity(path);
-                isCaseSensitive = result?1:0;
+                caseSensitivity = result?CASE_SENSITIVE:CASE_INSENSITIVE;
                 return result;
             } catch (IOException ex) {
                 return false;
@@ -447,22 +438,34 @@ public class ClassFileNameHandler {
                 try { f2.delete(); } catch (Exception ex) {}
             }
         }
+    }
+
+    private class FileEntry extends FileSystemEntry {
+        private FileEntry(@Nullable DirectoryEntry parent, @Nonnull String logicalName) {
+            super(parent, logicalName);
+        }
 
         @Override
-        public FileSystemEntry makeVirtual(File parent) {
-            return this;
+        protected String makePhysicalName(int suffix) {
+            if (suffix > 0) {
+                return addSuffixBeforeExtension(getNormalizedName(true), '.' + Integer.toString(suffix));
+            }
+            return getNormalizedName(true);
         }
     }
 
-    private class ClassNameEntry extends FileSystemEntry {
-        public ClassNameEntry(File parent, String name) {
-            super(new File(parent, name));
-        }
+    private static String addSuffixBeforeExtension(String pathElement, String suffix) {
+        int extensionStart = pathElement.lastIndexOf('.');
 
-        @Override
-        public File addUniqueChild(String[] pathElements, int pathElementsIndex) {
-            assert false;
-            return file;
+        StringBuilder newName = new StringBuilder(pathElement.length() + suffix.length() + 1);
+        if (extensionStart < 0) {
+            newName.append(pathElement);
+            newName.append(suffix);
+        } else {
+            newName.append(pathElement.subSequence(0, extensionStart));
+            newName.append(suffix);
+            newName.append(pathElement.subSequence(extensionStart, pathElement.length()));
         }
+        return newName.toString();
     }
 }
