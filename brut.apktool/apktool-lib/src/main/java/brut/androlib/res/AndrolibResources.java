@@ -56,6 +56,8 @@ import org.xmlpull.v1.XmlSerializer;
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
 final public class AndrolibResources {
+    private File frameworkDirectory = null;
+
     public ResTable getResTable(ExtFile apkFile) throws AndrolibException {
         return getResTable(apkFile, true);
     }
@@ -748,6 +750,10 @@ final public class AndrolibResources {
     }
 
     private File getFrameworkDir() throws AndrolibException {
+        if (frameworkDirectory != null) {
+            return frameworkDirectory;
+        }
+
         File dir;
 
         // if a framework path was specified on the command line, use it
@@ -756,6 +762,11 @@ final public class AndrolibResources {
         } else {
             File parentPath = new File(System.getProperty("user.home"));
             if (!parentPath.canWrite()) {
+                System.err.println(String.format("WARNING: Could not write to $HOME (%s), using %s instead.",
+                        parentPath.getAbsolutePath(), System.getProperty("java.io.tmpdir")));
+                System.err.println("WARNING: Please be aware this is a volatile directory and frameworks could go missing, " +
+                        "please utilize --frame-path if the default storage directory is unavailable " +
+                        "($HOME/apktool/framework)");
                 parentPath = new File(System.getProperty("java.io.tmpdir"));
             }
 
@@ -771,8 +782,10 @@ final public class AndrolibResources {
             System.exit(1);
         }
 
-        if (! dir.exists()) {
-            if (! dir.mkdirs()) {
+        if (!dir.exists()) {
+            if (dir.canWrite()) {
+                dir.mkdirs();
+            } else {
                 if (apkOptions.frameworkFolderLocation != null) {
                     System.err.println("Can't create Framework directory: " + dir);
                 }
@@ -780,6 +793,7 @@ final public class AndrolibResources {
             }
         }
 
+        frameworkDirectory = dir;
         return dir;
     }
 
