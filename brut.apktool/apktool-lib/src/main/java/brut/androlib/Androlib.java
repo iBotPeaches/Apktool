@@ -257,7 +257,7 @@ public class Androlib {
 
     public void build(ExtFile appDir, File outFile)
             throws BrutException {
-        LOGGER.info("Using Apktool " + Androlib.getVersion() + " on " + appDir.getName());
+        LOGGER.info("Using Apktool " + Androlib.getVersion());
 
         Map<String, Object> meta = readMetaFile(appDir);
         Object t1 = meta.get("isFrameworkApk");
