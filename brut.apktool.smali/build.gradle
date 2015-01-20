@@ -79,6 +79,7 @@ subprojects {
                    junit: 'junit:junit:4.6',
                    antlr_runtime: 'org.antlr:antlr-runtime:3.5.2',
                    antlr: 'org.antlr:antlr:3.5.2',
+                   stringtemplate: 'org.antlr:stringtemplate:3.2.1',
                    commons_cli: 'commons-cli:commons-cli:1.2',
                    jflex: 'de.jflex:jflex:1.4.3',
                    proguard: 'net.sf.proguard:proguard-base:4.8'
