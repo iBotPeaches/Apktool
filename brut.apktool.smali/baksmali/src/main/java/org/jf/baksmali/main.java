@@ -206,7 +206,7 @@ public class main {
                     options.setResourceIdFiles(rif);
                     break;
                 case 't':
-                    options.useImplicitReferences = false;
+                    options.useImplicitReferences = true;
                     break;
                 case 'e':
                     options.dexEntry = commandLine.getOptionValue("e");
@@ -425,8 +425,8 @@ public class main {
                 .withArgName("FILES")
                 .create("i");
 
-        Option noImplicitReferencesOption = OptionBuilder.withLongOpt("no-implicit-references")
-                .withDescription("Don't use implicit (type-less) method and field references")
+        Option noImplicitReferencesOption = OptionBuilder.withLongOpt("implicit-references")
+                .withDescription("Use implicit (type-less) method and field references")
                 .create("t");
 
         Option checkPackagePrivateAccessOption = OptionBuilder.withLongOpt("check-package-private-access")

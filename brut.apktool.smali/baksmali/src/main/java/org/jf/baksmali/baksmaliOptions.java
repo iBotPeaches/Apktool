@@ -75,7 +75,7 @@ public class baksmaliOptions {
     public boolean deodex = false;
     public boolean ignoreErrors = false;
     public boolean checkPackagePrivateAccess = false;
-    public boolean useImplicitReferences = true;
+    public boolean useImplicitReferences = false;
     public File customInlineDefinitions = null;
     public InlineMethodResolver inlineResolver = null;
     public int registerInfo = 0;
