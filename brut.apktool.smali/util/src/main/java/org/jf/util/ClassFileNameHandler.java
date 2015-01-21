@@ -323,7 +323,7 @@ public class ClassFileNameHandler {
             super(parent, logicalName);
         }
 
-        public FileSystemEntry addChild(FileSystemEntry entry) {
+        public synchronized FileSystemEntry addChild(FileSystemEntry entry) {
             String normalizedChildName = entry.getNormalizedName(false);
             Collection<FileSystemEntry> entries = children.get(normalizedChildName);
             if (entry instanceof DirectoryEntry) {
