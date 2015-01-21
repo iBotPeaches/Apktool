@@ -16,7 +16,6 @@
 
 package brut.directory;
 
-import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,9 +23,11 @@ import java.io.OutputStream;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 public class ZipRODirectory extends AbstractDirectory {
-    private ZipExtFile mZipFile;
+    private ZipFile mZipFile;
     private String mPath;
 
     public ZipRODirectory(String zipFileName) throws DirectoryException {
@@ -37,7 +38,7 @@ public class ZipRODirectory extends AbstractDirectory {
         this(zipFile, "");
     }
 
-    public ZipRODirectory(ZipExtFile zipFile) {
+    public ZipRODirectory(ZipFile zipFile) {
         this(zipFile, "");
     }
 
@@ -49,14 +50,14 @@ public class ZipRODirectory extends AbstractDirectory {
     public ZipRODirectory(File zipFile, String path) throws DirectoryException {
         super();
         try {
-            mZipFile = new ZipExtFile(zipFile);
+            mZipFile = new ZipFile(zipFile);
         } catch (IOException e) {
             throw new DirectoryException(e);
         }
         mPath = path;
     }
 
-    public ZipRODirectory(ZipExtFile zipFile, String path) {
+    public ZipRODirectory(ZipFile zipFile, String path) {
         super();
         mZipFile = zipFile;
         mPath = path;
@@ -72,8 +73,7 @@ public class ZipRODirectory extends AbstractDirectory {
     protected InputStream getFileInputLocal(String name)
             throws DirectoryException {
         try {
-            mZipFile.getEntry(getPath() + name).getGeneralPurposeBit().useEncryption(false);
-            return getZipFile().getInputStream(mZipFile.getEntry(getPath() + name));
+            return getZipFile().getInputStream(new ZipEntry(getPath() + name));
         } catch (IOException e) {
             throw new PathNotExist(name, e);
         }
@@ -105,12 +105,9 @@ public class ZipRODirectory extends AbstractDirectory {
         mDirs = new LinkedHashMap<String, AbstractDirectory>();
         
         int prefixLen = getPath().length();
-        Enumeration<? extends ZipArchiveEntry> entries = getZipFile().getEntries();
+        Enumeration<? extends ZipEntry> entries = getZipFile().entries();
         while (entries.hasMoreElements()) {
-            ZipArchiveEntry entry = entries.nextElement();
-
-            // ignore general purpose bit, since AOSP does
-            entry.getGeneralPurposeBit().useEncryption(false);
+            ZipEntry entry = entries.nextElement();
             String name = entry.getName();
             
             if (name.equals(getPath()) || ! name.startsWith(getPath())) {
@@ -140,7 +137,7 @@ public class ZipRODirectory extends AbstractDirectory {
         return mPath;
     }
 
-    private ZipExtFile getZipFile() {
+    private ZipFile getZipFile() {
         return mZipFile;
     }
 

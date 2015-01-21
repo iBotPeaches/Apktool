@@ -35,6 +35,8 @@ import java.util.*;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.nio.file.Files;
+import java.util.zip.ZipFile;
+
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
@@ -174,7 +176,7 @@ public class Androlib {
         // with regular looping of apkFile for easy copy
         try {
             Directory unk = apkFile.getDirectory();
-            ZipExtFile apkZipFile = new ZipExtFile(apkFile.getAbsolutePath());
+            ZipFile apkZipFile = new ZipFile(apkFile.getAbsolutePath());
 
             // loop all items in container recursively, ignoring any that are pre-defined by aapt
             Set<String> files = unk.getFiles(true);
@@ -184,8 +186,6 @@ public class Androlib {
                     // copy file out of archive into special "unknown" folder
                     unk.copyToDir(unknownOut, file);
                     try {
-                        // ignore encryption
-                        apkZipFile.getEntry(file).getGeneralPurposeBit().useEncryption(false);
                         invZipFile = apkZipFile.getEntry(file);
 
                         // lets record the name of the file, and its compression type
