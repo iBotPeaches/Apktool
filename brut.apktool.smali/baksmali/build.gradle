@@ -40,7 +40,7 @@ dependencies {
     compile depends.guava
 
     testCompile depends.junit
-    testCompile project(':smali')
+    testCompile project(':brut.apktool.smali:smali')
 
     proguard depends.proguard
 }
