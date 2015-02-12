@@ -742,34 +742,50 @@ final public class AndrolibResources {
     }
 
     private File getFrameworkDir() throws AndrolibException {
+        if (mFrameworkDirectory != null) {
+            return mFrameworkDirectory;
+        }
+
         String path;
 
         // if a framework path was specified on the command line, use it
         if (apkOptions.frameworkFolderLocation != null) {
             path = apkOptions.frameworkFolderLocation;
-        } else if (OSDetection.isMacOSX()) {
-            path = System.getProperty("user.home") + File.separatorChar + "Library" + File.separatorChar +
-                    "apktool" + File.separatorChar + "framework";
         } else {
-            path = System.getProperty("user.home") + File.separatorChar + "apktool" + File.separatorChar + "framework";
+            File parentPath = new File(System.getProperty("user.home"));
+            if (! parentPath.canWrite()) {
+                LOGGER.severe(String.format("WARNING: Could not write to $HOME (%s), using %s instead...",
+                        parentPath.getAbsolutePath(), System.getProperty("java.io.tmpdir")));
+                LOGGER.severe("Please be aware this is a volatile directory and frameworks could go missing, " +
+                        "please utilize --frame-path if the default storage directory is unavailable");
+
+                parentPath = new File(System.getProperty("java.io.tmpdir"));
+            }
+
+            if (OSDetection.isMacOSX()) {
+                path = parentPath.getAbsolutePath() + String.format("%1$sLibrary%1$sapktool%1$sframework", File.separatorChar);
+            } else {
+                path = parentPath.getAbsolutePath() + String.format("%1$sapktool%1$sframework", File.separatorChar);
+            }
         }
 
         File dir = new File(path);
 
         if (dir.getParentFile() != null && dir.getParentFile().isFile()) {
-            System.err.println("Please remove file at " + dir.getParentFile());
+            LOGGER.severe("Please remove file at " + dir.getParentFile());
             System.exit(1);
         }
 
         if (! dir.exists()) {
             if (! dir.mkdirs()) {
                 if (apkOptions.frameworkFolderLocation != null) {
-                    System.err.println("Can't create Framework directory: " + dir);
+                    LOGGER.severe("Can't create Framework directory: " + dir);
                 }
                 throw new AndrolibException("Can't create directory: " + dir);
             }
         }
 
+        mFrameworkDirectory = dir;
         return dir;
     }
 
@@ -819,6 +835,8 @@ final public class AndrolibResources {
     public static boolean sKeepBroken = false;
 
     private final static Logger LOGGER = Logger.getLogger(AndrolibResources.class.getName());
+
+    private File mFrameworkDirectory = null;
 
     private String mMinSdkVersion = null;
     private String mMaxSdkVersion = null;
