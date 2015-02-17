@@ -256,8 +256,8 @@ public class ARSCDecoder {
         short mcc = mIn.readShort();
         short mnc = mIn.readShort();
 
-        char[] language = new char[] { (char) mIn.readByte(), (char) mIn.readByte() };
-        char[] country = new char[] { (char) mIn.readByte(), (char) mIn.readByte() };
+        char[] language = this.unpackLanguageOrRegion(mIn.readByte(), mIn.readByte(), 'a');
+        char[] country = this.unpackLanguageOrRegion(mIn.readByte(), mIn.readByte(), '0');
 
         byte orientation = mIn.readByte();
         byte touchscreen = mIn.readByte();
@@ -318,6 +318,24 @@ public class ARSCDecoder {
                 inputFlags, screenWidth, screenHeight, sdkVersion,
                 screenLayout, uiMode, smallestScreenWidthDp, screenWidthDp,
                 screenHeightDp, isInvalid);
+    }
+
+    private char[] unpackLanguageOrRegion(byte in0, byte in1, char base) throws AndrolibException {
+        if (in0 == 0 && in1 == 0) {
+            return new char[] {(char) in0, (char) in1};
+        } else {
+            // check high bit, if so we have a packed 3 letter code
+            if (((in0 >> 7) & 1) == 1) {
+                int first = in1 & 0x1F;
+                int second = ((in1 & 0xE0) >> 5) + ((in0 & 0x03) << 3);
+                int third = (in0 & 0x7C) >> 2;
+
+                // since this function handles languages & regions, we add the value(s) to the base char
+                // which is usually 'a' or '0' depending on language or region.
+                return new char[] { (char) (first + base), (char) (second + base), (char) (third + base) };
+            }
+            return new char[] { (char) in0, (char) in1 };
+        }
     }
 
     private void addMissingResSpecs() throws AndrolibException {

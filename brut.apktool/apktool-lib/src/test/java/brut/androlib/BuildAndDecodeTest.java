@@ -183,6 +183,11 @@ public class BuildAndDecodeTest {
     }
 
     @Test
+    public void bcp47tagTest() throws BrutException, IOException {
+        compareValuesFiles("values-ast-rES/strings.xml");
+    }
+
+    @Test
     public void drawableNoDpiTest() throws BrutException, IOException {
         compareResFolder("drawable-nodpi");
     }
