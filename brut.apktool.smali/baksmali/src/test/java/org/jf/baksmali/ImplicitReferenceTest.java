@@ -31,22 +31,15 @@
 
 package org.jf.baksmali;
 
-import junit.framework.Assert;
 import org.antlr.runtime.RecognitionException;
-import org.jf.baksmali.Adaptors.ClassDefinition;
-import org.jf.dexlib2.iface.ClassDef;
-import org.jf.smali.SmaliTestUtils;
-import org.jf.util.IndentingWriter;
-import org.jf.util.TextUtils;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.io.StringWriter;
 
 public class ImplicitReferenceTest {
     @Test
     public void testImplicitMethodReferences() throws IOException, RecognitionException {
-        ClassDef classDef = SmaliTestUtils.compileSmali("" +
+        String source = "" +
                 ".class public LHelloWorld;\n" +
                 ".super Ljava/lang/Object;\n" +
                 ".method public static main([Ljava/lang/String;)V\n" +
@@ -55,7 +48,7 @@ public class ImplicitReferenceTest {
                 "    invoke-static {p0}, LHelloWorld;->V()V\n" +
                 "    invoke-static {p0}, LHelloWorld;->I()V\n" +
                 "    return-void\n" +
-                ".end method");
+                ".end method";
 
         String expected = "" +
                 ".class public LHelloWorld;\n" +
@@ -72,19 +65,12 @@ public class ImplicitReferenceTest {
         baksmaliOptions options = new baksmaliOptions();
         options.useImplicitReferences = true;
 
-        StringWriter stringWriter = new StringWriter();
-        IndentingWriter writer = new IndentingWriter(stringWriter);
-        ClassDefinition classDefinition = new ClassDefinition(options, classDef);
-        classDefinition.writeTo(writer);
-        writer.close();
-
-        Assert.assertEquals(TextUtils.normalizeWhitespace(expected),
-                TextUtils.normalizeWhitespace(stringWriter.toString()));
+        BaksmaliTestUtils.assertSmaliCompiledEquals(source, expected, options);
     }
 
     @Test
     public void testExplicitMethodReferences() throws IOException, RecognitionException {
-        ClassDef classDef = SmaliTestUtils.compileSmali("" +
+        String source = "" +
                 ".class public LHelloWorld;\n" +
                 ".super Ljava/lang/Object;\n" +
                 ".method public static main([Ljava/lang/String;)V\n" +
@@ -93,7 +79,7 @@ public class ImplicitReferenceTest {
                 "    invoke-static {p0}, LHelloWorld;->V()V\n" +
                 "    invoke-static {p0}, LHelloWorld;->I()V\n" +
                 "    return-void\n" +
-                ".end method");
+                ".end method";
 
         String expected = "" +
                 ".class public LHelloWorld;\n" +
@@ -110,25 +96,18 @@ public class ImplicitReferenceTest {
         baksmaliOptions options = new baksmaliOptions();
         options.useImplicitReferences = false;
 
-        StringWriter stringWriter = new StringWriter();
-        IndentingWriter writer = new IndentingWriter(stringWriter);
-        ClassDefinition classDefinition = new ClassDefinition(options, classDef);
-        classDefinition.writeTo(writer);
-        writer.close();
-
-        Assert.assertEquals(TextUtils.normalizeWhitespace(expected),
-                TextUtils.normalizeWhitespace(stringWriter.toString()));
+        BaksmaliTestUtils.assertSmaliCompiledEquals(source, expected, options);
     }
 
     @Test
     public void testImplicitMethodLiterals() throws IOException, RecognitionException {
-        ClassDef classDef = SmaliTestUtils.compileSmali("" +
+        String source = "" +
                 ".class public LHelloWorld;\n" +
                 ".super Ljava/lang/Object;\n" +
                 ".field public static field1:Ljava/lang/reflect/Method; = LHelloWorld;->toString()V\n" +
                 ".field public static field2:Ljava/lang/reflect/Method; = LHelloWorld;->V()V\n" +
                 ".field public static field3:Ljava/lang/reflect/Method; = LHelloWorld;->I()V\n" +
-                ".field public static field4:Ljava/lang/Class; = I");
+                ".field public static field4:Ljava/lang/Class; = I";
 
         String expected = "" +
                 ".class public LHelloWorld;\n" +
@@ -142,25 +121,18 @@ public class ImplicitReferenceTest {
         baksmaliOptions options = new baksmaliOptions();
         options.useImplicitReferences = true;
 
-        StringWriter stringWriter = new StringWriter();
-        IndentingWriter writer = new IndentingWriter(stringWriter);
-        ClassDefinition classDefinition = new ClassDefinition(options, classDef);
-        classDefinition.writeTo(writer);
-        writer.close();
-
-        Assert.assertEquals(TextUtils.normalizeWhitespace(expected),
-                TextUtils.normalizeWhitespace(stringWriter.toString()));
+        BaksmaliTestUtils.assertSmaliCompiledEquals(source, expected, options);
     }
 
     @Test
     public void testExplicitMethodLiterals() throws IOException, RecognitionException {
-        ClassDef classDef = SmaliTestUtils.compileSmali("" +
+        String source = "" +
                 ".class public LHelloWorld;\n" +
                 ".super Ljava/lang/Object;\n" +
                 ".field public static field1:Ljava/lang/reflect/Method; = LHelloWorld;->toString()V\n" +
                 ".field public static field2:Ljava/lang/reflect/Method; = LHelloWorld;->V()V\n" +
                 ".field public static field3:Ljava/lang/reflect/Method; = LHelloWorld;->I()V\n" +
-                ".field public static field4:Ljava/lang/Class; = I");
+                ".field public static field4:Ljava/lang/Class; = I";
 
         String expected = "" +
                 ".class public LHelloWorld;\n" +
@@ -174,19 +146,12 @@ public class ImplicitReferenceTest {
         baksmaliOptions options = new baksmaliOptions();
         options.useImplicitReferences = false;
 
-        StringWriter stringWriter = new StringWriter();
-        IndentingWriter writer = new IndentingWriter(stringWriter);
-        ClassDefinition classDefinition = new ClassDefinition(options, classDef);
-        classDefinition.writeTo(writer);
-        writer.close();
-
-        Assert.assertEquals(TextUtils.normalizeWhitespace(expected),
-                TextUtils.normalizeWhitespace(stringWriter.toString()));
+        BaksmaliTestUtils.assertSmaliCompiledEquals(source, expected, options);
     }
 
     @Test
     public void testImplicitFieldReferences() throws IOException, RecognitionException {
-        ClassDef classDef = SmaliTestUtils.compileSmali("" +
+        String source = "" +
                 ".class public LHelloWorld;\n" +
                 ".super Ljava/lang/Object;\n" +
                 ".method public static main([Ljava/lang/String;)V\n" +
@@ -195,7 +160,7 @@ public class ImplicitReferenceTest {
                 "    sget v0, LHelloWorld;->I:I\n" +
                 "    sget v0, LHelloWorld;->V:I\n" +
                 "    return-void\n" +
-                ".end method");
+                ".end method";
 
         String expected = "" +
                 ".class public LHelloWorld;\n" +
@@ -212,19 +177,12 @@ public class ImplicitReferenceTest {
         baksmaliOptions options = new baksmaliOptions();
         options.useImplicitReferences = true;
 
-        StringWriter stringWriter = new StringWriter();
-        IndentingWriter writer = new IndentingWriter(stringWriter);
-        ClassDefinition classDefinition = new ClassDefinition(options, classDef);
-        classDefinition.writeTo(writer);
-        writer.close();
-
-        Assert.assertEquals(TextUtils.normalizeWhitespace(expected),
-                TextUtils.normalizeWhitespace(stringWriter.toString()));
+        BaksmaliTestUtils.assertSmaliCompiledEquals(source, expected, options);
     }
 
     @Test
     public void testExplicitFieldReferences() throws IOException, RecognitionException {
-        ClassDef classDef = SmaliTestUtils.compileSmali("" +
+        String source = "" +
                 ".class public LHelloWorld;\n" +
                 ".super Ljava/lang/Object;\n" +
                 ".method public static main([Ljava/lang/String;)V\n" +
@@ -233,7 +191,7 @@ public class ImplicitReferenceTest {
                 "    sget v0, LHelloWorld;->I:I\n" +
                 "    sget v0, LHelloWorld;->V:I\n" +
                 "    return-void\n" +
-                ".end method");
+                ".end method";
 
         String expected = "" +
                 ".class public LHelloWorld;\n" +
@@ -250,24 +208,17 @@ public class ImplicitReferenceTest {
         baksmaliOptions options = new baksmaliOptions();
         options.useImplicitReferences = false;
 
-        StringWriter stringWriter = new StringWriter();
-        IndentingWriter writer = new IndentingWriter(stringWriter);
-        ClassDefinition classDefinition = new ClassDefinition(options, classDef);
-        classDefinition.writeTo(writer);
-        writer.close();
-
-        Assert.assertEquals(TextUtils.normalizeWhitespace(expected),
-                TextUtils.normalizeWhitespace(stringWriter.toString()));
+        BaksmaliTestUtils.assertSmaliCompiledEquals(source, expected, options);
     }
 
     @Test
     public void testImplicitFieldLiterals() throws IOException, RecognitionException {
-        ClassDef classDef = SmaliTestUtils.compileSmali("" +
+        String source = "" +
                 ".class public LHelloWorld;\n" +
                 ".super Ljava/lang/Object;\n" +
                 ".field public static field1:Ljava/lang/reflect/Field; = LHelloWorld;->someField:I\n" +
                 ".field public static field2:Ljava/lang/reflect/Field; = LHelloWorld;->V:I\n" +
-                ".field public static field3:Ljava/lang/reflect/Field; = LHelloWorld;->I:I");
+                ".field public static field3:Ljava/lang/reflect/Field; = LHelloWorld;->I:I";
 
         String expected = "" +
                 ".class public LHelloWorld;\n" +
@@ -280,24 +231,17 @@ public class ImplicitReferenceTest {
         baksmaliOptions options = new baksmaliOptions();
         options.useImplicitReferences = true;
 
-        StringWriter stringWriter = new StringWriter();
-        IndentingWriter writer = new IndentingWriter(stringWriter);
-        ClassDefinition classDefinition = new ClassDefinition(options, classDef);
-        classDefinition.writeTo(writer);
-        writer.close();
-
-        Assert.assertEquals(TextUtils.normalizeWhitespace(expected),
-                TextUtils.normalizeWhitespace(stringWriter.toString()));
+        BaksmaliTestUtils.assertSmaliCompiledEquals(source, expected, options);
     }
 
     @Test
     public void testExplicitFieldLiterals() throws IOException, RecognitionException {
-        ClassDef classDef = SmaliTestUtils.compileSmali("" +
+        String source = "" +
                 ".class public LHelloWorld;\n" +
                 ".super Ljava/lang/Object;\n" +
                 ".field public static field1:Ljava/lang/reflect/Field; = LHelloWorld;->someField:I\n" +
                 ".field public static field2:Ljava/lang/reflect/Field; = LHelloWorld;->V:I\n" +
-                ".field public static field3:Ljava/lang/reflect/Field; = LHelloWorld;->I:I");
+                ".field public static field3:Ljava/lang/reflect/Field; = LHelloWorld;->I:I";
 
         String expected = "" +
                 ".class public LHelloWorld;\n" +
@@ -310,13 +254,7 @@ public class ImplicitReferenceTest {
         baksmaliOptions options = new baksmaliOptions();
         options.useImplicitReferences = false;
 
-        StringWriter stringWriter = new StringWriter();
-        IndentingWriter writer = new IndentingWriter(stringWriter);
-        ClassDefinition classDefinition = new ClassDefinition(options, classDef);
-        classDefinition.writeTo(writer);
-        writer.close();
-
-        Assert.assertEquals(TextUtils.normalizeWhitespace(expected),
-                TextUtils.normalizeWhitespace(stringWriter.toString()));
+        BaksmaliTestUtils.assertSmaliCompiledEquals(source, expected, options);
     }
+
 }

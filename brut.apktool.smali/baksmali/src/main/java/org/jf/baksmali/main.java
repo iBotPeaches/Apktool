@@ -192,6 +192,9 @@ public class main {
                 case 'x':
                     options.deodex = true;
                     break;
+                case 'X':
+                    options.experimental = true;
+                    break;
                 case 'm':
                     options.noAccessorComments = true;
                     break;
@@ -253,7 +256,8 @@ public class main {
         }
 
         //Read in and parse the dex file
-        DexBackedDexFile dexFile = DexFileFactory.loadDexFile(dexFileFile, options.dexEntry, options.apiLevel);
+        DexBackedDexFile dexFile = DexFileFactory.loadDexFile(dexFileFile, options.dexEntry,
+                options.apiLevel, options.experimental);
 
         if (dexFile.isOdexFile()) {
             if (!options.deodex) {
@@ -270,13 +274,15 @@ public class main {
             if (dexFile instanceof DexBackedOdexFile) {
                 options.bootClassPathEntries = ((DexBackedOdexFile)dexFile).getDependencies();
             } else {
-                options.bootClassPathEntries = getDefaultBootClassPathForApi(options.apiLevel);
+                options.bootClassPathEntries = getDefaultBootClassPathForApi(options.apiLevel,
+                        options.experimental);
             }
         }
 
         if (options.customInlineDefinitions == null && dexFile instanceof DexBackedOdexFile) {
             options.inlineResolver =
-                    InlineMethodResolver.createInlineMethodResolver(((DexBackedOdexFile)dexFile).getOdexVersion());
+                    InlineMethodResolver.createInlineMethodResolver(
+                            ((DexBackedOdexFile)dexFile).getOdexVersion());
         }
 
         boolean errorOccurred = false;
@@ -288,7 +294,7 @@ public class main {
             if (dumpFileName == null) {
                 dumpFileName = commandLine.getOptionValue(inputDexFileName + ".dump");
             }
-            dump.dump(dexFile, dumpFileName, options.apiLevel);
+            dump.dump(dexFile, dumpFileName, options.apiLevel, options.experimental);
         }
 
         if (errorOccurred) {
@@ -351,6 +357,10 @@ public class main {
                 .withDescription("deodex the given odex file. This option is ignored if the input file is not an " +
                         "odex file")
                 .create("x");
+
+        Option experimentalOption = OptionBuilder.withLongOpt("experimental")
+                .withDescription("enable experimental opcodes to be disassembled, even if they aren't necessarily supported in the Android runtime yet")
+                .create("X");
 
         Option useLocalsOption = OptionBuilder.withLongOpt("use-locals")
                 .withDescription("output the .locals directive with the number of non-parameter registers, rather" +
@@ -469,6 +479,7 @@ public class main {
         basicOptions.addOption(outputDirOption);
         basicOptions.addOption(noParameterRegistersOption);
         basicOptions.addOption(deodexerantOption);
+        basicOptions.addOption(experimentalOption);
         basicOptions.addOption(useLocalsOption);
         basicOptions.addOption(sequentialLabelsOption);
         basicOptions.addOption(noDebugInfoOption);
@@ -496,9 +507,9 @@ public class main {
             options.addOption((Option)option);
         }
     }
-    
+
     @Nonnull
-    private static List<String> getDefaultBootClassPathForApi(int apiLevel) {
+    private static List<String> getDefaultBootClassPathForApi(int apiLevel, boolean experimental) {
         if (apiLevel < 9) {
             return Lists.newArrayList(
                     "/system/framework/core.jar",

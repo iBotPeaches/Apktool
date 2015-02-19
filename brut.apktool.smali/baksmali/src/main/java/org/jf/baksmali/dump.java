@@ -40,7 +40,7 @@ import java.io.IOException;
 import java.io.Writer;
 
 public class dump {
-    public static void dump(DexBackedDexFile dexFile, String dumpFileName, int apiLevel) throws IOException {
+    public static void dump(DexBackedDexFile dexFile, String dumpFileName, int apiLevel, boolean experimental) throws IOException {
         if (dumpFileName != null) {
             Writer writer = null;
 
@@ -52,7 +52,7 @@ public class dump {
                     consoleWidth = 120;
                 }
 
-                RawDexFile rawDexFile = new RawDexFile(new Opcodes(apiLevel), dexFile);
+                RawDexFile rawDexFile = new RawDexFile(new Opcodes(apiLevel, experimental), dexFile);
                 DexAnnotator annotator = new DexAnnotator(rawDexFile, consoleWidth);
                 annotator.writeAnnotations(writer);
             } catch (IOException ex) {

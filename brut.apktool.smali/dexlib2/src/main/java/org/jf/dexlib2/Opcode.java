@@ -269,13 +269,13 @@ public enum Opcode
     INVOKE_OBJECT_INIT_RANGE((short)0xf0, "invoke-object-init/range", minApi(14), ReferenceType.METHOD,  Format.Format3rc, Opcode.ODEX_ONLY | Opcode.CAN_THROW | Opcode.CAN_CONTINUE | Opcode.SETS_RESULT | Opcode.CAN_INITIALIZE_REFERENCE),
     RETURN_VOID_BARRIER((short)0xf1, "return-void-barrier", minApi(11), ReferenceType.NONE, Format.Format10x, Opcode.ODEX_ONLY),
     IGET_QUICK((short)0xf2, "iget-quick", ReferenceType.NONE,  Format.Format22cs, Opcode.ODEX_ONLY | Opcode.ODEXED_INSTANCE_QUICK | Opcode.CAN_THROW | Opcode.CAN_CONTINUE | Opcode.SETS_REGISTER),
-    IGET_WIDE_QUICK((short)0xf3, "iget-wide-quick", ReferenceType.NONE,  Format.Format22cs, Opcode.ODEX_ONLY | Opcode.ODEXED_INSTANCE_QUICK | Opcode.CAN_THROW | Opcode.CAN_CONTINUE | Opcode.SETS_REGISTER | Opcode.SETS_WIDE_REGISTER),
-    IGET_OBJECT_QUICK((short)0xf4, "iget-object-quick", ReferenceType.NONE,  Format.Format22cs, Opcode.ODEX_ONLY | Opcode.ODEXED_INSTANCE_QUICK | Opcode.CAN_THROW | Opcode.CAN_CONTINUE | Opcode.SETS_REGISTER),
-    IPUT_QUICK((short)0xf5, "iput-quick", ReferenceType.NONE,  Format.Format22cs, Opcode.ODEX_ONLY | Opcode.ODEXED_INSTANCE_QUICK | Opcode.CAN_THROW | Opcode.CAN_CONTINUE),
-    IPUT_WIDE_QUICK((short)0xf6, "iput-wide-quick", ReferenceType.NONE,  Format.Format22cs, Opcode.ODEX_ONLY | Opcode.ODEXED_INSTANCE_QUICK | Opcode.CAN_THROW | Opcode.CAN_CONTINUE),
-    IPUT_OBJECT_QUICK((short)0xf7, "iput-object-quick", ReferenceType.NONE,  Format.Format22cs, Opcode.ODEX_ONLY | Opcode.ODEXED_INSTANCE_QUICK | Opcode.CAN_THROW | Opcode.CAN_CONTINUE),
-    INVOKE_VIRTUAL_QUICK((short)0xf8, "invoke-virtual-quick", ReferenceType.NONE,  Format.Format35ms, Opcode.ODEX_ONLY | Opcode.CAN_THROW | Opcode.CAN_CONTINUE | Opcode.SETS_RESULT),
-    INVOKE_VIRTUAL_QUICK_RANGE((short)0xf9, "invoke-virtual-quick/range", ReferenceType.NONE,  Format.Format3rms, Opcode.ODEX_ONLY | Opcode.CAN_THROW | Opcode.CAN_CONTINUE | Opcode.SETS_RESULT),
+    IGET_WIDE_QUICK((short)0xf3, "iget-wide-quick", maxApi(22), ReferenceType.NONE,  Format.Format22cs, Opcode.ODEX_ONLY | Opcode.ODEXED_INSTANCE_QUICK | Opcode.CAN_THROW | Opcode.CAN_CONTINUE | Opcode.SETS_REGISTER | Opcode.SETS_WIDE_REGISTER),
+    IGET_OBJECT_QUICK((short)0xf4, "iget-object-quick", maxApi(22), ReferenceType.NONE,  Format.Format22cs, Opcode.ODEX_ONLY | Opcode.ODEXED_INSTANCE_QUICK | Opcode.CAN_THROW | Opcode.CAN_CONTINUE | Opcode.SETS_REGISTER),
+    IPUT_QUICK((short)0xf5, "iput-quick", maxApi(22), ReferenceType.NONE,  Format.Format22cs, Opcode.ODEX_ONLY | Opcode.ODEXED_INSTANCE_QUICK | Opcode.CAN_THROW | Opcode.CAN_CONTINUE),
+    IPUT_WIDE_QUICK((short)0xf6, "iput-wide-quick", maxApi(22), ReferenceType.NONE,  Format.Format22cs, Opcode.ODEX_ONLY | Opcode.ODEXED_INSTANCE_QUICK | Opcode.CAN_THROW | Opcode.CAN_CONTINUE),
+    IPUT_OBJECT_QUICK((short)0xf7, "iput-object-quick", maxApi(22), ReferenceType.NONE,  Format.Format22cs, Opcode.ODEX_ONLY | Opcode.ODEXED_INSTANCE_QUICK | Opcode.CAN_THROW | Opcode.CAN_CONTINUE),
+    INVOKE_VIRTUAL_QUICK((short)0xf8, "invoke-virtual-quick", maxApi(22), ReferenceType.NONE,  Format.Format35ms, Opcode.ODEX_ONLY | Opcode.CAN_THROW | Opcode.CAN_CONTINUE | Opcode.SETS_RESULT),
+    INVOKE_VIRTUAL_QUICK_RANGE((short)0xf9, "invoke-virtual-quick/range", maxApi(22), ReferenceType.NONE,  Format.Format3rms, Opcode.ODEX_ONLY | Opcode.CAN_THROW | Opcode.CAN_CONTINUE | Opcode.SETS_RESULT),
     INVOKE_SUPER_QUICK((short)0xfa, "invoke-super-quick", ReferenceType.NONE,  Format.Format35ms, Opcode.ODEX_ONLY | Opcode.CAN_THROW | Opcode.CAN_CONTINUE | Opcode.SETS_RESULT),
     INVOKE_SUPER_QUICK_RANGE((short)0xfb, "invoke-super-quick/range", ReferenceType.NONE,  Format.Format3rms, Opcode.ODEX_ONLY | Opcode.CAN_THROW | Opcode.CAN_CONTINUE | Opcode.SETS_RESULT),
 
@@ -285,7 +285,17 @@ public enum Opcode
 
     PACKED_SWITCH_PAYLOAD((short)0x100, "packed-switch-payload", ReferenceType.NONE, Format.PackedSwitchPayload, 0),
     SPARSE_SWITCH_PAYLOAD((short)0x200, "sparse-switch-payload", ReferenceType.NONE, Format.SparseSwitchPayload, 0),
-    ARRAY_PAYLOAD((short)0x300, "array-payload", ReferenceType.NONE, Format.ArrayPayload, 0);
+    ARRAY_PAYLOAD((short)0x300, "array-payload", ReferenceType.NONE, Format.ArrayPayload, 0),
+
+    // Reuse the deprecated f3-ff opcodes in Art:
+    INVOKE_LAMBDA((short)0xf3, "invoke-lambda", minApi(23), ReferenceType.NONE, Format.Format25x, Opcode.CAN_THROW | Opcode.CAN_CONTINUE | Opcode.SETS_RESULT | Opcode.EXPERIMENTAL),
+    // TODO: What about JUMBO support if the string ID is too large?
+    CAPTURE_VARIABLE((short)0xf5, "capture-variable", minApi(23), ReferenceType.STRING, Format.Format21c, Opcode.EXPERIMENTAL),
+    CREATE_LAMBDA((short)0xf6, "create-lambda", minApi(23), ReferenceType.METHOD, Format.Format21c, Opcode.SETS_REGISTER | Opcode.EXPERIMENTAL),
+    // TODO: do we need a capture/liberate wide?
+    LIBERATE_VARIABLE((short)0xf7, "liberate-variable", minApi(23), ReferenceType.STRING, Format.Format22c, Opcode.SETS_REGISTER | Opcode.EXPERIMENTAL),
+    BOX_LAMBDA((short)0xf8, "box-lambda", minApi(23), ReferenceType.NONE, Format.Format22x, Opcode.SETS_REGISTER | Opcode.EXPERIMENTAL),
+    UNBOX_LAMBDA((short)0xf9, "unbox-lambda", minApi(23), ReferenceType.TYPE, Format.Format22c, Opcode.SETS_REGISTER | Opcode.EXPERIMENTAL);
 
     //if the instruction can throw an exception
     public static final int CAN_THROW = 0x1;
@@ -309,6 +319,8 @@ public enum Opcode
     public static final int JUMBO_OPCODE = 0x200;
     //if the instruction can initialize an uninitialized object reference
     public static final int CAN_INITIALIZE_REFERENCE = 0x400;
+    //if the instruction is experimental (not potentially supported by Android runtime yet)
+    public static final int EXPERIMENTAL = 0x800;
 
     private static final int ALL_APIS = 0xFFFF0000;
 
@@ -416,5 +428,9 @@ public enum Opcode
 
     public final boolean canInitializeReference() {
         return (flags & CAN_INITIALIZE_REFERENCE) != 0;
+    }
+
+    public final boolean isExperimental() {
+        return (flags & EXPERIMENTAL) != 0;
     }
 }

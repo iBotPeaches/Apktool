@@ -92,7 +92,7 @@ public class JumboStringConversionTest {
         MemoryDataStore dexStore = new MemoryDataStore();
         dexBuilder.writeTo(dexStore);
 
-        DexBackedDexFile dexFile = new DexBackedDexFile(new Opcodes(15), dexStore.getData());
+        DexBackedDexFile dexFile = new DexBackedDexFile(new Opcodes(15, false), dexStore.getData());
 
         ClassDef classDef = Iterables.getFirst(dexFile.getClasses(), null);
         Assert.assertNotNull(classDef);
@@ -189,7 +189,7 @@ public class JumboStringConversionTest {
         MemoryDataStore dexStore = new MemoryDataStore();
         dexBuilder.writeTo(dexStore);
 
-        DexBackedDexFile dexFile = new DexBackedDexFile(new Opcodes(15), dexStore.getData());
+        DexBackedDexFile dexFile = new DexBackedDexFile(new Opcodes(15, false), dexStore.getData());
 
         ClassDef classDef = Iterables.getFirst(dexFile.getClasses(), null);
         Assert.assertNotNull(classDef);

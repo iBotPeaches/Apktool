@@ -40,13 +40,14 @@ public class Opcodes {
     private final Opcode[] opcodesByValue;
     private final HashMap<String, Opcode> opcodesByName;
 
-    public Opcodes(int api) {
+    public Opcodes(int api, boolean experimental) {
         opcodesByValue = new Opcode[256];
         opcodesByName = Maps.newHashMap();
 
         for (Opcode opcode: Opcode.values()) {
             if (!opcode.format.isPayloadFormat) {
-                if (api <= opcode.getMaxApi() && api >= opcode.getMinApi()) {
+                if (api <= opcode.getMaxApi() && api >= opcode.getMinApi() &&
+                        (experimental || !opcode.isExperimental())) {
                     opcodesByValue[opcode.value] = opcode;
                     opcodesByName.put(opcode.name.toLowerCase(), opcode);
                 }

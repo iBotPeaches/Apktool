@@ -34,6 +34,7 @@ import org.antlr.runtime.Token;
 import org.antlr.runtime.TokenSource;
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
+import org.antlr.runtime.tree.TreeNodeStream;
 import org.apache.commons.cli.*;
 import org.jf.dexlib2.writer.builder.DexBuilder;
 import org.jf.dexlib2.writer.io.FileDataStore;
@@ -110,6 +111,7 @@ public class main {
         boolean allowOdex = false;
         boolean verboseErrors = false;
         boolean printTokens = false;
+        boolean experimental = false;
 
         int apiLevel = 15;
 
@@ -141,6 +143,9 @@ public class main {
                     break;
                 case 'x':
                     allowOdex = true;
+                    break;
+                case 'X':
+                    experimental = true;
                     break;
                 case 'a':
                     apiLevel = Integer.parseInt(commandLine.getOptionValue("a"));
@@ -198,11 +203,12 @@ public class main {
             final boolean finalPrintTokens = printTokens;
             final boolean finalAllowOdex = allowOdex;
             final int finalApiLevel = apiLevel;
+            final boolean finalExperimental = experimental;
             for (final File file: filesToProcess) {
                 tasks.add(executor.submit(new Callable<Boolean>() {
                     @Override public Boolean call() throws Exception {
                         return assembleSmaliFile(file, dexBuilder, finalVerboseErrors, finalPrintTokens,
-                                finalAllowOdex, finalApiLevel);
+                                finalAllowOdex, finalApiLevel, finalExperimental);
                     }
                 }));
             }
@@ -252,7 +258,8 @@ public class main {
     }
 
     private static boolean assembleSmaliFile(File smaliFile, DexBuilder dexBuilder, boolean verboseErrors,
-                                             boolean printTokens, boolean allowOdex, int apiLevel)
+                                             boolean printTokens, boolean allowOdex, int apiLevel,
+                                             boolean experimental)
             throws Exception {
         CommonTokenStream tokens;
 
@@ -267,7 +274,7 @@ public class main {
 
         if (printTokens) {
             tokens.getTokens();
-            
+
             for (int i=0; i<tokens.size(); i++) {
                 Token token = tokens.get(i);
                 if (token.getChannel() == smaliParser.HIDDEN) {
@@ -276,12 +283,14 @@ public class main {
 
                 System.out.println(smaliParser.tokenNames[token.getType()] + ": " + token.getText());
             }
+
+            System.out.flush();
         }
 
         smaliParser parser = new smaliParser(tokens);
         parser.setVerboseErrors(verboseErrors);
         parser.setAllowOdex(allowOdex);
-        parser.setApiLevel(apiLevel);
+        parser.setApiLevel(apiLevel, experimental);
 
         smaliParser.smali_file_return result = parser.smali_file();
 
@@ -294,7 +303,13 @@ public class main {
         CommonTreeNodeStream treeStream = new CommonTreeNodeStream(t);
         treeStream.setTokenStream(tokens);
 
+        if (printTokens) {
+            System.out.println(t.toStringTree());
+        }
+
         smaliTreeWalker dexGen = new smaliTreeWalker(treeStream);
+        dexGen.setApiLevel(apiLevel, experimental);
+
         dexGen.setVerboseErrors(verboseErrors);
         dexGen.setDexBuilder(dexBuilder);
         dexGen.smali_file();
@@ -363,6 +378,11 @@ public class main {
                 .withArgName("API_LEVEL")
                 .create("a");
 
+        Option experimentalOption = OptionBuilder.withLongOpt("experimental")
+                .withDescription("enable experimental opcodes to be assembled, even if they " +
+                        " aren't necessarily supported by the Android runtime yet")
+                .create("X");
+
         Option jobsOption = OptionBuilder.withLongOpt("jobs")
                 .withDescription("The number of threads to use. Defaults to the number of cores available, up to a " +
                         "maximum of 6")
@@ -383,6 +403,7 @@ public class main {
         basicOptions.addOption(outputOption);
         basicOptions.addOption(allowOdexOption);
         basicOptions.addOption(apiLevelOption);
+        basicOptions.addOption(experimentalOption);
         basicOptions.addOption(jobsOption);
 
         debugOptions.addOption(verboseErrorsOption);

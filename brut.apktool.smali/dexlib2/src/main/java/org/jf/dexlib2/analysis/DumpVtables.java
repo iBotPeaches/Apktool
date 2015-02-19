@@ -71,6 +71,7 @@ public class DumpVtables {
         ArrayList<String> bootClassPathDirs = Lists.newArrayList();
         String outFile = "vtables.txt";
         int apiLevel = 15;
+        boolean experimental = false;
 
         for (int i=0; i<parsedOptions.length; i++) {
             Option option = parsedOptions[i];
@@ -85,6 +86,9 @@ public class DumpVtables {
                     break;
                 case 'a':
                     apiLevel = Integer.parseInt(commandLine.getOptionValue("a"));
+                    break;
+                case 'X':
+                    experimental = true;
                     break;
                 default:
                     assert false;
@@ -105,9 +109,9 @@ public class DumpVtables {
         }
 
         try {
-            DexBackedDexFile dexFile = DexFileFactory.loadDexFile(dexFileFile, apiLevel);
+            DexBackedDexFile dexFile = DexFileFactory.loadDexFile(dexFileFile, apiLevel, experimental);
             Iterable<String> bootClassPaths = Splitter.on(":").split("core.jar:ext.jar:framework.jar:android.policy.jar:services.jar");
-            ClassPath classPath = ClassPath.fromClassPath(bootClassPathDirs, bootClassPaths, dexFile, apiLevel);
+            ClassPath classPath = ClassPath.fromClassPath(bootClassPathDirs, bootClassPaths, dexFile, apiLevel, experimental);
             FileOutputStream outStream = new FileOutputStream(outFile);
 
             for (ClassDef classDef: dexFile.getClasses()) {
@@ -167,8 +171,14 @@ public class DumpVtables {
                 .withArgName("API_LEVEL")
                 .create("a");
 
+        Option experimentalOption = OptionBuilder.withLongOpt("experimental")
+                .withDescription("Enable dumping experimental opcodes, that aren't necessarily " +
+                                "supported by the android runtime yet.")
+                .create("X");
+
         options.addOption(classPathDirOption);
         options.addOption(outputFileOption);
         options.addOption(apiLevelOption);
+        options.addOption(experimentalOption);
     }
 }

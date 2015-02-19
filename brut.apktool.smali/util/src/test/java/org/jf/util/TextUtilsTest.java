@@ -1,5 +1,5 @@
 /*
- * Copyright 2014, Google Inc.
+ * Copyright 2015, Google Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,47 +31,23 @@
 
 package org.jf.util;
 
-import javax.annotation.Nonnull;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import org.junit.Assert;
+import org.junit.Test;
 
-public class TextUtils {
-    private static String newline = System.getProperty("line.separator");
-
-    @Nonnull
-    public static String normalizeNewlines(@Nonnull String source) {
-        return normalizeNewlines(source, newline);
+public class TextUtilsTest {
+    @Test
+    public void testStripComments() {
+        Assert.assertEquals("", TextUtils.stripComments("#world"));
+        Assert.assertEquals("hello", TextUtils.stripComments("hello#world"));
+        Assert.assertEquals("multi\nline", TextUtils.stripComments("multi#hello world\nline#world"));
     }
 
-    @Nonnull
-    public static String normalizeNewlines(@Nonnull String source, String newlineValue) {
-        return source.replace("\r", "").replace("\n", newlineValue);
-    }
-
-    @Nonnull
-    public static String normalizeWhitespace(@Nonnull String source) {
-        // Go to native system new lines so that ^/$ work correctly
-        source = normalizeNewlines(source);
-
-        // Remove all suffix/prefix whitespace
-        Pattern pattern = Pattern.compile("((^[ \t]+)|([ \t]+))");
-        Matcher matcher = pattern.matcher(source);
-        source = matcher.replaceAll("");
-
-        // Remove all empty lines
-        Pattern pattern2 = Pattern.compile("^\r?\n?", Pattern.MULTILINE);
-        Matcher matcher2 = pattern2.matcher(source);
-        source = matcher2.replaceAll("");
-
-        // Go back to unix-style \n newlines
-        source = normalizeNewlines(source, "\n");
-        return source;
-    }
-
-    @Nonnull
-    public static String stripComments(@Nonnull String source) {
-        Pattern pattern = Pattern.compile("#(.*)");
-        Matcher matcher = pattern.matcher(source);
-        return matcher.replaceAll("");
+    @Test
+    public void testNormalizeWhitespace() {
+        Assert.assertEquals("", TextUtils.normalizeWhitespace(" "));
+        Assert.assertEquals("hello", TextUtils.normalizeWhitespace("hello "));
+        Assert.assertEquals("hello", TextUtils.normalizeWhitespace(" hello"));
+        Assert.assertEquals("hello", TextUtils.normalizeWhitespace(" hello "));
+        Assert.assertEquals("hello\nworld", TextUtils.normalizeWhitespace("hello \n \n world"));
     }
 }

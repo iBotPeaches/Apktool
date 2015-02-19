@@ -1,5 +1,5 @@
 /*
- * Copyright 2014, Google Inc.
+ * Copyright 2015, Google Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,49 +29,19 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.jf.util;
+package org.jf.dexlib2.iface.instruction;
 
-import javax.annotation.Nonnull;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+public interface OneFixedFourParameterRegisterInstruction extends VariableRegisterInstruction {
+    int getRegisterFixedC();
+    int getRegisterParameterD();
+    int getRegisterParameterE();
+    int getRegisterParameterF();
+    int getRegisterParameterG();
 
-public class TextUtils {
-    private static String newline = System.getProperty("line.separator");
+    /** Returns the count of just the parameter register counts; in range of [0, 4] */
+    int getParameterRegisterCount();
 
-    @Nonnull
-    public static String normalizeNewlines(@Nonnull String source) {
-        return normalizeNewlines(source, newline);
-    }
-
-    @Nonnull
-    public static String normalizeNewlines(@Nonnull String source, String newlineValue) {
-        return source.replace("\r", "").replace("\n", newlineValue);
-    }
-
-    @Nonnull
-    public static String normalizeWhitespace(@Nonnull String source) {
-        // Go to native system new lines so that ^/$ work correctly
-        source = normalizeNewlines(source);
-
-        // Remove all suffix/prefix whitespace
-        Pattern pattern = Pattern.compile("((^[ \t]+)|([ \t]+))");
-        Matcher matcher = pattern.matcher(source);
-        source = matcher.replaceAll("");
-
-        // Remove all empty lines
-        Pattern pattern2 = Pattern.compile("^\r?\n?", Pattern.MULTILINE);
-        Matcher matcher2 = pattern2.matcher(source);
-        source = matcher2.replaceAll("");
-
-        // Go back to unix-style \n newlines
-        source = normalizeNewlines(source, "\n");
-        return source;
-    }
-
-    @Nonnull
-    public static String stripComments(@Nonnull String source) {
-        Pattern pattern = Pattern.compile("#(.*)");
-        Matcher matcher = pattern.matcher(source);
-        return matcher.replaceAll("");
-    }
+    /** Includes the total sum of both fixed and parameter register counts; at least 1 */
+    @Override
+    int getRegisterCount();
 }

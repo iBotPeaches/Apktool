@@ -170,18 +170,18 @@ public class ClassPath {
 
     @Nonnull
     public static ClassPath fromClassPath(Iterable<String> classPathDirs, Iterable<String> classPath, DexFile dexFile,
-                                          int api) {
-        return fromClassPath(classPathDirs, classPath, dexFile, api, api == 17);
+                                          int api, boolean experimental) {
+        return fromClassPath(classPathDirs, classPath, dexFile, api, api == 17, experimental);
     }
 
     @Nonnull
     public static ClassPath fromClassPath(Iterable<String> classPathDirs, Iterable<String> classPath, DexFile dexFile,
-                                          int api, boolean checkPackagePrivateAccess) {
+                                          int api, boolean checkPackagePrivateAccess, boolean experimental) {
         ArrayList<DexFile> dexFiles = Lists.newArrayList();
 
         for (String classPathEntry: classPath) {
             try {
-                dexFiles.add(loadClassPathEntry(classPathDirs, classPathEntry, api));
+                dexFiles.add(loadClassPathEntry(classPathDirs, classPathEntry, api, experimental));
             } catch (ExceptionWithContext e){}
         }
         dexFiles.add(dexFile);
@@ -192,7 +192,8 @@ public class ClassPath {
 
     @Nonnull
     private static DexFile loadClassPathEntry(@Nonnull Iterable<String> classPathDirs,
-                                              @Nonnull String bootClassPathEntry, int api) {
+                                              @Nonnull String bootClassPathEntry, int api,
+                                              boolean experimental) {
         File rawEntry = new File(bootClassPathEntry);
         // strip off the path - we only care about the filename
         String entryName = rawEntry.getName();
@@ -227,7 +228,7 @@ public class ClassPath {
                                 "warning: cannot open %s for reading. Will continue looking.", file.getPath()));
                     } else {
                         try {
-                            return DexFileFactory.loadDexFile(file, api);
+                            return DexFileFactory.loadDexFile(file, api, experimental);
                         } catch (DexFileFactory.NoClassesDexException ex) {
                             // ignore and continue
                         } catch (Exception ex) {

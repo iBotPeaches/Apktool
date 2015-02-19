@@ -75,7 +75,7 @@ public class DexWriterTest {
             throw new RuntimeException(ex);
         }
 
-        DexBackedDexFile dexFile = new DexBackedDexFile(new Opcodes(15), dataStore.getData());
+        DexBackedDexFile dexFile = new DexBackedDexFile(new Opcodes(15, false), dataStore.getData());
         ClassDef dbClassDef = Iterables.getFirst(dexFile.getClasses(), null);
         Assert.assertNotNull(dbClassDef);
         Annotation dbAnnotation = Iterables.getFirst(dbClassDef.getAnnotations(), null);

@@ -84,6 +84,8 @@ const-string
 check-cast
 new-instance
 const-class
+capture-variable
+create-lambda
 const/high16
 const-wide/high16
 const/16
@@ -122,6 +124,8 @@ iput-wide-volatile
 iput-object-volatile
 instance-of
 new-array
+unbox-lambda
+liberate-variable
 iget-quick
 iget-wide-quick
 iget-object-quick
@@ -144,6 +148,7 @@ if-le
 move/from16
 move-wide/from16
 move-object/from16
+box-lambda
 cmpl-float
 cmpg-float
 cmpl-double
@@ -194,6 +199,7 @@ add-double
 sub-double
 mul-double
 div-double
+invoke-lambda
 goto/32
 const-string/jumbo
 const

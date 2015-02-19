@@ -77,15 +77,15 @@ import java.util.*;
   public String classType;
   private boolean verboseErrors = false;
   private int apiLevel = 15;
-  private Opcodes opcodes = new Opcodes(apiLevel);
+  private Opcodes opcodes = new Opcodes(apiLevel, false);
   private DexBuilder dexBuilder;
 
   public void setDexBuilder(DexBuilder dexBuilder) {
       this.dexBuilder = dexBuilder;
   }
 
-  public void setApiLevel(int apiLevel) {
-      this.opcodes = new Opcodes(apiLevel);
+  public void setApiLevel(int apiLevel, boolean experimental) {
+      this.opcodes = new Opcodes(apiLevel, experimental);
       this.apiLevel = apiLevel;
   }
 
@@ -674,6 +674,22 @@ register_list returns[byte[\] registers, byte registerCount]
         $registers[$registerCount++] = parseRegister_nibble($REGISTER.text);
       })*);
 
+register_list4 returns[byte[\] registers, byte registerCount]
+  @init
+  {
+    $registers = new byte[4];
+    $registerCount = 0;
+  }
+  : ^(I_REGISTER_LIST
+      (REGISTER
+      {
+        if ($registerCount == 4) {
+          throw new SemanticException(input, $I_REGISTER_LIST, "A list4 of registers can only have a maximum of 4 " +
+                  "registers. Use the <op>/range alternate opcode instead.");
+        }
+        $registers[$registerCount++] = parseRegister_nibble($REGISTER.text);
+      })*);
+
 register_range returns[int startRegister, int endRegister]
   : ^(I_REGISTER_RANGE (startReg=REGISTER endReg=REGISTER?)?)
     {
@@ -726,6 +742,8 @@ instruction
   | insn_format21c_field
   | insn_format21c_string
   | insn_format21c_type
+  | insn_format21c_lambda
+  | insn_format21c_method
   | insn_format21ih
   | insn_format21lh
   | insn_format21s
@@ -733,10 +751,12 @@ instruction
   | insn_format22b
   | insn_format22c_field
   | insn_format22c_type
+  | insn_format22c_string
   | insn_format22s
   | insn_format22t
   | insn_format22x
   | insn_format23x
+  | insn_format25x
   | insn_format30t
   | insn_format31c
   | insn_format31i
@@ -861,6 +881,30 @@ insn_format21c_type
               dexBuilder.internTypeReference($nonvoid_type_descriptor.type)));
     };
 
+insn_format21c_lambda
+  : //e.g. capture-variable v1, "foobar"
+    ^(I_STATEMENT_FORMAT21c_LAMBDA INSTRUCTION_FORMAT21c_LAMBDA REGISTER string_literal)
+    {
+      Opcode opcode = opcodes.getOpcodeByName($INSTRUCTION_FORMAT21c_LAMBDA.text);
+      short regA = parseRegister_byte($REGISTER.text);
+
+      $method::methodBuilder.addInstruction(new BuilderInstruction21c(opcode, regA,
+              dexBuilder.internStringReference($string_literal.value)));
+    };
+
+insn_format21c_method
+  : //e.g. create-lambda v1, java/io/PrintStream/print(Ljava/lang/Stream;)V
+    ^(I_STATEMENT_FORMAT21c_METHOD INSTRUCTION_FORMAT21c_METHOD REGISTER method_reference)
+    {
+      Opcode opcode = opcodes.getOpcodeByName($INSTRUCTION_FORMAT21c_METHOD.text);
+      short regA = parseRegister_byte($REGISTER.text);
+
+      ImmutableMethodReference methodReference = $method_reference.methodReference;
+
+      $method::methodBuilder.addInstruction(new BuilderInstruction21c(opcode, regA,
+              dexBuilder.internMethodReference(methodReference)));
+    };
+
 insn_format21ih
   : //e.g. const/high16 v1, 1234
     ^(I_STATEMENT_FORMAT21ih INSTRUCTION_FORMAT21ih REGISTER fixed_32bit_literal)
@@ -947,6 +991,18 @@ insn_format22c_type
               dexBuilder.internTypeReference($nonvoid_type_descriptor.type)));
     };
 
+insn_format22c_string
+  : //e.g. liberate-variable v0, v1, "baz"
+    ^(I_STATEMENT_FORMAT22c_STRING INSTRUCTION_FORMAT22c_STRING registerA=REGISTER registerB=REGISTER string_literal)
+    {
+      Opcode opcode = opcodes.getOpcodeByName($INSTRUCTION_FORMAT22c_STRING.text);
+      byte regA = parseRegister_nibble($registerA.text);
+      byte regB = parseRegister_nibble($registerB.text);
+
+      $method::methodBuilder.addInstruction(new BuilderInstruction22c(opcode, regA, regB,
+              dexBuilder.internStringReference($string_literal.value)));
+    };
+
 insn_format22s
   : //e.g. add-int/lit16 v0, v1, 12345
     ^(I_STATEMENT_FORMAT22s INSTRUCTION_FORMAT22s registerA=REGISTER registerB=REGISTER short_integral_literal)
@@ -992,6 +1048,23 @@ insn_format23x
       short regC = parseRegister_byte($registerC.text);
 
       $method::methodBuilder.addInstruction(new BuilderInstruction23x(opcode, regA, regB, regC));
+    };
+
+insn_format25x
+  : //e.g. invoke-lambda vClosure, {vD, vE, vF, vG} -- up to 4 parameters + the closure.
+    ^(I_STATEMENT_FORMAT25x INSTRUCTION_FORMAT25x REGISTER register_list4)
+    {
+      Opcode opcode = opcodes.getOpcodeByName($INSTRUCTION_FORMAT25x.text);
+
+      byte closureRegister = parseRegister_nibble($REGISTER.text);
+
+      //this depends on the fact that register_list4 returns a byte[4]
+      byte[] registers = $register_list4.registers;
+      int parameterRegisterCount = $register_list4.registerCount;  // don't count closure register
+
+      $method::methodBuilder.addInstruction(new BuilderInstruction25x(opcode,
+            parameterRegisterCount, closureRegister, registers[0], registers[1],
+            registers[2], registers[3]));
     };
 
 insn_format30t

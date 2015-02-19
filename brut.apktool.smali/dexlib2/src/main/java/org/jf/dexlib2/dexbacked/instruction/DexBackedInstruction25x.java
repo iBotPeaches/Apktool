@@ -1,5 +1,5 @@
 /*
- * Copyright 2014, Google Inc.
+ * Copyright 2015, Google Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,49 +29,55 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.jf.util;
+package org.jf.dexlib2.dexbacked.instruction;
+
+import org.jf.dexlib2.Opcode;
+import org.jf.dexlib2.dexbacked.DexBackedDexFile;
+import org.jf.dexlib2.iface.instruction.formats.Instruction25x;
+import org.jf.util.NibbleUtils;
 
 import javax.annotation.Nonnull;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-public class TextUtils {
-    private static String newline = System.getProperty("line.separator");
-
-    @Nonnull
-    public static String normalizeNewlines(@Nonnull String source) {
-        return normalizeNewlines(source, newline);
+public class DexBackedInstruction25x extends DexBackedInstruction implements Instruction25x {
+    public DexBackedInstruction25x(@Nonnull DexBackedDexFile dexFile,
+            @Nonnull Opcode opcode,
+            int instructionStart) {
+        super(dexFile, opcode, instructionStart);
     }
 
-    @Nonnull
-    public static String normalizeNewlines(@Nonnull String source, String newlineValue) {
-        return source.replace("\r", "").replace("\n", newlineValue);
+    @Override
+    public int getRegisterCount() {
+        return getParameterRegisterCount() + 1;
     }
 
-    @Nonnull
-    public static String normalizeWhitespace(@Nonnull String source) {
-        // Go to native system new lines so that ^/$ work correctly
-        source = normalizeNewlines(source);
-
-        // Remove all suffix/prefix whitespace
-        Pattern pattern = Pattern.compile("((^[ \t]+)|([ \t]+))");
-        Matcher matcher = pattern.matcher(source);
-        source = matcher.replaceAll("");
-
-        // Remove all empty lines
-        Pattern pattern2 = Pattern.compile("^\r?\n?", Pattern.MULTILINE);
-        Matcher matcher2 = pattern2.matcher(source);
-        source = matcher2.replaceAll("");
-
-        // Go back to unix-style \n newlines
-        source = normalizeNewlines(source, "\n");
-        return source;
+    @Override
+    public int getParameterRegisterCount() {
+        return NibbleUtils.extractHighUnsignedNibble(dexFile.readUbyte(instructionStart + 1));
     }
 
-    @Nonnull
-    public static String stripComments(@Nonnull String source) {
-        Pattern pattern = Pattern.compile("#(.*)");
-        Matcher matcher = pattern.matcher(source);
-        return matcher.replaceAll("");
+    @Override
+    public int getRegisterFixedC() {
+        return NibbleUtils.extractLowUnsignedNibble(dexFile.readUbyte(instructionStart + 2));
     }
+
+    @Override
+    public int getRegisterParameterD() {
+        return NibbleUtils.extractHighUnsignedNibble(dexFile.readUbyte(instructionStart + 2));
+    }
+
+    @Override
+    public int getRegisterParameterE() {
+        return NibbleUtils.extractLowUnsignedNibble(dexFile.readUbyte(instructionStart + 3));
+    }
+
+    @Override
+    public int getRegisterParameterF() {
+        return NibbleUtils.extractHighUnsignedNibble(dexFile.readUbyte(instructionStart + 3));
+    }
+
+    @Override
+    public int getRegisterParameterG() {
+        return NibbleUtils.extractLowUnsignedNibble(dexFile.readUbyte(instructionStart + 1));
+    }
+
 }
