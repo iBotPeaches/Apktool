@@ -16,7 +16,6 @@
 
 package brut.androlib.res.data;
 
-import javax.security.auth.callback.CallbackHandler;
 import java.util.logging.Logger;
 
 /**
