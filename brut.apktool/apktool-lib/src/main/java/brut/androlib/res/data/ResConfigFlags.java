@@ -16,6 +16,7 @@
 
 package brut.androlib.res.data;
 
+import javax.security.auth.callback.CallbackHandler;
 import java.util.logging.Logger;
 
 /**
@@ -26,9 +27,7 @@ public class ResConfigFlags {
     public final short mnc;
 
     public final char[] language;
-    public final char[] country;
-
-    public final short layoutDirection;
+    public final char[] region;
 
     public final byte orientation;
     public final byte touchscreen;
@@ -50,6 +49,9 @@ public class ResConfigFlags {
     public final short screenWidthDp;
     public final short screenHeightDp;
 
+    private final char[] localeScript;
+    private final char[] localeVariant;
+
     public final boolean isInvalid;
 
     private final String mQualifiers;
@@ -58,8 +60,7 @@ public class ResConfigFlags {
         mcc = 0;
         mnc = 0;
         language = new char[] { '\00', '\00' };
-        country = new char[] { '\00', '\00' };
-        layoutDirection = SCREENLAYOUT_LAYOUTDIR_ANY;
+        region = new char[] { '\00', '\00' };
         orientation = ORIENTATION_ANY;
         touchscreen = TOUCHSCREEN_ANY;
         density = DENSITY_DEFAULT;
@@ -74,17 +75,20 @@ public class ResConfigFlags {
         smallestScreenWidthDp = 0;
         screenWidthDp = 0;
         screenHeightDp = 0;
+        localeScript = new char[] { '\00', '\00', '\00', '\00' };
+        localeVariant = new char[] { '\00', '\00', '\00', '\00', '\00', '\00', '\00', '\00' };
         isInvalid = false;
         mQualifiers = "";
     }
 
     public ResConfigFlags(short mcc, short mnc, char[] language,
-                          char[] country, short layoutDirection, byte orientation,
+                          char[] region, byte orientation,
                           byte touchscreen, int density, byte keyboard, byte navigation,
                           byte inputFlags, short screenWidth, short screenHeight,
                           short sdkVersion, byte screenLayout, byte uiMode,
                           short smallestScreenWidthDp, short screenWidthDp,
-                          short screenHeightDp, boolean isInvalid) {
+                          short screenHeightDp, char[] localeScript, char[] localeVariant,
+                          boolean isInvalid) {
         if (orientation < 0 || orientation > 3) {
             LOGGER.warning("Invalid orientation value: " + orientation);
             orientation = 0;
@@ -114,8 +118,7 @@ public class ResConfigFlags {
         this.mcc = mcc;
         this.mnc = mnc;
         this.language = language;
-        this.country = country;
-        this.layoutDirection = layoutDirection;
+        this.region = region;
         this.orientation = orientation;
         this.touchscreen = touchscreen;
         this.density = density;
@@ -130,6 +133,8 @@ public class ResConfigFlags {
         this.smallestScreenWidthDp = smallestScreenWidthDp;
         this.screenWidthDp = screenWidthDp;
         this.screenHeightDp = screenHeightDp;
+        this.localeScript = localeScript;
+        this.localeVariant = localeVariant;
         this.isInvalid = isInvalid;
         mQualifiers = generateQualifiers();
     }
@@ -155,12 +160,8 @@ public class ResConfigFlags {
                 ret.append("-mnc00");
             }
         }
-        if (language[0] != '\00') {
-            ret.append('-').append(language);
-            if (country[0] != '\00') {
-                ret.append("-r").append(country);
-            }
-        }
+        ret.append(getLocaleString());
+
         switch (screenLayout & MASK_LAYOUTDIR) {
             case SCREENLAYOUT_LAYOUTDIR_RTL:
                 ret.append("-ldrtl");
@@ -368,6 +369,52 @@ public class ResConfigFlags {
         }
         return 0;
     }
+
+    private String getLocaleString() {
+        StringBuilder sb = new StringBuilder();
+
+        // check for old style non BCP47 tags
+        // allows values-xx-rXX, values-xx, values-xxx-rXX
+        // denies values-xxx, anything else
+        if (language[0] != '\00' && localeScript.length == 0 && localeVariant.length == 0 &&
+                (region.length != 3 && language.length != 3) ||
+                (language.length == 3 && region.length == 2 && region[0] != '\00')) {
+            sb.append("-").append(language);
+            if (region[0] != '\00') {
+                sb.append("-r").append(region);
+            }
+        } else { // BCP47
+            if (language[0] == '\00' && region[0] == '\00') {
+                return sb.toString(); // early return, no language or region
+            }
+            sb.append("-b+");
+            if (language[0] != '\00') {
+                sb.append(language);
+            }
+            if (localeScript.length == 4 && region.length == 2) {
+                sb.append("+").append(localeScript).append("+").append(region);
+            }
+            if (region.length == 3) {
+                sb.append("+").append(region);
+            }
+            if (localeVariant.length >= 5) {
+                if (region.length == 2) {
+                    sb.append("+").append(region);
+                }
+                sb.append("+").append(toUpper(localeVariant));
+            }
+        }
+        return sb.toString();
+    }
+
+    private String toUpper(char[] character) {
+        StringBuilder sb = new StringBuilder();
+        for (char ch: character) {
+            sb.append(Character.toUpperCase(ch));
+        }
+        return sb.toString();
+    }
+
 
     @Override
     public String toString() {
