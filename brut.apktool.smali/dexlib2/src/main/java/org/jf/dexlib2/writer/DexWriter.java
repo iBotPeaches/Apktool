@@ -576,6 +576,9 @@ public abstract class DexWriter<
     private void writeAnnotationSets(@Nonnull DexDataWriter writer) throws IOException {
         writer.align();
         annotationSetSectionOffset = writer.getPosition();
+        if (shouldCreateEmptyAnnotationSet()) {
+            writer.writeInt(0);
+        }
         for (Map.Entry<? extends AnnotationSetKey, Integer> entry: annotationSetSection.getItems()) {
             Collection<? extends AnnotationKey> annotations = Ordering.from(BaseAnnotation.BY_TYPE)
                     .immutableSortedCopy(annotationSetSection.getAnnotations(entry.getKey()));
@@ -613,6 +616,8 @@ public abstract class DexWriter<
                         for (AnnotationSetKey annotationSetKey: parameterAnnotations) {
                             if (annotationSetSection.getAnnotations(annotationSetKey).size() > 0) {
                                 writer.writeInt(annotationSetSection.getItemOffset(annotationSetKey));
+                            } else if (shouldCreateEmptyAnnotationSet()) {
+                                writer.writeInt(annotationSetSectionOffset);
                             } else {
                                 writer.writeInt(NO_OFFSET);
                             }
@@ -1115,7 +1120,7 @@ public abstract class DexWriter<
         if (annotationSection.getItems().size() > 0) {
             numItems++;
         }
-        if (annotationSetSection.getItems().size() > 0) {
+        if (annotationSetSection.getItems().size() > 0 || shouldCreateEmptyAnnotationSet()) {
             numItems++;
         }
         if (numAnnotationSetRefItems > 0) {
@@ -1163,8 +1168,8 @@ public abstract class DexWriter<
         writeMapItem(writer, ItemType.TYPE_LIST, typeListSection.getItems().size(), typeListSectionOffset);
         writeMapItem(writer, ItemType.ENCODED_ARRAY_ITEM, numEncodedArrayItems, encodedArraySectionOffset);
         writeMapItem(writer, ItemType.ANNOTATION_ITEM, annotationSection.getItems().size(), annotationSectionOffset);
-        writeMapItem(writer, ItemType.ANNOTATION_SET_ITEM, annotationSetSection.getItems().size(),
-                annotationSetSectionOffset);
+        writeMapItem(writer, ItemType.ANNOTATION_SET_ITEM,
+                annotationSetSection.getItems().size() + (shouldCreateEmptyAnnotationSet() ? 1 : 0), annotationSetSectionOffset);
         writeMapItem(writer, ItemType.ANNOTATION_SET_REF_LIST, numAnnotationSetRefItems, annotationSetRefSectionOffset);
         writeMapItem(writer, ItemType.ANNOTATION_DIRECTORY_ITEM, numAnnotationDirectoryItems,
                 annotationDirectorySectionOffset);
@@ -1225,5 +1230,12 @@ public abstract class DexWriter<
         } else {
             writer.writeInt(0);
         }
+    }
+
+    private boolean shouldCreateEmptyAnnotationSet() {
+        // Workaround for a crash in Dalvik VM before Jelly Bean MR1 (4.2)
+        // which is triggered by NO_OFFSET in parameter annotation list.
+        // (https://code.google.com/p/android/issues/detail?id=35304)
+        return (api < 17);
     }
 }
