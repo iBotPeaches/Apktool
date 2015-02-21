@@ -203,8 +203,23 @@ public class BuildAndDecodeTest {
     }
 
     @Test
+    public void twoLetterLangBcp47Test() throws BrutException, IOException {
+        compareValuesFiles("values-en-rUS/strings.xml");
+    }
+
+    @Test
     public void variantBcp47Test() throws BrutException, IOException {
         compareValuesFiles("values-b+en+US+POSIX/strings.xml");
+    }
+
+    @Test
+    public void fourpartBcp47Test() throws BrutException, IOException {
+        compareValuesFiles("values-b+ast+Latn+IT+AREVELA/strings.xml");
+    }
+
+    @Test
+    public void RegionLocaleBcp47Test() throws BrutException, IOException {
+        compareValuesFiles("values-b+en+Latn+419/strings.xml");
     }
 
     @Test

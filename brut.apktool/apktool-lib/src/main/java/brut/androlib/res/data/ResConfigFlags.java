@@ -377,7 +377,9 @@ public class ResConfigFlags {
         // denies values-xxx, anything else
         if (language[0] != '\00' && localeScript.length == 0 && localeVariant.length == 0 &&
                 (region.length != 3 && language.length != 3) ||
-                (language.length == 3 && region.length == 2 && region[0] != '\00')) {
+                (language.length == 3 && region.length == 2 && region[0] != '\00' &&
+                        localeScript.length == 0 && localeVariant.length == 0)) {
+
             sb.append("-").append(language);
             if (region[0] != '\00') {
                 sb.append("-r").append(region);
@@ -390,16 +392,13 @@ public class ResConfigFlags {
             if (language[0] != '\00') {
                 sb.append(language);
             }
-            if (localeScript.length == 4 && region.length == 2) {
-                sb.append("+").append(localeScript).append("+").append(region);
+            if (localeScript.length == 4) {
+                sb.append("+").append(localeScript);
             }
-            if (region.length == 3) {
+            if ((region.length == 2 || region.length == 3) && region[0] != '\00') {
                 sb.append("+").append(region);
             }
             if (localeVariant.length >= 5) {
-                if (region.length == 2) {
-                    sb.append("+").append(region);
-                }
                 sb.append("+").append(toUpper(localeVariant));
             }
         }
