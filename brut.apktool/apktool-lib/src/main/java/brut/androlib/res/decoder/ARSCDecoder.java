@@ -256,8 +256,8 @@ public class ARSCDecoder {
         short mcc = mIn.readShort();
         short mnc = mIn.readShort();
 
-        char[] language = new char[] { (char) mIn.readByte(), (char) mIn.readByte() };
-        char[] country = new char[] { (char) mIn.readByte(), (char) mIn.readByte() };
+        char[] language = this.unpackLanguageOrRegion(mIn.readByte(), mIn.readByte(), 'a');
+        char[] country = this.unpackLanguageOrRegion(mIn.readByte(), mIn.readByte(), '0');
 
         byte orientation = mIn.readByte();
         byte touchscreen = mIn.readByte();
@@ -291,9 +291,11 @@ public class ARSCDecoder {
             screenHeightDp = mIn.readShort();
         }
 
-        short layoutDirection = 0;
-        if (size >= 38) {
-            layoutDirection = mIn.readShort();
+        char[] localeScript = {'\00'};
+        char[] localeVariant = {'\00'};
+        if (size >= 48) {
+            localeScript = this.readScriptOrVariantChar(4).toCharArray();
+            localeVariant = this.readScriptOrVariantChar(8).toCharArray();
         }
 
         int exceedingSize = size - KNOWN_CONFIG_BYTES;
@@ -313,11 +315,40 @@ public class ARSCDecoder {
             }
         }
 
-        return new ResConfigFlags(mcc, mnc, language, country, layoutDirection,
+        return new ResConfigFlags(mcc, mnc, language, country,
                 orientation, touchscreen, density, keyboard, navigation,
                 inputFlags, screenWidth, screenHeight, sdkVersion,
                 screenLayout, uiMode, smallestScreenWidthDp, screenWidthDp,
-                screenHeightDp, isInvalid);
+                screenHeightDp, localeScript, localeVariant, isInvalid);
+    }
+
+    private char[] unpackLanguageOrRegion(byte in0, byte in1, char base) throws AndrolibException {
+        // check high bit, if so we have a packed 3 letter code
+        if (((in0 >> 7) & 1) == 1) {
+            int first = in1 & 0x1F;
+            int second = ((in1 & 0xE0) >> 5) + ((in0 & 0x03) << 3);
+            int third = (in0 & 0x7C) >> 2;
+
+            // since this function handles languages & regions, we add the value(s) to the base char
+            // which is usually 'a' or '0' depending on language or region.
+            return new char[] { (char) (first + base), (char) (second + base), (char) (third + base) };
+        }
+        return new char[] { (char) in0, (char) in1 };
+    }
+
+    private String readScriptOrVariantChar(int length) throws AndrolibException, IOException {
+        StringBuilder string = new StringBuilder(16);
+
+        while(length-- != 0) {
+            short ch = mIn.readByte();
+            if (ch == 0) {
+                break;
+            }
+            string.append((char) ch);
+        }
+        mIn.skipBytes(length);
+
+        return string.toString();
     }
 
     private void addMissingResSpecs() throws AndrolibException {
@@ -416,7 +447,7 @@ public class ARSCDecoder {
     }
 
     private static final Logger LOGGER = Logger.getLogger(ARSCDecoder.class.getName());
-    private static final int KNOWN_CONFIG_BYTES = 38;
+    private static final int KNOWN_CONFIG_BYTES = 48;
 
     public static class ARSCData {
 

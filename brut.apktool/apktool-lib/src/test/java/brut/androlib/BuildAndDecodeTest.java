@@ -183,6 +183,51 @@ public class BuildAndDecodeTest {
     }
 
     @Test
+    public void packed3CharsTest() throws BrutException, IOException {
+        compareValuesFiles("values-ast-rES/strings.xml");
+    }
+
+    @Test
+    public void rightToLeftTest() throws BrutException, IOException {
+        compareValuesFiles("values-ldrtl/strings.xml");
+    }
+
+    @Test
+    public void scriptBcp47Test() throws BrutException, IOException {
+        compareValuesFiles("values-b+en+Latn+US/strings.xml");
+    }
+
+    @Test
+    public void threeLetterLangBcp47Test() throws BrutException, IOException {
+        compareValuesFiles("values-b+ast/strings.xml");
+    }
+
+    @Test
+    public void twoLetterLangBcp47Test() throws BrutException, IOException {
+        compareValuesFiles("values-en-rUS/strings.xml");
+    }
+
+    @Test
+    public void variantBcp47Test() throws BrutException, IOException {
+        compareValuesFiles("values-b+en+US+POSIX/strings.xml");
+    }
+
+    @Test
+    public void fourpartBcp47Test() throws BrutException, IOException {
+        compareValuesFiles("values-b+ast+Latn+IT+AREVELA/strings.xml");
+    }
+
+    @Test
+    public void RegionLocaleBcp47Test() throws BrutException, IOException {
+        compareValuesFiles("values-b+en+Latn+419/strings.xml");
+    }
+
+    @Test
+    public void numericalRegionBcp47Test() throws BrutException, IOException {
+        compareValuesFiles("values-b+eng+419/strings.xml");
+    }
+
+    @Test
     public void drawableNoDpiTest() throws BrutException, IOException {
         compareResFolder("drawable-nodpi");
     }
