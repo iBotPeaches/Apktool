@@ -93,7 +93,7 @@ subprojects {
                 guava: 'com.google.guava:guava:14.0',
                 jflex: 'de.jflex:jflex:1.4.3',
                 junit: 'junit:junit:4.6',
-                proguard: 'net.sf.proguard:proguard-base:4.8',
+                proguard: 'net.sf.proguard:proguard-base:5.2',
                 snakeyaml: 'org.yaml:snakeyaml:1.12',
                 xmlpull: 'xpp3:xpp3:1.1.4c',
                 xmlunit: 'xmlunit:xmlunit:1.3',
