@@ -619,7 +619,8 @@ final public class AndrolibResources {
     private ResPackage[] getResPackagesFromApk(ExtFile apkFile,ResTable resTable, boolean keepBroken)
             throws AndrolibException {
         try {
-            return ARSCDecoder.decode(apkFile.getDirectory().getFileInput("resources.arsc"),false,
+            BufferedInputStream bfi = new BufferedInputStream(apkFile.getDirectory().getFileInput("resources.arsc"));
+            return ARSCDecoder.decode(bfi ,false,
                     keepBroken, resTable).getPackages();
         } catch (DirectoryException ex) {
             throw new AndrolibException("Could not load resources.arsc from file: " + apkFile, ex);
