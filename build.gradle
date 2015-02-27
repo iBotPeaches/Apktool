@@ -57,7 +57,7 @@ build.doFirst {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.1'
+    gradleVersion = '2.3'
 }
 
 // used for official releases only. Please don't use
