@@ -144,12 +144,7 @@ public class ResConfigFlags {
             ret.append("-mcc").append(String.format("%03d", mcc));
             if (mnc != MNC_ZERO) {
                 if (mnc != 0) {
-                    ret.append("-mnc");
-                    if (mnc > 0 && mnc < 10) {
-                        ret.append(String.format("%02d", mnc));
-                    } else {
-                        ret.append(String.format("%03d", mnc));
-                    }
+                    ret.append(String.format("-mnc%03d", mnc));
                 }
             } else {
                 ret.append("-mnc00");
