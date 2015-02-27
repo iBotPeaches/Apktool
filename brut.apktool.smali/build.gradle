@@ -82,7 +82,7 @@ subprojects {
                    stringtemplate: 'org.antlr:stringtemplate:3.2.1',
                    commons_cli: 'commons-cli:commons-cli:1.2',
                    jflex: 'de.jflex:jflex:1.4.3',
-                   proguard: 'net.sf.proguard:proguard-base:4.8'
+                   proguard: 'net.sf.proguard:proguard-base:5.2'
          ]
     }
 

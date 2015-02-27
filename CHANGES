@@ -1,4 +1,6 @@
 v2.0.0 (TBA)
+-Updated to ProGuard 5.2 to handle java8
+-Updated to Gradle 2.3
 -Updated to smali/baksmali to v2.0.5
 -Updated to Gradle 1.8
 -Fixed (issue #8)   - Correctly uses -c to retain original manifest and META-INF. (Thanks M1cha)
