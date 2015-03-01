@@ -1009,10 +1009,13 @@ public class MXSerializer implements XmlSerializer {
 				}
 			} else {
 				if (ch == '&') {
-					if (i > pos)
-						out.write(text.substring(pos, i));
-					out.write("&amp;");
-					pos = i + 1;
+                    if(!(i < text.length() - 3 && text.charAt(i+1) == 'l' 
+                            && text.charAt(i+2) == 't' && text.charAt(i+3) == ';')){
+                        if (i > pos)
+                            out.write(text.substring(pos, i));
+                        out.write("&amp;");
+                        pos = i + 1;
+                    }
 				} else if (ch == '<') {
 					if (i > pos)
 						out.write(text.substring(pos, i));
