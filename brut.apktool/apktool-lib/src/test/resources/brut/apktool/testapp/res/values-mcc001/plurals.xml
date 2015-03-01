@@ -16,7 +16,8 @@
         <item quantity="other">foo %d</item>
         <item quantity="one">foo 1</item>
     </plurals>
-    <plurals name="issue658">
-        <item quantity="one">&lt;b>%d&lt;/b> guide123</item>
+    <plurals name="issue_658">
+        <item quantity="other">&lt;b>%d&lt;/b> guide123</item>
+        <item quantity="one">&lt;b>%d&lt;/b> 1</item>
     </plurals>
 </resources>

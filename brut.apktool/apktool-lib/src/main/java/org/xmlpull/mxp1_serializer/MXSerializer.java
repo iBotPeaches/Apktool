@@ -10,7 +10,7 @@ import org.xmlpull.v1.XmlSerializer;
 /**
  * Implementation of XmlSerializer interface from XmlPull V1 API. This
  * implementation is optimzied for performance and low memory footprint.
- * 
+ *
  * <p>
  * Implemented features:
  * <ul>
@@ -25,7 +25,7 @@ import org.xmlpull.v1.XmlSerializer;
  * <li>PROPERTY_SERIALIZER_INDENTATION
  * <li>PROPERTY_SERIALIZER_LINE_SEPARATOR
  * </ul>
- * 
+ *
  */
 public class MXSerializer implements XmlSerializer {
 	protected final static String XML_URI = "http://www.w3.org/XML/1998/namespace";
@@ -1009,12 +1009,12 @@ public class MXSerializer implements XmlSerializer {
 				}
 			} else {
 				if (ch == '&') {
-                    if(!(i < text.length() - 3 && text.charAt(i+1) == 'l' 
-                            && text.charAt(i+2) == 't' && text.charAt(i+3) == ';')){
-                        if (i > pos)
-                            out.write(text.substring(pos, i));
-                        out.write("&amp;");
-                        pos = i + 1;
+					if (!(i < text.length() - 3 && text.charAt(i+1) == 'l'
+					    && text.charAt(i+2) == 't' && text.charAt(i+3) == ';')) {
+					    if (i > pos)
+					        out.write(text.substring(pos, i));
+					    out.write("&amp;");
+					    pos = i + 1;
                     }
 				} else if (ch == '<') {
 					if (i > pos)
