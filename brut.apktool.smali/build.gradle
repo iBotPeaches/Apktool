@@ -110,5 +110,9 @@ buildscript {
 }
 
 task wrapper(type: Wrapper) {
+<<<<<<< HEAD
+    gradleVersion = '2.3'
+=======
     gradleVersion = '1.8'
+>>>>>>> bd566f26709ce951fb6f05d5feb2290cfcbd104d
 }
