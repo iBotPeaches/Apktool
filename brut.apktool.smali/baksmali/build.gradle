@@ -57,8 +57,29 @@ task fatJar (type: Jar) {
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
 
     manifest {
-        attributes("Main-Class": "org.jf.baksmali.main")
+        attributes('Main-Class': 'org.jf.baksmali.main')
     }
+<<<<<<< HEAD:brut.apktool.smali/baksmali/build.gradle
+=======
+
+    doLast {
+        if (!System.getProperty('os.name').toLowerCase().contains('windows')) {
+            ant.symlink(link: file("${destinationDir}/baksmali.jar"), resource: archivePath, overwrite: true)
+        }
+    }
+}
+tasks.getByPath('build').dependsOn(fatJar)
+
+uploadArchives {
+    repositories.mavenDeployer {
+        pom.project {
+            description 'baksmali is a disassembler for dalvik bytecode'
+            scm {
+                url 'https://github.com/JesusFreke/smali/tree/master/baksmali'
+            }
+        }
+    }
+>>>>>>> f0c481a... Use single-quotes in build.gradle files when double-quotes aren't needed:baksmali/build.gradle
 }
 
 task proguard(type: proguard.gradle.ProGuardTask, dependsOn: fatJar) {

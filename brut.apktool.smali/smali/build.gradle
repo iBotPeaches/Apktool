@@ -90,21 +90,30 @@ task fatJar (type: Jar) {
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
 
     manifest {
-        attributes("Main-Class": "org.jf.smali.main")
+        attributes('Main-Class': 'org.jf.smali.main')
     }
+<<<<<<< HEAD:brut.apktool.smali/smali/build.gradle
+=======
+
+    doLast {
+        if (!System.getProperty('os.name').toLowerCase().contains('windows')) {
+            ant.symlink(link: file("${destinationDir}/smali.jar"), resource: archivePath, overwrite: true)
+        }
+    }
+>>>>>>> f0c481a... Use single-quotes in build.gradle files when double-quotes aren't needed:smali/build.gradle
 }
 tasks.getByPath('build').dependsOn(fatJar)
 
 generateTestGrammarSource {
-    outputDirectory = new File(outputDirectory, "org/jf/smali")
+    outputDirectory = new File(outputDirectory, 'org/jf/smali')
 }
 
 generateGrammarSource {
-    outputDirectory = new File(outputDirectory, "org/jf/smali")
+    outputDirectory = new File(outputDirectory, 'org/jf/smali')
 }
 
 generateJFlexSource {
-    outputDirectory = new File(outputDirectory, "org/jf/smali")
+    outputDirectory = new File(outputDirectory, 'org/jf/smali')
 }
 
 task proguard(type: proguard.gradle.ProGuardTask, dependsOn: fatJar) {
