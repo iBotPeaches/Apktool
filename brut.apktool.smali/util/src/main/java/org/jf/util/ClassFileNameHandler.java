@@ -68,7 +68,7 @@ public class ClassFileNameHandler {
     public ClassFileNameHandler(File path, String fileExtension) {
         this.top = new DirectoryEntry(path);
         this.fileExtension = fileExtension;
-        this.modifyWindowsReservedFilenames = testForWindowsReservedFileNames(path);
+        this.modifyWindowsReservedFilenames = isWindows();
     }
 
     // for testing
@@ -229,27 +229,8 @@ public class ClassFileNameHandler {
         return sb.toString();
     }
 
-    private static boolean testForWindowsReservedFileNames(File path) {
-        String[] reservedNames = new String[]{"aux", "con", "com1", "com9", "lpt1", "com9"};
-
-        for (String reservedName: reservedNames) {
-            File f = new File(path, reservedName + ".smali");
-            if (f.exists()) {
-                continue;
-            }
-
-            try {
-                FileWriter writer = new FileWriter(f);
-                writer.write("test");
-                writer.flush();
-                writer.close();
-                f.delete(); //doesn't throw IOException
-            } catch (IOException ex) {
-                //if an exception occurred, it's likely that we're on a windows system.
-                return true;
-            }
-        }
-        return false;
+    private static boolean isWindows() {
+        return System.getProperty("os.name").startsWith("Windows");
     }
 
     private static Pattern reservedFileNameRegex = Pattern.compile("^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(\\..*)?$",
