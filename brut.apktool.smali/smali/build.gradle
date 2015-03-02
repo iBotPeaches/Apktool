@@ -32,7 +32,15 @@
 configurations {
     antlr3
     jflex
-    proguard
+}
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath depends.proguard_gradle
+    }
 }
 
 ext.antlrSource = 'src/main/antlr3'
@@ -75,7 +83,6 @@ dependencies {
 
     antlr3 depends.antlr
     jflex depends.jflex
-    proguard depends.proguard
 }
 
 task generateParserAntlrSource(type: JavaExec) {
@@ -147,25 +154,23 @@ jar {
     }
 }
 
-processResources.inputs.property('version', version)
-processResources.expand('version': version)
+task proguard(type: proguard.gradle.ProGuardTask, dependsOn: fatJar) {
+    def outFile = fatJar.destinationDir.getPath() + '/' + fatJar.baseName + '-' +
+            fatJar.version + '-small' + '.' + fatJar.extension
 
-task proguard(type: JavaExec, dependsOn: jar) {
-    def outFile = jar.destinationDir.getPath() + '/' + jar.baseName + '-' + jar.version + '-small' + '.' + jar.extension
-    inputs.file jar.archivePath
-    outputs.file outFile
+    injars fatJar.archivePath
+    outjars outFile
 
-    classpath = configurations.proguard
-    main = 'proguard.ProGuard'
-    args "-injars ${jar.archivePath}(!**/TestStringTemplate*.class)"
-    args "-outjars ${outFile}"
-    args "-libraryjars ${System.properties['java.home']}/lib/rt.jar"
-    args '-dontobfuscate'
-    args '-dontoptimize'
-    args '-keep public class org.jf.smali.main { public static void main(java.lang.String[]); }'
-    args '-keepclassmembers enum * { public static **[] values(); public static ** valueOf(java.lang.String); }'
-    args '-dontwarn com.google.common.**'
-    args '-dontnote com.google.common.**'
+    libraryjars "${System.properties['java.home']}/lib/rt.jar"
+
+    dontobfuscate
+    dontoptimize
+
+    keep 'public class org.jf.smali.main { public static void main(java.lang.String[]); }'
+    keepclassmembers 'enum * { public static **[] values(); public static ** valueOf(java.lang.String); }'
+
+    dontwarn 'com.google.common.**'
+    dontnote 'com.google.common.**'
 }
 
 tasks.getByPath(':release').dependsOn(proguard)
