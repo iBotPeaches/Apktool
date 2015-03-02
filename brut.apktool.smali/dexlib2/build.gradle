@@ -46,37 +46,6 @@ dependencies {
 ext.testAccessorOutputDir = file("${buildDir}/generated-accessor-test-sources")
 ext.testAccessorOutputFile = file("${buildDir}/generated-accessor-test-sources/org/jf/dexlib2/AccessorTypes.java")
 
-sourceSets {
-    // The sources for building the test dex file for the accessor test
-    accessorTestDex {
-        java {
-            srcDir testAccessorOutputDir
-        }
-    }
-
-    // The sources for the accessor test itself
-    accessorTest {
-        java {
-            compileClasspath += main.output
-            runtimeClasspath += main.output
-        }
-    }
-}
-
-configurations {
-    accessorTestDexCompile.extendsFrom compile
-    accessorTestDexRuntime.extendsFrom runtime
-
-    accessorTestCompile.extendsFrom testCompile
-    accessorTestRuntime.extendsFrom testRuntime
-}
-
-idea {
-    module {
-        testSourceDirs += sourceSets.accessorTest.java.srcDirs
-    }
-}
-
 // You must manually execute this task to regenerate SyntheticAccessorFSM.java, after modifying the ragel file
 // e.g. ./gradlew ragel
 task ragel(type:Exec) {
@@ -87,33 +56,45 @@ task ragel(type:Exec) {
 }
 
 task generateAccessorTestSource(type: JavaExec) {
-    outputs.dir file(testAccessorOutputDir)
+    doFirst {
+        file(testAccessorOutputFile.parent).mkdirs()
+    }
 
-    mkdir(file(testAccessorOutputFile).parent)
+    outputs.dir file(testAccessorOutputDir)
+    sourceSets['test'].java.srcDir file(testAccessorOutputDir)
 
     classpath = configurations.accessorTestGenerator
     main = 'org.jf.dexlib2.AccessorTestGenerator'
     args testAccessorOutputFile
 }
-compileAccessorTestDexJava.dependsOn(generateAccessorTestSource)
+compileTestJava.dependsOn generateAccessorTestSource
 
-task generateAccessorTestDex(type: Exec, dependsOn: compileAccessorTestDexJava) {
-    def outputDex = file("${sourceSets.accessorTest.output.resourcesDir}/accessorTest.dex")
-    mkdir(outputDex.parent)
+task generateAccessorTestDex(type: Exec, dependsOn: compileTestJava) {
+    def outputDex = file(new File(sourceSets.test.output.resourcesDir, 'accessorTest.dex'))
 
-    inputs.dir project.sourceSets.accessorTestDex.output.classesDir
+    doFirst {
+        file(outputDex.parent).mkdirs()
+    }
+
+    inputs.dir(project.sourceSets.test.output.classesDir)
     outputs.file outputDex
 
-    sourceSets.accessorTest.resources
-
-    workingDir project.sourceSets.accessorTestDex.output.classesDir
+    workingDir project.sourceSets.test.output.classesDir
     executable 'dx'
     args '--dex'
+    args '--no-strict'
     args "--output=${outputDex}"
-    args '.'
+
+    doFirst {
+        // this has to be done in doFirst, so that the generated classes will be available.
+        // otherwise, it the tree will be populated while the build is being configured,
+        // which is before the compileTestJava has run
+        fileTree(project.sourceSets.test.output.classesDir) {
+            include 'org/jf/dexlib2/AccessorTypes*.class'
+        }.each { File file ->
+            args file
+        }
+    }
 }
 
-task accessorTest(type: Test, dependsOn: generateAccessorTestDex) {
-    testClassesDir = project.sourceSets.accessorTest.output.classesDir
-    classpath = project.sourceSets.accessorTest.runtimeClasspath
-}
+test.dependsOn generateAccessorTestDex
