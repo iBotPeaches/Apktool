@@ -28,11 +28,9 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-apply plugin: 'jflex'
 
-configurations {
-    antlr3
-}
+apply plugin: 'antlr'
+apply plugin: 'jflex'
 
 buildscript {
     repositories {
@@ -46,20 +44,14 @@ buildscript {
 }
 
 configurations {
+    // Remove the full antlr library that's added by the antlr plugin. We manually
+    // add the smaller antlr_runtime library instead
+    compile.exclude group: 'org.antlr', module: 'antlr'
+
     // The jflex lexer doesn't have any runtime dependencies, so remove the dependency
     // that gets added by the jflex plugin
     compile.exclude group: 'de.jflex', module: 'jflex'
 }
-
-ext.antlrSource = 'src/main/antlr3'
-ext.antlrOutput = file("${buildDir}/generated-sources/antlr3")
-
-ext.testAntlrSource = 'src/test/antlr3'
-ext.testAntlrOutput = file("${buildDir}/generated-test-sources/antlr3")
-
-sourceSets.main.java.srcDir antlrOutput
-
-sourceSets.test.java.srcDir testAntlrOutput
 
 idea {
     module {
@@ -85,51 +77,9 @@ dependencies {
 
     testCompile depends.junit
 
-    antlr3 depends.antlr
+    antlr depends.antlr
     jflex depends.jflex
 }
-
-task generateParserAntlrSource(type: JavaExec) {
-    inputs.dir file(antlrSource)
-    outputs.dir file(antlrOutput)
-
-    mkdir(antlrOutput)
-    def grammars = fileTree(antlrSource).include('**/smaliParser.g')
-
-    classpath = configurations.antlr3
-    main = 'org.antlr.Tool'
-    args '-fo', relativePath("${antlrOutput}/org/jf/smali")
-    args grammars.files
-}
-
-task generateTreeWalkerAntlrSource(type: JavaExec) {
-    inputs.dir file(antlrSource)
-    outputs.dir file(antlrOutput)
-
-    mkdir(antlrOutput)
-    def grammars = fileTree(antlrSource).include('**/smaliTreeWalker.g')
-
-    classpath = configurations.antlr3
-    main = 'org.antlr.Tool'
-    args '-fo', relativePath("${antlrOutput}/org/jf/smali")
-    args grammars.files
-}
-
-task generateTestAntlrSource(type: JavaExec) {
-    inputs.dir file(testAntlrSource)
-    outputs.dir file(testAntlrOutput)
-
-    mkdir(testAntlrOutput)
-    def grammars = fileTree(testAntlrSource).include('**/*.g')
-
-    classpath = configurations.antlr3
-    main = 'org.antlr.Tool'
-    args '-fo', relativePath("${testAntlrOutput}/org/jf/smali")
-    args grammars.files.join(' ')
-}
-
-compileJava.dependsOn generateParserAntlrSource, generateTreeWalkerAntlrSource
-compileTestJava.dependsOn generateTestAntlrSource
 
 processResources.inputs.property('version', version)
 processResources.expand('version': version)
@@ -144,6 +94,14 @@ task fatJar (type: Jar) {
     }
 }
 tasks.getByPath('build').dependsOn(fatJar)
+
+generateTestGrammarSource {
+    outputDirectory = new File(outputDirectory, "org/jf/smali")
+}
+
+generateGrammarSource {
+    outputDirectory = new File(outputDirectory, "org/jf/smali")
+}
 
 generateJFlexSource {
     outputDirectory = new File(outputDirectory, "org/jf/smali")
