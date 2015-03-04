@@ -640,5 +640,5 @@ Type = {PrimitiveType} | {ClassDescriptor} | {ArrayDescriptor}
     "." { return invalidToken("Invalid directive"); }
     "." [a-zA-z\-_] { return invalidToken("Invalid directive"); }
     "." [a-zA-z\-_] [a-zA-z0-9\-_]* { return invalidToken("Invalid directive"); }
-    . { return invalidToken("Invalid text"); }
+    [^] { return invalidToken("Invalid text"); }
 }
