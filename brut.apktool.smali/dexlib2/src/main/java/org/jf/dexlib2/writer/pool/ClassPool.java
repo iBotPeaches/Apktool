@@ -116,7 +116,7 @@ public class ClassPool implements ClassSection<CharSequence, CharSequence,
 
         HashSet<String> methods = new HashSet<String>();
         for (PoolMethod method: poolClassDef.getMethods()) {
-            String methodDescriptor = ReferenceUtil.getShortMethodDescriptor(method);
+            String methodDescriptor = ReferenceUtil.getMethodDescriptor(method, true);
             if (!methods.add(methodDescriptor)) {
                 throw new ExceptionWithContext("Multiple definitions for method %s->%s",
                         poolClassDef.getType(), methodDescriptor);

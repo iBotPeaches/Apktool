@@ -35,7 +35,7 @@ import java.util.regex.Pattern;
 public class ConsoleUtil {
     /**
      * Attempt to find the width of the console. If it can't get the width, return a default of 80
-     * @return
+     * @return The current console width
      */
     public static int getConsoleWidth() {
         if (System.getProperty("os.name").toLowerCase().contains("windows")) {

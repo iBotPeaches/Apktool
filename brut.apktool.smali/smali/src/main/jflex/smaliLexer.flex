@@ -222,6 +222,8 @@ ArrayDescriptor = "[" + ({PrimitiveType} | {ClassDescriptor})
 Type = {PrimitiveType} | {ClassDescriptor} | {ArrayDescriptor}
 
 
+%state PARAM_LIST_OR_ID
+%state PARAM_LIST
 %state STRING
 %state CHAR
 
@@ -287,6 +289,20 @@ Type = {PrimitiveType} | {ClassDescriptor} | {ArrayDescriptor}
     "\"" { beginStringOrChar(STRING); sb.append('"'); }
 
     ' { beginStringOrChar(CHAR); sb.append('\''); }
+}
+
+<PARAM_LIST_OR_ID> {
+    {PrimitiveType} { return newToken(PRIMITIVE_TYPE); }
+    [^] { yypushback(1); yybegin(YYINITIAL); return newToken(PARAM_LIST_OR_ID_END); }
+    <<EOF>> { yybegin(YYINITIAL); return newToken(PARAM_LIST_OR_ID_END); }
+}
+
+<PARAM_LIST> {
+    {PrimitiveType} { return newToken(PRIMITIVE_TYPE); }
+    {ClassDescriptor} { return newToken(CLASS_DESCRIPTOR); }
+    {ArrayDescriptor} { return newToken(ARRAY_DESCRIPTOR); }
+    [^] { yypushback(1); yybegin(YYINITIAL); return newToken(PARAM_LIST_END); }
+    <<EOF>> { yybegin(YYINITIAL); return newToken(PARAM_LIST_END); }
 }
 
 <STRING> {
@@ -587,8 +603,19 @@ Type = {PrimitiveType} | {ClassDescriptor} | {ArrayDescriptor}
     V { return newToken(VOID_TYPE); }
     {ClassDescriptor} { return newToken(CLASS_DESCRIPTOR); }
     {ArrayDescriptor} { return newToken(ARRAY_DESCRIPTOR); }
-    {PrimitiveType} {PrimitiveType}+ { return newToken(PARAM_LIST_OR_ID); }
-    {Type} {Type}+ { return newToken(PARAM_LIST); }
+
+    {PrimitiveType} {PrimitiveType}+ {
+        yypushback(yylength());
+        yybegin(PARAM_LIST_OR_ID);
+        return newToken(PARAM_LIST_OR_ID_START);
+    }
+
+    {Type} {Type}+ {
+        yypushback(yylength());
+        yybegin(PARAM_LIST);
+        return newToken(PARAM_LIST_START);
+    }
+
     {SimpleName} { return newToken(SIMPLE_NAME); }
     "<" {SimpleName} ">" { return newToken(MEMBER_NAME); }
 }

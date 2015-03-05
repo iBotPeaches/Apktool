@@ -1493,8 +1493,11 @@ public class MethodAnalyzer {
         Instruction deodexedInstruction;
 
         int startRegister = instruction.getStartRegister();
-        int registerCount = instruction.getRegisterCount();
-        if (registerCount == 1 && startRegister < 16) {
+        // hack: we should be using instruction.getRegisterCount, but some tweaked versions of dalvik appear
+        // to generate invoke-object-init/range instructions with an invalid register count. We know it should
+        // always be 1, so just use that.
+        int registerCount = 1;
+        if (startRegister < 16) {
             deodexedInstruction = new ImmutableInstruction35c(Opcode.INVOKE_DIRECT,
                     registerCount, startRegister, 0, 0, 0, 0, instruction.getReference());
         } else {
@@ -1634,7 +1637,7 @@ public class MethodAnalyzer {
                 String superclass = methodClass.getSuperclass();
                 if (superclass == null) {
                     throw new ExceptionWithContext("Couldn't find accessible class while resolving method %s",
-                            ReferenceUtil.getShortMethodDescriptor(resolvedMethod));
+                            ReferenceUtil.getMethodDescriptor(resolvedMethod, true));
                 }
 
                 methodClass = classPath.getClassDef(superclass);
@@ -1642,11 +1645,14 @@ public class MethodAnalyzer {
 
             // methodClass is now the first accessible class found. Now. we need to make sure that the method is
             // actually valid for this class
-            resolvedMethod = classPath.getClass(methodClass.getType()).getMethodByVtableIndex(methodIndex);
-            if (resolvedMethod == null) {
+            MethodReference newResolvedMethod =
+                    classPath.getClass(methodClass.getType()).getMethodByVtableIndex(methodIndex);
+            if (newResolvedMethod == null) {
+                // TODO: fix NPE here
                 throw new ExceptionWithContext("Couldn't find accessible class while resolving method %s",
-                        ReferenceUtil.getShortMethodDescriptor(resolvedMethod));
+                        ReferenceUtil.getMethodDescriptor(resolvedMethod, true));
             }
+            resolvedMethod = newResolvedMethod;
             resolvedMethod = new ImmutableMethodReference(methodClass.getType(), resolvedMethod.getName(),
                     resolvedMethod.getParameterTypes(), resolvedMethod.getReturnType());
         }

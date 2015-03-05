@@ -31,7 +31,6 @@ package org.jf.baksmali;
 import com.google.common.collect.Lists;
 import org.apache.commons.cli.*;
 import org.jf.dexlib2.DexFileFactory;
-import org.jf.dexlib2.analysis.CustomInlineMethodResolver;
 import org.jf.dexlib2.analysis.InlineMethodResolver;
 import org.jf.dexlib2.dexbacked.DexBackedDexFile;
 import org.jf.dexlib2.dexbacked.DexBackedOdexFile;
@@ -206,6 +205,15 @@ public class main {
                     String rif = commandLine.getOptionValue("i");
                     options.setResourceIdFiles(rif);
                     break;
+                case 't':
+                    options.useImplicitReferences = true;
+                    break;
+                case 'e':
+                    options.dexEntry = commandLine.getOptionValue("e");
+                    break;
+                case 'k':
+                    options.checkPackagePrivateAccess = true;
+                    break;
                 case 'N':
                     disassemble = false;
                     break;
@@ -217,7 +225,7 @@ public class main {
                     options.ignoreErrors = true;
                     break;
                 case 'T':
-                    options.inlineResolver = new CustomInlineMethodResolver(options.classPath, new File(commandLine.getOptionValue("T")));
+                    options.customInlineDefinitions = new File(commandLine.getOptionValue("T"));
                     break;
                 default:
                     assert false;
@@ -236,10 +244,6 @@ public class main {
             }
         }
 
-        if (options.apiLevel >= 17) {
-            options.checkPackagePrivateAccess = true;
-        }
-
         String inputDexFileName = remainingArgs[0];
 
         File dexFileFile = new File(inputDexFileName);
@@ -249,7 +253,7 @@ public class main {
         }
 
         //Read in and parse the dex file
-        DexBackedDexFile dexFile = DexFileFactory.loadDexFile(dexFileFile, options.apiLevel);
+        DexBackedDexFile dexFile = DexFileFactory.loadDexFile(dexFileFile, options.dexEntry, options.apiLevel);
 
         if (dexFile.isOdexFile()) {
             if (!options.deodex) {
@@ -270,7 +274,7 @@ public class main {
             }
         }
 
-        if (options.inlineResolver == null && dexFile instanceof DexBackedOdexFile) {
+        if (options.customInlineDefinitions == null && dexFile instanceof DexBackedOdexFile) {
             options.inlineResolver =
                     InlineMethodResolver.createInlineMethodResolver(((DexBackedOdexFile)dexFile).getOdexVersion());
         }
@@ -421,6 +425,16 @@ public class main {
                 .withArgName("FILES")
                 .create("i");
 
+        Option noImplicitReferencesOption = OptionBuilder.withLongOpt("implicit-references")
+                .withDescription("Use implicit (type-less) method and field references")
+                .create("t");
+
+        Option checkPackagePrivateAccessOption = OptionBuilder.withLongOpt("check-package-private-access")
+                .withDescription("When deodexing, use the package-private access check when calculating vtable " +
+                        "indexes. It should only be needed for 4.2.0 odexes. The functionality was reverted for " +
+                        "4.2.1.")
+                .create("k");
+
         Option dumpOption = OptionBuilder.withLongOpt("dump-to")
                 .withDescription("dumps the given dex file into a single annotated dump file named FILE" +
                         " (<dexfile>.dump by default), along with the normal disassembly")
@@ -444,6 +458,12 @@ public class main {
                 .withArgName("FILE")
                 .create("T");
 
+        Option dexEntryOption = OptionBuilder.withLongOpt("dex-file")
+                .withDescription("looks for dex file named DEX_FILE, defaults to classes.dex")
+                .withArgName("DEX_FILE")
+                .hasArg()
+                .create("e");
+
         basicOptions.addOption(versionOption);
         basicOptions.addOption(helpOption);
         basicOptions.addOption(outputDirOption);
@@ -460,6 +480,9 @@ public class main {
         basicOptions.addOption(apiLevelOption);
         basicOptions.addOption(jobsOption);
         basicOptions.addOption(resourceIdFilesOption);
+        basicOptions.addOption(noImplicitReferencesOption);
+        basicOptions.addOption(dexEntryOption);
+        basicOptions.addOption(checkPackagePrivateAccessOption);
 
         debugOptions.addOption(dumpOption);
         debugOptions.addOption(ignoreErrorsOption);

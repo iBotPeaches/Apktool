@@ -71,8 +71,8 @@ public class ResFileDecoder {
                         outFileName = outResName + ".r.9" + ext;
                     }
 
-                    // check for samsung qmg
-                    if (inFileName.toLowerCase().endsWith(".qmg")) {
+                    // check for samsung qmg & spi
+                    if (inFileName.toLowerCase().endsWith(".qmg") || inFileName.toLowerCase().endsWith(".spi")) {
                         copyRaw(inDir, outDir, outFileName);
                         return;
                     }

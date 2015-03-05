@@ -160,7 +160,7 @@ public abstract class DebugInfo implements Iterable<DebugItem> {
                         int next = reader.readUbyte();
                         switch (next) {
                             case DebugItemType.END_SEQUENCE: {
-                                return null;
+                                return endOfData();
                             }
                             case DebugItemType.ADVANCE_PC: {
                                 int addressDiff = reader.readSmallUleb128();

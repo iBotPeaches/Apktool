@@ -17,7 +17,7 @@ apply plugin: 'maven'
 apply from: 'gradle/functions.gradle'
 
 def apktoolversion_major = '2.0.0'
-def apktoolversion_minor = 'RC2';
+def apktoolversion_minor = 'RC4';
 
 allprojects {
     apply plugin: 'java'
@@ -87,14 +87,13 @@ subprojects {
                 antlr: 'org.antlr:antlr:3.5',
                 antlr_runtime: 'org.antlr:antlr-runtime:3.5',
                 commons_cli: 'commons-cli:commons-cli:1.2',
-                commons_compress: 'org.apache.commons:commons-compress:1.4.1',
                 commons_io: 'commons-io:commons-io:2.4',
                 commons_lang: 'org.apache.commons:commons-lang3:3.1',
                 findbugs: 'com.google.code.findbugs:jsr305:1.3.9',
                 guava: 'com.google.guava:guava:14.0',
                 jflex: 'de.jflex:jflex:1.4.3',
                 junit: 'junit:junit:4.6',
-                proguard: 'net.sf.proguard:proguard-base:4.8',
+                proguard: 'net.sf.proguard:proguard-base:5.2',
                 snakeyaml: 'org.yaml:snakeyaml:1.12',
                 xmlpull: 'xpp3:xpp3:1.1.4c',
                 xmlunit: 'xmlunit:xmlunit:1.3',

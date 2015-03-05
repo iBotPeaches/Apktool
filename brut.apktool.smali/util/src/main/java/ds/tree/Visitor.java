@@ -33,7 +33,8 @@ package ds.tree;
  * @author Tahseen Ur Rehman (tahseen.ur.rehman {at.spam.me.not} gmail.com)
  * @author Javid Jamae
  * @author Dennis Heidsiek
- * @param <T,R>
+ * @param <T>
+ * @param <R>
  */
 public interface Visitor<T, R> {
     /**

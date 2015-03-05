@@ -83,6 +83,15 @@ public class ARSCDecoder {
     private ResPackage readPackage() throws IOException, AndrolibException {
         checkChunkType(Header.TYPE_PACKAGE);
         int id = (byte) mIn.readInt();
+
+        if (id == 0) {
+            // This means we are dealing with a Library Package, we should just temporarily
+            // set the packageId to the next available id . This will be set at runtime regardless, but
+            // for Apktool's use we need a non-zero packageId.
+            // AOSP indicates 0x02 is next, as 0x01 is system and 0x7F is private.
+            id = 2;
+        }
+
         String name = mIn.readNullEndedString(128, true);
 		/* typeStrings */mIn.skipInt();
 		/* lastPublicType */mIn.skipInt();
@@ -96,11 +105,33 @@ public class ARSCDecoder {
         mPkg = new ResPackage(mResTable, id, name);
 
         nextChunk();
+        while (mHeader.type == Header.TYPE_LIBRARY) {
+            readLibraryType();
+        }
+
         while (mHeader.type == Header.TYPE_TYPE) {
             readType();
         }
 
         return mPkg;
+    }
+
+    private void readLibraryType() throws AndrolibException, IOException {
+        checkChunkType(Header.TYPE_LIBRARY);
+        int libraryCount = mIn.readInt();
+
+        int packageId;
+        String packageName;
+
+        for (int i = 0; i < libraryCount; i++) {
+            packageId = mIn.readInt();
+            packageName = mIn.readNullEndedString(128, true);
+            LOGGER.info(String.format("Decoding Shared Library (%s), pkgId: %d", packageName, packageId));
+        }
+
+        while(nextChunk().type == Header.TYPE_CONFIG) {
+            readConfig();
+        }
     }
 
     private ResType readType() throws AndrolibException, IOException {
@@ -225,8 +256,8 @@ public class ARSCDecoder {
         short mcc = mIn.readShort();
         short mnc = mIn.readShort();
 
-        char[] language = new char[] { (char) mIn.readByte(), (char) mIn.readByte() };
-        char[] country = new char[] { (char) mIn.readByte(), (char) mIn.readByte() };
+        char[] language = this.unpackLanguageOrRegion(mIn.readByte(), mIn.readByte(), 'a');
+        char[] country = this.unpackLanguageOrRegion(mIn.readByte(), mIn.readByte(), '0');
 
         byte orientation = mIn.readByte();
         byte touchscreen = mIn.readByte();
@@ -260,9 +291,11 @@ public class ARSCDecoder {
             screenHeightDp = mIn.readShort();
         }
 
-        short layoutDirection = 0;
-        if (size >= 38) {
-            layoutDirection = mIn.readShort();
+        char[] localeScript = {'\00'};
+        char[] localeVariant = {'\00'};
+        if (size >= 48) {
+            localeScript = this.readScriptOrVariantChar(4).toCharArray();
+            localeVariant = this.readScriptOrVariantChar(8).toCharArray();
         }
 
         int exceedingSize = size - KNOWN_CONFIG_BYTES;
@@ -282,11 +315,40 @@ public class ARSCDecoder {
             }
         }
 
-        return new ResConfigFlags(mcc, mnc, language, country, layoutDirection,
+        return new ResConfigFlags(mcc, mnc, language, country,
                 orientation, touchscreen, density, keyboard, navigation,
                 inputFlags, screenWidth, screenHeight, sdkVersion,
                 screenLayout, uiMode, smallestScreenWidthDp, screenWidthDp,
-                screenHeightDp, isInvalid);
+                screenHeightDp, localeScript, localeVariant, isInvalid);
+    }
+
+    private char[] unpackLanguageOrRegion(byte in0, byte in1, char base) throws AndrolibException {
+        // check high bit, if so we have a packed 3 letter code
+        if (((in0 >> 7) & 1) == 1) {
+            int first = in1 & 0x1F;
+            int second = ((in1 & 0xE0) >> 5) + ((in0 & 0x03) << 3);
+            int third = (in0 & 0x7C) >> 2;
+
+            // since this function handles languages & regions, we add the value(s) to the base char
+            // which is usually 'a' or '0' depending on language or region.
+            return new char[] { (char) (first + base), (char) (second + base), (char) (third + base) };
+        }
+        return new char[] { (char) in0, (char) in1 };
+    }
+
+    private String readScriptOrVariantChar(int length) throws AndrolibException, IOException {
+        StringBuilder string = new StringBuilder(16);
+
+        while(length-- != 0) {
+            short ch = mIn.readByte();
+            if (ch == 0) {
+                break;
+            }
+            string.append((char) ch);
+        }
+        mIn.skipBytes(length);
+
+        return string.toString();
     }
 
     private void addMissingResSpecs() throws AndrolibException {
@@ -370,7 +432,7 @@ public class ARSCDecoder {
         }
 
         public final static short TYPE_NONE = -1, TYPE_TABLE = 0x0002,
-                TYPE_PACKAGE = 0x0200, TYPE_TYPE = 0x0202,
+                TYPE_PACKAGE = 0x0200, TYPE_TYPE = 0x0202, TYPE_LIBRARY = 0x0203,
                 TYPE_CONFIG = 0x0201;
     }
 
@@ -385,7 +447,7 @@ public class ARSCDecoder {
     }
 
     private static final Logger LOGGER = Logger.getLogger(ARSCDecoder.class.getName());
-    private static final int KNOWN_CONFIG_BYTES = 38;
+    private static final int KNOWN_CONFIG_BYTES = 48;
 
     public static class ARSCData {
 

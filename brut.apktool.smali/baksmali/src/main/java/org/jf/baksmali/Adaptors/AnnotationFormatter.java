@@ -33,13 +33,16 @@ import org.jf.dexlib2.AnnotationVisibility;
 import org.jf.dexlib2.iface.Annotation;
 import org.jf.util.IndentingWriter;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.Collection;
 
 public class AnnotationFormatter {
 
-    public static void writeTo(IndentingWriter writer,
-                               Collection<? extends Annotation> annotations) throws IOException {
+    public static void writeTo(@Nonnull IndentingWriter writer,
+                               @Nonnull Collection<? extends Annotation> annotations,
+                               @Nullable String containingClass) throws IOException {
         boolean first = true;
         for (Annotation annotation: annotations) {
             if (!first) {
@@ -47,18 +50,19 @@ public class AnnotationFormatter {
             }
             first = false;
 
-            writeTo(writer, annotation);
+            writeTo(writer, annotation, containingClass);
         }
     }
 
-    public static void writeTo(IndentingWriter writer, Annotation annotation) throws IOException {
+    public static void writeTo(@Nonnull IndentingWriter writer, @Nonnull Annotation annotation,
+                               @Nullable String containingClass) throws IOException {
         writer.write(".annotation ");
         writer.write(AnnotationVisibility.getVisibility(annotation.getVisibility()));
         writer.write(' ');
         writer.write(annotation.getType());
         writer.write('\n');
 
-        AnnotationEncodedValueAdaptor.writeElementsTo(writer, annotation.getElements());
+        AnnotationEncodedValueAdaptor.writeElementsTo(writer, annotation.getElements(), containingClass);
 
         writer.write(".end annotation\n");
     }

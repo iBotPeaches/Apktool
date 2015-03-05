@@ -1,5 +1,5 @@
 v2.0.0 (TBA)
--Updated to smali/baksmali to v2.0.3
+-Updated to smali/baksmali to v2.0.5
 -Updated to Gradle 1.8
 -Fixed (issue #8)   - Correctly uses -c to retain original manifest and META-INF. (Thanks M1cha)
 -Fixed (issue #63)  - Correctly handles apk's that have unknown files outside of the standard aapt allowed resources.
@@ -50,6 +50,18 @@ v2.0.0 (TBA)
 -Fixed (issue #689) - Fixed issue with hard coding extension as PNG.
 -Fixed (issue #653) - Added Android Lollipop support.
 -Fixed (issue #706) - Added support for TYPE_DYNAMIC_REFERENCE.
+-Fixed (issue #685) - Fixed invalid attrs values with Android Lollipop.
+-Fixed (issue #713) - Fixed issue with packages that had shared library resources.
+-Fixed (issue #329) - Fixed issue with incorrectly identifying similarly named strings as ResFileValues.
+-Fixed (issue #590) - Fixed issue with segfaulting aapt with certain apks.
+-Fixed (issue #545) - Fixed issue with undefined attrs w/ updated internal frameworks
+-Fixed (issue #702) - Fixed improper handling of MNC_ZERO which caused dupe`d resources
+-Fixed (issue #744) - Fixed warnings of "Cleaning up unclosed ZipFile..."
+-Fixed (issue #757) - Download gradle binaries over https
+-Fixed (issue #402) - Fix issues when running user has no access to $HOME.
+-Fixed (issue #761) - Added proper support for BCP47 localization tags
+-Fixed (issue #658) - Fixes Ampersand in "&lt;" gets replaced with "&amp;" in plural strings
+-Fixed issue with attempting to decode .spi files as 9 patches (Thanks Furniel)
 -Fixed issue with APKs with multiple dex files.
 -Fixed issue with using Apktool without smali/baksmali for ApktoolProperties (Thanks teprrr)
 -Fixed issue with non-URI standard characters in apk name (Thanks rover12421)

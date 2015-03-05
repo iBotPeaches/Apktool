@@ -68,6 +68,7 @@ dependencies {
     compile project(':brut.apktool.smali:util')
     compile project(':brut.apktool.smali:dexlib2')
     compile depends.antlr_runtime
+    compile depends.stringtemplate
     compile depends.commons_cli
 
     testCompile depends.junit

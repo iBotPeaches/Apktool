@@ -48,7 +48,6 @@ public class BaseDexReader<T extends BaseDexBuffer> {
     public int getOffset() { return offset; }
     public void setOffset(int offset) { this.offset = offset; }
 
-    /** {@inheritDoc} */
     public int readSleb128() {
         int end = offset;
         int currentByteValue;

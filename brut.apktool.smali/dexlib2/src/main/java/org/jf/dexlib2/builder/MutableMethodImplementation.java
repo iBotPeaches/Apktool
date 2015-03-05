@@ -96,8 +96,8 @@ public class MutableMethodImplementation implements MethodImplementation {
             index++;
         }
 
-        // the switch instructions must be converted last, so that any switch statements that refer to them have
-        // created the referring labels that we look for
+        // the switch payload instructions must be converted last, so that any switch statements that refer to them
+        // have created the referring labels that we look for
         for (Task switchPayloadTask: switchPayloadTasks) {
             switchPayloadTask.perform();
         }
@@ -213,8 +213,10 @@ public class MutableMethodImplementation implements MethodImplementation {
             return;
         }
         int codeAddress = instructionList.get(index).getCodeAddress();
+        MethodLocation newLoc = new MethodLocation(instruction, codeAddress, index);
+        instructionList.add(index, newLoc);
+        instruction.location = newLoc;
 
-        instructionList.add(index, new MethodLocation(instruction, codeAddress, index));
         codeAddress += instruction.getCodeUnits();
 
         for (int i=index+1; i<instructionList.size(); i++) {

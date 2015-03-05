@@ -41,6 +41,7 @@ import org.jf.dexlib2.iface.MethodImplementation;
 import org.jf.dexlib2.iface.debug.DebugItem;
 import org.jf.dexlib2.iface.instruction.Instruction;
 import org.jf.util.AlignmentUtils;
+import org.jf.util.ExceptionWithContext;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -75,9 +76,17 @@ public class DexBackedMethodImplementation implements MethodImplementation {
                     @Override
                     protected Instruction readNextItem(@Nonnull DexReader reader) {
                         if (reader.getOffset() >= endOffset) {
-                            return null;
+                            return endOfData();
                         }
-                        return DexBackedInstruction.readFrom(reader);
+
+                        Instruction instruction = DexBackedInstruction.readFrom(reader);
+
+                        // Does the instruction extend past the end of the method?
+                        int offset = reader.getOffset();
+                        if (offset > endOffset || offset < 0) {
+                            throw new ExceptionWithContext("The last instruction in the method is truncated");
+                        }
+                        return instruction;
                     }
                 };
             }

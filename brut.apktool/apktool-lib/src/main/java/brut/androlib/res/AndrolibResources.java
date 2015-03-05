@@ -42,8 +42,6 @@ import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
-import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -278,8 +276,9 @@ final public class AndrolibResources {
         transformer.transform(source, result);
     }
 
-    public void decode(ResTable resTable, ExtFile apkFile, File outDir)
+    public void decodeManifestWithResources(ResTable resTable, ExtFile apkFile, File outDir)
             throws AndrolibException {
+
         Duo<ResFileDecoder, AXmlResourceParser> duo = getResFileDecoder();
         ResFileDecoder fileDecoder = duo.m1;
         ResAttrDecoder attrDecoder = duo.m2.getAttrDecoder();
@@ -290,7 +289,6 @@ final public class AndrolibResources {
         try {
             inApk = apkFile.getDirectory();
             out = new FileDirectory(outDir);
-
             LOGGER.info("Decoding AndroidManifest.xml with resources...");
 
             fileDecoder.decodeManifest(inApk, "AndroidManifest.xml", out, "AndroidManifest.xml");
@@ -306,6 +304,24 @@ final public class AndrolibResources {
                 remove_manifest_versions(outDir.getAbsolutePath() + File.separator + "AndroidManifest.xml");
                 mPackageId = String.valueOf(resTable.getPackageId());
             }
+        } catch (DirectoryException ex) {
+            throw new AndrolibException(ex);
+        }
+    }
+
+    public void decode(ResTable resTable, ExtFile apkFile, File outDir)
+            throws AndrolibException {
+        Duo<ResFileDecoder, AXmlResourceParser> duo = getResFileDecoder();
+        ResFileDecoder fileDecoder = duo.m1;
+        ResAttrDecoder attrDecoder = duo.m2.getAttrDecoder();
+
+        attrDecoder.setCurrentPackage(resTable.listMainPackages().iterator().next());
+        Directory inApk, in = null, out;
+
+        try {
+            out = new FileDirectory(outDir);
+
+            inApk = apkFile.getDirectory();
             if (inApk.containsDir("res")) {
                 in = inApk.getDir("res");
             }
@@ -603,8 +619,8 @@ final public class AndrolibResources {
     private ResPackage[] getResPackagesFromApk(ExtFile apkFile,ResTable resTable, boolean keepBroken)
             throws AndrolibException {
         try {
-            return ARSCDecoder.decode(apkFile.getDirectory().getFileInput("resources.arsc"),false,
-                    keepBroken, resTable).getPackages();
+            BufferedInputStream bfi = new BufferedInputStream(apkFile.getDirectory().getFileInput("resources.arsc"));
+            return ARSCDecoder.decode(bfi, false, keepBroken, resTable).getPackages();
         } catch (DirectoryException ex) {
             throw new AndrolibException("Could not load resources.arsc from file: " + apkFile, ex);
         }
@@ -647,10 +663,10 @@ final public class AndrolibResources {
     public void installFramework(File frameFile, String tag)
             throws AndrolibException {
         InputStream in = null;
-        ZipArchiveOutputStream out = null;
+        ZipOutputStream out = null;
         try {
-            ZipExtFile zip = new ZipExtFile(frameFile);
-            ZipArchiveEntry entry = zip.getEntry("resources.arsc");
+            ZipFile zip = new ZipFile(frameFile);
+            ZipEntry entry = zip.getEntry("resources.arsc");
 
             if (entry == null) {
                 throw new AndrolibException("Can't find resources.arsc file");
@@ -667,21 +683,17 @@ final public class AndrolibResources {
                     + (tag == null ? "" : '-' + tag)
                     + ".apk");
 
-            out = new ZipArchiveOutputStream(new FileOutputStream(outFile));
+            out = new ZipOutputStream(new FileOutputStream(outFile));
             out.setMethod(ZipOutputStream.STORED);
             CRC32 crc = new CRC32();
             crc.update(data);
-            entry = new ZipArchiveEntry("resources.arsc");
+            entry = new ZipEntry("resources.arsc");
             entry.setSize(data.length);
             entry.setCrc(crc.getValue());
-            out.putArchiveEntry(entry);
+            out.putNextEntry(entry);
             out.write(data);
-
-            out.closeArchiveEntry();
             zip.close();
             LOGGER.info("Framework installed to: " + outFile);
-        } catch (ZipException ex) {
-            throw new AndrolibException(ex);
         } catch (IOException ex) {
             throw new AndrolibException(ex);
         } finally {
@@ -730,34 +742,50 @@ final public class AndrolibResources {
     }
 
     private File getFrameworkDir() throws AndrolibException {
+        if (mFrameworkDirectory != null) {
+            return mFrameworkDirectory;
+        }
+
         String path;
 
         // if a framework path was specified on the command line, use it
         if (apkOptions.frameworkFolderLocation != null) {
             path = apkOptions.frameworkFolderLocation;
-        } else if (OSDetection.isMacOSX()) {
-            path = System.getProperty("user.home") + File.separatorChar + "Library" + File.separatorChar +
-                    "apktool" + File.separatorChar + "framework";
         } else {
-            path = System.getProperty("user.home") + File.separatorChar + "apktool" + File.separatorChar + "framework";
+            File parentPath = new File(System.getProperty("user.home"));
+            if (! parentPath.canWrite()) {
+                LOGGER.severe(String.format("WARNING: Could not write to $HOME (%s), using %s instead...",
+                        parentPath.getAbsolutePath(), System.getProperty("java.io.tmpdir")));
+                LOGGER.severe("Please be aware this is a volatile directory and frameworks could go missing, " +
+                        "please utilize --frame-path if the default storage directory is unavailable");
+
+                parentPath = new File(System.getProperty("java.io.tmpdir"));
+            }
+
+            if (OSDetection.isMacOSX()) {
+                path = parentPath.getAbsolutePath() + String.format("%1$sLibrary%1$sapktool%1$sframework", File.separatorChar);
+            } else {
+                path = parentPath.getAbsolutePath() + String.format("%1$sapktool%1$sframework", File.separatorChar);
+            }
         }
 
         File dir = new File(path);
 
         if (dir.getParentFile() != null && dir.getParentFile().isFile()) {
-            System.err.println("Please remove file at " + dir.getParentFile());
+            LOGGER.severe("Please remove file at " + dir.getParentFile());
             System.exit(1);
         }
 
         if (! dir.exists()) {
             if (! dir.mkdirs()) {
                 if (apkOptions.frameworkFolderLocation != null) {
-                    System.err.println("Can't create Framework directory: " + dir);
+                    LOGGER.severe("Can't create Framework directory: " + dir);
                 }
                 throw new AndrolibException("Can't create directory: " + dir);
             }
         }
 
+        mFrameworkDirectory = dir;
         return dir;
     }
 
@@ -807,6 +835,8 @@ final public class AndrolibResources {
     public static boolean sKeepBroken = false;
 
     private final static Logger LOGGER = Logger.getLogger(AndrolibResources.class.getName());
+
+    private File mFrameworkDirectory = null;
 
     private String mMinSdkVersion = null;
     private String mMaxSdkVersion = null;

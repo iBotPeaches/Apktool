@@ -60,7 +60,7 @@ public final class DexFileFactory {
     }
 
     @Nonnull
-    public static DexBackedDexFile loadDexFile(File dexFile, String filename, @Nonnull Opcodes opcodes) throws IOException {
+    public static DexBackedDexFile loadDexFile(File dexFile, String dexEntry, @Nonnull Opcodes opcodes) throws IOException {
         ZipFile zipFile = null;
         boolean isZipFile = false;
         try {
@@ -68,16 +68,16 @@ public final class DexFileFactory {
             // if we get here, it's safe to assume we have a zip file
             isZipFile = true;
 
-            ZipEntry zipEntry = zipFile.getEntry(filename);
+            ZipEntry zipEntry = zipFile.getEntry(dexEntry);
             if (zipEntry == null) {
                 throw new NoClassesDexException("zip file %s does not contain a classes.dex file", dexFile.getName());
             }
             long fileLength = zipEntry.getSize();
             if (fileLength < 40) {
                 throw new ExceptionWithContext(
-                        "The " + filename + " file in %s is too small to be a valid dex file", dexFile.getName());
+                        "The " + dexEntry + " file in %s is too small to be a valid dex file", dexFile.getName());
             } else if (fileLength > Integer.MAX_VALUE) {
-                throw new ExceptionWithContext("The " + filename + " file in %s is too large to read in", dexFile.getName());
+                throw new ExceptionWithContext("The " + dexEntry + " file in %s is too large to read in", dexFile.getName());
             }
             byte[] dexBytes = new byte[(int)fileLength];
             ByteStreams.readFully(zipFile.getInputStream(zipEntry), dexBytes);

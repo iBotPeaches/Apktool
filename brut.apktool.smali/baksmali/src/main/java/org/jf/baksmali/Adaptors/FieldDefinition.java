@@ -29,6 +29,7 @@
 package org.jf.baksmali.Adaptors;
 
 import org.jf.baksmali.Adaptors.EncodedValue.EncodedValueAdaptor;
+import org.jf.baksmali.baksmaliOptions;
 import org.jf.dexlib2.AccessFlags;
 import org.jf.dexlib2.iface.Annotation;
 import org.jf.dexlib2.iface.Field;
@@ -40,7 +41,8 @@ import java.io.IOException;
 import java.util.Collection;
 
 public class FieldDefinition {
-    public static void writeTo(IndentingWriter writer, Field field, boolean setInStaticConstructor) throws IOException {
+    public static void writeTo(baksmaliOptions options, IndentingWriter writer, Field field,
+                               boolean setInStaticConstructor) throws IOException {
         EncodedValue initialValue = field.getInitialValue();
         int accessFlags = field.getAccessFlags();
 
@@ -64,7 +66,13 @@ public class FieldDefinition {
         writer.write(field.getType());
         if (initialValue != null) {
             writer.write(" = ");
-            EncodedValueAdaptor.writeTo(writer, initialValue);
+
+            String containingClass = null;
+            if (options.useImplicitReferences) {
+                containingClass = field.getDefiningClass();
+            }
+
+            EncodedValueAdaptor.writeTo(writer, initialValue, containingClass);
         }
 
         writer.write('\n');
@@ -72,7 +80,13 @@ public class FieldDefinition {
         Collection<? extends Annotation> annotations = field.getAnnotations();
         if (annotations.size() > 0) {
             writer.indent(4);
-            AnnotationFormatter.writeTo(writer, annotations);
+
+            String containingClass = null;
+            if (options.useImplicitReferences) {
+                containingClass = field.getDefiningClass();
+            }
+
+            AnnotationFormatter.writeTo(writer, annotations, containingClass);
             writer.deindent(4);
             writer.write(".end field\n");
         }

@@ -39,6 +39,7 @@ import org.jf.dexlib2.iface.Field;
 import org.jf.dexlib2.iface.reference.*;
 import org.jf.dexlib2.iface.value.*;
 import org.jf.dexlib2.writer.DexWriter;
+import org.jf.dexlib2.writer.io.DexDataStore;
 import org.jf.dexlib2.writer.io.FileDataStore;
 import org.jf.dexlib2.writer.pool.ProtoPool.Key;
 import org.jf.util.ExceptionWithContext;
@@ -80,6 +81,14 @@ public class DexPool extends DexWriter<CharSequence, StringReference, CharSequen
                     AnnotationPool annotationPool, AnnotationSetPool annotationSetPool) {
         super(api, stringPool, typePool, protoPool, fieldPool, methodPool,
                 classPool, typeListPool, annotationPool, annotationSetPool);
+    }
+
+    public static void writeTo(@Nonnull DexDataStore dataStore, @Nonnull org.jf.dexlib2.iface.DexFile input) throws IOException {
+        DexPool dexPool = makeDexPool();
+        for (ClassDef classDef: input.getClasses()) {
+            ((ClassPool)dexPool.classSection).intern(classDef);
+        }
+        dexPool.writeTo(dataStore);
     }
 
     public static void writeTo(@Nonnull String path, @Nonnull org.jf.dexlib2.iface.DexFile input) throws IOException {

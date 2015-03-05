@@ -31,46 +31,32 @@
 
 package org.jf.dexlib2.dexbacked.util;
 
+import com.google.common.collect.AbstractIterator;
 import org.jf.dexlib2.dexbacked.DexBackedDexFile;
 import org.jf.dexlib2.dexbacked.DexReader;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 
-public abstract class VariableSizeLookaheadIterator<T> implements Iterator<T> {
+public abstract class VariableSizeLookaheadIterator<T> extends AbstractIterator<T> implements Iterator<T> {
     @Nonnull private final DexReader reader;
-
-    private T cachedItem = null;
 
     protected VariableSizeLookaheadIterator(@Nonnull DexBackedDexFile dexFile, int offset) {
         this.reader = dexFile.readerAt(offset);
-        cachedItem = readNextItem(reader);
     }
 
     /**
-     * Reads the next item from reader. If the end of the list has been reached, it should return null.
+     * Reads the next item from reader. If the end of the list has been reached, it should call endOfData.
      *
-     * @return The item that was read, or null if the end of the list has been reached.
+     * endOfData has a return value of T, so you can simply {@code return endOfData()}
+     *
+     * @return The item that was read. If endOfData was called, the return value is ignored.
      */
     @Nullable protected abstract T readNextItem(@Nonnull DexReader reader);
 
     @Override
-    public boolean hasNext() {
-        return cachedItem != null;
+    protected T computeNext() {
+        return readNextItem(reader);
     }
-
-    @Override
-    @Nonnull
-    public T next() {
-        if (cachedItem == null) {
-            throw new NoSuchElementException();
-        }
-        T ret = cachedItem;
-        cachedItem = readNextItem(reader);
-        return ret;
-    }
-
-    @Override public void remove() { throw new UnsupportedOperationException(); }
 }

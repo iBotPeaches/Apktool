@@ -41,17 +41,6 @@ tokens {
   ARRAY_DATA_DIRECTIVE;
   ARRAY_DESCRIPTOR;
   ARROW;
-  BASE_ARRAY_DESCRIPTOR;
-  BASE_CHAR_LITERAL;
-  BASE_CLASS_DESCRIPTOR;
-  BASE_FLOAT;
-  BASE_FLOAT_OR_ID;
-  BASE_INTEGER;
-  BASE_PRIMITIVE_TYPE;
-  BASE_SIMPLE_NAME;
-  BASE_STRING_LITERAL;
-  BASE_TYPE;
-  BINARY_EXPONENT;
   BOOL_LITERAL;
   BYTE_LITERAL;
   CATCH_DIRECTIVE;
@@ -63,7 +52,6 @@ tokens {
   CLOSE_PAREN;
   COLON;
   COMMA;
-  DECIMAL_EXPONENT;
   DOTDOT;
   DOUBLE_LITERAL;
   DOUBLE_LITERAL_OR_ID;
@@ -79,14 +67,10 @@ tokens {
   ENUM_DIRECTIVE;
   EPILOGUE_DIRECTIVE;
   EQUAL;
-  ESCAPE_SEQUENCE;
   FIELD_DIRECTIVE;
   FIELD_OFFSET;
   FLOAT_LITERAL;
   FLOAT_LITERAL_OR_ID;
-  HEX_DIGIT;
-  HEX_DIGITS;
-  HEX_PREFIX;
   IMPLEMENTS_DIRECTIVE;
   INLINE_INDEX;
   INSTRUCTION_FORMAT10t;
@@ -133,7 +117,6 @@ tokens {
   INSTRUCTION_FORMAT3rmi_METHOD;
   INSTRUCTION_FORMAT3rms_METHOD;
   INSTRUCTION_FORMAT51l;
-  INVALID_TOKEN;
   LINE_COMMENT;
   LINE_DIRECTIVE;
   LOCAL_DIRECTIVE;
@@ -146,8 +129,10 @@ tokens {
   OPEN_BRACE;
   OPEN_PAREN;
   PACKED_SWITCH_DIRECTIVE;
-  PARAM_LIST;
-  PARAM_LIST_OR_ID;
+  PARAM_LIST_END;
+  PARAM_LIST_START;
+  PARAM_LIST_OR_ID_END;
+  PARAM_LIST_OR_ID_START;
   PARAMETER_DIRECTIVE;
   POSITIVE_INTEGER_LITERAL;
   PRIMITIVE_TYPE;
@@ -167,9 +152,9 @@ tokens {
   VTABLE_INDEX;
   WHITE_SPACE;
 
-  //A couple of generated types that we remap other tokens to, to simplify the generated AST
-  LABEL;
+  // misc non-lexer tokens
   INTEGER_LITERAL;
+  INVALID_TOKEN;
 
   //I_* tokens are imaginary tokens used as parent AST nodes
   I_CLASS_DEF;
@@ -547,6 +532,9 @@ registers_directive
       $statements_and_directives::hasRegistersDirective=true;
     };
 
+param_list_or_id
+  : PARAM_LIST_OR_ID_START PRIMITIVE_TYPE+ PARAM_LIST_OR_ID_END;
+
 /*identifiers are much more general than most languages. Any of the below can either be
 the indicated type OR an identifier, depending on the context*/
 simple_name
@@ -560,7 +548,7 @@ simple_name
   | BOOL_LITERAL -> SIMPLE_NAME[$BOOL_LITERAL]
   | NULL_LITERAL -> SIMPLE_NAME[$NULL_LITERAL]
   | REGISTER -> SIMPLE_NAME[$REGISTER]
-  | PARAM_LIST_OR_ID -> SIMPLE_NAME[$PARAM_LIST_OR_ID]
+  | param_list_or_id -> { adaptor.create(SIMPLE_NAME, $param_list_or_id.text) }
   | PRIMITIVE_TYPE -> SIMPLE_NAME[$PRIMITIVE_TYPE]
   | VOID_TYPE -> SIMPLE_NAME[$VOID_TYPE]
   | ANNOTATION_VISIBILITY -> SIMPLE_NAME[$ANNOTATION_VISIBILITY]
@@ -599,8 +587,8 @@ method_prototype
     -> ^(I_METHOD_PROTOTYPE[$start, "I_METHOD_PROTOTYPE"] ^(I_METHOD_RETURN_TYPE type_descriptor) param_list?);
 
 param_list
-  : PARAM_LIST -> { parseParamList((CommonToken)$PARAM_LIST) }
-  | PARAM_LIST_OR_ID -> { parseParamList((CommonToken)$PARAM_LIST_OR_ID) }
+  : PARAM_LIST_START nonvoid_type_descriptor* PARAM_LIST_END -> nonvoid_type_descriptor*
+  | PARAM_LIST_OR_ID_START PRIMITIVE_TYPE* PARAM_LIST_OR_ID_END -> PRIMITIVE_TYPE*
   | nonvoid_type_descriptor*;
 
 type_descriptor
@@ -698,22 +686,21 @@ enum_literal
 
 type_field_method_literal
   : reference_type_descriptor
-    ( ARROW
-      ( member_name COLON nonvoid_type_descriptor -> ^(I_ENCODED_FIELD reference_type_descriptor member_name nonvoid_type_descriptor)
-      | member_name method_prototype -> ^(I_ENCODED_METHOD reference_type_descriptor member_name method_prototype)
+  | ( (reference_type_descriptor ARROW)?
+      ( member_name COLON nonvoid_type_descriptor -> ^(I_ENCODED_FIELD reference_type_descriptor? member_name nonvoid_type_descriptor)
+      | member_name method_prototype -> ^(I_ENCODED_METHOD reference_type_descriptor? member_name method_prototype)
       )
-    | -> reference_type_descriptor
     )
   | PRIMITIVE_TYPE
   | VOID_TYPE;
 
-fully_qualified_method
-  : reference_type_descriptor ARROW member_name method_prototype
-  -> reference_type_descriptor member_name method_prototype;
+method_reference
+  : (reference_type_descriptor ARROW)? member_name method_prototype
+  -> reference_type_descriptor? member_name method_prototype;
 
-fully_qualified_field
-  : reference_type_descriptor ARROW member_name COLON nonvoid_type_descriptor
-  -> reference_type_descriptor member_name nonvoid_type_descriptor;
+field_reference
+  : (reference_type_descriptor ARROW)? member_name COLON nonvoid_type_descriptor
+  -> reference_type_descriptor? member_name nonvoid_type_descriptor;
 
 label
   : COLON simple_name -> ^(I_LABEL[$COLON, "I_LABEL"] simple_name);
@@ -729,7 +716,7 @@ register_range
   : (startreg=REGISTER (DOTDOT endreg=REGISTER)?)? -> ^(I_REGISTER_RANGE[$start, "I_REGISTER_RANGE"] $startreg? $endreg?);
 
 verification_error_reference
-  : CLASS_DESCRIPTOR | fully_qualified_field | fully_qualified_method;
+  : CLASS_DESCRIPTOR | field_reference | method_reference;
 
 catch_directive
   : CATCH_DIRECTIVE nonvoid_type_descriptor OPEN_BRACE from=label_ref DOTDOT to=label_ref CLOSE_BRACE using=label_ref
@@ -902,18 +889,18 @@ insn_format20t
 
 insn_format21c_field
   : //e.g. sget-object v0, java/lang/System/out LJava/io/PrintStream;
-    INSTRUCTION_FORMAT21c_FIELD REGISTER COMMA fully_qualified_field
-    -> ^(I_STATEMENT_FORMAT21c_FIELD[$start, "I_STATEMENT_FORMAT21c_FIELD"] INSTRUCTION_FORMAT21c_FIELD REGISTER fully_qualified_field);
+    INSTRUCTION_FORMAT21c_FIELD REGISTER COMMA field_reference
+    -> ^(I_STATEMENT_FORMAT21c_FIELD[$start, "I_STATEMENT_FORMAT21c_FIELD"] INSTRUCTION_FORMAT21c_FIELD REGISTER field_reference);
 
 insn_format21c_field_odex
   : //e.g. sget-object-volatile v0, java/lang/System/out LJava/io/PrintStream;
-    INSTRUCTION_FORMAT21c_FIELD_ODEX REGISTER COMMA fully_qualified_field
+    INSTRUCTION_FORMAT21c_FIELD_ODEX REGISTER COMMA field_reference
     {
       if (!allowOdex || opcodes.getOpcodeByName($INSTRUCTION_FORMAT21c_FIELD_ODEX.text) == null || apiLevel >= 14) {
         throwOdexedInstructionException(input, $INSTRUCTION_FORMAT21c_FIELD_ODEX.text);
       }
     }
-    -> ^(I_STATEMENT_FORMAT21c_FIELD[$start, "I_STATEMENT_FORMAT21c_FIELD"] INSTRUCTION_FORMAT21c_FIELD_ODEX REGISTER fully_qualified_field);
+    -> ^(I_STATEMENT_FORMAT21c_FIELD[$start, "I_STATEMENT_FORMAT21c_FIELD"] INSTRUCTION_FORMAT21c_FIELD_ODEX REGISTER field_reference);
 
 insn_format21c_string
   : //e.g. const-string v1, "Hello World!"
@@ -952,18 +939,18 @@ insn_format22b
 
 insn_format22c_field
   : //e.g. iput-object v1, v0 org/jf/HelloWorld2/HelloWorld2.helloWorld Ljava/lang/String;
-    INSTRUCTION_FORMAT22c_FIELD REGISTER COMMA REGISTER COMMA fully_qualified_field
-    -> ^(I_STATEMENT_FORMAT22c_FIELD[$start, "I_STATEMENT_FORMAT22c_FIELD"] INSTRUCTION_FORMAT22c_FIELD REGISTER REGISTER fully_qualified_field);
+    INSTRUCTION_FORMAT22c_FIELD REGISTER COMMA REGISTER COMMA field_reference
+    -> ^(I_STATEMENT_FORMAT22c_FIELD[$start, "I_STATEMENT_FORMAT22c_FIELD"] INSTRUCTION_FORMAT22c_FIELD REGISTER REGISTER field_reference);
 
 insn_format22c_field_odex
   : //e.g. iput-object-volatile v1, v0 org/jf/HelloWorld2/HelloWorld2.helloWorld Ljava/lang/String;
-    INSTRUCTION_FORMAT22c_FIELD_ODEX REGISTER COMMA REGISTER COMMA fully_qualified_field
+    INSTRUCTION_FORMAT22c_FIELD_ODEX REGISTER COMMA REGISTER COMMA field_reference
     {
       if (!allowOdex || opcodes.getOpcodeByName($INSTRUCTION_FORMAT22c_FIELD_ODEX.text) == null || apiLevel >= 14) {
         throwOdexedInstructionException(input, $INSTRUCTION_FORMAT22c_FIELD_ODEX.text);
       }
     }
-    -> ^(I_STATEMENT_FORMAT22c_FIELD[$start, "I_STATEMENT_FORMAT22c_FIELD"] INSTRUCTION_FORMAT22c_FIELD_ODEX REGISTER REGISTER fully_qualified_field);
+    -> ^(I_STATEMENT_FORMAT22c_FIELD[$start, "I_STATEMENT_FORMAT22c_FIELD"] INSTRUCTION_FORMAT22c_FIELD_ODEX REGISTER REGISTER field_reference);
 
 insn_format22c_type
   : //e.g. instance-of v0, v1, Ljava/lang/String;
@@ -1024,8 +1011,8 @@ insn_format32x
 
 insn_format35c_method
   : //e.g. invoke-virtual {v0,v1} java/io/PrintStream/print(Ljava/lang/Stream;)V
-    INSTRUCTION_FORMAT35c_METHOD OPEN_BRACE register_list CLOSE_BRACE COMMA fully_qualified_method
-    -> ^(I_STATEMENT_FORMAT35c_METHOD[$start, "I_STATEMENT_FORMAT35c_METHOD"] INSTRUCTION_FORMAT35c_METHOD register_list fully_qualified_method);
+    INSTRUCTION_FORMAT35c_METHOD OPEN_BRACE register_list CLOSE_BRACE COMMA method_reference
+    -> ^(I_STATEMENT_FORMAT35c_METHOD[$start, "I_STATEMENT_FORMAT35c_METHOD"] INSTRUCTION_FORMAT35c_METHOD register_list method_reference);
 
 insn_format35c_type
   : //e.g. filled-new-array {v0,v1}, I
@@ -1034,7 +1021,7 @@ insn_format35c_type
 
 insn_format35c_method_odex
   : //e.g. invoke-direct {p0}, Ljava/lang/Object;-><init>()V
-    INSTRUCTION_FORMAT35c_METHOD_ODEX OPEN_BRACE register_list CLOSE_BRACE COMMA fully_qualified_method
+    INSTRUCTION_FORMAT35c_METHOD_ODEX OPEN_BRACE register_list CLOSE_BRACE COMMA method_reference
     {
       throwOdexedInstructionException(input, $INSTRUCTION_FORMAT35c_METHOD_ODEX.text);
     };
@@ -1055,12 +1042,12 @@ insn_format35ms_method
 
 insn_format3rc_method
   : //e.g. invoke-virtual/range {v25..v26}, java/lang/StringBuilder/append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-    INSTRUCTION_FORMAT3rc_METHOD OPEN_BRACE register_range CLOSE_BRACE COMMA fully_qualified_method
-    -> ^(I_STATEMENT_FORMAT3rc_METHOD[$start, "I_STATEMENT_FORMAT3rc_METHOD"] INSTRUCTION_FORMAT3rc_METHOD register_range fully_qualified_method);
+    INSTRUCTION_FORMAT3rc_METHOD OPEN_BRACE register_range CLOSE_BRACE COMMA method_reference
+    -> ^(I_STATEMENT_FORMAT3rc_METHOD[$start, "I_STATEMENT_FORMAT3rc_METHOD"] INSTRUCTION_FORMAT3rc_METHOD register_range method_reference);
 
 insn_format3rc_method_odex
   : //e.g. invoke-object-init/range {p0}, Ljava/lang/Object;-><init>()V
-    INSTRUCTION_FORMAT3rc_METHOD_ODEX OPEN_BRACE register_list CLOSE_BRACE COMMA fully_qualified_method
+    INSTRUCTION_FORMAT3rc_METHOD_ODEX OPEN_BRACE register_list CLOSE_BRACE COMMA method_reference
     {
       throwOdexedInstructionException(input, $INSTRUCTION_FORMAT3rc_METHOD_ODEX.text);
     };

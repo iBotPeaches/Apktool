@@ -207,6 +207,26 @@ public class DexBackedDexFile extends BaseDexBuffer implements DexFile {
         return classCount;
     }
 
+    public int getStringCount() {
+        return stringCount;
+    }
+
+    public int getTypeCount() {
+        return typeCount;
+    }
+
+    public int getProtoCount() {
+        return protoCount;
+    }
+
+    public int getFieldCount() {
+        return fieldCount;
+    }
+
+    public int getMethodCount() {
+        return methodCount;
+    }
+
     @Nonnull
     public String getString(int stringIndex) {
         int stringOffset = getStringIdItemOffset(stringIndex);

@@ -373,7 +373,7 @@ public class RadixTreeImpl<T> implements RadixTree<T>, Formattable {
      * Display the Trie on console.
      *
      * WARNING! Do not use this for a large Trie, it's for testing purpose only.
-     * @see formatTo
+     * @see #formatTo
      */
     @Deprecated
     public void display() {
