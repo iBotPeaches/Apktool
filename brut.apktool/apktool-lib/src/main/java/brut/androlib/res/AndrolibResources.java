@@ -379,6 +379,10 @@ final public class AndrolibResources {
         }
     }
 
+    public void setSharedLibrary(boolean flag) {
+        mSharedLibrary = flag;
+    }
+
     public void aaptPackage(File apkFile, File manifest, File resDir, File rawDir, File assetDir, File[] include)
             throws AndrolibException {
 
@@ -428,9 +432,12 @@ final public class AndrolibResources {
 
         // force package id so that some frameworks build with correct id
         // disable if user adds own aapt (can't know if they have this feature)
-        if (mPackageId != null && ! customAapt) {
+        if (mPackageId != null && ! customAapt && ! mSharedLibrary) {
             cmd.add("--forced-package-id");
             cmd.add(mPackageId);
+        }
+        if (mSharedLibrary) {
+            cmd.add("--shared-lib");
         }
         if (mMinSdkVersion != null) {
             cmd.add("--min-sdk-version");
@@ -846,6 +853,8 @@ final public class AndrolibResources {
     private String mPackageRenamed = null;
     private String mPackageOriginal = null;
     private String mPackageId = null;
+
+    private boolean mSharedLibrary = false;
 
     private File mAaptBinary = null;
 

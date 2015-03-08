@@ -35,7 +35,7 @@ public class ResID {
     }
 
     public ResID(int package_, int type, int entry, int id) {
-        this.package_ = package_;
+        this.package_ = (package_ == 0) ? 2 : package_;
         this.type = type;
         this.entry = entry;
         this.id = id;
