@@ -320,6 +320,7 @@ public class ApkDecoder {
             putPackageInfo(meta);
             putVersionInfo(meta);
             putCompressionInfo(meta);
+            putSharedLibraryInfo(meta);
         }
         putUnknownInfo(meta);
 
@@ -391,6 +392,10 @@ public class ApkDecoder {
 
     private void putCompressionInfo(Map<String, Object> meta) throws AndrolibException {
         meta.put("compressionType", getCompressionType());
+    }
+
+    private void putSharedLibraryInfo(Map<String, Object> meta) throws AndrolibException {
+        meta.put("sharedLibrary", mResTable.getSharedLibrary());
     }
 
     private boolean getCompressionType() {

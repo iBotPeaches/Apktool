@@ -10,6 +10,7 @@ versionInfo:
   versionCode: '1'
   versionName: '1.0'
 compressionType: false
+sharedLibrary: false
 unknownFiles:
   hidden.file: '8'
   unk_folder/unknown_file: '8'

@@ -37,6 +37,7 @@ public class ResTable {
     private String mPackageOriginal;
     private int mPackageId;
     private boolean mAnalysisMode = false;
+    private boolean mSharedLibrary = false;
 
     private Map<String, String> mSdkInfo = new LinkedHashMap<String, String>();
     private Map<String, String> mVersionInfo = new LinkedHashMap<String, String>();
@@ -50,6 +51,13 @@ public class ResTable {
     }
 
     public ResResSpec getResSpec(int resID) throws AndrolibException {
+        // The pkgId is 0x00. That means a shared library is using its
+        // own resource, so lie to the caller replacing with its own
+        // packageId
+        if (resID >> 24 == 0) {
+            int pkgId = (mPackageId == 0 ? 2 : mPackageId);
+            resID = (0xFF000000 & (pkgId << 24)) | resID;
+        }
         return getResSpec(new ResID(resID));
     }
 
@@ -158,6 +166,10 @@ public class ResTable {
         mPackageId = id;
     }
 
+    public void setSharedLibrary(boolean flag) {
+        mSharedLibrary = flag;
+    }
+
     public void clearSdkInfo() {
         mSdkInfo.clear();
     }
@@ -192,5 +204,9 @@ public class ResTable {
 
     public int getPackageId() {
         return mPackageId;
+    }
+
+    public boolean getSharedLibrary() {
+        return mSharedLibrary;
     }
 }
