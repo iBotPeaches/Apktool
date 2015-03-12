@@ -34,6 +34,8 @@ public class ResValueFactory {
     public ResScalarValue factory(int type, int value, String rawValue)
             throws AndrolibException {
         switch (type) {
+            case TypedValue.TYPE_NULL:
+                return new ResReferenceValue(mPackage, 0, null);
             case TypedValue.TYPE_REFERENCE:
                 return newReference(value, rawValue);
             case TypedValue.TYPE_ATTRIBUTE:
