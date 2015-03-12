@@ -462,6 +462,7 @@ public class ResConfigFlags {
     public final static byte SDK_JELLY_BEAN_MR2 = 18;
     public final static byte SDK_KITKAT = 19;
     public final static byte SDK_LOLLIPOP = 21;
+    public final static byte SDK_LOLLIPOP_MR1 = 22;
 
     public final static byte ORIENTATION_ANY = 0;
     public final static byte ORIENTATION_PORT = 1;
