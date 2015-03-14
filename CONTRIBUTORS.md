@@ -1,4 +1,4 @@
-apktool
+# Apktool Contributors
 Copyright 2014 Ryszard Wiśniewski <brut.alll@gmail.com>
 
 This product includes software developed by:

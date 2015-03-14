@@ -1,29 +1,22 @@
+# Gradle
 .gradle/
-brut.apktool.smali/baksmali/build/
-brut.apktool.smali/build/
-brut.apktool.smali/dexlib/build/
-brut.apktool.smali/smali/build/
-brut.apktool.smali/util/build/
-brut.apktool/apktool-cli/build/
-brut.apktool/apktool-lib/build/
-brut.apktool/build/
-build/
-/brut.apktool/nbproject/private/
-/brut.apktool.smali/baksmali/nbproject/private/
-/brut.apktool.smali/dexlib/nbproject/private/
-/brut.apktool.smali/nbproject/private/
-/nbproject/private/
-/brut.apktool.smali/smali/nbproject/private/
-/brut.apktool.smali/util/nbproject/private/
-/brut.apktool/apktool-lib/nbproject/private/
-/brut.apktool/apktool-cli/nbproject/private/
-*.kate-swp
-*~
+bin/
+
+# Build
+**/build/
+
+# Eclipse
+**/nbproject/private/
 *.project
 *.classpath
 *.settings
 *.setting
-bin/
+
+# Tmp Files
+*.kate-swp
+*~
+
+# IntelliJ
 *.iml
 .idea/*
 /out
