@@ -9,8 +9,8 @@ title: Apktool Contribute
 Apktool gets plenty of issue reports not related to apktool at all. People use this tool, but they don't know how how to edit XML files, sign apks or even install them.
 I find it funny that some people go the hard route of reverse engineering when they don't even know how to work with application sources.
 
-So... if you get some errors from apktool when decoding or building apk, then most probably this is a bug of apktool and you should report it. 
-But if you have succeeded at decoding and building, but app doesn't work on your device, then I suggest you doing some tests:
+So... if you get some errors from apktool when decoding or building apk, then this is probably a bug in apktool and you should report it.
+But if you have succeeded at decoding and building, but the app doesn't work on your device, then I suggest you do some tests:
 
  * don't do anything with original apk file, just install it using the same way as for apk built by apktool. If it fails, then it can't be related to apktool, because you didn't even use it. Typical scenario: installing framework-res.apk by "adb push" command, which will certainly give you a lot of FCs.
  * unzip apk, remove META-INF dir, zip it back, sign and install. This will remove original signatures, but rest of the app will be intact. If you will fail at this point, you could be sure, that your problems are related to signing, not apktool.

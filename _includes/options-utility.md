@@ -1,4 +1,4 @@
-Options that can be executed independent of actions.
+Options that can be executed at any time.
 <br /><br />
 <strong><code>-version, --version</code></strong>
 <blockquote>Outputs current version. (Ex: 1.5.2)</blockquote>

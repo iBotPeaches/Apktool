@@ -4,6 +4,11 @@
     - Decoding
     - Building
     - Frameworks
+- title: Intermediate
+  subs:
+    - FrameworkFiles
+    - SmaliDebugging
+    - 9PatchImages
 - title: Options
   subs:
     - Utility

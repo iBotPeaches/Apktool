@@ -1089,12 +1089,12 @@ textarea {
   line-height: inherit;
 }
 a {
-  color: #337ab7;
+  color: #2fbba3;
   text-decoration: none;
 }
 a:hover,
 a:focus {
-  color: #23527c;
+  color: #00afbb;
   text-decoration: underline;
 }
 a:focus {
@@ -1456,9 +1456,13 @@ abbr[data-original-title] {
 }
 blockquote {
   padding: 10px 20px;
+  color: #2fbba3;
   margin: 0 0 20px;
-  font-size: 17.5px;
-  border-left: 5px solid #eeeeee;
+  font-size: 16.5px;
+  border-left: 5px solid #2fbba3;
+}
+blockquote a {
+    text-decoration: underline;
 }
 blockquote p:last-child,
 blockquote ul:last-child,
