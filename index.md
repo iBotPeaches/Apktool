@@ -20,7 +20,7 @@ It is **NOT** intended for piracy and other non-legal uses. It could be used for
  * Basic knowledge of Android SDK, AAPT and smali
 
 ## Installation for noobs
- * Read [Install Docs](/install)
+ * Read [Install Docs]({{ site.baseurl }}/install)
  
 ## Links of Interest
  * [XDA Thread](http://forum.xda-developers.com/showthread.php?t=1755243) - For those who wish to communicate on XDA-Developers for community support
