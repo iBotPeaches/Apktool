@@ -4212,6 +4212,7 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   padding-top: 30px;
   padding-bottom: 10px;
   line-height: 20px;
+  font-size: 18px;
 }
 @media (max-width: 767px) {
   .navbar-nav .open .dropdown-menu {
