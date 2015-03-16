@@ -1,3 +1,7 @@
+Sub projects brut.apktool, brut.j.common, brut.dir and brut.j.util are
+released under the following license:
+
+*******************************************************************************
 
                                  Apache License
                            Version 2.0, January 2004
@@ -200,3 +204,7 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
+*******************************************************************************
+
+The sub project (brut.apktool.smali) is a clone of the smali project. Its
+license can be found at brut.apktool.smali/NOTICE-SMALI

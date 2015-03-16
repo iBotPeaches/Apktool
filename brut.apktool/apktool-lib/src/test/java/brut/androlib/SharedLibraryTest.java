@@ -70,29 +70,42 @@ public class SharedLibraryTest {
     }
 
     @Test
-    public void isSharedResourceDecodingWorking() throws IOException, BrutException {
-        String framework = "library.apk";
+    public void isSharedResourceDecodingAndRebuildingWorking() throws IOException, BrutException {
+        String library = "library.apk";
         String client = "client.apk";
 
-
+        // setup apkOptions
         ApkOptions apkOptions = new ApkOptions();
         apkOptions.frameworkFolderLocation = sTmpDir.getAbsolutePath();
         apkOptions.frameworkTag = "shared";
 
-        new Androlib(apkOptions).installFramework(new File(sTmpDir + File.separator + framework));
-
+        // install library/framework
+        new Androlib(apkOptions).installFramework(new File(sTmpDir + File.separator + library));
         assertTrue(fileExists("2-shared.apk"));
 
+        // decode client.apk
         ApkDecoder apkDecoder = new ApkDecoder(new File(sTmpDir + File.separator + client));
         apkDecoder.setOutDir(new File(sTmpDir + File.separator + client + ".out"));
         apkDecoder.setFrameworkDir(apkOptions.frameworkFolderLocation);
         apkDecoder.setFrameworkTag(apkOptions.frameworkTag);
         apkDecoder.decode();
 
-        ExtFile testApk = new ExtFile(sTmpDir, client + ".out");
-        new Androlib(apkOptions).build(testApk, null);
+        // decode library.apk
+        ApkDecoder libraryDecoder = new ApkDecoder(new File(sTmpDir + File.separator + library));
+        libraryDecoder.setOutDir(new File(sTmpDir + File.separator + library + ".out"));
+        libraryDecoder.setFrameworkDir(apkOptions.frameworkFolderLocation);
+        libraryDecoder.setFrameworkTag(apkOptions.frameworkTag);
+        libraryDecoder.decode();
 
+        // build client.apk
+        ExtFile clientApk = new ExtFile(sTmpDir, client + ".out");
+        new Androlib(apkOptions).build(clientApk, null);
         assertTrue(fileExists(client + ".out" + File.separator + "dist" + File.separator + client));
+
+        // build library.apk (shared library)
+        ExtFile libraryApk = new ExtFile(sTmpDir, library + ".out");
+        new Androlib(apkOptions).build(libraryApk, null);
+        assertTrue(fileExists(library + ".out" + File.separator + "dist" + File.separator + library));
     }
 
     private boolean fileExists(String filepath) {
