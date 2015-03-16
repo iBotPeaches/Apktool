@@ -270,11 +270,7 @@ public class Androlib {
         mAndRes.setPackageId((Map<String, String>) meta.get("packageInfo"));
         mAndRes.setPackageInfo((Map<String, String>) meta.get("packageInfo"));
         mAndRes.setVersionInfo((Map<String, String>) meta.get("versionInfo"));
-<<<<<<< HEAD
-        mAndRes.setSharedLibrary((boolean) meta.get("sharedLibrary"));
-=======
         mAndRes.setSharedLibrary((boolean) (meta.get("sharedLibrary") == null ? false : meta.get("sharedLibrary")));
->>>>>>> pr/5
 
         if (outFile == null) {
             String outFileName = (String) meta.get("apkFileName");

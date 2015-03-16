@@ -67,7 +67,7 @@ public class ResValueFactory {
     }
 
     public ResValue factory(String value) {
-        if (value.startsWith("res/") && ! value.equalsIgnoreCase("res/")) {
+        if (value.startsWith("res/") && value.contains(".")) {
             return new ResFileValue(value);
         }
         return new ResStringValue(value);
