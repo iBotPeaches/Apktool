@@ -22,6 +22,18 @@ It is **NOT** intended for piracy and other non-legal uses. It could be used for
 ## Installation for noobs
  * Read [Install Docs](/install)
  
+## Links of Interest
+ * [XDA Thread](http://forum.xda-developers.com/showthread.php?t=1755243) - For those who wish to communicate on XDA-Developers for community support
+ * [Smali Project](http://code.google.com/p/smali/) - Smali Project is the tool used in the disassembling of `.dex` files
+ * [Freenode #apktool](http://webchat.freenode.net/?channels=apktool) - IRC Channel for support, bugs and discussions
+
+## Authors
+<ul>
+  {% for author in site.data.authors %}
+    <li><a href="https://github.com/{{ author.github }}">{{ author.name }}</a> - {{ author.note }}</li>
+  {% endfor %}
+</ul>
+
 ## News
 <ul>
   {% for release in site.data.releases %}
@@ -30,4 +42,4 @@ It is **NOT** intended for piracy and other non-legal uses. It could be used for
 </ul>
 
 ## License
-Apktool is licensed under the Apache License - see the [LICENSE](https://github.com/iBotPeaches/Apktool/blob/master/LICENSE) file for more details
+Apktool is licensed under the Apache 2.0 License - see the [LICENSE](https://github.com/iBotPeaches/Apktool/blob/master/LICENSE) file for more details

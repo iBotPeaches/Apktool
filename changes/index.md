@@ -19,7 +19,7 @@ MigrationInstructions
   * Fixed (issue #394 (on Google Code)) - Prevented duplicated files in final jar which saved around 1.2mb.
   * Added Proguard to drop final jar size from 6.2mb to 2.6mb.
   * Fixed (issue #395 (on Google Code)) - Added check for "aapt" in unit-tests.
-  * Added ability to use "--frame-path" on [if|install-framework]
+  * Added ability to use `--frame-path` on `if|install-framework`
   * Fixed renaming of ".r.9.png" images -> ".9.png".
   * Added ability to use --version to print out Apktool version
 

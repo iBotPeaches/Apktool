@@ -1,0 +1,30 @@
+#affixNav {
+    width: 263px;
+    margin-top: 10px;
+}
+#affixNav .nav > li > a {
+    display: block;
+    padding: 4px 20px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #333;
+}
+
+#affixNav .nav > .active > a, #affixNav .nav > li > a:hover {
+    padding-left: 18px;
+    font-weight: 700;
+    color: #2fbba3;
+    background-color: transparent;
+    border-left: 2px solid #2fbba3;
+}
+
+#affixNav .nav .nav > li > a {
+    padding-top: 1px;
+    padding-bottom: 1px;
+    padding-left: 30px;
+    font-size: 12px;
+    font-weight: 400;
+}
+p {
+    font-size: 16px;
+}
