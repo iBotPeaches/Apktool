@@ -11,8 +11,9 @@ It is **NOT** intended for piracy and other non-legal uses. It could be used for
 
 ## Features
  * Disassembling resources to nearly original form (including `resources.arsc`, `classes.dex`, `9.png.` and `XMLs`)
+ * Rebuilding decoded resources back to binary APK/JAR
  * Organizing and handling APKs that depend on framework resources
- * Smali debugging
+ * Smali Debugging
  * Helping with repetitive tasks
  
 ## Requirements
