@@ -37,7 +37,7 @@ It is **NOT** intended for piracy and other non-legal uses. It could be used for
 ## News
 <ul>
   {% for release in site.data.releases %}
-   <li>{{ release.date | date_to_string }} - {{ release.title }} {{ release.text | markdownify }} </li>
+   <li><strong>{{ release.date | date_to_string }}</strong> - {{ release.title }} {{ release.text | markdownify }} </li>
   {% endfor %}
 </ul>
 
