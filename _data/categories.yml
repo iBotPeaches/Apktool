@@ -4,11 +4,15 @@
     - Decoding
     - Building
     - Frameworks
+- title: Migration Instructions
+  subs:
+    - v1.5.x -> v2.0.0
+    - v1.4.x -> v1.5.1
 - title: Intermediate
   subs:
-    - FrameworkFiles
-    - SmaliDebugging
-    - 9PatchImages
+    - Framework Files
+    - Smali Debugging
+    - 9Patch Images
 - title: Options
   subs:
     - Utility
