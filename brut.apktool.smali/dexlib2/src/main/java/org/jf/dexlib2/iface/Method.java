@@ -44,7 +44,7 @@ import java.util.Set;
  * It also acts as a MethodReference to itself. Any equality/comparison is based on its identity as a MethodReference,
  * and shouldn't take into account any non-MethodReference specifics of this method.
  */
-public interface Method extends MethodReference {
+public interface Method extends MethodReference, Member {
     /**
      * Gets the type of the class that defines this method.
      *
@@ -86,7 +86,7 @@ public interface Method extends MethodReference {
      *
      * @return The access flags for this method
      */
-    int getAccessFlags();
+    @Override int getAccessFlags();
 
     /**
      * Gets a set of the annotations that are applied to this method.
@@ -95,7 +95,7 @@ public interface Method extends MethodReference {
      *
      * @return A set of the annotations that are applied to this method
      */
-    @Nonnull Set<? extends Annotation> getAnnotations();
+    @Override @Nonnull Set<? extends Annotation> getAnnotations();
 
     /**
      * Gets a MethodImplementation object that defines the implementation of the method.

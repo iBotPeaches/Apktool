@@ -44,27 +44,27 @@ import java.util.Set;
  * It also acts as a FieldReference to itself. Any equality/comparison is based on its identity as a FieldReference,
  * and shouldn't take into account any non-FieldReference specifics of this field.
  */
-public interface Field extends FieldReference {
+public interface Field extends FieldReference, Member {
     /**
      * Gets the type of the class that defines this field.
      *
      * @return The type of the class that defines this field
      */
-    @Nonnull String getDefiningClass();
+    @Override @Nonnull String getDefiningClass();
 
     /**
      * Gets the name of this field.
      *
      * @return The name of this field
      */
-    @Nonnull String getName();
+    @Override @Nonnull String getName();
 
     /**
      * Gets the type of this field.
      *
      * @return The type of this field
      */
-    @Nonnull String getType();
+    @Override @Nonnull String getType();
 
     /**
      * Gets the access flags for this field.
@@ -73,7 +73,7 @@ public interface Field extends FieldReference {
      *
      * @return The access flags for this field
      */
-    int getAccessFlags();
+    @Override int getAccessFlags();
 
     /**
      * Gets the initial value for this field, if available.
@@ -92,5 +92,5 @@ public interface Field extends FieldReference {
      *
      * @return A set of the annotations that are applied to this field
      */
-    @Nonnull Set<? extends Annotation> getAnnotations();
+    @Override @Nonnull Set<? extends Annotation> getAnnotations();
 }

@@ -43,7 +43,7 @@ import java.util.Set;
  * It also acts as a TypeReference to itself. Any equality/comparison is based on its identity as a TypeReference,
  * and shouldn't take into account anything other than the type of this class.
  */
-public interface ClassDef extends TypeReference {
+public interface ClassDef extends TypeReference, Annotatable {
     /**
      * Gets the class type.
      *
@@ -95,7 +95,7 @@ public interface ClassDef extends TypeReference {
      *
      * @return A set of the annotations that are applied to this class
      */
-    @Nonnull Set<? extends Annotation> getAnnotations();
+    @Override @Nonnull Set<? extends Annotation> getAnnotations();
 
     /**
      * Gets the static fields that are defined by this class.
