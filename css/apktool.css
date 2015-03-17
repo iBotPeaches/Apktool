@@ -5,7 +5,7 @@
 #affixNav .nav > li > a {
     display: block;
     padding: 4px 20px;
-    font-size: 13px;
+    font-size: 16px;
     font-weight: 500;
     color: #333;
 }
@@ -22,7 +22,7 @@
     padding-top: 1px;
     padding-bottom: 1px;
     padding-left: 30px;
-    font-size: 12px;
+    font-size: 15px;
     font-weight: 400;
 }
 p {

@@ -1,1 +1,2 @@
 baseurl: /Apktool
+exclude: ['Gemfile.lock', 'Gemfile', 'README.md']

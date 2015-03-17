@@ -56,4 +56,37 @@ Apktool comes with an internal framework like mentioned above. This file is copi
 Frameworks are stored in <code>$HOME/apktool/framework</code> for Windows and Unix systems. Mac OS X has a slightly different folder location of 
 <code>$HOME/Library/apktool/framework</code>.
 If these directories are not available it will default to <code>java.io.tmpdir</code> which is usually <code>/tmp</code>.
-This is a volatile directory so it would make sense to take advantage of the parameter --frame-path to select an alternative folder for framework files.
+This is a volatile directory so it would make sense to take advantage of the parameter <code>--frame-path</code> to select an alternative folder for framework files.
+<br /><br />
+<div class="alert alert-info">
+<p>Apktool has no control over the frameworks once installed, but you are free to manage these files on your own.</p>
+</div>
+<h4><strong>Tagging framework files</strong></h4>
+Frameworks are stored in the naming convention of: <code>&lt;id>-&lt;tag>.apk</code>. They are identified by pkgId and optionally custom tag. Usually tagging frameworks isn't necessary, but if you work on apps from many different devices and they have incompatible frameworks, you will need some way to easily switch between them.
+
+You could tag frameworks by:
+
+{% highlight console %}
+$ apktool if com.htc.resources.apk -t hero
+I: Framework installed to: /home/brutall/apktool/framework/2-hero.apk
+$ apktool if com.htc.resources.apk -t desire
+I: Framework installed to: /home/brutall/apktool/framework/2-desire.apk
+{% endhighlight %}
+
+Then:
+
+{% highlight console %}
+$ apktool d HtcContacts.apk -t hero
+I: Loading resource table...
+I: Decoding resources...
+I: Loading resource table from file: /home/brutall/apktool/framework/1.apk
+I: Loading resource table from file: /home/brutall/apktool/framework/2-hero.apk
+I: Copying assets and libs...
+$ apktool d HtcContacts.apk -t desire
+I: Loading resource table...
+I: Decoding resources...
+I: Loading resource table from file: /home/brutall/apktool/framework/1.apk
+I: Loading resource table from file: /home/brutall/apktool/framework/2-desire.apk
+I: Copying assets and libs...
+{% endhighlight %}
+You don't have to select a tag when building apk - apktool automatically uses the same tag, as when decoding.
