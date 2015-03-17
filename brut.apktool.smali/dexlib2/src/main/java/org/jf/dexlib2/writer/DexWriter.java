@@ -572,7 +572,6 @@ public abstract class DexWriter<
         }
     }
 
-
     private void writeAnnotationSets(@Nonnull DexDataWriter writer) throws IOException {
         writer.align();
         annotationSetSectionOffset = writer.getPosition();

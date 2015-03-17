@@ -31,7 +31,9 @@
 
 package org.jf.dexlib2.writer;
 
+import com.google.common.collect.Ordering;
 import org.jf.dexlib2.ValueType;
+import org.jf.dexlib2.base.BaseAnnotationElement;
 import org.jf.dexlib2.iface.reference.FieldReference;
 import org.jf.dexlib2.iface.reference.MethodReference;
 
@@ -40,7 +42,8 @@ import java.io.IOException;
 import java.util.Collection;
 
 public abstract class EncodedValueWriter<StringKey, TypeKey, FieldRefKey extends FieldReference,
-        MethodRefKey extends MethodReference, AnnotationElement, EncodedValue> {
+        MethodRefKey extends MethodReference, AnnotationElement extends org.jf.dexlib2.iface.AnnotationElement,
+        EncodedValue> {
     @Nonnull private final DexDataWriter writer;
     @Nonnull private final StringSection<StringKey, ?> stringSection;
     @Nonnull private final TypeSection<?, TypeKey, ?> typeSection;
@@ -70,7 +73,11 @@ public abstract class EncodedValueWriter<StringKey, TypeKey, FieldRefKey extends
         writer.writeEncodedValueHeader(ValueType.ANNOTATION, 0);
         writer.writeUleb128(typeSection.getItemIndex(annotationType));
         writer.writeUleb128(elements.size());
-        for (AnnotationElement element: elements) {
+
+        Collection<? extends AnnotationElement> sortedElements = Ordering.from(BaseAnnotationElement.BY_NAME)
+                .immutableSortedCopy(elements);
+
+        for (AnnotationElement element: sortedElements) {
             writer.writeUleb128(stringSection.getItemIndex(annotationSection.getElementName(element)));
             writeEncodedValue(annotationSection.getElementValue(element));
         }

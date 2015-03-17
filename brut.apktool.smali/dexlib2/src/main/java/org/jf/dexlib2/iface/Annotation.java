@@ -55,7 +55,7 @@ public interface Annotation extends BasicAnnotation, Comparable<Annotation> {
      *
      * @return The type of this annotation
      */
-    @Nonnull String getType();
+    @Nonnull @Override String getType();
 
     /**
      * Gets a set of the name/value elements associated with this annotation.
@@ -64,7 +64,7 @@ public interface Annotation extends BasicAnnotation, Comparable<Annotation> {
      *
      * @return A set of AnnotationElements
      */
-    @Nonnull Set<? extends AnnotationElement> getElements();
+    @Nonnull @Override Set<? extends AnnotationElement> getElements();
 
     /**
      * Returns a hashcode for this Annotation.
