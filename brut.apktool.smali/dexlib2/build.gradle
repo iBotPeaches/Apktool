@@ -31,6 +31,7 @@
 
 configurations {
     accessorTestGenerator
+    dx
 }
 
 dependencies {
@@ -41,6 +42,8 @@ dependencies {
     testCompile depends.junit
 
     accessorTestGenerator project('accessorTestGenerator')
+
+    dx depends.dx
 }
 
 ext.testAccessorOutputDir = file("${buildDir}/generated-accessor-test-sources")
@@ -69,23 +72,12 @@ task generateAccessorTestSource(type: JavaExec) {
 }
 compileTestJava.dependsOn generateAccessorTestSource
 
-task generateAccessorTestDex(type: Exec, dependsOn: compileTestJava) {
+task generateAccessorTestDex(type: JavaExec, dependsOn: compileTestJava) {
     def outputDex = file(new File(sourceSets.test.output.resourcesDir, 'accessorTest.dex'))
 
     doFirst {
         file(outputDex.parent).mkdirs()
-    }
 
-    inputs.dir(project.sourceSets.test.output.classesDir)
-    outputs.file outputDex
-
-    workingDir project.sourceSets.test.output.classesDir
-    executable 'dx'
-    args '--dex'
-    args '--no-strict'
-    args "--output=${outputDex}"
-
-    doFirst {
         // this has to be done in doFirst, so that the generated classes will be available.
         // otherwise, it the tree will be populated while the build is being configured,
         // which is before the compileTestJava has run
@@ -95,6 +87,18 @@ task generateAccessorTestDex(type: Exec, dependsOn: compileTestJava) {
             args file
         }
     }
+
+    inputs.dir(project.sourceSets.test.output.classesDir)
+    outputs.file outputDex
+
+    main 'com.android.dx.command.Main'
+    classpath = configurations.dx
+
+    workingDir project.sourceSets.test.output.classesDir
+    //executable 'dx'
+    args '--dex'
+    args '--no-strict'
+    args "--output=${outputDex}"
 }
 
 test.dependsOn generateAccessorTestDex

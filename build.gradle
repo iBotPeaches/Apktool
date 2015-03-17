@@ -93,6 +93,7 @@ subprojects {
                 commons_cli: 'commons-cli:commons-cli:1.2',
                 commons_io: 'commons-io:commons-io:2.4',
                 commons_lang: 'org.apache.commons:commons-lang3:3.1',
+                dx: 'com.google.android.tools:dx:1.7',
                 findbugs: 'com.google.code.findbugs:jsr305:1.3.9',
                 guava: 'com.google.guava:guava:14.0',
                 jflex: 'de.jflex:jflex:1.4.3',
