@@ -31,6 +31,7 @@
                     <div class="collapse navbar-collapse" id="navbar">
                         <ul class="nav navbar-nav">
                             <li class="item"><a href="{{ site.baseurl }}/install">Install</a></li>
+                            <li class="item"><a href="{{ site.baseurl }}/build">Build</a></li>
                             <li class="item"><a href="{{ site.baseurl }}/documentation">Documentation</a></li>
                             <li class="item"><a href="{{ site.baseurl }}/changes">Changes</a></li>
                             <li class="item"><a href="{{ site.baseurl }}/contribute">Contribute</a></li>
@@ -41,8 +42,12 @@
             </nav>
         </div>
         {{ content }}
+        <a href="#" class="well well-sm back-to-top">
+            <i class="glyphicon glyphicon-chevron-up"></i>
+        </a>
         <script type="application/javascript" src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
         <script type="application/javascript" src="{{ site.baseurl }}/js/bootstrap.min.js"></script>
+        <script type="application/javascript" src="{{ site.baseurl }}/js/apktool.js"></script>
         <script>
             (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
             function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;

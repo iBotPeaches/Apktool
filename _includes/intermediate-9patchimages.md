@@ -10,3 +10,18 @@ I will try and explain it here. The official docs mess one point that 9patch ima
   <li><strong>compiled</strong> - The mysterious form found in apk files. There are no borders and the 9patch data is written into
   a binary chunk called <code>npTc</code>. You can't see or modify it easily, but Android OS can as its quicker to read.</li>
 </ul>
+
+There are problems related to the above two points.
+<ul>
+  <li>You can't move 9patch images between both types without a conversion. If you try and unpack 9patch images from an apk and use it
+  in the source of another, you will get errors during build. Also vice versa, you cannot take source 9patch images directly into an apk.</li>
+  <li>9patch binary chunk isn't recognized by modern image processing tools. So modifying the compiled image will more than likely break the
+  <code>npTc</code> chunk, thus breaking the image on the device.</li>
+</ul>
+<br />
+The only solution to this problem is to easily convert between these two types. The encoder (which takes source to compiled) is built into
+the aapt tool and is automatically used during build. This means we only need to build a decoder which has been in apktool since <code>v1.3.0</code>
+and is automatically ran on all 9patch images during decode.
+<br /><br />
+So if you want to modify 9patch images, don't do it directly. Use apktool to decode the application (including the 9patch images) and then
+modify the images. At that point when you build the application back, the source 9patch images will be compiled.

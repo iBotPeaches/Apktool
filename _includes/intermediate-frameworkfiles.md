@@ -39,7 +39,7 @@ For the most part any apk in <code>/system/framework</code> on a device will be 
 <code>/data/system-framework</code> and even cleverly hidden in <code>/system/app</code> or <code>/system/priv-app</code>. They are usually
 named with the naming of "resources", "res" or "framework".
 <br /><br />
-<blockquote>For example HTC has a framework called <code>com.htc.resources.apk</code>, LG has one called <code>lge-res.apk</code></blockquote>
+<blockquote><span class="label label-info lb">Example</span> HTC has a framework called <code>com.htc.resources.apk</code>, LG has one called <code>lge-res.apk</code></blockquote>
 
 After you find a framework file you could pull it via <kbd>adb pull /path/to/file</kbd> or use a file manager application. After you have the
 file locally, pay attention to how Apktool installs it. The number that the framework is named during install corresponds to the pkgId of the
@@ -48,19 +48,14 @@ application. These values should range from 1 to 9. Any APK that installs itself
 <h4><strong>Internal Frameworks</strong></h4>
 Apktool comes with an internal framework like mentioned above. This file is copied to <code>$HOME/apktool/framework/1.apk</code> during use.
 <br /><br />
-<div class="alert alert-warning">
-<p>Apktool has no knowledge of what version of framework resides there. It will assume its up to date, so delete the file during Apktool upgrades</p>
-</div>
-
+<blockquote><span class="label label-warning lb">Warning</span> Apktool has no knowledge of what version of framework resides there. It will assume its up to date, so delete the file during Apktool upgrades</blockquote>
 <h4><strong>Managing framework files</strong></h4>
 Frameworks are stored in <code>$HOME/apktool/framework</code> for Windows and Unix systems. Mac OS X has a slightly different folder location of 
 <code>$HOME/Library/apktool/framework</code>.
 If these directories are not available it will default to <code>java.io.tmpdir</code> which is usually <code>/tmp</code>.
 This is a volatile directory so it would make sense to take advantage of the parameter <code>--frame-path</code> to select an alternative folder for framework files.
 <br /><br />
-<div class="alert alert-info">
-<p>Apktool has no control over the frameworks once installed, but you are free to manage these files on your own.</p>
-</div>
+<blockquote><span class="label label-info lb">Note</span> Apktool has no control over the frameworks once installed, but you are free to manage these files on your own.</blockquote>
 <h4><strong>Tagging framework files</strong></h4>
 Frameworks are stored in the naming convention of: <code>&lt;id>-&lt;tag>.apk</code>. They are identified by pkgId and optionally custom tag. Usually tagging frameworks isn't necessary, but if you work on apps from many different devices and they have incompatible frameworks, you will need some way to easily switch between them.
 

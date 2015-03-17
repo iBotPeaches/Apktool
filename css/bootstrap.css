@@ -1520,8 +1520,9 @@ samp {
 code {
   padding: 2px 4px;
   font-size: 90%;
-  color: #c7254e;
-  background-color: #f9f2f4;
+  color: #8ebe30;
+  font-weight: 600;
+  background-color: #edf9f7;
   border-radius: 4px;
 }
 kbd {

@@ -7,6 +7,7 @@ title: Apktool Documentation
   <div class="col-md-9" data-target="#affixNav">
     {% for category in site.data.categories %}
       <h2 id="{{ category.title }}">{{ category.title }}</h2>
+      <hr />
       {% for sub in category.subs %}
         <h3 id="{{ sub }}">{{ sub }}</h3>
         <p>
