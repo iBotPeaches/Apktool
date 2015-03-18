@@ -54,7 +54,7 @@ public class TextUtils {
         source = normalizeNewlines(source);
 
         // Remove all suffix/prefix whitespace
-        Pattern pattern = Pattern.compile("((^[ \t]+)|([ \t]+))");
+        Pattern pattern = Pattern.compile("((^[ \t]+)|([ \t]+$))", Pattern.MULTILINE);
         Matcher matcher = pattern.matcher(source);
         source = matcher.replaceAll("");
 
@@ -62,6 +62,11 @@ public class TextUtils {
         Pattern pattern2 = Pattern.compile("^\r?\n?", Pattern.MULTILINE);
         Matcher matcher2 = pattern2.matcher(source);
         source = matcher2.replaceAll("");
+
+        // Remove a trailing new line, if present
+        Pattern pattern3 = Pattern.compile("\r?\n?$");
+        Matcher matcher3 = pattern3.matcher(source);
+        source = matcher3.replaceAll("");
 
         // Go back to unix-style \n newlines
         source = normalizeNewlines(source, "\n");
