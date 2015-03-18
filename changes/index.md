@@ -7,7 +7,7 @@ title: Apktool Changelog
 2014.xx.xx
 
  * [Changelog](https://github.com/iBotPeaches/Apktool/blob/master/CHANGES) ongoing
- * [Migration Instructions from 1.5.x to 2.0.x]({{ base.url}}/documentation/#v1-5-x-v2-0-0)
+ * [Migration Instructions from 1.5.x to 2.0.x]({{ site.baseurl }}/documentation/#v1-5-x-v2-0-0)
 
 ## v1.5.2
 2013.02.02
