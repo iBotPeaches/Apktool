@@ -31,22 +31,29 @@
 
 package org.jf.baksmali;
 
-import org.antlr.runtime.RecognitionException;
-import org.junit.Test;
+import javax.annotation.Nonnull;
+import java.io.File;
 
-import java.io.IOException;
+/**
+ * A base test class for performing a roundtrip assembly/disassembly where the input and output
+ * should be identical.
+ *
+ * By default, the input/output file should be a resource at [testDir]/[testName].smali
+ */
+public abstract class IdenticalRoundtripTest extends RoundtripTest {
 
-public class LambdaTest extends IdenticalRoundtripTest {
-
-    private baksmaliOptions createOptions() {
-        baksmaliOptions options = new baksmaliOptions();
-        options.apiLevel = 23;  // since we need at least level 23 for lambda opcodes
-        options.experimental = true; // since these opcodes aren't implemented in runtime yet);
-        return options;
+    public IdenticalRoundtripTest(@Nonnull String testDir) {
+        super(testDir);
     }
 
-    @Test
-    public void testHelloWorldLambda() throws IOException, RecognitionException {
-        runTest("HelloWorldLambda", createOptions());
+    public IdenticalRoundtripTest() {
+    }
+
+    @Nonnull @Override protected String getInputFilename(@Nonnull String testName) {
+        return String.format("%s%s%s.smali", testDir, File.separatorChar, testName);
+    }
+
+    @Nonnull @Override protected String getOutputFilename(@Nonnull String testName) {
+        return getInputFilename(testName);
     }
 }
