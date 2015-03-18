@@ -1,2 +1,3 @@
 baseurl: /Apktool
 exclude: ['Gemfile.lock', 'Gemfile', 'README.md']
+url: https://ibotpeaches.github.io/Apktool
