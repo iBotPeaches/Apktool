@@ -544,7 +544,6 @@ public class Androlib {
 
     public void buildUnknownFiles(File appDir, File outFile, Map<String, Object> meta)
             throws AndrolibException {
-        File file;
         Path globalPath = Paths.get(appDir.getPath() + File.separatorChar + UNK_DIRNAME);
 
         if (meta.containsKey("unknownFiles")) {
@@ -561,58 +560,25 @@ public class Androlib {
                 // create filesystem
                 Path path = Paths.get(outFile.getAbsolutePath());
 
-                // loop through files inside
-                for (Map.Entry<String,String> entry : files.entrySet()) {
+                try(
+                        FileSystem fs = FileSystems.newFileSystem(path, null)
+                ) {
+                    // loop through files inside
+                    for (Map.Entry<String,String> entry : files.entrySet()) {
 
-                    file = new File(globalPath.toFile(), entry.getKey());
-                    if (file.isFile() && file.exists()) {
-                        insertFolder(path, zip_properties, file.getParentFile(), entry.getValue(),
-                                globalPath.toAbsolutePath());
-
-                        insertFile(path, zip_properties, file, entry.getValue(),
-                                globalPath.toAbsolutePath());
+                        File file = new File(globalPath.toFile(), entry.getKey());
+                        Path dest = fs.getPath(entry.getKey());
+                        Path destParent = dest.getParent();
+                        if (destParent != null && !Files.exists(destParent)) {
+                            Files.createDirectories(destParent);
+                        }
+                        Path newFile = Paths.get(file.getAbsolutePath());
+                        Files.copy(newFile, dest, StandardCopyOption.REPLACE_EXISTING);
                     }
                 }
             } catch (IOException ex) {
                 throw new AndrolibException(ex);
             }
-        }
-    }
-
-    private void insertFile(Path apkPath, Map<String,String> zip_properties, File insert, String method, Path location)
-            throws AndrolibException, IOException {
-        // ZipFileSystem only writes at .close()
-        // http://mail.openjdk.java.net/pipermail/nio-dev/2012-July/001764.html
-        try(
-                FileSystem fs = FileSystems.newFileSystem(apkPath, null)
-        ) {
-            Path root = fs.getPath("/");
-
-            // in order to get the path relative to the zip, we strip off the absolute path, minus what we
-            // already have in the zip. thus /var/files/apktool/apk/unknown/folder/file => /folder/file
-            Path dest = fs.getPath(root.toString(), insert.getAbsolutePath().replace(location.toString(),""));
-            Path newFile = Paths.get(insert.getAbsolutePath());
-            Files.copy(newFile,dest, StandardCopyOption.REPLACE_EXISTING);
-            fs.close();
-        }
-    }
-
-    private void insertFolder(Path apkPath, Map<String,String> zip_properties, File insert, String method, Path location)
-            throws AndrolibException, IOException {
-        try(
-                FileSystem fs = FileSystems.newFileSystem(apkPath, null)
-        ) {
-            Path root = fs.getPath("/");
-            Path dest = fs.getPath(root.toString(), insert.getAbsolutePath().replace(location.toString(),""));
-            Path parent = dest.normalize();
-
-            // check for folder existing in apkFileSystem
-            if (parent != null && Files.notExists(parent)) {
-                if (!Files.isDirectory(parent, LinkOption.NOFOLLOW_LINKS)) {
-                    Files.createDirectories(parent);
-                }
-            }
-            fs.close();
         }
     }
 
