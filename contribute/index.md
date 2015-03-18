@@ -12,7 +12,7 @@ I find it funny that some people go the hard route of reverse engineering when t
 So... if you get some errors from apktool when decoding or building apk, then this is probably a bug in apktool and you should report it.
 But if you have succeeded at decoding and building, but the app doesn't work on your device, then I suggest you do some tests:
 
- * don't do anything with original apk file, just install it using the same way as for apk built by apktool. If it fails, then it can't be related to apktool, because you didn't even use it. Typical scenario: installing framework-res.apk by "adb push" command, which will certainly give you a lot of FCs.
+ * don't do anything with original apk file, just install it using the same way you would with a modified apk. If it fails, then it can't be related to apktool, because you didn't even use it. Typical scenario: installing framework-res.apk by "adb push" command, which will certainly give you a lot of FCs.
  * unzip apk, remove META-INF dir, zip it back, sign and install. This will remove original signatures, but rest of the app will be intact. If you will fail at this point, you could be sure, that your problems are related to signing, not apktool.
  * rebuild apk without doing any changes to it (<kbd>apktool d</kbd> & <kbd>apktool b</kbd>). If apktool succeeds, but apk won't work, then it's probably an apktool bug and you should report it.
  * if an app was working earlier, but after doing some changes - it doesn't, this may be a bug of apktool, but more likely it's your fault.
