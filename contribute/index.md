@@ -24,7 +24,7 @@ After all of this, if you are ready to report a bug. Please make sure to answer 
  * What version of the tool are you using? On what Operating System?
  * Any additional information? (ROM, AOSP version)
  
-[Report a bug here](LinkToGithub)
+[Report a bug here](https://github.com/iBotPeaches/Apktool/issues/new)
 
 ### I want to work on the project
 Great! Explore and fix some bugs while you are here. You may find the project [here](https://github.com/iBotPeaches/Apktool) and [contributing hints](https://github.com/iBotPeaches/Apktool/blob/master/CONTRIBUTING.md).

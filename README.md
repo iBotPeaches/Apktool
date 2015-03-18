@@ -1,5 +1,5 @@
 ### Apktool Documentation
-**This is the repository for the [https://ibotpeaches.github.io/Apktool]() site. If you are looking for the Apktool tool repository. Click [here](https://github.com/iBotPeaches/Apktool).**
+**This is the repository for the [https://ibotpeaches.github.io/Apktool](https://ibotpeaches.github.io/Apktool) site. If you are looking for the Apktool tool repository. Click [here](https://github.com/iBotPeaches/Apktool).**
 
 This repository contains the files used in generating the Github Pages site. It's possible to test them locally so you can test changes prior to making pull requests.
 
@@ -19,3 +19,6 @@ This repository contains the files used in generating the Github Pages site. It'
  
 **Dates in `_data/releases.yml` have to include the timestamp like so `2010-03-02 00:00:0`**
  - I believe this is a YAML limitation, so make sure to always have a `00:00:0` timestamp added to days
+ 
+**Links in `_data/releases.yml` have to be hardcoded to live site**
+ - appending `/Apktool/` because `{{ site.baseurl }}` doesn't work

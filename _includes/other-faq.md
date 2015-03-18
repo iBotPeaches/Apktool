@@ -1,7 +1,7 @@
 <br />
 <strong>What about the <code>-j</code> switch shown from the original YouTube videos?</strong>
 <br />
-Read <a href="">Issue 88</a>. In short - it doesn't exist.
+Read <a href="https://github.com/iBotPeaches/Apktool/issues/199">Issue 199</a>. In short - it doesn't exist.
 <br /><br />
 <strong>Is it possible to run apktool on a device?</strong>
 <br />

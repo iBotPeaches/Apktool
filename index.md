@@ -15,7 +15,7 @@ It is **NOT** intended for piracy and other non-legal uses. It could be used for
  * Organizing and handling APKs that depend on framework resources
  * Smali Debugging
  * Helping with repetitive tasks
- 
+
 ## Requirements
  * Java 7 (JRE 1.7)
  * Basic knowledge of Android SDK, AAPT and smali

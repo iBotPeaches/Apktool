@@ -25,6 +25,9 @@
     font-size: 15px;
     font-weight: 400;
 }
+li > p {
+    font-size: 14px;
+}
 p {
     font-size: 16px;
 }
