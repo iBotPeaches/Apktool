@@ -31,10 +31,7 @@
 
 package org.jf.baksmali;
 
-import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
-
-import java.io.IOException;
 
 public class LambdaTest extends IdenticalRoundtripTest {
 
@@ -46,7 +43,7 @@ public class LambdaTest extends IdenticalRoundtripTest {
     }
 
     @Test
-    public void testHelloWorldLambda() throws IOException, RecognitionException {
+    public void testHelloWorldLambda() {
         runTest("HelloWorldLambda", createOptions());
     }
 }

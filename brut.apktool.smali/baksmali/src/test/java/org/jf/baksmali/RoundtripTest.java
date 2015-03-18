@@ -70,20 +70,29 @@ public abstract class RoundtripTest {
         return String.format("%s%s%sOutput.smali", testDir, File.separatorChar, testName);
     }
 
-    protected void runTest(@Nonnull String testName, @Nonnull baksmaliOptions options)
-            throws IOException, RecognitionException {
-        // Load file from resources as a stream
-        String inputFilename = getInputFilename(testName);
-        String input = readResourceFully(getInputFilename(testName));
-        String output;
-        if (getOutputFilename(testName).equals(inputFilename)) {
-            output = input;
-        } else {
-            output = readResourceFully(getOutputFilename(testName));
-        }
+    protected void runTest(@Nonnull String testName) {
+        runTest(testName, new baksmaliOptions());
+    }
 
-        // Run smali, baksmali, and then compare strings are equal (minus comments/whitespace)
-        BaksmaliTestUtils.assertSmaliCompiledEquals(input, output, options, true);
+    protected void runTest(@Nonnull String testName, @Nonnull baksmaliOptions options) {
+        try {
+            // Load file from resources as a stream
+            String inputFilename = getInputFilename(testName);
+            String input = readResourceFully(getInputFilename(testName));
+            String output;
+            if (getOutputFilename(testName).equals(inputFilename)) {
+                output = input;
+            } else {
+                output = readResourceFully(getOutputFilename(testName));
+            }
+
+            // Run smali, baksmali, and then compare strings are equal (minus comments/whitespace)
+            BaksmaliTestUtils.assertSmaliCompiledEquals(input, output, options, true);
+        } catch (IOException ex) {
+            Assert.fail();
+        } catch (RecognitionException ex) {
+            Assert.fail();
+        }
     }
 
     @Nonnull
