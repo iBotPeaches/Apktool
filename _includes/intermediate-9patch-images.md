@@ -3,7 +3,7 @@ and <a target="_blank" href="http://developer.android.com/tools/help/draw9patch.
 and lack information for those who work with already compiled 3rd party applications. There you can find information how to create them, but
 no information about how they actually work.
 <br /><br />
-I will try and explain it here. The official docs mess one point that 9patch images come in two forms: source & compiled.
+I will try and explain it here. The official docs miss one point that 9patch images come in two forms: source & compiled.
 <ul>
   <li><strong>source</strong> - You know this one. You find it in the source of an application or freely available online. These
   are images with a black border around them.</li>
