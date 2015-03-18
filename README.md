@@ -15,7 +15,7 @@ It is NOT intended for piracy and other non-legal uses. It could be used for loc
 - [#apktool on freenode](http://webchat.freenode.net/?channels=apktool)
 
 #### Links
-- [Downloads](http://ibotpeaches.github.io/Apktool/install/)
+- [Downloads](https://bitbucket.org/iBotPeaches/apktool/downloads)
 - [How to Build](http://ibotpeaches.github.io/Apktool/build/)
 - [Documentation](http://ibotpeaches.github.io/Apktool/documentation/)
 - [Bug Reports](https://github.com/iBotPeaches/Apktool/issues)
