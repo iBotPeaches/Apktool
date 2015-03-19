@@ -29,6 +29,7 @@
 package org.jf.baksmali.Adaptors;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import org.jf.baksmali.Adaptors.Debug.DebugMethodItem;
 import org.jf.baksmali.Adaptors.Format.InstructionMethodItemFactory;
 import org.jf.baksmali.baksmaliOptions;
@@ -45,11 +46,14 @@ import org.jf.dexlib2.iface.debug.DebugItem;
 import org.jf.dexlib2.iface.instruction.Instruction;
 import org.jf.dexlib2.iface.instruction.OffsetInstruction;
 import org.jf.dexlib2.iface.instruction.ReferenceInstruction;
+import org.jf.dexlib2.iface.instruction.formats.Instruction31t;
 import org.jf.dexlib2.iface.reference.MethodReference;
+import org.jf.dexlib2.immutable.instruction.ImmutableInstruction31t;
 import org.jf.dexlib2.util.InstructionOffsetMap;
 import org.jf.dexlib2.util.InstructionOffsetMap.InvalidInstructionOffset;
 import org.jf.dexlib2.util.ReferenceUtil;
 import org.jf.dexlib2.util.SyntheticAccessorResolver;
+import org.jf.dexlib2.util.SyntheticAccessorResolver.AccessedMember;
 import org.jf.dexlib2.util.TypeUtils;
 import org.jf.util.ExceptionWithContext;
 import org.jf.util.IndentingWriter;
@@ -65,6 +69,8 @@ public class MethodDefinition {
     @Nonnull public final Method method;
     @Nonnull public final MethodImplementation methodImpl;
     @Nonnull public final ImmutableList<Instruction> instructions;
+    @Nonnull public final List<Instruction> effectiveInstructions;
+
     @Nonnull public final ImmutableList<MethodParameter> methodParameters;
     public RegisterFormatter registerFormatter;
 
@@ -86,9 +92,14 @@ public class MethodDefinition {
             instructions = ImmutableList.copyOf(methodImpl.getInstructions());
             methodParameters = ImmutableList.copyOf(method.getParameters());
 
+            effectiveInstructions = Lists.newArrayList(instructions);
+
             packedSwitchMap = new SparseIntArray(0);
             sparseSwitchMap = new SparseIntArray(0);
             instructionOffsetMap = new InstructionOffsetMap(instructions);
+
+            int endOffset = instructionOffsetMap.getInstructionCodeOffset(instructions.size()-1) +
+                    instructions.get(instructions.size()-1).getCodeUnits();
 
             for (int i=0; i<instructions.size(); i++) {
                 Instruction instruction = instructions.get(i);
@@ -99,11 +110,20 @@ public class MethodDefinition {
                     int codeOffset = instructionOffsetMap.getInstructionCodeOffset(i);
                     int targetOffset = codeOffset + ((OffsetInstruction)instruction).getCodeOffset();
                     try {
-                        targetOffset = findSwitchPayload(targetOffset, Opcode.PACKED_SWITCH_PAYLOAD);
+                        targetOffset = findPayloadOffset(targetOffset, Opcode.PACKED_SWITCH_PAYLOAD);
                     } catch (InvalidSwitchPayload ex) {
                         valid = false;
                     }
                     if (valid) {
+                        if (packedSwitchMap.get(targetOffset, -1) != -1) {
+                            Instruction payloadInstruction =
+                                    findSwitchPayload(targetOffset, Opcode.PACKED_SWITCH_PAYLOAD);
+                            targetOffset = endOffset;
+                            effectiveInstructions.set(i, new ImmutableInstruction31t(opcode,
+                                    ((Instruction31t)instruction).getRegisterA(), targetOffset-codeOffset));
+                            effectiveInstructions.add(payloadInstruction);
+                            endOffset += payloadInstruction.getCodeUnits();
+                        }
                         packedSwitchMap.append(targetOffset, codeOffset);
                     }
                 } else if (opcode == Opcode.SPARSE_SWITCH) {
@@ -111,18 +131,27 @@ public class MethodDefinition {
                     int codeOffset = instructionOffsetMap.getInstructionCodeOffset(i);
                     int targetOffset = codeOffset + ((OffsetInstruction)instruction).getCodeOffset();
                     try {
-                        targetOffset = findSwitchPayload(targetOffset, Opcode.SPARSE_SWITCH_PAYLOAD);
+                        targetOffset = findPayloadOffset(targetOffset, Opcode.SPARSE_SWITCH_PAYLOAD);
                     } catch (InvalidSwitchPayload ex) {
                         valid = false;
                         // The offset to the payload instruction was invalid. Nothing to do, except that we won't
                         // add this instruction to the map.
                     }
                     if (valid) {
+                        if (sparseSwitchMap.get(targetOffset, -1) != -1) {
+                            Instruction payloadInstruction =
+                                    findSwitchPayload(targetOffset, Opcode.SPARSE_SWITCH_PAYLOAD);
+                            targetOffset = endOffset;
+                            effectiveInstructions.set(i, new ImmutableInstruction31t(opcode,
+                                    ((Instruction31t)instruction).getRegisterA(), targetOffset-codeOffset));
+                            effectiveInstructions.add(payloadInstruction);
+                            endOffset += payloadInstruction.getCodeUnits();
+                        }
                         sparseSwitchMap.append(targetOffset, codeOffset);
                     }
                 }
             }
-        }catch (Exception ex) {
+        } catch (Exception ex) {
             String methodString;
             try {
                 methodString = ReferenceUtil.getMethodDescriptor(method);
@@ -216,7 +245,36 @@ public class MethodDefinition {
         writer.write(".end method\n");
     }
 
-    public int findSwitchPayload(int targetOffset, Opcode type) {
+    public Instruction findSwitchPayload(int targetOffset, Opcode type) {
+        int targetIndex;
+        try {
+            targetIndex = instructionOffsetMap.getInstructionIndexAtCodeOffset(targetOffset);
+        } catch (InvalidInstructionOffset ex) {
+            throw new InvalidSwitchPayload(targetOffset);
+        }
+
+        //TODO: does dalvik let you pad with multiple nops?
+        //TODO: does dalvik let a switch instruction point to a non-payload instruction?
+
+        Instruction instruction = instructions.get(targetIndex);
+        if (instruction.getOpcode() != type) {
+            // maybe it's pointing to a NOP padding instruction. Look at the next instruction
+            if (instruction.getOpcode() == Opcode.NOP) {
+                targetIndex += 1;
+                if (targetIndex < instructions.size()) {
+                    instruction = instructions.get(targetIndex);
+                    if (instruction.getOpcode() == type) {
+                        return instruction;
+                    }
+                }
+            }
+            throw new InvalidSwitchPayload(targetOffset);
+        } else {
+            return instruction;
+        }
+    }
+
+    public int findPayloadOffset(int targetOffset, Opcode type) {
         int targetIndex;
         try {
             targetIndex = instructionOffsetMap.getInstructionIndexAtCodeOffset(targetOffset);
@@ -343,15 +401,16 @@ public class MethodDefinition {
 
     private void addInstructionMethodItems(List<MethodItem> methodItems) {
         int currentCodeAddress = 0;
-        for (int i=0; i<instructions.size(); i++) {
-            Instruction instruction = instructions.get(i);
+
+        for (int i=0; i<effectiveInstructions.size(); i++) {
+            Instruction instruction = effectiveInstructions.get(i);
 
             MethodItem methodItem = InstructionMethodItemFactory.makeInstructionFormatMethodItem(this,
                     currentCodeAddress, instruction);
 
             methodItems.add(methodItem);
 
-            if (i != instructions.size() - 1) {
+            if (i != effectiveInstructions.size() - 1) {
                 methodItems.add(new BlankMethodItem(currentCodeAddress));
             }
 
@@ -386,7 +445,7 @@ public class MethodDefinition {
 
                     if (methodReference != null &&
                             SyntheticAccessorResolver.looksLikeSyntheticAccessor(methodReference.getName())) {
-                        SyntheticAccessorResolver.AccessedMember accessedMember =
+                        AccessedMember accessedMember =
                                 classDef.options.syntheticAccessorResolver.getAccessedMember(methodReference);
                         if (accessedMember != null) {
                             methodItems.add(new SyntheticAccessCommentMethodItem(accessedMember, currentCodeAddress));

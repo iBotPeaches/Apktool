@@ -31,7 +31,10 @@
 
 package org.jf.baksmali;
 
-import org.antlr.runtime.RecognitionException;
+import com.google.common.collect.Iterables;
+import org.jf.dexlib2.Opcodes;
+import org.jf.dexlib2.dexbacked.DexBackedDexFile;
+import org.jf.dexlib2.iface.ClassDef;
 import org.junit.Assert;
 
 import javax.annotation.Nonnull;
@@ -39,28 +42,28 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * A base test class for performing a roundtrip assembly/disassembly
+ * A base test class for performing a disassembly on a dex file and verifying the results
  *
- * The test accepts a smali file as input, performs a smali -> dex -> smali roundtrip, and
- * verifies that the result equals a known-good output smali file.
+ * The test accepts a single-class dex file as input, disassembles it, and  verifies that
+ * the result equals a known-good output smali file.
  *
- * By default, the input and output files should be resources at [testDir]/[testName]Input.smali
+ * By default, the input and output files should be resources at [testDir]/[testName]Input.dex
  * and [testDir]/[testName]Output.smali respectively
  */
-public abstract class RoundtripTest {
+public class DisassemblyTest {
     protected final String testDir;
 
-    protected RoundtripTest(@Nonnull String testDir) {
+    protected DisassemblyTest(@Nonnull String testDir) {
         this.testDir = testDir;
     }
 
-    protected RoundtripTest() {
+    protected DisassemblyTest() {
         this.testDir = this.getClass().getSimpleName();
     }
 
     @Nonnull
     protected String getInputFilename(@Nonnull String testName) {
-        return String.format("%s%s%sInput.smali", testDir, File.separatorChar, testName);
+        return String.format("%s%s%sInput.dex", testDir, File.separatorChar, testName);
     }
 
     @Nonnull
@@ -76,19 +79,25 @@ public abstract class RoundtripTest {
         try {
             // Load file from resources as a stream
             String inputFilename = getInputFilename(testName);
-            String input = BaksmaliTestUtils.readResourceFully(getInputFilename(testName));
+            byte[] inputBytes = BaksmaliTestUtils.readResourceBytesFully(getInputFilename(testName));
+
+            DexBackedDexFile inputDex = new DexBackedDexFile(new Opcodes(options.apiLevel, false), inputBytes);
+            Assert.assertEquals(1, inputDex.getClassCount());
+            ClassDef inputClass = Iterables.getFirst(inputDex.getClasses(), null);
+            Assert.assertNotNull(inputClass);
+            String input = BaksmaliTestUtils.getNormalizedSmali(inputClass, options, true);
+
             String output;
             if (getOutputFilename(testName).equals(inputFilename)) {
                 output = input;
             } else {
                 output = BaksmaliTestUtils.readResourceFully(getOutputFilename(testName));
             }
+            output = BaksmaliTestUtils.normalizeSmali(output, true);
 
             // Run smali, baksmali, and then compare strings are equal (minus comments/whitespace)
-            BaksmaliTestUtils.assertSmaliCompiledEquals(input, output, options, true);
+            Assert.assertEquals(output, input);
         } catch (IOException ex) {
-            Assert.fail();
-        } catch (RecognitionException ex) {
             Assert.fail();
         }
     }

@@ -31,6 +31,7 @@
 
 package org.jf.baksmali;
 
+import com.google.common.io.ByteStreams;
 import junit.framework.Assert;
 
 import org.antlr.runtime.RecognitionException;
@@ -40,7 +41,9 @@ import org.jf.smali.SmaliTestUtils;
 import org.jf.util.IndentingWriter;
 import org.jf.util.TextUtils;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringWriter;
 
 public class BaksmaliTestUtils {
@@ -50,24 +53,9 @@ public class BaksmaliTestUtils {
         ClassDef classDef = SmaliTestUtils.compileSmali(source, options.apiLevel,
                 options.experimental);
 
-        StringWriter stringWriter = new StringWriter();
-        IndentingWriter writer = new IndentingWriter(stringWriter);
-        ClassDefinition classDefinition = new ClassDefinition(options, classDef);
-        classDefinition.writeTo(writer);
-        writer.close();
-
         // Remove unnecessary whitespace and optionally strip all comments from smali file
-        String normalizedExpected = expected;
-        if (stripComments) {
-            normalizedExpected = TextUtils.stripComments(normalizedExpected);
-        }
-        normalizedExpected = TextUtils.normalizeWhitespace(normalizedExpected);
-
-        String normalizedActual = stringWriter.toString();
-        if (stripComments) {
-            normalizedActual = TextUtils.stripComments(normalizedActual);
-        }
-        normalizedActual = TextUtils.normalizeWhitespace(normalizedActual);
+        String normalizedActual = getNormalizedSmali(classDef, options, stripComments);
+        String normalizedExpected = normalizeSmali(expected, stripComments);
 
         // Assert that normalized strings are now equal
         Assert.assertEquals(normalizedExpected, normalizedActual);
@@ -82,6 +70,48 @@ public class BaksmaliTestUtils {
             throws IOException, RecognitionException {
         baksmaliOptions options = new baksmaliOptions();
         assertSmaliCompiledEquals(source, expected, options);
+    }
+
+    @Nonnull
+    public static String normalizeSmali(@Nonnull String smaliText, boolean stripComments) {
+        if (stripComments) {
+            smaliText = TextUtils.stripComments(smaliText);
+        }
+        return TextUtils.normalizeWhitespace(smaliText);
+    }
+
+    @Nonnull
+    public static String getNormalizedSmali(@Nonnull ClassDef classDef, @Nonnull baksmaliOptions options,
+                                            boolean stripComments)
+            throws IOException {
+        StringWriter stringWriter = new StringWriter();
+        IndentingWriter writer = new IndentingWriter(stringWriter);
+        ClassDefinition classDefinition = new ClassDefinition(options, classDef);
+        classDefinition.writeTo(writer);
+        writer.close();
+        return normalizeSmali(stringWriter.toString(), stripComments);
+    }
+
+    @Nonnull
+    public static byte[] readResourceBytesFully(@Nonnull String fileName) throws IOException {
+        InputStream smaliStream = RoundtripTest.class.getClassLoader().
+                getResourceAsStream(fileName);
+        if (smaliStream == null) {
+            org.junit.Assert.fail("Could not load " + fileName);
+        }
+
+        return ByteStreams.toByteArray(smaliStream);
+    }
+
+    @Nonnull
+    public static String readResourceFully(@Nonnull String fileName) throws IOException {
+        return readResourceFully(fileName, "UTF-8");
+    }
+
+    @Nonnull
+    public static String readResourceFully(@Nonnull String fileName, @Nonnull String encoding)
+            throws IOException {
+        return new String(readResourceBytesFully(fileName), encoding);
     }
 
     // Static helpers class; do not instantiate.

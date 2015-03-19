@@ -130,26 +130,37 @@ public class InstructionMethodItem<T extends Instruction> extends MethodItem {
         }
 
         if (instruction instanceof Instruction31t) {
-            Opcode payloadOpcode;
+            boolean validPayload = true;
+
             switch (instruction.getOpcode()) {
                 case PACKED_SWITCH:
-                    payloadOpcode = Opcode.PACKED_SWITCH_PAYLOAD;
+                    int baseAddress = methodDef.getPackedSwitchBaseAddress(
+                            this.codeAddress + ((Instruction31t)instruction).getCodeOffset());
+                    if (baseAddress == -1) {
+                        validPayload = false;
+                    }
                     break;
                 case SPARSE_SWITCH:
-                    payloadOpcode = Opcode.SPARSE_SWITCH_PAYLOAD;
+                    baseAddress = methodDef.getSparseSwitchBaseAddress(
+                            this.codeAddress + ((Instruction31t)instruction).getCodeOffset());
+                    if (baseAddress == -1) {
+                        validPayload = false;
+                    }
                     break;
                 case FILL_ARRAY_DATA:
-                    payloadOpcode = Opcode.ARRAY_PAYLOAD;
+                    try {
+                        methodDef.findPayloadOffset(this.codeAddress + ((Instruction31t)instruction).getCodeOffset(),
+                                Opcode.ARRAY_PAYLOAD);
+                    } catch (InvalidSwitchPayload ex) {
+                        validPayload = false;
+                    }
                     break;
                 default:
                     throw new ExceptionWithContext("Invalid 31t opcode: %s", instruction.getOpcode());
             }
 
-            try {
-                methodDef.findSwitchPayload(this.codeAddress + ((Instruction31t)instruction).getCodeOffset(),
-                        payloadOpcode);
-            } catch (InvalidSwitchPayload ex) {
-                writer.write("#invalid payload reference");
+            if (!validPayload) {
+                writer.write("#invalid payload reference\n");
                 commentOutInstruction = true;
             }
         }
