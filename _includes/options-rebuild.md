@@ -12,7 +12,7 @@ These are all the options when building an apk.
 <strong><code>-f, --force-all</code></strong>
 <blockquote>Overwrites existing files during build, reassembling the <code>resources.arsc</code> file and <code>classes.dex</code> file</blockquote>
 <br />
-<strong><code>-o, --output &lt;DIR></code></strong>
+<strong><code>-o, --output &lt;FILE></code></strong>
 <blockquote>The name and location of the apk that gets written</blockquote>
 <br />
 <strong><code>-p, --frame-path &lt;DIR></code></strong>

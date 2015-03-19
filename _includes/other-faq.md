@@ -24,8 +24,8 @@ These points (some of which fixed now). Would of contributed to a smaller than n
 <br /><br />
 <strong>There is no META-INF dir in resulting apk. Is this ok?</strong>
 <br />
-Yes. <code>META-INF</code> contains apk signatures. After modifying the apk it is no longer signed. You can use <code>-c / --copy-original</code> to retain these signatures, but
-who knows how long this method will work with AOSP updates.
+Yes. <code>META-INF</code> contains apk signatures. After modifying the apk it is no longer signed. You can use <code>-c / --copy-original</code> to retain these signatures. However,
+using <code>-c</code> uses the original <code>AndroidManifest.xml</code> file, so changes to it will be lost.
 <br /><br />
 <strong>What do you call "magic apks"?</strong>
 <br />

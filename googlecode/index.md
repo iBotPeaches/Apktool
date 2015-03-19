@@ -28,7 +28,7 @@ Since Apktool [already](https://github.com/iBotPeaches/Apktool) had a mirror of 
  * **1,274,207** unique hits from (Nov 15 2014 -> March 16 2015)
  * **7,385,601** pageviews from (Nov 15 2014 -> March 16 2015)
  * **2** revision control changes (`cvs` -> `svn` -> `git`)
- * **3** build system changes (`bash files` -> `maven` -> `gradle`)
+ * **2** build system changes (`bash files` -> `maven` -> `gradle`)
  * **1,526,451** downloads for `v1.5.2`
  * **4,393,639** total downloads of all archives
  * **~5.99TB** of transferred bandwidth via all archives
