@@ -532,7 +532,7 @@ registers_directive returns[boolean isLocalsDirective, int registers]
     ^(( I_REGISTERS {$isLocalsDirective = false;}
       | I_LOCALS {$isLocalsDirective = true;}
       )
-      short_integral_literal {$registers = $short_integral_literal.value;}
+      short_integral_literal {$registers = $short_integral_literal.value & 0xFFFF;}
      );
 
 label_def
