@@ -120,7 +120,7 @@ public class IndentingWriter extends Writer {
         int pos = start;
         while (pos < end) {
             pos = str.indexOf('\n', start);
-            if (pos == -1) {
+            if (pos == -1 || pos >= end) {
                 writeLine(str, start, end-start);
                 return;
             } else {
