@@ -28,6 +28,7 @@
 
 package org.jf.baksmali.Adaptors.Format;
 
+import org.jf.baksmali.Adaptors.CommentingIndentingWriter;
 import org.jf.baksmali.Adaptors.LabelMethodItem;
 import org.jf.baksmali.Adaptors.MethodDefinition;
 import org.jf.dexlib2.iface.instruction.SwitchElement;
@@ -43,6 +44,9 @@ public class PackedSwitchMethodItem extends InstructionMethodItem<PackedSwitchPa
     private final List<PackedSwitchTarget> targets;
     private final int firstKey;
 
+    // Whether this sparse switch instruction should be commented out because it is never referenced
+    private boolean commentedOut;
+
     public PackedSwitchMethodItem(MethodDefinition methodDef, int codeAddress, PackedSwitchPayload instruction) {
         super(methodDef, codeAddress, instruction);
 
@@ -51,7 +55,6 @@ public class PackedSwitchMethodItem extends InstructionMethodItem<PackedSwitchPa
         targets = new ArrayList<PackedSwitchTarget>();
 
         boolean first = true;
-        //TODO: does dalvik allow switc payloads with no cases?
         int firstKey = 0;
         if (baseCodeAddress >= 0) {
             for (SwitchElement switchElement: instruction.getSwitchElements()) {
@@ -65,6 +68,7 @@ public class PackedSwitchMethodItem extends InstructionMethodItem<PackedSwitchPa
                 targets.add(new PackedSwitchLabelTarget(label));
             }
         } else {
+            commentedOut = true;
             for (SwitchElement switchElement: instruction.getSwitchElements()) {
                 if (first) {
                     firstKey = switchElement.getKey();
@@ -78,6 +82,9 @@ public class PackedSwitchMethodItem extends InstructionMethodItem<PackedSwitchPa
 
     @Override
     public boolean writeTo(IndentingWriter writer) throws IOException {
+        if (commentedOut) {
+            writer = new CommentingIndentingWriter(writer);
+        }
         writer.write(".packed-switch ");
         IntegerRenderer.writeTo(writer, firstKey);
         writer.indent(4);

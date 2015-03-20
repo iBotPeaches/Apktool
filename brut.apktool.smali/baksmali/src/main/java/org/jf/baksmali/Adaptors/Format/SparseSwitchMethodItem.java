@@ -28,6 +28,7 @@
 
 package org.jf.baksmali.Adaptors.Format;
 
+import org.jf.baksmali.Adaptors.CommentingIndentingWriter;
 import org.jf.baksmali.Adaptors.LabelMethodItem;
 import org.jf.baksmali.Adaptors.MethodDefinition;
 import org.jf.dexlib2.iface.instruction.SwitchElement;
@@ -41,6 +42,9 @@ import java.util.List;
 
 public class SparseSwitchMethodItem extends InstructionMethodItem<SparseSwitchPayload> {
     private final List<SparseSwitchTarget> targets;
+
+    // Whether this sparse switch instruction should be commented out because it is never referenced
+    private boolean commentedOut;
 
     public SparseSwitchMethodItem(MethodDefinition methodDef, int codeAddress, SparseSwitchPayload instruction) {
         super(methodDef, codeAddress, instruction);
@@ -56,6 +60,7 @@ public class SparseSwitchMethodItem extends InstructionMethodItem<SparseSwitchPa
                 targets.add(new SparseSwitchLabelTarget(switchElement.getKey(), label));
             }
         } else {
+            commentedOut = true;
             //if we couldn't determine a base address, just use relative offsets rather than labels
             for (SwitchElement switchElement: instruction.getSwitchElements()) {
                 targets.add(new SparseSwitchOffsetTarget(switchElement.getKey(), switchElement.getOffset()));
@@ -65,6 +70,10 @@ public class SparseSwitchMethodItem extends InstructionMethodItem<SparseSwitchPa
 
     @Override
     public boolean writeTo(IndentingWriter writer) throws IOException {
+        if (commentedOut) {
+            writer = new CommentingIndentingWriter(writer);
+        }
+
         writer.write(".sparse-switch\n");
         writer.indent(4);
         for (SparseSwitchTarget target: targets) {
