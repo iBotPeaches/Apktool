@@ -248,6 +248,8 @@ public class ARSCDecoder {
     private ResConfigFlags readConfigFlags() throws IOException,
             AndrolibException {
         int size = mIn.readInt();
+        int read = 0;
+
         if (size < 28) {
             throw new AndrolibException("Config size < 28");
         }
@@ -283,6 +285,7 @@ public class ARSCDecoder {
             screenLayout = mIn.readByte();
             uiMode = mIn.readByte();
             smallestScreenWidthDp = mIn.readShort();
+            read = 32;
         }
 
         short screenWidthDp = 0;
@@ -290,6 +293,7 @@ public class ARSCDecoder {
         if (size >= 36) {
             screenWidthDp = mIn.readShort();
             screenHeightDp = mIn.readShort();
+            read = 36;
         }
 
         char[] localeScript = null;
@@ -297,6 +301,7 @@ public class ARSCDecoder {
         if (size >= 48) {
             localeScript = readScriptOrVariantChar(4).toCharArray();
             localeVariant = readScriptOrVariantChar(8).toCharArray();
+            read = 48;
         }
 
         int exceedingSize = size - KNOWN_CONFIG_BYTES;
@@ -314,6 +319,11 @@ public class ARSCDecoder {
                         KNOWN_CONFIG_BYTES, exceedingBI));
                 isInvalid = true;
             }
+        }
+
+        int remainingSize = size - read;
+        if (remainingSize > 0) {
+            mIn.skipBytes(remainingSize);
         }
 
         return new ResConfigFlags(mcc, mnc, language, country,
