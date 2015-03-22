@@ -1,6 +1,6 @@
 The build option can be invoked either from <code>b</code> or <code>build</code> like shown below
 {% highlight console %}
-$ apktool b foo.out
+$ apktool b foo.jar.out
 // builds foo.jar.out folder into foo.jar.out/dist/foo.jar file
 
 $ apktool build foo.jar.out
