@@ -12,5 +12,6 @@ versionInfo:
 compressionType: false
 unknownFiles:
   hidden.file: '8'
+  stored.file: '0'
   unk_folder/unknown_file: '8'
   lib_bug603/bug603: '8'
