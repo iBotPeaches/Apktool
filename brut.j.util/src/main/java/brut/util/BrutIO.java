@@ -17,6 +17,8 @@
 package brut.util;
 
 import java.io.*;
+import java.util.zip.CRC32;
+
 import org.apache.commons.io.IOUtils;
 
 /**
@@ -58,5 +60,21 @@ public class BrutIO {
             }
         }
         return modified;
+    }
+
+    public static CRC32 calculateCrc(InputStream input, byte[] buffer) throws IOException {
+        CRC32 crc = new CRC32();
+        int bytesRead = 0;
+        while((bytesRead = input.read(buffer)) != -1) {
+            crc.update(buffer, 0, bytesRead);
+        }
+        return crc;
+    }
+
+    public static void copy(InputStream input, OutputStream output, byte[] buffer) throws IOException {
+        int bytesRead;
+        while((bytesRead = input.read(buffer)) != -1) {
+            output.write(buffer, 0, bytesRead);
+        }
     }
 }

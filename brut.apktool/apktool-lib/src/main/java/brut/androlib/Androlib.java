@@ -29,13 +29,10 @@ import brut.directory.*;
 import brut.util.BrutIO;
 import brut.util.OS;
 import java.io.*;
-import java.nio.file.*;
-import java.nio.file.Path;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
-import java.nio.file.Files;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
@@ -583,7 +580,7 @@ public class Androlib {
 
             // No need to create directory entries in the final apk
             if (!entry.isDirectory()) {
-                copy(inputFile.getInputStream(entry), outputFile, buffer);
+                BrutIO.copy(inputFile.getInputStream(entry), outputFile, buffer);
             }
 
             outputFile.closeEntry();
@@ -609,35 +606,18 @@ public class Androlib {
                 newEntry.setSize(inputFile.length());
                 newEntry.setCompressedSize(-1);
                 BufferedInputStream unknownFile = new BufferedInputStream(new FileInputStream(inputFile));
-                CRC32 crc = calculateCrc(unknownFile, buffer);
+                CRC32 crc = BrutIO.calculateCrc(unknownFile, buffer);
                 newEntry.setCrc(crc.getValue());
 
                 LOGGER.fine("\tsize: " + newEntry.getSize());
-            }
-            else {
+            } else {
                 newEntry.setMethod(ZipEntry.DEFLATED);
             }
             outputFile.putNextEntry(newEntry);
 
             BufferedInputStream unknownFile = new BufferedInputStream(new FileInputStream(inputFile));
-            copy(unknownFile, outputFile, buffer);
+            BrutIO.copy(unknownFile, outputFile, buffer);
             outputFile.closeEntry();
-        }
-    }
-
-    private CRC32 calculateCrc(InputStream input, byte[] buffer) throws IOException {
-        CRC32 crc = new CRC32();
-        int bytesRead = 0;
-        while((bytesRead = input.read(buffer)) != -1) {
-            crc.update(buffer, 0, bytesRead);
-        }
-        return crc;
-    }
-
-    private static void copy(InputStream input, OutputStream output, byte[] buffer) throws IOException {
-        int bytesRead;
-        while((bytesRead = input.read(buffer)) != -1) {
-            output.write(buffer, 0, bytesRead);
         }
     }
 
