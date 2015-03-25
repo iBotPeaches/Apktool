@@ -590,7 +590,8 @@ public class Androlib {
         }
     }
 
-    private void copyUnknownFiles(File appDir, ZipOutputStream outputFile, Map<String, String> files, byte[] buffer) throws IOException {
+    private void copyUnknownFiles(File appDir, ZipOutputStream outputFile, Map<String, String> files, byte[] buffer)
+            throws IOException {
         File unknownFileDir = new File(appDir, UNK_DIRNAME);
 
         // loop through unknown files
@@ -602,7 +603,7 @@ public class Androlib {
 
             ZipEntry newEntry = new ZipEntry(unknownFileInfo.getKey());
             int method = Integer.valueOf(unknownFileInfo.getValue());
-            LOGGER.fine("Copying unknown file " + unknownFileInfo.getKey() + " with method " + unknownFileInfo.getValue());
+            LOGGER.fine(String.format("Copying unknown file %s with method %d", unknownFileInfo.getKey(), method));
             if(method == ZipEntry.STORED) {
                 newEntry.setMethod(ZipEntry.STORED);
                 newEntry.setSize(inputFile.length());
