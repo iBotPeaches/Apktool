@@ -1,6 +1,7 @@
 ---
 layout: other
-title: Apktool
+description: Apktool - How to Install
+title: Apktool - How to Install
 ---
 
 # Install Instructions

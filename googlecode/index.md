@@ -1,7 +1,7 @@
 ---
 layout: other
-tags: apktool, android, apk, reengineering, smali, decode, resources, xml, resources.arsc, AndroidManifest, classes.dex
-title: Apktool
+description: Apktool - The end of Googlecode (android-apktool)
+title: Apktool - The end of Googlecode (android-apktool)
 ---
 
 # The history of Googlecode Project (android-apktool)

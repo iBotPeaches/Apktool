@@ -1,6 +1,7 @@
 ---
 layout: other
-title: Apktool Build
+title: Apktool - Build Guide
+description: Apktool - Build Guide
 ---
 
 # How to Build Apktool from source

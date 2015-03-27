@@ -1,6 +1,7 @@
 ---
 layout: other
-title: Apktool Changelog
+title: Apktool - Changelog
+description: Apktool - Changelog / Roadmap
 ---
 
 ## v2.0.0

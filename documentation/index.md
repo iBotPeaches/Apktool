@@ -1,6 +1,7 @@
 ---
 layout: other
-title: Apktool Documentation
+title: Apktool - Documentation
+description: Apktool - Documentation (Decoding, Rebuilding, FrameworkFiles, 9patch images, SmaliDebugging)
 ---
 
 <div class="row">

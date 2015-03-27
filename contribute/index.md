@@ -1,6 +1,7 @@
 ---
 layout: other
-title: Apktool Contribute
+title: Apktool - How to Contribute
+description: Apktool - How to Contribute
 ---
 
 ##Contributing to Apktool
