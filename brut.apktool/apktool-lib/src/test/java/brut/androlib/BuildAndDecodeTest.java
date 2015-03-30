@@ -308,6 +308,11 @@ public class BuildAndDecodeTest {
         Map<String, String> control_files = (Map<String, String>)control.get("unknownFiles");
         Map<String, String> test_files = (Map<String, String>)test.get("unknownFiles");
         assertTrue(control_files.size() == test_files.size());
+
+        // Make sure that the compression methods are still the same
+        for(Map.Entry<String, String> controlEntry : control_files.entrySet()) {
+            assertTrue(controlEntry.getValue().equals(test_files.get(controlEntry.getKey())));
+        }
     }
 
     private boolean compareBinaryFolder(String path, boolean res)
