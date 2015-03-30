@@ -4,11 +4,82 @@ title: Apktool - Changelog
 description: Apktool - Changelog / Roadmap
 ---
 
-## v2.0.0
+## v2.0.0 (In Development)
 2014.xx.xx
 
- * [Changelog](https://github.com/iBotPeaches/Apktool/blob/master/CHANGES) ongoing
  * [Migration Instructions from 1.5.x to 2.0.x]({{ site.baseurl }}/documentation/#v1-5-x-v2-0-0)
+ * **Android 5.1 support**
+ * Updated smali/baksmali to `v2.0.5`
+ * Updated gradle to `v2.1`
+ * Fixed using `-c` to retain original manifest and META-INF folder. ([Issue 118](https://github.com/iBotPeaches/Apktool/issues/118))
+ * Fixed handling apks that have unknown files outside of standard aapt allowed resources. ([Issue 174](https://github.com/iBotPeaches/Apktool/issues/174))
+ * Fixed aapt incorrectly setting `pkgId`. ([Issue 313](https://github.com/iBotPeaches/Apktool/issues/313)) / (Thanks M1cha)
+ * Added new usage output to organize features / parameters.  ([Issue 514](https://github.com/iBotPeaches/Apktool/issues/514))
+ * Fixed NPE from malformed 9patch images. ([Issue 470](https://github.com/iBotPeaches/Apktool/issues/470)) / (Thanks Felipe Richards)
+ * Fixed aapt requiring `versionName` and `versionCode` via parameter passing. ([Issue 512](https://github.com/iBotPeaches/Apktool/issues/512))
+ * Fixed common `aapt` problems by including an internal mac, win and linux aapt. ([Issue 551](https://github.com/iBotPeaches/Apktool/issues/551))
+ * Fixed decoding apks that had general access bit thrown. ([Issue 550](https://github.com/iBotPeaches/Apktool/issues/550))
+ * Fixed debug mode (`-d`) to fix smali debugging. ([Issue 450](https://github.com/iBotPeaches/Apktool/issues/450)) / (Thanks Ryszard)
+ * Adapted smali debugging output to make breakpoint setting easier across IDEs. ([Issue 228](https://github.com/iBotPeaches/Apktool/issues/288)) / (Thanks Ryszard)
+ * Fixed characters (`&` & `<`) from being double escaped in `<item>`'s of `arrays.xml`. ([Issue 502](https://github.com/iBotPeaches/Apktool/issues/502))
+ * Fixed "multiple substitution" errors with positional and exactly 1 non-positional argument. ([Issue 371](https://github.com/iBotPeaches/Apktool/issues/371))
+ * Fixed ignoring `--frame-path` on `[b]`uild. ([Issue 538](https://github.com/iBotPeaches/Apktool/issues/538))
+ * Fixed setting `android:debuggable` on debug apks. ([Issue 507](https://github.com/iBotPeaches/Apktool/issues/507))
+ * Fixed common "superclass" errors on debug mode. ([Issue 451](https://github.com/iBotPeaches/Apktool/issues/451))
+ * Fixed `pkgId` not being set in framework files. ([Issue 569](https://github.com/iBotPeaches/Apktool/issues/569))
+ * Added `-m` / `--match-original` feature to allow apks to match original. ([Issue 580](https://github.com/iBotPeaches/Apktool/issues/580))
+ * Fixed apks PNGs gaining brightness on rebuild. ([Issue 437](https://github.com/iBotPeaches/Apktool/issues/437))
+ * Added dexlib2 (smali2) into Apktool. ([Issue 559](https://github.com/iBotPeaches/Apktool/issues/559))
+ * Fixed windows builds caused by `java.nio`. ([Issue 606](https://github.com/iBotPeaches/Apktool/issues/606))
+ * Fixed error output being written to `stdout` instead of `stderr`. ([Issue 620](https://github.com/iBotPeaches/Apktool/issues/620))
+ * Fixed issue with smali filenames from being too long. ([Issue 537](https://github.com/iBotPeaches/Apktool/issues/537)) / (Thanks JesusFreke)
+ * Fixed issue with `INSTALL_FAILED_DEXOPT`. ([Issue 634](https://github.com/iBotPeaches/Apktool/issues/634)) / (Thanks JesusFreke)
+ * Fixed issue with apks with multiple packages. ([Issue 583](https://github.com/iBotPeaches/Apktool/issues/583))
+ * Fixed issue with decoding `.jar` files. ([Issue 641](https://github.com/iBotPeaches/Apktool/issues/641))
+ * Fixed issue with improperly labeling type of `<array>`'s. ([Issue 660](https://github.com/iBotPeaches/Apktool/issues/660))
+ * Fixed issue with truncated strings. ([Issue 681](https://github.com/iBotPeaches/Apktool/issues/681)) / (Thanks jtmuhone)
+ * Fixed issue with apks with multiple empty types via ignoring them. ([Issue 688](https://github.com/iBotPeaches/Apktool/issues/688))
+ * Fixed issue with apks with one package named `android` from decoding. ([Issue 699](https://github.com/iBotPeaches/Apktool/issues/699))
+ * Fixed StringBlock by making it thread safe. ([Issue 711](https://github.com/iBotPeaches/Apktool/issues/711)) / (Thanks aluedeke)
+ * Fixed truncated `UTF-16` strings. ([Issue 349](https://github.com/iBotPeaches/Apktool/issues/349))
+ * Spacing cleanup of 2014. ([Issue 694](https://github.com/iBotPeaches/Apktool/issues/694))
+ * Fixed style crash due to malformed styles. ([Issue 307](https://github.com/iBotPeaches/Apktool/issues/307)) 
+ * Fixed issue with unknown files being ignored that start with an accepted file name. ([Issue 713](https://github.com/iBotPeaches/Apktool/issues/713))
+ * Fixed issue with unknown files being ignored when `-r` was used. ([Issue 716](https://github.com/iBotPeaches/Apktool/issues/716))
+ * Fixed issue with renamed manifests such as (`android`, `com.htc` and `miui`). ([Issue 719](https://github.com/iBotPeaches/Apktool/issues/719))
+ * Fixed path issues with `UTF8` chars and unknown files. ([Issue 736](https://github.com/iBotPeaches/Apktool/issues/736))
+ * Fixed issue with renamed manifest (`com.lge`). ([Issue 740](https://github.com/iBotPeaches/Apktool/issues/740))
+ * Fixed incorrect typing of `<array>` items due to incorrect loop index. ([Issue 520](https://github.com/iBotPeaches/Apktool/issues/520))
+ * Fixed issue with `AndroidManifest.xml` missing attributes. ([Issue 623](https://github.com/iBotPeaches/Apktool/issues/623))
+ * Fixed issue with ignoring `formatted="false"` attribute in `<string-array>`'s. ([Issue 786](https://github.com/iBotPeaches/Apktool/issues/786))
+ * Fixed issue with multiple overlapping try catches. ([Issue 748](https://github.com/iBotPeaches/Apktool/issues/784))
+ * Fixed issue with apks with multiple `ResPackages` where default is not `pkgId` 0. ([Issue 793](https://github.com/iBotPeaches/Apktool/issues/793))
+ * Fixed issue with renamed manifest (`yi`). ([Issue 791](https://github.com/iBotPeaches/Apktool/issues/791))
+ * Fixed issue with apks with large StringPools failing to decode. ([Issue 773](https://github.com/iBotPeaches/Apktool/issues/773))
+ * Fixed issue with bad casting of `ResStringValue` to `ResAttr`. ([Issue 587](https://github.com/iBotPeaches/Apktool/issues/587)) / (Thanks whydoubt)
+ * Fixed issue with hardcoding 9 patches as `.png` when there are `.qmg`, `.spi`. ([Issue 798](https://github.com/iBotPeaches/Apktool/issues/798))
+ * Added support for Android 5.0 (Lollipop). ([Issue 763](https://github.com/iBotPeaches/Apktool/issues/763))
+ * Added support for `TYPE_DYNAMIC_REFERENCE`. ([Issue 815](https://github.com/iBotPeaches/Apktool/issues/815))
+ * Fixed issue with implicitly added version qualifiers. ([Issue 823](https://github.com/iBotPeaches/Apktool/issues/823))
+ * Added support for shared library apks. ([Issue 822](https://github.com/iBotPeaches/Apktool/issues/822))
+ * Fixed issue improperly casting strings that resembled filepaths to `ResFileValues`. ([Issue 440](https://github.com/iBotPeaches/Apktool/issues/440))
+ * Fixed issue with segfaulting `aapt`. ([Issue 700](https://github.com/iBotPeaches/Apktool/issues/700))
+ * Fixed issue with undefined attributes. ([Issue 655](https://github.com/iBotPeaches/Apktool/issues/655))
+ * Fixed issue with improper handling of `MNC_ZERO` which caused duplicated resources. ([Issue 811](https://github.com/iBotPeaches/Apktool/issues/811))
+ * Fixed warnings of "Cleaning up unclosed ZipFile...". ([Issue 853](https://github.com/iBotPeaches/Apktool/issues/853))
+ * Added support for downloading gradle binaries over `https`. ([Issue 866](https://github.com/iBotPeaches/Apktool/issues/866))
+ * Fixed issue when user has no access to `$HOME`. ([Issue 513](https://github.com/iBotPeaches/Apktool/issues/513))
+ * Added support for `BCP-47` localization tags. ([Issue 870](https://github.com/iBotPeaches/Apktool/issues/870))
+ * Fixed issue with double escaping of ampersands in `<`. ([Issue 658](https://github.com/iBotPeaches/Apktool/pull/105)) / (Thanks jhornber)
+ * Fixed issue with not respecting compression type of unknown files. ([Issue 878](https://github.com/iBotPeaches/Apktool/issues/878)) / (Thanks simtel12) 
+ * Fixed issue with decoding `.spi` files as 9 patch images. (Thanks Furniel)
+ * Fixed issue with APKs with multiple dex files. 
+ * Fixed issue using Apktool without smali/baksmali.
+ * Fixed issue using non URI standard characters in apk name. (Thanks rover12421)
+ * Added version output during decode/build operations to quickly identify apktool version.
+ * Fixed NPE error when using `.odex` files with `--no-src` specified. (Thanks Rodrigo Chiossi)
+ * Fixed locale problems when locale changes meaning of windows `.bat` script. (Thanks Adem666)
+ * Fixed issue when `-r` was used with no `/res` folder present. (Thanks chrisch1974)
 
 ## v1.5.2
 2013.02.02
