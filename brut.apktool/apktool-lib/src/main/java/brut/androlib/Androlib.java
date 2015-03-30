@@ -36,6 +36,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.io.IOUtils;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
@@ -230,7 +231,7 @@ public class Androlib {
 
         try (
                 Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
-                        new File(mOutDir, "apktool.yml")), "UTF-8"));
+                        new File(mOutDir, "apktool.yml")), "UTF-8"))
         ) {
             yaml.dump(meta, writer);
         } catch (IOException ex) {
@@ -241,7 +242,7 @@ public class Androlib {
     public Map<String, Object> readMetaFile(ExtFile appDir)
             throws AndrolibException {
         try(
-                InputStream in = appDir.getDirectory().getFileInput("apktool.yml");
+                InputStream in = appDir.getDirectory().getFileInput("apktool.yml")
         ) {
             Yaml yaml = new Yaml();
             return (Map<String, Object>) yaml.load(in);
@@ -557,9 +558,8 @@ public class Androlib {
                     ZipFile inputFile = new ZipFile(tempFile);
                     ZipOutputStream actualOutput = new ZipOutputStream(new FileOutputStream(outFile));
             ) {
-                byte[] buffer = new byte[4096 * 1024];
-                copyExistingFiles(inputFile, actualOutput, buffer);
-                copyUnknownFiles(appDir, actualOutput, files, buffer);
+                copyExistingFiles(inputFile, actualOutput);
+                copyUnknownFiles(appDir, actualOutput, files);
             } catch (IOException ex) {
                 throw new AndrolibException(ex);
             }
@@ -569,7 +569,7 @@ public class Androlib {
         }
     }
 
-    private void copyExistingFiles(ZipFile inputFile, ZipOutputStream outputFile, byte[] buffer) throws IOException {
+    private void copyExistingFiles(ZipFile inputFile, ZipOutputStream outputFile) throws IOException {
         // First, copy the contents from the existing outFile:
         Enumeration<? extends ZipEntry> entries = inputFile.entries();
         while (entries.hasMoreElements()) {
@@ -580,14 +580,18 @@ public class Androlib {
 
             // No need to create directory entries in the final apk
             if (!entry.isDirectory()) {
-                BrutIO.copy(inputFile.getInputStream(entry), outputFile, buffer);
+                try (
+                        InputStream is = inputFile.getInputStream(entry)
+                        ){
+                    IOUtils.copy(is, outputFile);
+                }
             }
 
             outputFile.closeEntry();
         }
     }
 
-    private void copyUnknownFiles(File appDir, ZipOutputStream outputFile, Map<String, String> files, byte[] buffer)
+    private void copyUnknownFiles(File appDir, ZipOutputStream outputFile, Map<String, String> files)
             throws IOException {
         File unknownFileDir = new File(appDir, UNK_DIRNAME);
 
@@ -606,7 +610,7 @@ public class Androlib {
                 newEntry.setSize(inputFile.length());
                 newEntry.setCompressedSize(-1);
                 BufferedInputStream unknownFile = new BufferedInputStream(new FileInputStream(inputFile));
-                CRC32 crc = BrutIO.calculateCrc(unknownFile, buffer);
+                CRC32 crc = BrutIO.calculateCrc(unknownFile);
                 newEntry.setCrc(crc.getValue());
 
                 LOGGER.fine("\tsize: " + newEntry.getSize());
@@ -615,8 +619,11 @@ public class Androlib {
             }
             outputFile.putNextEntry(newEntry);
 
-            BufferedInputStream unknownFile = new BufferedInputStream(new FileInputStream(inputFile));
-            BrutIO.copy(unknownFile, outputFile, buffer);
+            try (
+                 FileInputStream fis = new FileInputStream(inputFile)
+                    ){
+                IOUtils.copy(fis, outputFile);
+            }
             outputFile.closeEntry();
         }
     }
