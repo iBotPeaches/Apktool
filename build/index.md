@@ -21,7 +21,6 @@ The main project can be found below
 ### Requirements
   * JDK (1.7)
   * git
-  * aapt in $PATH (Android Asset Packaging Tool)
 
 ### Build Steps
 We use gradle to build. It's pretty easy. First clone the repository.
