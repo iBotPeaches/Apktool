@@ -63,6 +63,11 @@ public class BuildAndDecodeTest {
     }
 
     @Test
+    public void manifestTaggingNotSupressed() throws BrutException {
+        compareXmlFiles("AndroidManifest.xml");
+    }
+
+    @Test
     public void valuesAnimsTest() throws BrutException {
         compareValuesFiles("values-mcc001/anims.xml");
     }
