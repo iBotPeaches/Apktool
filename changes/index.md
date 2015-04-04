@@ -72,6 +72,8 @@ description: Apktool - Changelog / Roadmap
  * Added support for `BCP-47` localization tags. ([Issue 870](https://github.com/iBotPeaches/Apktool/issues/870))
  * Fixed issue with double escaping of ampersands in `<`. ([Issue 658](https://github.com/iBotPeaches/Apktool/pull/105)) / (Thanks jhornber)
  * Fixed issue with not respecting compression type of unknown files. ([Issue 878](https://github.com/iBotPeaches/Apktool/issues/878)) / (Thanks simtel12) 
+ * Fixed issue with apktool branding apks via `platformBuildVersion[Code/Name]`. ([Issue 890](https://github.com/iBotPeaches/Apktool/issues/890))
+ * Fixed issue when multiple dex files were ignored using `-s`. ([Issue 904](https://github.com/iBotPeaches/Apktool/issues/904))
  * Fixed issue with decoding `.spi` files as 9 patch images. (Thanks Furniel)
  * Fixed issue with APKs with multiple dex files. 
  * Fixed issue using Apktool without smali/baksmali.
