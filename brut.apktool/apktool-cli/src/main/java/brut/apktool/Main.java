@@ -469,7 +469,7 @@ public class Main {
 
         // print out more information
         System.out.println(
-                "For additional info, see: http://ibotpeaches.github.io/Apktool/ \n"
+                "For additional info, see: http://code.google.com/p/android-apktool/ \n"
                         + "For smali/baksmali info, see: http://code.google.com/p/smali/");
     }
 
