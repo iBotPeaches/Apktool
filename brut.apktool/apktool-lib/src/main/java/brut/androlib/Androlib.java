@@ -70,7 +70,7 @@ public class Androlib {
     public void decodeSourcesRaw(ExtFile apkFile, File outDir, String filename)
             throws AndrolibException {
         try {
-            LOGGER.info("Copying raw classes.dex file...");
+            LOGGER.info("Copying raw " + filename + " file...");
             apkFile.getDirectory().copyToDir(outDir, filename);
         } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
@@ -301,6 +301,7 @@ public class Androlib {
     public void buildNonDefaultSources(ExtFile appDir)
             throws AndrolibException {
         try {
+            // loop through any smali_ directories for multi-dex apks
             Map<String, Directory> dirs = appDir.getDirectory().getDirs();
             for (Map.Entry<String, Directory> directory : dirs.entrySet()) {
                 String name = directory.getKey();
@@ -311,6 +312,18 @@ public class Androlib {
                             && !buildSourcesSmali(appDir, name, filename)
                             && !buildSourcesJava(appDir)) {
                         LOGGER.warning("Could not find sources");
+                    }
+                }
+            }
+
+            // loop through any classes#.dex files for multi-dex apks
+            File[] dexFiles = appDir.listFiles();
+            if (dexFiles != null) {
+                for (File dex : dexFiles) {
+
+                    // skip classes.dex because we have handled it in buildSources()
+                    if (dex.getName().endsWith(".dex") && ! dex.getName().equalsIgnoreCase("classes.dex")) {
+                        buildSourcesRaw(appDir, dex.getName());
                     }
                 }
             }
