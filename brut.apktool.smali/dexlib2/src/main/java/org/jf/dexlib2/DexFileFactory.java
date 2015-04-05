@@ -102,19 +102,22 @@ public final class DexFileFactory {
         }
 
         InputStream inputStream = new BufferedInputStream(new FileInputStream(dexFile));
-
         try {
-            return DexBackedDexFile.fromInputStream(opcodes, inputStream);
-        } catch (DexBackedDexFile.NotADexFile ex) {
-            // just eat it
-        }
+            try {
+                return DexBackedDexFile.fromInputStream(opcodes, inputStream);
+            } catch (DexBackedDexFile.NotADexFile ex) {
+                // just eat it
+            }
 
-        // Note: DexBackedDexFile.fromInputStream will reset inputStream back to the same position, if it fails
+            // Note: DexBackedDexFile.fromInputStream will reset inputStream back to the same position, if it fails
 
-        try {
-            return DexBackedOdexFile.fromInputStream(opcodes, inputStream);
-        } catch (DexBackedOdexFile.NotAnOdexFile ex) {
-            // just eat it
+            try {
+                return DexBackedOdexFile.fromInputStream(opcodes, inputStream);
+            } catch (DexBackedOdexFile.NotAnOdexFile ex) {
+                // just eat it
+            }
+        } finally {
+            inputStream.close();
         }
 
         throw new ExceptionWithContext("%s is not an apk, dex file or odex file.", dexFile.getPath());
