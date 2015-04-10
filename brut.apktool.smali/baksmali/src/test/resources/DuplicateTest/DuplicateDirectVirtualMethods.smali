@@ -17,7 +17,6 @@
 # .end method
 
 
-
 # virtual methods
 .method public alah()V
     .registers 1
@@ -39,7 +38,6 @@
 
 #     return-void
 # .end method
-
 
 .method public clah()V
     .registers 1

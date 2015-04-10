@@ -22,7 +22,6 @@
 #     return-void
 # .end method
 
-
 .method public clah()V
     .registers 1
 
