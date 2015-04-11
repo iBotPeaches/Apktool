@@ -204,7 +204,7 @@ public class BuildAndDecodeTest {
 
     @Test
     public void threeLetterLangBcp47Test() throws BrutException, IOException {
-        compareValuesFiles("values-b+ast/strings.xml");
+        compareValuesFiles("values-ast/strings.xml");
     }
 
     @Test
