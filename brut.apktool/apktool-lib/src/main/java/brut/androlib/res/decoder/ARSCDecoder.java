@@ -292,11 +292,11 @@ public class ARSCDecoder {
             screenHeightDp = mIn.readShort();
         }
 
-        char[] localeScript = {'\00'};
-        char[] localeVariant = {'\00'};
+        char[] localeScript = null;
+        char[] localeVariant = null;
         if (size >= 48) {
-            localeScript = this.readScriptOrVariantChar(4).toCharArray();
-            localeVariant = this.readScriptOrVariantChar(8).toCharArray();
+            localeScript = readScriptOrVariantChar(4).toCharArray();
+            localeVariant = readScriptOrVariantChar(8).toCharArray();
         }
 
         int exceedingSize = size - KNOWN_CONFIG_BYTES;

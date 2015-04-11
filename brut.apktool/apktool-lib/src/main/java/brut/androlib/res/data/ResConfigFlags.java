@@ -74,8 +74,8 @@ public class ResConfigFlags {
         smallestScreenWidthDp = 0;
         screenWidthDp = 0;
         screenHeightDp = 0;
-        localeScript = new char[] { '\00', '\00', '\00', '\00' };
-        localeVariant = new char[] { '\00', '\00', '\00', '\00', '\00', '\00', '\00', '\00' };
+        localeScript = null;
+        localeVariant = null;
         isInvalid = false;
         mQualifiers = "";
     }
@@ -114,7 +114,7 @@ public class ResConfigFlags {
             isInvalid = true;
         }
 
-        if (localeScript.length != 0) {
+        if (localeScript != null && localeScript.length != 0) {
             if (localeScript[0] == '\00') {
                 localeScript = null;
             }
@@ -122,7 +122,7 @@ public class ResConfigFlags {
             localeScript = null;
         }
 
-        if (localeVariant.length != 0) {
+        if (localeVariant != null && localeVariant.length != 0) {
             if (localeVariant[0] == '\00') {
                 localeVariant = null;
             }

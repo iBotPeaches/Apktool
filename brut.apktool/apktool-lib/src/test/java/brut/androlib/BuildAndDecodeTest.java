@@ -208,6 +208,11 @@ public class BuildAndDecodeTest {
     }
 
     @Test
+    public void twoLetterNotHandledAsBcpTest() throws BrutException, IOException {
+        checkFolderExists("res/values-fr");
+    }
+
+    @Test
     public void twoLetterLangBcp47Test() throws BrutException, IOException {
         compareValuesFiles("values-en-rUS/strings.xml");
     }
@@ -359,6 +364,12 @@ public class BuildAndDecodeTest {
 
     private void compareXmlFiles(String path) throws BrutException {
         compareXmlFiles(path, null);
+    }
+
+    private void checkFolderExists(String path) throws BrutException {
+        File f =  new File(sTestNewDir, path);
+
+        assertTrue(f.isDirectory());
     }
 
     private void compareXmlFiles(String path, ElementQualifier qualifier)
