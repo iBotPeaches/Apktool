@@ -280,7 +280,9 @@ public class Androlib {
         new File(appDir, APK_DIRNAME).mkdirs();
         buildSources(appDir);
         buildNonDefaultSources(appDir);
+        mAndRes.fixing_public_attrs_in_providers(new File(appDir, "AndroidManifest.xml"));
         buildResources(appDir, (Map<String, Object>) meta.get("usesFramework"));
+
         buildLib(appDir);
         buildCopyOriginalFiles(appDir);
         buildApk(appDir, outFile);

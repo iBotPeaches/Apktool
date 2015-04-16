@@ -41,12 +41,14 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.*;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 import org.apache.commons.io.IOUtils;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import org.xmlpull.v1.XmlSerializer;
 
@@ -225,6 +227,64 @@ final public class AndrolibResources {
             } catch (SAXException | ParserConfigurationException | IOException | TransformerException ignored) {
             }
         }
+    }
+
+    public void fixing_public_attrs_in_providers(File file) throws AndrolibException {
+        if (file.exists()) {
+            try {
+                Document doc = loadDocument(file.getAbsolutePath());
+                XPath xPath = XPathFactory.newInstance().newXPath();
+                XPathExpression expression = xPath.compile("/manifest/application/provider");
+
+                Object result = expression.evaluate(doc, XPathConstants.NODESET);
+                NodeList nodes = (NodeList) result;
+
+                for (int i = 0; i < nodes.getLength(); i++) {
+                    Node node = nodes.item(i);
+                    NamedNodeMap attrs = node.getAttributes();
+
+                    if (attrs != null) {
+                        Node provider = attrs.getNamedItem("android:authorities");
+
+                        if (provider != null) {
+                            String reference = provider.getNodeValue();
+                            String replacement = pull_value_from_strings(file.getParentFile(), reference);
+
+                            if (replacement != null) {
+                                provider.setNodeValue(replacement);
+                                saveDocument(file.getAbsolutePath(), doc);
+                            }
+                        }
+                    }
+                }
+
+            }  catch (SAXException | ParserConfigurationException | IOException |
+                    XPathExpressionException | TransformerException ignored) {
+            }
+        }
+    }
+
+    public String pull_value_from_strings(File directory, String key) throws AndrolibException {
+        File file = new File(directory, "/res/values/strings.xml");
+        key = key.replace("@string/", "");
+
+        if (file.exists()) {
+            try {
+                Document doc = loadDocument(file.getAbsolutePath());
+                XPath xPath = XPathFactory.newInstance().newXPath();
+                XPathExpression expression = xPath.compile("/resources/string[@name=" + '"' + key + "\"]/text()");
+
+                Object result = expression.evaluate(doc, XPathConstants.STRING);
+
+                if (result != null) {
+                    return (String) result;
+                }
+
+            }  catch (SAXException | ParserConfigurationException | IOException | XPathExpressionException ignored) {
+            }
+        }
+
+        return null;
     }
 
     public void remove_manifest_versions(String filePath)
