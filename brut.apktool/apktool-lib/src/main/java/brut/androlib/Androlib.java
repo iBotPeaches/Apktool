@@ -22,6 +22,7 @@ import brut.androlib.res.data.ResPackage;
 import brut.androlib.res.data.ResTable;
 import brut.androlib.res.data.ResUnknownFiles;
 import brut.androlib.res.util.ExtFile;
+import brut.androlib.res.xml.ResXmlPatcher;
 import brut.androlib.src.SmaliBuilder;
 import brut.androlib.src.SmaliDecoder;
 import brut.common.BrutException;
@@ -280,7 +281,7 @@ public class Androlib {
         new File(appDir, APK_DIRNAME).mkdirs();
         buildSources(appDir);
         buildNonDefaultSources(appDir);
-        mAndRes.fixing_public_attrs_in_providers(new File(appDir, "AndroidManifest.xml"));
+        ResXmlPatcher.fixingPublicAttrsInProviderAttributes(new File(appDir, "AndroidManifest.xml"));
         buildResources(appDir, (Map<String, Object>) meta.get("usesFramework"));
 
         buildLib(appDir);
@@ -483,7 +484,7 @@ public class Androlib {
             File apkDir = new File(appDir, APK_DIRNAME);
 
             if (apkOptions.debugMode) {
-                mAndRes.remove_application_debug(new File(apkDir, "AndroidManifest.xml").getAbsolutePath());
+                ResXmlPatcher.removeApplicationDebugTag(new File(apkDir,"AndroidManifest.xml"));
             }
 
             if (apkOptions.forceBuildAll || isModified(newFiles(APK_MANIFEST_FILENAMES, appDir),

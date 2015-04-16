@@ -25,6 +25,7 @@ import brut.androlib.res.decoder.ARSCDecoder.ARSCData;
 import brut.androlib.res.decoder.ARSCDecoder.FlagsOffset;
 import brut.androlib.res.util.*;
 import brut.androlib.res.xml.ResValuesXmlSerializable;
+import brut.androlib.res.xml.ResXmlPatcher;
 import brut.common.BrutException;
 import brut.directory.*;
 import brut.util.*;
@@ -35,21 +36,8 @@ import java.util.zip.*;
 
 import java.io.File;
 import java.io.IOException;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.*;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.xpath.*;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
 
 import org.apache.commons.io.IOUtils;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 import org.xmlpull.v1.XmlSerializer;
 
 /**
@@ -169,171 +157,28 @@ final public class AndrolibResources {
         }
     }
 
-    public void remove_application_debug(String filePath)
-            throws AndrolibException {
-
-        // change application:debug to true
-        try {
-            Document doc = loadDocument(filePath);
-            Node application = doc.getElementById("application");
-
-            // load attr
-            NamedNodeMap attr = application.getAttributes();
-            Node debugAttr = attr.getNamedItem("debug");
-
-            // remove application:debug
-            if (debugAttr != null) {
-                attr.removeNamedItem("debug");
-            }
-
-            saveDocument(filePath, doc);
-
-        } catch (SAXException | ParserConfigurationException | IOException | TransformerException ignored) {
-        }
-    }
-
-    public void adjust_package_manifest(ResTable resTable, String filePath)
+    public void adjustPackageManifest(ResTable resTable, String filePath)
             throws AndrolibException {
 
         // compare resources.arsc package name to the one present in AndroidManifest
         ResPackage resPackage = resTable.getCurrentResPackage();
-        mPackageOriginal = resPackage.getName();
+        String packageOriginal = resPackage.getName();
         mPackageRenamed = resTable.getPackageRenamed();
 
         resTable.setPackageId(resPackage.getId());
-        resTable.setPackageOriginal(mPackageOriginal);
+        resTable.setPackageOriginal(packageOriginal);
 
-        // 1) Check if mPackageOriginal === mPackageRenamed
-        // 2) Check if mPackageOriginal is ignored via IGNORED_PACKAGES
+        // 1) Check if packageOriginal === mPackageRenamed
+        // 2) Check if packageOriginal is ignored via IGNORED_PACKAGES
         // 2a) If its ignored, make sure the mPackageRenamed isn't explicitly allowed
-        if (mPackageOriginal.equalsIgnoreCase(mPackageRenamed) ||
-                (Arrays.asList(IGNORED_PACKAGES).contains(mPackageOriginal) &&
+        if (packageOriginal.equalsIgnoreCase(mPackageRenamed) ||
+                (Arrays.asList(IGNORED_PACKAGES).contains(packageOriginal) &&
                 ! Arrays.asList(ALLOWED_PACKAGES).contains(mPackageRenamed))) {
             LOGGER.info("Regular manifest package...");
         } else {
-            try {
-                LOGGER.info("Renamed manifest package found! Replacing " + mPackageRenamed + " with " + mPackageOriginal);
-                Document doc = loadDocument(filePath);
-
-                // Get the manifest line
-                Node manifest = doc.getFirstChild();
-
-                // update package attribute
-                NamedNodeMap attr = manifest.getAttributes();
-                Node nodeAttr = attr.getNamedItem("package");
-                nodeAttr.setNodeValue(mPackageOriginal);
-                saveDocument(filePath, doc);
-
-            } catch (SAXException | ParserConfigurationException | IOException | TransformerException ignored) {
-            }
+            LOGGER.info("Renamed manifest package found! Replacing " + mPackageRenamed + " with " + packageOriginal);
+            ResXmlPatcher.renameManifestPackage(new File(filePath), packageOriginal);
         }
-    }
-
-    public void fixing_public_attrs_in_providers(File file) throws AndrolibException {
-        if (file.exists()) {
-            try {
-                Document doc = loadDocument(file.getAbsolutePath());
-                XPath xPath = XPathFactory.newInstance().newXPath();
-                XPathExpression expression = xPath.compile("/manifest/application/provider");
-
-                Object result = expression.evaluate(doc, XPathConstants.NODESET);
-                NodeList nodes = (NodeList) result;
-
-                for (int i = 0; i < nodes.getLength(); i++) {
-                    Node node = nodes.item(i);
-                    NamedNodeMap attrs = node.getAttributes();
-
-                    if (attrs != null) {
-                        Node provider = attrs.getNamedItem("android:authorities");
-
-                        if (provider != null) {
-                            String reference = provider.getNodeValue();
-                            String replacement = pull_value_from_strings(file.getParentFile(), reference);
-
-                            if (replacement != null) {
-                                provider.setNodeValue(replacement);
-                                saveDocument(file.getAbsolutePath(), doc);
-                            }
-                        }
-                    }
-                }
-
-            }  catch (SAXException | ParserConfigurationException | IOException |
-                    XPathExpressionException | TransformerException ignored) {
-            }
-        }
-    }
-
-    public String pull_value_from_strings(File directory, String key) throws AndrolibException {
-        File file = new File(directory, "/res/values/strings.xml");
-        key = key.replace("@string/", "");
-
-        if (file.exists()) {
-            try {
-                Document doc = loadDocument(file.getAbsolutePath());
-                XPath xPath = XPathFactory.newInstance().newXPath();
-                XPathExpression expression = xPath.compile("/resources/string[@name=" + '"' + key + "\"]/text()");
-
-                Object result = expression.evaluate(doc, XPathConstants.STRING);
-
-                if (result != null) {
-                    return (String) result;
-                }
-
-            }  catch (SAXException | ParserConfigurationException | IOException | XPathExpressionException ignored) {
-            }
-        }
-
-        return null;
-    }
-
-    public void remove_manifest_versions(String filePath)
-            throws AndrolibException {
-
-        File f = new File(filePath);
-
-        if (f.exists()) {
-            try {
-                Document doc = loadDocument(filePath);
-                Node manifest = doc.getFirstChild();
-
-                // load attr
-                NamedNodeMap attr = manifest.getAttributes();
-                Node vCode = attr.getNamedItem("android:versionCode");
-                Node vName = attr.getNamedItem("android:versionName");
-
-                // remove versionCode
-                if (vCode != null) {
-                    attr.removeNamedItem("android:versionCode");
-                }
-                if (vName != null) {
-                    attr.removeNamedItem("android:versionName");
-                }
-                saveDocument(filePath, doc);
-
-            } catch (SAXException | ParserConfigurationException | IOException | TransformerException ignored) {
-            }
-        }
-    }
-
-    private Document loadDocument(String filename)
-            throws IOException, SAXException, ParserConfigurationException {
-
-        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-        return docBuilder.parse(filename);
-    }
-
-    private void saveDocument(String filename, Document doc)
-            throws IOException, SAXException, ParserConfigurationException, TransformerException {
-
-        TransformerFactory transformerFactory = TransformerFactory.newInstance();
-        Transformer transformer = transformerFactory.newTransformer();
-        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-        transformer.setOutputProperty(OutputKeys.STANDALONE,"yes");
-        DOMSource source = new DOMSource(doc);
-        StreamResult result = new StreamResult(new File(filename));
-        transformer.transform(source, result);
     }
 
     public void decodeManifestWithResources(ResTable resTable, ExtFile apkFile, File outDir)
@@ -360,8 +205,11 @@ final public class AndrolibResources {
                 // also remove the android::versionCode / versionName from manifest for rebuild
                 // this is a required change to prevent aapt warning about conflicting versions
                 // it will be passed as a parameter to aapt like "--min-sdk-version" via apktool.yml
-                adjust_package_manifest(resTable, outDir.getAbsolutePath() + File.separator + "AndroidManifest.xml");
-                remove_manifest_versions(outDir.getAbsolutePath() + File.separator + "AndroidManifest.xml");
+                adjustPackageManifest(resTable, outDir.getAbsolutePath() + File.separator + "AndroidManifest.xml");
+
+                ResXmlPatcher.removeManifestVersions(new File(
+                        outDir.getAbsolutePath() + File.separator + "AndroidManifest.xml"));
+
                 mPackageId = String.valueOf(resTable.getPackageId());
             }
         } catch (DirectoryException ex) {
@@ -856,13 +704,15 @@ final public class AndrolibResources {
      * @throws AndrolibException
      */
     public File getAaptBinaryFile() throws AndrolibException {
+        File aaptBinary;
+
         try {
             if (OSDetection.isMacOSX()) {
-                mAaptBinary = Jar.getResourceAsFile("/prebuilt/aapt/macosx/aapt");
+                aaptBinary = Jar.getResourceAsFile("/prebuilt/aapt/macosx/aapt");
             } else if (OSDetection.isUnix()) {
-                mAaptBinary = Jar.getResourceAsFile("/prebuilt/aapt/linux/aapt");
+                aaptBinary = Jar.getResourceAsFile("/prebuilt/aapt/linux/aapt");
             } else if (OSDetection.isWindows()) {
-                mAaptBinary = Jar.getResourceAsFile("/prebuilt/aapt/windows/aapt.exe");
+                aaptBinary = Jar.getResourceAsFile("/prebuilt/aapt/windows/aapt.exe");
             } else {
                 LOGGER.warning("Unknown Operating System: " + OSDetection.returnOS());
                 return null;
@@ -870,8 +720,8 @@ final public class AndrolibResources {
         } catch (BrutException ex) {
             throw new AndrolibException(ex);
         }
-        if (mAaptBinary.setExecutable(true)) {
-            return mAaptBinary;
+        if (aaptBinary.setExecutable(true)) {
+            return aaptBinary;
         }
 
         System.err.println("Can't set aapt binary as executable");
@@ -901,12 +751,9 @@ final public class AndrolibResources {
     private String mVersionCode = null;
     private String mVersionName = null;
     private String mPackageRenamed = null;
-    private String mPackageOriginal = null;
     private String mPackageId = null;
 
     private boolean mSharedLibrary = false;
-
-    private File mAaptBinary = null;
 
     private final static String[] IGNORED_PACKAGES = new String[] {
             "android", "com.htc", "miui", "com.lge", "com.lge.internal", "yi" };
