@@ -71,6 +71,7 @@ task proguard(type: JavaExec, dependsOn: jar) {
     args '-injars ' + jar.archivePath
     args '-outjars ' + outFile
     args '-libraryjars ' + System.properties['java.home'] + '/lib/rt.jar'
+    args '-keepattributes Signature'
     args '-dontobfuscate'
     args '-dontoptimize'
     args '-keep public class org.jf.baksmali.main { public static void main(java.lang.String[]); }'
