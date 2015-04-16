@@ -409,8 +409,7 @@ public class Androlib {
             if (apkOptions.forceBuildAll || isModified(newFiles(APK_RESOURCES_FILENAMES, appDir),
                     newFiles(APK_RESOURCES_FILENAMES, apkDir))) {
                 LOGGER.info("Copying raw resources...");
-                appDir.getDirectory()
-                        .copyToDir(apkDir, APK_RESOURCES_FILENAMES);
+                appDir.getDirectory().copyToDir(apkDir, APK_RESOURCES_FILENAMES);
             }
             return true;
         } catch (DirectoryException ex) {
@@ -482,7 +481,7 @@ public class Androlib {
             File apkDir = new File(appDir, APK_DIRNAME);
 
             if (apkOptions.debugMode) {
-                mAndRes.remove_application_debug(new File(apkDir,"AndroidManifest.xml").getAbsolutePath());
+                mAndRes.remove_application_debug(new File(apkDir, "AndroidManifest.xml").getAbsolutePath());
             }
 
             if (apkOptions.forceBuildAll || isModified(newFiles(APK_MANIFEST_FILENAMES, appDir),
@@ -569,7 +568,7 @@ public class Androlib {
 
             try (
                     ZipFile inputFile = new ZipFile(tempFile);
-                    ZipOutputStream actualOutput = new ZipOutputStream(new FileOutputStream(outFile));
+                    ZipOutputStream actualOutput = new ZipOutputStream(new FileOutputStream(outFile))
             ) {
                 copyExistingFiles(inputFile, actualOutput);
                 copyUnknownFiles(appDir, actualOutput, files);
@@ -587,17 +586,14 @@ public class Androlib {
         Enumeration<? extends ZipEntry> entries = inputFile.entries();
         while (entries.hasMoreElements()) {
             ZipEntry entry = new ZipEntry(entries.nextElement());
+
             // We can't reuse the compressed size because it depends on compression sizes.
             entry.setCompressedSize(-1);
             outputFile.putNextEntry(entry);
 
             // No need to create directory entries in the final apk
-            if (!entry.isDirectory()) {
-                try (
-                        InputStream is = inputFile.getInputStream(entry)
-                        ){
-                    IOUtils.copy(is, outputFile);
-                }
+            if (! entry.isDirectory()) {
+                BrutIO.copy(inputFile, outputFile, entry);
             }
 
             outputFile.closeEntry();
@@ -611,32 +607,26 @@ public class Androlib {
         // loop through unknown files
         for (Map.Entry<String,String> unknownFileInfo : files.entrySet()) {
             File inputFile = new File(unknownFileDir, unknownFileInfo.getKey());
-            if(inputFile.isDirectory()) {
+            if (inputFile.isDirectory()) {
                 continue;
             }
 
             ZipEntry newEntry = new ZipEntry(unknownFileInfo.getKey());
             int method = Integer.valueOf(unknownFileInfo.getValue());
             LOGGER.fine(String.format("Copying unknown file %s with method %d", unknownFileInfo.getKey(), method));
-            if(method == ZipEntry.STORED) {
+            if (method == ZipEntry.STORED) {
                 newEntry.setMethod(ZipEntry.STORED);
                 newEntry.setSize(inputFile.length());
                 newEntry.setCompressedSize(-1);
                 BufferedInputStream unknownFile = new BufferedInputStream(new FileInputStream(inputFile));
                 CRC32 crc = BrutIO.calculateCrc(unknownFile);
                 newEntry.setCrc(crc.getValue());
-
-                LOGGER.fine("\tsize: " + newEntry.getSize());
             } else {
                 newEntry.setMethod(ZipEntry.DEFLATED);
             }
             outputFile.putNextEntry(newEntry);
 
-            try (
-                 FileInputStream fis = new FileInputStream(inputFile)
-                    ){
-                IOUtils.copy(fis, outputFile);
-            }
+            BrutIO.copy(inputFile, outputFile);
             outputFile.closeEntry();
         }
     }
