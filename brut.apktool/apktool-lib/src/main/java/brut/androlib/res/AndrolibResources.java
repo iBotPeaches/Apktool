@@ -591,6 +591,19 @@ final public class AndrolibResources {
         throw new CantFindFrameworkResException(id);
     }
 
+    public void updateFramework() throws AndrolibException {
+        File dir = getFrameworkDir();
+        File apk;
+
+        apk = new File(dir, "1.apk");
+
+        if (! apk.exists()) {
+            LOGGER.warning("Can't update framework, no file found at: " + apk.getAbsolutePath());
+        } else {
+
+        }
+    }
+
     public void installFramework(File frameFile) throws AndrolibException {
         installFramework(frameFile, apkOptions.frameworkTag);
     }
