@@ -39,8 +39,12 @@ if (!('release' in gradle.startParameter.taskNames)) {
     }
 } else {
     project.ext.set("hash", "")
-    project.ext.set("apktool_version", apktoolversion_major + "-" + apktoolversion_minor);
-    println "Building RELEASE (" + getCheckedOutBranch() + "): " + apktoolversion_major + "-" + apktoolversion_minor;
+    if (apktoolversion_minor.length() > 0) {
+        project.ext.set("apktool_version", apktoolversion_major + "-" + apktoolversion_minor);
+    } else {
+        project.ext.set("apktool_version", apktoolversion_major);
+    }
+    println "Building RELEASE (" + getCheckedOutBranch() + "): " + project.ext.apktool_version;
 }
 
 build.doFirst {
