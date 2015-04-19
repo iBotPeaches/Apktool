@@ -125,6 +125,10 @@ public final class ResXmlPatcher {
      * @throws AndrolibException
      */
     public static String pullValueFromStrings(File directory, String key) throws AndrolibException {
+        if (! key.contains("@")) {
+            return null;
+        }
+
         File file = new File(directory, "/res/values/strings.xml");
         key = key.replace("@string/", "");
 
