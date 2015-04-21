@@ -4,8 +4,8 @@ title: Apktool - Changelog
 description: Apktool - Changelog / Roadmap
 ---
 
-## v2.0.0 (In Development)
-2014.xx.xx
+## v2.0.0
+2014.04.21
 
  * [Migration Instructions from 1.5.x to 2.0.x]({{ site.baseurl }}/documentation/#v1-5-x-v2-0-0)
  * **Android 5.1 support**
@@ -74,6 +74,7 @@ description: Apktool - Changelog / Roadmap
  * Fixed issue with not respecting compression type of unknown files. ([Issue 878](https://github.com/iBotPeaches/Apktool/issues/878)) / (Thanks simtel12) 
  * Fixed issue with apktool branding apks via `platformBuildVersion[Code/Name]`. ([Issue 890](https://github.com/iBotPeaches/Apktool/issues/890))
  * Fixed issue when multiple dex files were ignored using `-s`. ([Issue 904](https://github.com/iBotPeaches/Apktool/issues/904))
+ * Fixed issue with `@string` references in `<provider>` attributes from preventing apk install. ([Issue 636](https://github.com/iBotPeaches/Apktool/issues/636))
  * Fixed issue with decoding `.spi` files as 9 patch images. (Thanks Furniel)
  * Fixed issue with APKs with multiple dex files. 
  * Fixed issue using Apktool without smali/baksmali.
