@@ -325,37 +325,39 @@ public class BuildAndDecodeTest {
         }
     }
 
-    private boolean compareBinaryFolder(String path, boolean res)
+    private void compareBinaryFolder(String path, boolean res)
             throws BrutException, IOException {
+        Boolean exists = true;
+
         String tmp = "";
         if (res) {
             tmp = File.separatorChar + "res" + File.separatorChar;
         }
 
-        FileDirectory fileDirectory = new FileDirectory(sTestOrigDir + tmp + path);
+        String location = tmp + path;
+
+        FileDirectory fileDirectory = new FileDirectory(sTestOrigDir + location);
 
         Set<String> files = fileDirectory.getFiles(true);
         for (String filename : files) {
-            File control = new File(filename);
 
-            // hacky fix - load test by changing name of control
-            File test =  new File(control.toString().replace("testapp-orig", "testapp-new"));
+            File control = new File((sTestOrigDir + location), filename);
+            File test =  new File((sTestNewDir + location), filename);
 
-            if (test.isFile() && control.isFile()) {
-                if (control.hashCode() != test.hashCode()) {
-                    return false;
-                }
+            if (! test.isFile() || ! control.isFile()) {
+                exists = false;
             }
         }
-        return true;
+
+        assertTrue(exists);
     }
 
-    private boolean compareResFolder(String path) throws BrutException, IOException {
-        return compareBinaryFolder(path, true);
+    private void compareResFolder(String path) throws BrutException, IOException {
+        compareBinaryFolder(path, true);
     }
 
-    private boolean compareLibsFolder(String path) throws BrutException, IOException {
-        return compareBinaryFolder(File.separatorChar + path,false);
+    private void compareLibsFolder(String path) throws BrutException, IOException {
+        compareBinaryFolder(File.separatorChar + path, false);
     }
 
     private void compareValuesFiles(String path) throws BrutException {
@@ -380,9 +382,7 @@ public class BuildAndDecodeTest {
             Reader test = new FileReader(new File(sTestNewDir, path));
 
             diff = new DetailedDiff(new Diff(control, test));
-        } catch (SAXException ex) {
-            throw new BrutException(ex);
-        } catch (IOException ex) {
+        } catch (SAXException | IOException ex) {
             throw new BrutException(ex);
         }
 
