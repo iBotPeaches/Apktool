@@ -8,6 +8,7 @@ description: Apktool - Changelog / Roadmap
 2015.xx.xx
 
  * Fixed version qualifier like `v4` from being ignored during decode. ([Issue 928](https://github.com/iBotPeaches/Apktool/issues/928))
+ * Fixed windows helper script from appending current directory into `$PATH`. ([Issue 927](https://github.com/iBotPeaches/Apktool/issues/927)) / (Thanks Tercete)
  * Correctly add `libs` and `lib` folders on `[b]uild`
  
 ## v2.0.0
