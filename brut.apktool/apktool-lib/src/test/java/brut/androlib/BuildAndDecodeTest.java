@@ -278,6 +278,11 @@ public class BuildAndDecodeTest {
     }
 
     @Test
+    public void drawableQualifierXxhdpiTest() throws BrutException, IOException {
+        compareResFolder("drawable-xxhdpi-v4");
+    }
+
+    @Test
     public void drawableXxxhdpiTest() throws BrutException, IOException {
         compareResFolder("drawable-xxxhdpi");
     }
@@ -308,8 +313,7 @@ public class BuildAndDecodeTest {
     }
 
     @SuppressWarnings("unchecked")
-    private void compareUnknownFiles()
-            throws BrutException, IOException {
+    private void compareUnknownFiles() throws BrutException, IOException {
         Map<String, Object> control = new Androlib().readMetaFile(sTestOrigDir);
         Map<String, Object> test = new Androlib().readMetaFile(sTestNewDir);
         assertTrue(control.containsKey("unknownFiles"));
@@ -320,13 +324,12 @@ public class BuildAndDecodeTest {
         assertTrue(control_files.size() == test_files.size());
 
         // Make sure that the compression methods are still the same
-        for(Map.Entry<String, String> controlEntry : control_files.entrySet()) {
+        for (Map.Entry<String, String> controlEntry : control_files.entrySet()) {
             assertTrue(controlEntry.getValue().equals(test_files.get(controlEntry.getKey())));
         }
     }
 
-    private void compareBinaryFolder(String path, boolean res)
-            throws BrutException, IOException {
+    private void compareBinaryFolder(String path, boolean res) throws BrutException, IOException {
         Boolean exists = true;
 
         String tmp = "";
@@ -374,8 +377,7 @@ public class BuildAndDecodeTest {
         assertTrue(f.isDirectory());
     }
 
-    private void compareXmlFiles(String path, ElementQualifier qualifier)
-            throws BrutException {
+    private void compareXmlFiles(String path, ElementQualifier qualifier) throws BrutException {
         DetailedDiff diff;
         try {
             Reader control = new FileReader(new File(sTestOrigDir, path));

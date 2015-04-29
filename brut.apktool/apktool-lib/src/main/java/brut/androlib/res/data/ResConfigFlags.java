@@ -359,7 +359,7 @@ public class ResConfigFlags {
                 ret.append(String.format("-%dx%d", screenHeight, screenWidth));
             }
         }
-        if (sdkVersion > getNaturalSdkVersionRequirement()) {
+        if (sdkVersion > 0 && sdkVersion >= getNaturalSdkVersionRequirement()) {
             ret.append("-v").append(sdkVersion);
         }
         if (isInvalid) {
