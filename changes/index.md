@@ -4,8 +4,14 @@ title: Apktool - Changelog
 description: Apktool - Changelog / Roadmap
 ---
 
+## v2.0.1 (unreleased)
+2015.xx.xx
+
+ * Fixed version qualifier like `v4` from being ignored during decode. ([Issue 928](https://github.com/iBotPeaches/Apktool/issues/928))
+ * Correctly add `libs` and `lib` folders on `[b]uild`
+ 
 ## v2.0.0
-2014.04.21
+2015.04.21
 
  * [Migration Instructions from 1.5.x to 2.0.x]({{ site.baseurl }}/documentation/#v1-5-x-v2-0-0)
  * **Android 5.1 support**
