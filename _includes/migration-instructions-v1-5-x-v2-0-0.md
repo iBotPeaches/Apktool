@@ -2,7 +2,7 @@
   <li><strong>Java 1.7 is required</strong></li>
   <li>Update apktool to v2.0.0</li>
   <li>aapt is now included inside the apktool binary. It's not required to maintain your own aapt install under $PATH. (However, features like <code>-a / --aapt</code> are still used and can override the internal aapt)</li>
-  <li>The addition of aapt replaces the need for separate aapt download packages. Helper Scripts may be found [here](https://github.com/iBotPeaches/Apktool/tree/master/scripts)</li>
+  <li>The addition of aapt replaces the need for separate aapt download packages. Helper Scripts may be found <a href="https://github.com/iBotPeaches/Apktool/tree/master/scripts">here</a></li>
   <li>Remove framework <code>$HOME/apktool/framework/1.apk</code></li>
   <li>Eagle eyed users will notice resources are now decoded before sources now. This is because we need to know the API version via the manifest for decoding the sources</li>
 </ul>
