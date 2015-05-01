@@ -246,7 +246,7 @@ public class InstructionMethodItem<T extends Instruction> extends MethodItem {
                     boolean isResourceId = writeCommentIfResourceId(writer);
                     if (!isResourceId) writeCommentIfLikelyFloat(writer);
                 }
-                return true;
+                break;
             case Format21t:
             case Format31t:
                 writeOpcode(writer);

@@ -39,7 +39,7 @@ if (!('release' in gradle.startParameter.taskNames)) {
     def versionSuffix
     try {
         def git = org.eclipse.jgit.api.Git.open(file('../.'))
-        def head = git.getRepository().getRef("HEAD")
+        def head = git.getRepository().getRef('HEAD')
         versionSuffix = head.getObjectId().abbreviate(8).name()
 
         if (!git.status().call().clean) {
@@ -83,8 +83,9 @@ subprojects {
                    commons_cli: 'commons-cli:commons-cli:1.2',
                    jflex: 'de.jflex:jflex:1.4.3',
                    jflex_plugin: 'co.tomlee.gradle.plugins:gradle-jflex-plugin:0.0.1',
-                   proguard_gradle: 'net.sf.proguard:proguard-gradle:5.1'
-         ]
+                   proguard_gradle: 'net.sf.proguard:proguard-gradle:5.1',
+                   dx: 'com.google.android.tools:dx:1.7'
+        ]
     }
 
     jar {

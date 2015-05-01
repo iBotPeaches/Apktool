@@ -92,15 +92,6 @@ task fatJar (type: Jar) {
     manifest {
         attributes('Main-Class': 'org.jf.smali.main')
     }
-<<<<<<< HEAD:brut.apktool.smali/smali/build.gradle
-=======
-
-    doLast {
-        if (!System.getProperty('os.name').toLowerCase().contains('windows')) {
-            ant.symlink(link: file("${destinationDir}/smali.jar"), resource: archivePath, overwrite: true)
-        }
-    }
->>>>>>> f0c481a... Use single-quotes in build.gradle files when double-quotes aren't needed:smali/build.gradle
 }
 tasks.getByPath('build').dependsOn(fatJar)
 
