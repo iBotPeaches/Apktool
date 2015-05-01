@@ -52,15 +52,12 @@ processResources.inputs.property('version', version)
 processResources.expand('version': version)
 
 // build a jar containing all dependencies
-jar {
+task fatJar (type: Jar) {
+    from sourceSets.main.output
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
 
     manifest {
         attributes("Main-Class": "org.jf.baksmali.main")
-    }
-
-    doLast {
-        //ant.symlink(link: file("${destinationDir}/baksmali.jar"), resource: archivePath, overwrite: true)
     }
 }
 

@@ -141,16 +141,16 @@ task generateJflexSource(type: JavaExec) {
 compileJava.dependsOn generateParserAntlrSource, generateTreeWalkerAntlrSource, generateJflexSource
 compileTestJava.dependsOn generateTestAntlrSource
 
+processResources.inputs.property('version', version)
+processResources.expand('version': version)
+
 // build a jar containing all dependencies
-jar {
+task fatJar (type: Jar) {
+    from sourceSets.main.output
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
 
     manifest {
         attributes("Main-Class": "org.jf.smali.main")
-    }
-
-    doLast {
-        // ant.symlink(link: file("${destinationDir}/smali.jar"), resource: archivePath, overwrite: true)
     }
 }
 

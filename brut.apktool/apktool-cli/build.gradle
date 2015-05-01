@@ -15,13 +15,18 @@
  */
 apply plugin: 'eu.appsatori.fatjar'
 
-configurations {
-    proguard
+dependencies {
+    compile project(':brut.apktool:apktool-lib')
 }
 
-dependencies {
-  compile project(':brut.apktool:apktool-lib')
-  proguard depends.proguard
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath depends.proguard_gradle
+    }
 }
 
 gradle.taskGraph.whenReady {
@@ -36,26 +41,25 @@ task cleanOutputDirectory(type: Delete) {
     delete fileTree(dir: jar.destinationDir.getPath(), exclude: "apktool-cli.jar")
 }
 
-task proguard(type: JavaExec, dependsOn: fatJar) {
+task proguard(type: proguard.gradle.ProGuardTask, dependsOn: fatJar) {
     def outFile = jar.destinationDir.getPath() + '/' + "apktool" + '-' + project.apktool_version + '-small' + '.' + jar.extension
-    inputs.file jar.archivePath
-    outputs.file outFile
 
-    classpath = configurations.proguard
-    main = 'proguard.ProGuard'
-    args '-injars ' + "${jar.archivePath}" + ' (!META-INF/LICENSE.txt,!META-INF/NOTICE.txt,!README)'
-    args "-outjars ${outFile}"
-    args "-libraryjars ${System.properties['java.home']}/lib/rt.jar"
-    args '-dontobfuscate'
-    args '-dontoptimize'
-    args '-keep public class brut.apktool.Main { public static void main(java.lang.String[]); }'
-    args '-keep class org.yaml.snakeyaml.** { public protected private *; }'
-    args '-keepclassmembers enum * { public static **[] values(); public static ** valueOf(java.lang.String); }'
-    args '-dontwarn com.google.common.base.**'
-    args '-dontwarn com.google.common.collect.**'
-    args '-dontwarn com.google.common.util.**'
-    args '-dontwarn javax.xml.xpath.**'
-    args '-dontnote **'
+    injars fatJar.archivePath
+    outjars outFile
+
+    libraryjars "${System.properties['java.home']}/lib/rt.jar"
+
+    dontobfuscate
+    dontoptimize
+
+    keep 'public class brut.apktool.Main { public static void main(java.lang.String[]); }'
+    keep 'class org.yaml.snakeyaml.** { public protected private *; }'
+    keepclassmembers 'enum * { public static **[] values(); public static ** valueOf(java.lang.String); }'
+    dontwarn 'com.google.common.base.**'
+    dontwarn 'com.google.common.collect.**'
+    dontwarn 'com.google.common.util.**'
+    dontwarn 'javax.xml.xpath.**'
+    dontnote '**'
 }
 
 proguard.dependsOn cleanOutputDirectory
