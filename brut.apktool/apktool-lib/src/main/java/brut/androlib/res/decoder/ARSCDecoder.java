@@ -90,7 +90,9 @@ public class ARSCDecoder {
             // for Apktool's use we need a non-zero packageId.
             // AOSP indicates 0x02 is next, as 0x01 is system and 0x7F is private.
             id = 2;
-            mResTable.setSharedLibrary(true);
+            if (mResTable.getPackageOriginal() == null && mResTable.getPackageRenamed() == null) {
+                mResTable.setSharedLibrary(true);
+            }
         }
 
         String name = mIn.readNullEndedString(128, true);
