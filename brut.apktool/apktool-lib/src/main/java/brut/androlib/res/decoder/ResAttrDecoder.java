@@ -17,6 +17,7 @@
 package brut.androlib.res.decoder;
 
 import brut.androlib.AndrolibException;
+import brut.androlib.err.UndefinedResObject;
 import brut.androlib.res.data.ResPackage;
 import brut.androlib.res.data.ResResSpec;
 import brut.androlib.res.data.value.ResAttr;
@@ -32,10 +33,15 @@ public class ResAttrDecoder {
                 type, value, rawValue);
 
         String decoded = null;
-        if (attrResId != 0) {
-            ResAttr attr = (ResAttr) getCurrentPackage().getResTable()
-                    .getResSpec(attrResId).getDefaultResource().getValue();
-            decoded = attr.convertToResXmlFormat(resValue);
+        if (attrResId > 0) {
+            try {
+                ResAttr attr = (ResAttr) getCurrentPackage().getResTable()
+                        .getResSpec(attrResId).getDefaultResource().getValue();
+
+                decoded = attr.convertToResXmlFormat(resValue);
+            } catch (UndefinedResObject ex) {
+                // ignored
+            }
         }
 
         return decoded != null ? decoded : resValue.encodeAsResXmlAttr();
