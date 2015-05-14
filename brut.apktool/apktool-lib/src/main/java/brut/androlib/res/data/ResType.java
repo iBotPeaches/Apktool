@@ -40,6 +40,10 @@ public final class ResType {
         return mName;
     }
 
+    public boolean isString() {
+        return mName.equalsIgnoreCase("string");
+    }
+
     public Set<ResResSpec> listResSpecs() {
         return new LinkedHashSet<ResResSpec>(mResSpecs.values());
     }

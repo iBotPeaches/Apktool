@@ -202,6 +202,9 @@ public class ARSCDecoder {
 
         ResValue value = (flags & ENTRY_FLAG_COMPLEX) == 0 ? readValue() : readComplexEntry();
 
+        if (mType.isString() && value instanceof ResFileValue) {
+            value = new ResStringValue(value.toString());
+        }
         if (mConfig == null) {
             return;
         }
@@ -229,8 +232,19 @@ public class ARSCDecoder {
 
         ResValueFactory factory = mPkg.getValueFactory();
         Duo<Integer, ResScalarValue>[] items = new Duo[count];
+        ResValue resValue;
+        int resId;
+
         for (int i = 0; i < count; i++) {
-            items[i] = new Duo<Integer, ResScalarValue>(mIn.readInt(), (ResScalarValue) readValue());
+            resId = mIn.readInt();
+            resValue = readValue();
+
+            try {
+                items[i] = new Duo<Integer, ResScalarValue>(resId, (ResScalarValue) resValue);
+            } catch (ClassCastException ex) {
+                resValue = new ResStringValue(resValue.toString());
+                items[i] = new Duo<Integer, ResScalarValue>(resId, (ResScalarValue) resValue);
+            }
         }
 
         return factory.bagFactory(parent, items);
