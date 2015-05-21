@@ -46,6 +46,8 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -110,24 +112,46 @@ public class AccessorTest {
             MethodImplementation methodImpl = method.getImplementation();
             Assert.assertNotNull(methodImpl);
 
+            List<Instruction> invokeStaticInstructions = new ArrayList<Instruction>();
+
             for (Instruction instruction: methodImpl.getInstructions()) {
                 Opcode opcode = instruction.getOpcode();
                 if (opcode == Opcode.INVOKE_STATIC || opcode == Opcode.INVOKE_STATIC_RANGE) {
-                    MethodReference accessorMethod =
-                            (MethodReference)((ReferenceInstruction) instruction).getReference();
-
-                    SyntheticAccessorResolver.AccessedMember accessedMember = sar.getAccessedMember(accessorMethod);
-
-                    Assert.assertNotNull(String.format("Could not resolve accessor for %s_%s", type, operation),
-                            accessedMember);
-
-                    int operationType = operationTypes.get(operation);
-                    Assert.assertEquals(operationType, accessedMember.accessedMemberType);
-
-                    Assert.assertEquals(String.format("%s_val", type),
-                            ((FieldReference)accessedMember.accessedMember).getName());
+                    invokeStaticInstructions.add(instruction);
                 }
             }
+
+            Assert.assertTrue(invokeStaticInstructions.size() > 0 && invokeStaticInstructions.size() <= 2);
+
+            if (invokeStaticInstructions.size() == 1) {
+                int operationType = operationTypes.get(operation);
+                int accessedMemberType =
+                            resolveAccessedMemberType(sar, invokeStaticInstructions.get(0), type, operation);
+                Assert.assertEquals(accessedMemberType, operationType);
+            } else {
+                int getterAccessedMemberType =
+                            resolveAccessedMemberType(sar, invokeStaticInstructions.get(0), type, operation);
+                Assert.assertEquals(getterAccessedMemberType, SyntheticAccessorResolver.GETTER);
+
+                int setterAccessedMemberType =
+                            resolveAccessedMemberType(sar, invokeStaticInstructions.get(1), type, operation);
+                Assert.assertEquals(setterAccessedMemberType, SyntheticAccessorResolver.SETTER);
+            }
         }
+    }
+
+    private static int resolveAccessedMemberType(SyntheticAccessorResolver sar, Instruction instruction, String type,
+                                                 String operation) {
+        MethodReference accessorMethod =
+            (MethodReference)((ReferenceInstruction) instruction).getReference();
+        SyntheticAccessorResolver.AccessedMember accessedMember = sar.getAccessedMember(accessorMethod);
+
+        Assert.assertNotNull(String.format("Could not resolve accessor for %s_%s", type, operation),
+                accessedMember);
+
+        Assert.assertEquals(String.format("%s_val", type),
+                ((FieldReference)accessedMember.accessedMember).getName());
+
+        return accessedMember.accessedMemberType;
     }
 }
