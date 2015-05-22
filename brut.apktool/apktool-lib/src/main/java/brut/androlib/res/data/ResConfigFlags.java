@@ -363,7 +363,7 @@ public class ResConfigFlags {
             ret.append("-v").append(sdkVersion);
         }
         if (isInvalid) {
-            ret.append("-ERR" + sErrCounter++);
+            ret.append("-ERR").append(sErrCounter++);
         }
 
         return ret.toString();
