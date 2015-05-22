@@ -11,6 +11,8 @@ description: Apktool - Changelog / Roadmap
  * Fixed windows helper script from appending current directory into `$PATH`. ([Issue 927](https://github.com/iBotPeaches/Apktool/issues/927)) / (Thanks Tercete)
  * Fixed frameworks that were SharedLibraries from affecting the `apktool.yml` file. ([Issue 936](https://github.com/iBotPeaches/Apktool/issues/936))
  * Fixed apks that were crashing on internal attributes. ([Issue 913](https://github.com/iBotPeaches/Apktool/issues/913))
+ * Fixed `ResFileValue(s)` being casted to `ResScalarValues`. ([Issue 921](https://github.com/iBotPeaches/Apktool/issues/921))
+ * Fixed reading `ResConfigFlags` twice. ([Issue 924](https://github.com/iBotPeaches/Apktool/issues/924))
  * Correctly add `libs` and `lib` folders on `[b]uild`
  
 ## v2.0.0
