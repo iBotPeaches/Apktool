@@ -32,7 +32,7 @@
 package org.jf.dexlib2.dexbacked;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterators;
+import com.google.common.collect.ImmutableSet;
 import org.jf.dexlib2.base.reference.BaseMethodReference;
 import org.jf.dexlib2.dexbacked.raw.MethodIdItem;
 import org.jf.dexlib2.dexbacked.raw.ProtoIdItem;
@@ -152,7 +152,7 @@ public class DexBackedMethod extends BaseMethodReference implements Method {
         if (methodImpl != null) {
             return methodImpl.getParameterNames(null);
         }
-        return Iterators.emptyIterator();
+        return ImmutableSet.<String>of().iterator();
     }
 
     @Nonnull
