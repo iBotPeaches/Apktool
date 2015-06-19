@@ -40,6 +40,10 @@ public class Opcodes {
     private final Opcode[] opcodesByValue;
     private final HashMap<String, Opcode> opcodesByName;
 
+    public Opcodes(int api) {
+        this(api, false);
+    }
+
     public Opcodes(int api, boolean experimental) {
         opcodesByValue = new Opcode[256];
         opcodesByName = Maps.newHashMap();

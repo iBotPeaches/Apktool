@@ -45,9 +45,20 @@ import java.util.zip.ZipFile;
 
 public final class DexFileFactory {
     @Nonnull
+    public static DexBackedDexFile loadDexFile(String path, int api)
+            throws IOException {
+        return loadDexFile(path, api, false);
+    }
+
+    @Nonnull
     public static DexBackedDexFile loadDexFile(String path, int api, boolean experimental)
             throws IOException {
         return loadDexFile(new File(path), "classes.dex", new Opcodes(api, experimental));
+    }
+
+    @Nonnull
+    public static DexBackedDexFile loadDexFile(File dexFile, int api) throws IOException {
+        return loadDexFile(dexFile, api, false);
     }
 
     @Nonnull
