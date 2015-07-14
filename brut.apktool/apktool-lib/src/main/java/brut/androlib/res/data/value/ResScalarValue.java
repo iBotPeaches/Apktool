@@ -27,12 +27,13 @@ import org.xmlpull.v1.XmlSerializer;
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
-public abstract class ResScalarValue extends ResValue implements
+public abstract class ResScalarValue extends ResIntBasedValue implements
         ResXmlEncodable, ResValuesXmlSerializable {
     protected final String mType;
     protected final String mRawValue;
 
-    protected ResScalarValue(String type, String rawValue) {
+    protected ResScalarValue(String type, int rawIntValue, String rawValue) {
+        super(rawIntValue);
         mType = type;
         mRawValue = rawValue;
     }

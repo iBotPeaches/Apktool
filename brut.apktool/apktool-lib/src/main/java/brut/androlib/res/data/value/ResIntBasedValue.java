@@ -17,22 +17,16 @@
 package brut.androlib.res.data.value;
 
 /**
- * @author Ryszard Wiśniewski <brut.alll@gmail.com>
+ * @author Matt Mastracci <matthew@mastracci.com>
  */
-public class ResFloatValue extends ResScalarValue {
-    private final float mValue;
+public class ResIntBasedValue extends ResValue {
+    private int mRawIntValue;
 
-    public ResFloatValue(float value, int rawIntValue, String rawValue) {
-        super("float", rawIntValue, rawValue);
-        this.mValue = value;
+    protected ResIntBasedValue(int rawIntValue) {
+        mRawIntValue = rawIntValue;
     }
 
-    public float getValue() {
-        return mValue;
-    }
-
-    @Override
-    protected String encodeAsResXml() {
-        return String.valueOf(mValue);
+    public int getRawIntValue() {
+        return mRawIntValue;
     }
 }

@@ -32,7 +32,7 @@ public class ResIntValue extends ResScalarValue {
     }
 
     public ResIntValue(int value, String rawValue, String type) {
-        super(type, rawValue);
+        super(type, value, rawValue);
         this.mValue = value;
     }
 

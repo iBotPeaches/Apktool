@@ -27,12 +27,12 @@ import org.xmlpull.v1.XmlSerializer;
  */
 public class ResStringValue extends ResScalarValue {
 
-    public ResStringValue(String value) {
-        this(value, "string");
+    public ResStringValue(String value, int rawValue) {
+        this(value, rawValue, "string");
     }
 
-    public ResStringValue(String value, String type) {
-        super(type, value);
+    public ResStringValue(String value, int rawValue, String type) {
+        super(type, rawValue, value);
     }
 
     @Override

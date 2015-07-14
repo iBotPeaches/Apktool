@@ -41,15 +41,15 @@ public class ResValueFactory {
             case TypedValue.TYPE_ATTRIBUTE:
                 return newReference(value, rawValue, true);
             case TypedValue.TYPE_STRING:
-                return new ResStringValue(rawValue);
+                return new ResStringValue(rawValue, value);
             case TypedValue.TYPE_FLOAT:
-                return new ResFloatValue(Float.intBitsToFloat(value), rawValue);
+                return new ResFloatValue(Float.intBitsToFloat(value), value, rawValue);
             case TypedValue.TYPE_DIMENSION:
                 return new ResDimenValue(value, rawValue);
             case TypedValue.TYPE_FRACTION:
                 return new ResFractionValue(value, rawValue);
             case TypedValue.TYPE_INT_BOOLEAN:
-                return new ResBoolValue(value != 0, rawValue);
+                return new ResBoolValue(value != 0, value, rawValue);
             case TypedValue.TYPE_DYNAMIC_REFERENCE:
                 return newReference(value, rawValue);
         }
@@ -66,11 +66,11 @@ public class ResValueFactory {
         throw new AndrolibException("Invalid value type: " + type);
     }
 
-    public ResValue factory(String value) {
+    public ResIntBasedValue factory(String value, int rawValue) {
         if (value.startsWith("res/")) {
-            return new ResFileValue(value);
+            return new ResFileValue(value, rawValue);
         }
-        return new ResStringValue(value);
+        return new ResStringValue(value, rawValue);
     }
 
     public ResBagValue bagFactory(int parent,

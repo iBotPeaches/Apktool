@@ -203,7 +203,7 @@ public class ARSCDecoder {
         ResValue value = (flags & ENTRY_FLAG_COMPLEX) == 0 ? readValue() : readComplexEntry();
 
         if (mType.isString() && value instanceof ResFileValue) {
-            value = new ResStringValue(value.toString());
+            value = new ResStringValue(value.toString(), ((ResFileValue) value).getRawIntValue());
         }
         if (mConfig == null) {
             return;
@@ -232,17 +232,17 @@ public class ARSCDecoder {
 
         ResValueFactory factory = mPkg.getValueFactory();
         Duo<Integer, ResScalarValue>[] items = new Duo[count];
-        ResValue resValue;
+        ResIntBasedValue resValue;
         int resId;
 
         for (int i = 0; i < count; i++) {
             resId = mIn.readInt();
             resValue = readValue();
 
-            try {
+            if (resValue instanceof ResScalarValue) {
                 items[i] = new Duo<Integer, ResScalarValue>(resId, (ResScalarValue) resValue);
-            } catch (ClassCastException ex) {
-                resValue = new ResStringValue(resValue.toString());
+            } else {
+                resValue = new ResStringValue(resValue.toString(), resValue.getRawIntValue());
                 items[i] = new Duo<Integer, ResScalarValue>(resId, (ResScalarValue) resValue);
             }
         }
@@ -250,14 +250,14 @@ public class ARSCDecoder {
         return factory.bagFactory(parent, items);
     }
 
-    private ResValue readValue() throws IOException, AndrolibException {
+    private ResIntBasedValue readValue() throws IOException, AndrolibException {
 		/* size */mIn.skipCheckShort((short) 8);
 		/* zero */mIn.skipCheckByte((byte) 0);
         byte type = mIn.readByte();
         int data = mIn.readInt();
 
         return type == TypedValue.TYPE_STRING
-                ? mPkg.getValueFactory().factory(mTableStrings.getHTML(data))
+                ? mPkg.getValueFactory().factory(mTableStrings.getHTML(data), data)
                 : mPkg.getValueFactory().factory(type, data, null);
     }
 
@@ -395,7 +395,7 @@ public class ARSCDecoder {
                 mConfig = mPkg.getOrCreateConfig(new ResConfigFlags());
             }
 
-            ResValue value = new ResBoolValue(false, null);
+            ResValue value = new ResBoolValue(false, 0, null);
             ResResource res = new ResResource(mConfig, spec, value);
 
             mPkg.addResource(res);
