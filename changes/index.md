@@ -13,6 +13,7 @@ description: Apktool - Changelog / Roadmap
  * Fixed apks that were crashing on internal attributes. ([Issue 913](https://github.com/iBotPeaches/Apktool/issues/913))
  * Fixed `ResFileValue(s)` being casted to `ResScalarValues`. ([Issue 921](https://github.com/iBotPeaches/Apktool/issues/921))
  * Fixed reading `ResConfigFlags` twice. ([Issue 924](https://github.com/iBotPeaches/Apktool/issues/924))
+ * Expose raw index used for resource lookups. ([Issue 990](https://github.com/iBotPeaches/Apktool/issues/990)) / (Thanks mmastrac)
  * Correctly add `libs` and `lib` folders on `[b]uild`
  
 ## v2.0.0
