@@ -20,6 +20,8 @@ import brut.androlib.AndrolibException;
 import brut.androlib.res.data.ResResource;
 import brut.androlib.res.xml.ResXmlEncoders;
 import java.io.IOException;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 import org.xmlpull.v1.XmlSerializer;
 
 /**
@@ -37,7 +39,22 @@ public class ResStringValue extends ResScalarValue {
 
     @Override
     public String encodeAsResXmlAttr() {
-        return ResXmlEncoders.encodeAsResXmlAttr(mRawValue);
+        return makeSureItCantBeMistakenForAnInt(ResXmlEncoders.encodeAsResXmlAttr(mRawValue));
+    }
+
+    private static Pattern allDigits = Pattern.compile("\\d+");
+
+    // If a meta-data value consists of digits only, then it is considered an int.
+    // For instance, if the value of "answer" is "42", then the corresponding
+    // BaseBundle.getString("answer") returns null instead of "42" (while getInt()
+    // returns 42).
+    // This hack, of prefixing the value with "\\x3", makes sure that the value is
+    // considered a string nonetheless.
+    //
+    // See: http://stackoverflow.com/questions/2154945/how-to-force-a-meta-data-value-to-type-string
+    // and  http://developer.android.com/guide/topics/manifest/meta-data-element.html
+    private String makeSureItCantBeMistakenForAnInt(String v) {
+        return allDigits.matcher(v).matches() ?  "\\x3" + v : v;
     }
 
     @Override
