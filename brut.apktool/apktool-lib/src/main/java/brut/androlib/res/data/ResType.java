@@ -48,6 +48,14 @@ public final class ResType {
         return new LinkedHashSet<ResResSpec>(mResSpecs.values());
     }
 
+    public boolean hasResSpec(String name) {
+        if (mResSpecs.get(name) == null) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     public ResResSpec getResSpec(String name) throws AndrolibException {
         ResResSpec spec = mResSpecs.get(name);
         if (spec == null) {

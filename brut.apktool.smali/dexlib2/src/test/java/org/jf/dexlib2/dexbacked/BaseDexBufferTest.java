@@ -64,7 +64,7 @@ public class BaseDexBufferTest {
         dexBuf.readSmallUint(0);
     }
 
-    @Test(expected=ExceptionWithContext.class)
+    @Test
     public void testReadSmallUintTooLarge3() {
         BaseDexBuffer dexBuf = new BaseDexBuffer(new byte[] {(byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff});
         dexBuf.readSmallUint(0);

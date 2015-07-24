@@ -213,6 +213,8 @@ public class ARSCDecoder {
         ResResSpec spec;
         if (mPkg.hasResSpec(resId)) {
             spec = mPkg.getResSpec(resId);
+        } else if (mType.hasResSpec(mSpecNames.getString(specNamesId))) {
+            return;
         } else {
             spec = new ResResSpec(resId, mSpecNames.getString(specNamesId), mPkg, mType);
             mPkg.addResSpec(spec);
