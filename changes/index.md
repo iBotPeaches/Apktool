@@ -4,6 +4,11 @@ title: Apktool - Changelog
 description: Apktool - Changelog / Roadmap
 ---
 
+## v2.0.2 (in development)
+2015.xx.xx
+
+ * Fixed issues with apks that use `.9.xml` files, which improperly triggered 9patch decoder. ([Issue 1005](https://github.com/iBotPeaches/Apktool/issues/1005))
+
 ## v2.0.1
 2015.07.15
 
