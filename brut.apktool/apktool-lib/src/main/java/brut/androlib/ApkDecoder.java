@@ -89,8 +89,6 @@ public class ApkDecoder {
         LOGGER.info("Using Apktool " + Androlib.getVersion() + " on " + mApkFile.getName());
 
         if (hasResources()) {
-            setTargetSdkVersion();
-            setAnalysisMode(mAnalysisMode, true);
             setCompressionMode();
 
             switch (mDecodeResources) {
@@ -98,6 +96,9 @@ public class ApkDecoder {
                     mAndrolib.decodeResourcesRaw(mApkFile, outDir);
                     break;
                 case DECODE_RESOURCES_FULL:
+                    setTargetSdkVersion();
+                    setAnalysisMode(mAnalysisMode, true);
+
                     if (hasManifest()) {
                         mAndrolib.decodeManifestWithResources(mApkFile, outDir, getResTable());
                     }
