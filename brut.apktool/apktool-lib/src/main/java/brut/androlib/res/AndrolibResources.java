@@ -383,7 +383,13 @@ final public class AndrolibResources {
             cmd.add("-x");
         }
 
-        if (! apkOptions.resourcesAreCompressed) {
+        if (apkOptions.doNotCompress != null) {
+            for (String file : apkOptions.doNotCompress) {
+                cmd.add("-0");
+                cmd.add(file);
+            }
+        }
+        if (!apkOptions.resourcesAreCompressed) {
             cmd.add("-0");
             cmd.add("arsc");
         }

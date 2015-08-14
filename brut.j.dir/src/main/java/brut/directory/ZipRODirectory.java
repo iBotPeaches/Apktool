@@ -100,6 +100,16 @@ public class ZipRODirectory extends AbstractDirectory {
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    public int getCompressionLevel(String fileName)
+            throws DirectoryException {
+        ZipEntry entry =  mZipFile.getEntry(fileName);
+        if (entry == null) {
+            throw new PathNotExist("Entry not found: " + fileName);
+        }
+        return entry.getMethod();
+    }
+
     private void loadAll() {
         mFiles = new LinkedHashSet<String>();
         mDirs = new LinkedHashMap<String, AbstractDirectory>();
