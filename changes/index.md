@@ -8,6 +8,11 @@ description: Apktool - Changelog / Roadmap
 2015.xx.xx
 
  * Fixed issues with apks that use `.9.xml` files, which improperly triggered 9patch decoder. ([Issue 1005](https://github.com/iBotPeaches/Apktool/issues/1005))
+ * Prevent compressing resources that should not be. ([Pull 1020](https://github.com/iBotPeaches/Apktool/pull/1020))
+ * `aapt` changes
+    * [7bff1857](https://github.com/iBotPeaches/platform_frameworks_base/commit/7bff1857dd104623eaa2e1cd0f56187d3e1317dc) - skip compat functions
+    * [7e857f82](https://github.com/iBotPeaches/platform_frameworks_base/commit/7e857f8256dd8c905ca558711711bcc14013955c) - add miui support for `godzillaui`
+    * [74edf627](https://github.com/iBotPeaches/platform_frameworks_base/commit/74edf6279cb84c5e1b81f411ce1145ef7ceaaf79) - add miui support for 4 digit `mnc`/`mcc` fields.
 
 ## v2.0.1
 2015.07.15
