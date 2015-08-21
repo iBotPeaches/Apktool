@@ -18,6 +18,7 @@ package brut.androlib;
 
 import brut.androlib.err.InFileNotFoundException;
 import brut.androlib.err.OutDirExistsException;
+import brut.androlib.err.UndefinedResObject;
 import brut.androlib.res.AndrolibResources;
 import brut.androlib.res.data.ResPackage;
 import brut.androlib.res.data.ResTable;
@@ -347,7 +348,11 @@ public class ApkDecoder {
     private void putPackageInfo(Map<String, Object> meta) throws AndrolibException {
         String renamed = getResTable().getPackageRenamed();
         String original = getResTable().getPackageOriginal();
+
         int id = getResTable().getPackageId();
+        try {
+            id = getResTable().getPackage(renamed).getId();
+        } catch (UndefinedResObject ignored) {}
 
         HashMap<String, String> packages = new HashMap<String, String>();
 
