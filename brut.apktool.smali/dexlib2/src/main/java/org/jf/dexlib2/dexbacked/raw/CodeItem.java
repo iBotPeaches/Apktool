@@ -100,10 +100,10 @@ public class CodeItem {
                     int triesCount = reader.readUshort();
                     out.annotate(2, "tries_size = %d", triesCount);
 
-                    int debugInfoOffset = reader.readSmallUint();
+                    int debugInfoOffset = reader.readInt();
                     out.annotate(4, "debug_info_off = 0x%x", debugInfoOffset);
 
-                    if (debugInfoOffset != 0) {
+                    if (debugInfoOffset > 0) {
                         addDebugInfoIdentity(debugInfoOffset, itemIdentity);
                     }
 

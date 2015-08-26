@@ -123,7 +123,16 @@ public class DexBackedMethodImplementation implements MethodImplementation {
 
     @Nonnull
     private DebugInfo getDebugInfo() {
-        return DebugInfo.newOrEmpty(dexFile, dexFile.readSmallUint(codeOffset + CodeItem.DEBUG_INFO_OFFSET), this);
+        int debugOffset = dexFile.readInt(codeOffset + CodeItem.DEBUG_INFO_OFFSET);
+
+        if (debugOffset == -1 || debugOffset == 0) {
+            return DebugInfo.newOrEmpty(dexFile, 0, this);
+        }
+        if (debugOffset < 0) {
+            System.err.println("%s: Invalid debug offset");
+            return DebugInfo.newOrEmpty(dexFile, 0, this);
+        }
+        return DebugInfo.newOrEmpty(dexFile, debugOffset, this);
     }
 
     @Nonnull @Override
