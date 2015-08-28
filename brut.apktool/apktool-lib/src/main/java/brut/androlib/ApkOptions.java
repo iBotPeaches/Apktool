@@ -15,6 +15,8 @@
  */
 package brut.androlib;
 
+import java.util.Collection;
+
 public class ApkOptions {
     public boolean forceBuildAll = false;
     public boolean debugMode = false;
@@ -23,6 +25,7 @@ public class ApkOptions {
     public boolean updateFiles = false;
     public boolean isFramework = false;
     public boolean resourcesAreCompressed = false;
+    public Collection<String> doNotCompress;
 
     public String frameworkFolderLocation = null;
     public String frameworkTag = null;

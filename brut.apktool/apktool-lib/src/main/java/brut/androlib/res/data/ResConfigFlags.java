@@ -246,6 +246,9 @@ public class ResConfigFlags {
             case UI_MODE_TYPE_LARGEUI:
                 ret.append("-largeui");
                 break;
+            case UI_MODE_TYPE_GODZILLAUI:
+                ret.append("-godzillaui");
+                break;
             case UI_MODE_TYPE_HUGEUI:
                 ret.append("-hugeui");
                 break;
@@ -551,6 +554,7 @@ public class ResConfigFlags {
     public final static byte UI_MODE_TYPE_WATCH = 0x06;
 
     // start - miui
+    public final static byte UI_MODE_TYPE_GODZILLAUI = 0x0b;
     public final static byte UI_MODE_TYPE_SMALLUI = 0x0c;
     public final static byte UI_MODE_TYPE_MEDIUMUI = 0x0d;
     public final static byte UI_MODE_TYPE_LARGEUI = 0x0e;

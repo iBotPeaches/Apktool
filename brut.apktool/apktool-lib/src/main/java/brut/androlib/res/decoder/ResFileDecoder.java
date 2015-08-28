@@ -77,6 +77,12 @@ public class ResFileDecoder {
                         return;
                     }
 
+                    // check for xml 9 patches which are just xml files
+                    if (inFileName.toLowerCase().endsWith(".xml")) {
+                        decode(inDir, inFileName, outDir, outFileName, "xml");
+                        return;
+                    }
+
                     try {
                         decode(inDir, inFileName, outDir, outFileName, "9patch");
                         return;
