@@ -58,6 +58,7 @@ import org.jf.dexlib2.iface.reference.StringReference;
 import org.jf.dexlib2.iface.reference.TypeReference;
 import org.jf.dexlib2.util.InstructionUtil;
 import org.jf.dexlib2.util.MethodUtil;
+import org.jf.dexlib2.util.ReferenceUtil;
 import org.jf.dexlib2.writer.io.DeferredOutputStream;
 import org.jf.dexlib2.writer.io.DeferredOutputStreamFactory;
 import org.jf.dexlib2.writer.io.DexDataStore;
@@ -194,6 +195,33 @@ public abstract class DexWriter<
                 fieldSection.getItems().size() * FieldIdItem.ITEM_SIZE +
                 methodSection.getItems().size() * MethodIdItem.ITEM_SIZE +
                 classSection.getItems().size() * ClassDefItem.ITEM_SIZE;
+    }
+
+    @Nonnull
+    public List<String> getMethodReferences() {
+        List<String> methodReferences = Lists.newArrayList();
+        for (Entry<? extends MethodRefKey, Integer> methodReference: methodSection.getItems()) {
+            methodReferences.add(ReferenceUtil.getMethodDescriptor(methodReference.getKey()));
+        }
+        return methodReferences;
+    }
+
+    @Nonnull
+    public List<String> getFieldReferences() {
+        List<String> fieldReferences = Lists.newArrayList();
+        for (Entry<? extends FieldRefKey, Integer> fieldReference: fieldSection.getItems()) {
+            fieldReferences.add(ReferenceUtil.getFieldDescriptor(fieldReference.getKey()));
+        }
+        return fieldReferences;
+    }
+
+    @Nonnull
+    public List<String> getTypeReferences() {
+        List<String> classReferences = Lists.newArrayList();
+        for (Entry<? extends TypeKey, Integer> typeReference: typeSection.getItems()) {
+            classReferences.add(typeReference.getKey().toString());
+        }
+        return classReferences;
     }
 
     public void writeTo(@Nonnull DexDataStore dest) throws IOException {

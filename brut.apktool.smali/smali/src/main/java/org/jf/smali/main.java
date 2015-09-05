@@ -28,7 +28,9 @@
 
 package org.jf.smali;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Ordering;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.TokenSource;
@@ -113,6 +115,15 @@ public class main {
         boolean printTokens = false;
         boolean experimental = false;
 
+        boolean listMethods = false;
+        String methodListFilename = null;
+
+        boolean listFields = false;
+        String fieldListFilename = null;
+
+        boolean listTypes = false;
+        String typeListFilename = null;
+
         int apiLevel = 15;
 
         String outputDexFile = "out.dex";
@@ -152,6 +163,18 @@ public class main {
                     break;
                 case 'j':
                     jobs = Integer.parseInt(commandLine.getOptionValue("j"));
+                    break;
+                case 'm':
+                    listMethods = true;
+                    methodListFilename = commandLine.getOptionValue("m");
+                    break;
+                case 'f':
+                    listFields = true;
+                    fieldListFilename = commandLine.getOptionValue("f");
+                    break;
+                case 't':
+                    listTypes = true;
+                    typeListFilename = commandLine.getOptionValue("t");
                     break;
                 case 'V':
                     verboseErrors = true;
@@ -232,6 +255,27 @@ public class main {
                 System.exit(1);
             }
 
+            if (listMethods) {
+                if (Strings.isNullOrEmpty(methodListFilename)) {
+                    methodListFilename = outputDexFile + ".methods";
+                }
+                writeReferences(dexBuilder.getMethodReferences(), methodListFilename);
+            }
+
+            if (listFields) {
+                if (Strings.isNullOrEmpty(fieldListFilename)) {
+                    fieldListFilename = outputDexFile + ".fields";
+                }
+                writeReferences(dexBuilder.getFieldReferences(), fieldListFilename);
+            }
+
+            if (listTypes) {
+                if (Strings.isNullOrEmpty(typeListFilename)) {
+                    typeListFilename = outputDexFile + ".types";
+                }
+                writeReferences(dexBuilder.getTypeReferences(), typeListFilename);
+            }
+
             dexBuilder.writeTo(new FileDataStore(new File(outputDexFile)));
         } catch (RuntimeException ex) {
             System.err.println("\nUNEXPECTED TOP-LEVEL EXCEPTION:");
@@ -241,6 +285,23 @@ public class main {
             System.err.println("\nUNEXPECTED TOP-LEVEL ERROR:");
             ex.printStackTrace();
             System.exit(3);
+        }
+    }
+
+    private static void writeReferences(List<String> references, String filename) {
+        PrintWriter writer = null;
+        try {
+            writer = new PrintWriter(new BufferedWriter(new FileWriter(filename)));
+
+            for (String reference: Ordering.natural().sortedCopy(references)) {
+                writer.println(reference);
+            }
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        } finally {
+            if (writer != null) {
+                writer.close();
+            }
         }
     }
 
@@ -378,6 +439,27 @@ public class main {
                 .withArgName("API_LEVEL")
                 .create("a");
 
+        Option listMethodsOption = OptionBuilder.withLongOpt("list-methods")
+                .withDescription("Lists all the method references to FILE" +
+                        " (<output_dex_filename>.methods by default)")
+                .hasOptionalArg()
+                .withArgName("FILE")
+                .create("m");
+
+        Option listFieldsOption = OptionBuilder.withLongOpt("list-fields")
+                .withDescription("Lists all the field references to FILE" +
+                        " (<output_dex_filename>.fields by default)")
+                .hasOptionalArg()
+                .withArgName("FILE")
+                .create("f");
+
+        Option listClassesOption = OptionBuilder.withLongOpt("list-types")
+                .withDescription("Lists all the type references to FILE" +
+                        " (<output_dex_filename>.types by default)")
+                .hasOptionalArg()
+                .withArgName("FILE")
+                .create("t");
+
         Option experimentalOption = OptionBuilder.withLongOpt("experimental")
                 .withDescription("enable experimental opcodes to be assembled, even if they " +
                         " aren't necessarily supported by the Android runtime yet")
@@ -405,6 +487,9 @@ public class main {
         basicOptions.addOption(apiLevelOption);
         basicOptions.addOption(experimentalOption);
         basicOptions.addOption(jobsOption);
+        basicOptions.addOption(listMethodsOption);
+        basicOptions.addOption(listFieldsOption);
+        basicOptions.addOption(listClassesOption);
 
         debugOptions.addOption(verboseErrorsOption);
         debugOptions.addOption(printTokensOption);
