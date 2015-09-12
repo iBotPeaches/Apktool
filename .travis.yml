@@ -7,7 +7,6 @@ jdk:
   - oraclejdk8
 os:
   - linux
-  - osx
 before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -qq libstdc++6:i386 lib32z1 expect
@@ -16,9 +15,6 @@ branches:
   only:
     - master
     - stable
-matrix:
-  allow_failures:
-    - jdk: oraclejdk8
 notifications:
   irc:
     channels:
