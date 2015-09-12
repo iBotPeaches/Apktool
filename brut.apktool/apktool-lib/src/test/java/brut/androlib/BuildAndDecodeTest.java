@@ -171,6 +171,11 @@ public class BuildAndDecodeTest {
     }
 
     @Test
+    public void xmlReferenceAttributeTest() throws BrutException {
+        compareXmlFiles("res/layout/issue1040.xml");
+    }
+
+    @Test
     public void qualifiersTest() throws BrutException {
         compareValuesFiles("values-mcc004-mnc04-en-rUS-ldrtl-sw100dp-w200dp-h300dp"
                 + "-xlarge-long-land-desk-night-xhdpi-finger-keyssoft-12key"
