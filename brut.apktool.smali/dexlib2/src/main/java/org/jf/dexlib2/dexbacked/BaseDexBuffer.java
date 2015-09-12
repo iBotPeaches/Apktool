@@ -48,7 +48,8 @@ public class BaseDexBuffer {
                 ((buf[offset+1] & 0xff) << 8) |
                 ((buf[offset+2] & 0xff) << 16) |
                 ((buf[offset+3]) << 24);
-        if (result < 0) {
+        // In case offset is invalid to avoid decompilation. e.g.(0xFFFFFFFF)
+        if (result < 0 && result != -1) {
             throw new ExceptionWithContext("Encountered small uint that is out of range at offset 0x%x", offset);
         }
         return result;

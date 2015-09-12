@@ -61,7 +61,8 @@ public abstract class DebugInfo implements Iterable<DebugItem> {
 
     public static DebugInfo newOrEmpty(@Nonnull DexBackedDexFile dexFile, int debugInfoOffset,
                                        @Nonnull DexBackedMethodImplementation methodImpl) {
-        if (debugInfoOffset == 0) {
+        // In case debugInfoOff is invalid to avoid decompilation. e.g.(0xFFFFFFFF)
+        if (debugInfoOffset == 0 || debugInfoOffset == -1) {
             return EmptyDebugInfo.INSTANCE;
         }
         return new DebugInfoImpl(dexFile, debugInfoOffset, methodImpl);
