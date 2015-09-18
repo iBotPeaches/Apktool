@@ -320,6 +320,10 @@ public class MethodDefinition {
             String parameterType = parameter.getType();
             String parameterName = parameter.getName();
             Collection<? extends Annotation> annotations = parameter.getAnnotations();
+	    
+            //if no parameter name we create one for could see the parameter in AndroidStudio debugger
+            //Warning abstract classes should not have parametter declared (for avoid INSTALL_FAILED_DEXOPT error)
+            if (options.outputDebugInfo && parameterName == null && method.getImplementation() != null) parameterName = "p"+registerNumber;
             if (parameterName != null || annotations.size() != 0) {
                 writer.write(".param p");
                 writer.printSignedIntAsDec(registerNumber);
