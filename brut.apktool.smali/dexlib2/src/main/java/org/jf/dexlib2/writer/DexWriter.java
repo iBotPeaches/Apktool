@@ -433,7 +433,7 @@ public abstract class DexWriter<
         nextIndex = writeClass(indexWriter, offsetWriter, nextIndex, superEntry);
 
         // then, try to write interfaces
-        for (TypeKey interfaceTypeKey: typeListSection.getTypes(classSection.getSortedInterfaces(key))) {
+        for (TypeKey interfaceTypeKey: typeListSection.getTypes(classSection.getInterfaces(key))) {
             Map.Entry<? extends ClassKey, Integer> interfaceEntry = classSection.getClassEntryByType(interfaceTypeKey);
             nextIndex = writeClass(indexWriter, offsetWriter, nextIndex, interfaceEntry);
         }
@@ -446,7 +446,7 @@ public abstract class DexWriter<
         indexWriter.writeInt(typeSection.getItemIndex(classSection.getType(key)));
         indexWriter.writeInt(classSection.getAccessFlags(key));
         indexWriter.writeInt(typeSection.getNullableItemIndex(classSection.getSuperclass(key)));
-        indexWriter.writeInt(typeListSection.getNullableItemOffset(classSection.getSortedInterfaces(key)));
+        indexWriter.writeInt(typeListSection.getNullableItemOffset(classSection.getInterfaces(key)));
         indexWriter.writeInt(stringSection.getNullableItemIndex(classSection.getSourceFile(key)));
         indexWriter.writeInt(classSection.getAnnotationDirectoryOffset(key));
 

@@ -43,7 +43,7 @@ import java.util.*;
 
 class PoolClassDef extends BaseTypeReference implements ClassDef {
     @Nonnull final ClassDef classDef;
-    @Nonnull final TypeListPool.Key<SortedSet<String>> interfaces;
+    @Nonnull final TypeListPool.Key<List<String>> interfaces;
     @Nonnull final ImmutableSortedSet<Field> staticFields;
     @Nonnull final ImmutableSortedSet<Field> instanceFields;
     @Nonnull final ImmutableSortedSet<PoolMethod> directMethods;
@@ -56,7 +56,7 @@ class PoolClassDef extends BaseTypeReference implements ClassDef {
     PoolClassDef(@Nonnull ClassDef classDef) {
         this.classDef = classDef;
 
-        interfaces = new TypeListPool.Key<SortedSet<String>>(ImmutableSortedSet.copyOf(classDef.getInterfaces()));
+        interfaces = new TypeListPool.Key<List<String>>(ImmutableList.copyOf(classDef.getInterfaces()));
         staticFields = ImmutableSortedSet.copyOf(classDef.getStaticFields());
         instanceFields = ImmutableSortedSet.copyOf(classDef.getInstanceFields());
         directMethods = ImmutableSortedSet.copyOf(
@@ -77,7 +77,7 @@ class PoolClassDef extends BaseTypeReference implements ClassDef {
         return classDef.getSuperclass();
     }
 
-    @Nonnull @Override public SortedSet<String> getInterfaces() {
+    @Nonnull @Override public List<String> getInterfaces() {
         return interfaces.types;
     }
 

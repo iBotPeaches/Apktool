@@ -53,7 +53,7 @@ public interface ClassSection<StringKey extends CharSequence, TypeKey extends Ch
     @Nonnull TypeKey getType(@Nonnull ClassKey key);
     int getAccessFlags(@Nonnull ClassKey key);
     @Nullable TypeKey getSuperclass(@Nonnull ClassKey key);
-    @Nullable TypeListKey getSortedInterfaces(@Nonnull ClassKey key);
+    @Nullable TypeListKey getInterfaces(@Nonnull ClassKey key);
     @Nullable StringKey getSourceFile(@Nonnull ClassKey key);
     @Nullable Collection<? extends EncodedValue> getStaticInitializers(@Nonnull ClassKey key);
 

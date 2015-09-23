@@ -31,6 +31,7 @@
 
 package org.jf.dexlib2.dexbacked;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import org.jf.dexlib2.base.reference.BaseTypeReference;
@@ -47,7 +48,9 @@ import org.jf.dexlib2.immutable.reference.ImmutableMethodReference;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.AbstractList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 public class DexBackedClassDef extends BaseTypeReference implements ClassDef {
@@ -114,21 +117,21 @@ public class DexBackedClassDef extends BaseTypeReference implements ClassDef {
 
     @Nonnull
     @Override
-    public Set<String> getInterfaces() {
+    public List<String> getInterfaces() {
         final int interfacesOffset = dexFile.readSmallUint(classDefOffset + ClassDefItem.INTERFACES_OFFSET);
         if (interfacesOffset > 0) {
             final int size = dexFile.readSmallUint(interfacesOffset);
-            return new FixedSizeSet<String>() {
-                @Nonnull
+            return new AbstractList<String>() {
                 @Override
-                public String readItem(int index) {
+                @Nonnull
+                public String get(int index) {
                     return dexFile.getType(dexFile.readUshort(interfacesOffset + 4 + (2*index)));
                 }
 
                 @Override public int size() { return size; }
             };
         }
-        return ImmutableSet.of();
+        return ImmutableList.of();
     }
 
     @Nonnull

@@ -47,12 +47,13 @@ import javax.annotation.Nullable;
 import java.util.AbstractCollection;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 public class ImmutableClassDef extends BaseTypeReference implements ClassDef {
     @Nonnull protected final String type;
     protected final int accessFlags;
     @Nullable protected final String superclass;
-    @Nonnull protected final ImmutableSet<String> interfaces;
+    @Nonnull protected final ImmutableList<String> interfaces;
     @Nullable protected final String sourceFile;
     @Nonnull protected final ImmutableSet<? extends ImmutableAnnotation> annotations;
     @Nonnull protected final ImmutableSortedSet<? extends ImmutableField> staticFields;
@@ -78,7 +79,7 @@ public class ImmutableClassDef extends BaseTypeReference implements ClassDef {
         this.type = type;
         this.accessFlags = accessFlags;
         this.superclass = superclass;
-        this.interfaces = interfaces==null ? ImmutableSet.<String>of() : ImmutableSet.copyOf(interfaces);
+        this.interfaces = interfaces==null ? ImmutableList.<String>of() : ImmutableList.copyOf(interfaces);
         this.sourceFile = sourceFile;
         this.annotations = ImmutableAnnotation.immutableSetOf(annotations);
         this.staticFields = ImmutableField.immutableSetOf(Iterables.filter(fields, FieldUtil.FIELD_IS_STATIC));
@@ -100,7 +101,7 @@ public class ImmutableClassDef extends BaseTypeReference implements ClassDef {
         this.type = type;
         this.accessFlags = accessFlags;
         this.superclass = superclass;
-        this.interfaces = interfaces==null ? ImmutableSet.<String>of() : ImmutableSet.copyOf(interfaces);
+        this.interfaces = interfaces==null ? ImmutableList.<String>of() : ImmutableList.copyOf(interfaces);
         this.sourceFile = sourceFile;
         this.annotations = ImmutableAnnotation.immutableSetOf(annotations);
         this.staticFields = ImmutableField.immutableSetOf(staticFields);
@@ -112,7 +113,7 @@ public class ImmutableClassDef extends BaseTypeReference implements ClassDef {
     public ImmutableClassDef(@Nonnull String type,
                              int accessFlags,
                              @Nullable String superclass,
-                             @Nullable ImmutableSet<String> interfaces,
+                             @Nullable ImmutableList<String> interfaces,
                              @Nullable String sourceFile,
                              @Nullable ImmutableSet<? extends ImmutableAnnotation> annotations,
                              @Nullable ImmutableSortedSet<? extends ImmutableField> staticFields,
@@ -122,7 +123,7 @@ public class ImmutableClassDef extends BaseTypeReference implements ClassDef {
         this.type = type;
         this.accessFlags = accessFlags;
         this.superclass = superclass;
-        this.interfaces = ImmutableUtils.nullToEmptySet(interfaces);
+        this.interfaces = ImmutableUtils.nullToEmptyList(interfaces);
         this.sourceFile = sourceFile;
         this.annotations = ImmutableUtils.nullToEmptySet(annotations);
         this.staticFields = ImmutableUtils.nullToEmptySortedSet(staticFields);
@@ -151,7 +152,7 @@ public class ImmutableClassDef extends BaseTypeReference implements ClassDef {
     @Nonnull @Override public String getType() { return type; }
     @Override public int getAccessFlags() { return accessFlags; }
     @Nullable @Override public String getSuperclass() { return superclass; }
-    @Nonnull @Override public ImmutableSet<String> getInterfaces() { return interfaces; }
+    @Nonnull @Override public ImmutableList<String> getInterfaces() { return interfaces; }
     @Nullable @Override public String getSourceFile() { return sourceFile; }
     @Nonnull @Override public ImmutableSet<? extends ImmutableAnnotation> getAnnotations() { return annotations; }
     @Nonnull @Override public ImmutableSet<? extends ImmutableField> getStaticFields() { return staticFields; }

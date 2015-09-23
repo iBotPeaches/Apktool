@@ -41,6 +41,7 @@ import org.jf.dexlib2.iface.Method;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 public class ClassDefRewriter implements Rewriter<ClassDef> {
@@ -73,8 +74,8 @@ public class ClassDefRewriter implements Rewriter<ClassDef> {
             return RewriterUtils.rewriteNullable(rewriters.getTypeRewriter(), classDef.getSuperclass());
         }
 
-        @Override @Nonnull public Set<String> getInterfaces() {
-            return RewriterUtils.rewriteSet(rewriters.getTypeRewriter(), classDef.getInterfaces());
+        @Override @Nonnull public List<String> getInterfaces() {
+            return RewriterUtils.rewriteList(rewriters.getTypeRewriter(), classDef.getInterfaces());
         }
 
         @Override @Nullable public String getSourceFile() {

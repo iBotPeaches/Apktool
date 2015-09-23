@@ -250,7 +250,7 @@ public class ClassPool implements ClassSection<CharSequence, CharSequence,
         return classDef.getSuperclass();
     }
 
-    @Nullable @Override public TypeListPool.Key<SortedSet<String>> getSortedInterfaces(@Nonnull PoolClassDef classDef) {
+    @Nullable @Override public TypeListPool.Key<List<String>> getInterfaces(@Nonnull PoolClassDef classDef) {
         return classDef.interfaces;
     }
 

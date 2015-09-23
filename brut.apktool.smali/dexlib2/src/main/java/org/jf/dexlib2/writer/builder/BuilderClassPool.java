@@ -122,7 +122,7 @@ public class BuilderClassPool implements ClassSection<BuilderStringReference, Bu
         return builderClassDef.superclass;
     }
 
-    @Nullable @Override public BuilderTypeList getSortedInterfaces(@Nonnull BuilderClassDef builderClassDef) {
+    @Nullable @Override public BuilderTypeList getInterfaces(@Nonnull BuilderClassDef builderClassDef) {
         return builderClassDef.interfaces;
     }
 

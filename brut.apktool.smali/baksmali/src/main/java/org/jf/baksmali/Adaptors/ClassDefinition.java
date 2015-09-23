@@ -146,8 +146,7 @@ public class ClassDefinition {
     }
 
     private void writeInterfaces(IndentingWriter writer) throws IOException {
-        List<String> interfaces = Lists.newArrayList(classDef.getInterfaces());
-        Collections.sort(interfaces);
+        List<String> interfaces = classDef.getInterfaces();
 
         if (interfaces.size() != 0) {
             writer.write('\n');

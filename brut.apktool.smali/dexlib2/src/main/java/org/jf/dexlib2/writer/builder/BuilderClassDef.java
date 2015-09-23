@@ -31,6 +31,7 @@
 
 package org.jf.dexlib2.writer.builder;
 
+import com.google.common.base.Function;
 import com.google.common.base.Functions;
 import com.google.common.collect.*;
 import org.jf.dexlib2.base.reference.BaseTypeReference;
@@ -101,16 +102,8 @@ public class BuilderClassDef extends BaseTypeReference implements ClassDef {
     @Nonnull @Override public SortedSet<BuilderMethod> getVirtualMethods() { return virtualMethods; }
 
     @Nonnull @Override
-    public Set<String> getInterfaces() {
-        return new AbstractSet<String>() {
-            @Nonnull @Override public Iterator<String> iterator() {
-                return Iterators.transform(interfaces.iterator(), Functions.toStringFunction());
-            }
-
-            @Override public int size() {
-                return interfaces.size();
-            }
-        };
+    public List<String> getInterfaces() {
+        return Lists.transform(this.interfaces, Functions.toStringFunction());
     }
 
     @Nonnull @Override public Collection<BuilderField> getFields() {

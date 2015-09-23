@@ -35,6 +35,7 @@ import org.jf.dexlib2.iface.reference.TypeReference;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -72,11 +73,11 @@ public interface ClassDef extends TypeReference, Annotatable {
     @Nullable String getSuperclass();
 
     /**
-     * Gets a set of the interfaces that this class implements.
+     * Gets a list of the interfaces that this class implements.
      *
-     * @return A set of the interfaces that this class implements
+     * @return A list of the interfaces that this class implements
      */
-    @Nonnull Set<String> getInterfaces();
+    @Nonnull List<String> getInterfaces();
 
     /**
      * Gets the name of the primary source file that this class is defined in, if available.

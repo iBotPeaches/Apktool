@@ -35,6 +35,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.jf.dexlib2.ValueType;
 import org.jf.dexlib2.iface.Annotation;
 import org.jf.dexlib2.iface.MethodImplementation;
@@ -117,16 +118,15 @@ public class DexBuilder extends DexWriter<BuilderStringReference, BuilderStringR
         if (interfaces == null) {
             interfaces = ImmutableList.of();
         } else {
-            interfaces = Lists.newArrayList(interfaces);
-            Collections.sort(interfaces);
-            String prev = null;
+            Set<String> interfaces_copy = Sets.newHashSet(interfaces);
             Iterator<String> interfaceIterator = interfaces.iterator();
             while (interfaceIterator.hasNext()) {
                 String iface = interfaceIterator.next();
-                if (prev != null && iface.equals(prev)) {
+                if (!interfaces_copy.contains(iface)) {
                     interfaceIterator.remove();
+                } else {
+                    interfaces_copy.remove(iface);
                 }
-                prev = iface;
             }
         }
 

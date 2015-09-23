@@ -33,6 +33,7 @@ package org.jf.dexlib2.analysis.reflection;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterators;
 import org.jf.dexlib2.analysis.reflection.util.ReflectionUtils;
@@ -48,6 +49,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 import java.util.AbstractSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -78,23 +80,17 @@ public class ReflectionClassDef extends BaseTypeReference implements ClassDef {
         return ReflectionUtils.javaToDexName(superClass.getName());
     }
 
-    @Nonnull @Override public Set<String> getInterfaces() {
-        return new AbstractSet<String>() {
-            @Nonnull @Override public Iterator<String> iterator() {
-                return Iterators.transform(Iterators.forArray(cls.getInterfaces()), new Function<Class, String>() {
-                    @Nullable @Override public String apply(@Nullable Class input) {
-                        if (input == null) {
-                            return null;
-                        }
-                        return ReflectionUtils.javaToDexName(input.getName());
-                    }
-                });
+    @Nonnull @Override public List<String> getInterfaces() {
+        return ImmutableList.copyOf(Iterators.transform(Iterators.forArray(cls.getInterfaces()), new Function<Class, String>() {
+            @Nullable
+            @Override
+            public String apply(@Nullable Class input) {
+                if (input == null) {
+                    return null;
+                }
+                return ReflectionUtils.javaToDexName(input.getName());
             }
-
-            @Override public int size() {
-                return cls.getInterfaces().length;
-            }
-        };
+        }));
     }
 
     @Nullable @Override public String getSourceFile() {
