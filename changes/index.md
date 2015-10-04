@@ -13,8 +13,8 @@ description: Apktool - Changelog / Roadmap
     * [7bff1857](https://github.com/iBotPeaches/platform_frameworks_base/commit/7bff1857dd104623eaa2e1cd0f56187d3e1317dc) - skip compat functions
     * [7e857f82](https://github.com/iBotPeaches/platform_frameworks_base/commit/7e857f8256dd8c905ca558711711bcc14013955c) - add miui support for `godzillaui`
     * [74edf627](https://github.com/iBotPeaches/platform_frameworks_base/commit/74edf6279cb84c5e1b81f411ce1145ef7ceaaf79) - add miui support for 4 digit `mnc`/`mcc` fields.
-  * Updated smali/baksmali to `v2.0.8`
-  * Fixed issues with reference attributes being decoded improperly. ([Issue 1023](https://github.com/iBotPeaches/Apktool/issues/1023)) / (Thanks phhusson)
+ * Updated smali/baksmali to `v2.0.8`
+ * Fixed issues with reference attributes being decoded improperly. ([Issue 1023](https://github.com/iBotPeaches/Apktool/issues/1023)) / (Thanks phhusson)
 
 ## v2.0.1
 2015.07.15
