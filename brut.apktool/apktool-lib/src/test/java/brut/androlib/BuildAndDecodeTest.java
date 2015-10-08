@@ -178,7 +178,7 @@ public class BuildAndDecodeTest {
     @Test
     public void qualifiersTest() throws BrutException {
         compareValuesFiles("values-mcc004-mnc04-en-rUS-ldrtl-sw100dp-w200dp-h300dp"
-                + "-xlarge-long-land-desk-night-xhdpi-finger-keyssoft-12key"
+                + "-xlarge-long-round-land-desk-night-xhdpi-finger-keyssoft-12key"
                 + "-navhidden-dpad/strings.xml");
     }
 
@@ -240,6 +240,12 @@ public class BuildAndDecodeTest {
     @Test
     public void numericalRegionBcp47Test() throws BrutException, IOException {
         compareValuesFiles("values-b+eng+419/strings.xml");
+    }
+
+    @Test
+    public void api23ConfigurationsTest() throws BrutException, IOException {
+        compareValuesFiles("values-round/strings.xml");
+        compareValuesFiles("values-notround/strings.xml");
     }
 
     @Test
