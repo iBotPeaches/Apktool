@@ -320,6 +320,13 @@ public class ARSCDecoder {
             read = 48;
         }
 
+        byte screenLayout2 = 0;
+        if (size >= 52) {
+            screenLayout2 = mIn.readByte();
+            mIn.skipBytes(3); // reserved padding
+            read = 52;
+        }
+
         int exceedingSize = size - KNOWN_CONFIG_BYTES;
         if (exceedingSize > 0) {
             byte[] buf = new byte[exceedingSize];
@@ -347,7 +354,7 @@ public class ARSCDecoder {
                 orientation, touchscreen, density, keyboard, navigation,
                 inputFlags, screenWidth, screenHeight, sdkVersion,
                 screenLayout, uiMode, smallestScreenWidthDp, screenWidthDp,
-                screenHeightDp, localeScript, localeVariant, isInvalid);
+                screenHeightDp, localeScript, localeVariant, screenLayout2, isInvalid);
     }
 
     private char[] unpackLanguageOrRegion(byte in0, byte in1, char base) throws AndrolibException {
@@ -475,7 +482,7 @@ public class ARSCDecoder {
     }
 
     private static final Logger LOGGER = Logger.getLogger(ARSCDecoder.class.getName());
-    private static final int KNOWN_CONFIG_BYTES = 48;
+    private static final int KNOWN_CONFIG_BYTES = 52;
 
     public static class ARSCData {
 
