@@ -25,7 +25,7 @@ It is **NOT** intended for piracy and other non-legal uses. It could be used for
  
 ## Links of Interest
  * [XDA Thread](http://forum.xda-developers.com/showthread.php?t=1755243) - For those who wish to communicate on XDA-Developers for community support
- * [Smali Project](http://code.google.com/p/smali/) - Smali Project is the tool used in the disassembling of `.dex` files
+ * [Smali Project](https://github.com/JesusFreke/smali) - Smali Project is the tool used in the disassembling of `.dex` files
  * [Freenode #apktool](http://webchat.freenode.net/?channels=apktool) - IRC Channel for support, bugs and discussions
 
 ## Authors

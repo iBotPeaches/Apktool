@@ -4,9 +4,9 @@ title: Apktool - Changelog
 description: Apktool - Changelog / Roadmap
 ---
 
-## v2.0.2 (in development)
-2015.xx.xx
-
+## v2.0.2
+2015.10.12
+ * [Migration Instructions from 2.0.1 to 2.0.2]({{ site.baseurl }}/documentation/#v2-0-1-v2-0-2)
  * Fixed issues with apks that use `.9.xml` files, which improperly triggered 9patch decoder. ([Issue 1005](https://github.com/iBotPeaches/Apktool/issues/1005))
  * Prevent compressing resources that should not be. ([Pull 1020](https://github.com/iBotPeaches/Apktool/pull/1020))
  * `aapt` changes
