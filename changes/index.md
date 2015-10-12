@@ -1,4 +1,4 @@
----
+a---
 layout: other
 title: Apktool - Changelog
 description: Apktool - Changelog / Roadmap
@@ -10,12 +10,14 @@ description: Apktool - Changelog / Roadmap
  * Fixed issues with apks that use `.9.xml` files, which improperly triggered 9patch decoder. ([Issue 1005](https://github.com/iBotPeaches/Apktool/issues/1005))
  * Prevent compressing resources that should not be. ([Pull 1020](https://github.com/iBotPeaches/Apktool/pull/1020))
  * `aapt` changes
-    * [7bff1857](https://github.com/iBotPeaches/platform_frameworks_base/commit/83aff2b1841f510d496d78735dbb317f75ed77d3) - skip compat functions
-    * [7e857f82](https://github.com/iBotPeaches/platform_frameworks_base/commit/1e0cef65ee52c403e5ebaffd544b7f4223c48874) - add miui support for `godzillaui`
-    * [74edf627](https://github.com/iBotPeaches/platform_frameworks_base/commit/2ed8754ae247cbaae1d9e5d26e02a87ce26ce55e) - add miui support for 4 digit `mnc`/`mcc` fields.
+    * [5cded813](https://github.com/iBotPeaches/platform_frameworks_base/commit/5cded8132294c860a374409b7e0c94167ab91e06) - skip compat functions.
+    * [eb06229e](https://github.com/iBotPeaches/platform_frameworks_base/commit/eb06229e29362dded12f67cf0962f604e8214815) - add miui support for `godzillaui`.
+    * [d3c5cc64](https://github.com/iBotPeaches/platform_frameworks_base/commit/d3c5cc64d686a95e40cd87682cef346a5b9eb352) - add miui support for 4 digit `mnc`/`mcc` fields.
+    * [ef9e8d09](https://github.com/iBotPeaches/platform_frameworks_base/commit/ef9e8d86d0941cb80097f05274ec76fbdef2fbe7) - build `libc++` statically.
  * Updated smali/baksmali to `v2.0.8`
  * Fixed issues with reference attributes being decoded improperly. ([Issue 1023](https://github.com/iBotPeaches/Apktool/issues/1023)) / (Thanks phhusson)
  * Fixed issue with version qualifiers being improperly added during build. ([Issue 928](https://github.com/iBotPeaches/Apktool/issues/928))
+ * Added Support for Android Marshmallow (API 23). ([Issue 999](https://github.com/iBotPeaches/Apktool/issues/999))
 
 ## v2.0.1
 2015.07.15
