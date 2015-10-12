@@ -1,6 +1,7 @@
 # Github Pages
 _drafts/
 _site/
+vendor/
 
 # Temp files
 *.swp
