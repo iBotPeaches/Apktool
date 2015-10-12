@@ -6,3 +6,7 @@ vendor/
 # Temp files
 *.swp
 *~
+
+# IntelliJ & Bundle
+.bundle/
+.idea/
