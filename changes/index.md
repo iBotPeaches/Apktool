@@ -4,6 +4,11 @@ title: Apktool - Changelog
 description: Apktool - Changelog / Roadmap
 ---
 
+## v2.0.3 (in development)
+2015.xx.xx
+
+ * Fixed issue with too long command due to large amount of uncompressed files. ([Issue 1053](https://github.com/iBotPeaches/Apktool/issues/1053))
+
 ## v2.0.2
 2015.10.12
 
