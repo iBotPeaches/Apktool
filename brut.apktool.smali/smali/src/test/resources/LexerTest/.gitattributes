@@ -1,2 +1,0 @@
-# Prevent newlines from being normalized on windows
-*.smali -text

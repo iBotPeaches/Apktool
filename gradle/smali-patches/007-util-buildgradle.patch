@@ -1,0 +1,32 @@
+From cee3b393b9477db6047e489bc0e4ba89c687f723 Mon Sep 17 00:00:00 2001
+From: Connor Tumbleson <connor.tumbleson@gmail.com>
+Date: Wed, 14 Oct 2015 06:18:02 -0500
+Subject: util: add apktool build.gradle changes
+
+---
+ util/build.gradle | 11 -----------
+ 1 file changed, 11 deletions(-)
+
+diff --git a/util/build.gradle b/util/build.gradle
+index 407ef71..6dbd7a0 100644
+--- a/util/build.gradle
++++ b/util/build.gradle
+@@ -34,15 +34,4 @@ dependencies {
+     compile depends.findbugs
+     compile depends.guava
+     testCompile depends.junit
+-}
+-
+-uploadArchives {
+-    repositories.mavenDeployer {
+-        pom.project {
+-            description 'This library contains random utilities used by smali/baksmali/dexlib2'
+-            scm {
+-                url 'https://github.com/JesusFreke/smali/tree/master/util'
+-            }
+-        }
+-    }
+ }
+\ No newline at end of file
+-- 
+2.1.4

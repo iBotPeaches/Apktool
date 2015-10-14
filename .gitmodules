@@ -1,0 +1,3 @@
+[submodule "smali"]
+	path = smali
+	url = git@github.com:JesusFreke/smali.git

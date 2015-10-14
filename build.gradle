@@ -13,11 +13,29 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+buildscript {
+    repositories {
+        jcenter()
+    }
+    tasks.withType(JavaCompile) {
+        options.encoding = "UTF-8"
+    }
+    dependencies {
+        classpath 'eu.appsatori:gradle-fatjar-plugin:0.3'
+    }
+}
+
+plugins {
+    id 'net.minecrell.gitpatcher' version '0.7.1'
+}
+
 apply plugin: 'maven'
 apply from: 'gradle/functions.gradle'
 
 def apktoolversion_major = '2.0.3'
 def apktoolversion_minor = 'SNAPSHOT';
+
+defaultTasks 'build', 'fatJar', 'proguard'
 
 allprojects {
     apply plugin: 'java'
@@ -60,25 +78,20 @@ build.doFirst {
     }
 }
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '2.3'
+clean.doFirst {
+    delete "${rootDir}/brut.apktool.smali"
+    println "deleting ${rootDir}/brut.apktool.smali in favor of smali"
+    println "You will need to run applyPatches again, as they have been wiped."
 }
 
 // used for official releases only. Please don't use
 task release {
 }
 
-buildscript {
-    repositories {
-        jcenter()
-    }
-    tasks.withType(JavaCompile) {
-        options.encoding = "UTF-8"
-        options.incremental = true
-    }
-    dependencies {
-        classpath 'eu.appsatori:gradle-fatjar-plugin:0.3'
-    }
+patches {
+    submodule = 'smali'
+    target = file('brut.apktool.smali')
+    patches = file('gradle/smali-patches')
 }
 
 subprojects {
@@ -117,4 +130,8 @@ subprojects {
             exceptionFormat = 'full'
         }
     }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.3'
 }

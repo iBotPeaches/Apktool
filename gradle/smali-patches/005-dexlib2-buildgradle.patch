@@ -1,0 +1,55 @@
+From 88ad24a648ca190e0e39e69fcb9fc9687edb58ec Mon Sep 17 00:00:00 2001
+From: Connor Tumbleson <connor.tumbleson@gmail.com>
+Date: Wed, 14 Oct 2015 06:17:13 -0500
+Subject: dexlib2: add apktool build.gradle changes
+
+---
+ dexlib2/accessorTestGenerator/build.gradle |  2 +-
+ dexlib2/build.gradle                       | 13 +------------
+ 2 files changed, 2 insertions(+), 13 deletions(-)
+
+diff --git a/dexlib2/accessorTestGenerator/build.gradle b/dexlib2/accessorTestGenerator/build.gradle
+index e50bdc0..e242ae0 100644
+--- a/dexlib2/accessorTestGenerator/build.gradle
++++ b/dexlib2/accessorTestGenerator/build.gradle
+@@ -30,7 +30,7 @@
+  */
+ 
+ dependencies {
+-    compile project(':util')
++    compile project(':brut.apktool.smali:util')
+     compile 'com.google.code.findbugs:jsr305:1.3.9'
+     compile 'com.google.guava:guava:13.0.1'
+     compile 'org.antlr:ST4:4.0.7'
+diff --git a/dexlib2/build.gradle b/dexlib2/build.gradle
+index 8fbe5ff..82b71b5 100644
+--- a/dexlib2/build.gradle
++++ b/dexlib2/build.gradle
+@@ -46,7 +46,7 @@ configurations {
+ }
+ 
+ dependencies {
+-    compile project(':util')
++    compile project(':brut.apktool.smali:util')
+     compile depends.findbugs
+     compile depends.guava
+ 
+@@ -91,15 +91,4 @@ task generateAccessorTestDex(type: JavaExec, dependsOn: compileAccessorTestJava)
+     args '--no-strict'
+     args "--output=${outputDex}"
+     args sourceSets.accessorTest.output.classesDir
+-}
+-
+-uploadArchives {
+-    repositories.mavenDeployer {
+-        pom.project {
+-            description 'dexlib2 is a library for reading/modifying/writing Android dex files'
+-            scm {
+-                url 'https://github.com/JesusFreke/smali/tree/master/dexlib2'
+-            }
+-        }
+-    }
+ }
+\ No newline at end of file
+-- 
+2.1.4
