@@ -19,7 +19,6 @@ buildscript {
     }
     tasks.withType(JavaCompile) {
         options.encoding = "UTF-8"
-        options.incremental = true
     }
     dependencies {
         classpath 'eu.appsatori:gradle-fatjar-plugin:0.3'
@@ -36,7 +35,7 @@ apply from: 'gradle/functions.gradle'
 def apktoolversion_major = '2.0.3'
 def apktoolversion_minor = 'SNAPSHOT';
 
-defaultTasks 'clean', 'applyPatches', 'build', 'fatJar', 'proguard'
+defaultTasks 'build', 'fatJar', 'proguard'
 
 allprojects {
     apply plugin: 'java'
@@ -77,18 +76,12 @@ build.doFirst {
                 "Currently it is set to: " + System.getProperty("java.home")
         );
     }
-
-    println 'Applying smali patches...'
-    rootProject.tasks.applyPatches
 }
 
 clean.doFirst {
     delete "${rootDir}/brut.apktool.smali"
     println "deleting ${rootDir}/brut.apktool.smali in favor of smali"
-}
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '2.3'
+    println "You will need to run applyPatches again, as they have been wiped."
 }
 
 // used for official releases only. Please don't use
@@ -137,4 +130,8 @@ subprojects {
             exceptionFormat = 'full'
         }
     }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.3'
 }
