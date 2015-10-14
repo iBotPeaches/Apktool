@@ -1,0 +1,69 @@
+From b23132a5a7b5bc7f6d267e621194565a607cab85 Mon Sep 17 00:00:00 2001
+From: Connor Tumbleson <connor.tumbleson@gmail.com>
+Date: Wed, 14 Oct 2015 06:17:39 -0500
+Subject: smali: add apktool build.gradle changes
+
+---
+ smali/build.gradle | 26 ++------------------------
+ 1 file changed, 2 insertions(+), 24 deletions(-)
+
+diff --git a/smali/build.gradle b/smali/build.gradle
+index 0e5cbf2..d387c7f 100644
+--- a/smali/build.gradle
++++ b/smali/build.gradle
+@@ -68,8 +68,8 @@ idea {
+ }
+ 
+ dependencies {
+-    compile project(':util')
+-    compile project(':dexlib2')
++    compile project(':brut.apktool.smali:util')
++    compile project(':brut.apktool.smali:dexlib2')
+     compile depends.antlr_runtime
+     compile depends.stringtemplate
+     compile depends.commons_cli
+@@ -83,11 +83,6 @@ dependencies {
+ processResources.inputs.property('version', version)
+ processResources.expand('version': version)
+ 
+-// This is the jar that gets uploaded to maven
+-jar {
+-    baseName = 'maven'
+-}
+-
+ // Build a separate jar that contains all dependencies
+ task fatJar(type: Jar, dependsOn: jar) {
+     from sourceSets.main.output
+@@ -96,12 +91,6 @@ task fatJar(type: Jar, dependsOn: jar) {
+     manifest {
+         attributes('Main-Class': 'org.jf.smali.main')
+     }
+-
+-    doLast {
+-        if (!System.getProperty('os.name').toLowerCase().contains('windows')) {
+-            ant.symlink(link: file("${destinationDir}/smali.jar"), resource: archivePath, overwrite: true)
+-        }
+-    }
+ }
+ tasks.getByPath('build').dependsOn(fatJar)
+ 
+@@ -117,17 +106,6 @@ generateJFlexSource {
+     outputDirectory = new File(outputDirectory, 'org/jf/smali')
+ }
+ 
+-uploadArchives {
+-    repositories.mavenDeployer {
+-        pom.project {
+-            description 'smali is an assembler for dalvik bytecode'
+-            scm {
+-                url 'https://github.com/JesusFreke/smali/tree/master/smali'
+-            }
+-        }
+-    }
+-}
+-
+ task proguard(type: proguard.gradle.ProGuardTask, dependsOn: fatJar) {
+     def outFile = fatJar.destinationDir.getPath() + '/' + fatJar.baseName + '-' +
+             fatJar.version + '-small' + '.' + fatJar.extension
+-- 
+2.1.4

@@ -1,0 +1,58 @@
+From eaa6a9f04b582644a40054532dac3a93c01a5fe7 Mon Sep 17 00:00:00 2001
+From: Connor Tumbleson <connor.tumbleson@gmail.com>
+Date: Wed, 14 Oct 2015 06:09:38 -0500
+Subject: dexlib2: added "dontLoadClassPath"
+
+---
+ dexlib2/src/main/java/org/jf/dexlib2/analysis/ClassPath.java      | 6 ++++++
+ dexlib2/src/main/java/org/jf/dexlib2/analysis/MethodAnalyzer.java | 4 ++--
+ 2 files changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/dexlib2/src/main/java/org/jf/dexlib2/analysis/ClassPath.java b/dexlib2/src/main/java/org/jf/dexlib2/analysis/ClassPath.java
+index 9d0bb2d..513e73f 100644
+--- a/dexlib2/src/main/java/org/jf/dexlib2/analysis/ClassPath.java
++++ b/dexlib2/src/main/java/org/jf/dexlib2/analysis/ClassPath.java
+@@ -58,6 +58,8 @@ import java.util.regex.Matcher;
+ import java.util.regex.Pattern;
+ 
+ public class ClassPath {
++    public static boolean dontLoadClassPath = false;
++
+     @Nonnull private final TypeProto unknownClass;
+     @Nonnull private HashMap<String, ClassDef> availableClasses = Maps.newHashMap();
+     private final boolean checkPackagePrivateAccess;
+@@ -171,6 +173,10 @@ public class ClassPath {
+ 
+     @Nonnull
+     public ClassDef getClassDef(String type) {
++        if (dontLoadClassPath) {
++            throw new UnresolvedClassException("Could not resolve class %s", type);
++        }
++
+         ClassDef ret = availableClasses.get(type);
+         if (ret == null) {
+             throw new UnresolvedClassException("Could not resolve class %s", type);
+diff --git a/dexlib2/src/main/java/org/jf/dexlib2/analysis/MethodAnalyzer.java b/dexlib2/src/main/java/org/jf/dexlib2/analysis/MethodAnalyzer.java
+index e634297..d853133 100644
+--- a/dexlib2/src/main/java/org/jf/dexlib2/analysis/MethodAnalyzer.java
++++ b/dexlib2/src/main/java/org/jf/dexlib2/analysis/MethodAnalyzer.java
+@@ -1230,7 +1230,7 @@ public class MethodAnalyzer {
+         ThreeRegisterInstruction instruction = (ThreeRegisterInstruction)analyzedInstruction.instruction;
+ 
+         RegisterType arrayRegisterType = analyzedInstruction.getPreInstructionRegisterType(instruction.getRegisterB());
+-        if (arrayRegisterType.category != RegisterType.NULL) {
++        if (! ClassPath.dontLoadClassPath && arrayRegisterType.category != RegisterType.NULL) {
+             if (arrayRegisterType.category != RegisterType.REFERENCE ||
+                     !(arrayRegisterType.type instanceof ArrayProto)) {
+                 throw new AnalysisException("aget-wide used with non-array register: %s", arrayRegisterType.toString());
+@@ -1261,7 +1261,7 @@ public class MethodAnalyzer {
+         ThreeRegisterInstruction instruction = (ThreeRegisterInstruction)analyzedInstruction.instruction;
+ 
+         RegisterType arrayRegisterType = analyzedInstruction.getPreInstructionRegisterType(instruction.getRegisterB());
+-        if (arrayRegisterType.category != RegisterType.NULL) {
++        if (! ClassPath.dontLoadClassPath && arrayRegisterType.category != RegisterType.NULL) {
+             if (arrayRegisterType.category != RegisterType.REFERENCE ||
+                     !(arrayRegisterType.type instanceof ArrayProto)) {
+                 throw new AnalysisException("aget-object used with non-array register: %s",
+-- 
+2.1.4
