@@ -251,7 +251,7 @@ public class ApkDecoder {
 
     public boolean hasMultipleSources() throws AndrolibException {
         try {
-            Set<String> files = mApkFile.getDirectory().getFiles(true);
+            Set<String> files = mApkFile.getDirectory().getFiles(false);
             for (String file : files) {
                 if (file.endsWith(".dex")) {
                     if (! file.equalsIgnoreCase("classes.dex")) {
