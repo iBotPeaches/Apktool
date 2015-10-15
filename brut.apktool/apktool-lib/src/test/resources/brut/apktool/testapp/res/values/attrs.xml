@@ -13,4 +13,8 @@
     <attr format="reference|color" name="test_attr8"/>
     <attr format="color" name="test_attr9"/>
     <attr format="boolean" name="test_attr10"/>
+    <attr name="test_attr11">
+        <enum name="TEST_ZERO" value="0" />
+        <enum name="TEST_ONE" value="1" />
+    </attr>
 </resources>
