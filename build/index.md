@@ -37,5 +37,6 @@ After 1-2 minutes you should have a jar file at
 
 `./brut.apktool/apktool-cli/build/libs/apktool-xxxxx.jar`
 
-#### Cleaning
+
+### Cleaning
 Cleaning the project, removes all build directories and wipes the `brut.apktool.smali` directory. You must reapply patches via step 4 above to re-create the `brut.apktool.smali`. **This must be done before building Apktool again.**.
