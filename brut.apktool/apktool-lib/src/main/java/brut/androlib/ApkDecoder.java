@@ -177,6 +177,7 @@ public class ApkDecoder {
     }
 
     public void setDebugMode(boolean debug) {
+        LOGGER.warning("SmaliDebugging has been deprecated. It will be removed in Apktool 2.1 - https://github.com/iBotPeaches/Apktool/issues/1061");
         mDebug = debug;
     }
 
