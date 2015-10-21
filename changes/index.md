@@ -7,6 +7,7 @@ description: Apktool - Changelog / Roadmap
 ## v2.0.3 (in development)
 2015.xx.xx
 
+ * **For developers** - Run `git submodule update --init --recursive` to setup submodules.
  * Fixed issue with too long command due to large amount of uncompressed files. ([Issue 1053](https://github.com/iBotPeaches/Apktool/issues/1053))
  * Fixed bad casting issue between `ResStringValue` and `ResAttr`. ([Issue 1060](https://github.com/iBotPeaches/Apktool/issues/1060))
  * Fixed bad casting issue between `ResStyleValue` and `ResAttr`. ([Issue 957](https://github.com/iBotPeaches/Apktool/issues/957), [Issue 1063](https://github.com/iBotPeaches/Apktool/issues/1063))
