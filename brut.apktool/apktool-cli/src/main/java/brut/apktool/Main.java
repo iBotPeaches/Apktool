@@ -470,7 +470,7 @@ public class Main {
         // print out more information
         System.out.println(
                 "For additional info, see: http://ibotpeaches.github.io/Apktool/ \n"
-                        + "For smali/baksmali info, see: http://code.google.com/p/smali/");
+                        + "For smali/baksmali info, see: https://github.com/JesusFreke/smali");
     }
 
     private static void setupLogging(Verbosity verbosity) {
