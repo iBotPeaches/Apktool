@@ -15,12 +15,10 @@ From our <a target="_blank" href="https://github.com/iBotPeaches/Apktool">Github
 <br />
 There are a couple of reasons that might cause this.
 <ul>
-  <li>Compression of <code>resources.arsc</code> file. <s>Apktool always compresses it</s> As of apktool 2, apktool only compresses <code>resources.arsc</code> if the original was.</li>
   <li>Apktool builds unsigned apks. This means an entire directory <code>META-INF</code> is missing.</li>
   <li>New aapt binary. Newer versions of apktool contain a newer aapt which optimizes images differently.</li>
-  <li><s>Unknown files to the build engine that apktool will ignore</s> - Apktool now correctly handles unknown files.</li>
 </ul>
-These points (some of which fixed now). Would of contributed to a smaller than normal apk
+These points might have contributed to a smaller than normal apk
 <br /><br />
 <strong>There is no META-INF dir in resulting apk. Is this ok?</strong>
 <br />
