@@ -13,6 +13,7 @@ description: Apktool - Changelog / Roadmap
  * Fixed bad casting issue between `ResStyleValue` and `ResAttr`. ([Issue 957](https://github.com/iBotPeaches/Apktool/issues/957), [Issue 1063](https://github.com/iBotPeaches/Apktool/issues/1063))
  * Prevent greedy additional `.dex` finder from pulling `.dex` files outside of apk root.
  * Move smali to git submodule for easier updates, update to `2.1.0` in process.
+ * Fixed issue with echo in helper scripts. ([Issue 1056](https://github.com/iBotPeaches/Apktool/issues/1056))
 
 ## v2.0.2
 2015.10.12
