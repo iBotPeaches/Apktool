@@ -14,6 +14,7 @@ description: Apktool - Changelog / Roadmap
  * Prevent greedy additional `.dex` finder from pulling `.dex` files outside of apk root.
  * Move smali to git submodule for easier updates, update to `2.1.0` in process.
  * Fixed issue with echo in helper scripts. ([Issue 1056](https://github.com/iBotPeaches/Apktool/issues/1056))
+ * Fixed issue with `mnc1` qualifier. ([Issue 1072](https://github.com/iBotPeaches/Apktool/issues/1072))
 
 ## v2.0.2
 2015.10.12
