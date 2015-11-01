@@ -188,6 +188,11 @@ public class BuildAndDecodeTest {
     }
 
     @Test
+    public void shortMncHtcTest() throws BrutException {
+        compareValuesFiles("values-mnc1/strings.xml");
+    }
+
+    @Test
     public void anyDpiTest() throws BrutException, IOException {
         compareValuesFiles("values-watch/strings.xml");
     }

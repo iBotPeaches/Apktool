@@ -178,6 +178,10 @@ public class ResConfigFlags {
             } else {
                 ret.append("-mnc00");
             }
+        } else {
+            if (mnc != 0) {
+                ret.append("-mnc").append(mnc);
+            }
         }
         ret.append(getLocaleString());
 
