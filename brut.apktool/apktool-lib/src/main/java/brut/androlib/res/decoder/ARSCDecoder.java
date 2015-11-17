@@ -264,7 +264,7 @@ public class ARSCDecoder {
     private ResConfigFlags readConfigFlags() throws IOException,
             AndrolibException {
         int size = mIn.readInt();
-        int read = 0;
+        int read = 28;
 
         if (size < 28) {
             throw new AndrolibException("Config size < 28");
