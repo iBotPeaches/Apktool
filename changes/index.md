@@ -15,7 +15,7 @@ description: Apktool - Changelog / Roadmap
  * Move smali to git submodule for easier updates, update to `2.1.0` in process.
  * Fixed issue with echo in helper scripts. ([Issue 1056](https://github.com/iBotPeaches/Apktool/issues/1056))
  * Fixed issue with `mnc1` qualifier. ([Issue 1072](https://github.com/iBotPeaches/Apktool/issues/1072))
- * Fixed issue with apks that have a 28 byte `ResConfig` size. ([Issue 1084])(https://github.com/iBotPeaches/Apktool/pull/1084) / Thanks rover
+ * Fixed issue with apks that have a 28 byte `ResConfig` size. ([Issue 1084](https://github.com/iBotPeaches/Apktool/pull/1084) / Thanks rover
 
 ## v2.0.2
 2015.10.12
