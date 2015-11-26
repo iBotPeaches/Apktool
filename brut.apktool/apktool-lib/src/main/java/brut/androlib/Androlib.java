@@ -32,11 +32,13 @@ import brut.util.OS;
 import java.io.*;
 import java.util.*;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
@@ -158,6 +160,28 @@ public class Androlib {
         }
     }
 
+    public void recordUncompressedFiles(ExtFile apkFile, Collection<String> uncompressedExtensions) throws AndrolibException {
+        try {
+            Directory unk = apkFile.getDirectory();
+            Set<String> files = unk.getFiles(true);
+            String ext;
+
+            for (String file : files) {
+                if (isAPKFileNames(file) && !NO_COMPRESS_PATTERN.matcher(file).find()) {
+                    if (unk.getCompressionLevel(file) == 0) {
+                        ext = FilenameUtils.getExtension(file);
+
+                        if (! uncompressedExtensions.contains(ext)) {
+                            uncompressedExtensions.add(FilenameUtils.getExtension(file));
+                        }
+                    }
+                }
+            }
+        } catch (DirectoryException ex) {
+            throw new AndrolibException(ex);
+        }
+    }
+
     private boolean isAPKFileNames(String file) {
         for (String apkFile : APK_STANDARD_ALL_FILENAMES) {
             if (apkFile.equals(file) || file.startsWith(apkFile + "/")) {
@@ -171,13 +195,8 @@ public class Androlib {
             throws AndrolibException {
         LOGGER.info("Copying unknown files...");
         File unknownOut = new File(outDir, UNK_DIRNAME);
-        ZipEntry invZipFile;
-
-        // have to use container of ZipFile to help identify compression type
-        // with regular looping of apkFile for easy copy
         try {
             Directory unk = apkFile.getDirectory();
-            ZipFile apkZipFile = new ZipFile(apkFile.getAbsolutePath());
 
             // loop all items in container recursively, ignoring any that are pre-defined by aapt
             Set<String> files = unk.getFiles(true);
@@ -186,19 +205,12 @@ public class Androlib {
 
                     // copy file out of archive into special "unknown" folder
                     unk.copyToDir(unknownOut, file);
-                    try {
-                        invZipFile = apkZipFile.getEntry(file);
-
-                        // lets record the name of the file, and its compression type
-                        // so that we may re-include it the same way
-                        if (invZipFile != null) {
-                            mResUnknownFiles.addUnknownFileInfo(invZipFile.getName(), String.valueOf(invZipFile.getMethod()));
-                        }
-                    } catch (NullPointerException ignored) { }
+                    // lets record the name of the file, and its compression type
+                    // so that we may re-include it the same way
+                    mResUnknownFiles.addUnknownFileInfo(file, String.valueOf(unk.getCompressionLevel(file)));
                 }
             }
-            apkZipFile.close();
-        } catch (DirectoryException | IOException ex) {
+        } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
         }
     }
@@ -266,6 +278,7 @@ public class Androlib {
         apkOptions.resourcesAreCompressed = meta.get("compressionType") == null
                 ? false
                 : Boolean.valueOf(meta.get("compressionType").toString());
+        apkOptions.doNotCompress = (Collection<String>) meta.get("doNotCompress");
 
         mAndRes.setSdkInfo((Map<String, String>) meta.get("sdkInfo"));
         mAndRes.setPackageId((Map<String, String>) meta.get("packageInfo"));
@@ -739,4 +752,9 @@ public class Androlib {
             "AndroidManifest.xml" };
     private final static String[] APK_STANDARD_ALL_FILENAMES = new String[] {
             "classes.dex", "AndroidManifest.xml", "resources.arsc", "res", "lib", "libs", "assets", "META-INF" };
+    // Taken from AOSP's frameworks/base/tools/aapt/Package.cpp
+    private final static Pattern NO_COMPRESS_PATTERN = Pattern.compile("\\.(" +
+            "jpg|jpeg|png|gif|wav|mp2|mp3|ogg|aac|mpg|mpeg|mid|midi|smf|jet|rtttl|imy|xmf|mp4|" +
+            "m4a|m4v|3gp|3gpp|3g2|3gpp2|amr|awb|wma|wmv)$");
+
 }

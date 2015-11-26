@@ -23,8 +23,6 @@
 prog="$0"
 while [ -h "${prog}" ]; do
     newProg=`/bin/ls -ld "${prog}"`
-    echo ${newProg}
-
 
     newProg=`expr "${newProg}" : ".* -> \(.*\)$"`
     if expr "x${newProg}" : 'x/' >/dev/null; then
@@ -40,7 +38,6 @@ cd "${progdir}"
 progdir=`pwd`
 prog="${progdir}"/`basename "${prog}"`
 cd "${oldwd}"
-
 
 jarfile=apktool.jar
 libdir="$progdir"

@@ -1,0 +1,142 @@
+From 915202a77b6a3d5af044b2ad487f4ce02c2edd7c Mon Sep 17 00:00:00 2001
+From: Connor Tumbleson <connor.tumbleson@gmail.com>
+Date: Wed, 14 Oct 2015 06:16:41 -0500
+Subject: base: add apktool build.gradle changes
+
+---
+ build.gradle | 97 +-----------------------------------------------------------
+ 1 file changed, 1 insertion(+), 96 deletions(-)
+
+diff --git a/build.gradle b/build.gradle
+index 237d30e..36af3a7 100644
+--- a/build.gradle
++++ b/build.gradle
+@@ -38,7 +38,7 @@ def jarVersion = version
+ if (!('release' in gradle.startParameter.taskNames)) {
+     def versionSuffix
+     try {
+-        def git = org.eclipse.jgit.api.Git.open(file('.'))
++        def git = org.eclipse.jgit.api.Git.open(file('../.'))
+         def head = git.getRepository().getRef('HEAD')
+         versionSuffix = head.getObjectId().abbreviate(8).name()
+ 
+@@ -57,21 +57,8 @@ if (!('release' in gradle.startParameter.taskNames)) {
+     // use something like module-1.2.3-dev.jar for the jar name, rather than the full
+     // module-1.2.3-001afe02-dirty.jar
+     jarVersion = baseVersion + '-dev'
+-} else {
+-    if (System.env.JDK6_HOME == null && !JavaVersion.current().isJava6()) {
+-        throw new InvalidUserDataException("bzzzzzzzt. Release builds must be performed with java 6. " +
+-                "Either run gradle with java 6, or define the JDK6_HOME environment variable.")
+-    }
+-}
+-
+-// Note: please don't use this. This is strictly for the official releases
+-// that are posted on, e.g. the bitbucket download page.
+-task release() {
+ }
+ 
+-// The projects that get pushed to maven
+-def maven_release_projects = ['smali', 'baksmali', 'dexlib2', 'util']
+-
+ subprojects {
+     apply plugin: 'java'
+     apply plugin: 'idea'
+@@ -84,19 +71,6 @@ subprojects {
+         }
+     }
+ 
+-    if (System.env.JDK6_HOME != null) {
+-        sourceCompatibility = 1.6
+-        targetCompatibility = 1.6
+-
+-        tasks.withType(JavaCompile) {
+-            doFirst {
+-                options.fork = true
+-                options.bootClasspath = "$System.env.JDK6_HOME/jre/lib/rt.jar"
+-                options.bootClasspath += "$File.pathSeparator$System.env.JDK6_HOME/jre/lib/jsse.jar"
+-            }
+-        }
+-    }
+-
+     version = parent.version
+ 
+     ext {
+@@ -121,75 +95,6 @@ subprojects {
+     repositories {
+         mavenCentral()
+     }
+-
+-    if (project.name in maven_release_projects) {
+-        apply plugin: 'maven'
+-        apply plugin: 'signing'
+-
+-        group = 'org.smali'
+-
+-        task javadocJar(type: Jar, dependsOn: javadoc) {
+-            classifier = 'javadoc'
+-            from 'build/docs/javadoc'
+-        }
+-
+-        task sourcesJar(type: Jar) {
+-            classifier = 'sources'
+-            from sourceSets.main.allJava
+-        }
+-
+-        artifacts {
+-            archives javadocJar
+-            archives sourcesJar
+-        }
+-
+-        signing {
+-            required { gradle.taskGraph.hasTask('uploadArchives') }
+-            sign configurations.archives
+-        }
+-
+-        uploadArchives {
+-            repositories.mavenDeployer {
+-                configuration = configurations.archives
+-
+-                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+-
+-                if (rootProject.hasProperty('sonatypeUsername') && rootProject.hasProperty('sonatypePassword')) {
+-                    repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
+-                        authentication(userName: sonatypeUsername, password: sonatypePassword)
+-                    }
+-                }
+-
+-                pom.artifactId = project.name
+-
+-                pom.project {
+-                    name project.name
+-                    url 'http://smali.org'
+-                    packaging 'jar'
+-                    licenses {
+-                        license {
+-                            name 'The BSD 3-Clause License'
+-                            url 'http://opensource.org/licenses/BSD-3-Clause'
+-                            distribution 'repo'
+-                        }
+-                    }
+-                    scm {
+-                        connection 'scm:git:git://github.com/JesusFreke/smali.git'
+-                        developerConnection 'scm:git:git@github.com:JesusFreke/smali.git'
+-                    }
+-                    developers {
+-                        developer {
+-                            id 'jesusfreke'
+-                            name 'Ben Gruver'
+-                            email 'jesusfreke@jesusfreke.com'
+-                        }
+-                    }
+-                }
+-            }
+-        }
+-
+-        tasks.getByPath(':release').dependsOn(uploadArchives)
+-    }
+ }
+ 
+ buildscript {
+-- 
+2.1.4

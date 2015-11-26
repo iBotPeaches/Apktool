@@ -18,6 +18,7 @@ package brut.androlib;
 
 import brut.androlib.err.InFileNotFoundException;
 import brut.androlib.err.OutDirExistsException;
+import brut.androlib.err.UndefinedResObject;
 import brut.androlib.res.AndrolibResources;
 import brut.androlib.res.data.ResPackage;
 import brut.androlib.res.data.ResTable;
@@ -31,8 +32,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Logger;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
@@ -89,15 +88,14 @@ public class ApkDecoder {
         LOGGER.info("Using Apktool " + Androlib.getVersion() + " on " + mApkFile.getName());
 
         if (hasResources()) {
-            setTargetSdkVersion();
-            setAnalysisMode(mAnalysisMode, true);
-            setCompressionMode();
-
             switch (mDecodeResources) {
                 case DECODE_RESOURCES_NONE:
                     mAndrolib.decodeResourcesRaw(mApkFile, outDir);
                     break;
                 case DECODE_RESOURCES_FULL:
+                    setTargetSdkVersion();
+                    setAnalysisMode(mAnalysisMode, true);
+
                     if (hasManifest()) {
                         mAndrolib.decodeManifestWithResources(mApkFile, outDir, getResTable());
                     }
@@ -158,6 +156,8 @@ public class ApkDecoder {
 
         mAndrolib.decodeRawFiles(mApkFile, outDir);
         mAndrolib.decodeUnknownFiles(mApkFile, outDir, mResTable);
+        mUncompressedFiles = new ArrayList<String>();
+        mAndrolib.recordUncompressedFiles(mApkFile, mUncompressedFiles);
         mAndrolib.writeOriginalFiles(mApkFile, outDir);
         writeMetaFile();
     }
@@ -177,6 +177,7 @@ public class ApkDecoder {
     }
 
     public void setDebugMode(boolean debug) {
+        LOGGER.warning("SmaliDebugging has been deprecated. It will be removed in Apktool 2.1 - https://github.com/iBotPeaches/Apktool/issues/1061");
         mDebug = debug;
     }
 
@@ -190,18 +191,6 @@ public class ApkDecoder {
             }
             mResTable.setAnalysisMode(mode);
         }
-    }
-
-    public void setCompressionMode() throws AndrolibException, IOException {
-        // read the resources.arsc checking for STORED vs DEFLATE
-        // this will determine whether we compress on rebuild or not.
-        ZipFile zf = new ZipFile(mApkFile.getAbsolutePath());
-        ZipEntry ze = zf.getEntry("resources.arsc");
-        if (ze != null) {
-            int compression = ze.getMethod();
-            mCompressResources = (compression == ZipEntry.DEFLATED);
-        }
-        zf.close();
     }
 
     public void setTargetSdkVersion() throws AndrolibException, IOException {
@@ -263,7 +252,7 @@ public class ApkDecoder {
 
     public boolean hasMultipleSources() throws AndrolibException {
         try {
-            Set<String> files = mApkFile.getDirectory().getFiles(true);
+            Set<String> files = mApkFile.getDirectory().getFiles(false);
             for (String file : files) {
                 if (file.endsWith(".dex")) {
                     if (! file.equalsIgnoreCase("classes.dex")) {
@@ -319,10 +308,10 @@ public class ApkDecoder {
             putSdkInfo(meta);
             putPackageInfo(meta);
             putVersionInfo(meta);
-            putCompressionInfo(meta);
             putSharedLibraryInfo(meta);
         }
         putUnknownInfo(meta);
+        putFileCompressionInfo(meta);
 
         mAndrolib.writeMetaFile(mOutDir, meta);
     }
@@ -360,7 +349,11 @@ public class ApkDecoder {
     private void putPackageInfo(Map<String, Object> meta) throws AndrolibException {
         String renamed = getResTable().getPackageRenamed();
         String original = getResTable().getPackageOriginal();
+
         int id = getResTable().getPackageId();
+        try {
+            id = getResTable().getPackage(renamed).getId();
+        } catch (UndefinedResObject ignored) {}
 
         HashMap<String, String> packages = new HashMap<String, String>();
 
@@ -390,16 +383,14 @@ public class ApkDecoder {
         }
     }
 
-    private void putCompressionInfo(Map<String, Object> meta) throws AndrolibException {
-        meta.put("compressionType", getCompressionType());
+    private void putFileCompressionInfo(Map<String, Object> meta) throws AndrolibException {
+        if (!mUncompressedFiles.isEmpty()) {
+            meta.put("doNotCompress", mUncompressedFiles);
+        }
     }
 
     private void putSharedLibraryInfo(Map<String, Object> meta) throws AndrolibException {
         meta.put("sharedLibrary", mResTable.getSharedLibrary());
-    }
-
-    private boolean getCompressionType() {
-        return mCompressResources;
     }
 
     private final Androlib mAndrolib;
@@ -416,7 +407,7 @@ public class ApkDecoder {
     private boolean mForceDelete = false;
     private boolean mKeepBrokenResources = false;
     private boolean mBakDeb = true;
-    private boolean mCompressResources = false;
+    private Collection<String> mUncompressedFiles;
     private boolean mAnalysisMode = false;
     private int mApi = 15;
 }

@@ -1,3 +1,0 @@
-The test dex file was produced from these smali files, using
-an old version of smali that doesn't check for field/method
-duplicates

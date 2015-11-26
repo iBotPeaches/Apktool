@@ -41,6 +41,9 @@ public class ResFlagsAttr extends ResAttr {
     @Override
     public String convertToResXmlFormat(ResScalarValue value)
             throws AndrolibException {
+        if(value instanceof ResReferenceValue) {
+            return value.encodeAsResXml();
+        }
         if (!(value instanceof ResIntValue)) {
             return super.convertToResXmlFormat(value);
         }

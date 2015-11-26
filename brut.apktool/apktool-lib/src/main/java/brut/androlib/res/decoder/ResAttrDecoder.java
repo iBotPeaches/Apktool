@@ -39,7 +39,7 @@ public class ResAttrDecoder {
                         .getResSpec(attrResId).getDefaultResource().getValue();
 
                 decoded = attr.convertToResXmlFormat(resValue);
-            } catch (UndefinedResObject ex) {
+            } catch (UndefinedResObject | ClassCastException ex) {
                 // ignored
             }
         }
