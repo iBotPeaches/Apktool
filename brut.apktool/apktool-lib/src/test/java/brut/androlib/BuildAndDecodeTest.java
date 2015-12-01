@@ -177,19 +177,29 @@ public class BuildAndDecodeTest {
 
     @Test
     public void qualifiersTest() throws BrutException {
-        compareValuesFiles("values-mcc004-mnc04-en-rUS-ldrtl-sw100dp-w200dp-h300dp"
+        compareValuesFiles("values-mcc004-mnc4-en-rUS-ldrtl-sw100dp-w200dp-h300dp"
                 + "-xlarge-long-round-land-desk-night-xhdpi-finger-keyssoft-12key"
                 + "-navhidden-dpad/strings.xml");
     }
 
     @Test
     public void shortendedMncTest() throws BrutException {
-        compareValuesFiles("values-mcc001-mnc01/strings.xml");
+        compareValuesFiles("values-mcc001-mnc1/strings.xml");
     }
 
     @Test
     public void shortMncHtcTest() throws BrutException {
         compareValuesFiles("values-mnc1/strings.xml");
+    }
+
+    @Test
+    public void shortMncv2Test() throws BrutException {
+        compareValuesFiles("values-mcc238-mnc6/strings.xml");
+    }
+
+    @Test
+    public void longMncTest() throws BrutException {
+        compareValuesFiles("values-mcc238-mnc870/strings.xml");
     }
 
     @Test

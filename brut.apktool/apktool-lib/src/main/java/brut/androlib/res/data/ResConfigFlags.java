@@ -57,6 +57,8 @@ public class ResConfigFlags {
 
     private final String mQualifiers;
 
+    private final int size;
+
     public ResConfigFlags() {
         mcc = 0;
         mnc = 0;
@@ -81,6 +83,7 @@ public class ResConfigFlags {
         screenLayout2 = 0;
         isInvalid = false;
         mQualifiers = "";
+        size = 0;
     }
 
     public ResConfigFlags(short mcc, short mnc, char[] language,
@@ -90,7 +93,7 @@ public class ResConfigFlags {
                           short sdkVersion, byte screenLayout, byte uiMode,
                           short smallestScreenWidthDp, short screenWidthDp,
                           short screenHeightDp, char[] localeScript, char[] localeVariant,
-                          byte screenLayout2, boolean isInvalid) {
+                          byte screenLayout2, boolean isInvalid, int size) {
         if (orientation < 0 || orientation > 3) {
             LOGGER.warning("Invalid orientation value: " + orientation);
             orientation = 0;
@@ -155,6 +158,7 @@ public class ResConfigFlags {
         this.localeVariant = localeVariant;
         this.screenLayout2 = screenLayout2;
         this.isInvalid = isInvalid;
+        this.size = size;
         mQualifiers = generateQualifiers();
     }
 
@@ -169,10 +173,14 @@ public class ResConfigFlags {
             if (mnc != MNC_ZERO) {
                 if (mnc != 0) {
                     ret.append("-mnc");
-                    if (mnc > 0 && mnc < 10) {
-                        ret.append(String.format("%02d", mnc));
+                    if (size <= 32) {
+                        if (mnc > 0 && mnc < 10) {
+                            ret.append(String.format("%02d", mnc));
+                        } else {
+                            ret.append(String.format("%03d", mnc));
+                        }
                     } else {
-                        ret.append(String.format("%03d", mnc));
+                        ret.append(mnc);
                     }
                 }
             } else {

@@ -354,7 +354,7 @@ public class ARSCDecoder {
                 orientation, touchscreen, density, keyboard, navigation,
                 inputFlags, screenWidth, screenHeight, sdkVersion,
                 screenLayout, uiMode, smallestScreenWidthDp, screenWidthDp,
-                screenHeightDp, localeScript, localeVariant, screenLayout2, isInvalid);
+                screenHeightDp, localeScript, localeVariant, screenLayout2, isInvalid, size);
     }
 
     private char[] unpackLanguageOrRegion(byte in0, byte in1, char base) throws AndrolibException {

@@ -16,11 +16,13 @@
 
 package brut.androlib;
 
+import brut.androlib.res.AndrolibResources;
 import brut.common.BrutException;
 import brut.directory.*;
 import java.io.*;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 import org.custommonkey.xmlunit.ElementQualifier;
