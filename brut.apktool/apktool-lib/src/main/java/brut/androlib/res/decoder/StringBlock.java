@@ -60,13 +60,13 @@ public class StringBlock {
         if (styleCount != 0) {
             block.m_styleOffsets = reader.readIntArray(styleCount);
         }
-        {
-            int size = ((stylesOffset == 0) ? chunkSize : stylesOffset) - stringsOffset;
-            block.m_strings = new byte[size];
-            reader.readFully(block.m_strings);
-        }
+
+        int size = ((stylesOffset == 0) ? chunkSize : stylesOffset) - stringsOffset;
+        block.m_strings = new byte[size];
+        reader.readFully(block.m_strings);
+
         if (stylesOffset != 0) {
-            int size = (chunkSize - stylesOffset);
+            size = (chunkSize - stylesOffset);
             block.m_styles = reader.readIntArray(size / 4);
 
             // read remaining bytes
