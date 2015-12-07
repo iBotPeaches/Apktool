@@ -448,11 +448,13 @@ public class ARSCDecoder {
 
     public static class Header {
         public final short type;
+        public final int headerSize;
         public final int chunkSize;
 
-        public Header(short type, int size) {
+        public Header(short type, int headerSize, int chunkSize) {
             this.type = type;
-            this.chunkSize = size;
+            this.headerSize = headerSize;
+            this.chunkSize = chunkSize;
         }
 
         public static Header read(ExtDataInput in) throws IOException {
@@ -460,10 +462,9 @@ public class ARSCDecoder {
             try {
                 type = in.readShort();
             } catch (EOFException ex) {
-                return new Header(TYPE_NONE, 0);
+                return new Header(TYPE_NONE, 0, 0);
             }
-            in.skipBytes(2);
-            return new Header(type, in.readInt());
+            return new Header(type, in.readShort(), in.readInt());
         }
 
         public final static short TYPE_NONE = -1, TYPE_TABLE = 0x0002,
