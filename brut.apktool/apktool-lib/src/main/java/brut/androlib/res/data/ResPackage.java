@@ -33,8 +33,8 @@ public class ResPackage {
     private final int mId;
     private final String mName;
     private final Map<ResID, ResResSpec> mResSpecs = new LinkedHashMap<ResID, ResResSpec>();
-    private final Map<ResConfigFlags, ResConfig> mConfigs = new LinkedHashMap<ResConfigFlags, ResConfig>();
-    private final Map<String, ResType> mTypes = new LinkedHashMap<String, ResType>();
+    private final Map<ResConfigFlags, ResType> mConfigs = new LinkedHashMap<ResConfigFlags, ResType>();
+    private final Map<String, ResTypeSpec> mTypes = new LinkedHashMap<String, ResTypeSpec>();
     private final Set<ResID> mSynthesizedRes = new HashSet<ResID>();
 
     private ResValueFactory mValueFactory;
@@ -61,16 +61,16 @@ public class ResPackage {
         return spec;
     }
 
-    public List<ResConfig> getConfigs() {
-        return new ArrayList<ResConfig>(mConfigs.values());
+    public List<ResType> getConfigs() {
+        return new ArrayList<ResType>(mConfigs.values());
     }
 
     public boolean hasConfig(ResConfigFlags flags) {
         return mConfigs.containsKey(flags);
     }
 
-    public ResConfig getConfig(ResConfigFlags flags) throws AndrolibException {
-        ResConfig config = mConfigs.get(flags);
+    public ResType getConfig(ResConfigFlags flags) throws AndrolibException {
+        ResType config = mConfigs.get(flags);
         if (config == null) {
             throw new UndefinedResObject("config: " + flags);
         }
@@ -81,26 +81,26 @@ public class ResPackage {
         return mResSpecs.size();
     }
 
-    public ResConfig getOrCreateConfig(ResConfigFlags flags)
+    public ResType getOrCreateConfig(ResConfigFlags flags)
             throws AndrolibException {
-        ResConfig config = mConfigs.get(flags);
+        ResType config = mConfigs.get(flags);
         if (config == null) {
-            config = new ResConfig(flags);
+            config = new ResType(flags);
             mConfigs.put(flags, config);
         }
         return config;
     }
 
-    public List<ResType> listTypes() {
-        return new ArrayList<ResType>(mTypes.values());
+    public List<ResTypeSpec> listTypes() {
+        return new ArrayList<ResTypeSpec>(mTypes.values());
     }
 
     public boolean hasType(String typeName) {
         return mTypes.containsKey(typeName);
     }
 
-    public ResType getType(String typeName) throws AndrolibException {
-        ResType type = mTypes.get(typeName);
+    public ResTypeSpec getType(String typeName) throws AndrolibException {
+        ResTypeSpec type = mTypes.get(typeName);
         if (type == null) {
             throw new UndefinedResObject("type: " + typeName);
         }
@@ -120,13 +120,13 @@ public class ResPackage {
     }
 
     public Collection<ResValuesFile> listValuesFiles() {
-        Map<Duo<ResType, ResConfig>, ResValuesFile> ret = new HashMap<Duo<ResType, ResConfig>, ResValuesFile>();
+        Map<Duo<ResTypeSpec, ResType>, ResValuesFile> ret = new HashMap<Duo<ResTypeSpec, ResType>, ResValuesFile>();
         for (ResResSpec spec : mResSpecs.values()) {
             for (ResResource res : spec.listResources()) {
                 if (res.getValue() instanceof ResValuesXmlSerializable) {
-                    ResType type = res.getResSpec().getType();
-                    ResConfig config = res.getConfig();
-                    Duo<ResType, ResConfig> key = new Duo<ResType, ResConfig>(
+                    ResTypeSpec type = res.getResSpec().getType();
+                    ResType config = res.getConfig();
+                    Duo<ResTypeSpec, ResType> key = new Duo<ResTypeSpec, ResType>(
                             type, config);
                     ResValuesFile values = ret.get(key);
                     if (values == null) {
@@ -162,13 +162,13 @@ public class ResPackage {
         }
     }
 
-    public void addConfig(ResConfig config) throws AndrolibException {
+    public void addConfig(ResType config) throws AndrolibException {
         if (mConfigs.put(config.getFlags(), config) != null) {
             throw new AndrolibException("Multiple configs: " + config);
         }
     }
 
-    public void addType(ResType type) throws AndrolibException {
+    public void addType(ResTypeSpec type) throws AndrolibException {
         if (mTypes.containsKey(type.getName())) {
             LOGGER.warning("Multiple types detected! " + type + " ignored!");
         } else {

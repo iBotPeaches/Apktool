@@ -28,10 +28,10 @@ public class ResResSpec {
     private final ResID mId;
     private final String mName;
     private final ResPackage mPackage;
-    private final ResType mType;
+    private final ResTypeSpec mType;
     private final Map<ResConfigFlags, ResResource> mResources = new LinkedHashMap<ResConfigFlags, ResResource>();
 
-    public ResResSpec(ResID id, String name, ResPackage pkg, ResType type) {
+    public ResResSpec(ResID id, String name, ResPackage pkg, ResTypeSpec type) {
         this.mId = id;
         this.mName = name;
         this.mPackage = pkg;
@@ -42,7 +42,7 @@ public class ResResSpec {
         return new LinkedHashSet<ResResource>(mResources.values());
     }
 
-    public ResResource getResource(ResConfig config) throws AndrolibException {
+    public ResResource getResource(ResType config) throws AndrolibException {
         return getResource(config.getFlags());
     }
 
@@ -56,7 +56,7 @@ public class ResResSpec {
         return res;
     }
 
-    public boolean hasResource(ResConfig config) {
+    public boolean hasResource(ResType config) {
         return hasResource(config.getFlags());
     }
 
@@ -97,7 +97,7 @@ public class ResResSpec {
         return mPackage;
     }
 
-    public ResType getType() {
+    public ResTypeSpec getType() {
         return mType;
     }
 

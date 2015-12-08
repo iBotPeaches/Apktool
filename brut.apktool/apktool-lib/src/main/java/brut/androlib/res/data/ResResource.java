@@ -23,11 +23,11 @@ import brut.androlib.res.data.value.ResValue;
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
 public class ResResource {
-    private final ResConfig mConfig;
+    private final ResType mConfig;
     private final ResResSpec mResSpec;
     private final ResValue mValue;
 
-    public ResResource(ResConfig config, ResResSpec spec, ResValue value) {
+    public ResResource(ResType config, ResResSpec spec, ResValue value) {
         this.mConfig = config;
         this.mResSpec = spec;
         this.mValue = value;
@@ -38,7 +38,7 @@ public class ResResource {
                 + mConfig.getFlags().getQualifiers() + "/" + mResSpec.getName();
     }
 
-    public ResConfig getConfig() {
+    public ResType getConfig() {
         return mConfig;
     }
 
