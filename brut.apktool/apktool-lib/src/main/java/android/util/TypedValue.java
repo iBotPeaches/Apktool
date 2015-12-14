@@ -181,6 +181,17 @@ public class TypedValue {
 	/* ------------------------------------------------------------ */
 
     /**
+     * {@link #TYPE_NULL} data indicating the value was not specified.
+     */
+    public static final int DATA_NULL_UNDEFINED = 0;
+    /**
+     * {@link #TYPE_NULL} data indicating the value was explicitly set to null.
+     */
+    public static final int DATA_NULL_EMPTY = 1;
+
+    /* ------------------------------------------------------------ */
+
+    /**
      * If {@link #density} is equal to this value, then the density should be
      * treated as the system's default density value:
      * {@link DisplayMetrics#DENSITY_DEFAULT}.

@@ -35,6 +35,9 @@ public class ResValueFactory {
             throws AndrolibException {
         switch (type) {
             case TypedValue.TYPE_NULL:
+                if (value == TypedValue.DATA_NULL_EMPTY) { // Special case $empty as explicitly defined empty value
+                    return new ResStringValue(null, value);
+                }
                 return new ResReferenceValue(mPackage, 0, null);
             case TypedValue.TYPE_REFERENCE:
                 return newReference(value, rawValue);
