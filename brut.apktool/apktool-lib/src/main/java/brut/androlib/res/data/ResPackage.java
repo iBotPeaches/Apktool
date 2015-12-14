@@ -81,8 +81,7 @@ public class ResPackage {
         return mResSpecs.size();
     }
 
-    public ResType getOrCreateConfig(ResConfigFlags flags)
-            throws AndrolibException {
+    public ResType getOrCreateConfig(ResConfigFlags flags) throws AndrolibException {
         ResType config = mConfigs.get(flags);
         if (config == null) {
             config = new ResType(flags);
@@ -126,8 +125,7 @@ public class ResPackage {
                 if (res.getValue() instanceof ResValuesXmlSerializable) {
                     ResTypeSpec type = res.getResSpec().getType();
                     ResType config = res.getConfig();
-                    Duo<ResTypeSpec, ResType> key = new Duo<ResTypeSpec, ResType>(
-                            type, config);
+                    Duo<ResTypeSpec, ResType> key = new Duo<ResTypeSpec, ResType>(type, config);
                     ResValuesFile values = ret.get(key);
                     if (values == null) {
                         values = new ResValuesFile(this, type, config);
@@ -204,9 +202,7 @@ public class ResPackage {
             return false;
         }
         final ResPackage other = (ResPackage) obj;
-        if (this.mResTable != other.mResTable
-                && (this.mResTable == null || !this.mResTable
-                .equals(other.mResTable))) {
+        if (this.mResTable != other.mResTable && (this.mResTable == null || !this.mResTable.equals(other.mResTable))) {
             return false;
         }
         if (this.mId != other.mId) {
@@ -218,8 +214,7 @@ public class ResPackage {
     @Override
     public int hashCode() {
         int hash = 17;
-        hash = 31 * hash
-                + (this.mResTable != null ? this.mResTable.hashCode() : 0);
+        hash = 31 * hash + (this.mResTable != null ? this.mResTable.hashCode() : 0);
         hash = 31 * hash + this.mId;
         return hash;
     }
@@ -231,6 +226,5 @@ public class ResPackage {
         return mValueFactory;
     }
 
-    private final static Logger LOGGER = Logger
-            .getLogger(ResPackage.class.getName());
+    private final static Logger LOGGER = Logger.getLogger(ResPackage.class.getName());
 }

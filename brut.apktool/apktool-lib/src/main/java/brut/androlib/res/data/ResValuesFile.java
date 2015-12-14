@@ -69,12 +69,10 @@ public class ResValuesFile {
             return false;
         }
         final ResValuesFile other = (ResValuesFile) obj;
-        if (this.mType != other.mType
-                && (this.mType == null || !this.mType.equals(other.mType))) {
+        if (this.mType != other.mType && (this.mType == null || !this.mType.equals(other.mType))) {
             return false;
         }
-        if (this.mConfig != other.mConfig
-                && (this.mConfig == null || !this.mConfig.equals(other.mConfig))) {
+        if (this.mConfig != other.mConfig && (this.mConfig == null || !this.mConfig.equals(other.mConfig))) {
             return false;
         }
         return true;

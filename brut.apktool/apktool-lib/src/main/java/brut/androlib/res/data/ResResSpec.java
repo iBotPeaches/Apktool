@@ -46,12 +46,10 @@ public class ResResSpec {
         return getResource(config.getFlags());
     }
 
-    public ResResource getResource(ResConfigFlags config)
-            throws AndrolibException {
+    public ResResource getResource(ResConfigFlags config) throws AndrolibException {
         ResResource res = mResources.get(config);
         if (res == null) {
-            throw new UndefinedResObject(String.format(
-                    "resource: spec=%s, config=%s", this, config));
+            throw new UndefinedResObject(String.format("resource: spec=%s, config=%s", this, config));
         }
         return res;
     }
@@ -109,12 +107,10 @@ public class ResResSpec {
         addResource(res, false);
     }
 
-    public void addResource(ResResource res, boolean overwrite)
-            throws AndrolibException {
+    public void addResource(ResResource res, boolean overwrite) throws AndrolibException {
         ResConfigFlags flags = res.getConfig().getFlags();
         if (mResources.put(flags, res) != null && !overwrite) {
-            throw new AndrolibException(String.format(
-                    "Multiple resources: spec=%s, config=%s", this, flags));
+            throw new AndrolibException(String.format("Multiple resources: spec=%s, config=%s", this, flags));
         }
     }
 

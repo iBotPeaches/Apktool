@@ -87,8 +87,8 @@ public class ResTable {
     public ResPackage getHighestSpecPackage() throws AndrolibException {
         int id = 0;
         int value = 0;
-        for(ResPackage resPackage : mPackagesById.values()) {
-            if(resPackage.getResSpecCount() > value && !resPackage.getName().equalsIgnoreCase("android")) {
+        for (ResPackage resPackage : mPackagesById.values()) {
+            if (resPackage.getResSpecCount() > value && !resPackage.getName().equalsIgnoreCase("android")) {
                 value = resPackage.getResSpecCount();
                 id = resPackage.getId();
             }
@@ -123,18 +123,14 @@ public class ResTable {
         return mPackagesByName.containsKey(name);
     }
 
-    public ResValue getValue(String package_, String type, String name)
-            throws AndrolibException {
-        return getPackage(package_).getType(type).getResSpec(name)
-                .getDefaultResource().getValue();
+    public ResValue getValue(String package_, String type, String name) throws AndrolibException {
+        return getPackage(package_).getType(type).getResSpec(name).getDefaultResource().getValue();
     }
 
-    public void addPackage(ResPackage pkg, boolean main)
-            throws AndrolibException {
+    public void addPackage(ResPackage pkg, boolean main) throws AndrolibException {
         Integer id = pkg.getId();
         if (mPackagesById.containsKey(id)) {
-            throw new AndrolibException("Multiple packages: id="
-                    + id.toString());
+            throw new AndrolibException("Multiple packages: id=" + id.toString());
         }
         String name = pkg.getName();
         if (mPackagesByName.containsKey(name)) {

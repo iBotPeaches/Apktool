@@ -34,8 +34,7 @@ public class ResResource {
     }
 
     public String getFilePath() {
-        return mResSpec.getType().getName()
-                + mConfig.getFlags().getQualifiers() + "/" + mResSpec.getName();
+        return mResSpec.getType().getName() + mConfig.getFlags().getQualifiers() + "/" + mResSpec.getName();
     }
 
     public ResType getConfig() {

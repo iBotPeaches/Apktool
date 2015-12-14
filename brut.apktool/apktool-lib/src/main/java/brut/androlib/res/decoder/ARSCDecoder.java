@@ -289,8 +289,7 @@ public class ARSCDecoder {
                 : mPkg.getValueFactory().factory(type, data, null);
     }
 
-    private ResConfigFlags readConfigFlags() throws IOException,
-            AndrolibException {
+    private ResConfigFlags readConfigFlags() throws IOException, AndrolibException {
         int size = mIn.readInt();
         int read = 28;
 
@@ -465,8 +464,7 @@ public class ARSCDecoder {
         }
     }
 
-    private void nextChunkCheckType(int expectedType) throws IOException,
-            AndrolibException {
+    private void nextChunkCheckType(int expectedType) throws IOException, AndrolibException {
         nextChunk();
         checkChunkType(expectedType);
     }

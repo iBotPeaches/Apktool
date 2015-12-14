@@ -38,8 +38,7 @@ public class ResType {
     public ResResource getResource(ResResSpec spec) throws AndrolibException {
         ResResource res = mResources.get(spec);
         if (res == null) {
-            throw new UndefinedResObject(String.format(
-                    "resource: spec=%s, config=%s", spec, this));
+            throw new UndefinedResObject(String.format("resource: spec=%s, config=%s", spec, this));
         }
         return res;
     }
@@ -61,12 +60,10 @@ public class ResType {
         mResources.remove(spec);
     }
 
-    public void addResource(ResResource res, boolean overwrite)
-            throws AndrolibException {
+    public void addResource(ResResource res, boolean overwrite) throws AndrolibException {
         ResResSpec spec = res.getResSpec();
         if (mResources.put(spec, res) != null && !overwrite) {
-            throw new AndrolibException(String.format(
-                    "Multiple resources: spec=%s, config=%s", spec, this));
+            throw new AndrolibException(String.format("Multiple resources: spec=%s, config=%s", spec, this));
         }
     }
 
