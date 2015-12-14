@@ -26,16 +26,14 @@ public class ExtMXSerializer extends MXSerializer implements ExtXmlSerializer {
     @Override
     public void startDocument(String encoding, Boolean standalone)
             throws IOException, IllegalArgumentException, IllegalStateException {
-        super.startDocument(encoding != null ? encoding : mDefaultEncoding,
-                standalone);
+        super.startDocument(encoding != null ? encoding : mDefaultEncoding, standalone);
         this.newLine();
     }
 
     @Override
-    protected void writeAttributeValue(String value, Writer out)
-            throws IOException {
+    protected void writeAttributeValue(String value, Writer out) throws IOException {
         if (mIsDisabledAttrEscape) {
-            out.write(value);
+            out.write(value == null ? "" : value);
             return;
         }
         super.writeAttributeValue(value, out);
@@ -55,8 +53,7 @@ public class ExtMXSerializer extends MXSerializer implements ExtXmlSerializer {
     }
 
     @Override
-    public void setProperty(String name, Object value)
-            throws IllegalArgumentException, IllegalStateException {
+    public void setProperty(String name, Object value) throws IllegalArgumentException, IllegalStateException {
         if (PROPERTY_DEFAULT_ENCODING.equals(name)) {
             mDefaultEncoding = (String) value;
         } else {

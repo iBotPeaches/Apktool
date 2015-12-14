@@ -34,7 +34,7 @@ public final class ResXmlEncoders {
     }
 
     public static String encodeAsResXmlAttr(String str) {
-        if (str.isEmpty()) {
+        if (str == null || str.isEmpty()) {
             return str;
         }
 
