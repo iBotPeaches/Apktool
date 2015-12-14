@@ -101,6 +101,10 @@ public class ResResSpec {
         return mType;
     }
 
+    public boolean isDummyResSpec() {
+        return getName().startsWith("APKTOOL_DUMMY_");
+    }
+
     public void addResource(ResResource res) throws AndrolibException {
         addResource(res, false);
     }
@@ -112,6 +116,11 @@ public class ResResSpec {
             throw new AndrolibException(String.format(
                     "Multiple resources: spec=%s, config=%s", this, flags));
         }
+    }
+
+    public void removeResource(ResResource res) throws AndrolibException {
+        ResConfigFlags flags = res.getConfig().getFlags();
+        mResources.remove(flags);
     }
 
     @Override

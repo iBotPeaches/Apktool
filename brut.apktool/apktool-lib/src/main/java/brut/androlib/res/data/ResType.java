@@ -56,6 +56,11 @@ public class ResType {
         addResource(res, false);
     }
 
+    public void removeResource(ResResource res) throws AndrolibException {
+        ResResSpec spec = res.getResSpec();
+        mResources.remove(spec);
+    }
+
     public void addResource(ResResource res, boolean overwrite)
             throws AndrolibException {
         ResResSpec spec = res.getResSpec();
