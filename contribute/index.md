@@ -4,10 +4,10 @@ title: Apktool - How to Contribute
 description: Apktool - How to Contribute
 ---
 
-##Contributing to Apktool
+## Contributing to Apktool
 
 ### Report a bug
-Apktool gets plenty of issue reports not related to apktool at all. People use this tool, but they don't know how to edit XML files, sign apks or even install them.
+Apktool gets plenty of bug reports not related to apktool at all. People use this tool, but they don't know how to edit XML files, sign apks or even install them.
 I find it funny that some people go the hard route of reverse engineering when they don't even know how to work with application sources.
 
 So... if you get some errors from apktool when decoding or building an apk, then this is probably a bug in apktool and you should report it.
@@ -32,3 +32,8 @@ Great! Explore and fix some bugs while you are here. You may find the project [h
 
 ### This documentation could use some work
 Good thing it is open source! Clean up the documentation [here](https://github.com/iBotPeaches/Apktool/tree/gh-pages).
+
+## Community Contributions
+ 1. [Ubuntu Bash Script](https://github.com/draekko/apktool4ubuntu) - draekko
+
+Feel free to make pull requests with additional community tools
