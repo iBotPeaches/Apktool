@@ -17,7 +17,7 @@ description: Apktool - Changelog / Roadmap
  * Fixed issue with `mnc1` qualifier. ([Issue 1072](https://github.com/iBotPeaches/Apktool/issues/1072))
  * Fixed issue with apks that have a 28 byte `ResConfig` size. ([Issue 1084](https://github.com/iBotPeaches/Apktool/pull/1084)) / Thanks rover
  * Cleaned up code base to match AOSP naming. ([Issue 1099](https://github.com/iBotPeaches/Apktool/issues/1099))
- * Fixed issue with APKs that had sparse ResourceTable. ([Issue 1031](https://github.com/iBotPeaches/Apktool/issues/1031))
+ * Fixed issue with APKs that had sparse ResourceTable. ([Issue 964](https://github.com/iBotPeaches/Apktool/issues/964), [Issue 1031](https://github.com/iBotPeaches/Apktool/issues/1031))
  * Added support for `DATA_NULL_EMPTY`
  * Added support for API23 mnc values. They are no longer zero padded.
 
