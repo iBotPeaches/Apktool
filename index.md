@@ -20,7 +20,7 @@ It is **NOT** intended for piracy and other non-legal uses. It could be used for
  * Java 7 (JRE 1.7)
  * Basic knowledge of Android SDK, AAPT and smali
 
-## Installation for noobs
+## Install Instructions
  * Read [Install Docs]({{ site.baseurl }}/install)
  
 ## Links of Interest
