@@ -20,6 +20,8 @@ import brut.androlib.AndrolibException;
 import brut.androlib.res.data.ResResource;
 import brut.androlib.res.xml.ResXmlEncoders;
 import java.io.IOException;
+import java.util.regex.Pattern;
+
 import org.xmlpull.v1.XmlSerializer;
 
 /**
@@ -37,7 +39,7 @@ public class ResStringValue extends ResScalarValue {
 
     @Override
     public String encodeAsResXmlAttr() {
-        return ResXmlEncoders.encodeAsResXmlAttr(mRawValue);
+        return checkIfStringIsNumeric(ResXmlEncoders.encodeAsResXmlAttr(mRawValue));
     }
 
     @Override
@@ -61,4 +63,10 @@ public class ResStringValue extends ResScalarValue {
             serializer.attribute(null, "formatted", "false");
         }
     }
+
+    private String checkIfStringIsNumeric(String val) {
+        return allDigits.matcher(val).matches() ? "\\ " + val : val;
+    }
+
+    private static Pattern allDigits = Pattern.compile("\\d+");
 }
