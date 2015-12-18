@@ -37,8 +37,7 @@ public abstract class TestUtils {
     public static Map<String, String> parseStringsXml(File file)
             throws BrutException {
         try {
-            XmlPullParser xpp = XmlPullParserFactory.newInstance()
-                    .newPullParser();
+            XmlPullParser xpp = XmlPullParserFactory.newInstance().newPullParser();
             xpp.setInput(new FileReader(file));
 
             int eventType;
@@ -83,16 +82,14 @@ public abstract class TestUtils {
      * implementation uses brut.dir. I think I should merge all my projects to
      * single brut.common .
      */
-    public static void copyResourceDir(Class class_, String dirPath, File out)
-            throws BrutException {
+    public static void copyResourceDir(Class class_, String dirPath, File out) throws BrutException {
         if (!out.exists()) {
             out.mkdirs();
         }
         copyResourceDir(class_, dirPath, new FileDirectory(out));
     }
 
-    public static void copyResourceDir(Class class_, String dirPath,
-                                       Directory out) throws BrutException {
+    public static void copyResourceDir(Class class_, String dirPath, Directory out) throws BrutException {
         if (class_ == null) {
             class_ = Class.class;
         }
@@ -111,9 +108,7 @@ public abstract class TestUtils {
         if (dirURL.getProtocol().equals("jar")) {
             String jarPath;
             try {
-                jarPath = URLDecoder.decode(
-                        dirURL.getPath().substring(5,
-                                dirURL.getPath().indexOf("!")), "UTF-8");
+                jarPath = URLDecoder.decode(dirURL.getPath().substring(5, dirURL.getPath().indexOf("!")), "UTF-8");
             } catch (UnsupportedEncodingException ex) {
                 throw new BrutException(ex);
             }
@@ -135,9 +130,7 @@ public abstract class TestUtils {
                 testType = test.getAttribute("type");
             }
 
-            return controlType.equals(testType)
-                    && control.getAttribute("name").equals(
-                    test.getAttribute("name"));
+            return controlType.equals(testType) && control.getAttribute("name").equals(test.getAttribute("name"));
         }
     }
 }
