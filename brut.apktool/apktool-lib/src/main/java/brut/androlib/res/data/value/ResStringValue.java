@@ -65,6 +65,9 @@ public class ResStringValue extends ResScalarValue {
     }
 
     private String checkIfStringIsNumeric(String val) {
+        if (val == null || val.isEmpty()) {
+            return val;
+        }
         return allDigits.matcher(val).matches() ? "\\ " + val : val;
     }
 
