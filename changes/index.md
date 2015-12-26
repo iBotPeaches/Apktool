@@ -21,6 +21,8 @@ description: Apktool - Changelog / Roadmap
  * Added support for `DATA_NULL_EMPTY`
  * Added support for API23 mnc values. They are no longer zero padded.
  * Fixed issue where large int values in `AndroidManifest.xml` were truncated due to overflow. ([Issue 767](https://github.com/iBotPeaches/Apktool/issues/767)) / Thanks gio73 and MarcMil
+ * Added decode support for Dexguard Enterprise applications. ([Issue 1014](https://github.com/iBotPeaches/Apktool/issues/1014))
+    * Simply creates dummy key value names to prevent duplicate resource error.
 
 ## v2.0.2
 2015.10.12
