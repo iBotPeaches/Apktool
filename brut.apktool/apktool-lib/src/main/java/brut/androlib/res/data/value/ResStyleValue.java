@@ -59,7 +59,8 @@ public class ResStyleValue extends ResBagValue implements
             // hacky-fix remove bad ReferenceVars
             if (resource.contains("ResReferenceValue@")) {
                 continue;
-            } else if (resource.contains("ResStringValue@") || resource.contains("ResStyleValue@")) {
+            } else if (resource.contains("ResStringValue@") || resource.contains("ResStyleValue@") ||
+                    resource.contains("ResBoolValue@")) {
                 name = "@" + spec.getFullName(res.getResSpec().getPackage(), false);
             } else {
                 ResAttr attr = (ResAttr) spec.getDefaultResource().getValue();
