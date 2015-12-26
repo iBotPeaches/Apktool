@@ -33,7 +33,7 @@ public class ResResSpec {
 
     public ResResSpec(ResID id, String name, ResPackage pkg, ResTypeSpec type) {
         this.mId = id;
-        this.mName = name;
+        this.mName = (name.isEmpty() ? ("APKTOOL_DUMMYVAL_" + id.toString()) : name);
         this.mPackage = pkg;
         this.mType = type;
     }
