@@ -4,8 +4,8 @@ title: Apktool - Changelog
 description: Apktool - Changelog / Roadmap
 ---
 
-## v2.0.3 (in development)
-2015.xx.xx
+## v2.0.3
+2015.12.31
 
  * **For developers** - Run `git submodule update --init --recursive` to setup submodules.
  * Fixed issue with too long command due to large amount of uncompressed files. ([Issue 1053](https://github.com/iBotPeaches/Apktool/issues/1053))
