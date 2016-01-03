@@ -15,6 +15,7 @@
  */
 package brut.androlib.res.data;
 
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -23,13 +24,13 @@ import java.util.Map;
  */
 public class ResUnknownFiles {
 
-    private final Map<String, String> mUnknownFiles = new LinkedHashMap<String, String>();
+    private final Map<byte[], String> mUnknownFiles = new LinkedHashMap<byte[], String>();
 
     public void addUnknownFileInfo(String file, String value) {
-        mUnknownFiles.put(file,value);
+        mUnknownFiles.put(file.getBytes(StandardCharsets.UTF_8), value);
     }
 
-    public Map<String, String> getUnknownFiles() {
+    public Map<byte[], String> getUnknownFiles() {
         return mUnknownFiles;
     }
 }

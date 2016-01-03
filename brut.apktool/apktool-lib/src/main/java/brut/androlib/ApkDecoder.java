@@ -377,7 +377,7 @@ public class ApkDecoder {
     }
 
     private void putUnknownInfo(Map<String, Object> meta) throws AndrolibException {
-        Map<String,String> info = mAndrolib.mResUnknownFiles.getUnknownFiles();
+        Map<byte[], String> info = mAndrolib.mResUnknownFiles.getUnknownFiles();
         if (info.size() > 0) {
             meta.put("unknownFiles", info);
         }
