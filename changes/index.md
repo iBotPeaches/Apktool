@@ -4,6 +4,11 @@ title: Apktool - Changelog
 description: Apktool - Changelog / Roadmap
 ---
 
+## v2.1.0 (in development)
+2016.xx.xx
+
+ * Fixed issue with non printable chars in unknown files. Thanks ihanson
+
 ## v2.0.3
 2015.12.31
 
