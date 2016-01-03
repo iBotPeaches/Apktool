@@ -11,7 +11,7 @@ versionInfo:
   versionName: '1.0'
 compressionType: false
 unknownFiles:
-  hidden.file: '8'
-  stored.file: '0'
-  unk_folder/unknown_file: '8'
-  lib_bug603/bug603: '8'
+  !!binary "aGlkZGVuLmZpbGU=": '8'
+  !!binary "c3RvcmVkLmZpbGU=": '0'
+  !!binary "dW5rX2ZvbGRlci91bmtub3duX2ZpbGU=": '8'
+  !!binary "bGliX2J1ZzYwMy9idWc2MDM=": '8'

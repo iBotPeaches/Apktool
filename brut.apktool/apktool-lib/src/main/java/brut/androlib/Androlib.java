@@ -30,6 +30,7 @@ import brut.directory.*;
 import brut.util.BrutIO;
 import brut.util.OS;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -258,7 +259,11 @@ public class Androlib {
                 InputStream in = appDir.getDirectory().getFileInput("apktool.yml")
         ) {
             Yaml yaml = new Yaml();
-            return (Map<String, Object>) yaml.load(in);
+            Map<String, Object> result = (Map<String, Object>) yaml.load(in);
+            if (result.containsKey("unknownFiles")) {
+                result.put("unknownFiles", getUnknownFiles(result));
+            }
+            return result;
         } catch (DirectoryException | IOException ex) {
             throw new AndrolibException(ex);
         }
@@ -735,6 +740,15 @@ public class Androlib {
             files[i] = new File(dir, names[i]);
         }
         return files;
+    }
+
+    private static Map<String, String> getUnknownFiles(Map<String, Object> meta) {
+        Map<byte[], String> unknownFiles = (Map<byte[], String>) meta.get("unknownFiles");
+        Map<String, String> result = new LinkedHashMap<>();
+        for (Map.Entry<byte[], String> entry : unknownFiles.entrySet()) {
+            result.put(new String(entry.getKey(), StandardCharsets.UTF_8), entry.getValue());
+        }
+        return result;
     }
 
     private final static Logger LOGGER = Logger.getLogger(Androlib.class.getName());
