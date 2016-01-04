@@ -171,9 +171,11 @@ public class Androlib {
                 if (isAPKFileNames(file) && !NO_COMPRESS_PATTERN.matcher(file).find()) {
                     if (unk.getCompressionLevel(file) == 0) {
                         ext = FilenameUtils.getExtension(file);
-
+                        if (ext.isEmpty()) {
+                            ext = file;
+                        }
                         if (! uncompressedExtensions.contains(ext)) {
-                            uncompressedExtensions.add(FilenameUtils.getExtension(file));
+                            uncompressedExtensions.add(ext);
                         }
                     }
                 }
