@@ -8,6 +8,8 @@ description: Apktool - Changelog / Roadmap
 2016.xx.xx
 
  * Fixed issue with non printable chars in unknown files. Thanks ihanson
+ * Fixed issue when a non-compressed file has no extension. ([Issue 1122](https://github.com/iBotPeaches/Apktool/issues/1122)) / Thanks BurgerZ
+ * Added ability for launched executables (`aapt`) to differentiate between output and error streams. Thanks BurgerZ
 
 ## v2.0.3
 2015.12.31
