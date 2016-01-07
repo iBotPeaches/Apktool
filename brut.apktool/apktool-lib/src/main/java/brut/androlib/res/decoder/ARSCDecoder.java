@@ -21,14 +21,19 @@ import brut.androlib.AndrolibException;
 import brut.androlib.res.data.*;
 import brut.androlib.res.data.value.*;
 import brut.util.Duo;
-import brut.androlib.res.data.ResTable;
 import brut.util.ExtDataInput;
 import com.mindprod.ledatastream.LEDataInputStream;
-import java.io.*;
-import java.math.BigInteger;
-import java.util.*;
-import java.util.logging.Logger;
 import org.apache.commons.io.input.CountingInputStream;
+
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>

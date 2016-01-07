@@ -15,6 +15,7 @@
  */
 package brut.androlib;
 
+import brut.androlib.meta.MetaInfo;
 import brut.androlib.res.util.ExtFile;
 import brut.common.BrutException;
 import brut.directory.FileDirectory;
@@ -340,13 +341,13 @@ public class BuildAndDecodeTest {
 
     @SuppressWarnings("unchecked")
     private void compareUnknownFiles() throws BrutException, IOException {
-        Map<String, Object> control = new Androlib().readMetaFile(sTestOrigDir);
-        Map<String, Object> test = new Androlib().readMetaFile(sTestNewDir);
-        assertTrue(control.containsKey("unknownFiles"));
-        assertTrue(test.containsKey("unknownFiles"));
+        MetaInfo control = new Androlib().readMetaFile(sTestOrigDir);
+        MetaInfo test = new Androlib().readMetaFile(sTestNewDir);
+        assertNotNull(control.unknownFiles);
+        assertNotNull(test.unknownFiles);
 
-        Map<String, String> control_files = (Map<String, String>)control.get("unknownFiles");
-        Map<String, String> test_files = (Map<String, String>)test.get("unknownFiles");
+        Map<String, String> control_files = control.unknownFiles;
+        Map<String, String> test_files = test.unknownFiles;
         assertTrue(control_files.size() == test_files.size());
 
         // Make sure that the compression methods are still the same

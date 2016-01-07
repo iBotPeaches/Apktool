@@ -17,6 +17,8 @@
 package brut.androlib;
 
 import brut.androlib.java.AndrolibJava;
+import brut.androlib.meta.MetaInfo;
+import brut.androlib.meta.UsesFramework;
 import brut.androlib.res.AndrolibResources;
 import brut.androlib.res.data.ResPackage;
 import brut.androlib.res.data.ResTable;
@@ -30,7 +32,6 @@ import brut.directory.*;
 import brut.util.BrutIO;
 import brut.util.OS;
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -40,9 +41,6 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.Yaml;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
@@ -237,33 +235,21 @@ public class Androlib {
         }
     }
 
-    public void writeMetaFile(File mOutDir, Map<String, Object> meta)
+    public void writeMetaFile(File mOutDir, MetaInfo meta)
             throws AndrolibException {
-        DumperOptions options = new DumperOptions();
-        options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-        Yaml yaml = new Yaml(options);
-
-        try (
-                Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
-                        new File(mOutDir, "apktool.yml")), "UTF-8"))
-        ) {
-            yaml.dump(meta, writer);
+        try{
+            meta.save(new File(mOutDir, "apktool.yml"));
         } catch (IOException ex) {
             throw new AndrolibException(ex);
         }
     }
 
-    public Map<String, Object> readMetaFile(ExtFile appDir)
+    public MetaInfo readMetaFile(ExtFile appDir)
             throws AndrolibException {
         try(
                 InputStream in = appDir.getDirectory().getFileInput("apktool.yml")
         ) {
-            Yaml yaml = new Yaml();
-            Map<String, Object> result = (Map<String, Object>) yaml.load(in);
-            if (result.containsKey("unknownFiles")) {
-                result.put("unknownFiles", getUnknownFiles(result));
-            }
-            return result;
+            return MetaInfo.load(in);
         } catch (DirectoryException | IOException ex) {
             throw new AndrolibException(ex);
         }
@@ -277,22 +263,19 @@ public class Androlib {
             throws BrutException {
         LOGGER.info("Using Apktool " + Androlib.getVersion());
 
-        Map<String, Object> meta = readMetaFile(appDir);
-        Object t1 = meta.get("isFrameworkApk");
-        apkOptions.isFramework = (t1 == null ? false : (Boolean) t1);
-        apkOptions.resourcesAreCompressed = meta.get("compressionType") == null
-                ? false
-                : Boolean.valueOf(meta.get("compressionType").toString());
-        apkOptions.doNotCompress = (Collection<String>) meta.get("doNotCompress");
+        MetaInfo meta = readMetaFile(appDir);
+        apkOptions.isFramework = meta.isFrameworkApk;
+        apkOptions.resourcesAreCompressed = meta.compressionType;
+        apkOptions.doNotCompress = meta.doNotCompress;
 
-        mAndRes.setSdkInfo((Map<String, String>) meta.get("sdkInfo"));
-        mAndRes.setPackageId((Map<String, String>) meta.get("packageInfo"));
-        mAndRes.setPackageInfo((Map<String, String>) meta.get("packageInfo"));
-        mAndRes.setVersionInfo((Map<String, String>) meta.get("versionInfo"));
-        mAndRes.setSharedLibrary((boolean) (meta.get("sharedLibrary") == null ? false : meta.get("sharedLibrary")));
+        mAndRes.setSdkInfo(meta.sdkInfo);
+        mAndRes.setPackageId(meta.packageInfo);
+        mAndRes.setPackageRenamed(meta.packageInfo);
+        mAndRes.setVersionInfo(meta.versionInfo);
+        mAndRes.setSharedLibrary(meta.sharedLibrary);
 
         if (outFile == null) {
-            String outFileName = (String) meta.get("apkFileName");
+            String outFileName = meta.apkFileName;
             outFile = new File(appDir, "dist" + File.separator + (outFileName == null ? "out.apk" : outFileName));
         }
 
@@ -300,7 +283,7 @@ public class Androlib {
         buildSources(appDir);
         buildNonDefaultSources(appDir);
         ResXmlPatcher.fixingPublicAttrsInProviderAttributes(new File(appDir, "AndroidManifest.xml"));
-        buildResources(appDir, (Map<String, Object>) meta.get("usesFramework"));
+        buildResources(appDir, meta.usesFramework);
 
         buildLib(appDir);
         buildLibs(appDir);
@@ -410,7 +393,7 @@ public class Androlib {
         return true;
     }
 
-    public void buildResources(ExtFile appDir, Map<String, Object> usesFramework)
+    public void buildResources(ExtFile appDir, UsesFramework usesFramework)
             throws BrutException {
         if (!buildResourcesRaw(appDir) && !buildResourcesFull(appDir, usesFramework)
                 && !buildManifest(appDir, usesFramework)) {
@@ -439,7 +422,7 @@ public class Androlib {
         }
     }
 
-    public boolean buildResourcesFull(File appDir, Map<String, Object> usesFramework)
+    public boolean buildResourcesFull(File appDir, UsesFramework usesFramework)
             throws AndrolibException {
         try {
             if (!new File(appDir, "res").exists()) {
@@ -490,7 +473,7 @@ public class Androlib {
         }
     }
 
-    public boolean buildManifest(ExtFile appDir, Map<String, Object> usesFramework)
+    public boolean buildManifest(ExtFile appDir, UsesFramework usesFramework)
             throws BrutException {
         try {
             if (!new File(appDir, "AndroidManifest.xml").exists()) {
@@ -585,12 +568,12 @@ public class Androlib {
         }
     }
 
-    public void buildUnknownFiles(File appDir, File outFile, Map<String, Object> meta)
+    public void buildUnknownFiles(File appDir, File outFile, MetaInfo meta)
             throws AndrolibException {
-        if (meta.containsKey("unknownFiles")) {
+        if (meta.unknownFiles != null) {
             LOGGER.info("Copying unknown files/dir...");
 
-            Map<String, String> files = (Map<String, String>)meta.get("unknownFiles");
+            Map<String, String> files = meta.unknownFiles;
             File tempFile = new File(outFile.getParent(), outFile.getName() + ".apktool_temp");
             boolean renamed = outFile.renameTo(tempFile);
             if(!renamed) {
@@ -701,18 +684,18 @@ public class Androlib {
         return ApktoolProperties.get("application.version");
     }
 
-    private File[] parseUsesFramework(Map<String, Object> usesFramework)
+    private File[] parseUsesFramework(UsesFramework usesFramework)
             throws AndrolibException {
         if (usesFramework == null) {
             return null;
         }
 
-        List<Integer> ids = (List<Integer>) usesFramework.get("ids");
+        List<Integer> ids = usesFramework.ids;
         if (ids == null || ids.isEmpty()) {
             return null;
         }
 
-        String tag = (String) usesFramework.get("tag");
+        String tag = usesFramework.tag;
         File[] files = new File[ids.size()];
         int i = 0;
         for (int id : ids) {
@@ -740,15 +723,6 @@ public class Androlib {
             files[i] = new File(dir, names[i]);
         }
         return files;
-    }
-
-    private static Map<String, String> getUnknownFiles(Map<String, Object> meta) {
-        Map<byte[], String> unknownFiles = (Map<byte[], String>) meta.get("unknownFiles");
-        Map<String, String> result = new LinkedHashMap<>();
-        for (Map.Entry<byte[], String> entry : unknownFiles.entrySet()) {
-            result.put(new String(entry.getKey(), StandardCharsets.UTF_8), entry.getValue());
-        }
-        return result;
     }
 
     private final static Logger LOGGER = Logger.getLogger(Androlib.class.getName());
