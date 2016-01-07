@@ -19,26 +19,35 @@ package brut.androlib.res;
 import brut.androlib.AndrolibException;
 import brut.androlib.ApkOptions;
 import brut.androlib.err.CantFindFrameworkResException;
+import brut.androlib.meta.PackageInfo;
+import brut.androlib.meta.VersionInfo;
 import brut.androlib.res.data.*;
 import brut.androlib.res.decoder.*;
 import brut.androlib.res.decoder.ARSCDecoder.ARSCData;
 import brut.androlib.res.decoder.ARSCDecoder.FlagsOffset;
-import brut.androlib.res.util.*;
+import brut.androlib.res.util.ExtFile;
+import brut.androlib.res.util.ExtMXSerializer;
+import brut.androlib.res.util.ExtXmlSerializer;
 import brut.androlib.res.xml.ResValuesXmlSerializable;
 import brut.androlib.res.xml.ResXmlPatcher;
 import brut.common.BrutException;
-import brut.directory.*;
-import brut.util.*;
+import brut.directory.Directory;
+import brut.directory.DirectoryException;
+import brut.directory.FileDirectory;
+import brut.util.Duo;
+import brut.util.Jar;
+import brut.util.OS;
+import brut.util.OSDetection;
+import org.apache.commons.io.IOUtils;
+import org.xmlpull.v1.XmlSerializer;
+
 import java.io.*;
 import java.util.*;
 import java.util.logging.Logger;
-import java.util.zip.*;
-
-import java.io.File;
-import java.io.IOException;
-
-import org.apache.commons.io.IOUtils;
-import org.xmlpull.v1.XmlSerializer;
+import java.util.zip.CRC32;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
@@ -268,22 +277,22 @@ final public class AndrolibResources {
         }
     }
 
-    public void setVersionInfo(Map<String, String> map) {
-        if (map != null) {
-            mVersionCode = map.get("versionCode");
-            mVersionName = map.get("versionName");
+    public void setVersionInfo(VersionInfo versionInfo) {
+        if (versionInfo != null) {
+            mVersionCode = versionInfo.versionCode;
+            mVersionName = versionInfo.versionName;
         }
     }
 
-    public void setPackageInfo(Map<String, String> map) {
-        if (map != null) {
-            mPackageRenamed = map.get("rename-manifest-package");
+    public void setPackageRenamed(PackageInfo packageInfo) {
+        if (packageInfo != null) {
+            mPackageRenamed = packageInfo.renameManifestPackage;
         }
     }
 
-    public void setPackageId(Map<String, String> map) {
-        if (map != null) {
-            mPackageId = map.get("forced-package-id");
+    public void setPackageId(PackageInfo packageInfo) {
+        if (packageInfo != null) {
+            mPackageId = packageInfo.forcedPackageId;
         }
     }
 

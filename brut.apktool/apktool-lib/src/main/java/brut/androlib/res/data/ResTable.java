@@ -18,6 +18,7 @@ package brut.androlib.res.data;
 
 import brut.androlib.AndrolibException;
 import brut.androlib.err.UndefinedResObject;
+import brut.androlib.meta.VersionInfo;
 import brut.androlib.res.AndrolibResources;
 import brut.androlib.res.data.value.ResValue;
 import java.util.*;
@@ -39,8 +40,8 @@ public class ResTable {
     private boolean mAnalysisMode = false;
     private boolean mSharedLibrary = false;
 
-    private Map<String, String> mSdkInfo = new LinkedHashMap<String, String>();
-    private Map<String, String> mVersionInfo = new LinkedHashMap<String, String>();
+    private Map<String, String> mSdkInfo = new LinkedHashMap<>();
+    private VersionInfo mVersionInfo = new VersionInfo();
 
     public ResTable() {
         mAndRes = null;
@@ -174,11 +175,15 @@ public class ResTable {
         mSdkInfo.put(key, value);
     }
 
-    public void addVersionInfo(String key, String value) {
-        mVersionInfo.put(key, value);
+    public void setVersionName(String versionName) {
+        mVersionInfo.versionName = versionName;
     }
 
-    public Map<String, String> getVersionInfo() {
+    public void setVersionCode(String versionCode) {
+        mVersionInfo.versionCode = versionCode;
+    }
+
+    public VersionInfo getVersionInfo() {
         return mVersionInfo;
     }
 

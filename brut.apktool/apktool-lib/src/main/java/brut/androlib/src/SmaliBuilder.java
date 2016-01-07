@@ -20,16 +20,18 @@ import brut.androlib.AndrolibException;
 import brut.androlib.mod.SmaliMod;
 import brut.androlib.res.util.ExtFile;
 import brut.directory.DirectoryException;
-import java.io.*;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.logging.Logger;
-
 import org.antlr.runtime.RecognitionException;
 import org.apache.commons.io.IOUtils;
 import org.jf.dexlib2.writer.builder.DexBuilder;
 import org.jf.dexlib2.writer.io.FileDataStore;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.logging.Logger;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
