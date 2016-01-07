@@ -159,7 +159,7 @@ public class Androlib {
         }
     }
 
-    public void recordUncompressedFiles(ExtFile apkFile, Collection<String> uncompressedExtensions) throws AndrolibException {
+    public void recordUncompressedFiles(ExtFile apkFile, Collection<String> uncompressedFilesOrExts) throws AndrolibException {
         try {
             Directory unk = apkFile.getDirectory();
             Set<String> files = unk.getFiles(true);
@@ -169,9 +169,11 @@ public class Androlib {
                 if (isAPKFileNames(file) && !NO_COMPRESS_PATTERN.matcher(file).find()) {
                     if (unk.getCompressionLevel(file) == 0) {
                         ext = FilenameUtils.getExtension(file);
-
-                        if (! uncompressedExtensions.contains(ext)) {
-                            uncompressedExtensions.add(FilenameUtils.getExtension(file));
+                        if (ext.isEmpty()) {
+                            ext = file;
+                        }
+                        if (! uncompressedFilesOrExts.contains(ext)) {
+                            uncompressedFilesOrExts.add(ext);
                         }
                     }
                 }
