@@ -68,7 +68,7 @@ public class YamlStringEscapeUtils {
         sz = str.length();
         for (int i = 0; i < sz; i++) {
             char ch = str.charAt(i);
-//            "[^\t\n\r\u0020-\u007E\u0085\u00A0-\uD7FF\uE000-\uFFFD]"
+            // "[^\t\n\r\u0020-\u007E\u0085\u00A0-\uD7FF\uE000-\uFFFD]"
             // handle unicode
             if (ch > 0xFFFD) {
                 out.write("\\u" + CharSequenceTranslator.hex(ch));
