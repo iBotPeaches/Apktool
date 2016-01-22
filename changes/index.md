@@ -10,6 +10,9 @@ description: Apktool - Changelog / Roadmap
  * Fixed issue with non printable chars in unknown files. Thanks ihanson
  * Fixed issue when a non-compressed file has no extension. ([Issue 1122](https://github.com/iBotPeaches/Apktool/issues/1122)) / Thanks BurgerZ
  * Added ability for launched executables (`aapt`) to differentiate between output and error streams. Thanks BurgerZ
+ * Revamped internal storage of `apktool.yml` to be serialized objects vs entries in HashMap. ([Issue 1128](https://github.com/iBotPeaches/Apktool/pull/1128)) / Thanks rover
+ * Closes streams that were not properly closed. ([Issue 1143](https://github.com/iBotPeaches/Apktool/issues/1143))
+ * Fixes issue when `@null` was improperly decoded. ([Issue 1123](https://github.com/iBotPeaches/Apktool/issues/1123))
 
 ## v2.0.3
 2015.12.31
