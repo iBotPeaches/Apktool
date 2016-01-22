@@ -108,6 +108,8 @@ public class SmaliBuilder {
             }
         }
 
+        inStream.close();
+
         try {
             if (!SmaliMod.assembleSmaliFile(out.toString(),dexBuilder, false, false, inFile)) {
                 throw new AndrolibException("Could not smali file: " + fileName);

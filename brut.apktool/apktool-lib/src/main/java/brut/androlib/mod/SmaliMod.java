@@ -96,6 +96,9 @@ public class SmaliMod {
         dexGen.setDexBuilder(dexBuilder);
         dexGen.smali_file();
 
+        is.close();
+        reader.close();
+
         return dexGen.getNumberOfSyntaxErrors() == 0;
     }
 }
