@@ -94,9 +94,9 @@ public class XmlPullStreamDecoder implements ResStreamDecoder {
                         if (attr_name.equalsIgnoreCase(("package"))) {
                             resTable.setPackageRenamed(pp.getAttributeValue(i));
                         } else if (attr_name.equalsIgnoreCase("versionCode")) {
-                            resTable.addVersionInfo("versionCode", pp.getAttributeValue(i));
+                            resTable.setVersionCode(pp.getAttributeValue(i));
                         } else if (attr_name.equalsIgnoreCase("versionName")) {
-                            resTable.addVersionInfo("versionName", pp.getAttributeValue(i));
+                            resTable.setVersionName(pp.getAttributeValue(i));
                         }
                     }
                     return true;
