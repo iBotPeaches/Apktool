@@ -13,23 +13,23 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib.res.data;
+package brut.androlib.meta;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import org.yaml.snakeyaml.nodes.Node;
+import org.yaml.snakeyaml.representer.Representer;
 
-/**
- * @author Connor Tumbleson <connor.tumbleson@gmail.com>
- */
-public class ResUnknownFiles {
-
-    private final Map<String, String> mUnknownFiles = new LinkedHashMap<>();
-
-    public void addUnknownFileInfo(String file, String value) {
-        mUnknownFiles.put(file, value);
+public class StringExRepresent extends Representer {
+    public StringExRepresent() {
+        RepresentStringEx representStringEx = new RepresentStringEx();
+        multiRepresenters.put(String.class, representStringEx);
+        representers.put(String.class, representStringEx);
     }
 
-    public Map<String, String> getUnknownFiles() {
-        return mUnknownFiles;
+    private class RepresentStringEx extends RepresentString {
+
+        @Override
+        public Node representData(Object data) {
+            return super.representData(YamlStringEscapeUtils.escapeString(data.toString()));
+        }
     }
 }

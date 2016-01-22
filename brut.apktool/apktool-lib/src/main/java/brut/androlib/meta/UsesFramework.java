@@ -13,23 +13,11 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib.res.data;
+package brut.androlib.meta;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.List;
 
-/**
- * @author Connor Tumbleson <connor.tumbleson@gmail.com>
- */
-public class ResUnknownFiles {
-
-    private final Map<String, String> mUnknownFiles = new LinkedHashMap<>();
-
-    public void addUnknownFileInfo(String file, String value) {
-        mUnknownFiles.put(file, value);
-    }
-
-    public Map<String, String> getUnknownFiles() {
-        return mUnknownFiles;
-    }
+public class UsesFramework {
+    public List<Integer> ids;
+    public String tag;
 }
