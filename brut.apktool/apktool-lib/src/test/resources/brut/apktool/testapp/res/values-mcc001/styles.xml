@@ -9,4 +9,7 @@
         <item name="@string/issue_477">?android:dividerVertical</item>
     </style>
     <style name="Foo.Bar" parent=""/>
+    <style name="IssueStyle">
+        <item name="@string/issue_1123">@null</item>
+    </style>
 </resources>

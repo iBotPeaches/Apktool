@@ -3,4 +3,5 @@
     <string name="test1" />
     <string name="hello_world">Hello World</string>
     <string name="issue_477">divider</string>
+    <string name="issue_1123">divider</string>
 </resources>
