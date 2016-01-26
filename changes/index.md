@@ -13,6 +13,7 @@ description: Apktool - Changelog / Roadmap
  * Revamped internal storage of `apktool.yml` to be serialized objects vs entries in HashMap. ([Issue 1128](https://github.com/iBotPeaches/Apktool/pull/1128)) / Thanks rover
  * Closes streams that were not properly closed. ([Issue 1143](https://github.com/iBotPeaches/Apktool/issues/1143))
  * Fixes issue when `@null` was improperly decoded. ([Issue 1123](https://github.com/iBotPeaches/Apktool/issues/1123))
+ * Fixes issue when apk filename has trailing space. ([Issue 1145](https://github.com/iBotPeaches/Apktool/issues/1145)) / Thanks BurgerZ
 
 ## v2.0.3
 2015.12.31
