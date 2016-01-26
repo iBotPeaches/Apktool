@@ -151,7 +151,7 @@ public class Main {
             // make out folder manually using name of apk
             String outName = apkName;
             outName = outName.endsWith(".apk") ? outName.substring(0,
-                    outName.length() - 4) : outName + ".out";
+                    outName.length() - 4).trim() : outName + ".out";
 
             // make file from path
             outName = new File(outName).getName();
