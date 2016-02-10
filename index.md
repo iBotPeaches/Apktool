@@ -21,7 +21,7 @@ It is **NOT** intended for piracy and other non-legal uses. It could be used for
  * Basic knowledge of Android SDK, AAPT and smali
 
 ## Install Instructions
- * Read [Install Docs]({{ site.baseurl }}/install)
+ * Read [Install Docs]({{ site.github.url }}/install)
  
 ## Links of Interest
  * [XDA Thread](http://forum.xda-developers.com/showthread.php?t=1755243) - For those who wish to communicate on XDA-Developers for community support

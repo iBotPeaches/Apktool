@@ -39,7 +39,7 @@ description: Apktool - Changelog / Roadmap
 ## v2.0.2
 2015.10.12
 
- * [Migration Instructions from 2.0.1 to 2.0.2]({{ site.baseurl }}/documentation/#v2-0-1-v2-0-2)
+ * [Migration Instructions from 2.0.1 to 2.0.2]({{ site.github.url }}/documentation/#v2-0-1-v2-0-2)
  * Fixed issues with apks that use `.9.xml` files, which improperly triggered 9patch decoder. ([Issue 1005](https://github.com/iBotPeaches/Apktool/issues/1005))
  * Prevent compressing resources that should not be. ([Pull 1020](https://github.com/iBotPeaches/Apktool/pull/1020))
  * `aapt` changes
@@ -67,7 +67,7 @@ description: Apktool - Changelog / Roadmap
 ## v2.0.0
 2015.04.21
 
- * [Migration Instructions from 1.5.x to 2.0.x]({{ site.baseurl }}/documentation/#v1-5-x-v2-0-0)
+ * [Migration Instructions from 1.5.x to 2.0.x]({{ site.github.url }}/documentation/#v1-5-x-v2-0-0)
  * **Android 5.1 support**
  * Updated smali/baksmali to `v2.0.5`
  * Updated gradle to `v2.1`

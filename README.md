@@ -21,4 +21,4 @@ This repository contains the files used in generating the Github Pages site. It'
  - I believe this is a YAML limitation, so make sure to always have a `00:00:0` timestamp added to days
  
 **Links in `_data/releases.yml` have to be hardcoded to live site**
- - appending `/Apktool/` because `{{ site.baseurl }}` doesn't work
+ - appending `/Apktool/` because `{{ site.github.url }}` doesn't work
