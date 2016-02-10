@@ -14,6 +14,7 @@ description: Apktool - Changelog / Roadmap
  * Closes streams that were not properly closed. ([Issue 1143](https://github.com/iBotPeaches/Apktool/issues/1143))
  * Fixes issue when `@null` was improperly decoded. ([Issue 1123](https://github.com/iBotPeaches/Apktool/issues/1123))
  * Fixes issue when apk filename has trailing space. ([Issue 1145](https://github.com/iBotPeaches/Apktool/issues/1145)) / Thanks BurgerZ
+ * Fixes issue that all digits were treated as string using `\ ###` trick. ([Issue 1130](https://github.com/iBotPeaches/Apktool/issues/1130))
 
 ## v2.0.3
 2015.12.31
