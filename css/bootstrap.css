@@ -1457,7 +1457,7 @@ abbr[data-original-title] {
 blockquote {
   padding: 10px 20px;
   color: #2fbba3;
-  margin: 0 0 20px;
+  margin: 5px 0 20px;
   font-size: 16.5px;
   border-left: 5px solid #2fbba3;
 }

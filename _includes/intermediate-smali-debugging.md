@@ -23,7 +23,8 @@ In our particular situation we have:
   <li>binaries: when building apk in debug mode, apktool removes original symbols and adds new, which are referencing smali code (line numbers, registers/variables, etc.)</li>
 </ul>
 <br />
-<blockquote><span class="label label-info lb">Info</span> To successfully run debug sessions, the apk must be <strong>both</strong> decoded and built in debug mode. <code>-d / --debug</code></blockquote>
+<blockquote><span class="label label-info lb">Info</span> To successfully run debug sessions, the apk must be <strong>both</strong> decoded and built in debug mode. Decoding with debug decodes the application
+ differently to allow the debug rebuild option to inject lines allowing the debugger to identify variables and types.<code>-d / --debug</code></blockquote>
 
 <h3><strong>General instructions</strong></h3>
 

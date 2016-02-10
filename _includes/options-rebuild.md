@@ -1,6 +1,6 @@
 These are all the options when building an apk.
 <br /><br />
-<strong><code>-a, --aapt &lt;FILE>></code></strong>
+<strong><code>-a, --aapt &lt;FILE></code></strong>
 <blockquote>Loads aapt from the specified file location, instead of relying on path. Falls back to <code>$PATH</code> loading, if no file found</blockquote>
 <br />
 <strong><code>-c, --copy-original</code></strong>
