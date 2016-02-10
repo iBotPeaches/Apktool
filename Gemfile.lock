@@ -100,11 +100,7 @@ GEM
       mini_portile2 (~> 2.0.0.rc2)
     octokit (4.2.0)
       sawyer (~> 0.6.0, >= 0.5.3)
-    posix-spawn (0.3.10)
     public_suffix (1.5.3)
-    pygments.rb (0.6.1)
-      posix-spawn (~> 0.3.6)
-      yajl-ruby (~> 1.2.0)
     rb-fsevent (0.9.7)
     rb-inotify (0.9.7)
       ffi (>= 0.5.0)
@@ -122,7 +118,6 @@ GEM
       ethon (>= 0.8.0)
     tzinfo (1.2.2)
       thread_safe (~> 0.1)
-    yajl-ruby (1.2.1)
 
 PLATFORMS
   ruby
@@ -130,7 +125,6 @@ PLATFORMS
 DEPENDENCIES
   github-pages (= 48)
   json
-  pygments.rb
 
 BUNDLED WITH
    1.11.2
