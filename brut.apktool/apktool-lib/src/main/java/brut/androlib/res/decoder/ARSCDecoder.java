@@ -249,8 +249,18 @@ public class ARSCDecoder {
         }
         ResResource res = new ResResource(mType, spec, value);
 
-        mType.addResource(res);
-        spec.addResource(res);
+        try {
+	    mType.addResource(res);
+	    spec.addResource(res);
+	} catch (AndrolibException e) {
+	    if (mKeepBroken) {
+		mType.addResource(res, true);
+		spec.addResource(res, true);
+		System.err.println("ignoring exception: " + e);
+	    } else {
+		throw e;
+	    }
+	}
         mPkg.addResource(res);
     }
 
