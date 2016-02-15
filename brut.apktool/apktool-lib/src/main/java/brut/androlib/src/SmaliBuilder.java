@@ -82,6 +82,7 @@ public class SmaliBuilder {
 
         StringBuilder out = new StringBuilder();
         List<String> lines = IOUtils.readLines(inStream);
+        inStream.close();
 
         if (! mDebug) {
             final String[] linesArray = lines.toArray(new String[0]);
@@ -107,9 +108,6 @@ public class SmaliBuilder {
                 out.append(line).append('\n');
             }
         }
-
-        inStream.close();
-
         try {
             if (!SmaliMod.assembleSmaliFile(out.toString(),dexBuilder, false, false, inFile)) {
                 throw new AndrolibException("Could not smali file: " + fileName);

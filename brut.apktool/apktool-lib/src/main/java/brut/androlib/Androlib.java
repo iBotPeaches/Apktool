@@ -628,7 +628,7 @@ public class Androlib {
             }
 
             ZipEntry newEntry = new ZipEntry(unknownFileInfo.getKey());
-            int method = Integer.valueOf(unknownFileInfo.getValue());
+            int method = Integer.parseInt(unknownFileInfo.getValue());
             LOGGER.fine(String.format("Copying unknown file %s with method %d", unknownFileInfo.getKey(), method));
             if (method == ZipEntry.STORED) {
                 newEntry.setMethod(ZipEntry.STORED);
