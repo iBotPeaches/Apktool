@@ -72,6 +72,7 @@ public class ApkDecoder {
 
     public void decode() throws AndrolibException, IOException, DirectoryException {
         File outDir = getOutDir();
+        AndrolibResources.sKeepBroken = mKeepBrokenResources;
 
         if (!mForceDelete && outDir.exists()) {
             throw new OutDirExistsException();
@@ -239,7 +240,6 @@ public class ApkDecoder {
                 throw new AndrolibException(
                         "Apk doesn't contain either AndroidManifest.xml file or resources.arsc file");
             }
-            AndrolibResources.sKeepBroken = mKeepBrokenResources;
             mResTable = mAndrolib.getResTable(mApkFile, hasResources);
         }
         return mResTable;
