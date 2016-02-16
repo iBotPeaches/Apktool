@@ -72,8 +72,7 @@ public class ApkDecoder {
 
     public void decode() throws AndrolibException, IOException, DirectoryException {
         File outDir = getOutDir();
-
-	AndrolibResources.sKeepBroken = mKeepBrokenResources;
+        AndrolibResources.sKeepBroken = mKeepBrokenResources;
 
         if (!mForceDelete && outDir.exists()) {
             throw new OutDirExistsException();

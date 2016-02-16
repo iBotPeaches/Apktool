@@ -250,17 +250,17 @@ public class ARSCDecoder {
         ResResource res = new ResResource(mType, spec, value);
 
         try {
-	    mType.addResource(res);
-	    spec.addResource(res);
-	} catch (AndrolibException e) {
-	    if (mKeepBroken) {
-		mType.addResource(res, true);
-		spec.addResource(res, true);
-		System.err.println("ignoring exception: " + e);
-	    } else {
-		throw e;
-	    }
-	}
+            mType.addResource(res);
+            spec.addResource(res);
+        } catch (AndrolibException ex) {
+            if (mKeepBroken) {
+                mType.addResource(res, true);
+                spec.addResource(res, true);
+                LOGGER.warning(String.format("Duplicate Resource Detected. Ignoring duplicate: %s", res.toString()));
+            } else {
+                throw ex;
+            }
+        }
         mPkg.addResource(res);
     }
 
