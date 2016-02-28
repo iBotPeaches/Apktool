@@ -128,10 +128,7 @@ public class ApkDecoder {
                     mAndrolib.decodeSourcesRaw(mApkFile, outDir, "classes.dex");
                     break;
                 case DECODE_SOURCES_SMALI:
-                    mAndrolib.decodeSourcesSmali(mApkFile, outDir, "classes.dex", mDebug, mDebugLinePrefix, mBakDeb, mApi);
-                    break;
-                case DECODE_SOURCES_JAVA:
-                    mAndrolib.decodeSourcesJava(mApkFile, outDir, mDebug);
+                    mAndrolib.decodeSourcesSmali(mApkFile, outDir, "classes.dex", mBakDeb, mApi);
                     break;
             }
         }
@@ -147,10 +144,7 @@ public class ApkDecoder {
                                 mAndrolib.decodeSourcesRaw(mApkFile, outDir, file);
                                 break;
                             case DECODE_SOURCES_SMALI:
-                                mAndrolib.decodeSourcesSmali(mApkFile, outDir, file, mDebug, mDebugLinePrefix, mBakDeb, mApi);
-                                break;
-                            case DECODE_SOURCES_JAVA:
-                                mAndrolib.decodeSourcesJava(mApkFile, outDir, mDebug);
+                                mAndrolib.decodeSourcesSmali(mApkFile, outDir, file, mBakDeb, mApi);
                                 break;
                         }
                     }
@@ -167,7 +161,7 @@ public class ApkDecoder {
     }
 
     public void setDecodeSources(short mode) throws AndrolibException {
-        if (mode != DECODE_SOURCES_NONE && mode != DECODE_SOURCES_SMALI && mode != DECODE_SOURCES_JAVA) {
+        if (mode != DECODE_SOURCES_NONE && mode != DECODE_SOURCES_SMALI) {
             throw new AndrolibException("Invalid decode sources mode: " + mode);
         }
         mDecodeSources = mode;
@@ -178,11 +172,6 @@ public class ApkDecoder {
             throw new AndrolibException("Invalid decode resources mode");
         }
         mDecodeResources = mode;
-    }
-
-    public void setDebugMode(boolean debug) {
-        LOGGER.warning("SmaliDebugging has been deprecated. It will be removed in Apktool 2.1 - https://github.com/iBotPeaches/Apktool/issues/1061");
-        mDebug = debug;
     }
 
     public void setAnalysisMode(boolean mode, boolean pass) throws AndrolibException{
@@ -206,10 +195,6 @@ public class ApkDecoder {
         if (sdkInfo.get("targetSdkVersion") != null) {
             mApi = Integer.parseInt(sdkInfo.get("targetSdkVersion"));
         }
-    }
-
-    public void setDebugLinePrefix(String debugLinePrefix) {
-        mDebugLinePrefix = debugLinePrefix;
     }
 
     public void setBaksmaliDebugMode(boolean bakdeb) {
@@ -288,7 +273,6 @@ public class ApkDecoder {
 
     public final static short DECODE_SOURCES_NONE = 0x0000;
     public final static short DECODE_SOURCES_SMALI = 0x0001;
-    public final static short DECODE_SOURCES_JAVA = 0x0002;
 
     public final static short DECODE_RESOURCES_NONE = 0x0100;
     public final static short DECODE_RESOURCES_FULL = 0x0101;
@@ -396,8 +380,6 @@ public class ApkDecoder {
     private ResTable mResTable;
     private short mDecodeSources = DECODE_SOURCES_SMALI;
     private short mDecodeResources = DECODE_RESOURCES_FULL;
-    private String mDebugLinePrefix = "a=0;// ";
-    private boolean mDebug = false;
     private boolean mForceDelete = false;
     private boolean mKeepBrokenResources = false;
     private boolean mBakDeb = true;

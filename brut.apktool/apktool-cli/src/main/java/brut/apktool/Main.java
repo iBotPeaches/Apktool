@@ -114,10 +114,8 @@ public class Main {
             decoder.setDecodeSources(ApkDecoder.DECODE_SOURCES_NONE);
         }
         if (cli.hasOption("d") || cli.hasOption("debug")) {
-            decoder.setDebugMode(true);
-        }
-        if (cli.hasOption("debug-line-prefix")) {
-            decoder.setDebugLinePrefix(cli.getOptionValue("debug-line-prefix"));
+            System.err.println("SmaliDebugging has been removed in 2.1.0 onward. Please see: https://github.com/iBotPeaches/Apktool/issues/1061");
+            System.exit(1);
         }
         if (cli.hasOption("b") || cli.hasOption("no-debug-info")) {
             decoder.setBaksmaliDebugMode(false);
@@ -201,7 +199,8 @@ public class Main {
             apkOptions.forceBuildAll = true;
         }
         if (cli.hasOption("d") || cli.hasOption("debug")) {
-            apkOptions.debugMode = true;
+            System.err.println("SmaliDebugging has been removed in 2.1.0 onward. Please see: https://github.com/iBotPeaches/Apktool/issues/1061");
+            System.exit(1);
         }
         if (cli.hasOption("v") || cli.hasOption("verbose")) {
             apkOptions.verbose = true;
@@ -273,18 +272,12 @@ public class Main {
                 .create("r");
 
         Option debugDecOption = OptionBuilder.withLongOpt("debug")
-                .withDescription("Decode in debug mode. Check project page for more info.")
+                .withDescription("REMOVED (DOES NOT WORK): Decode in debug mode.")
                 .create("d");
 
         Option analysisOption = OptionBuilder.withLongOpt("match-original")
                 .withDescription("Keeps files to closest to original as possible. Prevents rebuild.")
                 .create("m");
-
-        Option debugLinePrefix = OptionBuilder.withLongOpt("debug-line-prefix")
-                .withDescription("Smali line prefix when decoding in debug mode. Default is \"a=0;// \".")
-                .hasArg(true)
-                .withArgName("prefix")
-                .create();
 
         Option apiLevelOption = OptionBuilder.withLongOpt("api")
                 .withDescription("The numeric api-level of the file to generate, e.g. 14 for ICS.")
@@ -369,7 +362,6 @@ public class Main {
 
         // check for advance mode
         if (isAdvanceMode()) {
-            DecodeOptions.addOption(debugLinePrefix);
             DecodeOptions.addOption(debugDecOption);
             DecodeOptions.addOption(noDbgOption);
             DecodeOptions.addOption(keepResOption);
@@ -416,7 +408,6 @@ public class Main {
             allOptions.addOption((Option)op);
         }
         allOptions.addOption(analysisOption);
-        allOptions.addOption(debugLinePrefix);
         allOptions.addOption(debugDecOption);
         allOptions.addOption(noDbgOption);
         allOptions.addOption(keepResOption);

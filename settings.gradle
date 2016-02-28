@@ -1,10 +1,5 @@
 include 'brut.j.common',
         'brut.j.util',
         'brut.j.dir',
-        'brut.apktool.smali:util',
-        'brut.apktool.smali:dexlib2',
-        'brut.apktool.smali:baksmali',
-        'brut.apktool.smali:smali',
-        'brut.apktool.smali:dexlib2:accessorTestGenerator',
         'brut.apktool:apktool-lib',
         'brut.apktool:apktool-cli'

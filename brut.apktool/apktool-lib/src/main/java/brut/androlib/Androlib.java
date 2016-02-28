@@ -16,7 +16,6 @@
 
 package brut.androlib;
 
-import brut.androlib.java.AndrolibJava;
 import brut.androlib.meta.MetaInfo;
 import brut.androlib.meta.UsesFramework;
 import brut.androlib.res.AndrolibResources;
@@ -80,8 +79,8 @@ public class Androlib {
         }
     }
 
-    public void decodeSourcesSmali(File apkFile, File outDir, String filename, boolean debug, String debugLinePrefix,
-                                   boolean bakdeb, int api) throws AndrolibException {
+    public void decodeSourcesSmali(File apkFile, File outDir, String filename, boolean bakdeb, int api)
+            throws AndrolibException {
         try {
             File smaliDir;
             if (filename.equalsIgnoreCase("classes.dex")) {
@@ -92,16 +91,10 @@ public class Androlib {
             OS.rmdir(smaliDir);
             smaliDir.mkdirs();
             LOGGER.info("Baksmaling " + filename + "...");
-            SmaliDecoder.decode(apkFile, smaliDir, filename, debug, debugLinePrefix, bakdeb, api);
+            SmaliDecoder.decode(apkFile, smaliDir, filename, bakdeb, api);
         } catch (BrutException ex) {
             throw new AndrolibException(ex);
         }
-    }
-
-    public void decodeSourcesJava(ExtFile apkFile, File outDir, boolean debug)
-            throws AndrolibException {
-        LOGGER.info("Decoding Java sources...");
-        new AndrolibJava().decode(apkFile, outDir);
     }
 
     public void decodeManifestRaw(ExtFile apkFile, File outDir)
@@ -299,9 +292,7 @@ public class Androlib {
 
     public void buildSources(File appDir)
             throws AndrolibException {
-        if (!buildSourcesRaw(appDir, "classes.dex")
-                && !buildSourcesSmali(appDir, "smali", "classes.dex")
-                && !buildSourcesJava(appDir)) {
+        if (!buildSourcesRaw(appDir, "classes.dex") && !buildSourcesSmali(appDir, "smali", "classes.dex")) {
             LOGGER.warning("Could not find sources");
         }
     }
@@ -316,9 +307,7 @@ public class Androlib {
                 if (name.startsWith("smali_")) {
                     String filename = name.substring(name.indexOf("_") + 1) + ".dex";
 
-                    if (!buildSourcesRaw(appDir, filename)
-                            && !buildSourcesSmali(appDir, name, filename)
-                            && !buildSourcesJava(appDir)) {
+                    if (!buildSourcesRaw(appDir, filename) && !buildSourcesSmali(appDir, name, filename)) {
                         LOGGER.warning("Could not find sources");
                     }
                 }
@@ -372,25 +361,7 @@ public class Androlib {
         if (apkOptions.forceBuildAll || isModified(smaliDir, dex)) {
             LOGGER.info("Smaling " + folder + " folder into " + filename +"...");
             dex.delete();
-            SmaliBuilder.build(smaliDir, dex, apkOptions.debugMode);
-        }
-        return true;
-    }
-
-    public boolean buildSourcesJava(File appDir)
-            throws AndrolibException {
-        File javaDir = new File(appDir, "src");
-        if (!javaDir.exists()) {
-            return false;
-        }
-        File dex = new File(appDir, APK_DIRNAME + "/classes.dex");
-        if (! apkOptions.forceBuildAll) {
-            LOGGER.info("Checking whether sources has changed...");
-        }
-        if (apkOptions.forceBuildAll || isModified(javaDir, dex)) {
-            LOGGER.info("Building java sources...");
-            dex.delete();
-            new AndrolibJava().build(javaDir, dex);
+            SmaliBuilder.build(smaliDir, dex);
         }
         return true;
     }
@@ -486,10 +457,6 @@ public class Androlib {
             }
 
             File apkDir = new File(appDir, APK_DIRNAME);
-
-            if (apkOptions.debugMode) {
-                ResXmlPatcher.removeApplicationDebugTag(new File(apkDir,"AndroidManifest.xml"));
-            }
 
             if (apkOptions.forceBuildAll || isModified(newFiles(APK_MANIFEST_FILENAMES, appDir),
                     newFiles(APK_MANIFEST_FILENAMES, apkDir))) {

@@ -1,8 +1,6 @@
 env:
    - TERM=dumb
 language: java
-git:
-  submodules: false
 jdk:
   - openjdk7
   - oraclejdk7
@@ -21,9 +19,7 @@ before_install:
   - git config --global user.name "Travis CI Bot"
   - sudo apt-get update -qq
   - sudo apt-get install -qq libstdc++6:i386 lib32z1 expect
-  - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
   - git submodule update --init --recursive
-install: ./gradlew applyPatches
 script: ./gradlew build fatJar proguard
 branches:
   only:
