@@ -1,8 +1,6 @@
 env:
    - TERM=dumb
 language: java
-git:
-  submodules: false
 jdk:
   - openjdk7
   - oraclejdk7
@@ -22,7 +20,6 @@ before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -qq libstdc++6:i386 lib32z1 expect
   - git submodule update --init --recursive
-install: ./gradlew applyPatches
 script: ./gradlew build fatJar proguard
 branches:
   only:
