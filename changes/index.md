@@ -7,6 +7,7 @@ description: Apktool - Changelog / Roadmap
 ## v2.1.0 (in development)
 2016.xx.xx
 
+ * **Breaking** - Removes SmaliDebugging feature. ([Issue 1061](https://github.com/iBotPeaches/Apktool/issues/1061))
  * Fixed issue with non printable chars in unknown files. Thanks ihanson
  * Fixed issue when a non-compressed file has no extension. ([Issue 1122](https://github.com/iBotPeaches/Apktool/issues/1122)) / Thanks BurgerZ
  * Added ability for launched executables (`aapt`) to differentiate between output and error streams. Thanks BurgerZ
