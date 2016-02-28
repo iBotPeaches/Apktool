@@ -25,10 +25,6 @@ buildscript {
     }
 }
 
-plugins {
-    id 'net.minecrell.gitpatcher' version '0.7.1'
-}
-
 apply plugin: 'maven'
 apply from: 'gradle/functions.gradle'
 
@@ -78,20 +74,8 @@ build.doFirst {
     }
 }
 
-clean.doFirst {
-    delete "${rootDir}/brut.apktool.smali"
-    println "deleting ${rootDir}/brut.apktool.smali in favor of smali"
-    println "You will need to run applyPatches again, as they have been wiped."
-}
-
 // used for official releases only. Please don't use
 task release {
-}
-
-patches {
-    submodule = 'smali'
-    target = file('brut.apktool.smali')
-    patches = file('gradle/smali-patches')
 }
 
 subprojects {
@@ -103,6 +87,7 @@ subprojects {
         depends = [
                 antlr: 'org.antlr:antlr:3.5',
                 antlr_runtime: 'org.antlr:antlr-runtime:3.5',
+                baksmali: 'org.smali:baksmali:2.1.1',
                 commons_cli: 'commons-cli:commons-cli:1.2',
                 commons_io: 'commons-io:commons-io:2.4',
                 commons_lang: 'org.apache.commons:commons-lang3:3.1',
@@ -112,6 +97,7 @@ subprojects {
                 junit: 'junit:junit:4.6',
                 proguard_gradle: 'net.sf.proguard:proguard-gradle:5.2.1',
                 snakeyaml: 'org.yaml:snakeyaml:1.12',
+                smali: 'org.smali:smali:2.1.1',
                 xmlpull: 'xpp3:xpp3:1.1.4c',
                 xmlunit: 'xmlunit:xmlunit:1.3',
         ]

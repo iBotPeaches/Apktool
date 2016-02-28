@@ -205,6 +205,3 @@ released under the following license:
    See the License for the specific language governing permissions and
    limitations under the License.
 *******************************************************************************
-
-The sub project (brut.apktool.smali) is a clone of the smali project. Its
-license can be found at brut.apktool.smali/NOTICE-SMALI
