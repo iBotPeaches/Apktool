@@ -15,6 +15,7 @@ It is NOT intended for piracy and other non-legal uses. It could be used for loc
 
 #### Links
 - [Downloads](https://bitbucket.org/iBotPeaches/apktool/downloads)
+- [Downloads Mirror](http://connortumbleson.com/apktool/)
 - [How to Build](http://ibotpeaches.github.io/Apktool/build/)
 - [Documentation](http://ibotpeaches.github.io/Apktool/documentation/)
 - [Bug Reports](https://github.com/iBotPeaches/Apktool/issues)
