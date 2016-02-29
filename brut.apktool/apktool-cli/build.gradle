@@ -55,6 +55,8 @@ task proguard(type: proguard.gradle.ProGuardTask, dependsOn: fatJar) {
     keep 'public class brut.apktool.Main { public static void main(java.lang.String[]); }'
     keep 'class org.yaml.snakeyaml.** { public protected private *; }'
     keepclassmembers 'enum * { public static **[] values(); public static ** valueOf(java.lang.String); }'
+    dontwarn 'org.tukaani.xz.**'
+    dontwarn 'javax.crypto.**'
     dontwarn 'com.google.common.base.**'
     dontwarn 'com.google.common.collect.**'
     dontwarn 'com.google.common.util.**'

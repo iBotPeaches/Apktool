@@ -38,6 +38,9 @@ import brut.util.Duo;
 import brut.util.Jar;
 import brut.util.OS;
 import brut.util.OSDetection;
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
+import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.apache.commons.io.IOUtils;
 import org.xmlpull.v1.XmlSerializer;
 
@@ -45,8 +48,6 @@ import java.io.*;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.zip.CRC32;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 /**
@@ -589,10 +590,10 @@ final public class AndrolibResources {
     public void installFramework(File frameFile, String tag)
             throws AndrolibException {
         InputStream in = null;
-        ZipOutputStream out = null;
+        ZipArchiveOutputStream out = null;
         try {
             ZipFile zip = new ZipFile(frameFile);
-            ZipEntry entry = zip.getEntry("resources.arsc");
+            ZipArchiveEntry entry = zip.getEntry("resources.arsc");
 
             if (entry == null) {
                 throw new AndrolibException("Can't find resources.arsc file");
@@ -609,15 +610,17 @@ final public class AndrolibResources {
                     + (tag == null ? "" : '-' + tag)
                     + ".apk");
 
-            out = new ZipOutputStream(new FileOutputStream(outFile));
+            out = new ZipArchiveOutputStream(outFile);
             out.setMethod(ZipOutputStream.STORED);
             CRC32 crc = new CRC32();
             crc.update(data);
-            entry = new ZipEntry("resources.arsc");
+            entry = new ZipArchiveEntry("resources.arsc");
             entry.setSize(data.length);
             entry.setCrc(crc.getValue());
-            out.putNextEntry(entry);
+            out.putArchiveEntry(entry);
             out.write(data);
+
+            out.closeArchiveEntry();
             zip.close();
             LOGGER.info("Framework installed to: " + outFile);
         } catch (IOException ex) {
