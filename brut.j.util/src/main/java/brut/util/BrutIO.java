@@ -18,11 +18,10 @@ package brut.util;
 
 import java.io.*;
 import java.util.zip.CRC32;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipOutputStream;
-
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.compress.archivers.zip.ZipFile;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
@@ -73,7 +72,7 @@ public class BrutIO {
         return crc;
     }
 
-    public static void copy(File inputFile, ZipOutputStream outputFile) throws IOException {
+    public static void copy(File inputFile, ZipArchiveOutputStream outputFile) throws IOException {
         try (
                 FileInputStream fis = new FileInputStream(inputFile)
         ) {
@@ -81,7 +80,7 @@ public class BrutIO {
         }
     }
 
-    public static void copy(ZipFile inputFile, ZipOutputStream outputFile, ZipEntry entry) throws IOException {
+    public static void copy(ZipFile inputFile, ZipArchiveOutputStream outputFile, ZipArchiveEntry entry) throws IOException {
         try (
                 InputStream is = inputFile.getInputStream(entry)
         ) {

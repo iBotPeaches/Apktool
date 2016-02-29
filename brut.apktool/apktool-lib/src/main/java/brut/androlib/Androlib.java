@@ -35,10 +35,9 @@ import java.util.*;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.zip.CRC32;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipOutputStream;
-
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
+import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.apache.commons.io.FilenameUtils;
 
 /**
@@ -287,7 +286,11 @@ public class Androlib {
 
         // we must go after the Apk is built, and copy the files in via Zip
         // this is because Aapt won't add files it doesn't know (ex unknown files)
-        buildUnknownFiles(appDir, outFile, meta);
+        try {
+            buildUnknownFiles(appDir, outFile, meta);
+        } catch (IOException ex) {
+            throw new BrutException(ex);
+        }
     }
 
     public void buildSources(File appDir)
@@ -538,7 +541,7 @@ public class Androlib {
     }
 
     public void buildUnknownFiles(File appDir, File outFile, MetaInfo meta)
-            throws AndrolibException {
+            throws AndrolibException, IOException {
         if (meta.unknownFiles != null) {
             LOGGER.info("Copying unknown files/dir...");
 
@@ -549,41 +552,42 @@ public class Androlib {
                 throw new AndrolibException("Unable to rename temporary file");
             }
 
+            ZipFile inputFile = new ZipFile(tempFile);
             try (
-                    ZipFile inputFile = new ZipFile(tempFile);
-                    ZipOutputStream actualOutput = new ZipOutputStream(new FileOutputStream(outFile))
+                    ZipArchiveOutputStream actualOutput = new ZipArchiveOutputStream(outFile)
             ) {
                 copyExistingFiles(inputFile, actualOutput);
                 copyUnknownFiles(appDir, actualOutput, files);
             } catch (IOException ex) {
                 throw new AndrolibException(ex);
+            } finally {
+                inputFile.close();
+                tempFile.delete();
             }
-
-            // Remove our temporary file.
-            tempFile.delete();
         }
     }
 
-    private void copyExistingFiles(ZipFile inputFile, ZipOutputStream outputFile) throws IOException {
+    private void copyExistingFiles(ZipFile inputFile, ZipArchiveOutputStream outputFile) throws IOException {
         // First, copy the contents from the existing outFile:
-        Enumeration<? extends ZipEntry> entries = inputFile.entries();
+        Enumeration<? extends ZipArchiveEntry> entries = inputFile.getEntries();
         while (entries.hasMoreElements()) {
-            ZipEntry entry = new ZipEntry(entries.nextElement());
+            ZipArchiveEntry oldEntry = entries.nextElement();
+            ZipArchiveEntry entry = new ZipArchiveEntry(oldEntry);
 
             // We can't reuse the compressed size because it depends on compression sizes.
             entry.setCompressedSize(-1);
-            outputFile.putNextEntry(entry);
+            outputFile.putArchiveEntry(entry);
 
             // No need to create directory entries in the final apk
             if (! entry.isDirectory()) {
-                BrutIO.copy(inputFile, outputFile, entry);
+                BrutIO.copy(inputFile, outputFile, oldEntry);
             }
 
-            outputFile.closeEntry();
+            outputFile.closeArchiveEntry();
         }
     }
 
-    private void copyUnknownFiles(File appDir, ZipOutputStream outputFile, Map<String, String> files)
+    private void copyUnknownFiles(File appDir, ZipArchiveOutputStream outputFile, Map<String, String> files)
             throws IOException {
         File unknownFileDir = new File(appDir, UNK_DIRNAME);
 
@@ -594,23 +598,23 @@ public class Androlib {
                 continue;
             }
 
-            ZipEntry newEntry = new ZipEntry(unknownFileInfo.getKey());
+            ZipArchiveEntry newEntry = new ZipArchiveEntry(unknownFileInfo.getKey());
             int method = Integer.parseInt(unknownFileInfo.getValue());
             LOGGER.fine(String.format("Copying unknown file %s with method %d", unknownFileInfo.getKey(), method));
-            if (method == ZipEntry.STORED) {
-                newEntry.setMethod(ZipEntry.STORED);
+            if (method == ZipArchiveEntry.STORED) {
+                newEntry.setMethod(ZipArchiveEntry.STORED);
                 newEntry.setSize(inputFile.length());
                 newEntry.setCompressedSize(-1);
                 BufferedInputStream unknownFile = new BufferedInputStream(new FileInputStream(inputFile));
                 CRC32 crc = BrutIO.calculateCrc(unknownFile);
                 newEntry.setCrc(crc.getValue());
             } else {
-                newEntry.setMethod(ZipEntry.DEFLATED);
+                newEntry.setMethod(ZipArchiveEntry.DEFLATED);
             }
-            outputFile.putNextEntry(newEntry);
+            outputFile.putArchiveEntry(newEntry);
 
             BrutIO.copy(inputFile, outputFile);
-            outputFile.closeEntry();
+            outputFile.closeArchiveEntry();
         }
     }
 

@@ -24,7 +24,9 @@ import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
+
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipFile;
 
 public class ZipRODirectory extends AbstractDirectory {
     private ZipFile mZipFile;
@@ -73,7 +75,7 @@ public class ZipRODirectory extends AbstractDirectory {
     protected InputStream getFileInputLocal(String name)
             throws DirectoryException {
         try {
-            return getZipFile().getInputStream(new ZipEntry(getPath() + name));
+            return mZipFile.getInputStream(mZipFile.getEntry(getPath() + name));
         } catch (IOException e) {
             throw new PathNotExist(name, e);
         }
@@ -103,7 +105,7 @@ public class ZipRODirectory extends AbstractDirectory {
     @Override
     public int getCompressionLevel(String fileName)
             throws DirectoryException {
-        ZipEntry entry =  mZipFile.getEntry(fileName);
+        ZipArchiveEntry entry =  mZipFile.getEntry(fileName);
         if (entry == null) {
             throw new PathNotExist("Entry not found: " + fileName);
         }
@@ -115,7 +117,7 @@ public class ZipRODirectory extends AbstractDirectory {
         mDirs = new LinkedHashMap<String, AbstractDirectory>();
         
         int prefixLen = getPath().length();
-        Enumeration<? extends ZipEntry> entries = getZipFile().entries();
+        Enumeration<ZipArchiveEntry> entries = getZipFile().getEntries();
         while (entries.hasMoreElements()) {
             ZipEntry entry = entries.nextElement();
             String name = entry.getName();
