@@ -435,7 +435,7 @@ public class ARSCDecoder {
                 continue;
             }
 
-            ResResSpec spec = new ResResSpec(new ResID(resId | i), String.format("APKTOOL_DUMMY_%04x", i), mPkg, mTypeSpec);
+            ResResSpec spec = new ResResSpec(new ResID(resId | i), "APKTOOL_DUMMY_" + Integer.toHexString(i), mPkg, mTypeSpec);
 
             // If we already have this resID dont add it again.
             if (! mPkg.hasResSpec(new ResID(resId | i))) {
