@@ -17,6 +17,7 @@ description: Apktool - Changelog / Roadmap
  * Fixes issue when apk filename has trailing space. ([Issue 1145](https://github.com/iBotPeaches/Apktool/issues/1145)) / Thanks BurgerZ
  * Fixes issue that all digits were treated as string using `\ ###` trick. ([Issue 1130](https://github.com/iBotPeaches/Apktool/issues/1130))
  * Added additional feature to `--keep-broken-res` to ignore resource duplicates. ([Issue 1164](https://github.com/iBotPeaches/Apktool/pull/1164)) / Thanks crpalmer
+ * Performance enhancement - Stops using String.format() for `MISSING_RES_SPECS`. ([Issue 1186](https://github.com/iBotPeaches/Apktool/issues/1186)) / Thanks dnault
 
 ## v2.0.3
 2015.12.31
