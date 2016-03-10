@@ -18,7 +18,7 @@ description: Apktool - Changelog / Roadmap
  * Fixes issue that all digits were treated as string using `\ ###` trick. ([Issue 1130](https://github.com/iBotPeaches/Apktool/issues/1130))
  * Added additional feature to `--keep-broken-res` to ignore resource duplicates. ([Issue 1164](https://github.com/iBotPeaches/Apktool/pull/1164)) / Thanks crpalmer
  * Performance enhancement - Stops using String.format() for `MISSING_RES_SPECS`. ([Issue 1186](https://github.com/iBotPeaches/Apktool/issues/1186)) / Thanks dnault
-
+ * Added support for decoding `AndResGuard` apps. ([Issue 1170](https://github.com/iBotPeaches/Apktool/issues/1170))
 ## v2.0.3
 2015.12.31
 
