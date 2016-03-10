@@ -239,10 +239,13 @@ final public class AndrolibResources {
             out = new FileDirectory(outDir);
 
             inApk = apkFile.getDirectory();
+            out = out.createDir("res");
             if (inApk.containsDir("res")) {
                 in = inApk.getDir("res");
             }
-            out = out.createDir("res");
+            if (in == null && inApk.containsDir("r")) {
+                in = inApk.getDir("r");
+            }
         } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
         }

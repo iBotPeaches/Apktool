@@ -70,6 +70,9 @@ public class ResValueFactory {
         if (value.startsWith("res/")) {
             return new ResFileValue(value, rawValue);
         }
+        if (value.startsWith("r/")) { //AndroResGuard
+            return new ResFileValue(value, rawValue);
+        }
         return new ResStringValue(value, rawValue);
     }
 
