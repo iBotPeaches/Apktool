@@ -69,28 +69,10 @@ public class SmaliBuilder {
             } catch (IOException | RecognitionException ex) {
                 throw new AndrolibException(ex);
             }
-            return;
-        }
-        if (!fileName.endsWith(".java")) {
+        } else {
             LOGGER.warning("Unknown file type, ignoring: " + inFile);
-            return;
         }
-
-        StringBuilder out = new StringBuilder();
-        List<String> lines = IOUtils.readLines(inStream);
         inStream.close();
-
-        final String[] linesArray = lines.toArray(new String[0]);
-        for (int i = 1; i < linesArray.length - 1; i++) {
-            out.append(linesArray[i].split("//", 2)[1]).append('\n');
-        }
-        try {
-            if (!SmaliMod.assembleSmaliFile(out.toString(),dexBuilder, false, false, inFile)) {
-                throw new AndrolibException("Could not smali file: " + fileName);
-            }
-        } catch (IOException | RecognitionException ex) {
-            throw new AndrolibException(ex);
-        }
     }
 
     private final ExtFile mSmaliDir;
