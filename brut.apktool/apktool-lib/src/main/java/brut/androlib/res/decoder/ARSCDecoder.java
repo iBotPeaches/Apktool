@@ -23,7 +23,7 @@ import brut.androlib.res.data.value.*;
 import brut.util.Duo;
 import brut.androlib.res.data.ResTable;
 import brut.util.ExtDataInput;
-import com.mindprod.ledatastream.LEDataInputStream;
+import com.peterfranza.LittleEndianDataInputStream;
 import java.io.*;
 import java.math.BigInteger;
 import java.util.*;
@@ -61,7 +61,7 @@ public class ARSCDecoder {
             mCountIn = null;
             mFlagsOffsets = null;
         }
-        mIn = new ExtDataInput(new LEDataInputStream(arscStream));
+        mIn = new ExtDataInput(new LittleEndianDataInputStream(arscStream));
         mResTable = resTable;
         mKeepBroken = keepBroken;
     }
