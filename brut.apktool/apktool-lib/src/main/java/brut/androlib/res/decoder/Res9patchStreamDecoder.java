@@ -39,10 +39,9 @@ public class Res9patchStreamDecoder implements ResStreamDecoder {
             BufferedImage im = ImageIO.read(new ByteArrayInputStream(data));
             int w = im.getWidth(), h = im.getHeight();
 
-            ImageTypeSpecifier its = ImageTypeSpecifier.createFromRenderedImage( im );
-            BufferedImage im2 = its.createBufferedImage( w+2, h+2 );
+            BufferedImage im2 = new BufferedImage(w+2, h+2, BufferedImage.TYPE_INT_ARGB);
+            im2.createGraphics().drawImage(im, 1, 1, w, h, null);
 
-            im2.getRaster().setRect(1, 1, im.getRaster());
             NinePatch np = getNinePatch(data);
             drawHLine(im2, h + 1, np.padLeft + 1, w - np.padRight);
             drawVLine(im2, w + 1, np.padTop + 1, h - np.padBottom);
