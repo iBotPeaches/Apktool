@@ -19,6 +19,8 @@ description: Apktool - Changelog / Roadmap
  * Added additional feature to `--keep-broken-res` to ignore resource duplicates. ([Issue 1164](https://github.com/iBotPeaches/Apktool/pull/1164)) / Thanks crpalmer
  * Performance enhancement - Stops using String.format() for `MISSING_RES_SPECS`. ([Issue 1186](https://github.com/iBotPeaches/Apktool/issues/1186)) / Thanks dnault
  * Added support for decoding `AndResGuard` apps. ([Issue 1170](https://github.com/iBotPeaches/Apktool/issues/1170))
+ * Removed LittleEndianReader in favor for a public domain one. ([Issue 1166](https://github.com/iBotPeaches/Apktool/issues/1166)) / Thanks chirayudesai
+
 ## v2.0.3
 2015.12.31
 
