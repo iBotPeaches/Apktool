@@ -18,9 +18,16 @@ before_install:
   - git config --global user.email "travis@connortumbleson.com"
   - git config --global user.name "Travis CI Bot"
   - sudo apt-get update -qq
-  - sudo apt-get install -qq libstdc++6:i386 lib32z1 expect
+  - sudo apt-get install -qq libstdc++6:i386 lib32z1 expect wget unzip
   - git submodule update --init --recursive
-script: ./gradlew build fatJar proguard
+script:
+  - ./gradlew build fatJar proguard
+  - java -jar build/libs/Apktool.jar --version
+  - wget --continue https://dl.google.com/android/repository/build-tools_r23.0.1-linux.zip
+  - unzip build-tools_r23.0.1-linux.zip
+  - export PATH="`pwd`/android-6.0:$PATH"
+  - wget https://s3.amazonaws.com/public-mas-origin/Amazon_Appstore-release.apk
+  - java -jar build/libs/Apktool.jar decode Amazon_Appstore-release.apk
 branches:
   only:
     - master
