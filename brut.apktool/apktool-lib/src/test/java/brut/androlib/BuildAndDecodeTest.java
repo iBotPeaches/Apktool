@@ -20,6 +20,8 @@ import brut.androlib.res.util.ExtFile;
 import brut.common.BrutException;
 import brut.directory.FileDirectory;
 import brut.util.OS;
+
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.Map;
 import java.util.Set;
@@ -29,6 +31,8 @@ import org.custommonkey.xmlunit.*;
 import org.junit.*;
 import static org.junit.Assert.*;
 import org.xml.sax.SAXException;
+
+import javax.imageio.ImageIO;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
@@ -307,6 +311,27 @@ public class BuildAndDecodeTest {
     @Test
     public void drawableXhdpiTest() throws BrutException, IOException {
         compareResFolder("drawable-xhdpi");
+    }
+
+    @Test
+    public void ninePatchImageColorTest() throws BrutException, IOException {
+        char slash = File.separatorChar;
+        String location = slash + "res" + slash + "drawable-xhdpi" + slash;
+
+        File control = new File((sTestOrigDir + location), "9patch.9.png");
+        File test =  new File((sTestNewDir + location), "9patch.9.png");
+
+        BufferedImage controlImage = ImageIO.read(control);
+        BufferedImage testImage = ImageIO.read(test);
+
+        // lets start with 0,0 - empty
+        assertEquals(controlImage.getRGB(0, 0), testImage.getRGB(0, 0));
+
+        // then with 30, 0 - black
+        assertEquals(controlImage.getRGB(30, 0), testImage.getRGB(30, 0));
+
+        // then 30, 30 - blue
+        assertEquals(controlImage.getRGB(30, 30), testImage.getRGB(30, 30));
     }
 
     @Test
