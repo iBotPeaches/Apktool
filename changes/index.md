@@ -20,6 +20,7 @@ description: Apktool - Changelog / Roadmap
  * Performance enhancement - Stops using String.format() for `MISSING_RES_SPECS`. ([Issue 1186](https://github.com/iBotPeaches/Apktool/issues/1186)) / Thanks dnault
  * Added support for decoding `AndResGuard` apps. ([Issue 1170](https://github.com/iBotPeaches/Apktool/issues/1170))
  * Removed LittleEndianReader in favor for a public domain one. ([Issue 1166](https://github.com/iBotPeaches/Apktool/issues/1166)) / Thanks chirayudesai
+ * Adapt 9patch decoder to handle any format (Color Table, RGB, RGBA, Gray, GrayAlpha). ([Issue 1180](https://github.com/iBotPeaches/Apktool/issues/1180)) / Thanks mattsarett
 
 ## v2.0.3
 2015.12.31
