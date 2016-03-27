@@ -1,4 +1,4 @@
-<strong>SmaliDebugging has been marked as deprecated in 2.0.3, and will be removed in 2.1. Alternative tool(s) will be linked on 2.1 release.</strong>
+<span class="label label-danger lb">Warning</span>SmaliDebugging has been marked as deprecated in 2.0.3, and removed in 2.1. Please check <a href="#">SmaliIdea</a> for a debugger.</strong>
 <br /><br />
 Apktool makes possible to debug smali code step by step, watch variables, set breakpoints, etc.
 
