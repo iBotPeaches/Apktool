@@ -28,8 +28,8 @@ buildscript {
 apply plugin: 'maven'
 apply from: 'gradle/functions.gradle'
 
-def apktoolversion_major = '2.1.0'
-def apktoolversion_minor = '';
+def apktoolversion_major = '2.1.1'
+def apktoolversion_minor = 'SNAPSHOT';
 
 defaultTasks 'build', 'fatJar', 'proguard'
 
