@@ -104,6 +104,9 @@ public class ResTable {
         if (pkg != null) {
             return pkg;
         } else {
+            if (mMainPackages.size() == 1) {
+                return mMainPackages.iterator().next();
+            }
             return getHighestSpecPackage();
         }
     }
