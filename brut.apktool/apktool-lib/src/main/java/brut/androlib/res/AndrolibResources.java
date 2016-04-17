@@ -621,6 +621,15 @@ final public class AndrolibResources {
             entry.setCrc(crc.getValue());
             out.putNextEntry(entry);
             out.write(data);
+            out.closeEntry();
+            
+            //Write fake AndroidManifest.xml file to support original aapt
+            byte[] manifest = createAndroidManifestFileData();
+            entry = createAndroidManifestEntry(manifest);
+            out.putNextEntry(entry);
+            out.write(data);
+            out.closeEntry();
+
             zip.close();
             LOGGER.info("Framework installed to: " + outFile);
         } catch (IOException ex) {
@@ -629,6 +638,26 @@ final public class AndrolibResources {
             IOUtils.closeQuietly(in);
             IOUtils.closeQuietly(out);
         }
+    }
+    
+    private ZipEntry createAndroidManifestEntry(byte[] data) throws IOException {
+        ZipEntry entry = new ZipEntry("AndroidManifest.xml");
+        CRC32 crc = new CRC32();
+        crc.update(data);
+        entry.setSize(data.length);
+        entry.setCrc(crc.getValue());
+        return entry;
+    }
+
+    private byte[] createAndroidManifestFileData() throws IOException {
+        File temp = File.createTempFile("AndroidManifest", ".tmp");
+        BufferedWriter bw = new BufferedWriter(new FileWriter(temp));
+        bw.write("AndroidManifest.xml for official aapt");
+        bw.close();
+        InputStream in = new FileInputStream(temp);
+        byte[] data = IOUtils.toByteArray(in);
+        in.close();
+        return data;
     }
 
     public void publicizeResources(File arscFile) throws AndrolibException {
