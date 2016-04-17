@@ -199,8 +199,8 @@ public class Main {
             apkOptions.forceBuildAll = true;
         }
         if (cli.hasOption("d") || cli.hasOption("debug")) {
-            System.err.println("SmaliDebugging has been removed in 2.1.0 onward. Please see: https://github.com/iBotPeaches/Apktool/issues/1061");
-            System.exit(1);
+            System.out.println("SmaliDebugging has been removed in 2.1.0 onward. Please see: https://github.com/iBotPeaches/Apktool/issues/1061");
+            apkOptions.debugMode = true;
         }
         if (cli.hasOption("v") || cli.hasOption("verbose")) {
             apkOptions.verbose = true;
@@ -286,7 +286,7 @@ public class Main {
                 .create();
 
         Option debugBuiOption = OptionBuilder.withLongOpt("debug")
-                .withDescription("Builds in debug mode. Check project page for more info.")
+                .withDescription("Sets android:debuggable to \"true\" in the APK's compiled manifest")
                 .create("d");
 
         Option noDbgOption = OptionBuilder.withLongOpt("no-debug-info")
