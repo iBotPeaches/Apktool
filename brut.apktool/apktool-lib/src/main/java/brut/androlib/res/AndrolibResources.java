@@ -627,7 +627,7 @@ final public class AndrolibResources {
             byte[] manifest = createAndroidManifestFileData();
             entry = createAndroidManifestEntry(manifest);
             out.putNextEntry(entry);
-            out.write(data);
+            out.write(manifest);
             out.closeEntry();
 
             zip.close();
