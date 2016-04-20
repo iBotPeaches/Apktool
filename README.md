@@ -1,7 +1,7 @@
 ### Apktool
 **This is the repository for Apktool. If you are looking for the Apktool website. Click [here](https://github.com/iBotPeaches/Apktool/tree/gh-pages).**
 
-
+[![Join the chat at https://gitter.im/iBotPeaches/Apktool](https://badges.gitter.im/iBotPeaches/Apktool.svg)](https://gitter.im/iBotPeaches/Apktool?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build Status](https://travis-ci.org/iBotPeaches/Apktool.svg?branch=master)](https://travis-ci.org/iBotPeaches/Apktool)
 [![Software License](https://img.shields.io/badge/license-Apache%202.0-brightgreen.svg)](https://github.com/iBotPeaches/Apktool/blob/master/LICENSE)
 
@@ -19,6 +19,7 @@ It is NOT intended for piracy and other non-legal uses. It could be used for loc
 - [How to Build](http://ibotpeaches.github.io/Apktool/build/)
 - [Documentation](http://ibotpeaches.github.io/Apktool/documentation/)
 - [Bug Reports](https://github.com/iBotPeaches/Apktool/issues)
+- [Chat on Gitter](https://gitter.im/iBotPeaches/Apktool)
 - [Changelog/Information](http://ibotpeaches.github.io/Apktool/changes/)
 - [XDA Post](http://forum.xda-developers.com/showthread.php?p=28366939)
 - [Source (Github)](https://github.com/iBotPeaches/Apktool)
