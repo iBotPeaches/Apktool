@@ -21,6 +21,7 @@ public class ApkOptions {
     public boolean forceBuildAll = false;
     public boolean verbose = false;
     public boolean copyOriginalFiles = false;
+    public boolean keepMetaInf = false;
     public boolean updateFiles = false;
     public boolean isFramework = false;
     public boolean resourcesAreCompressed = false;

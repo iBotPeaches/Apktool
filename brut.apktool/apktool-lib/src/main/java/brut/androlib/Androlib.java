@@ -283,6 +283,7 @@ public class Androlib {
         buildLib(appDir);
         buildLibs(appDir);
         buildCopyOriginalFiles(appDir);
+        buildCopyMetaInfFiles(appDir);
         buildApk(appDir, outFile);
 
         // we must go after the Apk is built, and copy the files in via Zip
@@ -528,6 +529,24 @@ public class Androlib {
                     }
                     if (in.containsDir("META-INF")) {
                         LOGGER.info("Copy META-INF...");
+                        in.copyToDir(new File(appDir, APK_DIRNAME), "META-INF");
+                    }
+                } catch (DirectoryException ex) {
+                    throw new AndrolibException(ex);
+                }
+            }
+        }
+    }
+
+    public void buildCopyMetaInfFiles(File appDir)
+            throws AndrolibException {
+        if (apkOptions.keepMetaInf) {
+            File originalDir = new File(appDir, "original");
+            if(originalDir.exists()) {
+                try {
+                    LOGGER.info("Copy META-INF files...");
+                    Directory in = (new ExtFile(originalDir)).getDirectory();
+                    if (in.containsDir("META-INF")) {
                         in.copyToDir(new File(appDir, APK_DIRNAME), "META-INF");
                     }
                 } catch (DirectoryException ex) {

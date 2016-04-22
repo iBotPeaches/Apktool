@@ -211,6 +211,9 @@ public class Main {
         if (cli.hasOption("c") || cli.hasOption("copy-original")) {
             apkOptions.copyOriginalFiles = true;
         }
+        if (cli.hasOption("k") || cli.hasOption("keep-meta")) {
+            apkOptions.keepMetaInf = true;
+        }
         if (cli.hasOption("p") || cli.hasOption("frame-path")) {
             apkOptions.frameworkFolderLocation = cli.getOptionValue("p");
         }
@@ -336,6 +339,10 @@ public class Main {
                 .withDescription("Copies original AndroidManifest.xml and META-INF. See project page for more info.")
                 .create("c");
 
+        Option keepMetaInfOption = OptionBuilder.withLongOpt("keep-meta")
+                .withDescription("Copies original META-INF. See project page for more info.")
+                .create("k");
+
         Option tagOption = OptionBuilder.withLongOpt("tag")
                 .withDescription("Tag frameworks using <tag>.")
                 .hasArg(true)
@@ -371,6 +378,7 @@ public class Main {
             BuildOptions.addOption(debugBuiOption);
             BuildOptions.addOption(aaptOption);
             BuildOptions.addOption(originalOption);
+            BuildOptions.addOption(keepMetaInfOption);
         }
 
         // add global options
@@ -414,6 +422,7 @@ public class Main {
         allOptions.addOption(debugBuiOption);
         allOptions.addOption(aaptOption);
         allOptions.addOption(originalOption);
+        allOptions.addOption(keepMetaInfOption);
         allOptions.addOption(verboseOption);
         allOptions.addOption(quietOption);
     }
