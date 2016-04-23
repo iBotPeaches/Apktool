@@ -1,2 +1,2 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="brut.apktool.testapp" xmlns:android="http://schemas.android.com/apk/res/android" platformBuildVersionCode="20" platformBuildVersionName="4.4W.2-1537038" />
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="brut.apktool.testapp" platformBuildVersionCode="23" platformBuildVersionName="6.0-2438415"/>
