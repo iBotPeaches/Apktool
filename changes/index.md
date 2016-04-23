@@ -8,6 +8,7 @@ description: Apktool - Changelog / Roadmap
 2016.xx.xx
 
  * Fixed issue where APK would identify as wrong `packageId` ([Issue 1220](https://github.com/iBotPeaches/Apktool/issues/1220))
+ * Include the `AndroidManifest.xml` file from the framework being installed to satisfy default aapt. ([Issue 1224](https://github.com/iBotPeaches/Apktool/issues/1224))
 
 ## v2.1.0
 2016.03.27
