@@ -621,6 +621,23 @@ final public class AndrolibResources {
             entry.setCrc(crc.getValue());
             out.putNextEntry(entry);
             out.write(data);
+            out.closeEntry();
+            
+            //Write fake AndroidManifest.xml file to support original aapt
+            entry = zip.getEntry("AndroidManifest.xml");
+            if (entry != null) {
+                in = zip.getInputStream(entry);
+                byte[] manifest = IOUtils.toByteArray(in);
+                CRC32 manifestCrc = new CRC32();
+                manifestCrc.update(manifest);
+                entry.setSize(manifest.length);
+                entry.setCompressedSize(-1);
+                entry.setCrc(manifestCrc.getValue());
+                out.putNextEntry(entry);
+                out.write(manifest);
+                out.closeEntry();
+            }
+
             zip.close();
             LOGGER.info("Framework installed to: " + outFile);
         } catch (IOException ex) {
