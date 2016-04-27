@@ -25,6 +25,8 @@ import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
+
+import brut.util.OS;
 import org.custommonkey.xmlunit.ElementQualifier;
 import org.w3c.dom.Element;
 import org.xmlpull.v1.*;
@@ -114,6 +116,30 @@ public abstract class TestUtils {
             }
             DirUtil.copyToDir(new FileDirectory(jarPath), out);
         }
+    }
+
+    /**
+     *
+     * @throws AndrolibException
+     * @throws BrutException
+     */
+    public static void cleanFrameworkFile() throws AndrolibException, BrutException {
+        File framework = new File(getFrameworkDir(), "1.apk");
+
+        if (Files.exists(framework.toPath())) {
+            OS.rmfile(framework.getAbsolutePath());
+        }
+    }
+
+    /**
+     *
+     * @return File
+     * @throws AndrolibException
+     */
+    public static File getFrameworkDir() throws AndrolibException {
+        AndrolibResources androlibResources = new AndrolibResources();
+        androlibResources.apkOptions = new ApkOptions();
+        return androlibResources.getFrameworkDir();
     }
 
     public static class ResValueElementQualifier implements ElementQualifier {

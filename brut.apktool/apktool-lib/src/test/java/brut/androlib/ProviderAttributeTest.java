@@ -36,6 +36,7 @@ public class ProviderAttributeTest {
 
     @BeforeClass
     public static void beforeClass() throws BrutException {
+        TestUtils.cleanFrameworkFile();
         sTmpDir = new ExtFile(OS.createTempDirectory());
         TestUtils.copyResourceDir(ProviderAttributeTest.class, "brut/apktool/issue636/", sTmpDir);
     }

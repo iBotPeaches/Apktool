@@ -36,6 +36,7 @@ public class LargeIntsInManifestTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception, BrutException {
+        TestUtils.cleanFrameworkFile();
         sTmpDir = new ExtFile(OS.createTempDirectory());
         TestUtils.copyResourceDir(LargeIntsInManifestTest.class, "brut/apktool/issue767/", sTmpDir);
     }

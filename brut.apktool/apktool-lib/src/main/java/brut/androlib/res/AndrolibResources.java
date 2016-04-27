@@ -677,7 +677,7 @@ final public class AndrolibResources {
         }
     }
 
-    private File getFrameworkDir() throws AndrolibException {
+    public File getFrameworkDir() throws AndrolibException {
         if (mFrameworkDirectory != null) {
             return mFrameworkDirectory;
         }

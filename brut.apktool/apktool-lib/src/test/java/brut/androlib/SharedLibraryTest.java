@@ -35,6 +35,7 @@ public class SharedLibraryTest {
 
     @BeforeClass
     public static void beforeClass() throws BrutException {
+        TestUtils.cleanFrameworkFile();
         sTmpDir = new ExtFile(OS.createTempDirectory());
         TestUtils.copyResourceDir(SharedLibraryTest.class, "brut/apktool/shared_libraries/", sTmpDir);
     }

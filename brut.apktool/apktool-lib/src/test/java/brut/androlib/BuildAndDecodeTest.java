@@ -41,6 +41,8 @@ public class BuildAndDecodeTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception, BrutException {
+        TestUtils.cleanFrameworkFile();
+
         sTmpDir = new ExtFile(OS.createTempDirectory());
         sTestOrigDir = new ExtFile(sTmpDir, "testapp-orig");
         sTestNewDir = new ExtFile(sTmpDir, "testapp-new");

@@ -30,6 +30,7 @@ public class AndResGuardTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception, BrutException {
+        TestUtils.cleanFrameworkFile();
         sTmpDir = new ExtFile(OS.createTempDirectory());
         TestUtils.copyResourceDir(LargeIntsInManifestTest.class, "brut/apktool/issue1170/", sTmpDir);
     }
