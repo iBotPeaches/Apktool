@@ -22,10 +22,12 @@ import brut.androlib.err.UndefinedResObject;
 import brut.androlib.meta.MetaInfo;
 import brut.androlib.meta.PackageInfo;
 import brut.androlib.meta.UsesFramework;
+import brut.androlib.meta.VersionInfo;
 import brut.androlib.res.AndrolibResources;
 import brut.androlib.res.data.ResPackage;
 import brut.androlib.res.data.ResTable;
 import brut.androlib.res.util.ExtFile;
+import brut.androlib.res.xml.ResXmlPatcher;
 import brut.common.BrutException;
 import brut.directory.DirectoryException;
 import brut.util.OS;
@@ -354,7 +356,12 @@ public class ApkDecoder {
     }
 
     private void putVersionInfo(MetaInfo meta) throws AndrolibException {
-        meta.versionInfo = getResTable().getVersionInfo();
+        VersionInfo info = getResTable().getVersionInfo();
+        String refValue = ResXmlPatcher.pullValueFromStrings(mOutDir, info.versionName);
+        if (refValue != null) {
+            info.versionName = refValue;
+        }
+        meta.versionInfo = info;
     }
 
     private void putUnknownInfo(MetaInfo meta) throws AndrolibException {
