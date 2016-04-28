@@ -159,4 +159,8 @@ public abstract class TestUtils {
             return controlType.equals(testType) && control.getAttribute("name").equals(test.getAttribute("name"));
         }
     }
+
+    public static String replaceNewlines(String value) {
+        return value.replace("\n", "").replace("\r", "");
+    }
 }

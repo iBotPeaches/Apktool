@@ -409,6 +409,10 @@ public class Androlib {
                     newFiles(APK_RESOURCES_FILENAMES, apkDir))) {
                 LOGGER.info("Building resources...");
 
+                if (apkOptions.debugMode) {
+                    ResXmlPatcher.removeApplicationDebugTag(new File(appDir, "AndroidManifest.xml"));
+                }
+
                 File apkFile = File.createTempFile("APKTOOL", null);
                 apkFile.delete();
 
@@ -476,7 +480,6 @@ public class Androlib {
 
                 Directory tmpDir = new ExtFile(apkFile).getDirectory();
                 tmpDir.copyToDir(apkDir, APK_MANIFEST_FILENAMES);
-
             }
             return true;
         } catch (IOException | DirectoryException ex) {

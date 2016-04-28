@@ -40,6 +40,35 @@ import java.io.IOException;
  * @author Connor Tumbleson <connor.tumbleson@gmail.com>
  */
 public final class ResXmlPatcher {
+
+    /**
+     * Removes "debug" tag from file
+     *
+     * @param file AndroidManifest file
+     * @throws AndrolibException
+     */
+    public static void removeApplicationDebugTag(File file) throws AndrolibException {
+        if (file.exists()) {
+            try {
+                Document doc = loadDocument(file);
+                Node application = doc.getElementsByTagName("application").item(0);
+
+                // load attr
+                NamedNodeMap attr = application.getAttributes();
+                Node debugAttr = attr.getNamedItem("android:debuggable");
+
+                // remove application:debuggable
+                if (debugAttr != null) {
+                    attr.removeNamedItem("android:debuggable");
+                }
+
+                saveDocument(file, doc);
+
+            } catch (SAXException | ParserConfigurationException | IOException | TransformerException ignored) {
+            }
+        }
+    }
+
     /**
      * Any @string reference in a <provider> value in AndroidManifest.xml will break on
      * build, thus preventing the application from installing. This is from a bug/error

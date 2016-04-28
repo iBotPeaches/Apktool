@@ -66,7 +66,7 @@ public class ProviderAttributeTest {
         apkDecoder.setOutDir(new File(sTmpDir + File.separator + apk + ".out.two"));
         apkDecoder.decode();
 
-        String expected = replaceNewlines("<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"no\"?>\n" +
+        String expected = TestUtils.replaceNewlines("<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"no\"?>\n" +
                 "<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\" package=\"com.ibotpeaches.issue636\" platformBuildVersionCode=\"23\" platformBuildVersionName=\"6.0-2438415\">\n" +
                 "    <application android:allowBackup=\"true\" android:debuggable=\"true\" android:icon=\"@mipmap/ic_launcher\" android:label=\"@string/app_name\" android:theme=\"@style/AppTheme\">\n" +
                 "        <provider android:authorities=\"com.ibotpeaches.issue636.Provider\" android:exported=\"false\" android:grantUriPermissions=\"true\" android:label=\"@string/app_name\" android:multiprocess=\"false\" android:name=\"com.ibotpeaches.issue636.Provider\"/>\n" +
@@ -76,16 +76,12 @@ public class ProviderAttributeTest {
 
 
         byte[] encoded = Files.readAllBytes(Paths.get(sTmpDir + File.separator + apk + ".out.two" + File.separator + "AndroidManifest.xml"));
-        String obtained = replaceNewlines(new String(encoded));
+        String obtained = TestUtils.replaceNewlines(new String(encoded));
         assertEquals(expected, obtained);
     }
 
     private boolean fileExists(String filepath) {
         return Files.exists(Paths.get(sTmpDir.getAbsolutePath() + File.separator + filepath));
-    }
-
-    private String replaceNewlines(String value) {
-        return value.replace("\n", "").replace("\r", "");
     }
 
     private static ExtFile sTmpDir;
