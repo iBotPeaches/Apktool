@@ -10,6 +10,7 @@ description: Apktool - Changelog / Roadmap
  * Fixed issue where APK would identify as wrong `packageId` ([Issue 1220](https://github.com/iBotPeaches/Apktool/issues/1220))
  * Include the `AndroidManifest.xml` file from the framework being installed to satisfy default aapt. ([Issue 1224](https://github.com/iBotPeaches/Apktool/issues/1224))
  * Restore `-d / --debug-mode` to simply change `android:debuggable` in `AndroidManifest.xml`. ([Issue 1235](https://github.com/iBotPeaches/Apktool/issues/1235)) / THanks Benjamin-Dobell
+ * Insert literal `versionName` if it is a reference to satisfy `aapt`. ([Issue 1234](https://github.com/iBotPeaches/Apktool/issues/1234)) / Thanks padlar
 
 ## v2.1.0
 2016.03.27
