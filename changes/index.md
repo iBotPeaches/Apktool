@@ -12,6 +12,7 @@ description: Apktool - Changelog / Roadmap
  * Restore `-d / --debug-mode` to simply change `android:debuggable` in `AndroidManifest.xml`. ([Issue 1235](https://github.com/iBotPeaches/Apktool/issues/1235)) / THanks Benjamin-Dobell
  * Insert literal `versionName` if it is a reference to satisfy `aapt`. ([Issue 1234](https://github.com/iBotPeaches/Apktool/issues/1234)) / Thanks padlar
  * Fix Samsung apks that have an unknown 4 bytes. ([Issue 1131](https://github.com/iBotPeaches/Apktool/issues/1131))
+
 ## v2.1.0
 2016.03.27
 
