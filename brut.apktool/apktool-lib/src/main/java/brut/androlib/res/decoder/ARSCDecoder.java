@@ -54,11 +54,10 @@ public class ARSCDecoder {
     }
 
     private ARSCDecoder(InputStream arscStream, ResTable resTable, boolean storeFlagsOffsets, boolean keepBroken) {
+        arscStream = mCountIn = new CountingInputStream(arscStream);
         if (storeFlagsOffsets) {
-            arscStream = mCountIn = new CountingInputStream(arscStream);
             mFlagsOffsets = new ArrayList<FlagsOffset>();
         } else {
-            mCountIn = null;
             mFlagsOffsets = null;
         }
         mIn = new ExtDataInput(new LittleEndianDataInputStream(arscStream));
@@ -186,12 +185,18 @@ public class ARSCDecoder {
 
         /* res0, res1 */mIn.skipBytes(3);
         int entryCount = mIn.readInt();
-        /* entriesStart */mIn.skipInt();
-
+        int entriesStart = mIn.readInt();
         mMissingResSpecs = new boolean[entryCount];
         Arrays.fill(mMissingResSpecs, true);
 
         ResConfigFlags flags = readConfigFlags();
+        int position = (mHeader.startPosition + entriesStart) - (entryCount * 4);
+
+        // For some APKs there is a disconnect between the reported size of Configs
+        // If we find a mismatch skip those bytes.
+        if (position != mCountIn.getCount()) {
+            mIn.skipBytes(position - mCountIn.getCount());
+        }
         int[] entryOffsets = mIn.readIntArray(entryCount);
 
         if (flags.isInvalid) {
@@ -217,7 +222,10 @@ public class ARSCDecoder {
     }
 
     private void readEntry() throws IOException, AndrolibException {
-		/* size */mIn.skipBytes(2);
+        short size = mIn.readShort();
+        if (size < 0) {
+            throw new AndrolibException("Entry size is under 0 bytes.");
+        }
         short flags = mIn.readShort();
         int specNamesId = mIn.readInt();
 
@@ -464,7 +472,7 @@ public class ARSCDecoder {
     }
 
     private Header nextChunk() throws IOException {
-        return mHeader = Header.read(mIn);
+        return mHeader = Header.read(mIn, mCountIn);
     }
 
     private void checkChunkType(int expectedType) throws AndrolibException {
@@ -502,21 +510,26 @@ public class ARSCDecoder {
         public final short type;
         public final int headerSize;
         public final int chunkSize;
+        public final int startPosition;
+        public final int endPosition;
 
-        public Header(short type, int headerSize, int chunkSize) {
+        public Header(short type, int headerSize, int chunkSize, int headerStart) {
             this.type = type;
             this.headerSize = headerSize;
             this.chunkSize = chunkSize;
+            this.startPosition = headerStart;
+            this.endPosition = headerStart + chunkSize;
         }
 
-        public static Header read(ExtDataInput in) throws IOException {
+        public static Header read(ExtDataInput in, CountingInputStream countIn) throws IOException {
             short type;
+            int start = countIn.getCount();
             try {
                 type = in.readShort();
             } catch (EOFException ex) {
-                return new Header(TYPE_NONE, 0, 0);
+                return new Header(TYPE_NONE, 0, 0, countIn.getCount());
             }
-            return new Header(type, in.readShort(), in.readInt());
+            return new Header(type, in.readShort(), in.readInt(), start);
         }
 
         public final static short TYPE_NONE = -1, TYPE_TABLE = 0x0002,
