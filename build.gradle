@@ -29,7 +29,7 @@ apply plugin: 'maven'
 apply from: 'gradle/functions.gradle'
 
 def apktoolversion_major = '2.1.1'
-def apktoolversion_minor = 'SNAPSHOT';
+def apktoolversion_minor = '';
 
 defaultTasks 'build', 'fatJar', 'proguard'
 
