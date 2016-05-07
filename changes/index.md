@@ -4,12 +4,12 @@ title: Apktool - Changelog
 description: Apktool - Changelog / Roadmap
 ---
 
-## v2.1.1 (in development)
-2016.xx.xx
+## v2.1.1
+2016.05.07
 
  * Fixed issue where APK would identify as wrong `packageId` ([Issue 1220](https://github.com/iBotPeaches/Apktool/issues/1220))
- * Include the `AndroidManifest.xml` file from the framework being installed to satisfy default aapt. ([Issue 1224](https://github.com/iBotPeaches/Apktool/issues/1224))
- * Restore `-d / --debug-mode` to simply change `android:debuggable` in `AndroidManifest.xml`. ([Issue 1235](https://github.com/iBotPeaches/Apktool/issues/1235)) / THanks Benjamin-Dobell
+ * Include the `AndroidManifest.xml` file from the framework being installed to satisfy default aapt. ([Issue 1224](https://github.com/iBotPeaches/Apktool/issues/1224)) / Thanks BurgerZ
+ * Restore `-d / --debug-mode` to simply change `android:debuggable` in `AndroidManifest.xml`. ([Issue 1235](https://github.com/iBotPeaches/Apktool/issues/1235)) / Thanks Benjamin-Dobell
  * Insert literal `versionName` if it is a reference to satisfy `aapt`. ([Issue 1234](https://github.com/iBotPeaches/Apktool/issues/1234)) / Thanks padlar
  * Fix Samsung apks that have an unknown 4 bytes. ([Issue 1131](https://github.com/iBotPeaches/Apktool/issues/1131))
  * Prevent manifest rename for Adobe AIR applications. ([Issue 1240](https://github.com/iBotPeaches/Apktool/issues/1240))
