@@ -13,7 +13,7 @@ It is **NOT** intended for piracy and other non-legal uses. It could be used for
  * Disassembling resources to nearly original form (including `resources.arsc`, `classes.dex`, `9.png.` and `XMLs`)
  * Rebuilding decoded resources back to binary APK/JAR
  * Organizing and handling APKs that depend on framework resources
- * Smali Debugging (to be removed in `2.1.0` in favor of [IdeaSmali](https://github.com/JesusFreke/smali/wiki/smalidea))
+ * Smali Debugging (Removed in `2.1.0` in favor of [IdeaSmali](https://github.com/JesusFreke/smali/wiki/smalidea))
  * Helping with repetitive tasks
 
 ## Requirements
