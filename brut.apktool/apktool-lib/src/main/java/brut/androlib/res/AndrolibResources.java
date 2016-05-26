@@ -349,12 +349,12 @@ final public class AndrolibResources {
         if (apkOptions.debugMode) { // inject debuggable="true" into manifest
             cmd.add("--debug-mode");
         }
-        // force package id so that some frameworks build with correct id
-        // disable if user adds own aapt (can't know if they have this feature)
-        if (mPackageId != null && ! customAapt && ! mSharedLibrary) {
-            cmd.add("--forced-package-id");
-            cmd.add(mPackageId);
-        }
+//        // force package id so that some frameworks build with correct id
+//        // disable if user adds own aapt (can't know if they have this feature)
+//        if (mPackageId != null && ! customAapt && ! mSharedLibrary) {
+//            cmd.add("--forced-package-id");
+//            cmd.add(mPackageId);
+//        }
         if (mSharedLibrary) {
             cmd.add("--shared-lib");
         }
@@ -427,7 +427,7 @@ final public class AndrolibResources {
             cmd.add(rawDir.getAbsolutePath());
         }
         try {
-            OS.exec(cmd.toArray(new String[0]));
+            OS.exec(cmd.toArray(new String[cmd.size()]));
             if (apkOptions.verbose) {
                 LOGGER.info("command ran: ");
                 LOGGER.info(cmd.toString());

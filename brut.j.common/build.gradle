@@ -16,5 +16,6 @@
 
 dependencies {
     testCompile depends.junit
+    compile 'org.apache.commons:commons-lang3:3.4'
 }
 
