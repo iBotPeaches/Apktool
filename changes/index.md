@@ -4,6 +4,11 @@ title: Apktool - Changelog
 description: Apktool - Changelog / Roadmap
 ---
 
+## v2.1.2
+2016.xx.xx
+
+ * Fixed issue where extensions would be different cases. ([Issue 1258](https://github.com/iBotPeaches/Apktool/issues/1258))
+
 ## v2.1.1
 2016.05.07
 
