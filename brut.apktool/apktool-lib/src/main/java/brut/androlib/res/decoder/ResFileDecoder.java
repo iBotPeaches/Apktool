@@ -53,7 +53,7 @@ public class ResFileDecoder {
         if (extPos == -1) {
             outFileName = outResName;
         } else {
-            ext = inFileName.substring(extPos);
+            ext = inFileName.substring(extPos).toLowerCase();
             outFileName = outResName + ext;
         }
 
