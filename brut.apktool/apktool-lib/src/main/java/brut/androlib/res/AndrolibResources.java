@@ -633,10 +633,15 @@ final public class AndrolibResources {
                 byte[] manifest = IOUtils.toByteArray(in);
                 CRC32 manifestCrc = new CRC32();
                 manifestCrc.update(manifest);
-                entry.setSize(manifest.length);
-                entry.setCompressedSize(manifest.length);
-                entry.setCrc(manifestCrc.getValue());
-                out.putNextEntry(entry);
+                ZipEntry wEntry = new ZipEntry(entry.getName());
+                wEntry.setSize(manifest.length);
+                if (wEntry.getMethod() == ZipEntry.STORED) {
+                    wEntry.setCompressedSize(manifest.length);
+                } else  {
+                    wEntry.setCompressedSize(-1);
+                }
+                wEntry.setCrc(manifestCrc.getValue());
+                out.putNextEntry(wEntry);
                 out.write(manifest);
                 out.closeEntry();
             }
