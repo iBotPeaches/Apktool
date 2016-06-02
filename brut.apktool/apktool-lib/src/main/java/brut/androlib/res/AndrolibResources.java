@@ -634,7 +634,7 @@ final public class AndrolibResources {
                 CRC32 manifestCrc = new CRC32();
                 manifestCrc.update(manifest);
                 entry.setSize(manifest.length);
-                entry.setCompressedSize(-1);
+                entry.setCompressedSize(manifest.length);
                 entry.setCrc(manifestCrc.getValue());
                 out.putNextEntry(entry);
                 out.write(manifest);
