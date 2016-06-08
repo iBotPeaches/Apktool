@@ -125,7 +125,7 @@ public final class ResXmlPatcher {
      * @throws AndrolibException
      */
     public static String pullValueFromStrings(File directory, String key) throws AndrolibException {
-        if (! key.contains("@")) {
+        if (key == null || ! key.contains("@")) {
             return null;
         }
 
