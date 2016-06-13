@@ -37,8 +37,8 @@ public class ResValueFactory {
                 if (value == TypedValue.DATA_NULL_UNDEFINED) { // Special case $empty as explicitly defined empty value
                     return new ResStringValue(null, value);
                 } else if (value == TypedValue.DATA_NULL_EMPTY) {
-					return new ResEmptyValue(value, rawValue, type);
-				}
+                    return new ResEmptyValue(value, rawValue, type);
+                }
                 return new ResReferenceValue(mPackage, 0, null);
             case TypedValue.TYPE_REFERENCE:
                 return newReference(value, rawValue);

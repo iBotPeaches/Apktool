@@ -17,14 +17,10 @@
 package brut.androlib.res.data.value;
 
 import brut.androlib.AndrolibException;
-import brut.androlib.res.data.ResResource;
-import brut.androlib.res.xml.ResValuesXmlSerializable;
-import java.io.IOException;
-import org.xmlpull.v1.XmlSerializer;
 
 public class ResEmptyValue extends ResScalarValue {
     protected final int mValue;
-    private int type;
+    protected int type;
 
     public ResEmptyValue(int value, String rawValue, int type) {
         this(value, rawValue, "integer");
@@ -33,8 +29,8 @@ public class ResEmptyValue extends ResScalarValue {
 
     public ResEmptyValue(int value, String rawValue, String type) {
         super(type, value, rawValue);
-		if(value != 1)
-			throw new UnsupportedOperationException();
+        if (value != 1)
+            throw new UnsupportedOperationException();
         this.mValue = value;
     }
 
