@@ -7,7 +7,7 @@ description: Apktool - Changelog / Roadmap
 ## v2.2.0
 2016.xx.xx
 
- * [Migration Instructions from 2.1.1 to 2.2.0]({{ site.github.url }}/documentation/#v2.1.1-v2-2-0)
+ * [Migration Instructions from 2.1.1 to 2.2.0]({{ site.github.url }}/documentation/#v2-1-1-v2-2-0)
  * Default framework changed on Windows & Unix to prevent visible top level home directories. ([Issue 1277](https://github.com/iBotPeaches/Apktool/issues/1277))
  * Fixed issue where extensions would be different cases. ([Issue 1258](https://github.com/iBotPeaches/Apktool/issues/1258))
  * Fixed issue with APKs that had no `versionCode` / `versionName` properties. ([Issue 1264](https://github.com/iBotPeaches/Apktool/issues/1264))
