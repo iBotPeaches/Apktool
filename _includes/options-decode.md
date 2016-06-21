@@ -6,12 +6,6 @@ These are all the options when decoding an apk.
 <strong><code>-b, --no-debug-info</code></strong>
 <blockquote>Prevents baksmali from writing out debug info (.local, .param, .line, etc). Preferred to use if you are comparing smali from the same APK of different versions. The line numbers and debug will change among versions, which can make DIFF reports a pain.</blockquote>
 <br />
-<strong><code>-d, --debug</code></strong> - <span class="label label-danger">Advanced</span>
-<blockquote>Decodes in Debug Mode. Read <a href="#smali-debugging">SmaliDebugging</a></blockquote>
-<br />
-<strong><code>--debug-line-prefix &lt;PREFIX></code></strong>
-<blockquote>Smali line prefix when decoding in debug mode. Defaults to "a=0;//"</blockquote>
-<br />
 <strong><code>-f, --force</code></strong>
 <blockquote>Force delete destination directory. Use when trying to decode to a folder that already exists</blockquote>
 <br />
