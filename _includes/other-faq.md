@@ -35,3 +35,11 @@ by a modified system that can read these modified apks. Apktool cannot handle th
 Actually the Apache License, which apktool uses, answers all these questions. Yes you can redistribute and/or modify apktool without my permission. However,
 if you do it would be nice to add our contributors (brut.all, iBotPeaches and JesusFreke) into your credits but it's not required.
 <br /><br />
+<strong>Where does apktool store its framework files?</strong>
+<br />
+<ul>
+  <li><strong>unix</strong> - <pre>$HOME/.local/share/apktool</pre></li>
+  <li><strong>mac</strong> - <pre>$HOME/Library/apktool</pre></li>
+  <li><strong>windows</strong> - <pre>$HOME/AppData/Local/apktool</pre></li>
+</ul>
+<br /><br />

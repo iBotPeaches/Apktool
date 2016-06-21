@@ -6,6 +6,7 @@
     - Frameworks
 - title: Migration Instructions
   subs:
+    - v2.1.1 -> v2.2.0
     - v2.0.1 -> v2.0.2
     - v1.5.x -> v2.0.0
     - v1.4.x -> v1.5.1
