@@ -30,6 +30,8 @@ import java.util.logging.Logger;
 import org.custommonkey.xmlunit.*;
 import org.junit.*;
 import static org.junit.Assert.*;
+
+import org.junit.rules.ExpectedException;
 import org.xml.sax.SAXException;
 
 import javax.imageio.ImageIO;
@@ -190,6 +192,11 @@ public class BuildAndDecodeTest {
     @Test
     public void xmlSmallNumbersDontEscapeTest() throws BrutException {
         compareXmlFiles("res/layout/issue1130.xml");
+    }
+
+    @Test(expected = AssertionError.class)
+    public void xmlFillParentBecomesMatchTest() throws BrutException {
+        compareXmlFiles("res/layout/issue1274.xml");
     }
 
     @Test
