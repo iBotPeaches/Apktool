@@ -703,8 +703,10 @@ final public class AndrolibResources {
 
             if (OSDetection.isMacOSX()) {
                 path = parentPath.getAbsolutePath() + String.format("%1$sLibrary%1$sapktool%1$sframework", File.separatorChar);
+            } else if (OSDetection.isWindows()) {
+                path = parentPath.getAbsolutePath() + String.format("%1$sAppData%1$sLocal%1$sapktool%1$sframework", File.separatorChar);
             } else {
-                path = parentPath.getAbsolutePath() + String.format("%1$sapktool%1$sframework", File.separatorChar);
+                path = parentPath.getAbsolutePath() + String.format("%1$s.local%1$sshare%1$sapktool%1$sframework", File.separatorChar);
             }
         }
 
