@@ -7,10 +7,10 @@ title: Apktool - The end of Googlecode (android-apktool)
 # The history of Googlecode Project (android-apktool)
 
 brut.alll started the Googlecode project for Apktool in January of 2010, with the first release being published on Googlecode
-in March of 2010. Googlecode became the home for Apktool from then until March 2015 when Googlecode [announced](http://google-opensource.blogspot.com/2015/03/farewell-to-google-code.html)
+in March of 2010. Googlecode became the home for Apktool from then until March 2015 when Googlecode [announced](https://google-opensource.blogspot.com/2015/03/farewell-to-google-code.html)
 a shutdown of the service.  
 
-After already [loosing](http://google-opensource.blogspot.com/2013/05/a-change-to-google-code-download-service.html) the ability to upload files years ago,
+After already [loosing](https://google-opensource.blogspot.com/2013/05/a-change-to-google-code-download-service.html) the ability to upload files years ago,
 it was obvious Googlecode was loosing to popular alternatives such as Github and Bitbucket.  
 
 Since Apktool [already](https://github.com/iBotPeaches/Apktool) had a mirror of GIT at Github, we choose to move there.

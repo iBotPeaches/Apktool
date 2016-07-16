@@ -332,7 +332,7 @@ In order to get full Honeycomb/Gingerbread (3.1, API 12) support you have to:
   * fixed an issue when `*`.9.png doesn't have 9patch chunk in it ([Issue 170](https://github.com/iBotPeaches/Apktool/issues/170))
   * fixed NPE when there is a file without extension in drawable dir ([Issue 173](https://github.com/iBotPeaches/Apktool/issues/173))
   * fixed escaping of chars in XML style tags ([Issue 175](https://github.com/iBotPeaches/Apktool/issues/175))
-  * fixed an error, when there are missing resources in a type, which does not have default config (http://forum.xda-developers.com/showthread.php?p=7949440#post7949440)
+  * fixed an error, when there are missing resources in a type, which does not have default config (https://forum.xda-developers.com/showthread.php?p=7949440#post7949440)
   * try to use original value of XML attribute - instead of parsed one. Fixes an issue when apktool was decoding e.g. "01" as "1" ([Issue 187](https://github.com/iBotPeaches/Apktool/issues/187))
   * added more debugging info when omitting unknown config flags (`"Config size > 32" message`)
 

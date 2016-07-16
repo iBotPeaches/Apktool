@@ -17,7 +17,7 @@ Generally we need several things to run Java debugging session:
 In our particular situation we have:
 <br />
 <ul>
-  <li>server: Monitor (Previously DDMS), part of Android SDK, standard for debugging Android applications - explained <a href="http://developer.android.com/guide/developing/tools/ddms.html">here</a></li>
+  <li>server: Monitor (Previously DDMS), part of Android SDK, standard for debugging Android applications - explained <a href="https://developer.android.com/guide/developing/tools/ddms.html">here</a></li>
   <li>client: any JPDA client - most of decent IDEs have support for this protocol.</li>
   <li>sources: smali code modified by apktool to satisfy above requirements (".java" extension, class declaration, etc.). Apktool modifies them when decoding apk in debug mode.</li>
   <li>binaries: when building apk in debug mode, apktool removes original symbols and adds new, which are referencing smali code (line numbers, registers/variables, etc.)</li>

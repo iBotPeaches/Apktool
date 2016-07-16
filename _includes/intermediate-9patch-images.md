@@ -1,5 +1,5 @@
-Docs exist for the mysterious 9patch images <a target="_blank" href="http://developer.android.com/guide/topics/graphics/2d-graphics.html#nine-patch">here</a>
-and <a target="_blank" href="http://developer.android.com/tools/help/draw9patch.html">there</a>. (Read these first). These docs though are meant for developers
+Docs exist for the mysterious 9patch images <a target="_blank" href="https://developer.android.com/guide/topics/graphics/2d-graphics.html#nine-patch">here</a>
+and <a target="_blank" href="https://developer.android.com/tools/help/draw9patch.html">there</a>. (Read these first). These docs though are meant for developers
 and lack information for those who work with already compiled 3rd party applications. There you can find information how to create them, but
 no information about how they actually work.
 <br /><br />

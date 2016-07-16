@@ -21,4 +21,4 @@ $ apktool b bar.apk
 {% endhighlight %}
 
 <blockquote><span class="label label-info lb">Info</span>In order to run a rebuilt application. You must resign the application.
-Android <a target="_blank" href="http://developer.android.com/tools/publishing/app-signing.html#signing-manually">documentation</a> can help with this.</blockquote>
+Android <a target="_blank" href="https://developer.android.com/tools/publishing/app-signing.html#signing-manually">documentation</a> can help with this.</blockquote>
