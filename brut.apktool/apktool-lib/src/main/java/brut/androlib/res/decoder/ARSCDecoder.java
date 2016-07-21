@@ -384,8 +384,8 @@ public class ARSCDecoder {
                         .format("Config flags size > %d, but exceeding bytes are all zero, so it should be ok.",
                                 KNOWN_CONFIG_BYTES));
             } else {
-                LOGGER.warning(String.format("Config flags size > %d. Exceeding bytes: 0x%X.",
-                        KNOWN_CONFIG_BYTES, exceedingBI));
+                LOGGER.warning(String.format("Config flags size > %d. Size = %d. Exceeding bytes: 0x%X.",
+                        KNOWN_CONFIG_BYTES, size, exceedingBI));
                 isInvalid = true;
             }
         }
