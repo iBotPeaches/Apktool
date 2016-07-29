@@ -12,6 +12,7 @@ description: Apktool - Changelog / Roadmap
  * Fixed issue where extensions would be different cases. ([Issue 1258](https://github.com/iBotPeaches/Apktool/issues/1258))
  * Fixed issue with APKs that had no `versionCode` / `versionName` properties. ([Issue 1264](https://github.com/iBotPeaches/Apktool/issues/1264))
  * Fixed issue with improper decoding of `@empty` value. ([Issue 1270](https://github.com/iBotPeaches/Apktool/issues/1270)) / Thanks phhusson
+ * Fixed issue with improper compression with files with multiple extensions. ([Issue 1244](https://github.com/iBotPeaches/Apktool/issues/1244))
 
 ## v2.1.1
 2016.05.07
