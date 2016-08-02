@@ -30,10 +30,10 @@ public final class ResTypeSpec {
     private final ResTable mResTable;
     private final ResPackage mPackage;
 
-    private final byte mId;
+    private final int mId;
     private final int mEntryCount;
 
-    public ResTypeSpec(String name, ResTable resTable, ResPackage package_, byte id, int entryCount) {
+    public ResTypeSpec(String name, ResTable resTable, ResPackage package_, int id, int entryCount) {
         this.mName = name;
         this.mResTable = resTable;
         this.mPackage = package_;
@@ -45,7 +45,7 @@ public final class ResTypeSpec {
         return mName;
     }
 
-    public byte getId() {
+    public int getId() {
         return mId;
     }
 
