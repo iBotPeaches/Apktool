@@ -8,6 +8,8 @@ description: Apktool - Changelog / Roadmap
 2016.xx.xx
 
  * [Migration Instructions from 2.1.1 to 2.2.0]({{ site.github.url }}/documentation/#v2-1-1-v2-2-0)
+ * Updated smali/baksmali to `v2.1.3`
+   * Fixed upstream issue where debug comment indexes can cause out of bounds exception. ([Issue 1269](https://github.com/iBotPeaches/Apktool/issues/1269))
  * Default framework changed on Windows & Unix to prevent visible top level home directories. ([Issue 1277](https://github.com/iBotPeaches/Apktool/issues/1277))
  * Fixed issue where extensions would be different cases. ([Issue 1258](https://github.com/iBotPeaches/Apktool/issues/1258))
  * Fixed issue with APKs that had no `versionCode` / `versionName` properties. ([Issue 1264](https://github.com/iBotPeaches/Apktool/issues/1264))
