@@ -14,6 +14,7 @@ description: Apktool - Changelog / Roadmap
  * Fixed issue with improper decoding of `@empty` value. ([Issue 1270](https://github.com/iBotPeaches/Apktool/issues/1270)) / Thanks phhusson
  * Fixed issue with improper compression with files with multiple extensions. ([Issue 1244](https://github.com/iBotPeaches/Apktool/issues/1244))
  * Fixed issue with overflow for applications that have absurdly large TypeSpec indexes. ([Issue 1185](https://github.com/iBotPeaches/Apktool/issues/1185))
+ * Fixed issue with hex values being truncated in `AndroidManifest.xml`. ([Issue 972](https://github.com/iBotPeaches/Apktool/issues/972))
 
 ## v2.1.1
 2016.05.07
