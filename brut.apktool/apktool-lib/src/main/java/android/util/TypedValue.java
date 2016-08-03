@@ -269,7 +269,7 @@ public class TypedValue {
                         + FRACTION_UNIT_STRS[(data >> COMPLEX_UNIT_SHIFT)
                         & COMPLEX_UNIT_MASK];
             case TYPE_INT_HEX:
-                return "0x" + Integer.toHexString(data);
+                return String.format("0x%08X", data);
             case TYPE_INT_BOOLEAN:
                 return data != 0 ? "true" : "false";
         }
