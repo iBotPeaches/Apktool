@@ -76,6 +76,22 @@ public class ExtDataInput extends DataInputDelegate {
         }
     }
 
+    /**
+     * The general contract of DataInput doesn't guarantee all the bytes requested will be skipped
+     * and failure can occur for many reasons. We override this to try harder to skip all the bytes
+     * requested (this is similar to DataInputStream's wrapper).
+     */
+    public final int skipBytes(int n) throws IOException {
+        int total = 0;
+        int cur = 0;
+
+        while ((total < n) && ((cur = (int) super.skipBytes(n - total)) > 0)) {
+            total += cur;
+        }
+
+        return total;
+    }
+
     public String readNullEndedString(int length, boolean fixed)
             throws IOException {
         StringBuilder string = new StringBuilder(16);

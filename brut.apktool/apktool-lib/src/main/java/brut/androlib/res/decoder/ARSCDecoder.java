@@ -23,7 +23,7 @@ import brut.androlib.res.data.value.*;
 import brut.util.Duo;
 import brut.androlib.res.data.ResTable;
 import brut.util.ExtDataInput;
-import com.peterfranza.LittleEndianDataInputStream;
+import com.google.common.io.LittleEndianDataInputStream;
 import java.io.*;
 import java.math.BigInteger;
 import java.util.*;
@@ -60,7 +60,10 @@ public class ARSCDecoder {
         } else {
             mFlagsOffsets = null;
         }
-        mIn = new ExtDataInput(new LittleEndianDataInputStream(arscStream));
+        // We need to explicitly cast to DataInput as otherwise the constructor is ambiguous.
+        // We choose DataInput instead of InputStream as ExtDataInput wraps an InputStream in
+        // a DataInputStream which is big-endian and ignores the little-endian behavior.
+        mIn = new ExtDataInput((DataInput) new LittleEndianDataInputStream(arscStream));
         mResTable = resTable;
         mKeepBroken = keepBroken;
     }
