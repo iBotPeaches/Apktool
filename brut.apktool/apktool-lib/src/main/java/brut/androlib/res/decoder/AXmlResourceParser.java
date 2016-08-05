@@ -20,7 +20,8 @@ import android.util.TypedValue;
 import brut.androlib.AndrolibException;
 import brut.androlib.res.xml.ResXmlEncoders;
 import brut.util.ExtDataInput;
-import com.peterfranza.LittleEndianDataInputStream;
+import com.google.common.io.LittleEndianDataInputStream;
+import java.io.DataInput;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -69,7 +70,10 @@ public class AXmlResourceParser implements XmlResourceParser {
     public void open(InputStream stream) {
         close();
         if (stream != null) {
-            m_reader = new ExtDataInput(new LittleEndianDataInputStream(stream));
+            // We need to explicitly cast to DataInput as otherwise the constructor is ambiguous.
+            // We choose DataInput instead of InputStream as ExtDataInput wraps an InputStream in
+            // a DataInputStream which is big-endian and ignores the little-endian behavior.
+            m_reader = new ExtDataInput((DataInput) new LittleEndianDataInputStream(stream));
         }
     }
 
