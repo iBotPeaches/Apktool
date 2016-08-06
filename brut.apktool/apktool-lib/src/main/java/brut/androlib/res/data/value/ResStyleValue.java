@@ -45,7 +45,7 @@ public class ResStyleValue extends ResBagValue implements
                                         ResResource res) throws IOException, AndrolibException {
         serializer.startTag(null, "style");
         serializer.attribute(null, "name", res.getResSpec().getName());
-        if (!mParent.isNull()) {
+        if (!mParent.isNull() && !mParent.referentIsNull()) {
             serializer.attribute(null, "parent", mParent.encodeAsResXmlAttr());
         } else if (res.getResSpec().getName().indexOf('.') != -1) {
             serializer.attribute(null, "parent", "");
