@@ -33,7 +33,15 @@ public class ResResSpec {
 
     public ResResSpec(ResID id, String name, ResPackage pkg, ResTypeSpec type) {
         this.mId = id;
-        this.mName = (name.isEmpty() ? ("APKTOOL_DUMMYVAL_" + id.toString()) : name);
+        String cleanName;
+
+        try {
+            ResResSpec resResSpec = type.getResSpec(name);
+            cleanName = name + "_APKTOOL_DUPLICATENAME_" + id.toString();
+        } catch (AndrolibException ex) {
+            cleanName = (name.isEmpty() ? ("APKTOOL_DUMMYVAL_" + id.toString()) : name);
+        }
+        this.mName = cleanName;
         this.mPackage = pkg;
         this.mType = type;
     }
