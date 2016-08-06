@@ -19,6 +19,7 @@ description: Apktool - Changelog / Roadmap
  * Fixed issue with hex values being truncated in `AndroidManifest.xml`. ([Issue 972](https://github.com/iBotPeaches/Apktool/issues/972))
  * Replaced public domain LittleEndianReader for Google's Guava LittleEndianDataInputStream (Apache2). ([Issue 1166](https://github.com/iBotPeaches/Apktool/issues/1166))
  * Fixed issue with APKs that have duplicate value names by creating dummy names. ([Issue 894](https://github.com/iBotPeaches/Apktool/issues/894))
+ * Adjust mac and unix scripts to force UTF8 file encoding.
 
 ## v2.1.1
 2016.05.07
