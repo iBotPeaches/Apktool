@@ -246,6 +246,9 @@ final public class AndrolibResources {
             if (in == null && inApk.containsDir("r")) {
                 in = inApk.getDir("r");
             }
+            if (in == null && inApk.containsDir("R")) {
+                in = inApk.getDir("R");
+            }
         } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
         }
