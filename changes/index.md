@@ -21,7 +21,7 @@ description: Apktool - Changelog / Roadmap
  * Fixed issue with APKs that have duplicate value names by creating dummy names. ([Issue 894](https://github.com/iBotPeaches/Apktool/issues/894))
  * Adjust mac and unix scripts to force UTF8 file encoding.
  * Fixed public resource reference error when using references in `android:scheme` in `AndroidManifest.xml`. ([Issue 1097](https://github.com/iBotPeaches/Apktool/issues/1097))
-
+ * Fixed issue with APKs where parent reference in `styles.xml` is not found. ([Issue 745](https://github.com/iBotPeaches/Apktool/issues/745))
 
 ## v2.1.1
 2016.05.07
