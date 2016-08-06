@@ -82,6 +82,7 @@ public final class ResXmlPatcher {
      * @throws AndrolibException
      */
     public static void fixingPublicAttrsInProviderAttributes(File file) throws AndrolibException {
+        boolean saved = false;
         if (file.exists()) {
             try {
                 Document doc = loadDocument(file);
@@ -104,10 +105,40 @@ public final class ResXmlPatcher {
 
                             if (replacement != null) {
                                 provider.setNodeValue(replacement);
-                                saveDocument(file, doc);
+                                saved = true;
                             }
                         }
                     }
+                }
+
+                // android:scheme
+                xPath = XPathFactory.newInstance().newXPath();
+                expression = xPath.compile("/manifest/application/activity/intent-filter/data");
+
+                result = expression.evaluate(doc, XPathConstants.NODESET);
+                nodes = (NodeList) result;
+
+                for (int i = 0; i < nodes.getLength(); i++) {
+                    Node node = nodes.item(i);
+                    NamedNodeMap attrs = node.getAttributes();
+
+                    if (attrs != null) {
+                        Node provider = attrs.getNamedItem("android:scheme");
+
+                        if (provider != null) {
+                            String reference = provider.getNodeValue();
+                            String replacement = pullValueFromStrings(file.getParentFile(), reference);
+
+                            if (replacement != null) {
+                                provider.setNodeValue(replacement);
+                                saved = true;
+                            }
+                        }
+                    }
+                }
+
+                if (saved) {
+                    saveDocument(file, doc);
                 }
 
             }  catch (SAXException | ParserConfigurationException | IOException |
