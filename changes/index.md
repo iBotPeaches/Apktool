@@ -18,6 +18,7 @@ description: Apktool - Changelog / Roadmap
  * Fixed issue with overflow for applications that have absurdly large TypeSpec indexes. ([Issue 1185](https://github.com/iBotPeaches/Apktool/issues/1185))
  * Fixed issue with hex values being truncated in `AndroidManifest.xml`. ([Issue 972](https://github.com/iBotPeaches/Apktool/issues/972))
  * Replaced public domain LittleEndianReader for Google's Guava LittleEndianDataInputStream (Apache2). ([Issue 1166](https://github.com/iBotPeaches/Apktool/issues/1166))
+ * Fixed issue with APKs that have duplicate value names by creating dummy names. ([Issue 894](https://github.com/iBotPeaches/Apktool/issues/894))
 
 ## v2.1.1
 2016.05.07
