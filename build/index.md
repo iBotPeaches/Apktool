@@ -5,7 +5,7 @@ description: Apktool - Build Guide
 ---
 
 # How to Build Apktool from source
-Apktool is a collection of 1 project, containing 4 sub-projects and a few dependencies.
+Apktool is a collection of 1 project, containing sub-projects and a few dependencies.
 
   * **brut.apktool.lib** - (Main, all the Library code)
   * **brut.apktool.cli** - The cli interface of the program
@@ -30,6 +30,5 @@ We use gradle to build. It's pretty easy. First clone the repository.
   4. `[./gradlew][gradlew.bat] build fatJar` - Builds Apktool, including final binary.
   5. Optional (You may build a Proguard jar) `[./gradlew][gradlew.bat] build fatJar proguard`
   
-After 1-2 minutes you should have a jar file at
-
+After build completes you should have a jar file at:
 `./brut.apktool/apktool-cli/build/libs/apktool-xxxxx.jar`

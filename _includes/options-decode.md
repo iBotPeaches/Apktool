@@ -22,10 +22,10 @@ These are all the options when decoding an apk.
 <blockquote>The folder location where framework files should be stored/read from</blockquote>
 <br />
 <strong><code>-r, --no-res</code></strong>
-<blockquote>This will prevent the decompile of resources. This keeps the <code>resources.arsc</code> intact without any decode. If only editing Java (smali) then this is the recommend for faster decompile & rebuild</blockquote>
+<blockquote>This will prevent the decompile of resources. This keeps the <code>resources.arsc</code> intact without any decode. If only editing Java (smali) then this is the recommended action for faster decompile & rebuild</blockquote>
 <br />
 <strong><code>-s, --no-src</code></strong>
-<blockquote>This will prevent the disassemble of the dex files. This keeps the apk <code>classes.dex</code> file and simply moves it during build. If your only editing the resources. This is recommended for faster decompile & rebuild</blockquote>
+<blockquote>This will prevent the disassembly of the dex file(s). This keeps the apk <code>dex</code> file(s) and simply moves it during build. If you are only editing the resources. This is the recommended action for faster disassemble & assemble</blockquote>
 <br />
 <strong><code>-t, --frame-tag &lt;TAG></code></strong>
 <blockquote>Uses framework files tagged via <code>&lt;TAG></code></blockquote>

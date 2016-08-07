@@ -7,7 +7,7 @@ description: Apktool - How to Contribute
 ## Contributing to Apktool
 
 ### Report a bug
-Apktool gets plenty of bug reports not related to apktool at all. People use this tool, but they don't know how to edit XML files, sign apks or even install them.
+Apktool gets plenty of bug reports not related to apktool at all. People use the tool, but they don't know how to edit XML files, sign apks or even install them.
 I find it funny that some people go the hard route of reverse engineering when they don't even know how to work with application sources.
 
 So... if you get some errors from apktool when decoding or building an apk, then this is probably a bug in apktool and you should report it.
@@ -18,12 +18,7 @@ But if you have succeeded at decoding and building, but the app doesn't work on 
  * rebuild apk without doing any changes to it (<kbd>apktool d</kbd> & <kbd>apktool b</kbd>). If apktool succeeds, but apk won't work, then it's probably an apktool bug and you should report it.
  * if an app was working earlier, but after doing some changes - it doesn't, this may be a bug of apktool, but more likely it's your fault.
  
-After all of this, if you are ready to report a bug. Please make sure to answer the following questions in your bug report.
-
- * What steps will reproduce this problem?
- * What is the expected output? What do you see instead?
- * What version of the tool are you using? On what Operating System?
- * Any additional information? (ROM, AOSP version)
+After all of this, if you are ready to report a bug. Please make sure to follow the [Issue Template](https://github.com/iBotPeaches/Apktool/blob/master/.github/ISSUE_TEMPLATE.md).
  
 [Report a bug here](https://github.com/iBotPeaches/Apktool/issues/new)
 

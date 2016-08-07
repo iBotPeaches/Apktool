@@ -10,7 +10,7 @@ These are all the options when building an apk.
 <blockquote>Adds <code>debuggable="true"</code> to AndroidManifest file.</blockquote>
 <br />
 <strong><code>-f, --force-all</code></strong>
-<blockquote>Overwrites existing files during build, reassembling the <code>resources.arsc</code> file and <code>classes.dex</code> file</blockquote>
+<blockquote>Overwrites existing files during build, reassembling the <code>resources.arsc</code> file and <code>dex</code> file(s)</blockquote>
 <br />
 <strong><code>-o, --output &lt;FILE></code></strong>
 <blockquote>The name and location of the apk that gets written</blockquote>
