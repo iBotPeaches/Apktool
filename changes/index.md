@@ -5,7 +5,7 @@ description: Apktool - Changelog / Roadmap
 ---
 
 ## v2.2.0
-2016.xx.xx
+2016.08.07
 
  * [Migration Instructions from 2.1.1 to 2.2.0]({{ site.github.url }}/documentation/#v2-1-1-v2-2-0)
  * Updated smali/baksmali to `v2.1.3`
@@ -17,7 +17,7 @@ description: Apktool - Changelog / Roadmap
  * Fixed issue with improper compression with files with multiple extensions. ([Issue 1244](https://github.com/iBotPeaches/Apktool/issues/1244))
  * Fixed issue with overflow for applications that have absurdly large TypeSpec indexes. ([Issue 1185](https://github.com/iBotPeaches/Apktool/issues/1185))
  * Fixed issue with hex values being truncated in `AndroidManifest.xml`. ([Issue 972](https://github.com/iBotPeaches/Apktool/issues/972))
- * Replaced public domain LittleEndianReader for Google's Guava LittleEndianDataInputStream (Apache2). ([Issue 1166](https://github.com/iBotPeaches/Apktool/issues/1166))
+ * Replaced public domain LittleEndianReader for Google's Guava LittleEndianDataInputStream (Apache2). ([Issue 1166](https://github.com/iBotPeaches/Apktool/issues/1166)) / Thanks amorris
  * Fixed issue with APKs that have duplicate value names by creating dummy names. ([Issue 894](https://github.com/iBotPeaches/Apktool/issues/894))
  * Adjust mac and unix scripts to force UTF8 file encoding.
  * Fixed public resource reference error when using references in `android:scheme` in `AndroidManifest.xml`. ([Issue 1097](https://github.com/iBotPeaches/Apktool/issues/1097))
