@@ -4,6 +4,11 @@ title: Apktool - Changelog
 description: Apktool - Changelog / Roadmap
 ---
 
+## v2.2.1
+2016.xx.xx
+
+ * Fixed issue with missing attributes (using Android N Final Preview Sdk). ([Issue 1243](https://github.com/iBotPeaches/Apktool/issues/1243)).
+
 ## v2.2.0
 2016.08.07
 
