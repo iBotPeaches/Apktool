@@ -51,6 +51,7 @@ public class Androlib {
     private final AndrolibResources mAndRes = new AndrolibResources();
     protected final ResUnknownFiles mResUnknownFiles = new ResUnknownFiles();
     public ApkOptions apkOptions;
+    private int mMinSdkVersion = 0;
 
     public Androlib(ApkOptions apkOptions) {
         this.apkOptions = apkOptions;
@@ -278,6 +279,10 @@ public class Androlib {
         mAndRes.setVersionInfo(meta.versionInfo);
         mAndRes.setSharedLibrary(meta.sharedLibrary);
 
+        if (meta.sdkInfo != null && meta.sdkInfo.get("minSdkVersion") != null) {
+            mMinSdkVersion = Integer.parseInt(meta.sdkInfo.get("minSdkVersion"));
+        }
+
         if (outFile == null) {
             String outFileName = meta.apkFileName;
             outFile = new File(appDir, "dist" + File.separator + (outFileName == null ? "out.apk" : outFileName));
@@ -397,7 +402,7 @@ public class Androlib {
         if (apkOptions.forceBuildAll || isModified(smaliDir, dex)) {
             LOGGER.info("Smaling " + folder + " folder into " + filename +"...");
             dex.delete();
-            SmaliBuilder.build(smaliDir, dex);
+            SmaliBuilder.build(smaliDir, dex, mMinSdkVersion);
         }
         return true;
     }
