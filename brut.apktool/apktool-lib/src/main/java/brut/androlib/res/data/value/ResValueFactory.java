@@ -55,6 +55,7 @@ public class ResValueFactory {
             case TypedValue.TYPE_INT_BOOLEAN:
                 return new ResBoolValue(value != 0, value, rawValue);
             case TypedValue.TYPE_DYNAMIC_REFERENCE:
+            case TypedValue.TYPE_DYNAMIC_ATTRIBUTE:
                 return newReference(value, rawValue);
         }
 

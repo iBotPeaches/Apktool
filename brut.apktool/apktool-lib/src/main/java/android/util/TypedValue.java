@@ -57,6 +57,11 @@ public class TypedValue {
      */
     public static final int TYPE_DYNAMIC_REFERENCE = 0x07;
     /**
+     * The <var>data</var> an attribute resource identifier, which needs to be resolved
+     * before it can be used like a TYPE_ATTRIBUTE.
+     */
+    public static final int TYPE_DYNAMIC_ATTRIBUTE = 0x08;
+    /**
      * Identifies the start of plain integer values. Any type value from this to
      * {@link #TYPE_LAST_INT} means the <var>data</var> field holds a generic
      * integer value.
