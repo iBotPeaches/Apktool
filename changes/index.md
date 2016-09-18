@@ -7,7 +7,10 @@ description: Apktool - Changelog / Roadmap
 ## v2.2.1
 2016.xx.xx
 
- * Fixed issue with missing attributes (using Android N Final Preview Sdk). ([Issue 1243](https://github.com/iBotPeaches/Apktool/issues/1243)).
+ * **Android Nougat Support.** ([Issue 1223](https://github.com/iBotPeaches/Apktool/issues/1223))
+ * Fixed issue with missing attributes (using Android N Final Preview Sdk). ([Issue 1243](https://github.com/iBotPeaches/Apktool/issues/1243))
+ * Gracefully handle APKs with additional data after `TYPE` chunks. ([Issue 1324](https://github.com/iBotPeaches/Apktool/pull/1324)) / Thanks jamestut
+ * Pass `minSdkVersion` to smali to correctly trigger edge cases where proper API needs to set. ([Issue 1313](https://github.com/iBotPeaches/Apktool/pull/1313)) / Thanks benjamin-promon
 
 ## v2.2.0
 2016.08.07
