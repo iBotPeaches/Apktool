@@ -375,6 +375,11 @@ public class ARSCDecoder {
             read = 52;
         }
 
+        if (size >= 56) {
+            mIn.skipBytes(4);
+            read = 56;
+        }
+
         int exceedingSize = size - KNOWN_CONFIG_BYTES;
         if (exceedingSize > 0) {
             byte[] buf = new byte[exceedingSize];
@@ -550,7 +555,7 @@ public class ARSCDecoder {
     }
 
     private static final Logger LOGGER = Logger.getLogger(ARSCDecoder.class.getName());
-    private static final int KNOWN_CONFIG_BYTES = 52;
+    private static final int KNOWN_CONFIG_BYTES = 56;
 
     public static class ARSCData {
 
