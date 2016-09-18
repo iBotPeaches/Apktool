@@ -154,6 +154,12 @@ public class ARSCDecoder {
 
         while (type == Header.TYPE_TYPE) {
             readTableType();
+            
+            // skip "TYPE 8 chunks" and/or padding data at the end of this chunk
+            if(mCountIn.getCount() < mHeader.endPosition) {
+                mCountIn.skip(mHeader.endPosition - mCountIn.getCount());
+            }
+            
             type = nextChunk().type;
 
             addMissingResSpecs();
