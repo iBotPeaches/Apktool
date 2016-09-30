@@ -94,7 +94,7 @@ public class Main {
 
         // if no commands ran, run the version / usage check.
         if (cmdFound == false) {
-            if (commandLine.hasOption("version") || commandLine.hasOption("version")) {
+            if (commandLine.hasOption("version")) {
                 _version();
             } else {
                 usage(commandLine);
