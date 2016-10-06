@@ -591,6 +591,32 @@ final public class AndrolibResources {
         throw new CantFindFrameworkResException(id);
     }
 
+    public void emptyFrameworkDirectory() throws AndrolibException {
+        File dir = getFrameworkDir();
+        File apk;
+
+        apk = new File(dir, "1.apk");
+
+        if (! apk.exists()) {
+            LOGGER.warning("Can't empty framework directory, no file found at: " + apk.getAbsolutePath());
+        } else {
+            try {
+                if (apk.exists() && dir.listFiles().length > 1 && ! apkOptions.forceDeleteFramework) {
+                    LOGGER.warning("More than default framework detected. Please run command with `--force` parameter to wipe framework directory.");
+                } else {
+                    for (File file : dir.listFiles()) {
+                        if (file.isFile() && file.getName().endsWith(".apk")) {
+                            LOGGER.info("Removing " + file.getName() + " framework file...");
+                            file.delete();
+                        }
+                    }
+                }
+            } catch (NullPointerException e) {
+                throw new AndrolibException(e);
+            }
+        }
+    }
+
     public void installFramework(File frameFile) throws AndrolibException {
         installFramework(frameFile, apkOptions.frameworkTag);
     }

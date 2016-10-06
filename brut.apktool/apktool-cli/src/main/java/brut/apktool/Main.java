@@ -48,7 +48,7 @@ public class Main {
 
         // cli parser
         CommandLineParser parser = new PosixParser();
-        CommandLine commandLine = null;
+        CommandLine commandLine;
 
         // load options
         _Options();
@@ -57,7 +57,7 @@ public class Main {
             commandLine = parser.parse(allOptions, args, false);
         } catch (ParseException ex) {
             System.err.println(ex.getMessage());
-            usage(commandLine);
+            usage();
             return;
         }
 
@@ -86,6 +86,9 @@ public class Main {
             } else if (opt.equalsIgnoreCase("if") || opt.equalsIgnoreCase("install-framework")) {
                 cmdInstallFramework(commandLine);
                 cmdFound = true;
+            } else if (opt.equalsIgnoreCase("empty-framework-dir")) {
+                cmdEmptyFrameworkDirectory(commandLine);
+                cmdFound = true;
             } else if (opt.equalsIgnoreCase("publicize-resources")) {
                 cmdPublicizeResources(commandLine);
                 cmdFound = true;
@@ -97,7 +100,7 @@ public class Main {
             if (commandLine.hasOption("version")) {
                 _version();
             } else {
-                usage(commandLine);
+                usage();
             }
         }
     }
@@ -107,7 +110,7 @@ public class Main {
 
         int paraCount = cli.getArgList().size();
         String apkName = (String) cli.getArgList().get(paraCount - 1);
-        File outDir = null;
+        File outDir;
 
         // check for options
         if (cli.hasOption("s") || cli.hasOption("no-src")) {
@@ -224,8 +227,7 @@ public class Main {
         new Androlib(apkOptions).build(new File(appDirName), outFile);
     }
 
-    private static void cmdInstallFramework(CommandLine cli)
-            throws AndrolibException {
+    private static void cmdInstallFramework(CommandLine cli) throws AndrolibException {
         int paraCount = cli.getArgList().size();
         String apkName = (String) cli.getArgList().get(paraCount - 1);
 
@@ -239,12 +241,24 @@ public class Main {
         new Androlib(apkOptions).installFramework(new File(apkName));
     }
 
-    private static void cmdPublicizeResources(CommandLine cli)
-            throws AndrolibException {
+    private static void cmdPublicizeResources(CommandLine cli) throws AndrolibException {
         int paraCount = cli.getArgList().size();
         String apkName = (String) cli.getArgList().get(paraCount - 1);
 
         new Androlib().publicizeResources(new File(apkName));
+    }
+
+    private static void cmdEmptyFrameworkDirectory(CommandLine cli) throws AndrolibException {
+        ApkOptions apkOptions = new ApkOptions();
+
+        if (cli.hasOption("f") || cli.hasOption("force")) {
+            apkOptions.forceDeleteFramework = true;
+        }
+        if (cli.hasOption("p") || cli.hasOption("frame-path")) {
+            apkOptions.frameworkFolderLocation = cli.getOptionValue("p");
+        }
+
+        new Androlib(apkOptions).emptyFrameworkDirectory();
     }
 
     private static void _version() {
@@ -362,7 +376,6 @@ public class Main {
 
         // check for advance mode
         if (isAdvanceMode()) {
-            DecodeOptions.addOption(debugDecOption);
             DecodeOptions.addOption(noDbgOption);
             DecodeOptions.addOption(keepResOption);
             DecodeOptions.addOption(analysisOption);
@@ -393,6 +406,10 @@ public class Main {
         // add basic framework options
         frameOptions.addOption(tagOption);
         frameOptions.addOption(frameIfDirOption);
+
+        // add empty framework options
+        emptyFrameworkOptions.addOption(forceDecOption);
+        emptyFrameworkOptions.addOption(frameIfDirOption);
 
         // add all, loop existing cats then manually add advance
         for (Object op : normalOptions.getOptions()) {
@@ -426,7 +443,7 @@ public class Main {
         }
     }
 
-    private static void usage(CommandLine commandLine) {
+    private static void usage() {
 
         // load basicOptions
         _Options();
@@ -452,8 +469,9 @@ public class Main {
         formatter.printHelp("apktool " + verbosityHelp() + "d[ecode] [options] <file_apk>", DecodeOptions);
         formatter.printHelp("apktool " + verbosityHelp() + "b[uild] [options] <app_path>", BuildOptions);
         if (isAdvanceMode()) {
-            formatter.printHelp("apktool " + verbosityHelp() + "publicize-resources <file_path>",
-                    "Make all framework resources public.", emptyOptions, null);
+            formatter.printHelp("apktool " + verbosityHelp() + "publicize-resources <file_path>", emptyOptions);
+            formatter.printHelp("apktool " + verbosityHelp() + "empty-framework-dir [options]", emptyFrameworkOptions);
+            System.out.println("");
         } else {
             System.out.println("");
         }
@@ -536,6 +554,7 @@ public class Main {
     private final static Options frameOptions;
     private final static Options allOptions;
     private final static Options emptyOptions;
+    private final static Options emptyFrameworkOptions;
 
     static {
         //normal and advance usage output
@@ -545,5 +564,6 @@ public class Main {
         frameOptions = new Options();
         allOptions = new Options();
         emptyOptions = new Options();
+        emptyFrameworkOptions = new Options();
     }
 }
