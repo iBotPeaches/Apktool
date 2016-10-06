@@ -86,8 +86,8 @@ public class Main {
             } else if (opt.equalsIgnoreCase("if") || opt.equalsIgnoreCase("install-framework")) {
                 cmdInstallFramework(commandLine);
                 cmdFound = true;
-            } else if (opt.equalsIgnoreCase("u") || opt.equalsIgnoreCase("update-framework")) {
-                cmdUpdateFramework(commandLine);
+            } else if (opt.equalsIgnoreCase("empty-framework-dir")) {
+                cmdEmptyFrameworkDirectory(commandLine);
                 cmdFound = true;
             } else if (opt.equalsIgnoreCase("publicize-resources")) {
                 cmdPublicizeResources(commandLine);
@@ -248,7 +248,7 @@ public class Main {
         new Androlib().publicizeResources(new File(apkName));
     }
 
-    private static void cmdUpdateFramework(CommandLine cli) throws AndrolibException {
+    private static void cmdEmptyFrameworkDirectory(CommandLine cli) throws AndrolibException {
         ApkOptions apkOptions = new ApkOptions();
 
         if (cli.hasOption("f") || cli.hasOption("force")) {
@@ -258,7 +258,7 @@ public class Main {
             apkOptions.frameworkFolderLocation = cli.getOptionValue("p");
         }
 
-        new Androlib(apkOptions).updateFramework();
+        new Androlib(apkOptions).emptyFrameworkDirectory();
     }
 
     private static void _version() {
@@ -376,7 +376,6 @@ public class Main {
 
         // check for advance mode
         if (isAdvanceMode()) {
-            DecodeOptions.addOption(debugDecOption);
             DecodeOptions.addOption(noDbgOption);
             DecodeOptions.addOption(keepResOption);
             DecodeOptions.addOption(analysisOption);
@@ -407,6 +406,10 @@ public class Main {
         // add basic framework options
         frameOptions.addOption(tagOption);
         frameOptions.addOption(frameIfDirOption);
+
+        // add empty framework options
+        emptyFrameworkOptions.addOption(forceDecOption);
+        emptyFrameworkOptions.addOption(frameIfDirOption);
 
         // add all, loop existing cats then manually add advance
         for (Object op : normalOptions.getOptions()) {
@@ -466,8 +469,9 @@ public class Main {
         formatter.printHelp("apktool " + verbosityHelp() + "d[ecode] [options] <file_apk>", DecodeOptions);
         formatter.printHelp("apktool " + verbosityHelp() + "b[uild] [options] <app_path>", BuildOptions);
         if (isAdvanceMode()) {
-            formatter.printHelp("apktool " + verbosityHelp() + "publicize-resources <file_path>",
-                    "Make all framework resources public.", emptyOptions, null);
+            formatter.printHelp("apktool " + verbosityHelp() + "publicize-resources <file_path>", emptyOptions);
+            formatter.printHelp("apktool " + verbosityHelp() + "empty-framework-dir [options]", emptyFrameworkOptions);
+            System.out.println("");
         } else {
             System.out.println("");
         }
@@ -550,6 +554,7 @@ public class Main {
     private final static Options frameOptions;
     private final static Options allOptions;
     private final static Options emptyOptions;
+    private final static Options emptyFrameworkOptions;
 
     static {
         //normal and advance usage output
@@ -559,5 +564,6 @@ public class Main {
         frameOptions = new Options();
         allOptions = new Options();
         emptyOptions = new Options();
+        emptyFrameworkOptions = new Options();
     }
 }

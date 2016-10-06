@@ -684,8 +684,8 @@ public class Androlib {
         mAndRes.installFramework(frameFile);
     }
 
-    public void updateFramework() throws AndrolibException {
-        mAndRes.updateFramework();
+    public void emptyFrameworkDirectory() throws AndrolibException {
+        mAndRes.emptyFrameworkDirectory();
     }
 
     public boolean isFrameworkApk(ResTable resTable) {
