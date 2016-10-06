@@ -12,6 +12,7 @@ description: Apktool - Changelog / Roadmap
  * Fixed issue with new value type 8 - `TYPE_DYNAMIC_ATTRIBUTE`. ([Issue 1317](https://github.com/iBotPeaches/Apktool/issues/1317))
  * Gracefully handle APKs with additional data after `TYPE` chunks. ([Issue 1324](https://github.com/iBotPeaches/Apktool/pull/1324)) / Thanks jamestut
  * Pass `minSdkVersion` to smali to correctly trigger edge cases where proper API needs to set. ([Issue 1313](https://github.com/iBotPeaches/Apktool/pull/1313)) / Thanks benjamin-promon
+ * Added `empty-framework-dir` command to cleanup framework directory to ease upgrades. ([Issue 901](https://github.com/iBotPeaches/Apktool/issues/901))
 
 ## v2.2.0
 2016.08.07
