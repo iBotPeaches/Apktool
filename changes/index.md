@@ -5,7 +5,7 @@ description: Apktool - Changelog / Roadmap
 ---
 
 ## v2.2.1
-2016.xx.xx
+2016.10.18
 
  * **Android Nougat Support.** ([Issue 1223](https://github.com/iBotPeaches/Apktool/issues/1223))
  * Fixed issue with missing attributes (using Android N Final Preview Sdk). ([Issue 1243](https://github.com/iBotPeaches/Apktool/issues/1243))
