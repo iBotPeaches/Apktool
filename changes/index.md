@@ -4,6 +4,11 @@ title: Apktool - Changelog
 description: Apktool - Changelog / Roadmap
 ---
 
+## v2.2.2 (in development)
+xxxx.xx.xx
+
+ * Added Android 7.1 Resources ([Issue 1349](https://github.com/iBotPeaches/Apktool/issues/1349))
+
 ## v2.2.1
 2016.10.18
 
