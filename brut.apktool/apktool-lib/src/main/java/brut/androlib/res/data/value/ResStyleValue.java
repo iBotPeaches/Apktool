@@ -52,6 +52,11 @@ public class ResStyleValue extends ResBagValue implements
         }
         for (int i = 0; i < mItems.length; i++) {
             ResResSpec spec = mItems[i].m1.getReferent();
+
+            if (spec == null) {
+                continue;
+            }
+
             String name = null;
             String value = null;
 
