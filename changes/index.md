@@ -8,6 +8,7 @@ description: Apktool - Changelog / Roadmap
 xxxx.xx.xx
 
  * Added Android 7.1 Resources ([Issue 1349](https://github.com/iBotPeaches/Apktool/issues/1349))
+ * Fixed NPE with styles that had a parent that didn't exist. ([Issue 1370](https://github.com/iBotPeaches/Apktool/issues/1370))
 
 ## v2.2.1
 2016.10.18
