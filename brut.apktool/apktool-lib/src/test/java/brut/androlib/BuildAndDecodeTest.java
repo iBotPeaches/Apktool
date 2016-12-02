@@ -374,6 +374,16 @@ public class BuildAndDecodeTest {
     }
 
     @Test
+    public void fileAssetTest() throws BrutException, IOException {
+        compareAssetsFolder("txt");
+    }
+
+    @Test
+    public void unicodeAssetTest() throws BrutException, IOException {
+        // failure using ∂ (unicode)
+    }
+
+    @Test
     public void multipleDexTest() throws BrutException, IOException {
         compareBinaryFolder("/smali_classes2", false);
     }
@@ -432,6 +442,10 @@ public class BuildAndDecodeTest {
 
     private void compareLibsFolder(String path) throws BrutException, IOException {
         compareBinaryFolder(File.separatorChar + path, false);
+    }
+
+    private void compareAssetsFolder(String path) throws BrutException, IOException {
+        compareBinaryFolder(File.separatorChar + "assets" + File.separatorChar + path, false);
     }
 
     private void compareValuesFiles(String path) throws BrutException {
