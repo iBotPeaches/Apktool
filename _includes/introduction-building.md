@@ -18,7 +18,8 @@ $ apktool b bar -o new_bar.apk
 $ apktool b bar.apk
 // WRONG: brut.androlib.AndrolibException: brut.directory.PathNotExist: apktool.yml
 // Must use folder, not apk/jar file
+
 {% endhighlight %}
 
-<blockquote><span class="label label-info lb">Info</span>In order to run a rebuilt application. You must resign the application.
+<blockquote class="info"><span class="label label-info lb">Info</span> In order to run a rebuilt application. You must resign the application.
 Android <a target="_blank" href="https://developer.android.com/tools/publishing/app-signing.html#signing-manually">documentation</a> can help with this.</blockquote>

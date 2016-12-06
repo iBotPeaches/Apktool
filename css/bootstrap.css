@@ -1461,6 +1461,15 @@ blockquote {
   font-size: 16.5px;
   border-left: 5px solid #2fbba3;
 }
+blockquote.warning {
+  border-left: 5px solid #f0ad4e;
+}
+blockquote.info {
+  border-left: 5px solid #5bc0de;
+}
+blockquote.danger {
+  border-left: 5px solid #d9534f;
+}
 blockquote a {
     text-decoration: underline;
 }
@@ -1518,8 +1527,8 @@ samp {
   font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 code {
-  padding: 2px 4px;
-  font-size: 90%;
+  padding: 1px 3px;
+  font-size: 80%;
   color: #8ebe30;
   font-weight: 600;
   background-color: #4E4E4E;
