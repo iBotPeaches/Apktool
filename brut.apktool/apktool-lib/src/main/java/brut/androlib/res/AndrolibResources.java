@@ -773,16 +773,11 @@ final public class AndrolibResources {
 
         try {
             if (OSDetection.isMacOSX()) {
-                aaptBinary = Jar.getResourceAsFile("/prebuilt/aapt/macosx/aapt");
-
-                /*
-                Need to build these still.
                 if (OSDetection.is64Bit()) {
                     aaptBinary = Jar.getResourceAsFile("/prebuilt/aapt/macosx/64/aapt");
                 } else {
                     aaptBinary = Jar.getResourceAsFile("/prebuilt/aapt/macosx/32/aapt");
                 }
-                */
             } else if (OSDetection.isUnix()) {
                 if (OSDetection.is64Bit()) {
                     aaptBinary = Jar.getResourceAsFile("/prebuilt/aapt/linux/64/aapt");
