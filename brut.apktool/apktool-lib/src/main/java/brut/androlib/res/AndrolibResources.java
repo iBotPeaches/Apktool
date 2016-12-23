@@ -390,6 +390,7 @@ final public class AndrolibResources {
             cmd.add("--version-name");
             cmd.add(mVersionName);
         }
+        cmd.add("--no-version-vectors");
         cmd.add("-F");
         cmd.add(apkFile.getAbsolutePath());
 
