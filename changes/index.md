@@ -8,8 +8,10 @@ description: Apktool - Changelog / Roadmap
 xxxx.xx.xx
 
  * Added Android 7.1 Resources ([Issue 1349](https://github.com/iBotPeaches/Apktool/issues/1349))
+ * Update `aapt` to `android-7.1.1_r4`.
  * Fixed NPE with styles that had a parent that didn't exist. ([Issue 1370](https://github.com/iBotPeaches/Apktool/issues/1370))
  * Fixed issue with `TYPE_DYNAMIC_ATTRIBUTE` treating improperly which affected Nougat based applications. ([Issue 1382](https://github.com/iBotPeaches/Apktool/issues/1382)) / Thanks xpirt
+ * Fixed issue with APKs that have invalid characters. ([Issue 885](https://github.com/iBotPeaches/Apktool/issues/885)), ([Issue 1389](https://github.com/iBotPeaches/Apktool/issues/1389))
 
 ## v2.2.1
 2016.10.18
