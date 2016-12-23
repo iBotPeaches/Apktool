@@ -12,7 +12,7 @@ xxxx.xx.xx
  * Fixed NPE with styles that had a parent that didn't exist. ([Issue 1370](https://github.com/iBotPeaches/Apktool/issues/1370))
  * Fixed issue with `TYPE_DYNAMIC_ATTRIBUTE` treating improperly which affected Nougat based applications. ([Issue 1382](https://github.com/iBotPeaches/Apktool/issues/1382)) / Thanks xpirt
  * Fixed issue with APKs that have invalid characters. ([Issue 885](https://github.com/iBotPeaches/Apktool/issues/885)), ([Issue 1389](https://github.com/iBotPeaches/Apktool/issues/1389))
- * Fixed issue with versioning vector images during build. ([Issue 1384])(https://github.com/iBotPeaches/Apktool/issues/1384))
+ * Fixed issue with versioning vector images during build. ([Issue 1384](https://github.com/iBotPeaches/Apktool/issues/1384))
 
 ## v2.2.1
 2016.10.18
