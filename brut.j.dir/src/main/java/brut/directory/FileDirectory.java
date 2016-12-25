@@ -22,6 +22,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Paths;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 
@@ -30,6 +31,14 @@ public class FileDirectory extends AbstractDirectory {
 
     public FileDirectory(String dir) throws DirectoryException {
         this(new File(dir));
+    }
+
+    public FileDirectory(ExtFile dir, String folder) throws DirectoryException {
+        this(dir.toString(), folder);
+    }
+
+    public FileDirectory(String dir, String folder) throws DirectoryException {
+        this(Paths.get(dir, folder).toFile());
     }
 
     public FileDirectory(File dir) throws DirectoryException {
@@ -79,7 +88,7 @@ public class FileDirectory extends AbstractDirectory {
     protected void removeFileLocal(String name) {
         new File(generatePath(name)).delete();
     }
-    
+
     private String generatePath(String name) {
         return getDir().getPath() + separator + name;
     }
@@ -87,7 +96,7 @@ public class FileDirectory extends AbstractDirectory {
     private void loadAll() {
         mFiles = new LinkedHashSet<String>();
         mDirs = new LinkedHashMap<String, AbstractDirectory>();
-        
+
         File[] files = getDir().listFiles();
         for (int i = 0; i < files.length; i++) {
             File file = files[i];

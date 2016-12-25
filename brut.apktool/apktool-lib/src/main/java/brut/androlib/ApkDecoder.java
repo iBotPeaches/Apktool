@@ -26,7 +26,7 @@ import brut.androlib.meta.VersionInfo;
 import brut.androlib.res.AndrolibResources;
 import brut.androlib.res.data.ResPackage;
 import brut.androlib.res.data.ResTable;
-import brut.androlib.res.util.ExtFile;
+import brut.directory.ExtFile;
 import brut.androlib.res.xml.ResXmlPatcher;
 import brut.common.BrutException;
 import brut.directory.DirectoryException;

@@ -18,14 +18,12 @@ package brut.androlib.src;
 
 import brut.androlib.AndrolibException;
 import brut.androlib.mod.SmaliMod;
-import brut.androlib.res.util.ExtFile;
+import brut.directory.ExtFile;
 import brut.directory.DirectoryException;
 import java.io.*;
-import java.util.List;
 import java.util.logging.Logger;
 
 import org.antlr.runtime.RecognitionException;
-import org.apache.commons.io.IOUtils;
 import org.jf.dexlib2.Opcodes;
 import org.jf.dexlib2.writer.builder.DexBuilder;
 import org.jf.dexlib2.writer.io.FileDataStore;
