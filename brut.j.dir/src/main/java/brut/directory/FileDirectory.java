@@ -30,7 +30,7 @@ public class FileDirectory extends AbstractDirectory {
     private File mDir;
 
     public FileDirectory(String dir) throws DirectoryException {
-        this(new File(dir));
+        this(Paths.get(dir).toFile());
     }
 
     public FileDirectory(ExtFile dir, String folder) throws DirectoryException {
