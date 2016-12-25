@@ -98,7 +98,11 @@ public abstract class TestUtils {
 
         URL dirURL = class_.getClassLoader().getResource(dirPath);
         if (dirURL != null && dirURL.getProtocol().equals("file")) {
-            DirUtil.copyToDir(new FileDirectory(dirURL.getFile()), out);
+            try {
+                DirUtil.copyToDir(new FileDirectory(dirURL.getFile()), out);
+            } catch (UnsupportedEncodingException ex) {
+                throw new BrutException(ex);
+            }
             return;
         }
 
@@ -111,10 +115,10 @@ public abstract class TestUtils {
             String jarPath;
             try {
                 jarPath = URLDecoder.decode(dirURL.getPath().substring(5, dirURL.getPath().indexOf("!")), "UTF-8");
+                DirUtil.copyToDir(new FileDirectory(jarPath), out);
             } catch (UnsupportedEncodingException ex) {
                 throw new BrutException(ex);
             }
-            DirUtil.copyToDir(new FileDirectory(jarPath), out);
         }
     }
 
