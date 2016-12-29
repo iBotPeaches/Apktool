@@ -16,9 +16,8 @@
  */
 package brut.androlib;
 
-import brut.androlib.res.util.ExtFile;
+import brut.directory.ExtFile;
 import brut.common.BrutException;
-import brut.directory.DirectoryException;
 import brut.util.OS;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;

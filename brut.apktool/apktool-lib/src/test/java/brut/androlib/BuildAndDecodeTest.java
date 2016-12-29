@@ -16,7 +16,7 @@
 package brut.androlib;
 
 import brut.androlib.meta.MetaInfo;
-import brut.androlib.res.util.ExtFile;
+import brut.directory.ExtFile;
 import brut.common.BrutException;
 import brut.directory.FileDirectory;
 import brut.util.OS;
@@ -31,7 +31,6 @@ import org.custommonkey.xmlunit.*;
 import org.junit.*;
 import static org.junit.Assert.*;
 
-import org.junit.rules.ExpectedException;
 import org.xml.sax.SAXException;
 
 import javax.imageio.ImageIO;
@@ -420,7 +419,7 @@ public class BuildAndDecodeTest {
 
         String location = tmp + path;
 
-        FileDirectory fileDirectory = new FileDirectory(sTestOrigDir + location);
+        FileDirectory fileDirectory = new FileDirectory(sTestOrigDir, location);
 
         Set<String> files = fileDirectory.getFiles(true);
         for (String filename : files) {

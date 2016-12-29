@@ -16,15 +16,12 @@
  */
 package brut.androlib;
 
-import brut.androlib.res.util.ExtFile;
+import brut.directory.ExtFile;
 import brut.common.BrutException;
-import brut.directory.FileDirectory;
 import brut.util.OS;
 import java.io.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
 
 import org.custommonkey.xmlunit.*;

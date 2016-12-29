@@ -16,7 +16,7 @@
 package brut.androlib;
 
 import brut.androlib.meta.MetaInfo;
-import brut.androlib.res.util.ExtFile;
+import brut.directory.ExtFile;
 import brut.common.BrutException;
 import brut.util.OS;
 import org.junit.AfterClass;
