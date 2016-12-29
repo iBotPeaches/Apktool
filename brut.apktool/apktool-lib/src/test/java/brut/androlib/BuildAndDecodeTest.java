@@ -380,7 +380,7 @@ public class BuildAndDecodeTest {
 
     @Test
     public void unicodeAssetTest() throws BrutException, IOException {
-        // failure using ∂ (unicode)
+        compareAssetsFolder("unicode-txt");
     }
 
     @Test
