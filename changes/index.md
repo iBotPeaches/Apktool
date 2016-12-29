@@ -13,6 +13,8 @@ xxxx.xx.xx
  * Fixed issue with `TYPE_DYNAMIC_ATTRIBUTE` treating improperly which affected Nougat based applications. ([Issue 1382](https://github.com/iBotPeaches/Apktool/issues/1382)) / Thanks xpirt
  * Fixed issue with APKs that have invalid characters. ([Issue 885](https://github.com/iBotPeaches/Apktool/issues/885)), ([Issue 1389](https://github.com/iBotPeaches/Apktool/issues/1389))
  * Fixed issue with versioning vector images during build. ([Issue 1384](https://github.com/iBotPeaches/Apktool/issues/1384))
+ * Fixed issue with APKs that have invalid characters in filename. ([Issue 1369](https://github.com/iBotPeaches/Apktool/issues/1369))
+ * Fixed build issue where space was in build path. ([Issue 1394](https://github.com/iBotPeaches/Apktool/issues/1394))
 
 ## v2.2.1
 2016.10.18
