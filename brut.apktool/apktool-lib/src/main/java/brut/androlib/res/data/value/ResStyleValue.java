@@ -23,6 +23,7 @@ import brut.androlib.res.xml.ResValuesXmlSerializable;
 import brut.util.Duo;
 import java.io.IOException;
 import org.xmlpull.v1.XmlSerializer;
+import java.util.logging.Logger;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
@@ -54,6 +55,8 @@ public class ResStyleValue extends ResBagValue implements
             ResResSpec spec = mItems[i].m1.getReferent();
 
             if (spec == null) {
+                LOGGER.info(String.format("null reference: m1=0x%08x(%s), m2=0x%08x(%s)",
+                        mItems[i].m1.getRawIntValue(), mItems[i].m1.getType(), mItems[i].m2.getRawIntValue(), mItems[i].m2.getType()));
                 continue;
             }
 
@@ -90,4 +93,6 @@ public class ResStyleValue extends ResBagValue implements
     }
 
     private final Duo<ResReferenceValue, ResScalarValue>[] mItems;
+
+    private static final Logger LOGGER = Logger.getLogger(ResStyleValue.class.getName());
 }
