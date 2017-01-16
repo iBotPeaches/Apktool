@@ -17,6 +17,8 @@ xxxx.xx.xx
  * Fixed issue with APKs that have invalid characters in filename. ([Issue 1369](https://github.com/iBotPeaches/Apktool/issues/1369))
  * Fixed build issue where space was in build path. ([Issue 1394](https://github.com/iBotPeaches/Apktool/issues/1394))
  * Fixed issue with APKs that have 3 non positional attributes. ([Issue 1360](https://github.com/iBotPeaches/Apktool/issues/1360))
+ * Fixed issue with APKs that require non-standard `pkgId`. ([Issue 1119](https://github.com/iBotPeaches/Apktool/issues/1119)), ([Issue 989](https://github.com/iBotPeaches/Apktool/issues/989)), ([Issue 1278](https://github.com/iBotPeaches/Apktool/issues/1278)), ([Issue 1377](https://github.com/iBotPeaches/Apktool/issues/1377)), ([Issue 1091](https://github.com/iBotPeaches/Apktool/issues/1091)) / Thanks peter23
+ * Fixed issue with APKs that used reserved words `do` and `if`. ([Issue 1404](https://github.com/iBotPeaches/Apktool/issues/1404))
 
 ## v2.2.1
 2016.10.18
