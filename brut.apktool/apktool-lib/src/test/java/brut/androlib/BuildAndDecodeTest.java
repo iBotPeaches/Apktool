@@ -27,9 +27,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import brut.util.OSDetection;
 import org.custommonkey.xmlunit.*;
 import org.junit.*;
+
 import static org.junit.Assert.*;
+import static org.junit.Assume.*;
 
 import org.xml.sax.SAXException;
 
@@ -379,6 +382,7 @@ public class BuildAndDecodeTest {
 
     @Test
     public void unicodeAssetTest() throws BrutException, IOException {
+        assumeTrue(! OSDetection.isWindows());
         compareAssetsFolder("unicode-txt");
     }
 
