@@ -47,7 +47,7 @@ some of the fixed bugs in this release. This is a simple test to ensure the buil
 
 Copy the jar to any location to prep for uploading. The pattern we name the jars is
 
-   apktool_x.x.x.jar
+    apktool_x.x.x.jar
 
 Or in the case of the last release - `apktool_2.2.1.jar`
 
