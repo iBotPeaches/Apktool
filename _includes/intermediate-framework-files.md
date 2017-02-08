@@ -51,11 +51,18 @@ Apktool comes with an internal framework like mentioned above. This file is copi
 
 <blockquote class="warning"><span class="label label-warning lb">Warning</span> Apktool has no knowledge of what version of framework resides there. It will assume its up to date, so delete the file during Apktool upgrades</blockquote>
 <h4><strong>Managing framework files</strong></h4>
-Frameworks are stored in <code>$HOME/apktool/framework</code> for Windows and Unix systems. Mac OS X has a slightly different folder location of 
-<code>$HOME/Library/apktool/framework</code>.
+Frameworks are stored in different places depending on the OS in question.
+<ul>
+    <li>unix - <code>$HOME/.local/share/apktool</code></li>
+    <li>windows - <code>$HOME/AppData/Local/apktool</code></li>
+    <li>mac - <code>$HOME/Library/apktool</code></li>
+</ul>
 
 If these directories are not available it will default to <code>java.io.tmpdir</code> which is usually <code>/tmp</code>.
 This is a volatile directory so it would make sense to take advantage of the parameter <code>--frame-path</code> to select an alternative folder for framework files.
+<br /><br />
+Since these locations are in sometimes hidden directories, managing these frameworks becomes a challenge. A simple helper function
+(added in v2.2.1) allows you to run <code>apktool empty-framework-dir</code> to empty out frameworks.
 <br /><br />
 
 <blockquote class="info"><span class="label label-info lb">Note</span> Apktool has no control over the frameworks once installed, but you are free to manage these files on your own.</blockquote>
