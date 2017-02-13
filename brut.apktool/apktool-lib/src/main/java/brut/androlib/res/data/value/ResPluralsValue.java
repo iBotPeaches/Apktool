@@ -54,7 +54,7 @@ public class ResPluralsValue extends ResBagValue implements
 
             serializer.startTag(null, "item");
             serializer.attribute(null, "quantity", QUANTITY_MAP[i]);
-            serializer.text(ResXmlEncoders.enumerateNonPositionalSubstitutionsIfRequired(item.encodeAsResXmlValue()));
+            serializer.text(ResXmlEncoders.enumerateNonPositionalSubstitutionsIfRequired(item.encodeAsResXmlNonEscapedItemValue()));
             serializer.endTag(null, "item");
         }
         serializer.endTag(null, "plurals");
