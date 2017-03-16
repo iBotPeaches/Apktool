@@ -7,9 +7,9 @@ title: Apktool - How to Install
 # Install Instructions
 
 ## Quick Check
-  1. Is Java 1.7 installed?
-  1. Does executing <kbd>java -version</kbd> on command line / command prompt return 1.7?
-  1. If not, please install Java 7 and make it the default.
+  1. Is at least Java 1.7 installed?
+  1. Does executing <kbd>java -version</kbd> on command line / command prompt return 1.7 or greater?
+  1. If not, please install Java 7+ and make it the default.
 
 ## Installation for Apktool
   * **Windows**:
