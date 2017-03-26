@@ -328,6 +328,26 @@ public class Androlib {
                 throw new AndrolibException(ex.getMessage());
             }
         }
+
+        if (apkOptions.signBuildAll) {
+            String outFileName = meta.apkFileName;
+            int lastIndexOf = outFileName.lastIndexOf(".");
+            outFileName = outFileName.substring(0,lastIndexOf).concat("-sign.apk");
+            File outSignFile = new File(appDir, "dist" + File.separator + (outFileName == null ? "out-signed.apk" : outFileName));
+            signApk(outFile,outSignFile);
+        }
+    }
+
+    private void signApk(File outFile, File outSignFile) throws AndrolibException {
+        LOGGER.info("Signing apk file...");
+        String commandString = String.format("jarsigner -keystore %s -storepass %s -signedjar %s %s %s",
+                apkOptions.keystorePath,apkOptions.storepass,outSignFile.getAbsolutePath(),outFile.getAbsolutePath(),apkOptions.keypass);
+        String[] command = commandString.split(" ");
+        try {
+            OS.exec(command);
+        } catch (BrutException e) {
+            throw new AndrolibException(e);
+        }
     }
 
     public void buildSources(File appDir)

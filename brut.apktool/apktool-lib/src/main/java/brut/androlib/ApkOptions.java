@@ -34,4 +34,8 @@ public class ApkOptions {
     public String frameworkFolderLocation = null;
     public String frameworkTag = null;
     public String aaptPath = "";
+
+    public String keystorePath=null;
+    public String storepass=null;
+    public String keypass=null;
 }
