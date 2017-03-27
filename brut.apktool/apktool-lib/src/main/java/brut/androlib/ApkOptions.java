@@ -19,9 +19,9 @@ import java.util.Collection;
 
 public class ApkOptions {
     public boolean forceBuildAll = false;
-    public boolean installBuildAll = false;
-    public boolean reinstallBuildAll = false;
-    public boolean signBuildAll = false;
+    public boolean installBuild = false;
+    public boolean reinstallBuild = false;
+    public boolean signBuild = false;
     public boolean forceDeleteFramework = false;
     public boolean debugMode = false;
     public boolean verbose = false;
@@ -35,7 +35,5 @@ public class ApkOptions {
     public String frameworkTag = null;
     public String aaptPath = "";
 
-    public String keystorePath=null;
-    public String storepass=null;
-    public String keypass=null;
+    public String signConfigPath="sign.conf";
 }

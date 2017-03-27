@@ -1,17 +1,17 @@
 /**
- *  Copyright 2014 Ryszard Wiśniewski <brut.alll@gmail.com>
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Copyright 2014 Ryszard Wiśniewski <brut.alll@gmail.com>
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package brut.androlib;
@@ -30,6 +30,7 @@ import brut.common.BrutException;
 import brut.directory.*;
 import brut.util.BrutIO;
 import brut.util.OS;
+
 import java.io.*;
 import java.util.*;
 import java.util.logging.Logger;
@@ -174,7 +175,7 @@ public class Androlib {
                             }
                         }
 
-                        if (! uncompressedFilesOrExts.contains(ext)) {
+                        if (!uncompressedFilesOrExts.contains(ext)) {
                             uncompressedFilesOrExts.add(ext);
                         }
                     }
@@ -228,7 +229,7 @@ public class Androlib {
 
         try {
             Directory in = apkFile.getDirectory();
-            if(in.containsFile("AndroidManifest.xml")) {
+            if (in.containsFile("AndroidManifest.xml")) {
                 in.copyToDir(originalDir, "AndroidManifest.xml");
             }
             if (in.containsDir("META-INF")) {
@@ -241,7 +242,7 @@ public class Androlib {
 
     public void writeMetaFile(File mOutDir, MetaInfo meta)
             throws AndrolibException {
-        try{
+        try {
             meta.save(new File(mOutDir, "apktool.yml"));
         } catch (IOException ex) {
             throw new AndrolibException(ex);
@@ -250,7 +251,7 @@ public class Androlib {
 
     public MetaInfo readMetaFile(ExtFile appDir)
             throws AndrolibException {
-        try(
+        try (
                 InputStream in = appDir.getDirectory().getFileInput("apktool.yml")
         ) {
             return MetaInfo.load(in);
@@ -329,23 +330,60 @@ public class Androlib {
             }
         }
 
-        if (apkOptions.signBuildAll) {
+        if (apkOptions.signBuild) {
             String outFileName = meta.apkFileName;
             int lastIndexOf = outFileName.lastIndexOf(".");
-            outFileName = outFileName.substring(0,lastIndexOf).concat("-sign.apk");
+            outFileName = outFileName.substring(0, lastIndexOf).concat("-sign.apk");
             File outSignFile = new File(appDir, "dist" + File.separator + (outFileName == null ? "out-signed.apk" : outFileName));
-            signApk(outFile,outSignFile);
+
+            signApk(outFile, outSignFile);
+
+            if (apkOptions.installBuild || apkOptions.reinstallBuild) {
+                installApk(outSignFile, apkOptions.reinstallBuild);
+            }
+        }
+
+
+    }
+
+    private void installApk(File file, boolean isReplaceExistingApplication) throws AndrolibException {
+        LOGGER.info("Installing apk...");
+        ArrayList<String> strings = new ArrayList<>();
+        strings.add("adb");
+        strings.add("install");
+        if (isReplaceExistingApplication) {
+            strings.add("-r");
+        }
+        strings.add(file.getAbsolutePath());
+        try {
+            OS.exec(strings.toArray(new String[0]));
+        } catch (BrutException e) {
+            throw new AndrolibException(e);
         }
     }
 
     private void signApk(File outFile, File outSignFile) throws AndrolibException {
-        LOGGER.info("Signing apk file...");
-        String commandString = String.format("jarsigner -keystore %s -storepass %s -signedjar %s %s %s",
-                apkOptions.keystorePath,apkOptions.storepass,outSignFile.getAbsolutePath(),outFile.getAbsolutePath(),apkOptions.keypass);
-        String[] command = commandString.split(" ");
+        File file = new File(apkOptions.signConfigPath);
+        if (!file.exists()) {
+            LOGGER.warning(String.format("%s file does not exist,skip sign...", file.getAbsolutePath()));
+            return;
+        }
+
         try {
-            OS.exec(command);
-        } catch (BrutException e) {
+            List<String> strings = FileUtils.readLines(file);
+            if (strings.size() >= 1) {
+                LOGGER.info("Signing apk file...");
+
+                String cmd = strings.get(0);
+                cmd = String.format(cmd, outSignFile.getAbsolutePath(), outFile.getAbsolutePath());
+
+                String[] command = cmd.split(" ");
+                OS.exec(command);
+            } else {
+                LOGGER.warning("Sign config file cannot be empty,skip sign...");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
             throw new AndrolibException(e);
         }
     }
@@ -379,12 +417,12 @@ public class Androlib {
                 for (File dex : dexFiles) {
 
                     // skip classes.dex because we have handled it in buildSources()
-                    if (dex.getName().endsWith(".dex") && ! dex.getName().equalsIgnoreCase("classes.dex")) {
+                    if (dex.getName().endsWith(".dex") && !dex.getName().equalsIgnoreCase("classes.dex")) {
                         buildSourcesRaw(appDir, dex.getName());
                     }
                 }
             }
-        } catch(DirectoryException ex) {
+        } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
         }
     }
@@ -415,11 +453,11 @@ public class Androlib {
             return false;
         }
         File dex = new File(appDir, APK_DIRNAME + "/" + filename);
-        if (! apkOptions.forceBuildAll) {
+        if (!apkOptions.forceBuildAll) {
             LOGGER.info("Checking whether sources has changed...");
         }
         if (apkOptions.forceBuildAll || isModified(smaliDir, dex)) {
-            LOGGER.info("Smaling " + folder + " folder into " + filename +"...");
+            LOGGER.info("Smaling " + folder + " folder into " + filename + "...");
             dex.delete();
             SmaliBuilder.build(smaliDir, dex, mMinSdkVersion);
         }
@@ -441,7 +479,7 @@ public class Androlib {
                 return false;
             }
             File apkDir = new File(appDir, APK_DIRNAME);
-            if (! apkOptions.forceBuildAll) {
+            if (!apkOptions.forceBuildAll) {
                 LOGGER.info("Checking whether resources has changed...");
             }
             if (apkOptions.forceBuildAll || isModified(newFiles(APK_RESOURCES_FILENAMES, appDir),
@@ -461,7 +499,7 @@ public class Androlib {
             if (!new File(appDir, "res").exists()) {
                 return false;
             }
-            if (! apkOptions.forceBuildAll) {
+            if (!apkOptions.forceBuildAll) {
                 LOGGER.info("Checking whether resources has changed...");
             }
             File apkDir = new File(appDir, APK_DIRNAME);
@@ -481,7 +519,7 @@ public class Androlib {
                     ninePatch = null;
                 }
                 mAndRes.aaptPackage(apkFile, new File(appDir,
-                        "AndroidManifest.xml"), new File(appDir, "res"),
+                                "AndroidManifest.xml"), new File(appDir, "res"),
                         ninePatch, null, parseUsesFramework(usesFramework));
 
                 Directory tmpDir = new ExtFile(apkFile).getDirectory();
@@ -516,7 +554,7 @@ public class Androlib {
             if (!new File(appDir, "AndroidManifest.xml").exists()) {
                 return false;
             }
-            if (! apkOptions.forceBuildAll) {
+            if (!apkOptions.forceBuildAll) {
                 LOGGER.info("Checking whether resources has changed...");
             }
 
@@ -535,7 +573,7 @@ public class Androlib {
                 }
 
                 mAndRes.aaptPackage(apkFile, new File(appDir,
-                        "AndroidManifest.xml"), null, ninePatch, null,
+                                "AndroidManifest.xml"), null, ninePatch, null,
                         parseUsesFramework(usesFramework));
 
                 Directory tmpDir = new ExtFile(apkFile).getDirectory();
@@ -561,7 +599,7 @@ public class Androlib {
     public void buildLibrary(File appDir, String folder) throws AndrolibException {
         File working = new File(appDir, folder);
 
-        if (! working.exists()) {
+        if (!working.exists()) {
             return;
         }
 
@@ -581,11 +619,11 @@ public class Androlib {
             throws AndrolibException {
         if (apkOptions.copyOriginalFiles) {
             File originalDir = new File(appDir, "original");
-            if(originalDir.exists()) {
+            if (originalDir.exists()) {
                 try {
                     LOGGER.info("Copy original files...");
                     Directory in = (new ExtFile(originalDir)).getDirectory();
-                    if(in.containsFile("AndroidManifest.xml")) {
+                    if (in.containsFile("AndroidManifest.xml")) {
                         LOGGER.info("Copy AndroidManifest.xml...");
                         in.copyToDir(new File(appDir, APK_DIRNAME), "AndroidManifest.xml");
                     }
@@ -608,7 +646,7 @@ public class Androlib {
             Map<String, String> files = meta.unknownFiles;
             File tempFile = new File(outFile.getParent(), outFile.getName() + ".apktool_temp");
             boolean renamed = outFile.renameTo(tempFile);
-            if(!renamed) {
+            if (!renamed) {
                 throw new AndrolibException("Unable to rename temporary file");
             }
 
@@ -638,7 +676,7 @@ public class Androlib {
             outputFile.putNextEntry(entry);
 
             // No need to create directory entries in the final apk
-            if (! entry.isDirectory()) {
+            if (!entry.isDirectory()) {
                 BrutIO.copy(inputFile, outputFile, entry);
             }
 
@@ -651,7 +689,7 @@ public class Androlib {
         File unknownFileDir = new File(appDir, UNK_DIRNAME);
 
         // loop through unknown files
-        for (Map.Entry<String,String> unknownFileInfo : files.entrySet()) {
+        for (Map.Entry<String, String> unknownFileInfo : files.entrySet()) {
             File inputFile = new File(unknownFileDir, unknownFileInfo.getKey());
             if (inputFile.isDirectory()) {
                 continue;
@@ -741,7 +779,7 @@ public class Androlib {
     }
 
     private boolean isModified(File working, File stored) {
-        return ! stored.exists() || BrutIO.recursiveModifiedTime(working) > BrutIO .recursiveModifiedTime(stored);
+        return !stored.exists() || BrutIO.recursiveModifiedTime(working) > BrutIO.recursiveModifiedTime(stored);
     }
 
     private boolean isModified(File[] working, File[] stored) {
@@ -766,17 +804,17 @@ public class Androlib {
     private final static String SMALI_DIRNAME = "smali";
     private final static String APK_DIRNAME = "build/apk";
     private final static String UNK_DIRNAME = "unknown";
-    private final static String[] APK_RESOURCES_FILENAMES = new String[] {
-            "resources.arsc", "AndroidManifest.xml", "res" };
-    private final static String[] APK_RESOURCES_WITHOUT_RES_FILENAMES = new String[] {
-            "resources.arsc", "AndroidManifest.xml" };
-    private final static String[] APP_RESOURCES_FILENAMES = new String[] {
-            "AndroidManifest.xml", "res" };
-    private final static String[] APK_MANIFEST_FILENAMES = new String[] {
-            "AndroidManifest.xml" };
-    private final static String[] APK_STANDARD_ALL_FILENAMES = new String[] {
+    private final static String[] APK_RESOURCES_FILENAMES = new String[]{
+            "resources.arsc", "AndroidManifest.xml", "res"};
+    private final static String[] APK_RESOURCES_WITHOUT_RES_FILENAMES = new String[]{
+            "resources.arsc", "AndroidManifest.xml"};
+    private final static String[] APP_RESOURCES_FILENAMES = new String[]{
+            "AndroidManifest.xml", "res"};
+    private final static String[] APK_MANIFEST_FILENAMES = new String[]{
+            "AndroidManifest.xml"};
+    private final static String[] APK_STANDARD_ALL_FILENAMES = new String[]{
             "classes.dex", "AndroidManifest.xml", "resources.arsc", "res", "r", "R",
-            "lib", "libs", "assets", "META-INF" };
+            "lib", "libs", "assets", "META-INF"};
     // Taken from AOSP's frameworks/base/tools/aapt/Package.cpp
     private final static Pattern NO_COMPRESS_PATTERN = Pattern.compile("\\.(" +
             "jpg|jpeg|png|gif|wav|mp2|mp3|ogg|aac|mpg|mpeg|mid|midi|smf|jet|rtttl|imy|xmf|mp4|" +

@@ -202,20 +202,13 @@ public class Main {
             apkOptions.forceBuildAll = true;
         }
         if (cli.hasOption("i") || cli.hasOption("install")) {
-            apkOptions.installBuildAll = true;
+            apkOptions.installBuild = true;
         }
         if (cli.hasOption("r") || cli.hasOption("reinstall")) {
-            apkOptions.reinstallBuildAll = true;
+            apkOptions.reinstallBuild = true;
         }
         if (cli.hasOption("s") || cli.hasOption("sign")) {
-            apkOptions.signBuildAll = true;
-            if (args.length > 4) {
-                apkOptions.keystorePath = args[2];
-                apkOptions.storepass = args[3];
-                apkOptions.keypass = args[4];
-            } else {
-                throw new BrutException("sign apk argument error.");
-            }
+            apkOptions.signBuild = true;
         }
         if (cli.hasOption("d") || cli.hasOption("debug")) {
             System.out.println("SmaliDebugging has been removed in 2.1.0 onward. Please see: https://github.com/iBotPeaches/Apktool/issues/1061");
