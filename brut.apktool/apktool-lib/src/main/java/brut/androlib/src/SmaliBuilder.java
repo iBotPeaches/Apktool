@@ -50,9 +50,9 @@ public class SmaliBuilder {
         try {
             DexBuilder dexBuilder;
             if (mApiLevel > 0) {
-                dexBuilder = DexBuilder.makeDexBuilder(Opcodes.forApi(mApiLevel));
+                dexBuilder = new DexBuilder(Opcodes.forApi(mApiLevel));
             } else {
-                dexBuilder = DexBuilder.makeDexBuilder();
+                dexBuilder = new DexBuilder(Opcodes.getDefault());
             }
 
             for (String fileName : mSmaliDir.getDirectory().getFiles(true)) {
@@ -71,7 +71,7 @@ public class SmaliBuilder {
 
         if (fileName.endsWith(".smali")) {
             try {
-                if (!SmaliMod.assembleSmaliFile(inFile,dexBuilder, false, false)) {
+                if (!SmaliMod.assembleSmaliFile(inFile, dexBuilder, false, false)) {
                     throw new AndrolibException("Could not smali file: " + fileName);
                 }
             } catch (IOException | RecognitionException ex) {

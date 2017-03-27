@@ -17,9 +17,10 @@
 package brut.androlib.src;
 
 import brut.androlib.AndrolibException;
-import org.jf.baksmali.baksmali;
-import org.jf.baksmali.baksmaliOptions;
+import org.jf.baksmali.Baksmali;
+import org.jf.baksmali.BaksmaliOptions;
 import org.jf.dexlib2.DexFileFactory;
+import org.jf.dexlib2.Opcodes;
 import org.jf.dexlib2.dexbacked.DexBackedDexFile;
 import org.jf.dexlib2.dexbacked.DexBackedOdexFile;
 import org.jf.dexlib2.analysis.InlineMethodResolver;
@@ -47,31 +48,28 @@ public class SmaliDecoder {
 
     private void decode() throws AndrolibException {
         try {
-            baksmaliOptions options = new baksmaliOptions();
+            BaksmaliOptions options = new BaksmaliOptions();
 
             // options
             options.deodex = false;
-            options.outputDirectory = mOutDir.toString();
-            options.noParameterRegisters = false;
-            options.useLocalsDirective = true;
-            options.useSequentialLabels = true;
-            options.outputDebugInfo = mBakDeb;
-            options.addCodeOffsets = false;
-            options.jobs = -1;
-            options.noAccessorComments = false;
+            options.implicitReferences = false;
+            options.parameterRegisters = false;
+            options.localsDirective = true;
+            options.sequentialLabels = true;
+            options.debugInfo = mBakDeb;
+            options.codeOffsets = false;
+            options.accessorComments = false;
             options.registerInfo = 0;
-            options.ignoreErrors = false;
             options.inlineResolver = null;
-            options.checkPackagePrivateAccess = false;
 
             // set jobs automatically
-            options.jobs = Runtime.getRuntime().availableProcessors();
-            if (options.jobs > 6) {
-                options.jobs = 6;
+            int jobs = Runtime.getRuntime().availableProcessors();
+            if (jobs > 6) {
+                jobs = 6;
             }
 
             // create the dex
-            DexBackedDexFile dexFile = DexFileFactory.loadDexFile(mApkFile, mDexFile, mApi, false);
+            DexBackedDexFile dexFile = DexFileFactory.loadDexEntry(mApkFile, mDexFile, true, Opcodes.forApi(mApi));
 
             if (dexFile.isOdexFile()) {
                 throw new AndrolibException("Warning: You are disassembling an odex file without deodexing it.");
@@ -82,7 +80,7 @@ public class SmaliDecoder {
                         InlineMethodResolver.createInlineMethodResolver(((DexBackedOdexFile)dexFile).getOdexVersion());
             }
 
-            baksmali.disassembleDexFile(dexFile, options);
+            Baksmali.disassembleDexFile(dexFile, mOutDir, jobs, options);
         } catch (IOException ex) {
             throw new AndrolibException(ex);
         }

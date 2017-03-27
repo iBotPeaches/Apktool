@@ -16,9 +16,6 @@
 
 package brut.androlib;
 
-import org.jf.baksmali.baksmali;
-import org.jf.smali.main;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -51,7 +48,7 @@ public class ApktoolProperties {
 
         InputStream templateStream = null;
         try {
-            templateStream = baksmali.class.getClassLoader().getResourceAsStream("baksmali.properties");
+            templateStream = org.jf.baksmali.Main.class.getClassLoader().getResourceAsStream("baksmali.properties");
         } catch(NoClassDefFoundError ex) {
             LOGGER.warning("Can't load baksmali properties.");
         }
@@ -69,7 +66,7 @@ public class ApktoolProperties {
 
         templateStream = null;
         try {
-            templateStream = main.class.getClassLoader().getResourceAsStream("smali.properties");
+            templateStream = org.jf.smali.Main.class.getClassLoader().getResourceAsStream("smali.properties");
         } catch(NoClassDefFoundError ex) {
             LOGGER.warning("Can't load smali properties.");
         }
