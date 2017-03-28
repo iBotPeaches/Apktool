@@ -1,4 +1,3 @@
-
 /**
  *  Copyright 2014 Ryszard Wiśniewski <brut.alll@gmail.com>
  *
@@ -176,7 +175,7 @@ public class Androlib {
                             }
                         }
 
-                        if (!uncompressedFilesOrExts.contains(ext)) {
+                        if (! uncompressedFilesOrExts.contains(ext)) {
                             uncompressedFilesOrExts.add(ext);
                         }
                     }
