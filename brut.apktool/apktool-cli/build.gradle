@@ -16,6 +16,7 @@
 apply plugin: 'eu.appsatori.fatjar'
 
 dependencies {
+    compile depends.commons_cli
     compile project(':brut.apktool:apktool-lib')
 }
 
