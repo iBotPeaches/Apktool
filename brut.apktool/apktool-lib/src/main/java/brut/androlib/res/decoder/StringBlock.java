@@ -303,32 +303,34 @@ public class StringBlock {
     private static final int[] getUtf8(byte[] array, int offset) {
         int val = array[offset];
         int length;
-
+        // We skip the utf16 length of the string
         if ((val & 0x80) != 0) {
             offset += 2;
         } else {
-            offset += 1;
+            offset += 1;	
         }
+        // And we read only the utf-8 encoded length of the string
         val = array[offset];
+        offset += 1;
         if ((val & 0x80) != 0) {
-            offset += 2;
-        } else {
+        	int low = (array[offset] & 0xFF); 
+        	length = ((val & 0x7F) << 8) + low;
             offset += 1;
-        }
-        length = 0;
-        while (array[offset + length] != 0) {
-            length++;
+        } else {
+            length = val;
         }
         return new int[] { offset, length};
     }
-
+    
     private static final int[] getUtf16(byte[] array, int offset) {
         int val = ((array[offset + 1] & 0xFF) << 8 | array[offset] & 0xFF);
 
-        if (val == 0x8000) {
+        if ((val & 0x8000) != 0) {
             int high = (array[offset + 3] & 0xFF) << 8;
             int low = (array[offset + 2] & 0xFF);
-            return new int[] {4, (high + low) * 2};
+            int len_value =  ((val & 0x7FFF) << 16) + (high + low);
+            return new int[] {4, len_value * 2};
+            
         }
         return new int[] {2, val * 2};
     }
