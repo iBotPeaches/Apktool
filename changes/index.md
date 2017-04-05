@@ -4,6 +4,12 @@ title: Apktool - Changelog
 description: Apktool - Changelog / Roadmap
 ---
 
+## v2.2.3 (in development)
+2017.xx.xx
+
+ * Updated to [smali 2.2](https://github.com/JesusFreke/smali/wiki/SmaliBaksmali2.2)
+ * Fix for reading length of UTF16 encoded strings. (Thanks atn1969)
+
 ## v2.2.2
 2017.01.23
 
