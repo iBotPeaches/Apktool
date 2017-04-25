@@ -8,7 +8,9 @@ description: Apktool - Changelog / Roadmap
 2017.xx.xx
 
  * Updated to [smali 2.2](https://github.com/JesusFreke/smali/wiki/SmaliBaksmali2.2)
+ * Updated gradle to `v3.5`. (Thanks friederbluemle)
  * Fix for reading length of UTF16 encoded strings. (Thanks atn1969)
+ * Fixed issue changing default parameters on baksmali. ([Issue 1481](https://github.com/iBotPeaches/Apktool/issues/1481))
 
 ## v2.2.2
 2017.01.23
