@@ -48,12 +48,12 @@ public class SmaliDecoder {
 
     private void decode() throws AndrolibException {
         try {
-            BaksmaliOptions options = new BaksmaliOptions();
+            final BaksmaliOptions options = new BaksmaliOptions();
 
             // options
             options.deodex = false;
             options.implicitReferences = false;
-            options.parameterRegisters = false;
+            options.parameterRegisters = true;
             options.localsDirective = true;
             options.sequentialLabels = true;
             options.debugInfo = mBakDeb;
