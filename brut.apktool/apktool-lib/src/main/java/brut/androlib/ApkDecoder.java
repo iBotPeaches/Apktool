@@ -60,12 +60,10 @@ public class ApkDecoder {
     }
 
     public void setApkFile(File apkFile) {
-        if (mApkFile != null)
-        {
+        if (mApkFile != null) {
             try {
                 mApkFile.close();
-            } catch (IOException e) {
-            }
+            } catch (IOException ignored) {}
         }
 
         mApkFile = new ExtFile(apkFile);
@@ -172,8 +170,7 @@ public class ApkDecoder {
         } finally {
             try {
                 mApkFile.close();
-            } catch (IOException e) {
-            }
+            } catch (IOException ignored) {}
         }
     }
 

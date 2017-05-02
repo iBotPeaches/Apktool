@@ -563,8 +563,7 @@ final public class AndrolibResources {
             } finally {
                 try {
                     bfi.close();
-                } catch (IOException e) {
-                }
+                } catch (IOException ignored) {}
             }
         } catch (DirectoryException ex) {
             throw new AndrolibException("Could not load resources.arsc from file: " + apkFile, ex);
@@ -572,7 +571,7 @@ final public class AndrolibResources {
     }
 
     public File getFrameworkApk(int id, String frameTag)
-            throws AndrolibException {  
+            throws AndrolibException {
         File dir = getFrameworkDir();
         File apk;
 
