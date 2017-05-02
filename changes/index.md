@@ -11,6 +11,7 @@ description: Apktool - Changelog / Roadmap
  * Updated gradle to `v3.5`. (Thanks friederbluemle)
  * Fix for reading length of UTF16 encoded strings. (Thanks atn1969)
  * Fixed issue changing default parameters on baksmali. ([Issue 1481](https://github.com/iBotPeaches/Apktool/issues/1481))
+ * Fixed issue with apktool locking access to input files. ([Issue 1160](https://github.com/iBotPeaches/Apktool/issues/1160)) (Thanks MarcMil)
 
 ## v2.2.2
 2017.01.23
