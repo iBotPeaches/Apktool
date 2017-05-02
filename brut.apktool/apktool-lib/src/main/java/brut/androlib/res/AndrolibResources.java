@@ -121,7 +121,8 @@ final public class AndrolibResources {
         File apk = getFrameworkApk(id, frameTag);
 
         LOGGER.info("Loading resource table from file: " + apk);
-        ResPackage[] pkgs = getResPackagesFromApk(new ExtFile(apk), resTable, true);
+        mFramework = new ExtFile(apk);
+        ResPackage[] pkgs = getResPackagesFromApk(mFramework, resTable, true);
 
         ResPackage pkg;
         if (pkgs.length > 1) {
@@ -555,8 +556,15 @@ final public class AndrolibResources {
     private ResPackage[] getResPackagesFromApk(ExtFile apkFile,ResTable resTable, boolean keepBroken)
             throws AndrolibException {
         try {
-            BufferedInputStream bfi = new BufferedInputStream(apkFile.getDirectory().getFileInput("resources.arsc"));
-            return ARSCDecoder.decode(bfi, false, keepBroken, resTable).getPackages();
+            Directory dir = apkFile.getDirectory();
+            BufferedInputStream bfi = new BufferedInputStream(dir.getFileInput("resources.arsc"));
+            try {
+                return ARSCDecoder.decode(bfi, false, keepBroken, resTable).getPackages();
+            } finally {
+                try {
+                    bfi.close();
+                } catch (IOException ignored) {}
+            }
         } catch (DirectoryException ex) {
             throw new AndrolibException("Could not load resources.arsc from file: " + apkFile, ex);
         }
@@ -810,6 +818,10 @@ final public class AndrolibResources {
         }
     }
 
+    public void close() throws IOException {
+        mFramework.close();
+    }
+
     public ApkOptions apkOptions;
 
     // TODO: dirty static hack. I have to refactor decoding mechanisms.
@@ -818,6 +830,8 @@ final public class AndrolibResources {
     private final static Logger LOGGER = Logger.getLogger(AndrolibResources.class.getName());
 
     private File mFrameworkDirectory = null;
+
+    private ExtFile mFramework = null;
 
     private String mMinSdkVersion = null;
     private String mMaxSdkVersion = null;

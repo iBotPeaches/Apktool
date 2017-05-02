@@ -60,6 +60,12 @@ public class ApkDecoder {
     }
 
     public void setApkFile(File apkFile) {
+        if (mApkFile != null) {
+            try {
+                mApkFile.close();
+            } catch (IOException ignored) {}
+        }
+
         mApkFile = new ExtFile(apkFile);
         mResTable = null;
     }
@@ -73,93 +79,99 @@ public class ApkDecoder {
     }
 
     public void decode() throws AndrolibException, IOException, DirectoryException {
-        File outDir = getOutDir();
-        AndrolibResources.sKeepBroken = mKeepBrokenResources;
-
-        if (!mForceDelete && outDir.exists()) {
-            throw new OutDirExistsException();
-        }
-
-        if (!mApkFile.isFile() || !mApkFile.canRead()) {
-            throw new InFileNotFoundException();
-        }
-
         try {
-            OS.rmdir(outDir);
-        } catch (BrutException ex) {
-            throw new AndrolibException(ex);
-        }
-        outDir.mkdirs();
+            File outDir = getOutDir();
+            AndrolibResources.sKeepBroken = mKeepBrokenResources;
 
-        LOGGER.info("Using Apktool " + Androlib.getVersion() + " on " + mApkFile.getName());
-
-        if (hasResources()) {
-            switch (mDecodeResources) {
-                case DECODE_RESOURCES_NONE:
-                    mAndrolib.decodeResourcesRaw(mApkFile, outDir);
-                    break;
-                case DECODE_RESOURCES_FULL:
-                    setTargetSdkVersion();
-                    setAnalysisMode(mAnalysisMode, true);
-
-                    if (hasManifest()) {
-                        mAndrolib.decodeManifestWithResources(mApkFile, outDir, getResTable());
-                    }
-                    mAndrolib.decodeResourcesFull(mApkFile, outDir, getResTable());
-                    break;
+            if (!mForceDelete && outDir.exists()) {
+                throw new OutDirExistsException();
             }
-        } else {
-            // if there's no resources.asrc, decode the manifest without looking
-            // up attribute references
-            if (hasManifest()) {
+
+            if (!mApkFile.isFile() || !mApkFile.canRead()) {
+                throw new InFileNotFoundException();
+            }
+
+            try {
+                OS.rmdir(outDir);
+            } catch (BrutException ex) {
+                throw new AndrolibException(ex);
+            }
+            outDir.mkdirs();
+
+            LOGGER.info("Using Apktool " + Androlib.getVersion() + " on " + mApkFile.getName());
+
+            if (hasResources()) {
                 switch (mDecodeResources) {
                     case DECODE_RESOURCES_NONE:
-                        mAndrolib.decodeManifestRaw(mApkFile, outDir);
+                        mAndrolib.decodeResourcesRaw(mApkFile, outDir);
                         break;
                     case DECODE_RESOURCES_FULL:
-                        mAndrolib.decodeManifestFull(mApkFile, outDir,
-                                getResTable());
+                        setTargetSdkVersion();
+                        setAnalysisMode(mAnalysisMode, true);
+
+                        if (hasManifest()) {
+                            mAndrolib.decodeManifestWithResources(mApkFile, outDir, getResTable());
+                        }
+                        mAndrolib.decodeResourcesFull(mApkFile, outDir, getResTable());
+                        break;
+                }
+            } else {
+                // if there's no resources.asrc, decode the manifest without looking
+                // up attribute references
+                if (hasManifest()) {
+                    switch (mDecodeResources) {
+                        case DECODE_RESOURCES_NONE:
+                            mAndrolib.decodeManifestRaw(mApkFile, outDir);
+                            break;
+                        case DECODE_RESOURCES_FULL:
+                            mAndrolib.decodeManifestFull(mApkFile, outDir,
+                                    getResTable());
+                            break;
+                    }
+                }
+            }
+
+            if (hasSources()) {
+                switch (mDecodeSources) {
+                    case DECODE_SOURCES_NONE:
+                        mAndrolib.decodeSourcesRaw(mApkFile, outDir, "classes.dex");
+                        break;
+                    case DECODE_SOURCES_SMALI:
+                        mAndrolib.decodeSourcesSmali(mApkFile, outDir, "classes.dex", mBakDeb, mApi);
                         break;
                 }
             }
-        }
 
-        if (hasSources()) {
-            switch (mDecodeSources) {
-                case DECODE_SOURCES_NONE:
-                    mAndrolib.decodeSourcesRaw(mApkFile, outDir, "classes.dex");
-                    break;
-                case DECODE_SOURCES_SMALI:
-                    mAndrolib.decodeSourcesSmali(mApkFile, outDir, "classes.dex", mBakDeb, mApi);
-                    break;
-            }
-        }
-
-        if (hasMultipleSources()) {
-            // foreach unknown dex file in root, lets disassemble it
-            Set<String> files = mApkFile.getDirectory().getFiles(true);
-            for (String file : files) {
-                if (file.endsWith(".dex")) {
-                    if (! file.equalsIgnoreCase("classes.dex")) {
-                        switch(mDecodeSources) {
-                            case DECODE_SOURCES_NONE:
-                                mAndrolib.decodeSourcesRaw(mApkFile, outDir, file);
-                                break;
-                            case DECODE_SOURCES_SMALI:
-                                mAndrolib.decodeSourcesSmali(mApkFile, outDir, file, mBakDeb, mApi);
-                                break;
+            if (hasMultipleSources()) {
+                // foreach unknown dex file in root, lets disassemble it
+                Set<String> files = mApkFile.getDirectory().getFiles(true);
+                for (String file : files) {
+                    if (file.endsWith(".dex")) {
+                        if (! file.equalsIgnoreCase("classes.dex")) {
+                            switch(mDecodeSources) {
+                                case DECODE_SOURCES_NONE:
+                                    mAndrolib.decodeSourcesRaw(mApkFile, outDir, file);
+                                    break;
+                                case DECODE_SOURCES_SMALI:
+                                    mAndrolib.decodeSourcesSmali(mApkFile, outDir, file, mBakDeb, mApi);
+                                    break;
+                            }
                         }
                     }
                 }
             }
-        }
 
-        mAndrolib.decodeRawFiles(mApkFile, outDir);
-        mAndrolib.decodeUnknownFiles(mApkFile, outDir, mResTable);
-        mUncompressedFiles = new ArrayList<String>();
-        mAndrolib.recordUncompressedFiles(mApkFile, mUncompressedFiles);
-        mAndrolib.writeOriginalFiles(mApkFile, outDir);
-        writeMetaFile();
+            mAndrolib.decodeRawFiles(mApkFile, outDir);
+            mAndrolib.decodeUnknownFiles(mApkFile, outDir, mResTable);
+            mUncompressedFiles = new ArrayList<String>();
+            mAndrolib.recordUncompressedFiles(mApkFile, mUncompressedFiles);
+            mAndrolib.writeOriginalFiles(mApkFile, outDir);
+            writeMetaFile();
+        } finally {
+            try {
+                mApkFile.close();
+            } catch (IOException ignored) {}
+        }
     }
 
     public void setDecodeSources(short mode) throws AndrolibException {
@@ -271,6 +283,10 @@ public class ApkDecoder {
         } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
         }
+    }
+
+    public void close() throws IOException {
+        mAndrolib.close();
     }
 
     public final static short DECODE_SOURCES_NONE = 0x0000;

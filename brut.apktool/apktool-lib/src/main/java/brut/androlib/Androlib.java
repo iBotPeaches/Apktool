@@ -741,6 +741,10 @@ public class Androlib {
         return files;
     }
 
+    public void close() throws IOException {
+        mAndRes.close();
+    }
+
     private final static Logger LOGGER = Logger.getLogger(Androlib.class.getName());
 
     private final static String SMALI_DIRNAME = "smali";

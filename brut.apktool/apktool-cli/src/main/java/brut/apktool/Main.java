@@ -187,6 +187,11 @@ public class Main {
         } catch (DirectoryException ex) {
             System.err.println("Could not modify internal dex files. Please ensure you have permission.");
             System.exit(1);
+        } finally {
+            try {
+                decoder.close();
+            } catch (IOException e) {
+            }
         }
 
     }

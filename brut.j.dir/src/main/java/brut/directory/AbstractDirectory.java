@@ -17,6 +17,7 @@
 package brut.directory;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.LinkedHashMap;
@@ -233,6 +234,11 @@ public abstract class AbstractDirectory implements Directory {
             }
         }
         return dirs;
+    }
+
+
+    public void close() throws IOException {
+
     }
 
     private SubPath getSubPath(String path) throws PathNotExist {

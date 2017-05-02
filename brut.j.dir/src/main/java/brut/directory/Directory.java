@@ -50,5 +50,8 @@ public interface Directory {
     public int getCompressionLevel(String fileName)
             throws DirectoryException;
 
+
+    public void close() throws IOException;
+    
     public final char separator = '/';
 }
