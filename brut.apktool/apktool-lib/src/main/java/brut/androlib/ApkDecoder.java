@@ -286,7 +286,9 @@ public class ApkDecoder {
     }
 
     public void close() throws IOException {
-        mAndrolib.close();
+        if (mAndrolib != null) {
+            mAndrolib.close();
+        }
     }
 
     public final static short DECODE_SOURCES_NONE = 0x0000;
