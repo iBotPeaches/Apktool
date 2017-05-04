@@ -131,6 +131,11 @@ public class StringBlock {
         if (style == null) {
             return ResXmlEncoders.escapeXmlChars(raw);
         }
+
+        // If the returned style is further in string, than string length. Lets skip it.
+        if (style[1] > raw.length()) {
+            return ResXmlEncoders.escapeXmlChars(raw);
+        }
         StringBuilder html = new StringBuilder(raw.length() + 32);
         int[] opened = new int[style.length / 3];
         int offset = 0, depth = 0;

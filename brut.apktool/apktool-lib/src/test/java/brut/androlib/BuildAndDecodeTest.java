@@ -254,6 +254,11 @@ public class BuildAndDecodeTest {
     }
 
     @Test
+    public void androidOStringTest() throws BrutException, IOException {
+        compareValuesFiles("values-ast/strings.xml");
+    }
+
+    @Test
     public void twoLetterNotHandledAsBcpTest() throws BrutException, IOException {
         checkFolderExists("res/values-fr");
     }
