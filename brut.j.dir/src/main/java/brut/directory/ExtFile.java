@@ -56,7 +56,9 @@ public class ExtFile extends File {
     }
 
     public void close() throws IOException {
-        mDirectory.close();
+        if (mDirectory != null) {
+            mDirectory.close();
+        }
     }
 
     private Directory mDirectory;

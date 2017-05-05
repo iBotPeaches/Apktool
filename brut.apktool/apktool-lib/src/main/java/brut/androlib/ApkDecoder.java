@@ -167,6 +167,8 @@ public class ApkDecoder {
             mAndrolib.recordUncompressedFiles(mApkFile, mUncompressedFiles);
             mAndrolib.writeOriginalFiles(mApkFile, outDir);
             writeMetaFile();
+        } catch (Exception ex) {
+            throw ex;
         } finally {
             try {
                 mApkFile.close();
