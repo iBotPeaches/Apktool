@@ -486,7 +486,7 @@ public class Main {
                         + "For smali/baksmali info, see: https://github.com/JesusFreke/smali");
     }
 
-    private static void setupLogging(Verbosity verbosity) {
+    private static void setupLogging(final Verbosity verbosity) {
         Logger logger = Logger.getLogger("");
         for (Handler handler : logger.getHandlers()) {
             logger.removeHandler(handler);
@@ -509,7 +509,13 @@ public class Main {
                     if (record.getLevel().intValue() >= Level.WARNING.intValue()) {
                         System.err.write(message.getBytes());
                     } else {
-                        System.out.write(message.getBytes());
+                        if (record.getLevel().intValue() >= Level.INFO.intValue()) {
+                            System.out.write(message.getBytes());
+                        } else {
+                            if (verbosity == Verbosity.VERBOSE) {
+                                System.out.write(message.getBytes());
+                            }
+                        }
                     }
                 } catch (Exception exception) {
                     reportError(null, exception, ErrorManager.FORMAT_FAILURE);

@@ -55,7 +55,7 @@ public class ResStyleValue extends ResBagValue implements
             ResResSpec spec = mItems[i].m1.getReferent();
 
             if (spec == null) {
-                LOGGER.info(String.format("null reference: m1=0x%08x(%s), m2=0x%08x(%s)",
+                LOGGER.fine(String.format("null reference: m1=0x%08x(%s), m2=0x%08x(%s)",
                         mItems[i].m1.getRawIntValue(), mItems[i].m1.getType(), mItems[i].m2.getRawIntValue(), mItems[i].m2.getType()));
                 continue;
             }
