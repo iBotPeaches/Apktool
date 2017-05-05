@@ -190,10 +190,9 @@ public class Main {
         } finally {
             try {
                 decoder.close();
-            } catch (IOException e) {
-            }
+            } catch (IOException ignored) {}
         }
-
+        System.exit(0);
     }
 
     private static void cmdBuild(CommandLine cli) throws BrutException {

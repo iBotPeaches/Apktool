@@ -819,7 +819,9 @@ final public class AndrolibResources {
     }
 
     public void close() throws IOException {
-        mFramework.close();
+        if (mFramework != null) {
+            mFramework.close();
+        }
     }
 
     public ApkOptions apkOptions;
