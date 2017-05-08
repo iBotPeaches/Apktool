@@ -1,4 +1,4 @@
-package org.xmlpull.mxp1_serializer;
+package org.xmlpull.renamed;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -440,8 +440,8 @@ public class MXSerializer implements XmlSerializer {
 		// check that prefix is not duplicated ...
 		for (int i = elNamespaceCount[depth]; i < namespaceEnd; i++) {
 			if (prefix == namespacePrefix[i]) {
-				throw new IllegalStateException("duplicated prefix "
-						+ printable(prefix) + getLocation());
+				// Toss out extra namespaces at same depth to fix #1456
+				return;
 			}
 		}
 
