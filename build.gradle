@@ -21,17 +21,16 @@ buildscript {
         options.encoding = "UTF-8"
     }
     dependencies {
-        classpath 'eu.appsatori:gradle-fatjar-plugin:0.3'
+        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.4'
     }
 }
 
-apply plugin: 'maven'
 apply from: 'gradle/functions.gradle'
 
 def apktoolversion_major = '2.2.3'
 def apktoolversion_minor = 'SNAPSHOT';
 
-defaultTasks 'build', 'fatJar', 'proguard'
+defaultTasks 'build', 'shadowJar', 'proguard'
 
 allprojects {
     apply plugin: 'java'
@@ -80,8 +79,6 @@ task release {
 
 subprojects {
     apply plugin: 'java'
-    apply plugin: 'maven'
-    apply plugin: 'idea'
 
     ext {
         depends = [

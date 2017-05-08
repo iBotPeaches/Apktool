@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-apply plugin: 'eu.appsatori.fatjar'
+apply plugin: 'com.github.johnrengelman.shadow'
 
 dependencies {
     compile depends.commons_cli
@@ -30,22 +30,20 @@ buildscript {
     }
 }
 
-gradle.taskGraph.whenReady {
-  fatJar { 
+jar {
     manifest {
-      attributes("Main-Class": "brut.apktool.Main")
+        attributes 'Main-Class' : 'brut.apktool.Main'
     }
-  }
 }
 
 task cleanOutputDirectory(type: Delete) {
-    delete fileTree(dir: jar.destinationDir.getPath(), exclude: "apktool-cli.jar")
+    delete fileTree(dir: jar.destinationDir.getPath(), exclude: "apktool-cli-all.jar")
 }
 
-task proguard(type: proguard.gradle.ProGuardTask, dependsOn: fatJar) {
+task proguard(type: proguard.gradle.ProGuardTask, dependsOn: shadowJar) {
     def outFile = jar.destinationDir.getPath() + '/' + "apktool" + '-' + project.apktool_version + '-small' + '.' + jar.extension
 
-    injars fatJar.archivePath
+    injars shadowJar.archivePath
     outjars outFile
 
     libraryjars "${System.properties['java.home']}/lib/rt.jar"
@@ -54,7 +52,6 @@ task proguard(type: proguard.gradle.ProGuardTask, dependsOn: fatJar) {
     dontoptimize
 
     keep 'public class brut.apktool.Main { public static void main(java.lang.String[]); }'
-    keep 'class org.yaml.snakeyaml.** { public protected private *; }'
     keepclassmembers 'enum * { public static **[] values(); public static ** valueOf(java.lang.String); }'
     dontwarn 'com.google.common.base.**'
     dontwarn 'com.google.common.collect.**'
