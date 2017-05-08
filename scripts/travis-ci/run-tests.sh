@@ -1,2 +1,2 @@
 #!/usr/bin/env sh
-./gradlew build fatJar
+./gradlew build shadowJar
