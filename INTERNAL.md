@@ -33,11 +33,11 @@ For example for the `2.2.1` release.
 In order to maintain a clean slate. Run `gradlew clean` to start from a clean slate. Now lets build
 the new version. We should not have any new commits since the tagged commit.
 
-    ./gradlew build fatJar proguard release
+    ./gradlew build shadowJar proguard release
 
 The build should tell you what version you are building and it should match the commits you made previously.
 
-    ➜ Apktool git:(master) ./gradlew build fatJar proguard release
+    ➜ Apktool git:(master) ./gradlew build shadowJar proguard release
     Building RELEASE (master): 2.2.2
 
 ### Testing the binary.

@@ -17,7 +17,7 @@
 package brut.androlib.res.util;
 
 import java.io.*;
-import org.xmlpull.mxp1_serializer.MXSerializer;
+import org.xmlpull.renamed.MXSerializer;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>

@@ -20,7 +20,7 @@ before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -qq libstdc++6:i386 lib32z1 expect
   - git submodule update --init --recursive
-script: ./gradlew build fatJar proguard
+script: ./gradlew build shadowJar proguard
 branches:
   only:
     - master
