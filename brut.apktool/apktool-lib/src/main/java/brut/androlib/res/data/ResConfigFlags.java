@@ -507,6 +507,9 @@ public class ResConfigFlags {
     public final static byte SDK_LOLLIPOP = 21;
     public final static byte SDK_LOLLIPOP_MR1 = 22;
     public final static byte SDK_MNC = 23;
+    public final static byte SDK_NOUGAT = 24;
+    public final static byte SDK_NOUGAT_MR1 = 25;
+    public final static byte SDK_O = 26;
 
     public final static byte ORIENTATION_ANY = 0;
     public final static byte ORIENTATION_PORT = 1;
