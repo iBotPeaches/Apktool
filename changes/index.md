@@ -7,11 +7,15 @@ description: Apktool - Changelog / Roadmap
 ## v2.2.3 (in development)
 2017.xx.xx
 
+ * [WIP] - **Android O Preview Support** ([Issue 1453](https://github.com/iBotPeaches/Apktool/issues/1453))
  * Updated to [smali 2.2](https://github.com/JesusFreke/smali/wiki/SmaliBaksmali2.2)
+ * Removed deprecated fatJar plugin in favor of ShadowJar
+    * This turns `fatJar` to `shadowJar` on build instructions.
  * Updated gradle to `v3.5`. (Thanks friederbluemle)
  * Fix for reading length of UTF16 encoded strings. (Thanks atn1969)
  * Fixed issue changing default parameters on baksmali. ([Issue 1481](https://github.com/iBotPeaches/Apktool/issues/1481))
  * Fixed issue with apktool locking access to input files. ([Issue 1160](https://github.com/iBotPeaches/Apktool/issues/1160)) (Thanks MarcMil)
+ * Add support for animated vector drawables. ([Issue 1456](https://github.com/iBotPeaches/Apktool/issues/1456))
 
 ## v2.2.2
 2017.01.23
