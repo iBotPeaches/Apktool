@@ -219,7 +219,9 @@ public class ARSCDecoder {
 
         mType = flags.isInvalid && !mKeepBroken ? null : mPkg.getOrCreateConfig(flags);
 
-        for (int i = 0; i < entryOffsets.length; i++) {
+        int length=Math.min(entryOffsets.length,mMissingResSpecs.length);
+        //for (int i = 0; i < entryOffsets.length; i++) {
+        for (int i = 0; i <length; i++) {
             if (entryOffsets[i] != -1) {
                 mMissingResSpecs[i] = false;
                 mResId = (mResId & 0xffff0000) | i;
