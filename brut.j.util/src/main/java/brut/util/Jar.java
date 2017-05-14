@@ -29,8 +29,16 @@ import org.apache.commons.io.IOUtils;
  */
 abstract public class Jar {
     private final static Set<String> mLoaded = new HashSet<String>();
-    private final static Map<String, File> mExtracted =
-        new HashMap<String, File>();
+    private final static Map<String, File> mExtracted = new HashMap<String, File>();
+
+    public static File getResourceAsFile(String name, String path) throws BrutException {
+        File file = mExtracted.get(name);
+        if (file == null) {
+            file = extractToPath(name, path);
+            mExtracted.put(name, file);
+        }
+        return file;
+    }
 
     public static File getResourceAsFile(String name) throws BrutException {
         File file = mExtracted.get(name);
@@ -60,8 +68,7 @@ abstract public class Jar {
         return extractToTmp(resourcePath, "brut_util_Jar_");
     }
 
-    public static File extractToTmp(String resourcePath, String tmpPrefix)
-            throws BrutException {
+    public static File extractToTmp(String resourcePath, String tmpPrefix) throws BrutException {
         try {
             InputStream in = Class.class.getResourceAsStream(resourcePath);
             if (in == null) {
@@ -75,8 +82,26 @@ abstract public class Jar {
             out.close();
             return fileOut;
         } catch (IOException ex) {
-            throw new BrutException(
-                "Could not extract resource: " + resourcePath, ex);
+            throw new BrutException("Could not extract resource: " + resourcePath, ex);
+        }
+    }
+
+    public static File extractToPath(String resourcePath, String filePath) throws BrutException {
+        try {
+            InputStream in = Class.class.getResourceAsStream(resourcePath);
+            if (in == null) {
+                throw new FileNotFoundException(resourcePath);
+            }
+
+            File fileOut = new File(filePath, "brut_util_Jar");
+            fileOut.deleteOnExit();
+            OutputStream out = new FileOutputStream(fileOut);
+            IOUtils.copy(in, out);
+            in.close();
+            out.close();
+            return fileOut;
+        } catch (IOException ex) {
+            throw new BrutException("Could not extract resource: " + resourcePath, ex);
         }
     }
 }

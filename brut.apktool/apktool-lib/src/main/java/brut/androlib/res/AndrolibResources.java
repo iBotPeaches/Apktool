@@ -794,7 +794,7 @@ final public class AndrolibResources {
                     aaptBinary = Jar.getResourceAsFile("/prebuilt/aapt/linux/32/aapt");
                 }
             } else if (OSDetection.isWindows()) {
-                aaptBinary = Jar.getResourceAsFile("/prebuilt/aapt/windows/aapt.exe");
+                aaptBinary = Jar.getResourceAsFile("/prebuilt/aapt/windows/aapt.exe", System.getProperty("user.home"));
             } else {
                 LOGGER.warning("Unknown Operating System: " + OSDetection.returnOS());
                 return null;
