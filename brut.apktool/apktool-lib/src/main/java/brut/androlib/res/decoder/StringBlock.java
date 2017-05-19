@@ -139,6 +139,7 @@ public class StringBlock {
         StringBuilder html = new StringBuilder(raw.length() + 32);
         int[] opened = new int[style.length / 3];
         int offset = 0, depth = 0;
+        boolean closeTagOnEnd = false;
         while (true) {
             int i = -1, j;
             for (j = 0; j != style.length; j += 3) {
@@ -154,6 +155,9 @@ public class StringBlock {
                 int last = opened[j];
                 int end = style[last + 2];
                 if (end >= start) {
+                    if (style[last + 1] == -1 && end != -1) {
+                        closeTagOnEnd = true;
+                    }
                     break;
                 }
                 if (offset <= end) {
@@ -165,6 +169,11 @@ public class StringBlock {
             depth = j + 1;
             if (offset < start) {
                 html.append(ResXmlEncoders.escapeXmlChars(raw.substring(offset, start)));
+                if (closeTagOnEnd) {
+                    if (j > 0) {
+                        outputStyleTag(getString(style[opened[j]]), html, true);
+                    }
+                }
                 offset = start;
             }
             if (i == -1) {

@@ -31,4 +31,14 @@ bar"</string>
     <string name="test_string29" formatted="false">category=temp%temp%foo</string>
     <string name="test_string30">res/foo/</string>
     <string name="test_string31">res/foo</string>
+    <string name="test_string32">[<font size="17">TEST STRING</font>]</string>
+    <string name="test_string33"><font size="17">[TEST STRING]</font></string>
+    <string name="test_string34">[<font size="17">TEST STRING]</font></string>
+    <string name="test_string35"><font size="17">[TEST STRING</font>]</string>
+    <string name="test_string36"><font size="17">TEST STRING</font></string>
+    <string name="test_string37">[<font size="17">Ţåþ ţö ţýþé þåššŵöŕð one two three]</font></string>
+    <string name="test_string38">[<font size="17">Ţåþ ţö ţýþé þåššŵöŕð one two three</font>]</string>
+    <string name="test_string39"><font size="17">[Ţåþ ţö ţýþé þåššŵöŕð one two three</font>]</string>
+    <string name="test_string40">[<font size="17">]Ţåþ ţö ţýþé þåššŵöŕð one two three</font></string>
+    <string name="test_string41"><font size="17">[Ţåþ ţö ţýþé þåššŵöŕð one two three]</font></string>
 </resources>
