@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="test1">"‏‮Forgot‬‏ ‏‮your‬‏ ‏‮username‬‏ ‏‮or‬‏ ‏‮password?‬‏\n‏‮Visit‬‏ ‏‮google.com/accounts/recover‬‏‏‮y‬‏‏‮.‬‏"</string>
+    <string name="test2">‏‮Forgot‬‏ ‏‮your‬‏ ‏‮username‬‏ ‏‮or‬‏ ‏‮password?‬\n.‏‮Visit‬‏ ‏‮google.com/accounts/recover‬‏‏‮y‬‏</string>
+    <string name="test3">          (string8) "‏‮Forgot‬‏ ‏‮your‬‏ ‏‮username‬‏ ‏‮or‬‏ ‏‮password?‬‏\n‏‮Visit‬‏ ‏‮google.com/accounts/recover‬‏‏‮y‬‏‏‮.‬‏"</string>
+    <string name="test4">Forgot your username or password?\nVisit google.com/accounts/recovery.</string>
+    <string name="test5">‏‮Forgot‬‏ ‏‮your‬‏ ‏‮username‬‏ ‏‮or‬‏ ‏‮password?‬‏
+        ‏‮Visit‬‏ ‏‮google.com/accounts/recover‬‏‏‮y‬‏‏‮.‬‏</string>
+</resources>
