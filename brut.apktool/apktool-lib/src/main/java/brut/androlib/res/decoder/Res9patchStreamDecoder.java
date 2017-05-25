@@ -20,6 +20,8 @@ import brut.androlib.AndrolibException;
 import brut.androlib.err.CantFind9PatchChunk;
 import brut.util.ExtDataInput;
 import java.awt.image.BufferedImage;
+import java.awt.image.Raster;
+import java.awt.image.WritableRaster;
 import java.io.*;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageTypeSpecifier;
@@ -39,8 +41,24 @@ public class Res9patchStreamDecoder implements ResStreamDecoder {
             BufferedImage im = ImageIO.read(new ByteArrayInputStream(data));
             int w = im.getWidth(), h = im.getHeight();
 
-            BufferedImage im2 = new BufferedImage(w+2, h+2, BufferedImage.TYPE_INT_ARGB);
-            im2.createGraphics().drawImage(im, 1, 1, w, h, null);
+            BufferedImage im2 = new BufferedImage(w + 2, h + 2, BufferedImage.TYPE_INT_ARGB);
+            if (im.getType() == BufferedImage.TYPE_CUSTOM) {
+                //TODO: Ensure this is gray + alpha case?
+                Raster srcRaster = im.getRaster();
+                WritableRaster dstRaster = im2.getRaster();
+                int[] gray = null, alpha = null;
+                for (int y = 0; y < im.getHeight(); y++) {
+                    gray = srcRaster.getSamples(0, y, w, 1, 0, gray);
+                    alpha = srcRaster.getSamples(0, y, w, 1, 1, alpha);
+
+                    dstRaster.setSamples(1, y + 1, w, 1, 0, gray);
+                    dstRaster.setSamples(1, y + 1, w, 1, 1, gray);
+                    dstRaster.setSamples(1, y + 1, w, 1, 2, gray);
+                    dstRaster.setSamples(1, y + 1, w, 1, 3, alpha);
+                }
+            } else {
+                im2.createGraphics().drawImage(im, 1, 1, w, h, null);
+            }
 
             NinePatch np = getNinePatch(data);
             drawHLine(im2, h + 1, np.padLeft + 1, w - np.padRight);
