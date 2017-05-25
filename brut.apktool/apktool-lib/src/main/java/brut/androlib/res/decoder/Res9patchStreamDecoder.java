@@ -41,8 +41,8 @@ public class Res9patchStreamDecoder implements ResStreamDecoder {
             BufferedImage im = ImageIO.read(new ByteArrayInputStream(data));
             int w = im.getWidth(), h = im.getHeight();
 
-            BufferedImage im2 = new BufferedImage(w+2, h+2, BufferedImage.TYPE_INT_ARGB);
-            if(im.getType() == BufferedImage.TYPE_CUSTOM) {
+            BufferedImage im2 = new BufferedImage(w + 2, h + 2, BufferedImage.TYPE_INT_ARGB);
+            if (im.getType() == BufferedImage.TYPE_CUSTOM) {
                 //TODO: Ensure this is gray + alpha case?
                 Raster srcRaster = im.getRaster();
                 WritableRaster dstRaster = im2.getRaster();
@@ -51,10 +51,10 @@ public class Res9patchStreamDecoder implements ResStreamDecoder {
                     gray = srcRaster.getSamples(0, y, w, 1, 0, gray);
                     alpha = srcRaster.getSamples(0, y, w, 1, 1, alpha);
 
-                    dstRaster.setSamples(1, y+1, w, 1, 0, gray);
-                    dstRaster.setSamples(1, y+1, w, 1, 1, gray);
-                    dstRaster.setSamples(1, y+1, w, 1, 2, gray);
-                    dstRaster.setSamples(1, y+1, w, 1, 3, alpha);
+                    dstRaster.setSamples(1, y + 1, w, 1, 0, gray);
+                    dstRaster.setSamples(1, y + 1, w, 1, 1, gray);
+                    dstRaster.setSamples(1, y + 1, w, 1, 2, gray);
+                    dstRaster.setSamples(1, y + 1, w, 1, 3, alpha);
                 }
             } else {
                 im2.createGraphics().drawImage(im, 1, 1, w, h, null);
