@@ -254,6 +254,11 @@ public class BuildAndDecodeTest {
     }
 
     @Test
+    public void androidOStringTest() throws BrutException, IOException {
+        compareValuesFiles("values-ast/strings.xml");
+    }
+
+    @Test
     public void twoLetterNotHandledAsBcpTest() throws BrutException, IOException {
         checkFolderExists("res/values-fr");
     }
@@ -342,6 +347,27 @@ public class BuildAndDecodeTest {
         assertEquals(controlImage.getRGB(30, 0), testImage.getRGB(30, 0));
 
         // then 30, 30 - blue
+        assertEquals(controlImage.getRGB(30, 30), testImage.getRGB(30, 30));
+    }
+
+    @Test
+    public void issue1508Test() throws BrutException, IOException {
+        char slash = File.separatorChar;
+        String location = slash + "res" + slash + "drawable-xhdpi" + slash;
+
+        File control = new File((sTestOrigDir + location), "btn_zoom_up_normal.9.png");
+        File test = new File((sTestNewDir + location), "btn_zoom_up_normal.9.png");
+
+        BufferedImage controlImage = ImageIO.read(control);
+        BufferedImage testImage = ImageIO.read(test);
+
+        // 0, 0 = clear
+        assertEquals(controlImage.getRGB(0, 0), testImage.getRGB(0, 0));
+
+        // 30, 0 = black line
+        assertEquals(controlImage.getRGB(0, 30), testImage.getRGB(0, 30));
+
+        // 30, 30 = greyish button
         assertEquals(controlImage.getRGB(30, 30), testImage.getRGB(30, 30));
     }
 
