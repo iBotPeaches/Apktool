@@ -17,7 +17,6 @@ package brut.androlib;
 
 import brut.androlib.res.xml.ResXmlEncoders;
 import org.junit.Test;
-import java.util.logging.Logger;
 
 import static org.junit.Assert.assertEquals;
 
@@ -54,6 +53,4 @@ public class PositionalEnumerationTest {
     private String enumerateArguments(String value) {
         return ResXmlEncoders.enumerateNonPositionalSubstitutionsIfRequired(value);
     }
-
-    private final static Logger LOGGER = Logger.getLogger(BuildAndDecodeJarTest.class.getName());
 }

@@ -25,7 +25,6 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.Logger;
 
 import static org.junit.Assert.assertTrue;
 
@@ -66,6 +65,4 @@ public class VectorDrawableTest {
 
     private static ExtFile sTmpDir;
     private static ExtFile sTestOrigDir;
-
-    private final static Logger LOGGER = Logger.getLogger(VectorDrawableTest.class.getName());
 }

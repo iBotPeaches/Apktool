@@ -37,7 +37,7 @@ import static org.junit.Assert.assertTrue;
 public class DebugTagRetainedTest {
 
     @BeforeClass
-    public static void beforeClass() throws Exception, BrutException {
+    public static void beforeClass() throws Exception {
         TestUtils.cleanFrameworkFile();
         sTmpDir = new ExtFile(OS.createTempDirectory());
         sTestOrigDir = new ExtFile(sTmpDir, "issue1235-orig");

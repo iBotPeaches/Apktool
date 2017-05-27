@@ -44,7 +44,7 @@ import javax.imageio.ImageIO;
 public class BuildAndDecodeTest {
 
     @BeforeClass
-    public static void beforeClass() throws Exception, BrutException {
+    public static void beforeClass() throws Exception {
         TestUtils.cleanFrameworkFile();
 
         sTmpDir = new ExtFile(OS.createTempDirectory());
