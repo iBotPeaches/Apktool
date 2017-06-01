@@ -112,7 +112,7 @@ public class ResResSpec {
     }
 
     public void addResource(ResResource res) throws AndrolibException {
-        addResource(res, false);
+        addResource(res, true);
     }
 
     public void addResource(ResResource res, boolean overwrite) throws AndrolibException {
