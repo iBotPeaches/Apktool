@@ -486,7 +486,7 @@ public class Androlib {
                                 : APK_RESOURCES_WITHOUT_RES_FILENAMES);
 
                 // delete tmpDir
-                apkFile.delete();
+                tmpDir.delete();
             }
             return true;
         } catch (IOException | BrutException ex) {
