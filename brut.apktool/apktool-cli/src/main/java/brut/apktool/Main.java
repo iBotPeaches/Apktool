@@ -205,6 +205,15 @@ public class Main {
         if (cli.hasOption("f") || cli.hasOption("force-all")) {
             apkOptions.forceBuildAll = true;
         }
+        if (cli.hasOption("i") || cli.hasOption("install")) {
+            apkOptions.installBuild = true;
+        }
+        if (cli.hasOption("r") || cli.hasOption("reinstall")) {
+            apkOptions.reinstallBuild = true;
+        }
+        if (cli.hasOption("s") || cli.hasOption("sign")) {
+            apkOptions.signBuild = true;
+        }
         if (cli.hasOption("d") || cli.hasOption("debug")) {
             System.out.println("SmaliDebugging has been removed in 2.1.0 onward. Please see: https://github.com/iBotPeaches/Apktool/issues/1061");
             apkOptions.debugMode = true;
@@ -344,6 +353,18 @@ public class Main {
                 .withDescription("Skip changes detection and build all files.")
                 .create("f");
 
+        Option installBuiOption = OptionBuilder.withLongOpt("install")
+                .withDescription("Install this apk.")
+                .create("i");
+
+        Option reinstallBuiOption = OptionBuilder.withLongOpt("reinstall")
+                .withDescription("Reinstall this apk.")
+                .create("r");
+
+        Option signBuiOption = OptionBuilder.withLongOpt("sign")
+                .withDescription("Sign this apk.")
+                .create("s");
+
         Option aaptOption = OptionBuilder.withLongOpt("aapt")
                 .hasArg(true)
                 .withArgName("loc")
@@ -406,6 +427,9 @@ public class Main {
         BuildOptions.addOption(outputBuiOption);
         BuildOptions.addOption(frameDirOption);
         BuildOptions.addOption(forceBuiOption);
+        BuildOptions.addOption(installBuiOption);
+        BuildOptions.addOption(reinstallBuiOption);
+        BuildOptions.addOption(signBuiOption);
 
         // add basic framework options
         frameOptions.addOption(tagOption);
