@@ -17,6 +17,7 @@
 package brut.androlib.res.data.value;
 
 import brut.androlib.AndrolibException;
+import brut.androlib.err.UndefinedResObject;
 import brut.androlib.res.data.ResResSpec;
 import brut.androlib.res.data.ResResource;
 import brut.androlib.res.xml.ResValuesXmlSerializable;
@@ -62,6 +63,30 @@ public class ResStyleValue extends ResBagValue implements
 
             String name = null;
             String value = null;
+
+            //basically this is needed only for apk with broken resources.arsc
+            //I have one and this exception is very helpful,
+            //because it is much more informative than NullPointerException
+            if(spec == null) {
+                /*
+                I tried to add
+                    @Override
+                    public String toString() {
+                        return String.format("0x%08x %s", getRawIntValue(), getType());
+                    }
+                to class ResScalarValue, but it caused an error
+                    brut.androlib.res.data.value.ResBoolValue cannot be cast to brut.androlib.res.data.value.ResAttr
+
+                Then I tried to add toString() method to ResBagValue and to ResValue, but this did not help
+                (ResValue -> ResIntBasedValue -> ResScalarValue -> ResBoolValue)
+                (ResValue -> ResBagValue -> ResAttr)
+                I have no ideas :(
+                */
+                //throw new UndefinedResObject(String.format("resource: m1=%s, m2=%s", mItems[i].m1, mItems[i].m2));
+                //so there is dirtier code:
+                throw new UndefinedResObject(String.format("resource: m1=0x%08x %s, m2=0x%08x %s",
+                    mItems[i].m1.getRawIntValue(), mItems[i].m1.getType(), mItems[i].m2.getRawIntValue(), mItems[i].m2.getType()));
+            }
 
             String resource = spec.getDefaultResource().getValue().toString();
             // hacky-fix remove bad ReferenceVars
