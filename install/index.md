@@ -23,8 +23,6 @@ title: Apktool - How to Install
   * **Linux**:
     1. Download Linux [wrapper script](https://raw.githubusercontent.com/iBotPeaches/Apktool/master/scripts/linux/apktool) (Right click, Save Link As `apktool`)
     1. Download apktool-2 ([find newest here](https://bitbucket.org/iBotPeaches/apktool/downloads/))
-    1. Make sure you have the 32bit libraries (`ia32-libs`) downloaded and installed by your linux package manager, if you are on a 64bit unix system.
-    1. (This helps provide support for the 32bit native binary aapt, which is required by apktool)
     1. Rename downloaded jar to `apktool.jar`
     1. Move both files (`apktool.jar` & `apktool`) to `/usr/local/bin` (root needed)
     1. Make sure both files are executable (`chmod +x`)
