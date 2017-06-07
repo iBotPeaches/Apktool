@@ -4223,7 +4223,7 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   margin: 7.5px -15px;
 }
 .navbar-nav > li > a {
-  padding-top: 30px;
+  padding-top: 43px;
   padding-bottom: 10px;
   line-height: 20px;
   font-size: 18px;
@@ -4260,7 +4260,7 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
     float: left;
   }
   .navbar-nav > li > a {
-    padding-top: 30px;
+    padding-top: 43px;
     padding-bottom: 15px;
   }
 }

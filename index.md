@@ -21,6 +21,10 @@ It is **NOT** intended for piracy and other non-legal uses. It could be used for
  * Java 7 (JRE 1.7)
  * Basic knowledge of Android SDK, AAPT and smali
 
+## Sponsored By
+
+* [Sourcetoad](https://www.sourcetoad.com/cool-tools/apktool/) - helping with a weekly sponsorship for continued improvement and maintenance of the project.
+
 ## Install Instructions
  * Read [Install Docs]({{ site.github.url }}/install)
  
