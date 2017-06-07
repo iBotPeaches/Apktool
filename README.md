@@ -13,6 +13,10 @@ It is NOT intended for piracy and other non-legal uses. It could be used for loc
 - [Project Page](http://ibotpeaches.github.io/Apktool/)
 - [#apktool on freenode](http://webchat.freenode.net/?channels=apktool)
 
+#### Sponsored by
+
+* [Sourcetoad](https://www.sourcetoad.com/cool-tools/apktool/) - helping with a weekly sponsorship for continued improvement and maintenance of the project.
+
 #### Links
 - [Downloads](https://bitbucket.org/iBotPeaches/apktool/downloads)
 - [Downloads Mirror](http://connortumbleson.com/apktool/)
