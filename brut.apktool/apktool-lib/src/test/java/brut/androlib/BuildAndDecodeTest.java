@@ -372,6 +372,30 @@ public class BuildAndDecodeTest {
     }
 
     @Test
+    public void issue1511Test() throws BrutException, IOException {
+        char slash = File.separatorChar;
+        String location = slash + "res" + slash + "drawable-xxhdpi" + slash;
+
+        File control = new File((sTestOrigDir + location), "textfield_activated_holo_dark.9.png");
+        File test = new File((sTestNewDir + location), "textfield_activated_holo_dark.9.png");
+
+        BufferedImage controlImage = ImageIO.read(control);
+        BufferedImage testImage = ImageIO.read(test);
+
+        // Check entire image as we cannot mess this up
+        final int w = controlImage.getWidth(),
+                  h = controlImage.getHeight();
+
+        final int[] controlImageGrid = controlImage.getRGB(0, 0, w, h, null, 0, w);
+        final int[] testImageGrid = testImage.getRGB(0, 0, w, h, null, 0, w);
+
+
+        for (int i = 0; i < controlImageGrid.length; i++) {
+            assertEquals("Image lost Optical Bounds at i = " + i, controlImageGrid[i], testImageGrid[i]);
+        }
+    }
+
+    @Test
     public void drawableXxhdpiTest() throws BrutException, IOException {
         compareResFolder("drawable-xxhdpi");
     }
