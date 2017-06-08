@@ -74,34 +74,32 @@ public class Res9patchStreamDecoder implements ResStreamDecoder {
                 drawVLine(im2, 0, yDivs[i] + 1, yDivs[i + 1]);
             }
 
+            // Some images additionally use Optical Bounds
+            // https://developer.android.com/about/versions/android-4.3.html#OpticalBounds
             try {
                 OpticalInset oi = getOpticalInset(data);
 
-                //As far as I know, only the length of the red lines are interesting
-                //not their positions
-                //So set them up in the corners
-                //TODO: Check we haven't already filled it with NP_COLOR?
-                for(int i = 0; i < oi.layoutBoundsLeft; i++) {
+                for (int i = 0; i < oi.layoutBoundsLeft; i++) {
                     int x = 1 + i;
                     im2.setRGB(x, h + 1, OI_COLOR);
                 }
 
-                for(int i = 0; i < oi.layoutBoundsRight; i++) {
+                for (int i = 0; i < oi.layoutBoundsRight; i++) {
                     int x = w - i;
                     im2.setRGB(x, h + 1, OI_COLOR);
                 }
 
-                for(int i = 0; i < oi.layoutBoundsTop; i++) {
+                for (int i = 0; i < oi.layoutBoundsTop; i++) {
                     int y = 1 + i;
                     im2.setRGB(w + 1, y, OI_COLOR);
                 }
 
-                for(int i = 0; i < oi.layoutBoundsBottom; i++) {
+                for (int i = 0; i < oi.layoutBoundsBottom; i++) {
                     int y = h - i;
                     im2.setRGB(w + 1, y, OI_COLOR);
                 }
-            } catch(CantFind9PatchChunk t) {
-                //This chunk might not exist
+            } catch (CantFind9PatchChunk t) {
+                // This chunk might not exist
             }
 
             ImageIO.write(im2, "png", out);
