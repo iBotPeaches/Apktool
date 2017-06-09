@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!DOCTYPE manifest [<!ENTITY e1 SYSTEM 'http://ibotpeaches.com?z=APKTOOLXXE;'>]>
+<manifest hardwareAccelerated="true" package="com.ibotpeaches.doctype" platformBuildVersionCode="24" platformBuildVersionName="6.0-2456767" xmlns:android="http://schemas.android.com/apk/res/android">
+    &e1;
+<supports-screens android:anyDensity="true" android:largeScreens="true" android:normalScreens="true" android:resizeable="true" android:smallScreens="true" android:xlargeScreens="true"/>
+</manifest>

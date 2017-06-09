@@ -35,10 +35,10 @@ import static org.junit.Assert.assertEquals;
 public class MissingVersionManifestTest {
 
     @BeforeClass
-    public static void beforeClass() throws Exception, BrutException {
+    public static void beforeClass() throws Exception {
         TestUtils.cleanFrameworkFile();
         sTmpDir = new ExtFile(OS.createTempDirectory());
-        TestUtils.copyResourceDir(LargeIntsInManifestTest.class, "brut/apktool/issue1264/", sTmpDir);
+        TestUtils.copyResourceDir(MissingVersionManifestTest.class, "brut/apktool/issue1264/", sTmpDir);
     }
 
     @AfterClass
@@ -61,6 +61,4 @@ public class MissingVersionManifestTest {
     }
 
     private static ExtFile sTmpDir;
-
-    private final static Logger LOGGER = Logger.getLogger(BuildAndDecodeJarTest.class.getName());
 }

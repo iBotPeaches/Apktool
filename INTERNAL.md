@@ -200,7 +200,7 @@ to get the source downloaded. This is no small download, expect to use 40-60GB.
 After that, you need to build AOSP via this [documentation](https://source.android.com/source/building.html) guide. Now
 we aren't building the entire AOSP package, the initial build is to just see if you are capable of building it.
 
-We check out a certain tag. Currently we use `android-7.1.1_r4`.
+We check out a certain tag. Currently we use `android-7.1.2_r11`.
 
 ### Including our modified `frameworks/base` package.
 
@@ -239,3 +239,22 @@ we lose the ability to quickly build just the aapt binary. So the Windows proced
 1. `source build/envsetup.sh`
 2. `lunch sdk-eng`
 3. `make OUT_DIR=out-x64 LOCAL_MULTILIB=64 USE_NINJA=false aapt`
+
+# Gradle Tips n Tricks
+
+    ./gradlew build shadowJar proguard -x test
+
+This skips the testing suite (which currently takes 2-4 minutes). Use this when making quick builds and save the testing
+suite before pushing to GitHub.
+
+    ./gradlew build shadowJar proguard -Dtest.debug
+
+This enables debugging on the test suite. This starts the debugger on port 5005 which you can connect with IntelliJ.
+
+    ./gradlew :brut.apktool:apktool-lib:test ---tests "*BuildAndDecodeTest"
+
+This runs the library project of Apktool, selecting a specific test to run. Comes in handy when writing a new test and
+only wanting to run that one. The asterisk is used to the full path to the test can be ignored. You can additionally
+match this with the debugging parameter to debug a specific test. This command can be found below.
+
+    ./gradlew :brut.apktool:apktool-lib:test --tests "*BuildAndDecodeTest" -Dtest.debug

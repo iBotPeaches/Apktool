@@ -25,7 +25,6 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.Logger;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
@@ -36,10 +35,10 @@ import static org.junit.Assert.assertNotSame;
 public class UnknownCompressionTest {
 
     @BeforeClass
-    public static void beforeClass() throws Exception, BrutException {
+    public static void beforeClass() throws Exception {
         TestUtils.cleanFrameworkFile();
         sTmpDir = new ExtFile(OS.createTempDirectory());
-        TestUtils.copyResourceDir(LargeIntsInManifestTest.class, "brut/apktool/unknown_compression/", sTmpDir);
+        TestUtils.copyResourceDir(UnknownCompressionTest.class, "brut/apktool/unknown_compression/", sTmpDir);
 
         String apk = "deflated_unknowns.apk";
         ApkOptions apkOptions = new ApkOptions();
@@ -90,6 +89,4 @@ public class UnknownCompressionTest {
 
     private static ExtFile sOriginalFile;
     private static ExtFile sBuiltFile;
-
-    private final static Logger LOGGER = Logger.getLogger(BuildAndDecodeJarTest.class.getName());
 }

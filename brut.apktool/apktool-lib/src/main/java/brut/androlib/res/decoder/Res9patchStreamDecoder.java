@@ -20,6 +20,8 @@ import brut.androlib.AndrolibException;
 import brut.androlib.err.CantFind9PatchChunk;
 import brut.util.ExtDataInput;
 import java.awt.image.BufferedImage;
+import java.awt.image.Raster;
+import java.awt.image.WritableRaster;
 import java.io.*;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageTypeSpecifier;
@@ -39,8 +41,24 @@ public class Res9patchStreamDecoder implements ResStreamDecoder {
             BufferedImage im = ImageIO.read(new ByteArrayInputStream(data));
             int w = im.getWidth(), h = im.getHeight();
 
-            BufferedImage im2 = new BufferedImage(w+2, h+2, BufferedImage.TYPE_INT_ARGB);
-            im2.createGraphics().drawImage(im, 1, 1, w, h, null);
+            BufferedImage im2 = new BufferedImage(w + 2, h + 2, BufferedImage.TYPE_INT_ARGB);
+            if (im.getType() == BufferedImage.TYPE_CUSTOM) {
+                //TODO: Ensure this is gray + alpha case?
+                Raster srcRaster = im.getRaster();
+                WritableRaster dstRaster = im2.getRaster();
+                int[] gray = null, alpha = null;
+                for (int y = 0; y < im.getHeight(); y++) {
+                    gray = srcRaster.getSamples(0, y, w, 1, 0, gray);
+                    alpha = srcRaster.getSamples(0, y, w, 1, 1, alpha);
+
+                    dstRaster.setSamples(1, y + 1, w, 1, 0, gray);
+                    dstRaster.setSamples(1, y + 1, w, 1, 1, gray);
+                    dstRaster.setSamples(1, y + 1, w, 1, 2, gray);
+                    dstRaster.setSamples(1, y + 1, w, 1, 3, alpha);
+                }
+            } else {
+                im2.createGraphics().drawImage(im, 1, 1, w, h, null);
+            }
 
             NinePatch np = getNinePatch(data);
             drawHLine(im2, h + 1, np.padLeft + 1, w - np.padRight);
@@ -54,6 +72,34 @@ public class Res9patchStreamDecoder implements ResStreamDecoder {
             int[] yDivs = np.yDivs;
             for (int i = 0; i < yDivs.length; i += 2) {
                 drawVLine(im2, 0, yDivs[i] + 1, yDivs[i + 1]);
+            }
+
+            // Some images additionally use Optical Bounds
+            // https://developer.android.com/about/versions/android-4.3.html#OpticalBounds
+            try {
+                OpticalInset oi = getOpticalInset(data);
+
+                for (int i = 0; i < oi.layoutBoundsLeft; i++) {
+                    int x = 1 + i;
+                    im2.setRGB(x, h + 1, OI_COLOR);
+                }
+
+                for (int i = 0; i < oi.layoutBoundsRight; i++) {
+                    int x = w - i;
+                    im2.setRGB(x, h + 1, OI_COLOR);
+                }
+
+                for (int i = 0; i < oi.layoutBoundsTop; i++) {
+                    int y = 1 + i;
+                    im2.setRGB(w + 1, y, OI_COLOR);
+                }
+
+                for (int i = 0; i < oi.layoutBoundsBottom; i++) {
+                    int y = h - i;
+                    im2.setRGB(w + 1, y, OI_COLOR);
+                }
+            } catch (CantFind9PatchChunk t) {
+                // This chunk might not exist
             }
 
             ImageIO.write(im2, "png", out);
@@ -70,11 +116,18 @@ public class Res9patchStreamDecoder implements ResStreamDecoder {
     private NinePatch getNinePatch(byte[] data) throws AndrolibException,
             IOException {
         ExtDataInput di = new ExtDataInput(new ByteArrayInputStream(data));
-        find9patchChunk(di);
+        find9patchChunk(di, NP_CHUNK_TYPE);
         return NinePatch.decode(di);
     }
 
-    private void find9patchChunk(DataInput di) throws AndrolibException,
+    private OpticalInset getOpticalInset(byte[] data) throws AndrolibException,
+            IOException {
+        ExtDataInput di = new ExtDataInput(new ByteArrayInputStream(data));
+        find9patchChunk(di, OI_CHUNK_TYPE);
+        return OpticalInset.decode(di);
+    }
+
+    private void find9patchChunk(DataInput di, int magic) throws AndrolibException,
             IOException {
         di.skipBytes(8);
         while (true) {
@@ -84,7 +137,7 @@ public class Res9patchStreamDecoder implements ResStreamDecoder {
             } catch (IOException ex) {
                 throw new CantFind9PatchChunk("Cant find nine patch chunk", ex);
             }
-            if (di.readInt() == NP_CHUNK_TYPE) {
+            if (di.readInt() == magic) {
                 return;
             }
             di.skipBytes(size + 4);
@@ -104,7 +157,9 @@ public class Res9patchStreamDecoder implements ResStreamDecoder {
     }
 
     private static final int NP_CHUNK_TYPE = 0x6e705463; // npTc
+    private static final int OI_CHUNK_TYPE = 0x6e704c62; // npLb
     private static final int NP_COLOR = 0xff000000;
+    private static final int OI_COLOR = 0xffff0000;
 
     private static class NinePatch {
         public final int padLeft, padRight, padTop, padBottom;
@@ -121,21 +176,42 @@ public class Res9patchStreamDecoder implements ResStreamDecoder {
         }
 
         public static NinePatch decode(ExtDataInput di) throws IOException {
-            di.skipBytes(1);
+            di.skipBytes(1); // wasDeserialized
             byte numXDivs = di.readByte();
             byte numYDivs = di.readByte();
-            di.skipBytes(1);
-            di.skipBytes(8);
+            di.skipBytes(1); // numColors
+            di.skipBytes(8); // xDivs/yDivs offset
             int padLeft = di.readInt();
             int padRight = di.readInt();
             int padTop = di.readInt();
             int padBottom = di.readInt();
-            di.skipBytes(4);
+            di.skipBytes(4); // colorsOffset
             int[] xDivs = di.readIntArray(numXDivs);
             int[] yDivs = di.readIntArray(numYDivs);
 
             return new NinePatch(padLeft, padRight, padTop, padBottom, xDivs,
                     yDivs);
+        }
+    }
+
+    private static class OpticalInset {
+	    public final int layoutBoundsLeft, layoutBoundsTop, layoutBoundsRight, layoutBoundsBottom;
+
+        public OpticalInset(int layoutBoundsLeft, int layoutBoundsTop,
+                int layoutBoundsRight, int layoutBoundsBottom) {
+            this.layoutBoundsLeft   = layoutBoundsLeft;
+            this.layoutBoundsTop    = layoutBoundsTop;
+            this.layoutBoundsRight  = layoutBoundsRight;
+            this.layoutBoundsBottom = layoutBoundsBottom;
+        }
+
+        public static OpticalInset decode(ExtDataInput di) throws IOException {
+            int layoutBoundsLeft = Integer.reverseBytes(di.readInt());
+            int layoutBoundsTop = Integer.reverseBytes(di.readInt());
+            int layoutBoundsRight = Integer.reverseBytes(di.readInt());
+            int layoutBoundsBottom = Integer.reverseBytes(di.readInt());
+            return new OpticalInset(layoutBoundsLeft, layoutBoundsTop,
+                    layoutBoundsRight, layoutBoundsBottom);
         }
     }
 }

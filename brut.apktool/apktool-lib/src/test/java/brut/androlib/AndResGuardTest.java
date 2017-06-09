@@ -21,7 +21,6 @@ import brut.common.BrutException;
 import brut.util.OS;
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.Logger;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -29,10 +28,10 @@ import static org.junit.Assert.*;
 public class AndResGuardTest {
 
     @BeforeClass
-    public static void beforeClass() throws Exception, BrutException {
+    public static void beforeClass() throws Exception {
         TestUtils.cleanFrameworkFile();
         sTmpDir = new ExtFile(OS.createTempDirectory());
-        TestUtils.copyResourceDir(LargeIntsInManifestTest.class, "brut/apktool/issue1170/", sTmpDir);
+        TestUtils.copyResourceDir(AndResGuardTest.class, "brut/apktool/issue1170/", sTmpDir);
     }
 
     @AfterClass
@@ -62,6 +61,4 @@ public class AndResGuardTest {
 
     private static ExtFile sTmpDir;
     private static ExtFile sTestOrigDir;
-
-    private final static Logger LOGGER = Logger.getLogger(BuildAndDecodeTest.class.getName());
 }

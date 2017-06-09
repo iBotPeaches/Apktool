@@ -90,7 +90,8 @@ public class ResValueFactory {
         if (key == ResAttr.BAG_KEY_ATTR_TYPE) {
             return ResAttr.factory(parentVal, items, this, mPackage);
         }
-        if (key == ResArrayValue.BAG_KEY_ARRAY_START) {
+        // Android O Preview added an unknown enum for ResTable_map. This is hardcoded as 0 for now.
+        if (key == ResArrayValue.BAG_KEY_ARRAY_START || key == 0) {
             return new ResArrayValue(parentVal, items);
         }
         if (key >= ResPluralsValue.BAG_KEY_PLURALS_START && key <= ResPluralsValue.BAG_KEY_PLURALS_END) {

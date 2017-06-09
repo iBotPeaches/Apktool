@@ -18,12 +18,12 @@ import static org.junit.Assert.assertEquals;
 public class DefaultBaksmaliVariableTest {
 
     @BeforeClass
-    public static void beforeClass() throws Exception, BrutException {
+    public static void beforeClass() throws Exception {
         sTmpDir = new ExtFile(OS.createTempDirectory());
         sTestOrigDir = new ExtFile(sTmpDir, "testjar-orig");
         sTestNewDir = new ExtFile(sTmpDir, "testjar-new");
         LOGGER.info("Unpacking testjar...");
-        TestUtils.copyResourceDir(BuildAndDecodeJarTest.class, "brut/apktool/issue1481/", sTestOrigDir);
+        TestUtils.copyResourceDir(DefaultBaksmaliVariableTest.class, "brut/apktool/issue1481/", sTestOrigDir);
 
         LOGGER.info("Building issue1481.jar...");
         File testJar = new File(sTmpDir, "issue1481.jar");
@@ -99,5 +99,5 @@ public class DefaultBaksmaliVariableTest {
     private static ExtFile sTestOrigDir;
     private static ExtFile sTestNewDir;
 
-    private final static Logger LOGGER = Logger.getLogger(BuildAndDecodeJarTest.class.getName());
+    private final static Logger LOGGER = Logger.getLogger(DefaultBaksmaliVariableTest.class.getName());
 }

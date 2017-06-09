@@ -44,7 +44,7 @@ import javax.imageio.ImageIO;
 public class BuildAndDecodeTest {
 
     @BeforeClass
-    public static void beforeClass() throws Exception, BrutException {
+    public static void beforeClass() throws Exception {
         TestUtils.cleanFrameworkFile();
 
         sTmpDir = new ExtFile(OS.createTempDirectory());
@@ -254,6 +254,11 @@ public class BuildAndDecodeTest {
     }
 
     @Test
+    public void androidOStringTest() throws BrutException, IOException {
+        compareValuesFiles("values-ast/strings.xml");
+    }
+
+    @Test
     public void twoLetterNotHandledAsBcpTest() throws BrutException, IOException {
         checkFolderExists("res/values-fr");
     }
@@ -343,6 +348,89 @@ public class BuildAndDecodeTest {
 
         // then 30, 30 - blue
         assertEquals(controlImage.getRGB(30, 30), testImage.getRGB(30, 30));
+    }
+
+    @Test
+    public void issue1508Test() throws BrutException, IOException {
+        char slash = File.separatorChar;
+        String location = slash + "res" + slash + "drawable-xhdpi" + slash;
+
+        File control = new File((sTestOrigDir + location), "btn_zoom_up_normal.9.png");
+        File test = new File((sTestNewDir + location), "btn_zoom_up_normal.9.png");
+
+        BufferedImage controlImage = ImageIO.read(control);
+        BufferedImage testImage = ImageIO.read(test);
+
+        // 0, 0 = clear
+        assertEquals(controlImage.getRGB(0, 0), testImage.getRGB(0, 0));
+
+        // 30, 0 = black line
+        assertEquals(controlImage.getRGB(0, 30), testImage.getRGB(0, 30));
+
+        // 30, 30 = greyish button
+        assertEquals(controlImage.getRGB(30, 30), testImage.getRGB(30, 30));
+    }
+
+    @Test
+    public void issue1511Test() throws BrutException, IOException {
+        char slash = File.separatorChar;
+        String location = slash + "res" + slash + "drawable-xxhdpi" + slash;
+
+        File control = new File((sTestOrigDir + location), "textfield_activated_holo_dark.9.png");
+        File test = new File((sTestNewDir + location), "textfield_activated_holo_dark.9.png");
+
+        BufferedImage controlImage = ImageIO.read(control);
+        BufferedImage testImage = ImageIO.read(test);
+
+        // Check entire image as we cannot mess this up
+        final int w = controlImage.getWidth(),
+                  h = controlImage.getHeight();
+
+        final int[] controlImageGrid = controlImage.getRGB(0, 0, w, h, null, 0, w);
+        final int[] testImageGrid = testImage.getRGB(0, 0, w, h, null, 0, w);
+
+        for (int i = 0; i < controlImageGrid.length; i++) {
+            assertEquals("Image lost Optical Bounds at i = " + i, controlImageGrid[i], testImageGrid[i]);
+        }
+    }
+
+    @Test
+    public void robust9patchTest() throws BrutException, IOException {
+        String[] ninePatches = {"ic_notification_overlay.9.png", "status_background.9.png",
+                "search_bg_transparent.9.png", "screenshot_panel.9.png", "recents_lower_gradient.9.png"};
+
+        char slash = File.separatorChar;
+        String location = slash + "res" + slash + "drawable-xxhdpi" + slash;
+
+        for (String ninePatch : ninePatches) {
+            File control = new File((sTestOrigDir + location), ninePatch);
+            File test = new File((sTestNewDir + location), ninePatch);
+
+            BufferedImage controlImage = ImageIO.read(control);
+            BufferedImage testImage = ImageIO.read(test);
+
+            int w = controlImage.getWidth(), h = controlImage.getHeight();
+
+            // Check the entire horizontal line
+            for (int i = 1; i < w; i++) {
+                if (isTransparent(controlImage.getRGB(i, 0))) {
+                    assertTrue(isTransparent(testImage.getRGB(i, 0)));
+                } else {
+                    assertEquals("Image lost npTc chunk on image " + ninePatch + " at (x, y) (" + i + "," + 0 + ")",
+                            controlImage.getRGB(i, 0), testImage.getRGB(i, 0));
+                }
+            }
+
+            // Check the entire vertical line
+            for (int i = 1; i < h; i++) {
+                if (isTransparent(controlImage.getRGB(0, i))) {
+                    assertTrue(isTransparent(testImage.getRGB(0, i)));
+                } else {
+                    assertEquals("Image lost npTc chunk on image " + ninePatch + " at (x, y) (" + 0 + "," + i + ")",
+                            controlImage.getRGB(0, i), testImage.getRGB(0, i));
+                }
+            }
+        }
     }
 
     @Test
@@ -463,6 +551,10 @@ public class BuildAndDecodeTest {
         File f =  new File(sTestNewDir, path);
 
         assertTrue(f.isDirectory());
+    }
+
+    private boolean isTransparent(int pixel) {
+        return pixel >> 24 == 0x00;
     }
 
     private void compareXmlFiles(String path, ElementQualifier qualifier) throws BrutException {

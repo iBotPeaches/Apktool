@@ -246,6 +246,8 @@ public final class ResXmlPatcher {
             throws IOException, SAXException, ParserConfigurationException {
 
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+        docFactory.setFeature(FEATURE_DISABLE_DOCTYPE_DECL, true);
+
         DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
         return docBuilder.parse(file);
     }
@@ -264,10 +266,10 @@ public final class ResXmlPatcher {
 
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
         Transformer transformer = transformerFactory.newTransformer();
-        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-        transformer.setOutputProperty(OutputKeys.STANDALONE,"yes");
         DOMSource source = new DOMSource(doc);
         StreamResult result = new StreamResult(file);
         transformer.transform(source, result);
     }
+
+    private static final String FEATURE_DISABLE_DOCTYPE_DECL = "http://apache.org/xml/features/disallow-doctype-decl";
 }

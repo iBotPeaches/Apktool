@@ -25,7 +25,6 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.Logger;
 
 import static org.junit.Assert.assertEquals;
 
@@ -35,10 +34,10 @@ import static org.junit.Assert.assertEquals;
 public class ReferenceVersionCodeTest {
 
     @BeforeClass
-    public static void beforeClass() throws Exception, BrutException {
+    public static void beforeClass() throws Exception {
         TestUtils.cleanFrameworkFile();
         sTmpDir = new ExtFile(OS.createTempDirectory());
-        TestUtils.copyResourceDir(LargeIntsInManifestTest.class, "brut/apktool/issue1234/", sTmpDir);
+        TestUtils.copyResourceDir(ReferenceVersionCodeTest.class, "brut/apktool/issue1234/", sTmpDir);
     }
 
     @AfterClass
@@ -61,6 +60,4 @@ public class ReferenceVersionCodeTest {
     }
 
     private static ExtFile sTmpDir;
-
-    private final static Logger LOGGER = Logger.getLogger(BuildAndDecodeJarTest.class.getName());
 }
