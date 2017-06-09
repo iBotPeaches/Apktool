@@ -176,16 +176,16 @@ public class Res9patchStreamDecoder implements ResStreamDecoder {
         }
 
         public static NinePatch decode(ExtDataInput di) throws IOException {
-            di.skipBytes(1);
+            di.skipBytes(1); // wasDeserialized
             byte numXDivs = di.readByte();
             byte numYDivs = di.readByte();
-            di.skipBytes(1);
-            di.skipBytes(8);
+            di.skipBytes(1); // numColors
+            di.skipBytes(8); // xDivs/yDivs offset
             int padLeft = di.readInt();
             int padRight = di.readInt();
             int padTop = di.readInt();
             int padBottom = di.readInt();
-            di.skipBytes(4);
+            di.skipBytes(4); // colorsOffset
             int[] xDivs = di.readIntArray(numXDivs);
             int[] yDivs = di.readIntArray(numYDivs);
 
