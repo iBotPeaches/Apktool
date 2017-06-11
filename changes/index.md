@@ -19,6 +19,7 @@ description: Apktool - Changelog / Roadmap
  * Add support for animated vector drawables. ([Issue 1456](https://github.com/iBotPeaches/Apktool/issues/1456))
  * Fixes decoding brightness. ([Issue 1508](https://github.com/iBotPeaches/Apktool/issues/1508)) Thanks phhusson
  * Prevent unknown file decode outside of archive. ([Issue 1498](https://github.com/iBotPeaches/Apktool/issues/1498)) / Thanks mkilling
+ * Fixes improper decoding of optical bounds in images. ([Issue 1511](https://github.com/iBotPeaches/Apktool/issues/1508)) Thanks phhusson
 
 ## v2.2.2
 2017.01.23
