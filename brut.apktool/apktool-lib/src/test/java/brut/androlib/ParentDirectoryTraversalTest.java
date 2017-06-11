@@ -46,6 +46,7 @@ public class ParentDirectoryTraversalTest {
 
         // decode issue1498.apk
         ApkDecoder apkDecoder = new ApkDecoder(new File(sTmpDir + File.separator + apk));
+        apkDecoder.setDecodeResources(ApkDecoder.DECODE_RESOURCES_NONE);
 
         apkDecoder.setOutDir(new File(sTmpDir + File.separator + apk + ".out"));
 
