@@ -27,8 +27,8 @@ buildscript {
 
 apply from: 'gradle/functions.gradle'
 
-def apktoolversion_major = '2.2.3'
-def apktoolversion_minor = '';
+def apktoolversion_major = '2.2.4'
+def apktoolversion_minor = 'SNAPSHOT';
 
 defaultTasks 'build', 'shadowJar', 'proguard'
 
