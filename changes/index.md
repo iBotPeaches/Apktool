@@ -4,8 +4,8 @@ title: Apktool - Changelog
 description: Apktool - Changelog / Roadmap
 ---
 
-## v2.2.3 (in development)
-2017.xx.xx
+## v2.2.3
+2017.06.13
 
  * **Android O Preview Support** ([Issue 1453](https://github.com/iBotPeaches/Apktool/issues/1453))
  * Updated to [smali 2.2.1](https://github.com/JesusFreke/smali/wiki/SmaliBaksmali2.2)
