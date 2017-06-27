@@ -4,6 +4,11 @@ title: Apktool - Changelog
 description: Apktool - Changelog / Roadmap
 ---
 
+## v2.2.4
+2017.xx.xx
+
+ * Update SnakeYAML to 1.1.8 (Android) ([Issue 591](https://github.com/iBotPeaches/Apktool/issues/591))
+
 ## v2.2.3
 2017.06.13
 
