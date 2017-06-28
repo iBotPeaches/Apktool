@@ -62,11 +62,15 @@ public final class ResTypeSpec {
     }
 
     public ResResSpec getResSpec(String name) throws AndrolibException {
-        ResResSpec spec = mResSpecs.get(name);
+        ResResSpec spec = getResSpecUnsafe(name);
         if (spec == null) {
             throw new UndefinedResObject(String.format("resource spec: %s/%s", getName(), name));
         }
         return spec;
+    }
+
+    public ResResSpec getResSpecUnsafe(String name) {
+        return mResSpecs.get(name);
     }
 
     public void removeResSpec(ResResSpec spec) throws AndrolibException {
