@@ -36,10 +36,11 @@ public class ResResSpec {
         String cleanName;
 
         ResResSpec resResSpec = type.getResSpecUnsafe(name);
-        if (resResSpec != null)
+        if (resResSpec != null) {
             cleanName = name + "_APKTOOL_DUPLICATENAME_" + id.toString();
-        else
+        } else {
             cleanName = (name.isEmpty() ? ("APKTOOL_DUMMYVAL_" + id.toString()) : name);
+        }
         
         this.mName = cleanName;
         this.mPackage = pkg;
