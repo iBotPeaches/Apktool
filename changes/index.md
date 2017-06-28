@@ -8,7 +8,7 @@ description: Apktool - Changelog / Roadmap
 2017.xx.xx
 
  * Update SnakeYAML to 1.1.8 (Android). ([Issue 591](https://github.com/iBotPeaches/Apktool/issues/591))
- * Fixed issue with APKs taking longer than usual to parse resources. ([Issue 1489](https://github.com/iBotPeaches/Apktool/issues/1489))
+ * Fixed issue with APKs taking longer than usual to parse resources. ([Issue 1489](https://github.com/iBotPeaches/Apktool/issues/1489)) / Thanks MarcMil
 
 ## v2.2.3
 2017.06.13
