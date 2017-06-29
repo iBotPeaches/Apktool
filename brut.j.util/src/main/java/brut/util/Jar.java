@@ -17,11 +17,13 @@
 package brut.util;
 
 import brut.common.BrutException;
+
 import java.io.*;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.commons.io.IOUtils;
 
 /**
@@ -29,10 +31,9 @@ import org.apache.commons.io.IOUtils;
  */
 abstract public class Jar {
     private final static Set<String> mLoaded = new HashSet<String>();
-    private final static Map<String, File> mExtracted =
-        new HashMap<String, File>();
-		
-	public static File getResourceAsFile(String name, Class clazz) throws BrutException {
+    private final static Map<String, File> mExtracted = new HashMap<String, File>();
+
+    public static File getResourceAsFile(String name, Class clazz) throws BrutException {
         File file = mExtracted.get(name);
         if (file == null) {
             file = extractToTmp(name, clazz);
@@ -60,16 +61,19 @@ abstract public class Jar {
         System.load(libFile.getAbsolutePath());
     }
 
-    public static File extractToTmp(String resourcePath, Class clazz) throws BrutException {
-        return extractToTmp(resourcePath, "brut_util_Jar_", clazz);
-    }
-	
-	public static File extractToTmp(String resourcePath) throws BrutException {
+    public static File extractToTmp(String resourcePath) throws BrutException {
         return extractToTmp(resourcePath, Class.class);
     }
 
-    public static File extractToTmp(String resourcePath, String tmpPrefix, Class clazz)
-            throws BrutException {
+    public static File extractToTmp(String resourcePath, Class clazz) throws BrutException {
+        return extractToTmp(resourcePath, "brut_util_Jar_", clazz);
+    }
+
+    public static File extractToTmp(String resourcePath, String tmpPrefix) throws BrutException {
+        return extractToTmp(resourcePath, tmpPrefix, Class.class);
+    }
+
+    public static File extractToTmp(String resourcePath, String tmpPrefix, Class clazz) throws BrutException {
         try {
             InputStream in = clazz.getResourceAsStream(resourcePath);
             if (in == null) {
@@ -83,12 +87,7 @@ abstract public class Jar {
             out.close();
             return fileOut;
         } catch (IOException ex) {
-            throw new BrutException(
-                "Could not extract resource: " + resourcePath, ex);
+            throw new BrutException("Could not extract resource: " + resourcePath, ex);
         }
     }
-	
-	public static File extractToTmp(String resourcePath, String tmpPrefix) throws BrutException {
-		return extractToTmp(resourcePath, tmpPrefix, Class.class);
-	}
 }
