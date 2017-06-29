@@ -9,6 +9,7 @@ description: Apktool - Changelog / Roadmap
 
  * Update SnakeYAML to 1.1.8 (Android). ([Issue 591](https://github.com/iBotPeaches/Apktool/issues/591))
  * Fixed issue with APKs taking longer than usual to parse resources. ([Issue 1489](https://github.com/iBotPeaches/Apktool/issues/1489)) / Thanks MarcMil
+ * Fixed issue with internal binaries not accesible in a Spring boot environment. ([Issue 1543](https://github.com/iBotPeaches/Apktool/issues/1543) / Thanks bingqiao
 
 ## v2.2.3
 2017.06.13
