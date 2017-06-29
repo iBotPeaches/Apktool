@@ -783,18 +783,18 @@ final public class AndrolibResources {
         try {
             if (OSDetection.isMacOSX()) {
                 if (OSDetection.is64Bit()) {
-                    aaptBinary = Jar.getResourceAsFile("/prebuilt/aapt/macosx/64/aapt");
+                    aaptBinary = Jar.getResourceAsFile("/prebuilt/aapt/macosx/64/aapt", AndrolibResources.class);
                 } else {
-                    aaptBinary = Jar.getResourceAsFile("/prebuilt/aapt/macosx/32/aapt");
+                    aaptBinary = Jar.getResourceAsFile("/prebuilt/aapt/macosx/32/aapt", AndrolibResources.class);
                 }
             } else if (OSDetection.isUnix()) {
                 if (OSDetection.is64Bit()) {
-                    aaptBinary = Jar.getResourceAsFile("/prebuilt/aapt/linux/64/aapt");
+                    aaptBinary = Jar.getResourceAsFile("/prebuilt/aapt/linux/64/aapt", AndrolibResources.class);
                 } else {
-                    aaptBinary = Jar.getResourceAsFile("/prebuilt/aapt/linux/32/aapt");
+                    aaptBinary = Jar.getResourceAsFile("/prebuilt/aapt/linux/32/aapt", AndrolibResources.class);
                 }
             } else if (OSDetection.isWindows()) {
-                aaptBinary = Jar.getResourceAsFile("/prebuilt/aapt/windows/aapt.exe");
+                aaptBinary = Jar.getResourceAsFile("/prebuilt/aapt/windows/aapt.exe", AndrolibResources.class);
             } else {
                 LOGGER.warning("Unknown Operating System: " + OSDetection.returnOS());
                 return null;

@@ -31,14 +31,18 @@ abstract public class Jar {
     private final static Set<String> mLoaded = new HashSet<String>();
     private final static Map<String, File> mExtracted =
         new HashMap<String, File>();
-
-    public static File getResourceAsFile(String name) throws BrutException {
+		
+	public static File getResourceAsFile(String name, Class clazz) throws BrutException {
         File file = mExtracted.get(name);
         if (file == null) {
-            file = extractToTmp(name);
+            file = extractToTmp(name, clazz);
             mExtracted.put(name, file);
         }
         return file;
+    }
+
+    public static File getResourceAsFile(String name) throws BrutException {
+        return getResourceAsFile(name, Class.class);
     }
 
     public static void load(String libPath) {
@@ -56,14 +60,18 @@ abstract public class Jar {
         System.load(libFile.getAbsolutePath());
     }
 
-    public static File extractToTmp(String resourcePath) throws BrutException {
-        return extractToTmp(resourcePath, "brut_util_Jar_");
+    public static File extractToTmp(String resourcePath, Class clazz) throws BrutException {
+        return extractToTmp(resourcePath, "brut_util_Jar_", clazz);
+    }
+	
+	public static File extractToTmp(String resourcePath) throws BrutException {
+        return extractToTmp(resourcePath, Class.class);
     }
 
-    public static File extractToTmp(String resourcePath, String tmpPrefix)
+    public static File extractToTmp(String resourcePath, String tmpPrefix, Class clazz)
             throws BrutException {
         try {
-            InputStream in = Class.class.getResourceAsStream(resourcePath);
+            InputStream in = clazz.getResourceAsStream(resourcePath);
             if (in == null) {
                 throw new FileNotFoundException(resourcePath);
             }
@@ -79,4 +87,8 @@ abstract public class Jar {
                 "Could not extract resource: " + resourcePath, ex);
         }
     }
+	
+	public static File extractToTmp(String resourcePath, String tmpPrefix) throws BrutException {
+		return extractToTmp(resourcePath, tmpPrefix, Class.class);
+	}
 }
