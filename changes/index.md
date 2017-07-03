@@ -7,10 +7,12 @@ description: Apktool - Changelog / Roadmap
 ## v2.2.4
 2017.xx.xx
 
+ * **Android O Final Dev Preview Support** ([Issue 1520](https://github.com/iBotPeaches/Apktool/issues/1520))
  * Update SnakeYAML to 1.1.8 (Android). ([Issue 591](https://github.com/iBotPeaches/Apktool/issues/591))
  * Upgrade to `gradle 4.0`
  * Fixed issue with APKs taking longer than usual to parse resources. ([Issue 1489](https://github.com/iBotPeaches/Apktool/issues/1489)) / Thanks MarcMil
  * Fixed issue with internal binaries not accessible in a Spring boot environment. ([Issue 1543](https://github.com/iBotPeaches/Apktool/issues/1543)) / Thanks bingqiao
+ * Add preliminary support for rebuilding applications built in `aapt2` ([Issue 1520](https://github.com/iBotPeaches/Apktool/issues/1520))
 
 ## v2.2.3
 2017.06.13
