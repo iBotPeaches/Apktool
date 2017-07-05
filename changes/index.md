@@ -16,6 +16,8 @@ description: Apktool - Changelog / Roadmap
  * Add support for resource filenames to contain `$` symbols. ([Issue 1532](https://github.com/iBotPeaches/Apktool/issues/1532))
  * Only exit with a 0 status code during `version` commands.
  * Enforce proper Apache licenses on all Java files.
+ * Prevent malicious directory traversal with unknown files.
+ * Prevent XML-XXE processing to prevent unintended leaking of information in a malicious setting.
 
 ## v2.2.3
 2017.06.13
