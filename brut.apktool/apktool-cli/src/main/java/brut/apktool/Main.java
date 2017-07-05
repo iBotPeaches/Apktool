@@ -99,6 +99,7 @@ public class Main {
         if (cmdFound == false) {
             if (commandLine.hasOption("version")) {
                 _version();
+                System.exit(0);
             } else {
                 usage();
             }
@@ -192,7 +193,6 @@ public class Main {
                 decoder.close();
             } catch (IOException ignored) {}
         }
-        System.exit(0);
     }
 
     private static void cmdBuild(CommandLine cli) throws BrutException {
