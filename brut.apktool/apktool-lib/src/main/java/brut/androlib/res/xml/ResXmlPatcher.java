@@ -23,6 +23,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -247,6 +248,10 @@ public final class ResXmlPatcher {
 
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         docFactory.setFeature(FEATURE_DISABLE_DOCTYPE_DECL, true);
+        docFactory.setFeature(FEATURE_LOAD_DTD, false);
+
+        docFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, " ");
+        docFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, " ");
 
         DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
         return docBuilder.parse(file);
@@ -271,5 +276,6 @@ public final class ResXmlPatcher {
         transformer.transform(source, result);
     }
 
+    private static final String FEATURE_LOAD_DTD = "http://apache.org/xml/features/nonvalidating/load-external-dtd";
     private static final String FEATURE_DISABLE_DOCTYPE_DECL = "http://apache.org/xml/features/disallow-doctype-decl";
 }
