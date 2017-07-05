@@ -25,6 +25,10 @@ buildscript {
     }
 }
 
+plugins {
+    id "com.github.hierynomus.license" version "0.14.0"
+}
+
 apply from: 'gradle/functions.gradle'
 
 def apktoolversion_major = '2.2.4'
@@ -34,8 +38,23 @@ defaultTasks 'build', 'shadowJar', 'proguard'
 
 allprojects {
     apply plugin: 'java'
+    apply plugin: 'license'
     sourceCompatibility = JavaVersion.VERSION_1_7
     targetCompatibility = JavaVersion.VERSION_1_7
+
+    license {
+        header rootProject.file("brut.j.common/src/templates/apache2.0-header.txt")
+        include "**/*.java"
+        strictCheck true
+
+        ext.year = Calendar.getInstance().get(Calendar.YEAR)
+        ext.brut = 'Ryszard Wiśniewski'
+        ext.brutEmail = 'brut.alll@gmail.com'
+        ext.ibot = 'Connor Tumbleson'
+        ext.ibotEmail = 'connor.tumbleson@gmail.com'
+    }
+    compileJava.finalizedBy licenseFormatMain
+    licenseFormatMain.finalizedBy licenseFormatTest
 }
 
 if (!('release' in gradle.startParameter.taskNames)) {
