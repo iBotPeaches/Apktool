@@ -22,6 +22,10 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
+import brut.common.BrutException;
+import brut.common.InvalidUnknownFileException;
+import brut.common.RootUnknownFileException;
+import brut.common.TraversalUnknownFileException;
 import org.apache.commons.io.IOUtils;
 
 /**
@@ -71,6 +75,26 @@ public class BrutIO {
             crc.update(buffer, 0, bytesRead);
         }
         return crc;
+    }
+
+    public static String sanitizeUnknownFile(final File directory, final String entry) throws IOException, BrutException {
+        if (entry.length() == 0) {
+            throw new InvalidUnknownFileException("Invalid Unknown File - " + entry);
+        }
+
+        if (new File(entry).isAbsolute()) {
+            throw new RootUnknownFileException("Absolute Unknown Files is not allowed - " + entry);
+        }
+
+        final String canonicalDirPath = directory.getCanonicalPath() + File.separator;
+        final String canonicalEntryPath = new File(directory, entry).getCanonicalPath();
+
+        if (!canonicalEntryPath.startsWith(canonicalDirPath)) {
+            throw new TraversalUnknownFileException("Directory Traversal is not allowed - " + entry);
+        }
+
+        // https://stackoverflow.com/q/2375903/455008
+        return canonicalEntryPath.substring(canonicalDirPath.length());
     }
 
     public static void copy(File inputFile, ZipOutputStream outputFile) throws IOException {
