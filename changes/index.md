@@ -13,6 +13,7 @@ description: Apktool - Changelog / Roadmap
  * Fixed issue with APKs taking longer than usual to parse resources. ([Issue 1489](https://github.com/iBotPeaches/Apktool/issues/1489)) / Thanks MarcMil
  * Fixed issue with internal binaries not accessible in a Spring boot environment. ([Issue 1543](https://github.com/iBotPeaches/Apktool/issues/1543)) / Thanks bingqiao
  * Add preliminary support for rebuilding applications built in `aapt2` ([Issue 1520](https://github.com/iBotPeaches/Apktool/issues/1520))
+ * Add support for resource filenames to contain `$` symbols. ([Issue 1532](https://github.com/iBotPeaches/Apktool/issues/1532))
 
 ## v2.2.3
 2017.06.13
