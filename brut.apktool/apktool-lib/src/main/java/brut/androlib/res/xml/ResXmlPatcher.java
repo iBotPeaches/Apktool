@@ -101,13 +101,7 @@ public final class ResXmlPatcher {
                         Node provider = attrs.getNamedItem("android:authorities");
 
                         if (provider != null) {
-                            String reference = provider.getNodeValue();
-                            String replacement = pullValueFromStrings(file.getParentFile(), reference);
-
-                            if (replacement != null) {
-                                provider.setNodeValue(replacement);
-                                saved = true;
-                            }
+                            saved = isSaved(file, saved, provider);
                         }
                     }
                 }
@@ -127,13 +121,7 @@ public final class ResXmlPatcher {
                         Node provider = attrs.getNamedItem("android:scheme");
 
                         if (provider != null) {
-                            String reference = provider.getNodeValue();
-                            String replacement = pullValueFromStrings(file.getParentFile(), reference);
-
-                            if (replacement != null) {
-                                provider.setNodeValue(replacement);
-                                saved = true;
-                            }
+                            saved = isSaved(file, saved, provider);
                         }
                     }
                 }
@@ -146,6 +134,26 @@ public final class ResXmlPatcher {
                     XPathExpressionException | TransformerException ignored) {
             }
         }
+    }
+
+    /**
+     * Checks if the replacement was properly made to a node.
+     *
+     * @param file File we are searching for value
+     * @param saved boolean on whether we need to save
+     * @param provider Node we are attempign to replace
+     * @return boolean
+     * @throws AndrolibException setting node value failed
+     */
+    private static boolean isSaved(File file, boolean saved, Node provider) throws AndrolibException {
+        String reference = provider.getNodeValue();
+        String replacement = pullValueFromStrings(file.getParentFile(), reference);
+
+        if (replacement != null) {
+            provider.setNodeValue(replacement);
+            saved = true;
+        }
+        return saved;
     }
 
     /**
