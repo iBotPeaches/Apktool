@@ -74,7 +74,6 @@ public class Main {
             setAdvanceMode(true);
         }
 
-        // @todo use new ability of apache-commons-cli to check hasOption for non-prefixed items
         boolean cmdFound = false;
         for (String opt : commandLine.getArgs()) {
             if (opt.equalsIgnoreCase("d") || opt.equalsIgnoreCase("decode")) {
@@ -96,7 +95,7 @@ public class Main {
         }
 
         // if no commands ran, run the version / usage check.
-        if (cmdFound == false) {
+        if (!cmdFound) {
             if (commandLine.hasOption("version")) {
                 _version();
                 System.exit(0);
@@ -110,7 +109,7 @@ public class Main {
         ApkDecoder decoder = new ApkDecoder();
 
         int paraCount = cli.getArgList().size();
-        String apkName = (String) cli.getArgList().get(paraCount - 1);
+        String apkName = cli.getArgList().get(paraCount - 1);
         File outDir;
 
         // check for options
@@ -198,7 +197,7 @@ public class Main {
     private static void cmdBuild(CommandLine cli) throws BrutException {
         String[] args = cli.getArgs();
         String appDirName = args.length < 2 ? "." : args[1];
-        File outFile = null;
+        File outFile;
         ApkOptions apkOptions = new ApkOptions();
 
         // check for build options
@@ -233,7 +232,7 @@ public class Main {
 
     private static void cmdInstallFramework(CommandLine cli) throws AndrolibException {
         int paraCount = cli.getArgList().size();
-        String apkName = (String) cli.getArgList().get(paraCount - 1);
+        String apkName = cli.getArgList().get(paraCount - 1);
 
         ApkOptions apkOptions = new ApkOptions();
         if (cli.hasOption("p") || cli.hasOption("frame-path")) {
@@ -247,7 +246,7 @@ public class Main {
 
     private static void cmdPublicizeResources(CommandLine cli) throws AndrolibException {
         int paraCount = cli.getArgList().size();
-        String apkName = (String) cli.getArgList().get(paraCount - 1);
+        String apkName = cli.getArgList().get(paraCount - 1);
 
         new Androlib().publicizeResources(new File(apkName));
     }
@@ -448,8 +447,6 @@ public class Main {
     }
 
     private static void usage() {
-
-        // load basicOptions
         _Options();
         HelpFormatter formatter = new HelpFormatter();
         formatter.setWidth(120);
@@ -552,8 +549,8 @@ public class Main {
         Main.advanceMode = advanceMode;
     }
 
-    private static enum Verbosity {
-        NORMAL, VERBOSE, QUIET;
+    private enum Verbosity {
+        NORMAL, VERBOSE, QUIET
     }
 
     private static boolean advanceMode = false;
