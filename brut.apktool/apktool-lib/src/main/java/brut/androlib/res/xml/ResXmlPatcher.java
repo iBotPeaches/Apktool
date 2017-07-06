@@ -141,7 +141,7 @@ public final class ResXmlPatcher {
      *
      * @param file File we are searching for value
      * @param saved boolean on whether we need to save
-     * @param provider Node we are attempign to replace
+     * @param provider Node we are attempting to replace
      * @return boolean
      * @throws AndrolibException setting node value failed
      */
