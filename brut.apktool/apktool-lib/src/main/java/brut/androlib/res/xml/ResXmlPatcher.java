@@ -258,8 +258,8 @@ public final class ResXmlPatcher {
         docFactory.setFeature(FEATURE_DISABLE_DOCTYPE_DECL, true);
         docFactory.setFeature(FEATURE_LOAD_DTD, false);
 
-        docFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, " ");
-        docFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, " ");
+        docFactory.setAttribute(ACCESS_EXTERNAL_DTD, " ");
+        docFactory.setAttribute(ACCESS_EXTERNAL_SCHEMA, " ");
 
         DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
         return docBuilder.parse(file);
@@ -284,6 +284,8 @@ public final class ResXmlPatcher {
         transformer.transform(source, result);
     }
 
+    private static final String ACCESS_EXTERNAL_DTD = "http://javax.xml.XMLConstants/property/accessExternalDTD";
+    private static final String ACCESS_EXTERNAL_SCHEMA = "http://javax.xml.XMLConstants/property/accessExternalSchema";
     private static final String FEATURE_LOAD_DTD = "http://apache.org/xml/features/nonvalidating/load-external-dtd";
     private static final String FEATURE_DISABLE_DOCTYPE_DECL = "http://apache.org/xml/features/disallow-doctype-decl";
 }
