@@ -19,7 +19,6 @@ before_install:
   - git config --global user.name "Travis CI Bot"
   - sudo apt-get update -qq
   - sudo apt-get install -qq libstdc++6:i386 lib32z1 expect
-  - git submodule update --init --recursive
 script: ./gradlew build shadowJar proguard
 branches:
   only:
