@@ -57,8 +57,10 @@ allprojects {
     tasks.withType(JavaCompile) {
         options.compilerArgs += ["-Xlint:-options"]
     }
-    compileJava.finalizedBy licenseFormatMain
-    licenseFormatMain.finalizedBy licenseFormatTest
+
+    // license plugin automatically fires these tasks, disable them and run them during releases
+    gradle.startParameter.excludedTaskNames += "licenseMain"
+    gradle.startParameter.excludedTaskNames += "licenseTest"
 }
 
 if (!('release' in gradle.startParameter.taskNames)) {
@@ -121,10 +123,6 @@ subprojects {
 
     repositories {
         mavenCentral()
-    }
-
-    dependencies {
-        testCompile depends.junit
     }
 
     test {

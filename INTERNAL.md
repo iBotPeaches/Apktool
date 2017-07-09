@@ -2,7 +2,21 @@
 
 The steps taken for slicing an official release of Apktool.
 
-### Taging the release.
+### Ensuring proper license headers
+
+Before we build a release, its a good practice to ensure all headers in source files contain
+proper licenses.
+
+    ./gradlew licenseMain && ./gradlew licenseTest
+
+If any license violations were found you can automatically fix them with either
+
+    ./gradlew licenseFormatMain
+    ./gradlew licenseFormatTest
+
+Like described, one formats the `src/main` directory, while the other formats the `src/test` directory.
+
+### Tagging the release.
 
 Inside `build.gradle` there are two lines.
 
