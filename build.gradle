@@ -53,6 +53,10 @@ allprojects {
         ext.ibot = 'Connor Tumbleson'
         ext.ibotEmail = 'connor.tumbleson@gmail.com'
     }
+
+    tasks.withType(JavaCompile) {
+        options.compilerArgs += ["-Xlint:-options"]
+    }
     compileJava.finalizedBy licenseFormatMain
     licenseFormatMain.finalizedBy licenseFormatTest
 }
