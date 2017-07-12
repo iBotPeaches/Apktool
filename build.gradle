@@ -25,6 +25,10 @@ buildscript {
     }
 }
 
+plugins {
+    id "com.github.hierynomus.license" version "0.14.0"
+}
+
 apply from: 'gradle/functions.gradle'
 
 def apktoolversion_major = '2.2.4'
@@ -34,8 +38,29 @@ defaultTasks 'build', 'shadowJar', 'proguard'
 
 allprojects {
     apply plugin: 'java'
+    apply plugin: 'license'
     sourceCompatibility = JavaVersion.VERSION_1_7
     targetCompatibility = JavaVersion.VERSION_1_7
+
+    license {
+        header rootProject.file("brut.j.common/src/templates/apache2.0-header.txt")
+        include "**/*.java"
+        strictCheck true
+
+        ext.year = Calendar.getInstance().get(Calendar.YEAR)
+        ext.brut = 'Ryszard Wiśniewski'
+        ext.brutEmail = 'brut.alll@gmail.com'
+        ext.ibot = 'Connor Tumbleson'
+        ext.ibotEmail = 'connor.tumbleson@gmail.com'
+    }
+
+    tasks.withType(JavaCompile) {
+        options.compilerArgs += ["-Xlint:-options"]
+    }
+
+    // license plugin automatically fires these tasks, disable them and run them during releases
+    gradle.startParameter.excludedTaskNames += "licenseMain"
+    gradle.startParameter.excludedTaskNames += "licenseTest"
 }
 
 if (!('release' in gradle.startParameter.taskNames)) {
@@ -86,7 +111,6 @@ subprojects {
                 commons_cli: 'commons-cli:commons-cli:1.4',
                 commons_io: 'commons-io:commons-io:2.4',
                 commons_lang: 'org.apache.commons:commons-lang3:3.1',
-                findbugs: 'com.google.code.findbugs:jsr305:3.0.1',
                 guava: 'com.google.guava:guava:14.0',
                 junit: 'junit:junit:4.12',
                 proguard_gradle: 'net.sf.proguard:proguard-gradle:5.2.1',
@@ -99,10 +123,6 @@ subprojects {
 
     repositories {
         mavenCentral()
-    }
-
-    dependencies {
-        testCompile depends.junit
     }
 
     test {

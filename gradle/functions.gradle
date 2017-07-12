@@ -14,36 +14,37 @@
  *  limitations under the License.
  */
 
-gradle.allprojects {
+def getCheckedOutGitCommitHash() {
+    def gitFolder = "$projectDir/.git/"
+    def takeFromHash = 6
 
-    // https://gist.github.com/JonasGroeger/7620911
-    ext.getCheckedOutGitCommitHash = {
-        def gitFolder = "$projectDir/.git/"
-        def takeFromHash = 6
-
-        def head
-        try {
-            head = new File(gitFolder + "HEAD").text.split(":")
-        } catch(Exception e) {
-            return null;
-        }
-
-        def isCommit = head.length == 1
-        if(isCommit) return head[0].trim().take(takeFromHash)
-
-        def refHead = new File(gitFolder + head[1].trim())
-        refHead.text.trim().take takeFromHash
+    def head
+    try {
+        head = new File(gitFolder + "HEAD").text.split(":")
+    } catch(Exception e) {
+        return null;
     }
 
-    ext.getCheckedOutBranch = {
-        def gitFolder = "$projectDir/.git/"
+    def isCommit = head.length == 1
+    if(isCommit) return head[0].trim().take(takeFromHash)
 
-        def head
-        try {
-            head = new File(gitFolder + "HEAD").text.split("/")
-            return head[2].trim();
-        } catch(Exception e) {
-            return "SNAPSHOT";
-        }
+    def refHead = new File(gitFolder + head[1].trim())
+    refHead.text.trim().take takeFromHash
+}
+
+def getCheckedOutBranch() {
+    def gitFolder = "$projectDir/.git/"
+
+    def head
+    try {
+        head = new File(gitFolder + "HEAD").text.split("/")
+        return head[2].trim();
+    } catch(Exception e) {
+        return "SNAPSHOT";
     }
+}
+
+ext {
+    getCheckedOutGitCommitHash = this.&getCheckedOutGitCommitHash
+    getCheckedOutBranch = this.&getCheckedOutBranch
 }

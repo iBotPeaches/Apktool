@@ -1,6 +1,6 @@
 /**
- *  Copyright 2014 Ryszard Wiśniewski <brut.alll@gmail.com>
- *  Copyright 2015 Connor Tumbleson <connor.tumbleson@gmail.com>
+ *  Copyright (C) 2017 Ryszard Wiśniewski <brut.alll@gmail.com>
+ *  Copyright (C) 2017 Connor Tumbleson <connor.tumbleson@gmail.com>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -106,13 +107,7 @@ public final class ResXmlPatcher {
                         Node provider = attrs.getNamedItem("android:authorities");
 
                         if (provider != null) {
-                            String reference = provider.getNodeValue();
-                            String replacement = pullValueFromStrings(file.getParentFile(), reference);
-
-                            if (replacement != null) {
-                                provider.setNodeValue(replacement);
-                                saved = true;
-                            }
+                            saved = isSaved(file, saved, provider);
                         }
                     }
                 }
@@ -132,13 +127,7 @@ public final class ResXmlPatcher {
                         Node provider = attrs.getNamedItem("android:scheme");
 
                         if (provider != null) {
-                            String reference = provider.getNodeValue();
-                            String replacement = pullValueFromStrings(file.getParentFile(), reference);
-
-                            if (replacement != null) {
-                                provider.setNodeValue(replacement);
-                                saved = true;
-                            }
+                            saved = isSaved(file, saved, provider);
                         }
                     }
                 }
@@ -151,6 +140,26 @@ public final class ResXmlPatcher {
                     XPathExpressionException | TransformerException ignored) {
             }
         }
+    }
+
+    /**
+     * Checks if the replacement was properly made to a node.
+     *
+     * @param file File we are searching for value
+     * @param saved boolean on whether we need to save
+     * @param provider Node we are attempting to replace
+     * @return boolean
+     * @throws AndrolibException setting node value failed
+     */
+    private static boolean isSaved(File file, boolean saved, Node provider) throws AndrolibException {
+        String reference = provider.getNodeValue();
+        String replacement = pullValueFromStrings(file.getParentFile(), reference);
+
+        if (replacement != null) {
+            provider.setNodeValue(replacement);
+            saved = true;
+        }
+        return saved;
     }
 
     /**
@@ -253,6 +262,10 @@ public final class ResXmlPatcher {
 
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         docFactory.setFeature(FEATURE_DISABLE_DOCTYPE_DECL, true);
+        docFactory.setFeature(FEATURE_LOAD_DTD, false);
+
+        docFactory.setAttribute(ACCESS_EXTERNAL_DTD, " ");
+        docFactory.setAttribute(ACCESS_EXTERNAL_SCHEMA, " ");
 
         DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
         // Not using the parse(File) method on purpose, so that we can control when
@@ -284,5 +297,8 @@ public final class ResXmlPatcher {
         transformer.transform(source, result);
     }
 
+    private static final String ACCESS_EXTERNAL_DTD = "http://javax.xml.XMLConstants/property/accessExternalDTD";
+    private static final String ACCESS_EXTERNAL_SCHEMA = "http://javax.xml.XMLConstants/property/accessExternalSchema";
+    private static final String FEATURE_LOAD_DTD = "http://apache.org/xml/features/nonvalidating/load-external-dtd";
     private static final String FEATURE_DISABLE_DOCTYPE_DECL = "http://apache.org/xml/features/disallow-doctype-decl";
 }

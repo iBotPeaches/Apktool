@@ -1,5 +1,6 @@
 /**
- *  Copyright 2014 Ryszard Wiśniewski <brut.alll@gmail.com>
+ *  Copyright (C) 2017 Ryszard Wiśniewski <brut.alll@gmail.com>
+ *  Copyright (C) 2017 Connor Tumbleson <connor.tumbleson@gmail.com>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -13,7 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package brut.androlib.res;
 
 import brut.androlib.AndrolibException;
@@ -783,18 +783,18 @@ final public class AndrolibResources {
         try {
             if (OSDetection.isMacOSX()) {
                 if (OSDetection.is64Bit()) {
-                    aaptBinary = Jar.getResourceAsFile("/prebuilt/aapt/macosx/64/aapt");
+                    aaptBinary = Jar.getResourceAsFile("/prebuilt/aapt/macosx/64/aapt", AndrolibResources.class);
                 } else {
-                    aaptBinary = Jar.getResourceAsFile("/prebuilt/aapt/macosx/32/aapt");
+                    aaptBinary = Jar.getResourceAsFile("/prebuilt/aapt/macosx/32/aapt", AndrolibResources.class);
                 }
             } else if (OSDetection.isUnix()) {
                 if (OSDetection.is64Bit()) {
-                    aaptBinary = Jar.getResourceAsFile("/prebuilt/aapt/linux/64/aapt");
+                    aaptBinary = Jar.getResourceAsFile("/prebuilt/aapt/linux/64/aapt", AndrolibResources.class);
                 } else {
-                    aaptBinary = Jar.getResourceAsFile("/prebuilt/aapt/linux/32/aapt");
+                    aaptBinary = Jar.getResourceAsFile("/prebuilt/aapt/linux/32/aapt", AndrolibResources.class);
                 }
             } else if (OSDetection.isWindows()) {
-                aaptBinary = Jar.getResourceAsFile("/prebuilt/aapt/windows/aapt.exe");
+                aaptBinary = Jar.getResourceAsFile("/prebuilt/aapt/windows/aapt.exe", AndrolibResources.class);
             } else {
                 LOGGER.warning("Unknown Operating System: " + OSDetection.returnOS());
                 return null;
