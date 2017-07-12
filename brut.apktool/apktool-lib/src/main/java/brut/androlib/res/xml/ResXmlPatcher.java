@@ -16,26 +16,32 @@
  */
 package brut.androlib.res.xml;
 
-import brut.androlib.AndrolibException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+
+import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import javax.xml.XMLConstants;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.xpath.*;
-import java.io.File;
-import java.io.IOException;
+import brut.androlib.AndrolibException;
 
 /**
  * @author Connor Tumbleson <connor.tumbleson@gmail.com>
@@ -262,7 +268,14 @@ public final class ResXmlPatcher {
         docFactory.setAttribute(ACCESS_EXTERNAL_SCHEMA, " ");
 
         DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-        return docBuilder.parse(file);
+        // Not using the parse(File) method on purpose, so that we can control when
+        // to close it. Somehow parse(File) does not seem to close the file in all cases.
+        FileInputStream inputStream = new FileInputStream(file);
+        try {
+        	return docBuilder.parse(inputStream);
+        } finally {
+        	inputStream.close();
+        }
     }
 
     /**
