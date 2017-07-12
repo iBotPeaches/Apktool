@@ -14,6 +14,7 @@ description: Apktool - Changelog / Roadmap
  * Fixed issue with internal binaries not accessible in a Spring boot environment. ([Issue 1543](https://github.com/iBotPeaches/Apktool/issues/1543)) / Thanks bingqiao
  * Add preliminary support for rebuilding applications built in `aapt2` ([Issue 1520](https://github.com/iBotPeaches/Apktool/issues/1520))
  * Add support for resource filenames to contain `$` symbols. ([Issue 1532](https://github.com/iBotPeaches/Apktool/issues/1532))
+ * Fixed issue with apktool not closing file resources, creating locks. ([Issue 1561](https://github.com/iBotPeaches/Apktool/pull/1561))
  * Only exit with a 0 status code during `version` commands.
  * Enforce proper Apache licenses on all Java files.
  * Prevent malicious directory traversal with unknown files.
