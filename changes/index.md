@@ -4,7 +4,7 @@ title: Apktool - Changelog
 description: Apktool - Changelog / Roadmap
 ---
 
-## v2.2.4
+## v2.2.4 (in development)
 2017.xx.xx
 
  * **Android O Final Dev Preview Support** ([Issue 1520](https://github.com/iBotPeaches/Apktool/issues/1520))
