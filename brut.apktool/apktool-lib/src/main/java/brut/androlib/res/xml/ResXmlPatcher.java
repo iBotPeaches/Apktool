@@ -19,8 +19,8 @@ package brut.androlib.res.xml;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.logging.Logger;
 
-import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -264,8 +264,12 @@ public final class ResXmlPatcher {
         docFactory.setFeature(FEATURE_DISABLE_DOCTYPE_DECL, true);
         docFactory.setFeature(FEATURE_LOAD_DTD, false);
 
-        docFactory.setAttribute(ACCESS_EXTERNAL_DTD, " ");
-        docFactory.setAttribute(ACCESS_EXTERNAL_SCHEMA, " ");
+        try {
+            docFactory.setAttribute(ACCESS_EXTERNAL_DTD, " ");
+            docFactory.setAttribute(ACCESS_EXTERNAL_SCHEMA, " ");
+        } catch (IllegalArgumentException ex) {
+            LOGGER.warning("JAXP 1.5 Support is required to validate XML");
+        }
 
         DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
         // Not using the parse(File) method on purpose, so that we can control when
@@ -301,4 +305,6 @@ public final class ResXmlPatcher {
     private static final String ACCESS_EXTERNAL_SCHEMA = "http://javax.xml.XMLConstants/property/accessExternalSchema";
     private static final String FEATURE_LOAD_DTD = "http://apache.org/xml/features/nonvalidating/load-external-dtd";
     private static final String FEATURE_DISABLE_DOCTYPE_DECL = "http://apache.org/xml/features/disallow-doctype-decl";
+
+    private static final Logger LOGGER = Logger.getLogger(ResXmlPatcher.class.getName());
 }
