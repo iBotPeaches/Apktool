@@ -23,6 +23,7 @@ import brut.common.TraversalUnknownFileException;
 import brut.directory.ExtFile;
 import brut.util.BrutIO;
 import brut.util.OS;
+import brut.util.OSDetection;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -59,7 +60,8 @@ public class UnknownDirectoryTraversalTest {
 
     @Test(expected = RootUnknownFileException.class)
     public void invalidRootFileTest() throws IOException, BrutException {
-        BrutIO.sanitizeUnknownFile(sTmpDir, "/file");
+        String rootLocation = OSDetection.isWindows() ? "C:/" : File.separator;
+        BrutIO.sanitizeUnknownFile(sTmpDir, rootLocation + "file");
     }
 
     @Test(expected = InvalidUnknownFileException.class)
