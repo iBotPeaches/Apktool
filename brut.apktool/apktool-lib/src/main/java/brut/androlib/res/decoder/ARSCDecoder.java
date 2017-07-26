@@ -156,7 +156,7 @@ public class ARSCDecoder {
             readTableType();
             
             // skip "TYPE 8 chunks" and/or padding data at the end of this chunk
-            if(mCountIn.getCount() < mHeader.endPosition) {
+            if (mCountIn.getCount() < mHeader.endPosition) {
                 mCountIn.skip(mHeader.endPosition - mCountIn.getCount());
             }
             
@@ -237,6 +237,12 @@ public class ARSCDecoder {
         }
         short flags = mIn.readShort();
         int specNamesId = mIn.readInt();
+
+        // If we are here, we probably already inserted any remaining dummy resources. No need to parse
+        // any resources that doesn't have type information
+        if (mCountIn.getCount() == mHeader.endPosition) {
+            return;
+        }
 
         ResValue value = (flags & ENTRY_FLAG_COMPLEX) == 0 ? readValue() : readComplexEntry();
 
@@ -519,6 +525,8 @@ public class ARSCDecoder {
     private HashMap<Integer, ResTypeSpec> mResTypeSpecs = new HashMap<>();
 
     private final static short ENTRY_FLAG_COMPLEX = 0x0001;
+    private final static short ENTRY_FLAG_PUBLIC = 0x0002;
+    private final static short ENTRY_FLAG_WEAK = 0x0004;
 
     public static class Header {
         public final short type;
