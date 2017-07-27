@@ -71,6 +71,9 @@ public class ResValueFactory {
     }
 
     public ResIntBasedValue factory(String value, int rawValue) {
+        if (value == null) {
+            return new ResFileValue("", rawValue);
+        }
         if (value.startsWith("res/")) {
             return new ResFileValue(value, rawValue);
         }
