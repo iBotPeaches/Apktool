@@ -16,6 +16,7 @@ description: Apktool - Changelog / Roadmap
  * Add support for resource filenames to contain `$` symbols. ([Issue 1532](https://github.com/iBotPeaches/Apktool/issues/1532))
  * Fixed issue with apktool not closing file resources, creating locks. ([Issue 1561](https://github.com/iBotPeaches/Apktool/pull/1561)) / Thanks MarcMil
  * Fixed issue with APKs that have `INVALID TYPE CONFIG` resources. ([Issue 1534](https://github.com/iBotPeaches/Apktool/issues/1534))
+ * Fixed decoding issue with APKs with intentionally invalid characters. ([Issue 1564] (https://github.com/iBotPeaches/Apktool/issues/1564)
  * Only exit with a 0 status code during `version` commands.
  * Enforce proper Apache licenses on all Java files.
  * Prevent malicious directory traversal with unknown files.
