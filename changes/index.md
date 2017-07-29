@@ -4,8 +4,8 @@ title: Apktool - Changelog
 description: Apktool - Changelog / Roadmap
 ---
 
-## v2.2.4 (in development)
-2017.xx.xx
+## v2.2.4
+2017.07.29
 
  * **Android O Final Dev Preview Support** ([Issue 1520](https://github.com/iBotPeaches/Apktool/issues/1520))
  * Update SnakeYAML to 1.1.8 (Android). ([Issue 591](https://github.com/iBotPeaches/Apktool/issues/591))
