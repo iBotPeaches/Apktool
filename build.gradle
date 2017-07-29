@@ -32,7 +32,7 @@ plugins {
 apply from: 'gradle/functions.gradle'
 
 def apktoolversion_major = '2.2.4'
-def apktoolversion_minor = 'SNAPSHOT';
+def apktoolversion_minor = '';
 
 defaultTasks 'build', 'shadowJar', 'proguard'
 
