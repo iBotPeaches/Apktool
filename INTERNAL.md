@@ -65,15 +65,19 @@ Copy the jar to any location to prep for uploading. The pattern we name the jars
 
 Or in the case of the last release - `apktool_2.2.1.jar`
 
-Once you have the jar in this form. Record the md5 hash of it. This can be done using `md5sum`.
+Once you have the jar in this form. Record the md5 hash & sha256 hash of it. This can be done using `md5sum`
+and `sha256sum` on unix systems.
 
 This can be shown for the `2.2.2` release like so
 
     ➜  Desktop md5sum apktool_2.2.2.jar
     1e6be08d3f9bb4b442bb85cf4e21f1c1  apktool_2.2.2.jar
 
-Remember this hash. This is the local hash. This is our master hash. All others (Bitbucket, Backup)
-must match this.
+    ➜  Desktop sha256sum apktool-2.2.2.jar
+    1f1f186edcc09b8677bc1037f3f812dff89077187b24c8558ca2a89186ea3251  apktool-2.2.2.jar
+
+Remember these hashes. These are the local hashes. These are our master hashes. All others (Bitbucket, Backup)
+must match these. If they do not - they are invalid.
 
 ### Lets get uploading.
 
@@ -114,15 +118,19 @@ Access to this server is probably limited so this option may not be possible. SS
 `connortumbleson.com` server with username `connor`. Head to `public_html/apktool` and upload
 the `apktool_x.x.x.jar` to it.
 
-Now re-generate the md5 hashes for these files.
+Now re-generate the md5/sha256 hashes for these files.
 
     md5sum *.jar > md5.md5sum
+    sha256 *.jar > sha256.shasum
 
 Check the `md5.md5sum` file for the hashes. The file will look something like this.
 
     6de3e097943c553da5db2e604bced332  apktool_1.4.10.jar
     ...
     1e6be08d3f9bb4b442bb85cf4e21f1c1  apktool_2.2.2.jar
+
+Additionally check the `sha256.shasum` file for the hashes. This file will look almost identical to the above
+except for containing sha256 hashes.
 
 The hashes match so we have uploaded the binaries to all 3 locations. Time to get writing the release
 post.
@@ -143,7 +151,7 @@ So write the post. I tend to always include the following:
 2. Quick sentence or two for SEO to describe the meat of this release.
 3. Commit count and total for this release with author names.
 4. Changelog linking to the bugs that were fixed.
-5. Download including the md5 hash.
+5. Download including the md5/sha256 hash.
 6. Link dump to Project Site, GitHub, Bug Tracker and XDA Thread.
 
 Now that you've written this post. We need to go post it in places and update places where
