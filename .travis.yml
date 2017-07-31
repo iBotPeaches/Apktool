@@ -16,7 +16,6 @@ matrix:
     - os: osx
   allow_failures:
     - jdk: openjdk7
-    - jdk: openjdk8
 cache:
   directories:
     - $HOME/.gradle/caches/
