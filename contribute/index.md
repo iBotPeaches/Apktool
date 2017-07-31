@@ -6,7 +6,7 @@ description: Apktool - How to Contribute
 
 ## Supporters of Apktool
 
-[![Sourcetoad Logo](http://connortumbleson.com/content/images/2017/06/sourcetoad-logo-horiz-rgb_885x135.png)](https://www.sourcetoad.com/cool-tools/apktool/)
+[![Sourcetoad Logo](https://connortumbleson.com/content/images/2017/06/sourcetoad-logo-horiz-rgb_885x135.png)](https://www.sourcetoad.com/cool-tools/apktool/)
 
 ## Contributing to Apktool
 
