@@ -4,6 +4,11 @@ title: Apktool - Changelog
 description: Apktool - Changelog / Roadmap
 ---
 
+## v2.2.5 (in development)
+2017.xx.xx
+
+ * Run CI tests on OSX as well as unix ([Issue 1571](https://github.com/iBotPeaches/Apktool/issues/1571))
+
 ## v2.2.4
 2017.07.29
 
