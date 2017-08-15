@@ -85,6 +85,24 @@ public class UnknownCompressionTest {
         assertEquals(new Integer(0), rebuilt);
     }
 
+    @Test
+    public void confirmJsonFileIsDeflatedTest() throws BrutException, IOException {
+        Integer control = sOriginalFile.getDirectory().getCompressionLevel("test.json");
+        Integer rebuilt = sOriginalFile.getDirectory().getCompressionLevel("test.json");
+
+        assertEquals(control, rebuilt);
+        assertEquals(new Integer(8), rebuilt);
+    }
+
+    @Test
+    public void confirmPngFileIsCorrectlyDeflatedTest() throws BrutException, IOException {
+        Integer control = sOriginalFile.getDirectory().getCompressionLevel("950x150.png");
+        Integer rebuilt = sOriginalFile.getDirectory().getCompressionLevel("950x150.png");
+
+        assertEquals(control, rebuilt);
+        assertEquals(new Integer(8), rebuilt);
+    }
+
     private static ExtFile sTmpDir;
 
     private static ExtFile sOriginalFile;
