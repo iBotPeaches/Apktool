@@ -17,6 +17,10 @@ It is NOT intended for piracy and other non-legal uses. It could be used for loc
 
 * [Sourcetoad](https://www.sourcetoad.com/cool-tools/apktool/) - helping with a weekly sponsorship for continued improvement and maintenance of the project.
 
+#### Security Vulnerabilities
+
+If you discover a security vulnerability within Apktool, please send an e-mail to Connor Tumbleson at connor.tumbleson(at)gmail.com. All security vulnerabilities will be promptly addressed.
+
 #### Links
 - [Downloads](https://bitbucket.org/iBotPeaches/apktool/downloads)
 - [Downloads Mirror](http://connortumbleson.com/apktool/)
