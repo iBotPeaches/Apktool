@@ -730,14 +730,6 @@ final public class AndrolibResources {
             path = apkOptions.frameworkFolderLocation;
         } else {
             File parentPath = new File(System.getProperty("user.home"));
-            if (! parentPath.canWrite()) {
-                LOGGER.severe(String.format("WARNING: Could not write to $HOME (%s), using %s instead...",
-                        parentPath.getAbsolutePath(), System.getProperty("java.io.tmpdir")));
-                LOGGER.severe("Please be aware this is a volatile directory and frameworks could go missing, " +
-                        "please utilize --frame-path if the default storage directory is unavailable");
-
-                parentPath = new File(System.getProperty("java.io.tmpdir"));
-            }
 
             if (OSDetection.isMacOSX()) {
                 path = parentPath.getAbsolutePath() + String.format("%1$sLibrary%1$sapktool%1$sframework", File.separatorChar);
@@ -746,9 +738,25 @@ final public class AndrolibResources {
             } else {
                 path = parentPath.getAbsolutePath() + String.format("%1$s.local%1$sshare%1$sapktool%1$sframework", File.separatorChar);
             }
+
+            File fullPath = new File(path);
+
+            if (! fullPath.canWrite()) {
+                LOGGER.severe(String.format("WARNING: Could not write to (%1$s), using %2$s instead...",
+                        fullPath.getAbsolutePath(), System.getProperty("java.io.tmpdir")));
+                LOGGER.severe("Please be aware this is a volatile directory and frameworks could go missing, " +
+                        "please utilize --frame-path if the default storage directory is unavailable");
+
+                path = new File(System.getProperty("java.io.tmpdir")).getAbsolutePath();
+            }
         }
 
         File dir = new File(path);
+
+        if (!dir.isDirectory()) {
+            LOGGER.severe("--frame-path is set to a file, not a directory.");
+            System.exit(1);
+        }
 
         if (dir.getParentFile() != null && dir.getParentFile().isFile()) {
             LOGGER.severe("Please remove file at " + dir.getParentFile());
