@@ -54,7 +54,7 @@ Apktool comes with an internal framework like mentioned above. This file is copi
 Frameworks are stored in different places depending on the OS in question.
 <ul>
     <li>unix - <code>$HOME/.local/share/apktool</code></li>
-    <li>windows - <code>$HOME/AppData/Local/apktool</code></li>
+    <li>windows - <code>%UserProfile%\AppData\Local\apktool</code></li>
     <li>mac - <code>$HOME/Library/apktool</code></li>
 </ul>
 
