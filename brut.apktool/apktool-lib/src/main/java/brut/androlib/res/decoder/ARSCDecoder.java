@@ -139,12 +139,6 @@ public class ARSCDecoder {
         }
     }
 
-    private void resSparseTypeEntry() throws AndrolibException, IOException {
-        // uint_32_t - entry
-        int index = mIn.readInt();
-        int offset = mIn.readInt();
-    }
-
     private ResTypeSpec readTableTypeSpec() throws AndrolibException, IOException {
         mTypeSpec = readSingleTableTypeSpec();
         addTypeSpec(mTypeSpec);
@@ -213,6 +207,10 @@ public class ARSCDecoder {
         if (position != mCountIn.getCount()) {
             mIn.skipBytes(position - mCountIn.getCount());
         }
+
+        if (typeFlags == 1) {
+            LOGGER.info("Sparse type flags detected: " + mTypeSpec.getName());
+        }
         int[] entryOffsets = mIn.readIntArray(entryCount);
 
         if (flags.isInvalid) {
@@ -225,11 +223,6 @@ public class ARSCDecoder {
         }
 
         mType = flags.isInvalid && !mKeepBroken ? null : mPkg.getOrCreateConfig(flags);
-
-        if (typeFlags == 1) {
-            System.err.println("I don't have a parsed resource yet to test. So die out until I find one.");
-            System.exit(1);
-        }
 
         for (int i = 0; i < entryOffsets.length; i++) {
             if (entryOffsets[i] != -1) {
