@@ -381,9 +381,11 @@ public class ARSCDecoder {
         }
 
         byte screenLayout2 = 0;
+        byte colorimetry = 0;
         if (size >= 52) {
             screenLayout2 = mIn.readByte();
-            mIn.skipBytes(3); // reserved padding
+            colorimetry = mIn.readByte();
+            mIn.skipBytes(2); // reserved padding
             read = 52;
         }
 
@@ -419,7 +421,8 @@ public class ARSCDecoder {
                 orientation, touchscreen, density, keyboard, navigation,
                 inputFlags, screenWidth, screenHeight, sdkVersion,
                 screenLayout, uiMode, smallestScreenWidthDp, screenWidthDp,
-                screenHeightDp, localeScript, localeVariant, screenLayout2, isInvalid, size);
+                screenHeightDp, localeScript, localeVariant, screenLayout2,
+                colorimetry,isInvalid, size);
     }
 
     private char[] unpackLanguageOrRegion(byte in0, byte in1, char base) throws AndrolibException {

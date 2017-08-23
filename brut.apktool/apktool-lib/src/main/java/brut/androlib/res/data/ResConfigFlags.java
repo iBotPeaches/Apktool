@@ -52,6 +52,7 @@ public class ResConfigFlags {
     private final char[] localeVariant;
 
     private final byte screenLayout2;
+    private final byte colorimetry;
 
     public final boolean isInvalid;
 
@@ -81,6 +82,7 @@ public class ResConfigFlags {
         localeScript = null;
         localeVariant = null;
         screenLayout2 = 0;
+        colorimetry = COLOR_WIDE_UNDEFINED;
         isInvalid = false;
         mQualifiers = "";
         size = 0;
@@ -93,7 +95,7 @@ public class ResConfigFlags {
                           short sdkVersion, byte screenLayout, byte uiMode,
                           short smallestScreenWidthDp, short screenWidthDp,
                           short screenHeightDp, char[] localeScript, char[] localeVariant,
-                          byte screenLayout2, boolean isInvalid, int size) {
+                          byte screenLayout2, byte colorimetry, boolean isInvalid, int size) {
         if (orientation < 0 || orientation > 3) {
             LOGGER.warning("Invalid orientation value: " + orientation);
             orientation = 0;
@@ -157,6 +159,7 @@ public class ResConfigFlags {
         this.localeScript = localeScript;
         this.localeVariant = localeVariant;
         this.screenLayout2 = screenLayout2;
+        this.colorimetry = colorimetry;
         this.isInvalid = isInvalid;
         this.size = size;
         mQualifiers = generateQualifiers();
@@ -230,6 +233,22 @@ public class ResConfigFlags {
                 break;
             case SCREENLONG_NO:
                 ret.append("-notlong");
+                break;
+        }
+        switch (colorimetry & COLOR_HDR_MASK) {
+            case COLOR_HDR_YES:
+                ret.append("-highdr");
+                break;
+            case COLOR_HDR_NO:
+                ret.append("-lowdr");
+                break;
+        }
+        switch (colorimetry & COLOR_WIDE_MASK) {
+            case COLOR_WIDE_YES:
+                ret.append("-widecg");
+                break;
+            case COLOR_WIDE_NO:
+                ret.append("-nowidecg");
                 break;
         }
         switch (screenLayout2 & MASK_SCREENROUND) {
@@ -400,7 +419,7 @@ public class ResConfigFlags {
     }
 
     private short getNaturalSdkVersionRequirement() {
-        if ((uiMode & MASK_UI_MODE_TYPE) == UI_MODE_TYPE_VR_HEADSET) {
+        if ((uiMode & MASK_UI_MODE_TYPE) == UI_MODE_TYPE_VR_HEADSET || (colorimetry & COLOR_WIDE_MASK) != 0 || ((colorimetry & COLOR_HDR_MASK) != 0)) {
             return SDK_OREO;
         }
         if ((screenLayout2 & MASK_SCREENROUND) != 0) {
@@ -608,6 +627,19 @@ public class ResConfigFlags {
     public final static byte UI_MODE_NIGHT_ANY = 0x00;
     public final static byte UI_MODE_NIGHT_NO = 0x10;
     public final static byte UI_MODE_NIGHT_YES = 0x20;
+
+    public final static byte COLOR_HDR_MASK = 0xC;
+    public final static byte COLOR_HDR_NO = 0x4;
+    public final static byte COLOR_HDR_SHIFT = 0x2;
+    public final static byte COLOR_HDR_UNDEFINED = 0x0;
+    public final static byte COLOR_HDR_YES = 0x8;
+
+    public final static byte COLOR_UNDEFINED = 0x0;
+
+    public final static byte COLOR_WIDE_UNDEFINED = 0x0;
+    public final static byte COLOR_WIDE_NO = 0x1;
+    public final static byte COLOR_WIDE_YES = 0x2;
+    public final static byte COLOR_WIDE_MASK = 0x3;
 
     private static final Logger LOGGER = Logger.getLogger(ResConfigFlags.class.getName());
 }
