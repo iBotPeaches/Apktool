@@ -296,6 +296,14 @@ public class BuildAndDecodeTest {
     }
 
     @Test
+    public void api26ConfigurationsTest() throws BrutException, IOException {
+        //compareValuesFiles("values-widecg/strings.xml");
+        //compareValuesFiles("values-lowdr/strings.xml");
+        //compareValuesFiles("values-nowidecg/strings.xml");
+        //compareValuesFiles("values-vrheadset-v26/strings.xml");
+    }
+
+    @Test
     public void drawableNoDpiTest() throws BrutException, IOException {
         compareResFolder("drawable-nodpi");
     }
