@@ -52,7 +52,7 @@ public class ResConfigFlags {
     private final char[] localeVariant;
 
     private final byte screenLayout2;
-    private final byte colorimetry;
+    private final byte colorMode;
 
     public final boolean isInvalid;
 
@@ -82,7 +82,7 @@ public class ResConfigFlags {
         localeScript = null;
         localeVariant = null;
         screenLayout2 = 0;
-        colorimetry = COLOR_WIDE_UNDEFINED;
+        colorMode = COLOR_WIDE_UNDEFINED;
         isInvalid = false;
         mQualifiers = "";
         size = 0;
@@ -95,7 +95,7 @@ public class ResConfigFlags {
                           short sdkVersion, byte screenLayout, byte uiMode,
                           short smallestScreenWidthDp, short screenWidthDp,
                           short screenHeightDp, char[] localeScript, char[] localeVariant,
-                          byte screenLayout2, byte colorimetry, boolean isInvalid, int size) {
+                          byte screenLayout2, byte colorMode, boolean isInvalid, int size) {
         if (orientation < 0 || orientation > 3) {
             LOGGER.warning("Invalid orientation value: " + orientation);
             orientation = 0;
@@ -159,7 +159,7 @@ public class ResConfigFlags {
         this.localeScript = localeScript;
         this.localeVariant = localeVariant;
         this.screenLayout2 = screenLayout2;
-        this.colorimetry = colorimetry;
+        this.colorMode = colorMode;
         this.isInvalid = isInvalid;
         this.size = size;
         mQualifiers = generateQualifiers();
@@ -235,7 +235,15 @@ public class ResConfigFlags {
                 ret.append("-notlong");
                 break;
         }
-        switch (colorimetry & COLOR_HDR_MASK) {
+        switch (screenLayout2 & MASK_SCREENROUND) {
+            case SCREENLAYOUT_ROUND_NO:
+                ret.append("-notround");
+                break;
+            case SCREENLAYOUT_ROUND_YES:
+                ret.append("-round");
+                break;
+        }
+        switch (colorMode & COLOR_HDR_MASK) {
             case COLOR_HDR_YES:
                 ret.append("-highdr");
                 break;
@@ -243,20 +251,12 @@ public class ResConfigFlags {
                 ret.append("-lowdr");
                 break;
         }
-        switch (colorimetry & COLOR_WIDE_MASK) {
+        switch (colorMode & COLOR_WIDE_MASK) {
             case COLOR_WIDE_YES:
                 ret.append("-widecg");
                 break;
             case COLOR_WIDE_NO:
                 ret.append("-nowidecg");
-                break;
-        }
-        switch (screenLayout2 & MASK_SCREENROUND) {
-            case SCREENLAYOUT_ROUND_NO:
-                ret.append("-notround");
-                break;
-            case SCREENLAYOUT_ROUND_YES:
-                ret.append("-round");
                 break;
         }
         switch (orientation) {
@@ -419,7 +419,7 @@ public class ResConfigFlags {
     }
 
     private short getNaturalSdkVersionRequirement() {
-        if ((uiMode & MASK_UI_MODE_TYPE) == UI_MODE_TYPE_VR_HEADSET || (colorimetry & COLOR_WIDE_MASK) != 0 || ((colorimetry & COLOR_HDR_MASK) != 0)) {
+        if ((uiMode & MASK_UI_MODE_TYPE) == UI_MODE_TYPE_VR_HEADSET || (colorMode & COLOR_WIDE_MASK) != 0 || ((colorMode & COLOR_HDR_MASK) != 0)) {
             return SDK_OREO;
         }
         if ((screenLayout2 & MASK_SCREENROUND) != 0) {
