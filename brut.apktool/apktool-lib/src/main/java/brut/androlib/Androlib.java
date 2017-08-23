@@ -732,7 +732,7 @@ public class Androlib {
             case "N":
                 return ResConfigFlags.SDK_NOUGAT;
             case "O":
-                return ResConfigFlags.SDK_O;
+                return ResConfigFlags.SDK_OREO;
             default:
                 return Integer.parseInt(meta.sdkInfo.get("minSdkVersion"));
         }

@@ -282,6 +282,9 @@ public class ResConfigFlags {
             case UI_MODE_TYPE_WATCH:
                 ret.append("-watch");
                 break;
+            case UI_MODE_TYPE_VR_HEADSET:
+                ret.append("-vrheadset");
+                break;
         }
         switch (uiMode & MASK_UI_MODE_NIGHT) {
             case UI_MODE_NIGHT_YES:
@@ -397,6 +400,9 @@ public class ResConfigFlags {
     }
 
     private short getNaturalSdkVersionRequirement() {
+        if ((uiMode & MASK_UI_MODE_TYPE) == UI_MODE_TYPE_VR_HEADSET) {
+            return SDK_OREO;
+        }
         if ((screenLayout2 & MASK_SCREENROUND) != 0) {
             return SDK_MNC;
         }
@@ -509,7 +515,7 @@ public class ResConfigFlags {
     public final static byte SDK_MNC = 23;
     public final static byte SDK_NOUGAT = 24;
     public final static byte SDK_NOUGAT_MR1 = 25;
-    public final static byte SDK_O = 26;
+    public final static byte SDK_OREO = 26;
 
     public final static byte ORIENTATION_ANY = 0;
     public final static byte ORIENTATION_PORT = 1;
@@ -588,6 +594,7 @@ public class ResConfigFlags {
     public final static byte UI_MODE_TYPE_TELEVISION = 0x04;
     public final static byte UI_MODE_TYPE_APPLIANCE = 0x05;
     public final static byte UI_MODE_TYPE_WATCH = 0x06;
+    public final static byte UI_MODE_TYPE_VR_HEADSET = 0x07;
 
     // start - miui
     public final static byte UI_MODE_TYPE_GODZILLAUI = 0x0b;
