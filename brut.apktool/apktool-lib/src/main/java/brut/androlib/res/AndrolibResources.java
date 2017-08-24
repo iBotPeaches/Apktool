@@ -788,19 +788,15 @@ final public class AndrolibResources {
     public File getAaptBinaryFile() throws AndrolibException {
         File aaptBinary;
 
+        if (! OSDetection.is64Bit()) {
+            throw new AndrolibException("32 bit OS detected. No 32 bit binaries available.");
+        }
+
         try {
             if (OSDetection.isMacOSX()) {
-                if (OSDetection.is64Bit()) {
-                    aaptBinary = Jar.getResourceAsFile("/prebuilt/aapt/macosx/64/aapt", AndrolibResources.class);
-                } else {
-                    aaptBinary = Jar.getResourceAsFile("/prebuilt/aapt/macosx/32/aapt", AndrolibResources.class);
-                }
+                aaptBinary = Jar.getResourceAsFile("/prebuilt/aapt/macosx/aapt", AndrolibResources.class);
             } else if (OSDetection.isUnix()) {
-                if (OSDetection.is64Bit()) {
-                    aaptBinary = Jar.getResourceAsFile("/prebuilt/aapt/linux/64/aapt", AndrolibResources.class);
-                } else {
-                    aaptBinary = Jar.getResourceAsFile("/prebuilt/aapt/linux/32/aapt", AndrolibResources.class);
-                }
+                aaptBinary = Jar.getResourceAsFile("/prebuilt/aapt/linux/aapt", AndrolibResources.class);
             } else if (OSDetection.isWindows()) {
                 aaptBinary = Jar.getResourceAsFile("/prebuilt/aapt/windows/aapt.exe", AndrolibResources.class);
             } else {

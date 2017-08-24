@@ -234,13 +234,7 @@ you can clone the modified repo from first step into this directory.
 The steps below are different per flavor and operating system. For cross compiling the Windows binary on Unix,
 we lose the ability to quickly build just the aapt binary. So the Windows procedure builds the entire Sdk.
 
-#### Unix 32
-1. `source build/envsetup.sh`
-2. `lunch sdk-eng`
-3. `make OUT_DIR=out-x32 LOCAL_MULTILIB=32 USE_NINJA=false aapt`
-4. `strip out-x32/host/linux-x86/bin/aapt`
-
-#### Unix 64
+#### Unix
 1. `source build/envsetup.sh`
 2. `lunch sdk-eng`
 3. `make OUT_DIR=out-x64 LOCAL_MULTILIB=64 USE_NINJA=false aapt`
@@ -252,15 +246,12 @@ we lose the ability to quickly build just the aapt binary. So the Windows proced
 3. `make PRODUCT-sdk-win_sdk USE_NINJA=false`
 4. `strip out/host/windows-x86/bin/aapt.exe`
 
-#### Mac 32
-1. `source build/envsetup.sh`
-2. `lunch sdk-eng`
-3. `make OUT_DIR=out-x32 LOCAL_MULTILIB=32 USE_NINJA=false aapt`
-
-#### Mac 64
+#### Mac
 1. `source build/envsetup.sh`
 2. `lunch sdk-eng`
 3. `make OUT_DIR=out-x64 LOCAL_MULTILIB=64 USE_NINJA=false aapt`
+
+As of Android Oreo (API 26) all aapt binaries are 64 bit. 
 
 # Gradle Tips n Tricks
 
