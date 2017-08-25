@@ -304,6 +304,15 @@ public class BuildAndDecodeTest {
     }
 
     @Test
+    public void fontTest() throws BrutException, IOException {
+        File fontXml = new File((sTestNewDir + "/res/font"), "lobster.xml");
+        File fontFile = new File((sTestNewDir + "/res/font"), "lobster_regular.otf");
+
+        assertTrue(fontXml.isFile());
+        assertTrue(fontFile.isFile());
+    }
+
+    @Test
     public void drawableNoDpiTest() throws BrutException, IOException {
         compareResFolder("drawable-nodpi");
     }
