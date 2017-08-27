@@ -166,7 +166,7 @@ public class Androlib {
             String ext;
 
             for (String file : files) {
-                if (isAPKFileNames(file) && !NO_COMPRESS_PATTERN.matcher(file).find()) {
+                if (isAPKFileNames(file) && NO_COMPRESS_PATTERN.matcher(file).find()) {
                     if (unk.getCompressionLevel(file) == 0) {
 
                         if (StringUtils.countMatches(file, ".") > 1) {
