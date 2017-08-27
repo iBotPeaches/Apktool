@@ -63,17 +63,15 @@ public class ResStyleValue extends ResBagValue implements
             String name = null;
             String value = null;
 
-            String resource = spec.getDefaultResource().getValue().toString();
-            // hacky-fix remove bad ReferenceVars
-            if (resource.contains("ResReferenceValue@")) {
+            ResValue resource = spec.getDefaultResource().getValue();
+            if (resource instanceof ResReferenceValue) {
                 continue;
-            } else if (resource.contains("ResStringValue@") || resource.contains("ResStyleValue@") ||
-                    resource.contains("ResBoolValue@")) {
-                name = "@" + spec.getFullName(res.getResSpec().getPackage(), false);
-            } else {
-                ResAttr attr = (ResAttr) spec.getDefaultResource().getValue();
+            } else if (resource instanceof ResAttr) {
+                ResAttr attr = (ResAttr) resource;
                 value = attr.convertToResXmlFormat(mItems[i].m2);
                 name = spec.getFullName(res.getResSpec().getPackage(), true);
+            } else {
+                name = "@" + spec.getFullName(res.getResSpec().getPackage(), false);
             }
 
             if (value == null) {
