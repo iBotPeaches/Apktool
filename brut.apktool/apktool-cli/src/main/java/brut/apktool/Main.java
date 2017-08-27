@@ -265,7 +265,7 @@ public class Main {
 
         // create options
         Option versionOption = Option.builder("version")
-		        .longOpt("version")
+                .longOpt("version")
                 .desc("prints the version then exits")
                 .build();
 
