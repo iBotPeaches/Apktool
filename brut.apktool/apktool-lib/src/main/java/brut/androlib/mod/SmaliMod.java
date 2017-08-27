@@ -83,6 +83,7 @@ public class SmaliMod {
 
         if (parser.getNumberOfSyntaxErrors() > 0 || lexer.getNumberOfSyntaxErrors() > 0) {
             is.close();
+            reader.close();
             return false;
         }
 
