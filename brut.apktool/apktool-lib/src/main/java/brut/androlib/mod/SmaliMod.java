@@ -82,6 +82,7 @@ public class SmaliMod {
         smaliParser.smali_file_return result = parser.smali_file();
 
         if (parser.getNumberOfSyntaxErrors() > 0 || lexer.getNumberOfSyntaxErrors() > 0) {
+            is.close();
             return false;
         }
 
