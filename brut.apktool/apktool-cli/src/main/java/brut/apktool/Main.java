@@ -133,14 +133,13 @@ public class Main {
         if (cli.hasOption("m") || cli.hasOption("match-original")) {
             decoder.setAnalysisMode(true, false);
         }
-        if (cli.hasOption("api")) {
+        if (cli.hasOption("api") || cli.hasOption("api-level")) {
             decoder.setApi(Integer.parseInt(cli.getOptionValue("api")));
         }
         if (cli.hasOption("o") || cli.hasOption("output")) {
             outDir = new File(cli.getOptionValue("o"));
             decoder.setOutDir(outDir);
         } else {
-
             // make out folder manually using name of apk
             String outName = apkName;
             outName = outName.endsWith(".apk") ? outName.substring(0,
@@ -295,7 +294,7 @@ public class Main {
                 .build();
 
         Option apiLevelOption = Option.builder("api")
-                .longOpt("api")
+                .longOpt("api-level")
                 .desc("The numeric api-level of the file to generate, e.g. 14 for ICS.")
                 .hasArg(true)
                 .argName("API")
@@ -441,6 +440,7 @@ public class Main {
         for (Object op : frameOptions.getOptions()) {
             allOptions.addOption((Option)op);
         }
+        allOptions.addOption(apiLevelOption);
         allOptions.addOption(analysisOption);
         allOptions.addOption(debugDecOption);
         allOptions.addOption(noDbgOption);
