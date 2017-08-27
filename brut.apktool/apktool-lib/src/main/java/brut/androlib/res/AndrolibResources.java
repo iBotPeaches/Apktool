@@ -788,7 +788,7 @@ final public class AndrolibResources {
     public File getAaptBinaryFile() throws AndrolibException {
         File aaptBinary;
 
-        if (! OSDetection.is64Bit()) {
+        if (! OSDetection.is64Bit() && ! OSDetection.isWindows()) {
             throw new AndrolibException("32 bit OS detected. No 32 bit binaries available.");
         }
 
