@@ -11,7 +11,8 @@ description: Apktool - Changelog / Roadmap
  * Run CI tests on OSX as well as unix .([Issue 1571](https://github.com/iBotPeaches/Apktool/issues/1571))
  * Prevent apktool doing permission checks on unneeded directories. ([Issue 1586](https://github.com/iBotPeaches/Apktool/issues/1586))
  * Windows Unicode support for helper scripts. ([Issue 1595](https://github.com/iBotPeaches/Apktool/issues/1595))
- * Dropped support for all 32 bit binaries ([Issue 1598](https://github.com/iBotPeaches/Apktool/issues/1598))
+ * Dropped support for all 32 bit binaries, except Windows ([Issue 1598](https://github.com/iBotPeaches/Apktool/issues/1598))
+ * Fixed `ClassCastExceptions` when producing files. ([Issue 1444](https://github.com/iBotPeaches/Apktool/issues/1444))
 
 ## v2.2.4
 2017.07.29
