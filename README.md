@@ -17,6 +17,11 @@ It is NOT intended for piracy and other non-legal uses. It could be used for loc
 
 * [Sourcetoad](https://www.sourcetoad.com/cool-tools/apktool/) - helping with a weekly sponsorship for continued improvement and maintenance of the project.
 
+#### IDE of Choice
+
+![JetBrains IntelliJ](.github/intellij.png?raw=true "IntelliJ")
+
+
 #### Security Vulnerabilities
 
 If you discover a security vulnerability within Apktool, please send an e-mail to Connor Tumbleson at connor.tumbleson(at)gmail.com. All security vulnerabilities will be promptly addressed.
