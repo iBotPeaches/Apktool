@@ -19,7 +19,7 @@ It is NOT intended for piracy and other non-legal uses. It could be used for loc
 
 #### IDE of Choice
 
-[![JetBrains IntelliJ](.github/intellij.png?raw=true)](IntelliJ)
+[![JetBrains IntelliJ](.github/intellij.png?raw=true)](https://www.jetbrains.com/idea/)
 
 #### Security Vulnerabilities
 
