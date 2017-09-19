@@ -51,6 +51,16 @@ public class PositionalEnumerationTest {
         assertEquals(" %1$s, %2$s and %3$d other", enumerateArguments(" %1$s, %2$s and %3$d other"));
     }
 
+    @Test
+    public void fourArgumentsTest() {
+        assertEquals("%1$s, %2$s, and %3$d other and %4$d.", enumerateArguments("%s, %s, and %d other and %d."));
+    }
+
+    @Test
+    public void fourPositionalArgumentsTest() {
+        assertEquals(" %1$s, %2$s and %3$d other and %4$d.", enumerateArguments(" %1$s, %2$s and %3$d other and %4$d."));
+    }
+
     private String enumerateArguments(String value) {
         return ResXmlEncoders.enumerateNonPositionalSubstitutionsIfRequired(value);
     }
