@@ -307,7 +307,7 @@ final public class AndrolibResources {
         mSharedLibrary = flag;
     }
 
-    private String checkTargetSdkVersionBounds() {
+    public String checkTargetSdkVersionBounds() {
         int target = Integer.parseInt(mTargetSdkVersion);
         int min = (mMinSdkVersion != null) ? Integer.parseInt(mMinSdkVersion) : 0;
         int max = (mMaxSdkVersion != null) ? Integer.parseInt(mMaxSdkVersion) : target;
