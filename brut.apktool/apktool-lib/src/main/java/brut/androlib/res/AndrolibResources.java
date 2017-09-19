@@ -307,16 +307,10 @@ final public class AndrolibResources {
         mSharedLibrary = flag;
     }
 
-    // Ensure that targetSdkVersion is between minSdkVersion/maxSdkVersion if
-    // they are specified.
-    private String checkTargetSdkVersionBounds()
-    {
+    private String checkTargetSdkVersionBounds() {
         int target = Integer.parseInt(mTargetSdkVersion);
         int min = (mMinSdkVersion != null) ? Integer.parseInt(mMinSdkVersion) : 0;
         int max = (mMaxSdkVersion != null) ? Integer.parseInt(mMaxSdkVersion) : target;
-
-        // Your APK seems broken otherwise.
-        assert (min <= max);
 
         target = Math.min(max, target);
         target = Math.max(min, target);
@@ -384,6 +378,9 @@ final public class AndrolibResources {
         }
         if (mTargetSdkVersion != null) {
             cmd.add("--target-sdk-version");
+
+            // Ensure that targetSdkVersion is between minSdkVersion/maxSdkVersion if
+            // they are specified.
             cmd.add(checkTargetSdkVersionBounds());
         }
         if (mMaxSdkVersion != null) {
