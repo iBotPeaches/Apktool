@@ -137,13 +137,16 @@ public class Androlib {
         mAndRes.decodeManifestWithResources(resTable, apkFile, outDir);
     }
 
-    public void decodeRawFiles(ExtFile apkFile, File outDir)
+    public void decodeRawFiles(ExtFile apkFile, File outDir, short decodeAssetMode)
             throws AndrolibException {
         LOGGER.info("Copying assets and libs...");
         try {
             Directory in = apkFile.getDirectory();
-            if (in.containsDir("assets")) {
-                in.copyToDir(outDir, "assets");
+
+            if (decodeAssetMode == ApkDecoder.DECODE_ASSETS_FULL) {
+                if (in.containsDir("assets")) {
+                    in.copyToDir(outDir, "assets");
+                }
             }
             if (in.containsDir("lib")) {
                 in.copyToDir(outDir, "lib");

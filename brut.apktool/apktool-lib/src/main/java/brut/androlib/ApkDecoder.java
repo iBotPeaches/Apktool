@@ -161,7 +161,7 @@ public class ApkDecoder {
                 }
             }
 
-            mAndrolib.decodeRawFiles(mApkFile, outDir);
+            mAndrolib.decodeRawFiles(mApkFile, outDir, mDecodeAssets);
             mAndrolib.decodeUnknownFiles(mApkFile, outDir, mResTable);
             mUncompressedFiles = new ArrayList<String>();
             mAndrolib.recordUncompressedFiles(mApkFile, mUncompressedFiles);
@@ -188,6 +188,13 @@ public class ApkDecoder {
             throw new AndrolibException("Invalid decode resources mode");
         }
         mDecodeResources = mode;
+    }
+
+    public void setDecodeAssets(short mode) throws AndrolibException {
+        if (mode != DECODE_ASSETS_NONE && mode != DECODE_ASSETS_FULL) {
+            throw new AndrolibException("Invalid decode asset mode");
+        }
+        mDecodeAssets = mode;
     }
 
     public void setAnalysisMode(boolean mode, boolean pass) throws AndrolibException{
@@ -299,6 +306,9 @@ public class ApkDecoder {
     public final static short DECODE_RESOURCES_NONE = 0x0100;
     public final static short DECODE_RESOURCES_FULL = 0x0101;
 
+    public final static short DECODE_ASSETS_NONE = 0x0000;
+    public final static short DECODE_ASSETS_FULL = 0x0001;
+
     private File getOutDir() throws AndrolibException {
         if (mOutDir == null) {
             throw new AndrolibException("Out dir not set");
@@ -407,6 +417,7 @@ public class ApkDecoder {
     private ResTable mResTable;
     private short mDecodeSources = DECODE_SOURCES_SMALI;
     private short mDecodeResources = DECODE_RESOURCES_FULL;
+    private short mDecodeAssets = DECODE_ASSETS_FULL;
     private boolean mForceDelete = false;
     private boolean mKeepBrokenResources = false;
     private boolean mBakDeb = true;

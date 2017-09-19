@@ -124,6 +124,9 @@ public class Main {
         if (cli.hasOption("r") || cli.hasOption("no-res")) {
             decoder.setDecodeResources(ApkDecoder.DECODE_RESOURCES_NONE);
         }
+        if (cli.hasOption("no-assets")) {
+            decoder.setDecodeAssets(ApkDecoder.DECODE_ASSETS_NONE);
+        }
         if (cli.hasOption("k") || cli.hasOption("keep-broken-res")) {
             decoder.setKeepBrokenResources(true);
         }
@@ -283,6 +286,11 @@ public class Main {
                 .desc("Do not decode resources.")
                 .build();
 
+        Option noAssetOption = Option.builder()
+                .longOpt("no-assets")
+                .desc("Do not decode assets.")
+                .build();
+
         Option debugDecOption = Option.builder("d")
                 .longOpt("debug")
                 .desc("REMOVED (DOES NOT WORK): Decode in debug mode.")
@@ -396,6 +404,7 @@ public class Main {
             DecodeOptions.addOption(keepResOption);
             DecodeOptions.addOption(analysisOption);
             DecodeOptions.addOption(apiLevelOption);
+            DecodeOptions.addOption(noAssetOption);
 
             BuildOptions.addOption(debugBuiOption);
             BuildOptions.addOption(aaptOption);
@@ -444,6 +453,7 @@ public class Main {
         allOptions.addOption(analysisOption);
         allOptions.addOption(debugDecOption);
         allOptions.addOption(noDbgOption);
+        allOptions.addOption(noAssetOption);
         allOptions.addOption(keepResOption);
         allOptions.addOption(debugBuiOption);
         allOptions.addOption(aaptOption);
