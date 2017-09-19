@@ -120,7 +120,7 @@ public class ZipRODirectory extends AbstractDirectory {
             ZipEntry entry = entries.nextElement();
             String name = entry.getName();
             
-            if (name.equals(getPath()) || ! name.startsWith(getPath())) {
+            if (name.equals(getPath()) || ! name.startsWith(getPath()) || name.contains(".." + separator)) {
                 continue;
             }
             
@@ -136,8 +136,7 @@ public class ZipRODirectory extends AbstractDirectory {
                 subname = subname.substring(0, pos);
             }
             
-            boolean pointsToParentDirectory = (subname.equals("..") && prefixLen == 0);
-            if (! mDirs.containsKey(subname) && ! pointsToParentDirectory) {
+            if (! mDirs.containsKey(subname)) {
                 AbstractDirectory dir = new ZipRODirectory(getZipFile(), getPath() + subname + separator);
                 mDirs.put(subname, dir);                
             }
