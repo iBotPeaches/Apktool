@@ -13,6 +13,8 @@ description: Apktool - Changelog / Roadmap
  * Windows Unicode support for helper scripts. ([Issue 1595](https://github.com/iBotPeaches/Apktool/issues/1595))
  * Dropped support for all 32 bit binaries, except Windows ([Issue 1598](https://github.com/iBotPeaches/Apktool/issues/1598))
  * Fixed `ClassCastExceptions` when producing files. ([Issue 1444](https://github.com/iBotPeaches/Apktool/issues/1444))
+ * Added support for invalid `targetSdkValues` which are greater than `max` or less than `min`. ([Issue 1615](https://github.com/iBotPeaches/Apktool/pull/1615))
+ * Prevented directories being written outside of scope of decode directory. ([Issue 1589](https://github.com/iBotPeaches/Apktool/issues/1589))
 
 ## v2.2.4
 2017.07.29
