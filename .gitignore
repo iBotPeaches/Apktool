@@ -10,3 +10,4 @@ vendor/
 # IntelliJ & Bundle
 .bundle/
 .idea/
+*.iml
