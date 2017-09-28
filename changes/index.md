@@ -4,6 +4,11 @@ title: Apktool - Changelog
 description: Apktool - Changelog / Roadmap
 ---
 
+## v2.3.1 (under development)
+2017.xx.xx
+
+ * Fixed issue with shorthand SDK versions. ([Issue 1630](https://github.com/iBotPeaches/Apktool/issues/1630))
+
 ## v2.3.0
 2017.09.21
  
