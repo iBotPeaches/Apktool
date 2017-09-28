@@ -75,4 +75,16 @@ public class InvalidSdkBoundingTest {
         androlibResources.setSdkInfo(sdkInfo);
         assertEquals("25", androlibResources.checkTargetSdkVersionBounds());
     }
+
+
+    @Test
+    public void checkForShortHandSdkTag() throws BrutException, IOException {
+        AndrolibResources androlibResources = new AndrolibResources();
+
+        Map<String, String> sdkInfo = new LinkedHashMap<>();
+        sdkInfo.put("targetSdkVersion", "O");
+
+        androlibResources.setSdkInfo(sdkInfo);
+        assertEquals("26", androlibResources.checkTargetSdkVersionBounds());
+    }
 }

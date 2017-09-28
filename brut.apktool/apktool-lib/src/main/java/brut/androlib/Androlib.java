@@ -287,7 +287,7 @@ public class Androlib {
 
         if (meta.sdkInfo != null && meta.sdkInfo.get("minSdkVersion") != null) {
             String minSdkVersion = meta.sdkInfo.get("minSdkVersion");
-            mMinSdkVersion = getMinSdkVersionFromAndroidCodename(meta, minSdkVersion);
+            mMinSdkVersion = mAndRes.getMinSdkVersionFromAndroidCodename(meta, minSdkVersion);
         }
 
         if (outFile == null) {
@@ -726,19 +726,6 @@ public class Androlib {
             files[i++] = mAndRes.getFrameworkApk(id, tag);
         }
         return files;
-    }
-
-    private int getMinSdkVersionFromAndroidCodename(MetaInfo meta, String sdkVersion) {
-        switch (sdkVersion) {
-            case "M":
-                return ResConfigFlags.SDK_MNC;
-            case "N":
-                return ResConfigFlags.SDK_NOUGAT;
-            case "O":
-                return ResConfigFlags.SDK_OREO;
-            default:
-                return Integer.parseInt(meta.sdkInfo.get("minSdkVersion"));
-        }
     }
 
     private boolean isModified(File working, File stored) {

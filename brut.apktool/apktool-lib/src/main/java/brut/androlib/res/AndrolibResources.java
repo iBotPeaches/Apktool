@@ -19,6 +19,7 @@ package brut.androlib.res;
 import brut.androlib.AndrolibException;
 import brut.androlib.ApkOptions;
 import brut.androlib.err.CantFindFrameworkResException;
+import brut.androlib.meta.MetaInfo;
 import brut.androlib.meta.PackageInfo;
 import brut.androlib.meta.VersionInfo;
 import brut.androlib.res.data.*;
@@ -308,9 +309,10 @@ final public class AndrolibResources {
     }
 
     public String checkTargetSdkVersionBounds() {
-        int target = Integer.parseInt(mTargetSdkVersion);
-        int min = (mMinSdkVersion != null) ? Integer.parseInt(mMinSdkVersion) : 0;
-        int max = (mMaxSdkVersion != null) ? Integer.parseInt(mMaxSdkVersion) : target;
+        int target = mapSdkShorthandToVersion(mTargetSdkVersion);
+
+        int min = (mMinSdkVersion != null) ? mapSdkShorthandToVersion(mMinSdkVersion) : 0;
+        int max = (mMaxSdkVersion != null) ? mapSdkShorthandToVersion(mMaxSdkVersion) : target;
 
         target = Math.min(max, target);
         target = Math.max(min, target);
@@ -452,6 +454,28 @@ final public class AndrolibResources {
             }
         } catch (BrutException ex) {
             throw new AndrolibException(ex);
+        }
+    }
+
+    public int getMinSdkVersionFromAndroidCodename(MetaInfo meta, String sdkVersion) {
+        int sdkNumber = mapSdkShorthandToVersion(sdkVersion);
+
+        if (sdkNumber == ResConfigFlags.SDK_BASE) {
+            return Integer.parseInt(meta.sdkInfo.get("minSdkVersion"));
+        }
+        return sdkNumber;
+    }
+
+    private int mapSdkShorthandToVersion(String sdkVersion) {
+        switch (sdkVersion) {
+            case "M":
+                return ResConfigFlags.SDK_MNC;
+            case "N":
+                return ResConfigFlags.SDK_NOUGAT;
+            case "O":
+                return ResConfigFlags.SDK_OREO;
+            default:
+                return Integer.parseInt(sdkVersion);
         }
     }
 
