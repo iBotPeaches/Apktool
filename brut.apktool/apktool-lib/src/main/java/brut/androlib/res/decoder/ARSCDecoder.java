@@ -154,12 +154,12 @@ public class ARSCDecoder {
 
         while (type == Header.TYPE_TYPE) {
             readTableType();
-            
+
             // skip "TYPE 8 chunks" and/or padding data at the end of this chunk
             if (mCountIn.getCount() < mHeader.endPosition) {
                 mCountIn.skip(mHeader.endPosition - mCountIn.getCount());
             }
-            
+
             type = nextChunk().type;
 
             addMissingResSpecs();
@@ -223,33 +223,55 @@ public class ARSCDecoder {
         }
 
         mType = flags.isInvalid && !mKeepBroken ? null : mPkg.getOrCreateConfig(flags);
+        HashMap<Integer, EntryData> offsetsToEntryData =
+            new HashMap<Integer, EntryData>();
+
+        for (int offset : entryOffsets) {
+          if (offset == -1 || offsetsToEntryData.containsKey(offset)) {
+            continue;
+          }
+
+          offsetsToEntryData.put(offset, readEntryData());
+        }
 
         for (int i = 0; i < entryOffsets.length; i++) {
             if (entryOffsets[i] != -1) {
                 mMissingResSpecs[i] = false;
                 mResId = (mResId & 0xffff0000) | i;
-                readEntry();
+                EntryData entryData = offsetsToEntryData.get(entryOffsets[i]);
+                readEntry(entryData);
             }
         }
 
         return mType;
     }
 
-    private void readEntry() throws IOException, AndrolibException {
+    private class EntryData {
+        public short mFlags;
+        public int mSpecNamesId;
+        public ResValue mValue;
+    }
+
+    private EntryData readEntryData() throws IOException, AndrolibException {
         short size = mIn.readShort();
         if (size < 0) {
             throw new AndrolibException("Entry size is under 0 bytes.");
         }
+
         short flags = mIn.readShort();
         int specNamesId = mIn.readInt();
-
-        // If we are here, we probably already inserted any remaining dummy resources. No need to parse
-        // any resources that doesn't have type information
-        if (mCountIn.getCount() == mHeader.endPosition) {
-            return;
-        }
-
         ResValue value = (flags & ENTRY_FLAG_COMPLEX) == 0 ? readValue() : readComplexEntry();
+        EntryData entryData = new EntryData();
+        entryData.mFlags = flags;
+        entryData.mSpecNamesId = specNamesId;
+        entryData.mValue = value;
+        return entryData;
+    }
+
+    private void readEntry(EntryData entryData) throws AndrolibException {
+        short flags = entryData.mFlags;
+        int specNamesId = entryData.mSpecNamesId;
+        ResValue value = entryData.mValue;
 
         if (mTypeSpec.isString() && value instanceof ResFileValue) {
             value = new ResStringValue(value.toString(), ((ResFileValue) value).getRawIntValue());

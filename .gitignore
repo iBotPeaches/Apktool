@@ -15,6 +15,7 @@ bin/
 # Tmp Files
 *.kate-swp
 *~
+*.DS_Store
 
 # IntelliJ
 *.iml
@@ -23,3 +24,6 @@ bin/
 
 # gradle/smali-patches patch smali/ into brut.apktool.smali/
 brut.apktool.smali/
+
+# Patches
+*.patch
