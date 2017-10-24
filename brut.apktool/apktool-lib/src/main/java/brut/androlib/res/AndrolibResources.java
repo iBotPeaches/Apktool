@@ -791,13 +791,11 @@ final public class AndrolibResources {
         File dir = new File(path);
 
         if (!dir.isDirectory() && dir.isFile()) {
-            LOGGER.severe("--frame-path is set to a file, not a directory.");
-            System.exit(1);
+            throw new AndrolibException("--frame-path is set to a file, not a directory.");
         }
 
         if (dir.getParentFile() != null && dir.getParentFile().isFile()) {
-            LOGGER.severe("Please remove file at " + dir.getParentFile());
-            System.exit(1);
+            throw new AndrolibException("Please remove file at " + dir.getParentFile());
         }
 
         if (! dir.exists()) {
