@@ -790,7 +790,7 @@ final public class AndrolibResources {
 
         File dir = new File(path);
 
-        if (!dir.isDirectory()) {
+        if (!dir.isDirectory() && dir.isFile()) {
             throw new AndrolibException("--frame-path is set to a file, not a directory.");
         }
 
