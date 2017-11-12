@@ -50,12 +50,14 @@ public class ResEnumAttr extends ResAttr {
     protected void serializeBody(XmlSerializer serializer, ResResource res)
             throws AndrolibException, IOException {
         for (Duo<ResReferenceValue, ResIntValue> duo : mItems) {
-            int intVal = duo.m2.getValue();
+            if (duo.m1.getReferent() != null && duo.m2 != null) {
+                int intVal = duo.m2.getValue();
 
-            serializer.startTag(null, "enum");
-            serializer.attribute(null, "name", duo.m1.getReferent().getName());
-            serializer.attribute(null, "value", String.valueOf(intVal));
-            serializer.endTag(null, "enum");
+                serializer.startTag(null, "enum");
+                serializer.attribute(null, "name", duo.m1.getReferent().getName());
+                serializer.attribute(null, "value", String.valueOf(intVal));
+                serializer.endTag(null, "enum");
+            }
         }
     }
 
