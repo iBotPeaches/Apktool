@@ -7,6 +7,7 @@ description: Apktool - Changelog / Roadmap
 ## v2.3.1 (under development)
 2017.xx.xx
 
+ * **Android Oreo Support (8.1)** ([Issue 1667](https://github.com/iBotPeaches/Apktool/issues/1667))
  * Fixed issue with shorthand SDK versions. ([Issue 1630](https://github.com/iBotPeaches/Apktool/issues/1630))
  * Fixed issue with encoding raw font files. ([Issue 1662](https://github.com/iBotPeaches/Apktool/issues/1662)) / Thanks minsko
 
