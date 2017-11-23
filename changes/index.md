@@ -8,6 +8,7 @@ description: Apktool - Changelog / Roadmap
 2017.xx.xx
 
  * Fixed issue with shorthand SDK versions. ([Issue 1630](https://github.com/iBotPeaches/Apktool/issues/1630))
+ * Fixed issue with encoding raw font files. ([Issue 1662](https://github.com/iBotPeaches/Apktool/issues/1662)) / Thanks minsko
 
 ## v2.3.0
 2017.09.21
