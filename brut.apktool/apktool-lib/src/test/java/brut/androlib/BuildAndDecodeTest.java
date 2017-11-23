@@ -308,7 +308,12 @@ public class BuildAndDecodeTest {
         File fontXml = new File((sTestNewDir + "/res/font"), "lobster.xml");
         File fontFile = new File((sTestNewDir + "/res/font"), "lobster_regular.otf");
 
+        // Per #1662, ensure font file is not encoded.
         assertTrue(fontXml.isFile());
+        compareXmlFiles("/res/font/lobster.xml");
+
+        // If we properly skipped decoding the font (otf) file, this file should not exist
+        assertFalse((new File((sTestNewDir + "/res/values"), "fonts.xml")).isFile());
         assertTrue(fontFile.isFile());
     }
 
