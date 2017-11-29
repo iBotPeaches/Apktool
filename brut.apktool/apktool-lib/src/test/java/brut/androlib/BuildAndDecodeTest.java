@@ -197,6 +197,11 @@ public class BuildAndDecodeTest {
         compareXmlFiles("res/layout/issue1130.xml");
     }
 
+    @Test
+    public void xmlUniformAutoTextTest() throws BrutException {
+        compareXmlFiles("res/layout/issue1674.xml");
+    }
+
     @Test(expected = AssertionError.class)
     public void xmlFillParentBecomesMatchTest() throws BrutException {
         compareXmlFiles("res/layout/issue1274.xml");
