@@ -296,7 +296,6 @@ public class StringBlock {
             return (m_isUTF8 ? UTF8_DECODER : UTF16LE_DECODER).decode(
                     ByteBuffer.wrap(m_strings, offset, length)).toString();
         } catch (CharacterCodingException ex) {
-            LOGGER.log(Level.WARNING, null, ex);
             return null;
         }
     }
