@@ -115,7 +115,7 @@ subprojects {
                 junit: 'junit:junit:4.12',
                 proguard_gradle: 'net.sf.proguard:proguard-gradle:5.2.1',
                 snakeyaml: 'org.yaml:snakeyaml:1.18:android',
-                smali: 'org.smali:smali:2.2.1',
+                smali: 'org.smali:smali:2.2.2',
                 xmlpull: 'xpp3:xpp3:1.1.4c',
                 xmlunit: 'xmlunit:xmlunit:1.3',
         ]
