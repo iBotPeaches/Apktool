@@ -8,9 +8,11 @@ description: Apktool - Changelog / Roadmap
 2017.xx.xx
 
  * **Android Oreo Support (8.1)** ([Issue 1667](https://github.com/iBotPeaches/Apktool/issues/1667))
+ * Feature: Advanced `--force-manifest` for decoding manfest without resources. ([Issue 1680](https://github.com/iBotPeaches/Apktool/pull/1680))
  * Fixed issue with shorthand SDK versions. ([Issue 1630](https://github.com/iBotPeaches/Apktool/issues/1630))
  * Fixed issue with encoding raw font files. ([Issue 1662](https://github.com/iBotPeaches/Apktool/issues/1662)) / Thanks minsko
  * Fixed issue with rebuilding an apk that skipped resource decoding. ([Issue 1634](https://github.com/iBotPeaches/Apktool/issues/1634))
+ * Fixed issue with large screens decoding length incorrectly. ([Issue 1587](https://github.com/iBotPeaches/Apktool/issues/1587))
 
 ## v2.3.0
 2017.09.21
