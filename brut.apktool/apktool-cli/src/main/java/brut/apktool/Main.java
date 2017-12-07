@@ -124,6 +124,9 @@ public class Main {
         if (cli.hasOption("r") || cli.hasOption("no-res")) {
             decoder.setDecodeResources(ApkDecoder.DECODE_RESOURCES_NONE);
         }
+        if (cli.hasOption("force-manifest")) {
+            decoder.setForceDecodeManifest(ApkDecoder.FORCE_DECODE_MANIFEST_FULL);
+        }
         if (cli.hasOption("no-assets")) {
             decoder.setDecodeAssets(ApkDecoder.DECODE_ASSETS_NONE);
         }
@@ -286,6 +289,11 @@ public class Main {
                 .desc("Do not decode resources.")
                 .build();
 
+        Option forceManOption = Option.builder()
+                .longOpt("force-manifest")
+                .desc("Decode the APK's compiled manifest, even if decoding of resources is set to \"false\".")
+                .build();
+
         Option noAssetOption = Option.builder()
                 .longOpt("no-assets")
                 .desc("Do not decode assets.")
@@ -405,6 +413,7 @@ public class Main {
             DecodeOptions.addOption(analysisOption);
             DecodeOptions.addOption(apiLevelOption);
             DecodeOptions.addOption(noAssetOption);
+            DecodeOptions.addOption(forceManOption);
 
             BuildOptions.addOption(debugBuiOption);
             BuildOptions.addOption(aaptOption);
@@ -453,6 +462,7 @@ public class Main {
         allOptions.addOption(analysisOption);
         allOptions.addOption(debugDecOption);
         allOptions.addOption(noDbgOption);
+        allOptions.addOption(forceManOption);
         allOptions.addOption(noAssetOption);
         allOptions.addOption(keepResOption);
         allOptions.addOption(debugBuiOption);
