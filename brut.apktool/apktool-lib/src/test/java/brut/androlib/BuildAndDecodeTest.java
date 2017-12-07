@@ -166,6 +166,17 @@ public class BuildAndDecodeTest {
     }
 
     @Test
+    public void valuesExtraLongExactLengthTest() throws BrutException {
+        Map<String, String> strs = TestUtils.parseStringsXml(new File(sTestNewDir, "res/values-en/strings.xml"));
+
+        // long_string6 should be exactly 0x8888 chars of "a"
+        // the valuesExtraLongTest() should handle this
+        // but such an edge case, want a specific test
+        String aaaa = strs.get("long_string6");
+        assertEquals(0x8888, aaaa.length());
+    }
+
+    @Test
     public void crossTypeTest() throws BrutException {
         compareValuesFiles("values-mcc003/strings.xml");
         compareValuesFiles("values-mcc003/integers.xml");
