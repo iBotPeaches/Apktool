@@ -137,6 +137,23 @@ public abstract class TestUtils {
 
     /**
      *
+     * @return byte[]
+     * @throws FileNotFoundException
+     * @throws IOException
+     */
+    public static byte[] readHeaderOfFile(File file, int size) throws IOException {
+        byte[] buffer = new byte[size];
+        InputStream inputStream = new FileInputStream(file);
+        if (inputStream.read(buffer) != buffer.length) {
+            throw new IOException("File size too small for buffer length: " + size);
+        }
+        inputStream.close();
+
+        return buffer;
+    }
+
+    /**
+     *
      * @return File
      * @throws AndrolibException
      */
