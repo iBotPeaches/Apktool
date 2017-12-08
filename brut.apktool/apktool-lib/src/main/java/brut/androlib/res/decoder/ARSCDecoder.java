@@ -223,15 +223,14 @@ public class ARSCDecoder {
         }
 
         mType = flags.isInvalid && !mKeepBroken ? null : mPkg.getOrCreateConfig(flags);
-        HashMap<Integer, EntryData> offsetsToEntryData =
-            new HashMap<Integer, EntryData>();
+        HashMap<Integer, EntryData> offsetsToEntryData = new HashMap<Integer, EntryData>();
 
         for (int offset : entryOffsets) {
-          if (offset == -1 || offsetsToEntryData.containsKey(offset)) {
-            continue;
-          }
+            if (offset == -1 || offsetsToEntryData.containsKey(offset)) {
+                continue;
+            }
 
-          offsetsToEntryData.put(offset, readEntryData());
+            offsetsToEntryData.put(offset, readEntryData());
         }
 
         for (int i = 0; i < entryOffsets.length; i++) {
@@ -246,11 +245,6 @@ public class ARSCDecoder {
         return mType;
     }
 
-    private class EntryData {
-        public short mFlags;
-        public int mSpecNamesId;
-        public ResValue mValue;
-    }
 
     private EntryData readEntryData() throws IOException, AndrolibException {
         short size = mIn.readShort();
@@ -269,7 +263,6 @@ public class ARSCDecoder {
     }
 
     private void readEntry(EntryData entryData) throws AndrolibException {
-        short flags = entryData.mFlags;
         int specNamesId = entryData.mSpecNamesId;
         ResValue value = entryData.mValue;
 
@@ -596,6 +589,12 @@ public class ARSCDecoder {
             this.offset = offset;
             this.count = count;
         }
+    }
+
+    private class EntryData {
+        public short mFlags;
+        public int mSpecNamesId;
+        public ResValue mValue;
     }
 
     private static final Logger LOGGER = Logger.getLogger(ARSCDecoder.class.getName());
