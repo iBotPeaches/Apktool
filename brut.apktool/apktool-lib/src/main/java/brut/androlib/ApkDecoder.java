@@ -100,13 +100,6 @@ public class ApkDecoder {
 
             LOGGER.info("Using Apktool " + Androlib.getVersion() + " on " + mApkFile.getName());
 
-            if (mManifestOnly) {
-               setAnalysisMode(mAnalysisMode, true);
-               mAndrolib.decodeManifestWithResources(mApkFile, outDir, getResTable());
-               writeMetaFile();
-               return;
-            }
-
             if (hasResources()) {
                 switch (mDecodeResources) {
                     case DECODE_RESOURCES_NONE:
@@ -247,10 +240,6 @@ public class ApkDecoder {
 
     public void setForceDelete(boolean forceDelete) {
         mForceDelete = forceDelete;
-    }
-
-    public void setManifestOnly(boolean manifestOnly) {
-        mManifestOnly = manifestOnly;
     }
 
     public void setFrameworkTag(String tag) throws AndrolibException {
@@ -448,7 +437,6 @@ public class ApkDecoder {
     private short mForceDecodeManifest = FORCE_DECODE_MANIFEST_NONE;
     private short mDecodeAssets = DECODE_ASSETS_FULL;
     private boolean mForceDelete = false;
-    private boolean mManifestOnly = false;
     private boolean mKeepBrokenResources = false;
     private boolean mBakDeb = true;
     private Collection<String> mUncompressedFiles;

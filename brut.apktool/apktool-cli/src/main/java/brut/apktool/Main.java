@@ -127,9 +127,6 @@ public class Main {
         if (cli.hasOption("force-manifest")) {
             decoder.setForceDecodeManifest(ApkDecoder.FORCE_DECODE_MANIFEST_FULL);
         }
-        if (cli.hasOption("manifest-only")) {
-            decoder.setManifestOnly(true);
-        }
         if (cli.hasOption("no-assets")) {
             decoder.setDecodeAssets(ApkDecoder.DECODE_ASSETS_NONE);
         }
@@ -297,11 +294,6 @@ public class Main {
                 .desc("Decode the APK's compiled manifest, even if decoding of resources is set to \"false\".")
                 .build();
 
-        Option manifestOnlyOption = Option.builder("mo")
-                .longOpt("manifest-only")
-                .desc("Only decode manifest.")
-                .build();
-
         Option noAssetOption = Option.builder()
                 .longOpt("no-assets")
                 .desc("Do not decode assets.")
@@ -439,7 +431,6 @@ public class Main {
         DecodeOptions.addOption(forceDecOption);
         DecodeOptions.addOption(noSrcOption);
         DecodeOptions.addOption(noResOption);
-        DecodeOptions.addOption(manifestOnlyOption);
 
         // add basic build options
         BuildOptions.addOption(outputBuiOption);
