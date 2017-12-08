@@ -22,8 +22,5 @@ bin/
 .idea/*
 /out
 
-# gradle/smali-patches patch smali/ into brut.apktool.smali/
-brut.apktool.smali/
-
 # Patches
 *.patch
