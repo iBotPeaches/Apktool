@@ -219,6 +219,11 @@ public class BuildAndDecodeTest {
     }
 
     @Test
+    public void xmlCustomAttrsNotAndroidTest() throws BrutException {
+        compareXmlFiles("res/layout/issue1157.xml");
+    }
+
+    @Test
     public void qualifiersTest() throws BrutException {
         compareValuesFiles("values-mcc004-mnc4-en-rUS-ldrtl-sw100dp-w200dp-h300dp"
                 + "-xlarge-long-round-highdr-land-desk-night-xhdpi-finger-keyssoft-12key"
