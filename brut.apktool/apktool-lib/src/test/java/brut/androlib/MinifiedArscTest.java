@@ -46,6 +46,7 @@ public class MinifiedArscTest {
 
         // decode issue1157.apk
         ApkDecoder apkDecoder = new ApkDecoder(new ExtFile(sTmpDir, apk));
+        apkDecoder.setForceDelete(true);
         apkDecoder.setOutDir(sDecodedDir);
 
         // this should not raise an exception:
@@ -60,11 +61,10 @@ public class MinifiedArscTest {
     @Test
     public void checkIfMinifiedArscLayoutFileMatchesTest() throws IOException {
         String expected = TestUtils.replaceNewlines("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
-                "<PreferenceScreen\n" +
-                "    xmlns:android=\"http://schemas.android.com/apk/res/android\"\n" +
-                "    xmlns:app=\"http://schemas.android.com/apk/res/com.ibotpeaches.issue1157\"\n" +
-                "    android:max=\"100\" app:bar=\"1.0\"\n" +
-                "/>");
+                "<LinearLayout n1:orientation=\"vertical\" n1:layout_width=\"fill_parent\" n1:layout_height=\"fill_parent\"\n" +
+                "  xmlns:n1=\"http://schemas.android.com/apk/res/android\">\n" +
+                "    <com.ibotpeaches.issue1157.MyCustomView n1:max=\"100\" n2:default_value=\"1.0\" n2:max_value=\"5.0\" n2:min_value=\"0.2\" xmlns:n2=\"http://schemas.android.com/apk/res-auto\" />\n" +
+                "</LinearLayout>");
 
         byte[] encoded = Files.readAllBytes(Paths.get(sDecodedDir + File.separator + "res" + File.separator + "xml" + File.separator + "custom.xml"));
         String obtained = TestUtils.replaceNewlines(new String(encoded));
