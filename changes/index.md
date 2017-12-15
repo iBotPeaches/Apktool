@@ -13,6 +13,8 @@ description: Apktool - Changelog / Roadmap
  * Fixed issue with encoding raw font files. ([Issue 1662](https://github.com/iBotPeaches/Apktool/issues/1662)) / Thanks minsko
  * Fixed issue with rebuilding an apk that skipped resource decoding. ([Issue 1634](https://github.com/iBotPeaches/Apktool/issues/1634))
  * Fixed issue with large screens decoding length incorrectly. ([Issue 1587](https://github.com/iBotPeaches/Apktool/issues/1587))
+ * Fixed issue to allow repeated entry offsets to occur. ([Issue 1683](https://github.com/iBotPeaches/Apktool/pull/1683) / Thanks Bricnic
+ * Fixed issue where non-system attributes were decoded as system in minified resource applications. ([Issue 1157](https://github.com/iBotPeaches/Apktool/issues/1157)
 
 ## v2.3.0
 2017.09.21
