@@ -19,6 +19,7 @@ package brut.androlib.res.decoder;
 import android.content.res.XmlResourceParser;
 import android.util.TypedValue;
 import brut.androlib.AndrolibException;
+import brut.androlib.res.data.ResID;
 import brut.androlib.res.xml.ResXmlEncoders;
 import brut.util.ExtDataInput;
 import com.google.common.io.LittleEndianDataInputStream;
@@ -288,21 +289,31 @@ public class AXmlResourceParser implements XmlResourceParser {
             return "";
         }
 
-        // hacky: if the attribute names are proguarded, then so are the namespace
-        // I don't know where these are located yet in the file, but it is always
-        // this.android_ns in testing, so we will default to that for now.
-        // @todo figure out where proguarded namespaces are stored.
+        // Minifiers like removing the namespace, so we will default to default namespace
+        // unless the pkgId of the resource is private. We will grab the non-standard one.
         String value = m_strings.getString(namespace);
 
         if (value.length() == 0) {
-            int offsetName = getAttributeOffset(index);
-            int name = m_attributes[offsetName + ATTRIBUTE_IX_NAME];
-            if (m_strings.getString(name).length() == 0) {
+            ResID resourceId = new ResID(getAttributeNameResource(index));
+            if (resourceId.package_ == PRIVATE_PKG_ID) {
+                value = getNonDefaultNamespaceUri();
+            } else {
                 value = android_ns;
             }
         }
 
         return value;
+    }
+
+    private String getNonDefaultNamespaceUri() {
+        int offset = m_namespaces.getCurrentCount() + 1;
+        String prefix = m_strings.getString(m_namespaces.get(offset, true));
+
+        if (! prefix.equalsIgnoreCase("android")) {
+            return  m_strings.getString(m_namespaces.get(offset, false));
+        }
+
+        return android_ns;
     }
 
     @Override
@@ -999,4 +1010,6 @@ public class AXmlResourceParser implements XmlResourceParser {
             CHUNK_XML_END_NAMESPACE = 0x00100101,
             CHUNK_XML_START_TAG = 0x00100102, CHUNK_XML_END_TAG = 0x00100103,
             CHUNK_XML_TEXT = 0x00100104, CHUNK_XML_LAST = 0x00100104;
+
+    private static final int PRIVATE_PKG_ID = 0x7F;
 }
