@@ -1,31 +1,37 @@
 These are all the options when decoding an apk.
 <br /><br />
-<strong><code>--api &lt;API></code></strong>
+<strong><kbd>--api &lt;API></kbd></strong>
 <blockquote>The numeric api-level of the smali files to generate (defaults to targetSdkVersion)</blockquote>
 <br />
-<strong><code>-b, --no-debug-info</code></strong>
+<strong><kbd>-b, --no-debug-info</kbd></strong>
 <blockquote>Prevents baksmali from writing out debug info (.local, .param, .line, etc). Preferred to use if you are comparing smali from the same APK of different versions. The line numbers and debug will change among versions, which can make DIFF reports a pain.</blockquote>
 <br />
-<strong><code>-f, --force</code></strong>
+<strong><kbd>-f, --force</kbd></strong>
 <blockquote>Force delete destination directory. Use when trying to decode to a folder that already exists</blockquote>
 <br />
-<strong><code>--keep-broken-res</code></strong> - <span class="label label-danger">Advanced</span>
+<strong><kbd>--force-manifest</kbd></strong>
+<blockquote>Forces decode of AndroidManifest regardless of decoding of resources flag.</blockquote>
+<br />
+<strong><kbd>--keep-broken-res</kbd></strong> - <span class="label label-danger">Advanced</span>
 <blockquote>If there is an error like "Invalid Config Flags Detected. Dropping Resources...". This means that APK has a different structure then Apktool can handle. This might be a newer Android version or a random APK that doesn't match standards. Running this will allow the decode, but then you have to manually fix the folders with -ERR in them.</blockquote>
 <br />
-<strong><code>-m, --match-original</code></strong> - <span class="label label-info">Used for analysis</span>
+<strong><kbd>-m, --match-original</kbd></strong> - <span class="label label-info">Used for analysis</span>
 <blockquote>Matches files closest as possible to original, but <strong>prevents</strong> rebuild.</blockquote>
 <br />
-<strong><code>-o, --output &lt;DIR></code></strong>
+<strong><kbd>--no-assets</kbd></strong>
+<blockquote>Prevents decoding/copying of unknown asset files.</blockquote>
+<br />
+<strong><kbd>-o, --output &lt;DIR></kbd></strong>
 <blockquote>The name of the folder that apk gets written to</blockquote>
 <br />
-<strong><code>-p, --frame-path &lt;DIR></code></strong>
+<strong><kbd>-p, --frame-path &lt;DIR></kbd></strong>
 <blockquote>The folder location where framework files should be stored/read from</blockquote>
 <br />
-<strong><code>-r, --no-res</code></strong>
-<blockquote>This will prevent the decompile of resources. This keeps the <code>resources.arsc</code> intact without any decode. If only editing Java (smali) then this is the recommended action for faster decompile & rebuild</blockquote>
+<strong><kbd>-r, --no-res</kbd></strong>
+<blockquote>This will prevent the decompile of resources. This keeps the <kbd>resources.arsc</kbd> intact without any decode. If only editing Java (smali) then this is the recommended action for faster decompile & rebuild</blockquote>
 <br />
-<strong><code>-s, --no-src</code></strong>
-<blockquote>This will prevent the disassembly of the dex file(s). This keeps the apk <code>dex</code> file(s) and simply moves it during build. If you are only editing the resources. This is the recommended action for faster disassemble & assemble</blockquote>
+<strong><kbd>-s, --no-src</kbd></strong>
+<blockquote>This will prevent the disassembly of the dex file(s). This keeps the apk <kbd>dex</kbd> file(s) and simply moves it during build. If you are only editing the resources. This is the recommended action for faster disassemble & assemble</blockquote>
 <br />
-<strong><code>-t, --frame-tag &lt;TAG></code></strong>
-<blockquote>Uses framework files tagged via <code>&lt;TAG></code></blockquote>
+<strong><kbd>-t, --frame-tag &lt;TAG></kbd></strong>
+<blockquote>Uses framework files tagged via <kbd>&lt;TAG></kbd></blockquote>
