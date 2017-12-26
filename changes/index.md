@@ -4,11 +4,11 @@ title: Apktool - Changelog
 description: Apktool - Changelog / Roadmap
 ---
 
-## v2.3.1 (under development)
-2017.xx.xx
+## v2.3.1
+2017.12.26
 
  * **Android Oreo Support (8.1)** ([Issue 1667](https://github.com/iBotPeaches/Apktool/issues/1667))
- * Feature: Advanced `--force-manifest` for decoding manfest without resources. ([Issue 1680](https://github.com/iBotPeaches/Apktool/pull/1680))
+ * Feature: Advanced `--force-manifest` for decoding manifest without resources. ([Issue 1680](https://github.com/iBotPeaches/Apktool/pull/1680)) / Thanks rubenanagua
  * Fixed issue with shorthand SDK versions. ([Issue 1630](https://github.com/iBotPeaches/Apktool/issues/1630))
  * Fixed issue with encoding raw font files. ([Issue 1662](https://github.com/iBotPeaches/Apktool/issues/1662)) / Thanks minsko
  * Fixed issue with rebuilding an apk that skipped resource decoding. ([Issue 1634](https://github.com/iBotPeaches/Apktool/issues/1634))
