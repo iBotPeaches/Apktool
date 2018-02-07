@@ -229,7 +229,7 @@ We check out a certain tag. Currently we use `android-8.1.0_r9`.
 There is probably a more automated way to do this, but for now just remove all the files in `frameworks/base`. Now
 you can clone the modified repo from first step into this directory.
 
-### Building the aapt binary.
+### Building the aapt1 (Legacy) binary.
 
 The steps below are different per flavor and operating system. For cross compiling the Windows binary on Unix,
 we lose the ability to quickly build just the aapt binary. So the Windows procedure builds the entire Sdk.
@@ -252,6 +252,28 @@ we lose the ability to quickly build just the aapt binary. So the Windows proced
 3. `make OUT_DIR=out-x64 LOCAL_MULTILIB=64 USE_NINJA=false aapt`
 
 As of Android Oreo (API 26) all aapt binaries are 64 bit. 
+
+### Building the aapt2 binary.
+
+The steps below are different per flavor and operating system. For cross compiling the Windows binary on Unix,
+we lose the ability to quickly build just the aapt2 binary. So the Windows procedure builds the entire Sdk.
+
+#### Unix
+1. `source build/envsetup.sh`
+2. `lunch sdk-eng`
+3. `make OUT_DIR=out-x64 LOCAL_MULTILIB=64 USE_NINJA=false aapt2`
+4. `strip out-x64/host/linux-x86/bin/aapt2`
+
+#### Windows
+1. `source build/envsetup.sh`
+2. `lunch sdk-eng`
+3. `make PRODUCT-sdk-win_sdk USE_NINJA=false`
+4. `strip out/host/windows-x86/bin/aapt2.exe`
+
+#### Mac
+1. `source build/envsetup.sh`
+2. `lunch sdk-eng`
+3. `make OUT_DIR=out-x64 LOCAL_MULTILIB=64 USE_NINJA=false aapt2`
 
 # Gradle Tips n Tricks
 
