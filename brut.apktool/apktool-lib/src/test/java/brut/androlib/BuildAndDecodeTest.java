@@ -528,6 +528,11 @@ public class BuildAndDecodeTest {
         compareBinaryFolder("/smali", false);
     }
 
+    @Test
+    public void confirmKotlinFolderPersistsTest() throws BrutException, IOException {
+        checkFolderExists("/kotlin");
+    }
+
     @SuppressWarnings("unchecked")
     private void compareUnknownFiles() throws BrutException, IOException {
         MetaInfo control = new Androlib().readMetaFile(sTestOrigDir);

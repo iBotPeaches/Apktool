@@ -303,7 +303,6 @@ public class Androlib {
         buildNonDefaultSources(appDir);
         buildManifestFile(appDir, manifest, manifestOriginal);
         buildResources(appDir, meta.usesFramework);
-        buildLib(appDir);
         buildLibs(appDir);
         buildCopyOriginalFiles(appDir);
         buildApk(appDir, outFile);
@@ -545,12 +544,10 @@ public class Androlib {
         }
     }
 
-    public void buildLib(File appDir) throws AndrolibException {
-        buildLibrary(appDir, "lib");
-    }
-
     public void buildLibs(File appDir) throws AndrolibException {
+        buildLibrary(appDir, "lib");
         buildLibrary(appDir, "libs");
+        buildLibrary(appDir, "kotlin");
     }
 
     public void buildLibrary(File appDir, String folder) throws AndrolibException {
