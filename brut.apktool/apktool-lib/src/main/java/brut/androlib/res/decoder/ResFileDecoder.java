@@ -58,15 +58,15 @@ public class ResFileDecoder {
         }
 
         try {
-            if (typeName.equals("raw")) {
+            if (typeName.startsWith("raw")) {
                 decode(inDir, inFileName, outDir, outFileName, "raw");
                 return;
             }
-            if (typeName.equals("font") && !".xml".equals(ext)) {
+            if (typeName.startsWith("font") && !".xml".equals(ext)) {
                 decode(inDir, inFileName, outDir, outFileName, "raw");
                 return;
             }
-            if (typeName.equals("drawable") || typeName.equals("mipmap")) {
+            if (typeName.startsWith("drawable") || typeName.startsWith("mipmap")) {
                 if (inFileName.toLowerCase().endsWith(".9" + ext)) {
                     outFileName = outResName + ".9" + ext;
 
