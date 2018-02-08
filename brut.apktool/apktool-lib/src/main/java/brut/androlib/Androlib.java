@@ -235,7 +235,7 @@ public class Androlib {
 
         try {
             Directory in = apkFile.getDirectory();
-            if(in.containsFile("AndroidManifest.xml")) {
+            if (in.containsFile("AndroidManifest.xml")) {
                 in.copyToDir(originalDir, "AndroidManifest.xml");
             }
             if (in.containsDir("META-INF")) {
@@ -248,7 +248,7 @@ public class Androlib {
 
     public void writeMetaFile(File mOutDir, MetaInfo meta)
             throws AndrolibException {
-        try{
+        try {
             meta.save(new File(mOutDir, "apktool.yml"));
         } catch (IOException ex) {
             throw new AndrolibException(ex);
@@ -413,7 +413,7 @@ public class Androlib {
             LOGGER.info("Checking whether sources has changed...");
         }
         if (apkOptions.forceBuildAll || isModified(smaliDir, dex)) {
-            LOGGER.info("Smaling " + folder + " folder into " + filename +"...");
+            LOGGER.info("Smaling " + folder + " folder into " + filename + "...");
             dex.delete();
             SmaliBuilder.build(smaliDir, dex, mMinSdkVersion);
         }
@@ -573,11 +573,11 @@ public class Androlib {
             throws AndrolibException {
         if (apkOptions.copyOriginalFiles) {
             File originalDir = new File(appDir, "original");
-            if(originalDir.exists()) {
+            if (originalDir.exists()) {
                 try {
                     LOGGER.info("Copy original files...");
                     Directory in = (new ExtFile(originalDir)).getDirectory();
-                    if(in.containsFile("AndroidManifest.xml")) {
+                    if (in.containsFile("AndroidManifest.xml")) {
                         LOGGER.info("Copy AndroidManifest.xml...");
                         in.copyToDir(new File(appDir, APK_DIRNAME), "AndroidManifest.xml");
                     }
@@ -600,7 +600,7 @@ public class Androlib {
             Map<String, String> files = meta.unknownFiles;
             File tempFile = new File(outFile.getParent(), outFile.getName() + ".apktool_temp");
             boolean renamed = outFile.renameTo(tempFile);
-            if(!renamed) {
+            if (!renamed) {
                 throw new AndrolibException("Unable to rename temporary file");
             }
 
