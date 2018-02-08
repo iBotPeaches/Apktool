@@ -75,10 +75,12 @@ public class ResFileDecoder {
                         outFileName = outResName + ".r.9" + ext;
                     }
 
-                    // check for samsung qmg & spi
-                    if (inFileName.toLowerCase().endsWith(".qmg") || inFileName.toLowerCase().endsWith(".spi")) {
-                        copyRaw(inDir, outDir, outFileName);
-                        return;
+                    // check for raw 9patch images
+                    for (String extension : RAW_9PATCH_IMAGE_EXTENSIONS) {
+                        if (inFileName.toLowerCase().endsWith("." + extension)) {
+                            copyRaw(inDir, outDir, outFileName);
+                            return;
+                        }
                     }
 
                     // check for xml 9 patches which are just xml files
@@ -100,6 +102,15 @@ public class ResFileDecoder {
                         outFileName = outResName + ext;
                     }
                 }
+
+                // check for raw image
+                for (String extension : RAW_IMAGE_EXTENSIONS) {
+                    if (inFileName.toLowerCase().endsWith("." + extension)) {
+                        copyRaw(inDir, outDir, outFileName);
+                        return;
+                    }
+                }
+
                 if (!".xml".equals(ext)) {
                     decode(inDir, inFileName, outDir, outFileName, "raw");
                     return;
@@ -148,4 +159,13 @@ public class ResFileDecoder {
     }
 
     private final static Logger LOGGER = Logger.getLogger(ResFileDecoder.class.getName());
+
+    private final static String[] RAW_IMAGE_EXTENSIONS = new String[] {
+        "m4a", // apple
+    };
+
+    private final static String[] RAW_9PATCH_IMAGE_EXTENSIONS = new String[] {
+        "qmg", // samsung
+        "spi", // samsung
+    };
 }
