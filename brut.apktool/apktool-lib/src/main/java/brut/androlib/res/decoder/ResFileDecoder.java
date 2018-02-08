@@ -45,7 +45,7 @@ public class ResFileDecoder {
         ResFileValue fileValue = (ResFileValue) res.getValue();
         String inFileName = fileValue.getStrippedPath();
         String outResName = res.getFilePath();
-        String typeName = res.getResSpec().getType().getName();
+        String typeName = res.getResSpec().getType().getCleanDirectoryName();
 
         String ext = null;
         String outFileName;
