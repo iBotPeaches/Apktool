@@ -187,6 +187,17 @@ public class ARSCDecoder {
     private ResType readTableType() throws IOException, AndrolibException {
         checkChunkType(Header.TYPE_TYPE);
         int typeId = mIn.readUnsignedByte();
+
+        // Due to obfuscation, AndResGuard has made additional types that map existing types
+        // If we detect one, we will lie to the decoder and just pass on the valid corresponding type
+        // IE: drawable2 = drawable || raw2 = raw || layout3 = layout
+        ResTypeSpec mTempTypeSpec = mResTypeSpecs.get(typeId);
+
+        if (mTempTypeSpec.isAndResGuard()) {
+            //mTypeSpec = mTempTypeSpec.findStandardType(mResTypeSpecs);
+            //typeId = mTypeSpec.getId();
+        }
+
         if (mResTypeSpecs.containsKey(typeId)) {
             mResId = (0xff000000 & mResId) | mResTypeSpecs.get(typeId).getId() << 16;
             mTypeSpec = mResTypeSpecs.get(typeId);

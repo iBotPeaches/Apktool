@@ -67,6 +67,27 @@ public final class ResTypeSpec {
         return mName.equalsIgnoreCase("string");
     }
 
+    public boolean isAndResGuard() {
+        // This is will probably easily become a cat race against AndResGuard where they change the naming of their
+        // fake types and Apktool will break again. I don't have a fool proof solution since typeIds are not constant
+        // so this will work for now.
+        return Character.isDigit(mName.charAt(mName.length() - 1));
+    }
+
+    public ResTypeSpec findStandardType(HashMap<Integer, ResTypeSpec> resTypeSpecHashMap) {
+        for (Map.Entry<Integer, ResTypeSpec> entry : resTypeSpecHashMap.entrySet()) {
+            ResTypeSpec resTypeSpec = entry.getValue();
+
+            // If the resTypeSpec is NOT AndResGuard & our current clean name (raw2 => raw) matches the
+            // iteration spec, we know its the original of it.
+            if (! resTypeSpec.isAndResGuard() && getCleanDirectoryName().equalsIgnoreCase(resTypeSpec.mName)) {
+                return resTypeSpec;
+            }
+        }
+
+        return this;
+    }
+
     public Set<ResResSpec> listResSpecs() {
         return new LinkedHashSet<ResResSpec>(mResSpecs.values());
     }
