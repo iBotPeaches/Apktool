@@ -37,9 +37,15 @@ public class ResResSpec {
 
         ResResSpec resResSpec = type.getResSpecUnsafe(name);
         if (resResSpec != null) {
-            cleanName = name + "_APKTOOL_DUPLICATENAME_" + id.toString();
+            cleanName = "APKTOOL_" + id.toString();
         } else {
-            cleanName = (name.isEmpty() ? ("APKTOOL_DUMMYVAL_" + id.toString()) : name);
+            cleanName = (name.isEmpty() ? ("APKTOOL_" + id.toString()) : name);
+
+            // AndroResGuards marks all strings to this, which is an invalid string
+            // so drop to just a dummy name + id of resource
+            if (name.equalsIgnoreCase("(name removed)")) {
+                cleanName = "APKTOOL_" + id.toString();
+            }
         }
         
         this.mName = cleanName;

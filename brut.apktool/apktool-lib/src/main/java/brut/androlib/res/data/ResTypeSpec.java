@@ -47,7 +47,7 @@ public final class ResTypeSpec {
 
     public String getCleanDirectoryName() {
         for (String type: TYPES) {
-            if (getName().startsWith(type)) {
+            if (mName.startsWith(type)) {
                 return type;
             }
         }
@@ -99,6 +99,6 @@ public final class ResTypeSpec {
     }
 
     private final static String[] TYPES = new String[] {
-        "animator", "anim", "color", "drawable", "layout", "menu", "mipmap", "raw", "values", "xml"
+        "animator", "anim", "color", "drawable", "dimen", "dimen", "layout", "menu", "mipmap", "raw", "values", "xml", "style"
     };
 }
