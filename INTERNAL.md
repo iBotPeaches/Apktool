@@ -251,7 +251,7 @@ we lose the ability to quickly build just the aapt binary. So the Windows proced
 2. `lunch sdk-eng`
 3. `make OUT_DIR=out-x64 LOCAL_MULTILIB=64 USE_NINJA=false aapt`
 
-As of Android Oreo (API 26) all aapt binaries are 64 bit. 
+As of Android Oreo (API 26) all aapt binaries are 64 bit (With exception of Windows). 
 
 ### Building the aapt2 binary.
 
@@ -267,7 +267,20 @@ we lose the ability to quickly build just the aapt2 binary. So the Windows proce
 2. `strip out/host/windows-x86/bin/aapt2.exe`
 
 #### Mac
-1. `make OUT_DIR=out-x64 LOCAL_MULTILIB=64 USE_NINJA=false aapt2`
+1. `export ANDROID_JAVA_HOME=/Path/To/Jdk`
+2. `source build/envsetup.sh`
+3. `make OUT_DIR=out-x64 LOCAL_MULTILIB=64 USE_NINJA=false aapt2`
+4. `strip out-x64/host/darwin-x86/bin/aapt2`
+
+#### Confirming aapt/aapt2 builds are static
+
+There are some issues with some dependencies (namely `libc++`) in which they are built in the shared state. This is
+alright in the scope and context of AOSP/Android Studio, but once you leave those two behind and start using aapt on
+its own, you encounter some issues. The key is to force `libc++` to be built statically which takes some tweaks with the
+AOSP build systems as that dependency isn't standard like `libz` and others.
+
+You can test the finalized project using tools like `ldd` (unix) and `otool -L` (mac) for testing the binaries looking
+for shared dependencies.
 
 # Gradle Tips n Tricks
 
