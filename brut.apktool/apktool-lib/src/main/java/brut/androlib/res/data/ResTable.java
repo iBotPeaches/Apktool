@@ -39,6 +39,7 @@ public class ResTable {
     private int mPackageId;
     private boolean mAnalysisMode = false;
     private boolean mSharedLibrary = false;
+    private boolean mSparseResources = false;
 
     private Map<String, String> mSdkInfo = new LinkedHashMap<>();
     private VersionInfo mVersionInfo = new VersionInfo();
@@ -170,6 +171,10 @@ public class ResTable {
         mSharedLibrary = flag;
     }
 
+    public void setSparseResources(boolean flag) {
+        mSparseResources = flag;
+    }
+
     public void clearSdkInfo() {
         mSdkInfo.clear();
     }
@@ -212,5 +217,9 @@ public class ResTable {
 
     public boolean getSharedLibrary() {
         return mSharedLibrary;
+    }
+
+    public boolean getSparseResources() {
+        return mSparseResources;
     }
 }

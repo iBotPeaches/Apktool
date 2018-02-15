@@ -345,6 +345,7 @@ public class ApkDecoder {
             putPackageInfo(meta);
             putVersionInfo(meta);
             putSharedLibraryInfo(meta);
+            putSparseResourcesInfo(meta);
         }
         putUnknownInfo(meta);
         putFileCompressionInfo(meta);
@@ -419,6 +420,10 @@ public class ApkDecoder {
         if (mUncompressedFiles != null && !mUncompressedFiles.isEmpty()) {
             meta.doNotCompress = mUncompressedFiles;
         }
+    }
+
+    private void putSparseResourcesInfo(MetaInfo meta) throws AndrolibException {
+        meta.sparseResources = mResTable.getSparseResources();
     }
 
     private void putSharedLibraryInfo(MetaInfo meta) throws AndrolibException {
