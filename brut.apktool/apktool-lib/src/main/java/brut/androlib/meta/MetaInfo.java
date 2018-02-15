@@ -35,6 +35,7 @@ public class MetaInfo {
     public VersionInfo versionInfo;
     public boolean compressionType;
     public boolean sharedLibrary;
+    public boolean sparseResources;
     public Map<String, String> unknownFiles;
     public Collection<String> doNotCompress;
 
@@ -60,7 +61,7 @@ public class MetaInfo {
                 FileOutputStream fos = new FileOutputStream(file);
                 OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
                 Writer writer = new BufferedWriter(outputStreamWriter)
-        ){
+        ) {
             save(writer);
         }
     }
@@ -72,7 +73,7 @@ public class MetaInfo {
     public static MetaInfo load(File file) throws IOException {
         try (
                 InputStream fis = new FileInputStream(file)
-        ){
+        ) {
             return load(fis);
         }
     }

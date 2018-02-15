@@ -27,9 +27,16 @@ public class ApkOptions {
     public boolean updateFiles = false;
     public boolean isFramework = false;
     public boolean resourcesAreCompressed = false;
+    public boolean useAapt2 = false;
     public Collection<String> doNotCompress;
 
     public String frameworkFolderLocation = null;
     public String frameworkTag = null;
     public String aaptPath = "";
+
+    public int aaptVersion = 1; // default to v1
+
+    public boolean isAapt2() {
+        return this.useAapt2 || this.aaptVersion == 2;
+    }
 }
