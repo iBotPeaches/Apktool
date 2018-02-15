@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <item name="test_layouts1" type="layout">@android:layout/activity_list_item</item>
+    <item name="test_layouts2" type="layout">@android:layout/browser_link_context_header</item>
+    <item name="test_layouts3" type="layout">@android:layout/simple_list_item_1</item>
+    <item name="test_layouts4" type="layout">@android:layout/simple_spinner_item</item>
+</resources>

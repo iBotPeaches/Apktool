@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:custom="http://schemas.android.com/apk/res-auto">
+    <TextView custom:test_attr11="TEST_ONE" />
+    <TextView custom:test_attr11="TEST_ZERO" />
+</LinearLayout>
