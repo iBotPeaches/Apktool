@@ -22,6 +22,7 @@ import brut.androlib.err.InFileNotFoundException;
 import brut.androlib.err.OutDirExistsException;
 import brut.common.BrutException;
 import brut.directory.DirectoryException;
+import brut.util.AaptManager;
 import org.apache.commons.cli.*;
 
 import java.io.File;
@@ -217,6 +218,12 @@ public class Main {
         if (cli.hasOption("p") || cli.hasOption("frame-path")) {
             apkOptions.frameworkFolderLocation = cli.getOptionValue("p");
         }
+
+        // Temporary flag to enable the use of aapt2. This will tranform in time to a use-aapt1 flag, which will be
+        // legacy and eventually removed.
+        if (cli.hasOption("use-aapt2")) {
+            apkOptions.useAapt2 = true;
+        }
         if (cli.hasOption("o") || cli.hasOption("output")) {
             outFile = new File(cli.getOptionValue("o"));
         } else {
@@ -224,7 +231,15 @@ public class Main {
         }
 
         // try and build apk
-        new Androlib(apkOptions).build(new File(appDirName), outFile);
+        try {
+            if (cli.hasOption("a") || cli.hasOption("aapt")) {
+                apkOptions.aaptVersion = AaptManager.getAaptVersion(cli.getOptionValue("a"));
+            }
+            new Androlib(apkOptions).build(new File(appDirName), outFile);
+        } catch (BrutException ex) {
+            System.err.println(ex.getMessage());
+            System.exit(1);
+        }
     }
 
     private static void cmdInstallFramework(CommandLine cli) throws AndrolibException {
@@ -372,6 +387,11 @@ public class Main {
                 .desc("Loads aapt from specified location.")
                 .build();
 
+        Option aapt2Option = Option.builder()
+                .longOpt("use-aapt2")
+                .desc("Upgrades apktool to use experimental aapt2 binary.")
+                .build();
+
         Option originalOption = Option.builder("c")
                 .longOpt("copy-original")
                 .desc("Copies original AndroidManifest.xml and META-INF. See project page for more info.")
@@ -418,6 +438,7 @@ public class Main {
             BuildOptions.addOption(debugBuiOption);
             BuildOptions.addOption(aaptOption);
             BuildOptions.addOption(originalOption);
+            BuildOptions.addOption(aapt2Option);
         }
 
         // add global options
