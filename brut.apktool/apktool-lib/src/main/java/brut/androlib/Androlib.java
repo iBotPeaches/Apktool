@@ -459,7 +459,7 @@ public class Androlib {
             }
             File apkDir = new File(appDir, APK_DIRNAME);
             if (apkOptions.forceBuildAll || isModified(newFiles(APP_RESOURCES_FILENAMES, appDir),
-                    newFiles(APK_RESOURCES_FILENAMES, apkDir))) {
+                    newFiles(APK_RESOURCES_FILENAMES, apkDir)) || apkOptions.isAapt2()) {
                 LOGGER.info("Building resources...");
 
                 if (apkOptions.debugMode) {
