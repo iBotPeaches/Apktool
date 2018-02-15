@@ -55,7 +55,6 @@ public class UnknownCompressionTest {
         ExtFile clientApkFolder = new ExtFile(sOriginalFile.getAbsolutePath() + ".out");
         new Androlib(apkOptions).build(clientApkFolder, null);
         sBuiltFile = new ExtFile(clientApkFolder, "dist" + File.separator + apk);
-
     }
 
     @AfterClass
