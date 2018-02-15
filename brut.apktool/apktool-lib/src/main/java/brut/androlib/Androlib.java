@@ -690,7 +690,7 @@ public class Androlib {
         if (!assetDir.exists()) {
             assetDir = null;
         }
-        mAndRes.aaptPackage(outApk, null, null, new File(appDir, APK_DIRNAME), assetDir, null);
+        mAndRes.zipPackage(outApk, new File(appDir, APK_DIRNAME), assetDir);
     }
 
     public void publicizeResources(File arscFile) throws AndrolibException {
