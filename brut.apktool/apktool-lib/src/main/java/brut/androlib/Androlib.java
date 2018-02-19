@@ -478,9 +478,17 @@ public class Androlib {
                         ninePatch, null, parseUsesFramework(usesFramework));
 
                 Directory tmpDir = new ExtFile(apkFile).getDirectory();
-                tmpDir.copyToDir(apkDir,
-                        tmpDir.containsDir("res") ? APK_RESOURCES_FILENAMES
-                                : APK_RESOURCES_WITHOUT_RES_FILENAMES);
+
+                // Sometimes an application is built with a resources.arsc file with no resources,
+                // Apktool assumes it will have a rebuilt arsc file, when it doesn't. So if we
+                // encounter a copy error, move to a warning and continue on. (#1730)
+                try {
+                    tmpDir.copyToDir(apkDir,
+                            tmpDir.containsDir("res") ? APK_RESOURCES_FILENAMES
+                                    : APK_RESOURCES_WITHOUT_RES_FILENAMES);
+                } catch (DirectoryException ex) {
+                    LOGGER.warning(ex.getMessage());
+                }
 
                 // delete tmpDir
                 apkFile.delete();
