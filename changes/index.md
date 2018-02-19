@@ -4,6 +4,15 @@ title: Apktool - Changelog
 description: Apktool - Changelog / Roadmap
 ---
 
+## v2.3.2
+2018.xx.xx
+
+ * Fixed issue with application with empty resources.arsc file ([Issue 1730](https://github.com/iBotPeaches/Apktool/issues/1730))
+ * Fixed issue with root depth kotlin folder ([Issue 1703](https://github.com/iBotPeaches/Apktool/issues/1703))
+ * Added warning if application is non-zero typeIdOffset is discovered.
+ * Update to baksmali v2.2.2
+ * Support for treating additional photo extensions as raw (m4a)
+
 ## v2.3.1
 2017.12.26
 
