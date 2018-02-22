@@ -33,7 +33,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Connor Tumbleson <connor.tumbleson@gmail.com>
  */
-public class MinifiedArscTest {
+public class MinifiedArscTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
@@ -42,12 +42,12 @@ public class MinifiedArscTest {
         TestUtils.copyResourceDir(MinifiedArscTest.class, "brut/apktool/issue1157/", sTmpDir);
 
         String apk = "issue1157.apk";
-        sDecodedDir = new ExtFile(sTmpDir, "issue1157");
+        sTestNewDir = new ExtFile(sTmpDir, "issue1157");
 
         // decode issue1157.apk
         ApkDecoder apkDecoder = new ApkDecoder(new ExtFile(sTmpDir, apk));
         apkDecoder.setForceDelete(true);
-        apkDecoder.setOutDir(sDecodedDir);
+        apkDecoder.setOutDir(sTestNewDir);
 
         // this should not raise an exception:
         apkDecoder.decode();
@@ -66,11 +66,8 @@ public class MinifiedArscTest {
                 "    <com.ibotpeaches.issue1157.MyCustomView n1:max=\"100\" n2:default_value=\"1.0\" n2:max_value=\"5.0\" n2:min_value=\"0.2\" xmlns:n2=\"http://schemas.android.com/apk/res-auto\" />\n" +
                 "</LinearLayout>");
 
-        byte[] encoded = Files.readAllBytes(Paths.get(sDecodedDir + File.separator + "res" + File.separator + "xml" + File.separator + "custom.xml"));
+        byte[] encoded = Files.readAllBytes(Paths.get(sTestNewDir + File.separator + "res" + File.separator + "xml" + File.separator + "custom.xml"));
         String obtained = TestUtils.replaceNewlines(new String(encoded));
         assertEquals(expected, obtained);
     }
-
-    private static ExtFile sDecodedDir;
-    private static ExtFile sTmpDir;
 }

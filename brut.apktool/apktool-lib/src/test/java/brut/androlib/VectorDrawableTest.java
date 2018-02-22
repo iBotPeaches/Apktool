@@ -28,7 +28,7 @@ import java.io.IOException;
 
 import static org.junit.Assert.assertTrue;
 
-public class VectorDrawableTest {
+public class VectorDrawableTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
@@ -57,12 +57,9 @@ public class VectorDrawableTest {
         checkFileExists("res/drawable/ic_android_black_24dp.xml");
     }
 
-    private void checkFileExists(String path) throws BrutException {
+    private void checkFileExists(String path) {
         File f =  new File(sTestOrigDir, path);
 
         assertTrue(f.isFile());
     }
-
-    private static ExtFile sTmpDir;
-    private static ExtFile sTestOrigDir;
 }

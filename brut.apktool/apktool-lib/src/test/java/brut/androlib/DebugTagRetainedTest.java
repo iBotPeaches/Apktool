@@ -27,7 +27,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.logging.Logger;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -35,7 +34,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Connor Tumbleson <connor.tumbleson@gmail.com>
  */
-public class DebugTagRetainedTest {
+public class DebugTagRetainedTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
@@ -65,12 +64,12 @@ public class DebugTagRetainedTest {
     }
 
     @Test
-    public void buildAndDecodeTest() throws BrutException {
+    public void buildAndDecodeTest() {
         assertTrue(sTestNewDir.isDirectory());
     }
 
     @Test
-    public void DebugIsTruePriorToBeingFalseTest() throws BrutException, IOException {
+    public void DebugIsTruePriorToBeingFalseTest() throws IOException {
         String apk = "issue1235-new";
 
         String expected = TestUtils.replaceNewlines("<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"no\"?>\n" +
@@ -82,10 +81,4 @@ public class DebugTagRetainedTest {
         String obtained = TestUtils.replaceNewlines(new String(encoded));
         assertEquals(expected, obtained);
     }
-
-    private static ExtFile sTmpDir;
-    private static ExtFile sTestOrigDir;
-    private static ExtFile sTestNewDir;
-
-    private final static Logger LOGGER = Logger.getLogger(BuildAndDecodeJarTest.class.getName());
 }

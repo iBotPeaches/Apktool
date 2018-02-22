@@ -30,7 +30,7 @@ import java.nio.file.Paths;
 
 import static org.junit.Assert.assertTrue;
 
-public class SharedLibraryTest {
+public class SharedLibraryTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws BrutException {
@@ -111,6 +111,4 @@ public class SharedLibraryTest {
     private boolean fileExists(String filepath) {
         return Files.exists(Paths.get(sTmpDir.getAbsolutePath() + File.separator + filepath));
     }
-
-    private static ExtFile sTmpDir;
 }

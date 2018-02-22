@@ -16,33 +16,26 @@
  */
 package brut.androlib;
 
-import brut.androlib.meta.MetaInfo;
 import brut.directory.ExtFile;
 import brut.common.BrutException;
-import brut.directory.FileDirectory;
 import brut.util.OS;
 
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.Map;
-import java.util.Set;
-import java.util.logging.Logger;
 
 import brut.util.OSDetection;
-import org.custommonkey.xmlunit.*;
 import org.junit.*;
 
 import static org.junit.Assert.*;
 import static org.junit.Assume.*;
-
-import org.xml.sax.SAXException;
 
 import javax.imageio.ImageIO;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
-public class BuildAndDecodeTest {
+public class BuildAndDecodeTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
@@ -500,10 +493,11 @@ public class BuildAndDecodeTest {
     @Test
     public void libsTest() throws BrutException, IOException {
         compareLibsFolder("libs");
+        compareLibsFolder("lib");
     }
 
     @Test
-    public void unknownFolderTest() throws BrutException, IOException {
+    public void unknownFolderTest() throws BrutException {
         compareUnknownFiles();
     }
 
@@ -529,104 +523,7 @@ public class BuildAndDecodeTest {
     }
 
     @Test
-    public void confirmKotlinFolderPersistsTest() throws BrutException, IOException {
+    public void confirmKotlinFolderPersistsTest() {
         checkFolderExists("/kotlin");
     }
-
-    @SuppressWarnings("unchecked")
-    private void compareUnknownFiles() throws BrutException, IOException {
-        MetaInfo control = new Androlib().readMetaFile(sTestOrigDir);
-        MetaInfo test = new Androlib().readMetaFile(sTestNewDir);
-        assertNotNull(control.unknownFiles);
-        assertNotNull(test.unknownFiles);
-
-        Map<String, String> control_files = control.unknownFiles;
-        Map<String, String> test_files = test.unknownFiles;
-        assertTrue(control_files.size() == test_files.size());
-
-        // Make sure that the compression methods are still the same
-        for (Map.Entry<String, String> controlEntry : control_files.entrySet()) {
-            assertTrue(controlEntry.getValue().equals(test_files.get(controlEntry.getKey())));
-        }
-    }
-
-    private void compareBinaryFolder(String path, boolean res) throws BrutException, IOException {
-        Boolean exists = true;
-
-        String tmp = "";
-        if (res) {
-            tmp = File.separatorChar + "res" + File.separatorChar;
-        }
-
-        String location = tmp + path;
-
-        FileDirectory fileDirectory = new FileDirectory(sTestOrigDir, location);
-
-        Set<String> files = fileDirectory.getFiles(true);
-        for (String filename : files) {
-
-            File control = new File((sTestOrigDir + location), filename);
-            File test =  new File((sTestNewDir + location), filename);
-
-            if (! test.isFile() || ! control.isFile()) {
-                exists = false;
-            }
-        }
-
-        assertTrue(exists);
-    }
-
-    private void compareResFolder(String path) throws BrutException, IOException {
-        compareBinaryFolder(path, true);
-    }
-
-    private void compareLibsFolder(String path) throws BrutException, IOException {
-        compareBinaryFolder(File.separatorChar + path, false);
-    }
-
-    private void compareAssetsFolder(String path) throws BrutException, IOException {
-        compareBinaryFolder(File.separatorChar + "assets" + File.separatorChar + path, false);
-    }
-
-    private void compareValuesFiles(String path) throws BrutException {
-        compareXmlFiles("res/" + path, new ElementNameAndAttributeQualifier("name"));
-    }
-
-    private void compareXmlFiles(String path) throws BrutException {
-        compareXmlFiles(path, null);
-    }
-
-    private void checkFolderExists(String path) throws BrutException {
-        File f =  new File(sTestNewDir, path);
-
-        assertTrue(f.isDirectory());
-    }
-
-    private boolean isTransparent(int pixel) {
-        return pixel >> 24 == 0x00;
-    }
-
-    private void compareXmlFiles(String path, ElementQualifier qualifier) throws BrutException {
-        DetailedDiff diff;
-        try {
-            Reader control = new FileReader(new File(sTestOrigDir, path));
-            Reader test = new FileReader(new File(sTestNewDir, path));
-
-            diff = new DetailedDiff(new Diff(control, test));
-        } catch (SAXException | IOException ex) {
-            throw new BrutException(ex);
-        }
-
-        if (qualifier != null) {
-            diff.overrideElementQualifier(qualifier);
-        }
-
-        assertTrue(path + ": " + diff.getAllDifferences().toString(), diff.similar());
-    }
-
-    private static ExtFile sTmpDir;
-    private static ExtFile sTestOrigDir;
-    private static ExtFile sTestNewDir;
-
-    private final static Logger LOGGER = Logger.getLogger(BuildAndDecodeTest.class.getName());
 }

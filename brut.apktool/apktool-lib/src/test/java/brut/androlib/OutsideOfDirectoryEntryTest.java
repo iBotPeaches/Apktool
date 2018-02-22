@@ -24,7 +24,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
-import java.util.logging.Logger;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -32,7 +31,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Connor Tumbleson <connor.tumbleson@gmail.com>
  */
-public class OutsideOfDirectoryEntryTest {
+public class OutsideOfDirectoryEntryTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
@@ -56,16 +55,10 @@ public class OutsideOfDirectoryEntryTest {
     }
 
     @Test
-    public void skippedDecodingOfInvalidFileTest() throws BrutException {
+    public void skippedDecodingOfInvalidFileTest() {
         assertTrue(sTestNewDir.isDirectory());
 
         File testAssetFolder = new File(sTestNewDir, "assets");
         assertFalse(testAssetFolder.isDirectory());
     }
-
-
-    private static ExtFile sTmpDir;
-    private static ExtFile sTestNewDir;
-
-    private final static Logger LOGGER = Logger.getLogger(OutsideOfDirectoryEntryTest.class.getName());
 }

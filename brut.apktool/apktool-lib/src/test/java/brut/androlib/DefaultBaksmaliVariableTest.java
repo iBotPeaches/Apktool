@@ -27,11 +27,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.logging.Logger;
 
 import static org.junit.Assert.assertEquals;
 
-public class DefaultBaksmaliVariableTest {
+public class DefaultBaksmaliVariableTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
@@ -110,10 +109,4 @@ public class DefaultBaksmaliVariableTest {
         String obtained = TestUtils.replaceNewlines(new String(encoded));
         assertEquals(expected, obtained);
     }
-
-    private static ExtFile sTmpDir;
-    private static ExtFile sTestOrigDir;
-    private static ExtFile sTestNewDir;
-
-    private final static Logger LOGGER = Logger.getLogger(DefaultBaksmaliVariableTest.class.getName());
 }

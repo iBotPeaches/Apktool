@@ -33,7 +33,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Connor Tumbleson <connor.tumbleson@gmail.com>
  */
-public class DecodeKotlinTest {
+public class DecodeKotlinTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
@@ -57,7 +57,7 @@ public class DecodeKotlinTest {
     }
 
     @Test
-    public void kotlinFolderExistsTest() throws BrutException {
+    public void kotlinFolderExistsTest() {
         assertTrue(sTestNewDir.isDirectory());
 
         File testKotlinFolder = new File(sTestNewDir, "kotlin");
@@ -65,14 +65,9 @@ public class DecodeKotlinTest {
     }
 
     @Test
-    public void kotlinDecodeTest() throws BrutException, IOException {
+    public void kotlinDecodeTest() throws IOException {
         File kotlinActivity = new File(sTestNewDir, "smali/org/example/kotlin/mixed/KotlinActivity.smali");
 
         assertTrue(FileUtils.readFileToString(kotlinActivity).contains("KotlinActivity.kt"));
     }
-
-    private static ExtFile sTmpDir;
-    private static ExtFile sTestNewDir;
-
-    private final static Logger LOGGER = Logger.getLogger(DecodeKotlinTest.class.getName());
 }

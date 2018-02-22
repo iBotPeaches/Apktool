@@ -32,7 +32,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Connor Tumbleson <connor.tumbleson@gmail.com>
  */
-public class ReferenceVersionCodeTest {
+public class ReferenceVersionCodeTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
@@ -59,6 +59,4 @@ public class ReferenceVersionCodeTest {
         MetaInfo metaInfo = new Androlib().readMetaFile(decodedApk);
         assertEquals("v1.0.0", metaInfo.versionInfo.versionName);
     }
-
-    private static ExtFile sTmpDir;
 }

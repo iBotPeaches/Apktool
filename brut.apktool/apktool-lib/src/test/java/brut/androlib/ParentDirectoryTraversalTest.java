@@ -26,7 +26,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 
-public class ParentDirectoryTraversalTest {
+public class ParentDirectoryTraversalTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
@@ -53,6 +53,4 @@ public class ParentDirectoryTraversalTest {
         // this should not raise an exception:
         apkDecoder.decode();
     }
-
-    private static ExtFile sTmpDir;
 }

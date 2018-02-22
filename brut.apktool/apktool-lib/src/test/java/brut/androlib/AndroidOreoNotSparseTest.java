@@ -24,14 +24,13 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
-import java.util.logging.Logger;
 
 import static org.junit.Assert.assertTrue;
 
 /**
  * @author Connor Tumbleson <connor.tumbleson@gmail.com>
  */
-public class AndroidOreoNotSparseTest {
+public class AndroidOreoNotSparseTest extends BaseTest {
     @BeforeClass
     public static void beforeClass() throws Exception {
         TestUtils.cleanFrameworkFile();
@@ -59,14 +58,8 @@ public class AndroidOreoNotSparseTest {
     }
 
     @Test
-    public void buildAndDecodeTest() throws BrutException {
+    public void buildAndDecodeTest() {
         assertTrue(sTestNewDir.isDirectory());
         assertTrue(sTestOrigDir.isDirectory());
     }
-
-    private static ExtFile sTmpDir;
-    private static ExtFile sTestOrigDir;
-    private static ExtFile sTestNewDir;
-
-    private final static Logger LOGGER = Logger.getLogger(BuildAndDecodeJarTest.class.getName());
 }

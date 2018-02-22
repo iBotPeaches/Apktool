@@ -25,7 +25,7 @@ import java.io.IOException;
 import org.junit.*;
 import static org.junit.Assert.*;
 
-public class SkipAssetTest {
+public class SkipAssetTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
@@ -84,7 +84,4 @@ public class SkipAssetTest {
 
         assertTrue(f.isFile());
     }
-
-    private static ExtFile sTmpDir;
-    private static ExtFile sTestOrigDir;
 }

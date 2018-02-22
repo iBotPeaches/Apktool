@@ -25,7 +25,7 @@ import java.io.IOException;
 import org.junit.*;
 import static org.junit.Assert.*;
 
-public class AndResGuardTest {
+public class AndResGuardTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
@@ -50,15 +50,7 @@ public class AndResGuardTest {
         apkDecoder.setOutDir(new File(sTmpDir + File.separator + apk + ".out"));
         apkDecoder.decode();
 
-        checkFileExists("res/mipmap-hdpi-v4/a.png");
+        File aPng =  new File(sTestOrigDir,"res/mipmap-hdpi-v4/a.png");
+        assertTrue(aPng.isFile());
     }
-
-    private void checkFileExists(String path) throws BrutException {
-        File f =  new File(sTestOrigDir, path);
-
-        assertTrue(f.isFile());
-    }
-
-    private static ExtFile sTmpDir;
-    private static ExtFile sTestOrigDir;
 }

@@ -72,18 +72,11 @@ public abstract class TestUtils {
             }
 
             return map;
-        } catch (IOException ex) {
-            throw new BrutException(ex);
-        } catch (XmlPullParserException ex) {
+        } catch (IOException | XmlPullParserException ex) {
             throw new BrutException(ex);
         }
     }
 
-    /*
-     * TODO: move to brut.util.Jar - it's not possible for now, because below
-     * implementation uses brut.dir. I think I should merge all my projects to
-     * single brut.common .
-     */
     public static void copyResourceDir(Class class_, String dirPath, File out) throws BrutException {
         if (!out.exists()) {
             out.mkdirs();
@@ -122,11 +115,6 @@ public abstract class TestUtils {
         }
     }
 
-    /**
-     *
-     * @throws AndrolibException
-     * @throws BrutException
-     */
     public static void cleanFrameworkFile() throws AndrolibException, BrutException {
         File framework = new File(getFrameworkDir(), "1.apk");
 
@@ -135,12 +123,6 @@ public abstract class TestUtils {
         }
     }
 
-    /**
-     *
-     * @return byte[]
-     * @throws FileNotFoundException
-     * @throws IOException
-     */
     public static byte[] readHeaderOfFile(File file, int size) throws IOException {
         byte[] buffer = new byte[size];
         InputStream inputStream = new FileInputStream(file);
@@ -152,12 +134,7 @@ public abstract class TestUtils {
         return buffer;
     }
 
-    /**
-     *
-     * @return File
-     * @throws AndrolibException
-     */
-    public static File getFrameworkDir() throws AndrolibException {
+    static File getFrameworkDir() throws AndrolibException {
         AndrolibResources androlibResources = new AndrolibResources();
         androlibResources.apkOptions = new ApkOptions();
         return androlibResources.getFrameworkDir();

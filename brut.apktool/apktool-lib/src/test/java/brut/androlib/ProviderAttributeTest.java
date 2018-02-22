@@ -31,7 +31,7 @@ import java.nio.file.Paths;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class ProviderAttributeTest {
+public class ProviderAttributeTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws BrutException {
@@ -82,6 +82,4 @@ public class ProviderAttributeTest {
     private boolean fileExists(String filepath) {
         return Files.exists(Paths.get(sTmpDir.getAbsolutePath() + File.separator + filepath));
     }
-
-    private static ExtFile sTmpDir;
 }

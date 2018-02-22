@@ -33,7 +33,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Connor Tumbleson <connor.tumbleson@gmail.com>
  */
-public class DoubleExtensionUnknownFileTest {
+public class DoubleExtensionUnknownFileTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
@@ -64,6 +64,4 @@ public class DoubleExtensionUnknownFileTest {
             }
         }
     }
-
-    private static ExtFile sTmpDir;
 }

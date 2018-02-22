@@ -30,7 +30,7 @@ import java.util.Arrays;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class ForceManifestDecodeNoResourcesTest {
+public class ForceManifestDecodeNoResourcesTest extends BaseTest {
 
     private byte[] xmlHeader = new byte[] {
             0x3C, // <
@@ -139,6 +139,4 @@ public class ForceManifestDecodeNoResourcesTest {
         apkDecoder.setOutDir(new File(output));
         apkDecoder.decode();
     }
-
-    private static ExtFile sTmpDir;
 }

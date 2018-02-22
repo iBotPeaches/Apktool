@@ -17,8 +17,6 @@
 package brut.androlib;
 
 import brut.androlib.res.AndrolibResources;
-import brut.common.BrutException;
-import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -26,10 +24,10 @@ import org.junit.*;
 
 import static org.junit.Assert.assertEquals;
 
-public class InvalidSdkBoundingTest {
+public class InvalidSdkBoundingTest extends BaseTest {
 
     @Test
-    public void checkIfInvalidValuesPass() throws BrutException, IOException {
+    public void checkIfInvalidValuesPass() {
         AndrolibResources androlibResources = new AndrolibResources();
 
         Map<String, String> sdkInfo = new LinkedHashMap<>();
@@ -42,7 +40,7 @@ public class InvalidSdkBoundingTest {
     }
 
     @Test
-    public void checkIfMissingMinPasses() throws BrutException, IOException {
+    public void checkIfMissingMinPasses() {
         AndrolibResources androlibResources = new AndrolibResources();
 
         Map<String, String> sdkInfo = new LinkedHashMap<>();
@@ -54,7 +52,7 @@ public class InvalidSdkBoundingTest {
     }
 
     @Test
-    public void checkIfMissingMaxPasses() throws BrutException, IOException {
+    public void checkIfMissingMaxPasses() {
         AndrolibResources androlibResources = new AndrolibResources();
 
         Map<String, String> sdkInfo = new LinkedHashMap<>();
@@ -66,7 +64,7 @@ public class InvalidSdkBoundingTest {
     }
 
     @Test
-    public void checkIfMissingBothPasses() throws BrutException, IOException {
+    public void checkIfMissingBothPasses() {
         AndrolibResources androlibResources = new AndrolibResources();
 
         Map<String, String> sdkInfo = new LinkedHashMap<>();
@@ -78,7 +76,7 @@ public class InvalidSdkBoundingTest {
 
 
     @Test
-    public void checkForShortHandSdkTag() throws BrutException, IOException {
+    public void checkForShortHandSdkTag() {
         AndrolibResources androlibResources = new AndrolibResources();
 
         Map<String, String> sdkInfo = new LinkedHashMap<>();

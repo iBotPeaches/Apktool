@@ -26,14 +26,13 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.Logger;
 
 import static org.junit.Assert.assertEquals;
 
 /**
  * @author Connor Tumbleson <connor.tumbleson@gmail.com>
  */
-public class MissingVersionManifestTest {
+public class MissingVersionManifestTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
@@ -60,6 +59,4 @@ public class MissingVersionManifestTest {
         MetaInfo metaInfo = new Androlib().readMetaFile(decodedApk);
         assertEquals(null, metaInfo.versionInfo.versionName);
     }
-
-    private static ExtFile sTmpDir;
 }

@@ -36,7 +36,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Connor Tumbleson <connor.tumbleson@gmail.com>
  */
-public class UnknownDirectoryTraversalTest {
+public class UnknownDirectoryTraversalTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
@@ -74,6 +74,4 @@ public class UnknownDirectoryTraversalTest {
         String validFilename = BrutIO.sanitizeUnknownFile(sTmpDir, "dir" + File.separator + "file");
         assertEquals("dir" + File.separator + "file", validFilename);
     }
-
-    public static File sTmpDir;
 }

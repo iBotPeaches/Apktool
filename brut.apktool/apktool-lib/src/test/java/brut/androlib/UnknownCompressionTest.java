@@ -32,7 +32,7 @@ import static org.junit.Assert.assertNotSame;
 /**
  * @author Connor Tumbleson <connor.tumbleson@gmail.com>
  */
-public class UnknownCompressionTest {
+public class UnknownCompressionTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
@@ -44,17 +44,17 @@ public class UnknownCompressionTest {
         ApkOptions apkOptions = new ApkOptions();
         apkOptions.frameworkFolderLocation = sTmpDir.getAbsolutePath();
 
-        sOriginalFile = new ExtFile(sTmpDir, apk);
+        sTestOrigDir = new ExtFile(sTmpDir, apk);
 
         // decode deflated_unknowns.apk
-        ApkDecoder apkDecoder = new ApkDecoder(sOriginalFile);
-        apkDecoder.setOutDir(new File(sOriginalFile.getAbsolutePath() + ".out"));
+        ApkDecoder apkDecoder = new ApkDecoder(sTestOrigDir);
+        apkDecoder.setOutDir(new File(sTestOrigDir.getAbsolutePath() + ".out"));
         apkDecoder.decode();
 
         // build deflated_unknowns
-        ExtFile clientApkFolder = new ExtFile(sOriginalFile.getAbsolutePath() + ".out");
+        ExtFile clientApkFolder = new ExtFile(sTestOrigDir.getAbsolutePath() + ".out");
         new Androlib(apkOptions).build(clientApkFolder, null);
-        sBuiltFile = new ExtFile(clientApkFolder, "dist" + File.separator + apk);
+        sTestNewDir = new ExtFile(clientApkFolder, "dist" + File.separator + apk);
     }
 
     @AfterClass
@@ -64,8 +64,8 @@ public class UnknownCompressionTest {
 
     @Test
     public void pkmExtensionDeflatedTest() throws BrutException, IOException {
-        Integer control = sOriginalFile.getDirectory().getCompressionLevel("assets/bin/Data/test.pkm");
-        Integer rebuilt = sBuiltFile.getDirectory().getCompressionLevel("assets/bin/Data/test.pkm");
+        Integer control = sTestOrigDir.getDirectory().getCompressionLevel("assets/bin/Data/test.pkm");
+        Integer rebuilt = sTestNewDir.getDirectory().getCompressionLevel("assets/bin/Data/test.pkm");
 
         // Check that control = rebuilt (both deflated)
         // Add extra check for checking not equal to 0, just in case control gets broken
@@ -75,8 +75,8 @@ public class UnknownCompressionTest {
 
     @Test
     public void doubleExtensionStoredTest() throws BrutException, IOException {
-        Integer control = sOriginalFile.getDirectory().getCompressionLevel("assets/bin/Data/two.extension.file");
-        Integer rebuilt = sBuiltFile.getDirectory().getCompressionLevel("assets/bin/Data/two.extension.file");
+        Integer control = sTestOrigDir.getDirectory().getCompressionLevel("assets/bin/Data/two.extension.file");
+        Integer rebuilt = sTestNewDir.getDirectory().getCompressionLevel("assets/bin/Data/two.extension.file");
 
         // Check that control = rebuilt (both stored)
         // Add extra check for checking = 0 to enforce check for stored just in case control breaks
@@ -86,8 +86,8 @@ public class UnknownCompressionTest {
 
     @Test
     public void confirmJsonFileIsDeflatedTest() throws BrutException, IOException {
-        Integer control = sOriginalFile.getDirectory().getCompressionLevel("test.json");
-        Integer rebuilt = sOriginalFile.getDirectory().getCompressionLevel("test.json");
+        Integer control = sTestOrigDir.getDirectory().getCompressionLevel("test.json");
+        Integer rebuilt = sTestOrigDir.getDirectory().getCompressionLevel("test.json");
 
         assertEquals(control, rebuilt);
         assertEquals(new Integer(8), rebuilt);
@@ -95,15 +95,10 @@ public class UnknownCompressionTest {
 
     @Test
     public void confirmPngFileIsCorrectlyDeflatedTest() throws BrutException, IOException {
-        Integer control = sOriginalFile.getDirectory().getCompressionLevel("950x150.png");
-        Integer rebuilt = sOriginalFile.getDirectory().getCompressionLevel("950x150.png");
+        Integer control = sTestOrigDir.getDirectory().getCompressionLevel("950x150.png");
+        Integer rebuilt = sTestOrigDir.getDirectory().getCompressionLevel("950x150.png");
 
         assertEquals(control, rebuilt);
         assertEquals(new Integer(8), rebuilt);
     }
-
-    private static ExtFile sTmpDir;
-
-    private static ExtFile sOriginalFile;
-    private static ExtFile sBuiltFile;
 }

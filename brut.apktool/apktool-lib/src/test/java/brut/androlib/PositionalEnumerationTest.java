@@ -24,7 +24,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Connor Tumbleson <connor.tumbleson@gmail.com>
  */
-public class PositionalEnumerationTest {
+public class PositionalEnumerationTest extends BaseTest {
 
     @Test
     public void noArgumentsTest() {
