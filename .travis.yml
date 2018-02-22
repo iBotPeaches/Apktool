@@ -1,6 +1,7 @@
 env:
    - TERM=dumb
 language: java
+dist: precise
 matrix:
   include:
     - os: linux
