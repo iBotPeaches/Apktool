@@ -20,7 +20,7 @@ cache:
   directories:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
-install: ./gradlew build
+install: ./gradlew clean
 script: ./gradlew build shadowJar proguard
 branches:
   only:
