@@ -33,7 +33,7 @@ public class AaptManager {
 
     private static File getAppt(Integer version) throws BrutException {
         File aaptBinary;
-        String aaptVersion = "aapt" + (version == 2 ? "2" : null);
+        String aaptVersion = "aapt" + (version == 2 ? "2" : "");
 
         if (! OSDetection.is64Bit() && ! OSDetection.isWindows()) {
             throw new BrutException("32 bit OS detected. No 32 bit binaries available.");
