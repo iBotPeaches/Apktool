@@ -173,21 +173,12 @@ public class OS {
 
         @Override
         public void run() {
-            BufferedReader reader = null;
             String line;
-            try {
-                reader = new BufferedReader(new InputStreamReader(inputStream));
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
                 while ((line = reader.readLine()) != null) {
                     buffer.append(line).append('\n');
                 }
-            } catch (Exception e) {
-                System.err.println(e);
-            } finally {
-                try {
-                    reader.close();
-                } catch (IOException e) {}
-            }
-
+            } catch (IOException ignored) {}
         }
 
         public String get() {
