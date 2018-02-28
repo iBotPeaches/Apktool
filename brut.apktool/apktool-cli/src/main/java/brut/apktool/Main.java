@@ -491,6 +491,7 @@ public class Main {
         allOptions.addOption(originalOption);
         allOptions.addOption(verboseOption);
         allOptions.addOption(quietOption);
+        allOptions.addOption(aapt2Option);
     }
 
     private static String verbosityHelp() {
