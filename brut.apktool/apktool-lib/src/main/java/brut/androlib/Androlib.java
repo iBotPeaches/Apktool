@@ -283,6 +283,7 @@ public class Androlib {
         mAndRes.setPackageRenamed(meta.packageInfo);
         mAndRes.setVersionInfo(meta.versionInfo);
         mAndRes.setSharedLibrary(meta.sharedLibrary);
+        mAndRes.setSparseResources(meta.sparseResources);
 
         if (meta.sdkInfo != null && meta.sdkInfo.get("minSdkVersion") != null) {
             String minSdkVersion = meta.sdkInfo.get("minSdkVersion");

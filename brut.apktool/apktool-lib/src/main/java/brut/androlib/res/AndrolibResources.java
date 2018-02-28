@@ -302,6 +302,10 @@ final public class AndrolibResources {
         mSharedLibrary = flag;
     }
 
+    public void setSparseResources(boolean flag) {
+        mSparseResources = flag;
+    }
+
     public String checkTargetSdkVersionBounds() {
         int target = mapSdkShorthandToVersion(mTargetSdkVersion);
 
@@ -407,7 +411,9 @@ final public class AndrolibResources {
         cmd.add("--no-version-transitions");
         cmd.add("--no-resource-deduping");
 
-        // TODO Sparse Resources
+        if (mSparseResources) {
+            cmd.add("--enable-sparse-encoding");
+        }
 
         if (apkOptions.isFramework) {
             cmd.add("-x");
@@ -1016,6 +1022,7 @@ final public class AndrolibResources {
     private String mPackageId = null;
 
     private boolean mSharedLibrary = false;
+    private boolean mSparseResources = false;
 
     private final static String[] IGNORED_PACKAGES = new String[] {
             "android", "com.htc", "miui", "com.lge", "com.lge.internal", "yi", "com.miui.core", "flyme",
