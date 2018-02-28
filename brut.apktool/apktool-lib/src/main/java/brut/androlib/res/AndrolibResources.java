@@ -327,7 +327,8 @@ final public class AndrolibResources {
             cmd.add("--dir");
             cmd.add(resDir.getAbsolutePath());
 
-            cmd.add("--legacy"); // Treats error that used to be valid in aapt1 as warnings in aapt2
+            // Treats error that used to be valid in aapt1 as warnings in aapt2
+            cmd.add("--legacy");
 
             try {
                 tempResourcesZip = File.createTempFile("BRUT", ".zip");
@@ -342,10 +343,8 @@ final public class AndrolibResources {
 
                 try {
                     OS.exec(cmd.toArray(new String[0]));
-                    if (apkOptions.verbose) {
-                        LOGGER.info("aapt2 compile command ran: ");
-                        LOGGER.info(cmd.toString());
-                    }
+                    LOGGER.fine("aapt2 compile command ran: ");
+                    LOGGER.fine(cmd.toString());
                 } catch (BrutException ex) {
                     throw new AndrolibException(ex);
                 }
@@ -456,10 +455,8 @@ final public class AndrolibResources {
 
         try {
             OS.exec(cmd.toArray(new String[0]));
-            if (apkOptions.verbose) {
-                LOGGER.info("aapt2 link command ran: ");
-                LOGGER.info(cmd.toString());
-            }
+            LOGGER.fine("aapt2 link command ran: ");
+            LOGGER.fine(cmd.toString());
         } catch (BrutException ex) {
             throw new AndrolibException(ex);
         }
@@ -563,10 +560,8 @@ final public class AndrolibResources {
         }
         try {
             OS.exec(cmd.toArray(new String[0]));
-            if (apkOptions.verbose) {
-                LOGGER.info("command ran: ");
-                LOGGER.info(cmd.toString());
-            }
+            LOGGER.fine("command ran: ");
+            LOGGER.fine(cmd.toString());
         } catch (BrutException ex) {
             throw new AndrolibException(ex);
         }
@@ -587,9 +582,7 @@ final public class AndrolibResources {
                 cmd.add(aaptFile.getPath());
                 customAapt = true;
 
-                if (apkOptions.verbose) {
-                    LOGGER.info(aaptFile.getPath() + " being used as aapt location.");
-                }
+                LOGGER.fine(aaptFile.getPath() + " being used as aapt location.");
             } else {
                 LOGGER.warning("aapt location could not be found. Defaulting back to default");
 
