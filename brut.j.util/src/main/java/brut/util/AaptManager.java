@@ -33,7 +33,7 @@ public class AaptManager {
 
     private static File getAppt(Integer version) throws BrutException {
         File aaptBinary;
-        String aaptVersion = "aapt" + (version == 2 ? "2" : "");
+        String aaptVersion = getAaptBinaryName(version);
 
         if (! OSDetection.is64Bit() && ! OSDetection.isWindows()) {
             throw new BrutException("32 bit OS detected. No 32 bit binaries available.");
@@ -60,8 +60,26 @@ public class AaptManager {
         throw new BrutException("Can't set aapt binary as executable");
     }
 
+    public static String getAaptExecutionCommand(String aaptPath, File aapt) throws BrutException {
+        if (! aaptPath.isEmpty()) {
+            File aaptFile = new File(aaptPath);
+            if (aaptFile.canRead() && aaptFile.exists()) {
+                aaptFile.setExecutable(true);
+                return aaptFile.getPath();
+            } else {
+                throw new BrutException("binary could not be read: " + aaptFile.getAbsolutePath());
+            }
+        } else {
+            return aapt.getAbsolutePath();
+        }
+    }
+
     public static int getAaptVersion(String aaptLocation) throws BrutException {
         return getApptVersion(new File(aaptLocation));
+    }
+
+    public static String getAaptBinaryName(Integer version) {
+        return "aapt" + (version == 2 ? "2" : "");
     }
 
     public static int getApptVersion(File aapt) throws BrutException {

@@ -576,34 +576,16 @@ final public class AndrolibResources {
     public void aaptPackage(File apkFile, File manifest, File resDir, File rawDir, File assetDir, File[] include)
             throws AndrolibException {
 
-        boolean customAapt = false;
         String aaptPath = apkOptions.aaptPath;
+        boolean customAapt = !aaptPath.isEmpty();
         List<String> cmd = new ArrayList<String>();
 
-        // path for aapt binary
-        if (! aaptPath.isEmpty()) {
-            File aaptFile = new File(aaptPath);
-            if (aaptFile.canRead() && aaptFile.exists()) {
-                aaptFile.setExecutable(true);
-                cmd.add(aaptFile.getPath());
-                customAapt = true;
-
-                LOGGER.fine(aaptFile.getPath() + " being used as aapt location.");
-            } else {
-                LOGGER.warning("aapt location could not be found. Defaulting back to default");
-
-                try {
-                    cmd.add(getAaptBinaryFile().getAbsolutePath());
-                } catch (BrutException ignored) {
-                    cmd.add("aapt");
-                }
-            }
-        } else {
-            try {
-                cmd.add(getAaptBinaryFile().getAbsolutePath());
-            } catch (BrutException ignored) {
-                cmd.add("aapt");
-            }
+        try {
+            String aaptCommand = AaptManager.getAaptExecutionCommand(aaptPath, getAaptBinaryFile());
+            cmd.add(aaptCommand);
+        } catch (BrutException ex) {
+            LOGGER.warning("aapt: " + ex.getMessage() + " (defaulting to $PATH binary)");
+            cmd.add(AaptManager.getAaptBinaryName(getAaptVersion()));
         }
 
         if (apkOptions.isAapt2()) {
@@ -979,13 +961,17 @@ final public class AndrolibResources {
 
     private File getAaptBinaryFile() throws AndrolibException {
         try {
-            if (apkOptions.useAapt2 || apkOptions.aaptVersion == 2) {
+            if (getAaptVersion() == 2) {
                 return AaptManager.getAppt2();
             }
             return AaptManager.getAppt1();
         } catch (BrutException ex) {
             throw new AndrolibException(ex);
         }
+    }
+
+    private int getAaptVersion() {
+        return apkOptions.isAapt2() ? 2 : 1;
     }
 
     public File getAndroidResourcesFile() throws AndrolibException {
