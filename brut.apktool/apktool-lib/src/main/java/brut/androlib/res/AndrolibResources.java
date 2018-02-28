@@ -322,8 +322,14 @@ final public class AndrolibResources {
             throws AndrolibException {
 
         List<String> compileCommand = new ArrayList<>(cmd);
-        File tempResourcesZip = null;
+        File resourcesZip = null;
+
         if (resDir != null) {
+            File buildDir = new File(resDir.getParent(), "build");
+            resourcesZip = new File(buildDir, "resources.zip");
+        }
+
+        if (resDir != null && !resourcesZip.exists()) {
 
             // Compile the files into flat arsc files
             cmd.add("compile");
@@ -334,25 +340,21 @@ final public class AndrolibResources {
             // Treats error that used to be valid in aapt1 as warnings in aapt2
             cmd.add("--legacy");
 
+            File buildDir = new File(resDir.getParent(), "build");
+            resourcesZip = new File(buildDir, "resources.zip");
+
+            cmd.add("-o");
+            cmd.add(resourcesZip.getAbsolutePath());
+
+            if (apkOptions.verbose) {
+                cmd.add("-v");
+            }
+
             try {
-                tempResourcesZip = File.createTempFile("BRUT", ".zip");
-                tempResourcesZip.deleteOnExit();
-
-                cmd.add("-o");
-                cmd.add(tempResourcesZip.getAbsolutePath());
-
-                if (apkOptions.verbose) {
-                    cmd.add("-v");
-                }
-
-                try {
-                    OS.exec(cmd.toArray(new String[0]));
-                    LOGGER.fine("aapt2 compile command ran: ");
-                    LOGGER.fine(cmd.toString());
-                } catch (BrutException ex) {
-                    throw new AndrolibException(ex);
-                }
-            } catch (IOException ex) {
+                OS.exec(cmd.toArray(new String[0]));
+                LOGGER.fine("aapt2 compile command ran: ");
+                LOGGER.fine(cmd.toString());
+            } catch (BrutException ex) {
                 throw new AndrolibException(ex);
             }
         }
@@ -455,8 +457,8 @@ final public class AndrolibResources {
             cmd.add("-v");
         }
 
-        if (tempResourcesZip != null) {
-            cmd.add(tempResourcesZip.getAbsolutePath());
+        if (resourcesZip != null) {
+            cmd.add(resourcesZip.getAbsolutePath());
         }
 
         try {

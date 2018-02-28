@@ -459,8 +459,10 @@ public class Androlib {
                 LOGGER.info("Checking whether resources has changed...");
             }
             File apkDir = new File(appDir, APK_DIRNAME);
+            File resourceFile = new File(apkDir.getParent(), "resources.zip");
+
             if (apkOptions.forceBuildAll || isModified(newFiles(APP_RESOURCES_FILENAMES, appDir),
-                    newFiles(APK_RESOURCES_FILENAMES, apkDir)) || apkOptions.isAapt2()) {
+                    newFiles(APK_RESOURCES_FILENAMES, apkDir)) || (apkOptions.isAapt2() && !isFile(resourceFile))) {
                 LOGGER.info("Building resources...");
 
                 if (apkOptions.debugMode) {
@@ -469,6 +471,7 @@ public class Androlib {
 
                 File apkFile = File.createTempFile("APKTOOL", null);
                 apkFile.delete();
+                resourceFile.delete();
 
                 File ninePatch = new File(appDir, "9patch");
                 if (!ninePatch.exists()) {
@@ -742,6 +745,10 @@ public class Androlib {
 
     private boolean isModified(File working, File stored) {
         return ! stored.exists() || BrutIO.recursiveModifiedTime(working) > BrutIO .recursiveModifiedTime(stored);
+    }
+
+    private boolean isFile(File working) {
+        return working.exists();
     }
 
     private boolean isModified(File[] working, File[] stored) {
