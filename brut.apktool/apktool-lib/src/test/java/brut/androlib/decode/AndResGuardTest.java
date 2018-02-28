@@ -14,42 +14,27 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib;
+package brut.androlib.decode;
 
+import brut.androlib.ApkDecoder;
+import brut.androlib.BaseTest;
+import brut.androlib.TestUtils;
 import brut.directory.ExtFile;
 import brut.common.BrutException;
 import brut.util.OS;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import java.io.File;
+import java.io.IOException;
 
-import static org.junit.Assert.assertTrue;
+import org.junit.*;
+import static org.junit.Assert.*;
 
-/**
- * @author Connor Tumbleson <connor.tumbleson@gmail.com>
- */
-public class AndroidOreoNotSparseTest extends BaseTest {
+public class AndResGuardTest extends BaseTest {
+
     @BeforeClass
     public static void beforeClass() throws Exception {
         TestUtils.cleanFrameworkFile();
         sTmpDir = new ExtFile(OS.createTempDirectory());
-        sTestOrigDir = new ExtFile(sTmpDir, "issue1594-orig");
-        sTestNewDir = new ExtFile(sTmpDir, "issue1594-new");
-        LOGGER.info("Unpacking not_sparse.apk...");
-        TestUtils.copyResourceDir(AndroidOreoNotSparseTest.class, "brut/apktool/issue1594", sTestOrigDir);
-
-        File testApk = new File(sTestOrigDir, "not_sparse.apk");
-
-        LOGGER.info("Decoding not_sparse.apk...");
-        ApkDecoder apkDecoder = new ApkDecoder(testApk);
-        apkDecoder.setOutDir(sTestNewDir);
-        apkDecoder.decode();
-
-        LOGGER.info("Building not_sparse.apk...");
-        ApkOptions apkOptions = new ApkOptions();
-        new Androlib(apkOptions).build(sTestNewDir, testApk);
+        TestUtils.copyResourceDir(AndResGuardTest.class, "brut/apktool/issue1170/", sTmpDir);
     }
 
     @AfterClass
@@ -58,8 +43,17 @@ public class AndroidOreoNotSparseTest extends BaseTest {
     }
 
     @Test
-    public void buildAndDecodeTest() {
-        assertTrue(sTestNewDir.isDirectory());
-        assertTrue(sTestOrigDir.isDirectory());
+    public void checkifAndResDecodeRemapsRFolder() throws BrutException, IOException {
+        String apk = "issue1170.apk";
+
+        // decode issue1170.apk
+        ApkDecoder apkDecoder = new ApkDecoder(new File(sTmpDir + File.separator + apk));
+        sTestOrigDir = new ExtFile(sTmpDir + File.separator + apk + ".out");
+
+        apkDecoder.setOutDir(new File(sTmpDir + File.separator + apk + ".out"));
+        apkDecoder.decode();
+
+        File aPng =  new File(sTestOrigDir,"res/mipmap-hdpi-v4/a.png");
+        assertTrue(aPng.isFile());
     }
 }

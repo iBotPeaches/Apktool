@@ -14,8 +14,10 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib;
+package brut.androlib.util;
 
+import brut.androlib.BaseTest;
+import brut.androlib.TestUtils;
 import brut.common.BrutException;
 import brut.common.InvalidUnknownFileException;
 import brut.common.RootUnknownFileException;

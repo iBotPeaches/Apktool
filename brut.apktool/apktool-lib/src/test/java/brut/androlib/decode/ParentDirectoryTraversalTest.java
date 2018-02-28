@@ -14,8 +14,11 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib;
+package brut.androlib.decode;
 
+import brut.androlib.ApkDecoder;
+import brut.androlib.BaseTest;
+import brut.androlib.TestUtils;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
 import brut.util.OS;
@@ -24,29 +27,15 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.IOException;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-/**
- * @author Connor Tumbleson <connor.tumbleson@gmail.com>
- */
-public class OutsideOfDirectoryEntryTest extends BaseTest {
+public class ParentDirectoryTraversalTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
         TestUtils.cleanFrameworkFile();
         sTmpDir = new ExtFile(OS.createTempDirectory());
-        TestUtils.copyResourceDir(DecodeKotlinTest.class, "brut/apktool/issue1589/", sTmpDir);
-
-        String apk = "issue1589.apk";
-
-        // decode issue1589.apk
-        ApkDecoder apkDecoder = new ApkDecoder(new File(sTmpDir + File.separator + apk));
-        sTestNewDir = new ExtFile(sTmpDir + File.separator + apk + ".out");
-
-        apkDecoder.setOutDir(new File(sTmpDir + File.separator + apk + ".out"));
-        apkDecoder.decode();
+        TestUtils.copyResourceDir(ParentDirectoryTraversalTest.class, "brut/apktool/issue1498/", sTmpDir);
     }
 
     @AfterClass
@@ -55,10 +44,16 @@ public class OutsideOfDirectoryEntryTest extends BaseTest {
     }
 
     @Test
-    public void skippedDecodingOfInvalidFileTest() {
-        assertTrue(sTestNewDir.isDirectory());
+    public void checkIfDrawableFileDecodesProperly() throws BrutException, IOException {
+        String apk = "issue1498.apk";
 
-        File testAssetFolder = new File(sTestNewDir, "assets");
-        assertFalse(testAssetFolder.isDirectory());
+        // decode issue1498.apk
+        ApkDecoder apkDecoder = new ApkDecoder(new File(sTmpDir + File.separator + apk));
+        apkDecoder.setDecodeResources(ApkDecoder.DECODE_RESOURCES_NONE);
+
+        apkDecoder.setOutDir(new File(sTmpDir + File.separator + apk + ".out"));
+
+        // this should not raise an exception:
+        apkDecoder.decode();
     }
 }

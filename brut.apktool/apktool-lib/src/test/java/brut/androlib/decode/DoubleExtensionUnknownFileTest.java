@@ -14,12 +14,17 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib;
+package brut.androlib.decode;
 
+import brut.androlib.Androlib;
+import brut.androlib.ApkDecoder;
+import brut.androlib.BaseTest;
+import brut.androlib.TestUtils;
 import brut.androlib.meta.MetaInfo;
 import brut.directory.ExtFile;
 import brut.common.BrutException;
 import brut.util.OS;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -27,18 +32,18 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Connor Tumbleson <connor.tumbleson@gmail.com>
  */
-public class ReferenceVersionCodeTest extends BaseTest {
+public class DoubleExtensionUnknownFileTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
         TestUtils.cleanFrameworkFile();
         sTmpDir = new ExtFile(OS.createTempDirectory());
-        TestUtils.copyResourceDir(ReferenceVersionCodeTest.class, "brut/apktool/issue1234/", sTmpDir);
+        TestUtils.copyResourceDir(DoubleExtensionUnknownFileTest.class, "brut/apktool/issue1244/", sTmpDir);
     }
 
     @AfterClass
@@ -47,16 +52,20 @@ public class ReferenceVersionCodeTest extends BaseTest {
     }
 
     @Test
-    public void referenceBecomesLiteralTest() throws BrutException, IOException {
-        String apk = "issue1234.apk";
+    public void multipleExtensionUnknownFileTest() throws BrutException, IOException {
+        String apk = "issue1244.apk";
 
-        // decode issue1234.apk
+        // decode issue1244.apk
         ApkDecoder apkDecoder = new ApkDecoder(new File(sTmpDir + File.separator + apk));
         ExtFile decodedApk = new ExtFile(sTmpDir + File.separator + apk + ".out");
         apkDecoder.setOutDir(new File(sTmpDir + File.separator + apk + ".out"));
         apkDecoder.decode();
 
         MetaInfo metaInfo = new Androlib().readMetaFile(decodedApk);
-        assertEquals("v1.0.0", metaInfo.versionInfo.versionName);
+        for (String string : metaInfo.doNotCompress) {
+            if (StringUtils.countMatches(string, ".") > 1) {
+                assertTrue(string.equalsIgnoreCase("assets/bin/Data/sharedassets1.assets.split0"));
+            }
+        }
     }
 }

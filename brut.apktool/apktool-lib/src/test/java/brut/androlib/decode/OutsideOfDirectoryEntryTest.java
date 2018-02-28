@@ -14,36 +14,37 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib;
+package brut.androlib.decode;
 
-import brut.directory.ExtFile;
+import brut.androlib.ApkDecoder;
+import brut.androlib.BaseTest;
+import brut.androlib.TestUtils;
 import brut.common.BrutException;
+import brut.directory.ExtFile;
 import brut.util.OS;
-import org.apache.commons.io.FileUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.logging.Logger;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
  * @author Connor Tumbleson <connor.tumbleson@gmail.com>
  */
-public class DecodeKotlinTest extends BaseTest {
+public class OutsideOfDirectoryEntryTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
         TestUtils.cleanFrameworkFile();
         sTmpDir = new ExtFile(OS.createTempDirectory());
-        TestUtils.copyResourceDir(DecodeKotlinTest.class, "brut/apktool/testkotlin/", sTmpDir);
+        TestUtils.copyResourceDir(OutsideOfDirectoryEntryTest.class, "brut/apktool/issue1589/", sTmpDir);
 
-        String apk = "testkotlin.apk";
+        String apk = "issue1589.apk";
 
-        // decode testkotlin.apk
+        // decode issue1589.apk
         ApkDecoder apkDecoder = new ApkDecoder(new File(sTmpDir + File.separator + apk));
         sTestNewDir = new ExtFile(sTmpDir + File.separator + apk + ".out");
 
@@ -57,17 +58,10 @@ public class DecodeKotlinTest extends BaseTest {
     }
 
     @Test
-    public void kotlinFolderExistsTest() {
+    public void skippedDecodingOfInvalidFileTest() {
         assertTrue(sTestNewDir.isDirectory());
 
-        File testKotlinFolder = new File(sTestNewDir, "kotlin");
-        assertTrue(testKotlinFolder.isDirectory());
-    }
-
-    @Test
-    public void kotlinDecodeTest() throws IOException {
-        File kotlinActivity = new File(sTestNewDir, "smali/org/example/kotlin/mixed/KotlinActivity.smali");
-
-        assertTrue(FileUtils.readFileToString(kotlinActivity).contains("KotlinActivity.kt"));
+        File testAssetFolder = new File(sTestNewDir, "assets");
+        assertFalse(testAssetFolder.isDirectory());
     }
 }

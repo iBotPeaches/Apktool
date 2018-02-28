@@ -14,8 +14,12 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib;
+package brut.androlib.aapt1;
 
+import brut.androlib.Androlib;
+import brut.androlib.ApkDecoder;
+import brut.androlib.BaseTest;
+import brut.androlib.TestUtils;
 import brut.directory.ExtFile;
 import brut.common.BrutException;
 import brut.util.OS;
@@ -63,7 +67,7 @@ public class BuildAndDecodeTest extends BaseTest {
     }
 
     @Test
-    public void buildAndDecodeTest() throws BrutException {
+    public void buildAndDecodeTest() {
         assertTrue(sTestNewDir.isDirectory());
     }
 
@@ -244,73 +248,73 @@ public class BuildAndDecodeTest extends BaseTest {
     }
 
     @Test
-    public void anyDpiTest() throws BrutException, IOException {
+    public void anyDpiTest() throws BrutException {
         compareValuesFiles("values-watch/strings.xml");
     }
 
     @Test
-    public void packed3CharsTest() throws BrutException, IOException {
+    public void packed3CharsTest() throws BrutException {
         compareValuesFiles("values-ast-rES/strings.xml");
     }
 
     @Test
-    public void rightToLeftTest() throws BrutException, IOException {
+    public void rightToLeftTest() throws BrutException {
         compareValuesFiles("values-ldrtl/strings.xml");
     }
 
     @Test
-    public void scriptBcp47Test() throws BrutException, IOException {
+    public void scriptBcp47Test() throws BrutException {
         compareValuesFiles("values-b+en+Latn+US/strings.xml");
     }
 
     @Test
-    public void threeLetterLangBcp47Test() throws BrutException, IOException {
+    public void threeLetterLangBcp47Test() throws BrutException {
         compareValuesFiles("values-ast/strings.xml");
     }
 
     @Test
-    public void androidOStringTest() throws BrutException, IOException {
+    public void androidOStringTest() throws BrutException {
         compareValuesFiles("values-ast/strings.xml");
     }
 
     @Test
-    public void twoLetterNotHandledAsBcpTest() throws BrutException, IOException {
+    public void twoLetterNotHandledAsBcpTest() {
         checkFolderExists("res/values-fr");
     }
 
     @Test
-    public void twoLetterLangBcp47Test() throws BrutException, IOException {
+    public void twoLetterLangBcp47Test() throws BrutException {
         compareValuesFiles("values-en-rUS/strings.xml");
     }
 
     @Test
-    public void variantBcp47Test() throws BrutException, IOException {
+    public void variantBcp47Test() throws BrutException {
         compareValuesFiles("values-b+en+US+POSIX/strings.xml");
     }
 
     @Test
-    public void fourpartBcp47Test() throws BrutException, IOException {
+    public void fourpartBcp47Test() throws BrutException {
         compareValuesFiles("values-b+ast+Latn+IT+AREVELA/strings.xml");
     }
 
     @Test
-    public void RegionLocaleBcp47Test() throws BrutException, IOException {
+    public void RegionLocaleBcp47Test() throws BrutException {
         compareValuesFiles("values-b+en+Latn+419/strings.xml");
     }
 
     @Test
-    public void numericalRegionBcp47Test() throws BrutException, IOException {
+    public void numericalRegionBcp47Test() throws BrutException {
         compareValuesFiles("values-b+eng+419/strings.xml");
     }
 
     @Test
-    public void api23ConfigurationsTest() throws BrutException, IOException {
+    public void api23ConfigurationsTest() throws BrutException {
         compareValuesFiles("values-round/strings.xml");
         compareValuesFiles("values-notround/strings.xml");
     }
 
     @Test
-    public void api26ConfigurationsTest() throws BrutException, IOException {
+    public void api26ConfigurationsTest() throws BrutException {
         compareValuesFiles("values-widecg-v26/strings.xml");
         compareValuesFiles("values-lowdr-v26/strings.xml");
         compareValuesFiles("values-nowidecg-v26/strings.xml");
@@ -318,7 +322,7 @@ public class BuildAndDecodeTest extends BaseTest {
     }
 
     @Test
-    public void fontTest() throws BrutException, IOException {
+    public void fontTest() throws BrutException {
         File fontXml = new File((sTestNewDir + "/res/font"), "lobster.xml");
         File fontFile = new File((sTestNewDir + "/res/font"), "lobster_regular.otf");
 
@@ -367,7 +371,7 @@ public class BuildAndDecodeTest extends BaseTest {
     }
 
     @Test
-    public void ninePatchImageColorTest() throws BrutException, IOException {
+    public void ninePatchImageColorTest() throws IOException {
         char slash = File.separatorChar;
         String location = slash + "res" + slash + "drawable-xhdpi" + slash;
 
@@ -388,7 +392,7 @@ public class BuildAndDecodeTest extends BaseTest {
     }
 
     @Test
-    public void issue1508Test() throws BrutException, IOException {
+    public void issue1508Test() throws IOException {
         char slash = File.separatorChar;
         String location = slash + "res" + slash + "drawable-xhdpi" + slash;
 
@@ -409,7 +413,7 @@ public class BuildAndDecodeTest extends BaseTest {
     }
 
     @Test
-    public void issue1511Test() throws BrutException, IOException {
+    public void issue1511Test() throws IOException {
         char slash = File.separatorChar;
         String location = slash + "res" + slash + "drawable-xxhdpi" + slash;
 
@@ -432,7 +436,7 @@ public class BuildAndDecodeTest extends BaseTest {
     }
 
     @Test
-    public void robust9patchTest() throws BrutException, IOException {
+    public void robust9patchTest() throws IOException {
         String[] ninePatches = {"ic_notification_overlay.9.png", "status_background.9.png",
                 "search_bg_transparent.9.png", "screenshot_panel.9.png", "recents_lower_gradient.9.png"};
 

@@ -14,25 +14,43 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib;
+package brut.androlib.aapt1;
 
-import brut.common.BrutException;
+import brut.androlib.*;
 import brut.directory.ExtFile;
+import brut.common.BrutException;
 import brut.util.OS;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.IOException;
 
-public class ParentDirectoryTraversalTest extends BaseTest {
+import static org.junit.Assert.assertTrue;
 
+/**
+ * @author Connor Tumbleson <connor.tumbleson@gmail.com>
+ */
+public class AndroidOreoNotSparseTest extends BaseTest {
     @BeforeClass
     public static void beforeClass() throws Exception {
         TestUtils.cleanFrameworkFile();
         sTmpDir = new ExtFile(OS.createTempDirectory());
-        TestUtils.copyResourceDir(ParentDirectoryTraversalTest.class, "brut/apktool/issue1498/", sTmpDir);
+        sTestOrigDir = new ExtFile(sTmpDir, "issue1594-orig");
+        sTestNewDir = new ExtFile(sTmpDir, "issue1594-new");
+        LOGGER.info("Unpacking not_sparse.apk...");
+        TestUtils.copyResourceDir(AndroidOreoNotSparseTest.class, "brut/apktool/issue1594", sTestOrigDir);
+
+        File testApk = new File(sTestOrigDir, "not_sparse.apk");
+
+        LOGGER.info("Decoding not_sparse.apk...");
+        ApkDecoder apkDecoder = new ApkDecoder(testApk);
+        apkDecoder.setOutDir(sTestNewDir);
+        apkDecoder.decode();
+
+        LOGGER.info("Building not_sparse.apk...");
+        ApkOptions apkOptions = new ApkOptions();
+        new Androlib(apkOptions).build(sTestNewDir, testApk);
     }
 
     @AfterClass
@@ -41,16 +59,8 @@ public class ParentDirectoryTraversalTest extends BaseTest {
     }
 
     @Test
-    public void checkIfDrawableFileDecodesProperly() throws BrutException, IOException {
-        String apk = "issue1498.apk";
-
-        // decode issue1498.apk
-        ApkDecoder apkDecoder = new ApkDecoder(new File(sTmpDir + File.separator + apk));
-        apkDecoder.setDecodeResources(ApkDecoder.DECODE_RESOURCES_NONE);
-
-        apkDecoder.setOutDir(new File(sTmpDir + File.separator + apk + ".out"));
-
-        // this should not raise an exception:
-        apkDecoder.decode();
+    public void buildAndDecodeTest() {
+        assertTrue(sTestNewDir.isDirectory());
+        assertTrue(sTestOrigDir.isDirectory());
     }
 }

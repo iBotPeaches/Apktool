@@ -14,31 +14,27 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib;
+package brut.androlib.aapt1;
 
-import brut.androlib.meta.MetaInfo;
+import brut.androlib.Androlib;
+import brut.androlib.ApkDecoder;
+import brut.androlib.BaseTest;
+import brut.androlib.TestUtils;
 import brut.directory.ExtFile;
 import brut.common.BrutException;
 import brut.util.OS;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import java.io.File;
 import java.io.IOException;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.*;
 
-/**
- * @author Connor Tumbleson <connor.tumbleson@gmail.com>
- */
-public class MissingVersionManifestTest extends BaseTest {
+public class LargeIntsInManifestTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
         TestUtils.cleanFrameworkFile();
         sTmpDir = new ExtFile(OS.createTempDirectory());
-        TestUtils.copyResourceDir(MissingVersionManifestTest.class, "brut/apktool/issue1264/", sTmpDir);
+        TestUtils.copyResourceDir(LargeIntsInManifestTest.class, "brut/apktool/issue767/", sTmpDir);
     }
 
     @AfterClass
@@ -47,16 +43,28 @@ public class MissingVersionManifestTest extends BaseTest {
     }
 
     @Test
-    public void missingVersionParsesCorrectlyTest() throws BrutException, IOException {
-        String apk = "issue1264.apk";
+    public void checkIfLargeIntsAreHandledTest() throws BrutException, IOException {
+        String apk = "issue767.apk";
 
-        // decode issue1264.apk
+        // decode issue767.apk
         ApkDecoder apkDecoder = new ApkDecoder(new File(sTmpDir + File.separator + apk));
-        ExtFile decodedApk = new ExtFile(sTmpDir + File.separator + apk + ".out");
+        sTestOrigDir = new ExtFile(sTmpDir + File.separator + apk + ".out");
+
         apkDecoder.setOutDir(new File(sTmpDir + File.separator + apk + ".out"));
         apkDecoder.decode();
 
-        MetaInfo metaInfo = new Androlib().readMetaFile(decodedApk);
-        assertEquals(null, metaInfo.versionInfo.versionName);
+        // build issue767
+        ExtFile testApk = new ExtFile(sTmpDir, apk + ".out");
+        new Androlib().build(testApk, null);
+        String newApk = apk + ".out" + File.separator + "dist" + File.separator + apk;
+
+        // decode issue767 again
+        apkDecoder = new ApkDecoder(new File(sTmpDir + File.separator + newApk));
+        sTestNewDir = new ExtFile(sTmpDir + File.separator + apk + ".out.two");
+
+        apkDecoder.setOutDir(new File(sTmpDir + File.separator + apk + ".out.two"));
+        apkDecoder.decode();
+
+        compareXmlFiles("AndroidManifest.xml");
     }
 }

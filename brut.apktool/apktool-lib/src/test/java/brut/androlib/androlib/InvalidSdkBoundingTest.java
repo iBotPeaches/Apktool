@@ -14,8 +14,9 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib;
+package brut.androlib.androlib;
 
+import brut.androlib.BaseTest;
 import brut.androlib.res.AndrolibResources;
 import java.util.LinkedHashMap;
 import java.util.Map;

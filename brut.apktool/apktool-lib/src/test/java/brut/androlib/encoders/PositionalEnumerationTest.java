@@ -14,8 +14,9 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib;
+package brut.androlib.encoders;
 
+import brut.androlib.BaseTest;
 import brut.androlib.res.xml.ResXmlEncoders;
 import org.junit.Test;
 

@@ -14,8 +14,11 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib;
+package brut.androlib.decode;
 
+import brut.androlib.ApkDecoder;
+import brut.androlib.BaseTest;
+import brut.androlib.TestUtils;
 import brut.directory.ExtFile;
 import brut.common.BrutException;
 import brut.util.OS;
@@ -29,32 +32,27 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Connor Tumbleson <connor.tumbleson@gmail.com>
  */
-public class DebugTagRetainedTest extends BaseTest {
+public class MinifiedArscTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
         TestUtils.cleanFrameworkFile();
         sTmpDir = new ExtFile(OS.createTempDirectory());
-        sTestOrigDir = new ExtFile(sTmpDir, "issue1235-orig");
-        sTestNewDir = new ExtFile(sTmpDir, "issue1235-new");
-        LOGGER.info("Unpacking issue1235...");
-        TestUtils.copyResourceDir(BuildAndDecodeJarTest.class, "brut/apktool/issue1235/", sTestOrigDir);
+        TestUtils.copyResourceDir(MinifiedArscTest.class, "brut/apktool/issue1157/", sTmpDir);
 
-        LOGGER.info("Building issue1235.apk...");
-        ApkOptions apkOptions = new ApkOptions();
-        apkOptions.debugMode = true;
+        String apk = "issue1157.apk";
+        sTestNewDir = new ExtFile(sTmpDir, "issue1157");
 
-        File testApk = new File(sTmpDir, "issue1235.apk");
-        new Androlib(apkOptions).build(sTestOrigDir, testApk);
-
-        LOGGER.info("Decoding issue1235.apk...");
-        ApkDecoder apkDecoder = new ApkDecoder(testApk);
+        // decode issue1157.apk
+        ApkDecoder apkDecoder = new ApkDecoder(new ExtFile(sTmpDir, apk));
+        apkDecoder.setForceDelete(true);
         apkDecoder.setOutDir(sTestNewDir);
+
+        // this should not raise an exception:
         apkDecoder.decode();
     }
 
@@ -64,20 +62,14 @@ public class DebugTagRetainedTest extends BaseTest {
     }
 
     @Test
-    public void buildAndDecodeTest() {
-        assertTrue(sTestNewDir.isDirectory());
-    }
+    public void checkIfMinifiedArscLayoutFileMatchesTest() throws IOException {
+        String expected = TestUtils.replaceNewlines("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
+                "<LinearLayout n1:orientation=\"vertical\" n1:layout_width=\"fill_parent\" n1:layout_height=\"fill_parent\"\n" +
+                "  xmlns:n1=\"http://schemas.android.com/apk/res/android\">\n" +
+                "    <com.ibotpeaches.issue1157.MyCustomView n1:max=\"100\" n2:default_value=\"1.0\" n2:max_value=\"5.0\" n2:min_value=\"0.2\" xmlns:n2=\"http://schemas.android.com/apk/res-auto\" />\n" +
+                "</LinearLayout>");
 
-    @Test
-    public void DebugIsTruePriorToBeingFalseTest() throws IOException {
-        String apk = "issue1235-new";
-
-        String expected = TestUtils.replaceNewlines("<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"no\"?>\n" +
-                "<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\" package=\"com.ibotpeaches.issue1235\" platformBuildVersionCode=\"23\" platformBuildVersionName=\"6.0-2438415\">\n" +
-                "    <application android:debuggable=\"true\"/>" +
-                "</manifest>");
-
-        byte[] encoded = Files.readAllBytes(Paths.get(sTmpDir + File.separator + apk + File.separator + "AndroidManifest.xml"));
+        byte[] encoded = Files.readAllBytes(Paths.get(sTestNewDir + File.separator + "res" + File.separator + "xml" + File.separator + "custom.xml"));
         String obtained = TestUtils.replaceNewlines(new String(encoded));
         assertEquals(expected, obtained);
     }

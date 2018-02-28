@@ -14,32 +14,43 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib;
+package brut.androlib.aapt1;
 
-import brut.androlib.meta.MetaInfo;
+import brut.androlib.*;
 import brut.directory.ExtFile;
 import brut.common.BrutException;
 import brut.util.OS;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.IOException;
 
 import static org.junit.Assert.assertTrue;
 
 /**
  * @author Connor Tumbleson <connor.tumbleson@gmail.com>
  */
-public class DoubleExtensionUnknownFileTest extends BaseTest {
-
+public class AndroidOreoSparseTest extends BaseTest {
     @BeforeClass
     public static void beforeClass() throws Exception {
         TestUtils.cleanFrameworkFile();
         sTmpDir = new ExtFile(OS.createTempDirectory());
-        TestUtils.copyResourceDir(DoubleExtensionUnknownFileTest.class, "brut/apktool/issue1244/", sTmpDir);
+        sTestOrigDir = new ExtFile(sTmpDir, "issue1594-orig");
+        sTestNewDir = new ExtFile(sTmpDir, "issue1594-new");
+        LOGGER.info("Unpacking sparse.apk...");
+        TestUtils.copyResourceDir(AndroidOreoSparseTest.class, "brut/apktool/issue1594", sTestOrigDir);
+
+        File testApk = new File(sTestOrigDir, "sparse.apk");
+
+        LOGGER.info("Decoding sparse.apk...");
+        ApkDecoder apkDecoder = new ApkDecoder(testApk);
+        apkDecoder.setOutDir(sTestNewDir);
+        apkDecoder.decode();
+
+        LOGGER.info("Building sparse.apk...");
+        ApkOptions apkOptions = new ApkOptions();
+        new Androlib(apkOptions).build(sTestNewDir, testApk);
     }
 
     @AfterClass
@@ -48,20 +59,13 @@ public class DoubleExtensionUnknownFileTest extends BaseTest {
     }
 
     @Test
-    public void multipleExtensionUnknownFileTest() throws BrutException, IOException {
-        String apk = "issue1244.apk";
+    public void buildAndDecodeTest() {
+        assertTrue(sTestNewDir.isDirectory());
+        assertTrue(sTestOrigDir.isDirectory());
+    }
 
-        // decode issue1244.apk
-        ApkDecoder apkDecoder = new ApkDecoder(new File(sTmpDir + File.separator + apk));
-        ExtFile decodedApk = new ExtFile(sTmpDir + File.separator + apk + ".out");
-        apkDecoder.setOutDir(new File(sTmpDir + File.separator + apk + ".out"));
-        apkDecoder.decode();
-
-        MetaInfo metaInfo = new Androlib().readMetaFile(decodedApk);
-        for (String string : metaInfo.doNotCompress) {
-            if (StringUtils.countMatches(string, ".") > 1) {
-                assertTrue(string.equalsIgnoreCase("assets/bin/Data/sharedassets1.assets.split0"));
-            }
-        }
+    @Test
+    public void ensureStringsOreoTest() {
+        assertTrue((new File(sTestNewDir, "res/values-v26/strings.xml").isFile()));
     }
 }

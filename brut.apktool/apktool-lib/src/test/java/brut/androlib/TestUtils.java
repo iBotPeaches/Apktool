@@ -115,7 +115,7 @@ public abstract class TestUtils {
         }
     }
 
-    public static void cleanFrameworkFile() throws AndrolibException, BrutException {
+    public static void cleanFrameworkFile() throws BrutException {
         File framework = new File(getFrameworkDir(), "1.apk");
 
         if (Files.exists(framework.toPath())) {

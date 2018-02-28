@@ -20,10 +20,7 @@ import brut.androlib.meta.MetaInfo;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
 import brut.directory.FileDirectory;
-import org.custommonkey.xmlunit.DetailedDiff;
-import org.custommonkey.xmlunit.Diff;
-import org.custommonkey.xmlunit.ElementNameAndAttributeQualifier;
-import org.custommonkey.xmlunit.ElementQualifier;
+import org.custommonkey.xmlunit.*;
 import org.xml.sax.SAXException;
 
 import java.io.File;
@@ -36,10 +33,11 @@ import java.util.logging.Logger;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 
 public class BaseTest {
 
-    void compareUnknownFiles() throws BrutException {
+    protected void compareUnknownFiles() throws BrutException {
         MetaInfo control = new Androlib().readMetaFile(sTestOrigDir);
         MetaInfo test = new Androlib().readMetaFile(sTestNewDir);
         assertNotNull(control.unknownFiles);
@@ -55,7 +53,7 @@ public class BaseTest {
         }
     }
 
-    void compareBinaryFolder(String path, boolean res) throws BrutException, IOException {
+    protected void compareBinaryFolder(String path, boolean res) throws BrutException, IOException {
         Boolean exists = true;
 
         String prefixPath = "";
@@ -81,33 +79,33 @@ public class BaseTest {
         assertTrue(exists);
     }
 
-    void compareResFolder(String path) throws BrutException, IOException {
+    protected void compareResFolder(String path) throws BrutException, IOException {
         compareBinaryFolder(path, true);
     }
 
-    void compareLibsFolder(String path) throws BrutException, IOException {
+    protected void compareLibsFolder(String path) throws BrutException, IOException {
         compareBinaryFolder(File.separatorChar + path, false);
     }
 
-    void compareAssetsFolder(String path) throws BrutException, IOException {
+    protected void compareAssetsFolder(String path) throws BrutException, IOException {
         compareBinaryFolder(File.separatorChar + "assets" + File.separatorChar + path, false);
     }
 
-    void compareValuesFiles(String path) throws BrutException {
+    protected void compareValuesFiles(String path) throws BrutException {
         compareXmlFiles("res/" + path, new ElementNameAndAttributeQualifier("name"));
     }
 
-    void compareXmlFiles(String path) throws BrutException {
+    protected void compareXmlFiles(String path) throws BrutException {
         compareXmlFiles(path, null);
     }
 
-    void checkFolderExists(String path) {
+    protected  void checkFolderExists(String path) {
         File f =  new File(sTestNewDir, path);
 
         assertTrue(f.isDirectory());
     }
 
-    boolean isTransparent(int pixel) {
+    protected boolean isTransparent(int pixel) {
         return pixel >> 24 == 0x00;
     }
 
@@ -117,15 +115,19 @@ public class BaseTest {
             Reader control = new FileReader(new File(sTestOrigDir, path));
             Reader test = new FileReader(new File(sTestNewDir, path));
 
+            XMLUnit.setIgnoreWhitespace(true);
+
+            if (qualifier == null) {
+                assertXMLEqual(control, test);
+                return;
+            }
+
             diff = new DetailedDiff(new Diff(control, test));
         } catch (SAXException | IOException ex) {
             throw new BrutException(ex);
         }
 
-        if (qualifier != null) {
-            diff.overrideElementQualifier(qualifier);
-        }
-
+        diff.overrideElementQualifier(qualifier);
         assertTrue(path + ": " + diff.getAllDifferences().toString(), diff.similar());
     }
 

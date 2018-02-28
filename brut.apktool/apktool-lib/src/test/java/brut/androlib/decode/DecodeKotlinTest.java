@@ -14,42 +14,43 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib;
+package brut.androlib.decode;
 
+import brut.androlib.ApkDecoder;
+import brut.androlib.BaseTest;
+import brut.androlib.TestUtils;
 import brut.directory.ExtFile;
 import brut.common.BrutException;
 import brut.util.OS;
+import org.apache.commons.io.FileUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.IOException;
 
 import static org.junit.Assert.assertTrue;
 
 /**
  * @author Connor Tumbleson <connor.tumbleson@gmail.com>
  */
-public class AndroidOreoSparseTest extends BaseTest {
+public class DecodeKotlinTest extends BaseTest {
+
     @BeforeClass
     public static void beforeClass() throws Exception {
         TestUtils.cleanFrameworkFile();
         sTmpDir = new ExtFile(OS.createTempDirectory());
-        sTestOrigDir = new ExtFile(sTmpDir, "issue1594-orig");
-        sTestNewDir = new ExtFile(sTmpDir, "issue1594-new");
-        LOGGER.info("Unpacking sparse.apk...");
-        TestUtils.copyResourceDir(AndroidOreoNotSparseTest.class, "brut/apktool/issue1594", sTestOrigDir);
+        TestUtils.copyResourceDir(DecodeKotlinTest.class, "brut/apktool/testkotlin/", sTmpDir);
 
-        File testApk = new File(sTestOrigDir, "sparse.apk");
+        String apk = "testkotlin.apk";
 
-        LOGGER.info("Decoding sparse.apk...");
-        ApkDecoder apkDecoder = new ApkDecoder(testApk);
-        apkDecoder.setOutDir(sTestNewDir);
+        // decode testkotlin.apk
+        ApkDecoder apkDecoder = new ApkDecoder(new File(sTmpDir + File.separator + apk));
+        sTestNewDir = new ExtFile(sTmpDir + File.separator + apk + ".out");
+
+        apkDecoder.setOutDir(new File(sTmpDir + File.separator + apk + ".out"));
         apkDecoder.decode();
-
-        LOGGER.info("Building sparse.apk...");
-        ApkOptions apkOptions = new ApkOptions();
-        new Androlib(apkOptions).build(sTestNewDir, testApk);
     }
 
     @AfterClass
@@ -58,13 +59,17 @@ public class AndroidOreoSparseTest extends BaseTest {
     }
 
     @Test
-    public void buildAndDecodeTest() {
+    public void kotlinFolderExistsTest() {
         assertTrue(sTestNewDir.isDirectory());
-        assertTrue(sTestOrigDir.isDirectory());
+
+        File testKotlinFolder = new File(sTestNewDir, "kotlin");
+        assertTrue(testKotlinFolder.isDirectory());
     }
 
     @Test
-    public void ensureStringsOreoTest() {
-        assertTrue((new File(sTestNewDir, "res/values-v26/strings.xml").isFile()));
+    public void kotlinDecodeTest() throws IOException {
+        File kotlinActivity = new File(sTestNewDir, "smali/org/example/kotlin/mixed/KotlinActivity.smali");
+
+        assertTrue(FileUtils.readFileToString(kotlinActivity).contains("KotlinActivity.kt"));
     }
 }

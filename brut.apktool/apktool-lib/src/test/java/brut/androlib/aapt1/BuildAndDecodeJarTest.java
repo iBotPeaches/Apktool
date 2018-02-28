@@ -14,8 +14,12 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib;
+package brut.androlib.aapt1;
 
+import brut.androlib.Androlib;
+import brut.androlib.ApkDecoder;
+import brut.androlib.BaseTest;
+import brut.androlib.TestUtils;
 import brut.directory.ExtFile;
 import brut.common.BrutException;
 import brut.util.OS;
@@ -24,33 +28,31 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
-import java.util.logging.Logger;
 
 import static org.junit.Assert.assertTrue;
 
 /**
  * @author Connor Tumbleson <connor.tumbleson@gmail.com>
  */
-public class EmptyResourcesArscTest {
+public class BuildAndDecodeJarTest extends BaseTest {
+
     @BeforeClass
     public static void beforeClass() throws Exception {
         TestUtils.cleanFrameworkFile();
         sTmpDir = new ExtFile(OS.createTempDirectory());
-        sTestOrigDir = new ExtFile(sTmpDir, "issue1730-orig");
-        sTestNewDir = new ExtFile(sTmpDir, "issue1730-new");
-        LOGGER.info("Unpacking issue1730.apk...");
-        TestUtils.copyResourceDir(EmptyResourcesArscTest.class, "brut/apktool/issue1730", sTestOrigDir);
+        sTestOrigDir = new ExtFile(sTmpDir, "testjar-orig");
+        sTestNewDir = new ExtFile(sTmpDir, "testjar-new");
+        LOGGER.info("Unpacking testjar...");
+        TestUtils.copyResourceDir(BuildAndDecodeJarTest.class, "brut/apktool/testjar/", sTestOrigDir);
 
-        File testApk = new File(sTestOrigDir, "issue1730.apk");
+        LOGGER.info("Building testjar.jar...");
+        File testJar = new File(sTmpDir, "testjar.jar");
+        new Androlib().build(sTestOrigDir, testJar);
 
-        LOGGER.info("Decoding issue1730.apk...");
-        ApkDecoder apkDecoder = new ApkDecoder(testApk);
+        LOGGER.info("Decoding testjar.jar...");
+        ApkDecoder apkDecoder = new ApkDecoder(testJar);
         apkDecoder.setOutDir(sTestNewDir);
         apkDecoder.decode();
-
-        LOGGER.info("Building issue1730.apk...");
-        ApkOptions apkOptions = new ApkOptions();
-        new Androlib(apkOptions).build(sTestNewDir, testApk);
     }
 
     @AfterClass
@@ -59,14 +61,7 @@ public class EmptyResourcesArscTest {
     }
 
     @Test
-    public void buildAndDecodeTest() throws BrutException {
+    public void buildAndDecodeTest() {
         assertTrue(sTestNewDir.isDirectory());
-        assertTrue(sTestOrigDir.isDirectory());
     }
-
-    private static ExtFile sTmpDir;
-    private static ExtFile sTestOrigDir;
-    private static ExtFile sTestNewDir;
-
-    private final static Logger LOGGER = Logger.getLogger(EmptyResourcesArscTest.class.getName());
 }

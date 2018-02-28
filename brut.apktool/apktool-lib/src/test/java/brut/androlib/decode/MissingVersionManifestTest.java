@@ -14,24 +14,35 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib;
+package brut.androlib.decode;
 
+import brut.androlib.Androlib;
+import brut.androlib.ApkDecoder;
+import brut.androlib.BaseTest;
+import brut.androlib.TestUtils;
+import brut.androlib.meta.MetaInfo;
 import brut.directory.ExtFile;
 import brut.common.BrutException;
 import brut.util.OS;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
 import java.io.File;
 import java.io.IOException;
 
-import org.junit.*;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
-public class AndResGuardTest extends BaseTest {
+/**
+ * @author Connor Tumbleson <connor.tumbleson@gmail.com>
+ */
+public class MissingVersionManifestTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
         TestUtils.cleanFrameworkFile();
         sTmpDir = new ExtFile(OS.createTempDirectory());
-        TestUtils.copyResourceDir(AndResGuardTest.class, "brut/apktool/issue1170/", sTmpDir);
+        TestUtils.copyResourceDir(MissingVersionManifestTest.class, "brut/apktool/issue1264/", sTmpDir);
     }
 
     @AfterClass
@@ -40,17 +51,16 @@ public class AndResGuardTest extends BaseTest {
     }
 
     @Test
-    public void checkifAndResDecodeRemapsRFolder() throws BrutException, IOException {
-        String apk = "issue1170.apk";
+    public void missingVersionParsesCorrectlyTest() throws BrutException, IOException {
+        String apk = "issue1264.apk";
 
-        // decode issue1170.apk
+        // decode issue1264.apk
         ApkDecoder apkDecoder = new ApkDecoder(new File(sTmpDir + File.separator + apk));
-        sTestOrigDir = new ExtFile(sTmpDir + File.separator + apk + ".out");
-
+        ExtFile decodedApk = new ExtFile(sTmpDir + File.separator + apk + ".out");
         apkDecoder.setOutDir(new File(sTmpDir + File.separator + apk + ".out"));
         apkDecoder.decode();
 
-        File aPng =  new File(sTestOrigDir,"res/mipmap-hdpi-v4/a.png");
-        assertTrue(aPng.isFile());
+        MetaInfo metaInfo = new Androlib().readMetaFile(decodedApk);
+        assertEquals(null, metaInfo.versionInfo.versionName);
     }
 }
