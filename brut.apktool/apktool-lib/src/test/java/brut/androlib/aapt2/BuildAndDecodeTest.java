@@ -63,7 +63,17 @@ public class BuildAndDecodeTest extends BaseTest {
     }
 
     @Test
-    public void buildAndDecodeTest() throws BrutException {
+    public void buildAndDecodeTest() {
         assertTrue(sTestNewDir.isDirectory());
+    }
+
+    @Test
+    public void valuesStringsTest() throws BrutException {
+        compareValuesFiles("values/strings.xml");
+    }
+
+    @Test
+    public void confirmManifestStructureTest() throws BrutException {
+        compareXmlFiles("AndroidManifest.xml");
     }
 }
