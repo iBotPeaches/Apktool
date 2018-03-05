@@ -5,7 +5,7 @@ usesFramework:
   ids:
   - 1
 packageInfo:
-  forced-package-id: '127'
+  forcedPackageId: '127'
 versionInfo:
   versionCode: '1'
   versionName: '1.0'
