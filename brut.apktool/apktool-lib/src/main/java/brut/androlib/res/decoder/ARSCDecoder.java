@@ -17,6 +17,7 @@
 package brut.androlib.res.decoder;
 
 import android.util.TypedValue;
+import brut.androlib.Androlib;
 import brut.androlib.AndrolibException;
 import brut.androlib.res.data.*;
 import brut.androlib.res.data.value.*;
@@ -85,7 +86,7 @@ public class ARSCDecoder {
 
     private ResPackage readTablePackage() throws IOException, AndrolibException {
         checkChunkType(Header.TYPE_PACKAGE);
-        int id = (byte) mIn.readInt();
+        int id = mIn.readInt();
 
         if (id == 0) {
             // This means we are dealing with a Library Package, we should just temporarily
