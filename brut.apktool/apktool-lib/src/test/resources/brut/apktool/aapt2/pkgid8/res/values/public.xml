@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <public type="string" name="foo1" id="0x80020000" />
+    <public type="string" name="foo2" id="0x80020001" />
+    <public type="integer" name="foo3" id="0x80030000" />
+</resources>
