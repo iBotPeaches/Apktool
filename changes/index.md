@@ -7,6 +7,7 @@ description: Apktool - Changelog / Roadmap
 ## v2.3.2
 2018.xx.xx
 
+ * Initial support for rebuilding with aapt2 binary ([Issue 1689](https://github.com/iBotPeaches/Apktool/issues/1689))
  * Fixed issue with application with empty resources.arsc file ([Issue 1730](https://github.com/iBotPeaches/Apktool/issues/1730))
  * Fixed issue with root depth kotlin folder ([Issue 1703](https://github.com/iBotPeaches/Apktool/issues/1703))
  * Added warning if application is non-zero typeIdOffset is discovered.
