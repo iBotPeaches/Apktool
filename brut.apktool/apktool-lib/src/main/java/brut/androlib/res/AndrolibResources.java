@@ -617,13 +617,15 @@ final public class AndrolibResources {
     }
 
     private int mapSdkShorthandToVersion(String sdkVersion) {
-        switch (sdkVersion) {
+        switch (sdkVersion.toUpperCase()) {
             case "M":
                 return ResConfigFlags.SDK_MNC;
             case "N":
                 return ResConfigFlags.SDK_NOUGAT;
             case "O":
                 return ResConfigFlags.SDK_OREO;
+            case "P":
+                return ResConfigFlags.SDK_P;
             default:
                 return Integer.parseInt(sdkVersion);
         }
