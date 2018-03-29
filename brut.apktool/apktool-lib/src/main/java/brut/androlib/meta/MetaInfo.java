@@ -37,7 +37,10 @@ public class MetaInfo {
     public boolean sharedLibrary;
     public boolean sparseResources;
     public Map<String, String> unknownFiles;
+
+    @Deprecated
     public Collection<String> doNotCompress;
+    public Collection<String> noCompressAssets;
 
     private static Yaml getYaml() {
         DumperOptions options = new DumperOptions();
