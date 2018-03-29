@@ -62,7 +62,7 @@ public class DoubleExtensionUnknownFileTest extends BaseTest {
         apkDecoder.decode();
 
         MetaInfo metaInfo = new Androlib().readMetaFile(decodedApk);
-        for (String string : metaInfo.doNotCompress) {
+        for (String string : metaInfo.noCompressAssets) {
             if (StringUtils.countMatches(string, ".") > 1) {
                 assertTrue(string.equalsIgnoreCase("assets/bin/Data/sharedassets1.assets.split0"));
             }
