@@ -19,7 +19,6 @@ package brut.androlib;
 import brut.androlib.meta.MetaInfo;
 import brut.androlib.meta.UsesFramework;
 import brut.androlib.res.AndrolibResources;
-import brut.androlib.res.data.ResConfigFlags;
 import brut.androlib.res.data.ResPackage;
 import brut.androlib.res.data.ResTable;
 import brut.androlib.res.data.ResUnknownFiles;
@@ -262,6 +261,7 @@ public class Androlib {
         apkOptions.isFramework = meta.isFrameworkApk;
         apkOptions.resourcesAreCompressed = meta.compressionType;
         apkOptions.doNotCompress = meta.doNotCompress;
+        apkOptions.noCompressAssets = meta.noCompressAssets;
 
         mAndRes.setSdkInfo(meta.sdkInfo);
         mAndRes.setPackageId(meta.packageInfo);
@@ -293,8 +293,8 @@ public class Androlib {
         buildApk(appDir, outFile);
 
         // we must go after the Apk is built, and copy the files in via Zip
-        // this is because Aapt won't add files it doesn't know (ex unknown files)
-        buildUnknownFiles(appDir, outFile, meta);
+        // this is because Aapt won't add files it doesn't know (ex unknown files & uncompressed assets)
+        buildUnknownAndUncompressedAssets(appDir, outFile, meta);
 
         // we copied the AndroidManifest.xml to AndroidManifest.xml.orig so we can edit it
         // lets restore the unedited one, to not change the original
@@ -588,38 +588,46 @@ public class Androlib {
         }
     }
 
-    public void buildUnknownFiles(File appDir, File outFile, MetaInfo meta)
+    public void buildUnknownAndUncompressedAssets(File appDir, File outFile, MetaInfo meta)
             throws AndrolibException {
+        if (meta.unknownFiles == null && meta.noCompressAssets == null) {
+            return;
+        }
+
         if (meta.unknownFiles != null) {
             LOGGER.info("Copying unknown files/dir...");
-
-            Map<String, String> files = meta.unknownFiles;
-            File tempFile = new File(outFile.getParent(), outFile.getName() + ".apktool_temp");
-            boolean renamed = outFile.renameTo(tempFile);
-            if (!renamed) {
-                throw new AndrolibException("Unable to rename temporary file");
-            }
-
-            try (
-                    ZipFile inputFile = new ZipFile(tempFile);
-                    ZipOutputStream actualOutput = new ZipOutputStream(new FileOutputStream(outFile))
-            ) {
-                copyExistingFiles(inputFile, actualOutput);
-                copyUnknownFiles(appDir, actualOutput, files);
-            } catch (IOException | BrutException ex) {
-                throw new AndrolibException(ex);
-            }
-
-            // Remove our temporary file.
-            tempFile.delete();
         }
+
+        File tempFile = new File(outFile.getParent(), outFile.getName() + ".apktool_temp");
+        boolean renamed = outFile.renameTo(tempFile);
+        if (!renamed) {
+            throw new AndrolibException("Unable to rename temporary file");
+        }
+
+        try (
+                ZipFile inputFile = new ZipFile(tempFile);
+                ZipOutputStream actualOutput = new ZipOutputStream(new FileOutputStream(outFile))
+        ) {
+            copyExistingFiles(inputFile, actualOutput, meta.noCompressAssets);
+            copyUncompressedAssetFiles(appDir, actualOutput, meta.noCompressAssets);
+            copyUnknownFiles(appDir, actualOutput, meta.unknownFiles);
+        } catch (IOException | BrutException ex) {
+            throw new AndrolibException(ex);
+        }
+
+        // Remove our temporary file.
+        tempFile.delete();
     }
 
-    private void copyExistingFiles(ZipFile inputFile, ZipOutputStream outputFile) throws IOException {
+    private void copyExistingFiles(ZipFile inputFile, ZipOutputStream outputFile, Collection<String> assets)
+            throws IOException {
         // First, copy the contents from the existing outFile:
         Enumeration<? extends ZipEntry> entries = inputFile.entries();
         while (entries.hasMoreElements()) {
             ZipEntry entry = new ZipEntry(entries.nextElement());
+            if (assets != null && assets.contains(entry.getName())) {
+                continue;
+            }
 
             // We can't reuse the compressed size because it depends on compression sizes.
             entry.setCompressedSize(-1);
@@ -636,25 +644,25 @@ public class Androlib {
 
     private void copyUnknownFiles(File appDir, ZipOutputStream outputFile, Map<String, String> files)
             throws BrutException, IOException {
+
         File unknownFileDir = new File(appDir, UNK_DIRNAME);
+        if (files == null || files.isEmpty()) {
+            return;
+        }
 
         // loop through unknown files
         for (Map.Entry<String,String> unknownFileInfo : files.entrySet()) {
-            File inputFile = new File(unknownFileDir, BrutIO.sanitizeUnknownFile(unknownFileDir, unknownFileInfo.getKey()));
+            String cleanedPath = BrutIO.sanitizeUnknownFile(unknownFileDir, unknownFileInfo.getKey());
+            File inputFile = new File(unknownFileDir, cleanedPath);
             if (inputFile.isDirectory()) {
                 continue;
             }
 
-            ZipEntry newEntry = new ZipEntry(unknownFileInfo.getKey());
+            ZipEntry newEntry = new ZipEntry(cleanedPath);
             int method = Integer.parseInt(unknownFileInfo.getValue());
             LOGGER.fine(String.format("Copying unknown file %s with method %d", unknownFileInfo.getKey(), method));
             if (method == ZipEntry.STORED) {
-                newEntry.setMethod(ZipEntry.STORED);
-                newEntry.setSize(inputFile.length());
-                newEntry.setCompressedSize(-1);
-                BufferedInputStream unknownFile = new BufferedInputStream(new FileInputStream(inputFile));
-                CRC32 crc = BrutIO.calculateCrc(unknownFile);
-                newEntry.setCrc(crc.getValue());
+                newEntry = getStoredZipEntry(cleanedPath, inputFile);
             } else {
                 newEntry.setMethod(ZipEntry.DEFLATED);
             }
@@ -663,6 +671,45 @@ public class Androlib {
             BrutIO.copy(inputFile, outputFile);
             outputFile.closeEntry();
         }
+    }
+
+    private void copyUncompressedAssetFiles(File appDir, ZipOutputStream outputFile, Collection<String> files)
+            throws BrutException, IOException {
+
+        if (files == null || files.isEmpty()) {
+            return;
+        }
+
+        File assetFileDir = new File(appDir, ASSET_DIRNAME);
+
+        for (String asset : files) {
+            String cleanedPath = BrutIO.sanitizeUnknownFile(assetFileDir, asset);
+
+            File inputFile = new File(appDir, cleanedPath);
+            if (inputFile.isDirectory()) {
+                continue;
+            }
+
+            LOGGER.fine(String.format("Copying uncompressed asset: %s", asset));
+            ZipEntry newEntry = getStoredZipEntry(cleanedPath, inputFile);
+            outputFile.putNextEntry(newEntry);
+            BrutIO.copy(inputFile, outputFile);
+            outputFile.closeEntry();
+        }
+    }
+
+    private ZipEntry getStoredZipEntry(String cleanedPath, File inputFile)
+            throws IOException {
+
+        ZipEntry newEntry = new ZipEntry(cleanedPath);
+        newEntry.setMethod(ZipEntry.STORED);
+        newEntry.setSize(inputFile.length());
+        newEntry.setCompressedSize(-1);
+        BufferedInputStream unknownFile = new BufferedInputStream(new FileInputStream(inputFile));
+        CRC32 crc = BrutIO.calculateCrc(unknownFile);
+        newEntry.setCrc(crc.getValue());
+
+        return newEntry;
     }
 
     public void buildApk(File appDir, File outApk) throws AndrolibException {
@@ -762,6 +809,7 @@ public class Androlib {
     private final static String SMALI_DIRNAME = "smali";
     private final static String APK_DIRNAME = "build/apk";
     private final static String UNK_DIRNAME = "unknown";
+    private final static String ASSET_DIRNAME = "assets";
     private final static String[] APK_RESOURCES_FILENAMES = new String[] {
             "resources.arsc", "AndroidManifest.xml", "res" };
     private final static String[] APK_RESOURCES_WITHOUT_RES_FILENAMES = new String[] {
@@ -776,6 +824,6 @@ public class Androlib {
     // Taken from AOSP's frameworks/base/tools/aapt/Package.cpp
     private final static Pattern NO_COMPRESS_PATTERN = Pattern.compile("\\.(" +
             "jpg|jpeg|png|gif|wav|mp2|mp3|ogg|aac|mpg|mpeg|mid|midi|smf|jet|rtttl|imy|xmf|mp4|" +
-            "m4a|m4v|3gp|3gpp|3g2|3gpp2|amr|awb|wma|wmv|webm|mkv)$");
+            "m4a|m4v|3gp|3gpp|3g2|3gpp2|amr|awb|wma|wmv|webm|mkv|arsc)$");
 
 }
