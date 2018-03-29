@@ -418,7 +418,7 @@ public class ApkDecoder {
 
     private void putFileCompressionInfo(MetaInfo meta) throws AndrolibException {
         if (mUncompressedFiles != null && !mUncompressedFiles.isEmpty()) {
-            meta.doNotCompress = mUncompressedFiles;
+            meta.noCompressAssets = mUncompressedFiles;
         }
     }
 
