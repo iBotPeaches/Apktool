@@ -41,8 +41,6 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
@@ -161,28 +159,15 @@ public class Androlib {
         }
     }
 
-    public void recordUncompressedFiles(ExtFile apkFile, Collection<String> uncompressedFilesOrExts) throws AndrolibException {
+    public void recordUncompressedFiles(ExtFile apkFile, Collection<String> uncompressedFiles) throws AndrolibException {
         try {
             Directory unk = apkFile.getDirectory();
             Set<String> files = unk.getFiles(true);
-            String ext;
 
             for (String file : files) {
                 if (isAPKFileNames(file) && !NO_COMPRESS_PATTERN.matcher(file).find()) {
-                    if (unk.getCompressionLevel(file) == 0) {
-
-                        if (StringUtils.countMatches(file, ".") > 1) {
-                            ext = file;
-                        } else {
-                            ext = FilenameUtils.getExtension(file);
-                            if (ext.isEmpty()) {
-                                ext = file;
-                            }
-                        }
-
-                        if (! uncompressedFilesOrExts.contains(ext)) {
-                            uncompressedFilesOrExts.add(ext);
-                        }
+                    if (unk.getCompressionLevel(file) == 0 && !uncompressedFiles.contains(file)) {
+                        uncompressedFiles.add(file);
                     }
                 }
             }
