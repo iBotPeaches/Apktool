@@ -43,7 +43,7 @@ public class BuildAndDecodeJarTest extends BaseTest {
         sTestOrigDir = new ExtFile(sTmpDir, "testjar-orig");
         sTestNewDir = new ExtFile(sTmpDir, "testjar-new");
         LOGGER.info("Unpacking testjar...");
-        TestUtils.copyResourceDir(BuildAndDecodeJarTest.class, "brut/apktool/aapt1/testjar/", sTestOrigDir);
+        TestUtils.copyResourceDir(BuildAndDecodeJarTest.class, "aapt1/testjar/", sTestOrigDir);
 
         LOGGER.info("Building testjar.jar...");
         File testJar = new File(sTmpDir, "testjar.jar");

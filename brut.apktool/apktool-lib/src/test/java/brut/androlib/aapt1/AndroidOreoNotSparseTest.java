@@ -39,7 +39,7 @@ public class AndroidOreoNotSparseTest extends BaseTest {
         sTestOrigDir = new ExtFile(sTmpDir, "issue1594-orig");
         sTestNewDir = new ExtFile(sTmpDir, "issue1594-new");
         LOGGER.info("Unpacking not_sparse.apk...");
-        TestUtils.copyResourceDir(AndroidOreoNotSparseTest.class, "brut/apktool/aapt1/issue1594", sTestOrigDir);
+        TestUtils.copyResourceDir(AndroidOreoNotSparseTest.class, "aapt1/issue1594", sTestOrigDir);
 
         File testApk = new File(sTestOrigDir, "not_sparse.apk");
 

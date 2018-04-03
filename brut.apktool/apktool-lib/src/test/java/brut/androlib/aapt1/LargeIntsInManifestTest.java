@@ -34,7 +34,7 @@ public class LargeIntsInManifestTest extends BaseTest {
     public static void beforeClass() throws Exception {
         TestUtils.cleanFrameworkFile();
         sTmpDir = new ExtFile(OS.createTempDirectory());
-        TestUtils.copyResourceDir(LargeIntsInManifestTest.class, "brut/apktool/aapt1/issue767/", sTmpDir);
+        TestUtils.copyResourceDir(LargeIntsInManifestTest.class, "aapt1/issue767/", sTmpDir);
     }
 
     @AfterClass

@@ -34,7 +34,7 @@ public class AndResGuardTest extends BaseTest {
     public static void beforeClass() throws Exception {
         TestUtils.cleanFrameworkFile();
         sTmpDir = new ExtFile(OS.createTempDirectory());
-        TestUtils.copyResourceDir(AndResGuardTest.class, "brut/apktool/decode/issue1170/", sTmpDir);
+        TestUtils.copyResourceDir(AndResGuardTest.class, "decode/issue1170/", sTmpDir);
     }
 
     @AfterClass

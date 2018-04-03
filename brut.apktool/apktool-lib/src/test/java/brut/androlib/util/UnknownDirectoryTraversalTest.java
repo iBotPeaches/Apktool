@@ -43,7 +43,7 @@ public class UnknownDirectoryTraversalTest extends BaseTest {
     @BeforeClass
     public static void beforeClass() throws Exception {
         sTmpDir = new ExtFile(OS.createTempDirectory());
-        TestUtils.copyResourceDir(UnknownDirectoryTraversalTest.class, "brut/apktool/util/traversal", sTmpDir);
+        TestUtils.copyResourceDir(UnknownDirectoryTraversalTest.class, "util/traversal", sTmpDir);
     }
 
     @Test

@@ -42,7 +42,7 @@ public class MinifiedArscTest extends BaseTest {
     public static void beforeClass() throws Exception {
         TestUtils.cleanFrameworkFile();
         sTmpDir = new ExtFile(OS.createTempDirectory());
-        TestUtils.copyResourceDir(MinifiedArscTest.class, "brut/apktool/decode/issue1157/", sTmpDir);
+        TestUtils.copyResourceDir(MinifiedArscTest.class, "decode/issue1157/", sTmpDir);
 
         String apk = "issue1157.apk";
         sTestNewDir = new ExtFile(sTmpDir, "issue1157");

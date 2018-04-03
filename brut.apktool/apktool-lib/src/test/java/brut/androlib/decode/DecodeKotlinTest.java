@@ -41,7 +41,7 @@ public class DecodeKotlinTest extends BaseTest {
     public static void beforeClass() throws Exception {
         TestUtils.cleanFrameworkFile();
         sTmpDir = new ExtFile(OS.createTempDirectory());
-        TestUtils.copyResourceDir(DecodeKotlinTest.class, "brut/apktool/decode/testkotlin/", sTmpDir);
+        TestUtils.copyResourceDir(DecodeKotlinTest.class, "decode/testkotlin/", sTmpDir);
 
         String apk = "testkotlin.apk";
 

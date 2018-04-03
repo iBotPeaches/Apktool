@@ -34,7 +34,7 @@ public class SkipAssetTest extends BaseTest {
     public static void beforeClass() throws Exception {
         TestUtils.cleanFrameworkFile();
         sTmpDir = new ExtFile(OS.createTempDirectory());
-        TestUtils.copyResourceDir(SkipAssetTest.class, "brut/apktool/aapt1/issue1605/", sTmpDir);
+        TestUtils.copyResourceDir(SkipAssetTest.class, "aapt1/issue1605/", sTmpDir);
     }
 
     @AfterClass

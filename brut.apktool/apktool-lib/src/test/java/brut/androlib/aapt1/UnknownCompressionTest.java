@@ -39,7 +39,7 @@ public class UnknownCompressionTest extends BaseTest {
     public static void beforeClass() throws Exception {
         TestUtils.cleanFrameworkFile();
         sTmpDir = new ExtFile(OS.createTempDirectory());
-        TestUtils.copyResourceDir(UnknownCompressionTest.class, "brut/apktool/aapt1/unknown_compression/", sTmpDir);
+        TestUtils.copyResourceDir(UnknownCompressionTest.class, "aapt1/unknown_compression/", sTmpDir);
 
         String apk = "deflated_unknowns.apk";
         ApkOptions apkOptions = new ApkOptions();

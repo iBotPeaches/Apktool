@@ -42,7 +42,7 @@ public class DefaultBaksmaliVariableTest extends BaseTest {
         sTestOrigDir = new ExtFile(sTmpDir, "testjar-orig");
         sTestNewDir = new ExtFile(sTmpDir, "testjar-new");
         LOGGER.info("Unpacking testjar...");
-        TestUtils.copyResourceDir(DefaultBaksmaliVariableTest.class, "brut/apktool/aapt1/issue1481/", sTestOrigDir);
+        TestUtils.copyResourceDir(DefaultBaksmaliVariableTest.class, "aapt1/issue1481/", sTestOrigDir);
 
         LOGGER.info("Building issue1481.jar...");
         File testJar = new File(sTmpDir, "issue1481.jar");

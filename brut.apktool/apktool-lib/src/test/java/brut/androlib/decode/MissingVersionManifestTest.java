@@ -42,7 +42,7 @@ public class MissingVersionManifestTest extends BaseTest {
     public static void beforeClass() throws Exception {
         TestUtils.cleanFrameworkFile();
         sTmpDir = new ExtFile(OS.createTempDirectory());
-        TestUtils.copyResourceDir(MissingVersionManifestTest.class, "brut/apktool/decode/issue1264/", sTmpDir);
+        TestUtils.copyResourceDir(MissingVersionManifestTest.class, "decode/issue1264/", sTmpDir);
     }
 
     @AfterClass

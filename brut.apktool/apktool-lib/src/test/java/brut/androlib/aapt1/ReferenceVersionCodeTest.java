@@ -42,7 +42,7 @@ public class ReferenceVersionCodeTest extends BaseTest {
     public static void beforeClass() throws Exception {
         TestUtils.cleanFrameworkFile();
         sTmpDir = new ExtFile(OS.createTempDirectory());
-        TestUtils.copyResourceDir(ReferenceVersionCodeTest.class, "brut/apktool/aapt1/issue1234/", sTmpDir);
+        TestUtils.copyResourceDir(ReferenceVersionCodeTest.class, "aapt1/issue1234/", sTmpDir);
     }
 
     @AfterClass

@@ -37,7 +37,7 @@ public class VectorDrawableTest extends BaseTest {
     public static void beforeClass() throws Exception {
         TestUtils.cleanFrameworkFile();
         sTmpDir = new ExtFile(OS.createTempDirectory());
-        TestUtils.copyResourceDir(VectorDrawableTest.class, "brut/apktool/decode/issue1456/", sTmpDir);
+        TestUtils.copyResourceDir(VectorDrawableTest.class, "decode/issue1456/", sTmpDir);
     }
 
     @AfterClass

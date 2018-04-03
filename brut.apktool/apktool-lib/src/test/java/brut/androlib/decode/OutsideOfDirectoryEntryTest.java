@@ -40,7 +40,7 @@ public class OutsideOfDirectoryEntryTest extends BaseTest {
     public static void beforeClass() throws Exception {
         TestUtils.cleanFrameworkFile();
         sTmpDir = new ExtFile(OS.createTempDirectory());
-        TestUtils.copyResourceDir(OutsideOfDirectoryEntryTest.class, "brut/apktool/decode/issue1589/", sTmpDir);
+        TestUtils.copyResourceDir(OutsideOfDirectoryEntryTest.class, "decode/issue1589/", sTmpDir);
 
         String apk = "issue1589.apk";
 

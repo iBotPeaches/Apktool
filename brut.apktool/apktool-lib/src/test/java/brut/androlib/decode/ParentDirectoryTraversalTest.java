@@ -35,7 +35,7 @@ public class ParentDirectoryTraversalTest extends BaseTest {
     public static void beforeClass() throws Exception {
         TestUtils.cleanFrameworkFile();
         sTmpDir = new ExtFile(OS.createTempDirectory());
-        TestUtils.copyResourceDir(ParentDirectoryTraversalTest.class, "brut/apktool/decode/issue1498/", sTmpDir);
+        TestUtils.copyResourceDir(ParentDirectoryTraversalTest.class, "decode/issue1498/", sTmpDir);
     }
 
     @AfterClass

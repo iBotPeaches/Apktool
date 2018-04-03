@@ -41,7 +41,7 @@ public class NonStandardPkgIdTest extends BaseTest {
         sTestOrigDir = new ExtFile(sTmpDir, "pkgid8-orig");
         sTestNewDir = new ExtFile(sTmpDir, "pkgid8-new");
         LOGGER.info("Unpacking pkgid8...");
-        TestUtils.copyResourceDir(BuildAndDecodeTest.class, "brut/apktool/aapt2/pkgid8/", sTestOrigDir);
+        TestUtils.copyResourceDir(BuildAndDecodeTest.class, "aapt2/pkgid8/", sTestOrigDir);
 
         ApkOptions apkOptions = new ApkOptions();
         apkOptions.useAapt2 = true;

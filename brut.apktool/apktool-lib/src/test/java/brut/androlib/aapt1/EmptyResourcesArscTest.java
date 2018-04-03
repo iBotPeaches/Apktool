@@ -43,7 +43,7 @@ public class EmptyResourcesArscTest {
         sTestOrigDir = new ExtFile(sTmpDir, "issue1730-orig");
         sTestNewDir = new ExtFile(sTmpDir, "issue1730-new");
         LOGGER.info("Unpacking issue1730.apk...");
-        TestUtils.copyResourceDir(EmptyResourcesArscTest.class, "brut/apktool/aapt1/issue1730", sTestOrigDir);
+        TestUtils.copyResourceDir(EmptyResourcesArscTest.class, "aapt1/issue1730", sTestOrigDir);
 
         File testApk = new File(sTestOrigDir, "issue1730.apk");
 

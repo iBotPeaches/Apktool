@@ -44,7 +44,7 @@ public class DebugTagRetainedTest extends BaseTest {
         sTestOrigDir = new ExtFile(sTmpDir, "issue1235-orig");
         sTestNewDir = new ExtFile(sTmpDir, "issue1235-new");
         LOGGER.info("Unpacking issue1235...");
-        TestUtils.copyResourceDir(DebugTagRetainedTest.class, "brut/apktool/aapt1/issue1235/", sTestOrigDir);
+        TestUtils.copyResourceDir(DebugTagRetainedTest.class, "aapt1/issue1235/", sTestOrigDir);
 
         LOGGER.info("Building issue1235.apk...");
         ApkOptions apkOptions = new ApkOptions();

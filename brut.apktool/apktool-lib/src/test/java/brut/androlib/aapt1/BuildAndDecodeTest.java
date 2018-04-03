@@ -49,7 +49,7 @@ public class BuildAndDecodeTest extends BaseTest {
         sTestOrigDir = new ExtFile(sTmpDir, "testapp-orig");
         sTestNewDir = new ExtFile(sTmpDir, "testapp-new");
         LOGGER.info("Unpacking testapp...");
-        TestUtils.copyResourceDir(BuildAndDecodeTest.class, "brut/apktool/aapt1/testapp/", sTestOrigDir);
+        TestUtils.copyResourceDir(BuildAndDecodeTest.class, "aapt1/testapp/", sTestOrigDir);
 
         LOGGER.info("Building testapp.apk...");
         File testApk = new File(sTmpDir, "testapp.apk");

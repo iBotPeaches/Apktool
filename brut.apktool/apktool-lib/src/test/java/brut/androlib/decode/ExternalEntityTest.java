@@ -42,7 +42,7 @@ public class ExternalEntityTest extends BaseTest {
     @BeforeClass
     public static void beforeClass() throws Exception {
         sTestOrigDir = new ExtFile(OS.createTempDirectory());
-        TestUtils.copyResourceDir(ExternalEntityTest.class, "brut/apktool/decode/doctype/", sTestOrigDir);
+        TestUtils.copyResourceDir(ExternalEntityTest.class, "decode/doctype/", sTestOrigDir);
 
         LOGGER.info("Building doctype.apk...");
         File testApk = new File(sTestOrigDir, "doctype.apk");

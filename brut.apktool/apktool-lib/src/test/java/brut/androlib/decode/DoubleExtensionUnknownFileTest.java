@@ -43,7 +43,7 @@ public class DoubleExtensionUnknownFileTest extends BaseTest {
     public static void beforeClass() throws Exception {
         TestUtils.cleanFrameworkFile();
         sTmpDir = new ExtFile(OS.createTempDirectory());
-        TestUtils.copyResourceDir(DoubleExtensionUnknownFileTest.class, "brut/apktool/decode/issue1244/", sTmpDir);
+        TestUtils.copyResourceDir(DoubleExtensionUnknownFileTest.class, "decode/issue1244/", sTmpDir);
     }
 
     @AfterClass

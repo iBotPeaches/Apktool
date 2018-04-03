@@ -48,7 +48,7 @@ public class ForceManifestDecodeNoResourcesTest extends BaseTest {
     public static void beforeClass() throws Exception {
         TestUtils.cleanFrameworkFile();
         sTmpDir = new ExtFile(OS.createTempDirectory());
-        TestUtils.copyResourceDir(ForceManifestDecodeNoResourcesTest.class, "brut/apktool/decode/issue1680/", sTmpDir);
+        TestUtils.copyResourceDir(ForceManifestDecodeNoResourcesTest.class, "decode/issue1680/", sTmpDir);
     }
 
     @AfterClass
