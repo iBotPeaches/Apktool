@@ -97,6 +97,16 @@ public class BrutIO {
         return canonicalEntryPath.substring(canonicalDirPath.length());
     }
 
+    public static String normalizePath(String path) {
+        char separator = File.separatorChar;
+
+        if (separator != '/') {
+            return path.replace(separator, '/');
+        }
+
+        return path;
+    }
+
     public static void copy(File inputFile, ZipOutputStream outputFile) throws IOException {
         try (
                 FileInputStream fis = new FileInputStream(inputFile)
