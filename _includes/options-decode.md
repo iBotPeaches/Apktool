@@ -1,6 +1,6 @@
 These are all the options when decoding an apk.
 <br /><br />
-<strong><kbd>--api &lt;API></kbd></strong>
+<strong><kbd>-api, --api-level &lt;API></kbd></strong>
 <blockquote>The numeric api-level of the smali files to generate (defaults to targetSdkVersion)</blockquote>
 <br />
 <strong><kbd>-b, --no-debug-info</kbd></strong>
@@ -9,7 +9,7 @@ These are all the options when decoding an apk.
 <strong><kbd>-f, --force</kbd></strong>
 <blockquote>Force delete destination directory. Use when trying to decode to a folder that already exists</blockquote>
 <br />
-<strong><kbd>--force-manifest</kbd></strong>
+<strong><kbd>--force-manifest</kbd> - <span class="label label-success">v2.3.1</span></strong>
 <blockquote>Forces decode of AndroidManifest regardless of decoding of resources flag.</blockquote>
 <br />
 <strong><kbd>--keep-broken-res</kbd></strong> - <span class="label label-danger">Advanced</span>
@@ -18,7 +18,7 @@ These are all the options when decoding an apk.
 <strong><kbd>-m, --match-original</kbd></strong> - <span class="label label-info">Used for analysis</span>
 <blockquote>Matches files closest as possible to original, but <strong>prevents</strong> rebuild.</blockquote>
 <br />
-<strong><kbd>--no-assets</kbd></strong>
+<strong><kbd>--no-assets</kbd> - <span class="label label-success">v2.3.0</span></strong>
 <blockquote>Prevents decoding/copying of unknown asset files.</blockquote>
 <br />
 <strong><kbd>-o, --output &lt;DIR></kbd></strong>
