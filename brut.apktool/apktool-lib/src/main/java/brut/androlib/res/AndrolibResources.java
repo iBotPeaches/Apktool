@@ -651,16 +651,6 @@ final public class AndrolibResources {
         return it.next().contains("0x01");
     }
 
-    public void tagSmaliResIDs(ResTable resTable, File smaliDir)
-            throws AndrolibException {
-        new ResSmaliUpdater().tagResIDs(resTable, smaliDir);
-    }
-
-    public void updateSmaliResIDs(ResTable resTable, File smaliDir)
-            throws AndrolibException {
-        new ResSmaliUpdater().updateResIDs(resTable, smaliDir);
-    }
-
     public Duo<ResFileDecoder, AXmlResourceParser> getResFileDecoder() {
         ResStreamDecoderContainer decoders = new ResStreamDecoderContainer();
         decoders.setDecoder("raw", new ResRawStreamDecoder());
