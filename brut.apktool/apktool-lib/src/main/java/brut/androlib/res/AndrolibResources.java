@@ -601,7 +601,7 @@ final public class AndrolibResources {
             throws AndrolibException {
 
         try {
-            ZipUtils.zipFolders(rawDir, apkFile, assetDir, apkOptions.doNotCompress);
+            ZipUtils.zipFolders(rawDir, apkFile, assetDir, apkOptions.noCompressAssets);
         } catch (IOException | BrutException ex) {
             throw new AndrolibException(ex);
         }
