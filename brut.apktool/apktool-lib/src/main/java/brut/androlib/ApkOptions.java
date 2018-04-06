@@ -28,7 +28,10 @@ public class ApkOptions {
     public boolean isFramework = false;
     public boolean resourcesAreCompressed = false;
     public boolean useAapt2 = false;
+
+    @Deprecated
     public Collection<String> doNotCompress;
+    public Collection<String> noCompressAssets;
 
     public String frameworkFolderLocation = null;
     public String frameworkTag = null;
