@@ -692,10 +692,6 @@ public class Androlib {
             if (inputFile.isDirectory()) {
                 continue;
             }
-            if (! inputFile.isFile()) {
-                LOGGER.warning(String.format("File could not be located: %s", normalizedPath));
-                continue;
-            }
 
             LOGGER.fine(String.format("Copying uncompressed asset: %s", normalizedPath));
             ZipEntry newEntry = getStoredZipEntry(normalizedPath, inputFile);
