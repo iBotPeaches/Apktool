@@ -15,6 +15,7 @@ description: Apktool - Changelog / Roadmap
  * Added warning if application is non-zero typeIdOffset is discovered.
  * Update to baksmali v2.2.2
  * Support for treating additional photo extensions as raw (m4a)
+ * Prevent temporary BRUT files from clogging temp directories.
 
 ## v2.3.1
 2017.12.26
