@@ -16,6 +16,7 @@
  */
 package brut.androlib.res.data;
 
+import brut.util.BrutIO;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -27,7 +28,7 @@ public class ResUnknownFiles {
     private final Map<String, String> mUnknownFiles = new LinkedHashMap<>();
 
     public void addUnknownFileInfo(String file, String value) {
-        mUnknownFiles.put(file, value);
+        mUnknownFiles.put(BrutIO.normalizePath(file), value);
     }
 
     public Map<String, String> getUnknownFiles() {

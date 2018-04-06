@@ -652,7 +652,8 @@ public class Androlib {
 
         // loop through unknown files
         for (Map.Entry<String,String> unknownFileInfo : files.entrySet()) {
-            String cleanedPath = BrutIO.sanitizeUnknownFile(unknownFileDir, unknownFileInfo.getKey());
+            String normalizedPath = BrutIO.normalizePath(unknownFileInfo.getKey());
+            String cleanedPath = BrutIO.sanitizeUnknownFile(unknownFileDir, normalizedPath);
             File inputFile = new File(unknownFileDir, cleanedPath);
             if (inputFile.isDirectory()) {
                 continue;
@@ -683,15 +684,16 @@ public class Androlib {
         File assetFileDir = new File(appDir, ASSET_DIRNAME);
 
         for (String asset : files) {
-            String cleanedPath = BrutIO.sanitizeUnknownFile(assetFileDir, asset);
+            String normalizedPath = BrutIO.normalizePath(asset);
+            String cleanedPath = BrutIO.sanitizeUnknownFile(assetFileDir, normalizedPath);
 
             File inputFile = new File(appDir, cleanedPath);
             if (inputFile.isDirectory()) {
                 continue;
             }
 
-            LOGGER.fine(String.format("Copying uncompressed asset: %s", asset));
-            ZipEntry newEntry = getStoredZipEntry(cleanedPath, inputFile);
+            LOGGER.fine(String.format("Copying uncompressed asset: %s", normalizedPath));
+            ZipEntry newEntry = getStoredZipEntry(normalizedPath, inputFile);
             outputFile.putNextEntry(newEntry);
             BrutIO.copy(inputFile, outputFile);
             outputFile.closeEntry();
