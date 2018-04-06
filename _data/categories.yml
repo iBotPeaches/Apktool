@@ -24,5 +24,6 @@
 - title: Options
   subs:
     - Utility
+    - Empty Framework Dir
     - Decode
     - Rebuild
