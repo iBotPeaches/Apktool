@@ -1006,7 +1006,7 @@ final public class AndrolibResources {
 
     private final static String[] IGNORED_PACKAGES = new String[] {
             "android", "com.htc", "miui", "com.lge", "com.lge.internal", "yi", "com.miui.core", "flyme",
-            "air.com.adobe.appentry" };
+            "air.com.adobe.appentry", "FFFFFFFFFFFFFFFFFFFFFF" };
 
     private final static String[] ALLOWED_PACKAGES = new String[] {
             "com.miui" };
