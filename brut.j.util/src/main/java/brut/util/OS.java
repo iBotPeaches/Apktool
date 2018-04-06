@@ -122,6 +122,7 @@ public class OS {
     public static File createTempDirectory() throws BrutException {
         try {
             File tmp = File.createTempFile("BRUT", null);
+            tmp.deleteOnExit();
             if (!tmp.delete()) {
                 throw new BrutException("Could not delete tmp file: " + tmp.getAbsolutePath());
             }
