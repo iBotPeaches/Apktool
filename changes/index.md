@@ -5,13 +5,13 @@ description: Apktool - Changelog / Roadmap
 ---
 
 ## v2.3.2
-2018.xx.xx
+2018.04.07
 
+ * **Android P Preview Support** ([Issue 1742](https://github.com/iBotPeaches/Apktool/issues/1742))
  * Initial support for rebuilding with aapt2 binary ([Issue 1689](https://github.com/iBotPeaches/Apktool/issues/1689))
  * Fixed issue with application with empty resources.arsc file ([Issue 1730](https://github.com/iBotPeaches/Apktool/issues/1730))
  * Fixed issue with root depth kotlin folder ([Issue 1703](https://github.com/iBotPeaches/Apktool/issues/1703))
  * Fixed building Apktool on Windows. ([Issue 1741](https://github.com/iBotPeaches/Apktool/issues/1741))
- * Fixed command too long issue on Windows. ([Issue 1272](https://github.com/iBotPeaches/Apktool/issues/1272))
  * Added warning if application is non-zero typeIdOffset is discovered.
  * Update to baksmali v2.2.2
  * Support for treating additional photo extensions as raw (m4a)
