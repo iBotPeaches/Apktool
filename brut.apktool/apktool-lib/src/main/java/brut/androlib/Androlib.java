@@ -168,21 +168,19 @@ public class Androlib {
             String ext;
 
             for (String file : files) {
-                if (isAPKFileNames(file) && !NO_COMPRESS_PATTERN.matcher(file).find()) {
-                    if (unk.getCompressionLevel(file) == 0) {
+                if (isAPKFileNames(file) && unk.getCompressionLevel(file) == 0) {
 
-                        if (StringUtils.countMatches(file, ".") > 1) {
+                    if (StringUtils.countMatches(file, ".") > 1) {
+                        ext = file;
+                    } else {
+                        ext = FilenameUtils.getExtension(file);
+                        if (ext.isEmpty()) {
                             ext = file;
-                        } else {
-                            ext = FilenameUtils.getExtension(file);
-                            if (ext.isEmpty()) {
-                                ext = file;
-                            }
                         }
+                    }
 
-                        if (! uncompressedFilesOrExts.contains(ext)) {
-                            uncompressedFilesOrExts.add(ext);
-                        }
+                    if (!uncompressedFilesOrExts.contains(ext)) {
+                        uncompressedFilesOrExts.add(ext);
                     }
                 }
             }
@@ -789,9 +787,4 @@ public class Androlib {
     private final static String[] APK_STANDARD_ALL_FILENAMES = new String[] {
             "classes.dex", "AndroidManifest.xml", "resources.arsc", "res", "r", "R",
             "lib", "libs", "assets", "META-INF", "kotlin" };
-    // Taken from AOSP's frameworks/base/tools/aapt/Package.cpp
-    private final static Pattern NO_COMPRESS_PATTERN = Pattern.compile("\\.(" +
-            "jpg|jpeg|png|gif|wav|mp2|mp3|ogg|aac|mpg|mpeg|mid|midi|smf|jet|rtttl|imy|xmf|mp4|" +
-            "m4a|m4v|3gp|3gpp|3g2|3gpp2|amr|awb|wma|wmv|webm|mkv)$");
-
 }
