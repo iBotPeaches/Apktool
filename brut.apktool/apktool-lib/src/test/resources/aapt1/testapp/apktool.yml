@@ -10,6 +10,10 @@ versionInfo:
   versionCode: '1'
   versionName: '1.0'
 compressionType: false
+doNotCompress:
+- arsc
+- png
+- mp3
 unknownFiles:
   hidden.file: '8'
   non\u007Fprintable.file: '8'
