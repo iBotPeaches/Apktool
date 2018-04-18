@@ -1,7 +1,7 @@
 These are all the options when building an apk.
 <br /><br />
 <strong><kbd>-a, --aapt &lt;FILE></kbd></strong>
-<blockquote>Loads aapt from the specified file location, instead of relying on path. Falls back to <kbd>$PATH</kbd> loading, if no file found</blockquote>
+<blockquote>Loads aapt from the specified file location, instead of relying on path. Falls back to <kbd>$PATH</kbd> loading, if no file found. Unless <kbd>$PATH</kbd> references prebuilt custom aapt. This will more than likely not work.</blockquote>
 <br />
 <strong><kbd>-c, --copy-original</kbd></strong>
 <blockquote>Copies original <kbd>AndroidManifest.xml</kbd> and <kbd>META-INF</kbd> folder into built apk. Scheduled for <strong>deprecation</strong>.</blockquote>
