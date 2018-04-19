@@ -82,6 +82,18 @@ public class AaptManager {
         return "aapt" + (version == 2 ? "2" : "");
     }
 
+    public static int getAppVersionFromString(String version) throws BrutException {
+        if (version.startsWith("Android Asset Packaging Tool (aapt) 2:")) {
+            return 2;
+        } else if (version.startsWith("Android Asset Packaging Tool (aapt) 2.")) {
+            return 2; // Prior to Android SDK 26.0.2
+        } else if (version.startsWith("Android Asset Packaging Tool, v0.")) {
+            return 1;
+        }
+
+        throw new BrutException("aapt version could not be identified: " + version);
+    }
+
     public static int getApptVersion(File aapt) throws BrutException {
         if (!aapt.isFile()) {
             throw new BrutException("Could not identify aapt binary as executable.");
@@ -98,12 +110,6 @@ public class AaptManager {
             throw new BrutException("Could not execute aapt binary at location: " + aapt.getAbsolutePath());
         }
 
-        if (version.startsWith("Android Asset Packaging Tool (aapt) 2:")) {
-            return 2;
-        } else if (version.startsWith("Android Asset Packaging Tool, v0.")) {
-            return 1;
-        }
-
-        throw new BrutException("aapt version could not be identified: " + version);
+        return getAppVersionFromString(version);
     }
 }
