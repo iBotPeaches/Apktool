@@ -4,10 +4,11 @@ title: Apktool - Changelog
 description: Apktool - Changelog / Roadmap
 ---
 
-## v2.3.3 (in development)
-2018.xx.xx
+## v2.3.3
+2018.04.26
 
  * Fixed regression with compressing default AOSP filetypes like mp3. ([Issue 1769](https://github.com/iBotPeaches/Apktool/issues/1769))
+ * Fixed detection of aapt2 builds older than certain SDK versions. ([Issue 1774](https://github.com/iBotPeaches/Apktool/issues/1774))
 
 ## v2.3.2
 2018.04.07
