@@ -222,7 +222,10 @@ to get the source downloaded. This is no small download, expect to use 40-60GB.
 After that, you need to build AOSP via this [documentation](https://source.android.com/source/building.html) guide. Now
 we aren't building the entire AOSP package, the initial build is to just see if you are capable of building it.
 
-We check out a certain tag. Currently we use `android-8.1.0_r23`.
+We check out a certain tag. Currently we use 
+
+ * aapt2 - `master#05c09faad2ab67ada8d354440680d40176841b6c`.
+ * aapt1 - `android-8.1.0_r9`.
 
 ### Including our modified `frameworks/base` package.
 

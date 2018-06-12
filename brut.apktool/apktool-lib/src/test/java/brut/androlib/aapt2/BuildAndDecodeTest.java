@@ -73,6 +73,11 @@ public class BuildAndDecodeTest extends BaseTest {
     }
 
     @Test
+    public void navigationResourceTest() throws BrutException {
+        compareXmlFiles("res/navigation/nav_graph.xml");
+    }
+
+    @Test
     public void confirmManifestStructureTest() throws BrutException {
         compareXmlFiles("AndroidManifest.xml");
     }
