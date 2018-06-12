@@ -9,7 +9,7 @@ description: Apktool - Changelog / Roadmap
 
  * Fixed regression with compressing default AOSP filetypes like mp3. ([Issue 1769](https://github.com/iBotPeaches/Apktool/issues/1769))
  * Fixed detection of aapt2 builds older than certain SDK versions. ([Issue 1774](https://github.com/iBotPeaches/Apktool/issues/1774))
-
+ * Fixed issue with rebuilding applications with `$` or `_` characters (aapt2 only). ([Issue 1776](https://github.com/iBotPeaches/Apktool/issues/1776))
 ## v2.3.2
 2018.04.07
 
