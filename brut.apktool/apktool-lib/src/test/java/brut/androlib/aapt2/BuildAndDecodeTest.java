@@ -78,6 +78,11 @@ public class BuildAndDecodeTest extends BaseTest {
     }
 
     @Test
+    public void leadingDollarSignResourceNameTest() throws BrutException {
+        compareXmlFiles("res/drawable/$avd_hide_password__0.xml");
+    }
+
+    @Test
     public void confirmManifestStructureTest() throws BrutException {
         compareXmlFiles("AndroidManifest.xml");
     }
