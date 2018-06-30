@@ -4,13 +4,17 @@ title: Apktool - Changelog
 description: Apktool - Changelog / Roadmap
 ---
 
+## v2.2.4 (in development)
+2018.xx.xx 
+
+ * Fixed issue with rebuilding applications with `$` or `_` characters (aapt2 only). ([Issue 1776](https://github.com/iBotPeaches/Apktool/issues/1776))
+ * Updated aapt2 to latest version to handle various edge cases. ([Issue 1817](https://github.com/iBotPeaches/Apktool/issues/1817))
+
 ## v2.3.3
 2018.04.26
 
  * Fixed regression with compressing default AOSP filetypes like mp3. ([Issue 1769](https://github.com/iBotPeaches/Apktool/issues/1769))
  * Fixed detection of aapt2 builds older than certain SDK versions. ([Issue 1774](https://github.com/iBotPeaches/Apktool/issues/1774))
- * Fixed issue with rebuilding applications with `$` or `_` characters (aapt2 only). ([Issue 1776](https://github.com/iBotPeaches/Apktool/issues/1776))
- * Updated aapt2 to latest version to handle various edge cases. ([Issue 1817](https://github.com/iBotPeaches/Apktool/issues/1817))
 
 ## v2.3.2
 2018.04.07
