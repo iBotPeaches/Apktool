@@ -4,7 +4,7 @@ title: Apktool - Changelog
 description: Apktool - Changelog / Roadmap
 ---
 
-## v2.2.4 (in development)
+## v2.3.4 (in development)
 2018.xx.xx 
 
  * Fixed issue with rebuilding applications with `$` or `_` characters (aapt2 only). ([Issue 1776](https://github.com/iBotPeaches/Apktool/issues/1776))
