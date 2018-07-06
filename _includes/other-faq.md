@@ -5,7 +5,7 @@ Read <a href="https://github.com/iBotPeaches/Apktool/issues/199">Issue 199</a>. 
 <br /><br />
 <strong>Is it possible to run apktool on a device?</strong>
 <br />
-Sadly not. There are some incompatibilities with <code>SnakeYAML</code>, <code>java.nio</code> and <code>aapt</code>
+Sadly not. There are some incompatibilities with running the <code>aapt</code> binary on the device. Additionally, older builds of Android have problems with <code>java.nio</code>.
 <br /><br />
 <strong>Where can I download sources of apktool?</strong>
 <br />
