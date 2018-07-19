@@ -168,7 +168,9 @@ public class Androlib {
             String ext;
 
             for (String file : files) {
-                if (isAPKFileNames(file) && unk.getCompressionLevel(file) == 0) {
+                if (isAPKFileNames(file) &&
+                    unk.getCompressionLevel(file) == 0 &&
+                    unk.getSize(file) != 0) {
 
                     if (StringUtils.countMatches(file, ".") > 1) {
                         ext = file;
