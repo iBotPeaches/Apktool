@@ -41,6 +41,22 @@ public class FileDirectory extends AbstractDirectory {
     }
 
     @Override
+    public long getSize(String fileName)
+            throws DirectoryException {
+        File file = new File(generatePath(fileName));
+        if (! file.isFile()) {
+            throw new DirectoryException("file must be a file: " + file);
+        }
+        return file.length();
+    }
+
+    @Override
+    public long getCompressedSize(String fileName)
+            throws DirectoryException {
+        return getSize(fileName);
+    }
+
+    @Override
     protected AbstractDirectory createDirLocal(String name) throws DirectoryException {
         File dir = new File(generatePath(name));
         dir.mkdir();
