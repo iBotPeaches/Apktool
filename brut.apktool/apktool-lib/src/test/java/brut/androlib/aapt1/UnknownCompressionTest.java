@@ -88,7 +88,7 @@ public class UnknownCompressionTest extends BaseTest {
     @Test
     public void confirmJsonFileIsDeflatedTest() throws BrutException, IOException {
         Integer control = sTestOrigDir.getDirectory().getCompressionLevel("test.json");
-        Integer rebuilt = sTestOrigDir.getDirectory().getCompressionLevel("test.json");
+        Integer rebuilt = sTestNewDir.getDirectory().getCompressionLevel("test.json");
 
         assertEquals(control, rebuilt);
         assertEquals(new Integer(8), rebuilt);
@@ -97,7 +97,7 @@ public class UnknownCompressionTest extends BaseTest {
     @Test
     public void confirmPngFileIsCorrectlyDeflatedTest() throws BrutException, IOException {
         Integer control = sTestOrigDir.getDirectory().getCompressionLevel("950x150.png");
-        Integer rebuilt = sTestOrigDir.getDirectory().getCompressionLevel("950x150.png");
+        Integer rebuilt = sTestNewDir.getDirectory().getCompressionLevel("950x150.png");
 
         assertEquals(control, rebuilt);
         assertEquals(new Integer(8), rebuilt);
