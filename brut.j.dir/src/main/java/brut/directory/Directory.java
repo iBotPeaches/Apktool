@@ -47,6 +47,10 @@ public interface Directory {
     public void copyToDir(File out, String fileName)
         throws DirectoryException;
 
+    public long getSize(String fileName)
+            throws DirectoryException;
+    public long getCompressedSize(String fileName)
+            throws DirectoryException;
     public int getCompressionLevel(String fileName)
             throws DirectoryException;
 

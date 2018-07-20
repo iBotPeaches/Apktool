@@ -101,13 +101,33 @@ public class ZipRODirectory extends AbstractDirectory {
     }
 
     @Override
+    public long getSize(String fileName)
+            throws DirectoryException {
+        ZipEntry entry = getZipFileEntry(fileName);
+        return entry.getSize();
+    }
+
+    @Override
+    public long getCompressedSize(String fileName)
+            throws DirectoryException {
+        ZipEntry entry = getZipFileEntry(fileName);
+        return entry.getCompressedSize();
+    }
+
+    @Override
     public int getCompressionLevel(String fileName)
             throws DirectoryException {
-        ZipEntry entry =  mZipFile.getEntry(fileName);
+        ZipEntry entry = getZipFileEntry(fileName);
+        return entry.getMethod();
+    }
+
+    private ZipEntry getZipFileEntry(String fileName)
+            throws DirectoryException {
+        ZipEntry entry = mZipFile.getEntry(fileName);
         if (entry == null) {
             throw new PathNotExist("Entry not found: " + fileName);
         }
-        return entry.getMethod();
+        return entry;
     }
 
     private void loadAll() {
