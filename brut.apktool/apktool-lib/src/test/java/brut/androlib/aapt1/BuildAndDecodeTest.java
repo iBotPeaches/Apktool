@@ -20,6 +20,7 @@ import brut.androlib.Androlib;
 import brut.androlib.ApkDecoder;
 import brut.androlib.BaseTest;
 import brut.androlib.TestUtils;
+import brut.androlib.meta.MetaInfo;
 import brut.directory.ExtFile;
 import brut.common.BrutException;
 import brut.util.OS;
@@ -478,6 +479,15 @@ public class BuildAndDecodeTest extends BaseTest {
                             controlImage.getRGB(0, i), testImage.getRGB(0, i));
                 }
             }
+        }
+    }
+
+    @Test
+    public void confirmZeroByteFileIsNotStored() throws BrutException {
+        MetaInfo metaInfo = new Androlib().readMetaFile(sTestNewDir);
+
+        for (String item : metaInfo.doNotCompress) {
+            assertNotSame(item, "empty");
         }
     }
 

@@ -17,6 +17,7 @@
 package brut.androlib.aapt2;
 
 import brut.androlib.*;
+import brut.androlib.meta.MetaInfo;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
 import brut.util.OS;
@@ -70,6 +71,12 @@ public class BuildAndDecodeTest extends BaseTest {
     @Test
     public void valuesStringsTest() throws BrutException {
         compareValuesFiles("values/strings.xml");
+    }
+
+    @Test
+    public void confirmZeroByteFileIsNotStored() throws BrutException {
+        MetaInfo metaInfo = new Androlib().readMetaFile(sTestNewDir);
+        assertNull(metaInfo.doNotCompress);
     }
 
     @Test
