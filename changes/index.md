@@ -8,6 +8,7 @@ description: Apktool - Changelog / Roadmap
 2018.xx.xx 
 
  * Fixed issue with rebuilding applications with `$` or `_` characters (aapt2 only). ([Issue 1776](https://github.com/iBotPeaches/Apktool/issues/1776))
+ * Fixed process executor to wait for response (15 seconds) in the case of identifying aapt version. ([Issue 1809](https://github.com/iBotPeaches/Apktool/issues/1809)) / Thanks sunshouxiang
  * Fixed issue with 0 size file being marked as doNotCompress. ([Issue 1843](https://github.com/iBotPeaches/Apktool/issues/1843)) /  Thanks alexeikh
  * Updated aapt2 to latest version to handle various edge cases. ([Issue 1817](https://github.com/iBotPeaches/Apktool/issues/1817))
 
