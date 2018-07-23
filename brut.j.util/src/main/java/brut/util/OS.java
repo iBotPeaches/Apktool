@@ -21,6 +21,7 @@ import java.io.*;
 import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import org.apache.commons.io.IOUtils;
@@ -113,6 +114,12 @@ public class OS {
             executor.execute(collector);
 
             process.waitFor();
+            if (! executor.awaitTermination(15, TimeUnit.SECONDS)) {
+                executor.shutdownNow();
+                if (! executor.awaitTermination(5, TimeUnit.SECONDS)) {
+                    System.err.println("Stream collector did not terminate.");
+                }
+            }
             return collector.get();
         } catch (IOException | InterruptedException e) {
             return null;
