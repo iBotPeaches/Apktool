@@ -39,7 +39,7 @@ progdir=`pwd`
 prog="${progdir}"/`basename "${prog}"`
 cd "${oldwd}"
 
-jarfile=apktool.jar
+jarfile=$(ls | grep apktool_*.jar)
 libdir="$progdir"
 if [ ! -r "$libdir/$jarfile" ]
 then
