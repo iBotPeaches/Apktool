@@ -15,10 +15,12 @@
  *  limitations under the License.
  */
 package brut.util;
+import java.io.*;
 
 public class OSDetection {
     private static String OS = System.getProperty("os.name").toLowerCase();
     private static String Bit = System.getProperty("sun.arch.data.model").toLowerCase();
+    private static String android_linker = "/system/bin/linker64";
 
     public static boolean isWindows() {
         return (OS.contains("win"));
@@ -39,4 +41,26 @@ public class OSDetection {
     public static String returnOS() {
         return OS;
     }
+    public static boolean isAndroid() {
+        return new File(android_linker).exists();
+    }
+    public static String android_arch() {     
+        if(new File(android_linker).exists()){
+            try{
+                InputStream inputStream = new FileInputStream(android_linker);
+                byte[] bytes = new byte[20];
+                inputStream.read(bytes);
+                if(bytes[18] == (byte)62){
+                    return "x86_64";
+                }
+                else if(bytes[18] == (byte)183){
+                    return "aarch64";
+                }
+            }catch(IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+        return "unknown";
+    }
+
 }
