@@ -15,6 +15,7 @@ matrix:
       dist: trusty
       jdk: openjdk8
     - os: osx
+      osx_image: xcode9.2
   allow_failures:
     - jdk: openjdk7
 cache:
