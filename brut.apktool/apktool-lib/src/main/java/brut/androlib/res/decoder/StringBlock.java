@@ -41,7 +41,7 @@ public class StringBlock {
      * be at the chunk type.
      */
     public static StringBlock read(ExtDataInput reader) throws IOException {
-        reader.skipCheckInt(CHUNK_STRINGPOOL_TYPE);
+        reader.skipCheckChunkTypeInt(CHUNK_STRINGPOOL_TYPE, CHUNK_NULL_TYPE);
         int chunkSize = reader.readInt();
 
         // ResStringPool_header
