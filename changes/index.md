@@ -13,6 +13,7 @@ description: Apktool - Changelog / Roadmap
  * Fixed issue with 0 size file being marked as doNotCompress. ([Issue 1843](https://github.com/iBotPeaches/Apktool/issues/1843)) /  Thanks alexeikh
  * Updated aapt2 to latest version to handle various edge cases. ([Issue 1817](https://github.com/iBotPeaches/Apktool/issues/1817))
  * Align the `frameworks/base` project for both `aapt1/aapt2` builds. ([Issue 1889](https://github.com/iBotPeaches/Apktool/issues/1889))
+ * Update to Gradle 5.0 and fix warnings with upgrade. ([Issue 1884](https://github.com/iBotPeaches/Apktool/issues/1884))
 
 ## v2.3.3
 2018.04.26
