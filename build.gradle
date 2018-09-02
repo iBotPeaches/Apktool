@@ -117,7 +117,7 @@ subprojects {
                 snakeyaml: 'org.yaml:snakeyaml:1.18:android',
                 smali: 'org.smali:smali:2.2.2',
                 xmlpull: 'xpp3:xpp3:1.1.4c',
-                xmlunit: 'xmlunit:xmlunit:1.3',
+                xmlunit: 'xmlunit:xmlunit:1.6',
         ]
     }
 

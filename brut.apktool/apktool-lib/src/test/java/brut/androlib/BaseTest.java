@@ -117,6 +117,8 @@ public class BaseTest {
 
             if (qualifier == null) {
                 XMLUnit.setIgnoreWhitespace(true);
+                XMLUnit.setIgnoreAttributeOrder(true);
+                XMLUnit.setCompareUnmatched(false);
                 assertXMLEqual(control, test);
                 return;
             }
