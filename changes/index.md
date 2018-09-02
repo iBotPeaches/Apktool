@@ -12,6 +12,7 @@ description: Apktool - Changelog / Roadmap
  * Fixed process executor to wait for response (15 seconds) in the case of identifying aapt version. ([Issue 1809](https://github.com/iBotPeaches/Apktool/issues/1809)) / Thanks sunshouxiang
  * Fixed issue with 0 size file being marked as doNotCompress. ([Issue 1843](https://github.com/iBotPeaches/Apktool/issues/1843)) /  Thanks alexeikh
  * Updated aapt2 to latest version to handle various edge cases. ([Issue 1817](https://github.com/iBotPeaches/Apktool/issues/1817))
+ * Align the `frameworks/base` project for both `aapt1/aapt2` builds. ([Issue 1889](https://github.com/iBotPeaches/Apktool/issues/1889))
 
 ## v2.3.3
 2018.04.26
