@@ -20,7 +20,8 @@ import java.io.*;
 public class OSDetection {
     private static String OS = System.getProperty("os.name").toLowerCase();
     private static String Bit = System.getProperty("sun.arch.data.model").toLowerCase();
-    private static String android_linker = "/system/bin/linker64";
+    private static String android_linker = "/system/bin/linker";
+    private static String android_linker64 = "/system/bin/linker64";
 
     public static boolean isWindows() {
         return (OS.contains("win"));
@@ -42,12 +43,12 @@ public class OSDetection {
         return OS;
     }
     public static boolean isAndroid() {
-        return new File(android_linker).exists();
+        return new File(android_linker).exists() || new File(android_linker64).exists();
     }
-    public static String android_arch() {     
-        if(new File(android_linker).exists()){
+    public static String android_arch() {
+        if(new File(android_linker64).exists()){
             try{
-                InputStream inputStream = new FileInputStream(android_linker);
+                InputStream inputStream = new FileInputStream(android_linker64);
                 byte[] bytes = new byte[20];
                 inputStream.read(bytes);
                 if(bytes[18] == (byte)62){
@@ -55,6 +56,21 @@ public class OSDetection {
                 }
                 else if(bytes[18] == (byte)183){
                     return "aarch64";
+                }
+            }catch(IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+        else if(new File(android_linker).exists()){
+            try{
+                InputStream inputStream = new FileInputStream(android_linker);
+                byte[] bytes = new byte[20];
+                inputStream.read(bytes);
+                if(bytes[18] == (byte)3){
+                    return "x86";
+                }
+                else if(bytes[18] == (byte)40){
+                    return "arm";
                 }
             }catch(IOException ex) {
                 ex.printStackTrace();
