@@ -4,8 +4,8 @@ title: Apktool - Changelog
 description: Apktool - Changelog / Roadmap
 ---
 
-## v2.3.4 (in development)
-2018.xx.xx 
+## v2.3.4
+2018.09.05
 
  * **Android Pie Final Support** ([Issue 1864](https://github.com/iBotPeaches/Apktool/issues/1864))
  * Fixed issue with rebuilding applications with `$` or `_` characters (aapt2 only). ([Issue 1776](https://github.com/iBotPeaches/Apktool/issues/1776))
