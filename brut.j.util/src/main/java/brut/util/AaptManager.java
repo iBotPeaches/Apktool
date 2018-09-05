@@ -35,7 +35,7 @@ public class AaptManager {
         File aaptBinary;
         String aaptVersion = getAaptBinaryName(version);
 
-        if (! OSDetection.is64Bit() && ! OSDetection.isWindows()) {
+        if (! OSDetection.is64Bit() && ! OSDetection.isWindows() && ! OSDetection.isAndroid()) {
             throw new BrutException("32 bit OS detected. No 32 bit binaries available.");
         }
 
