@@ -4,6 +4,11 @@ title: Apktool - Changelog
 description: Apktool - Changelog / Roadmap
 ---
 
+## v2.4.0 (in development)
+2018.xx.xx
+
+ * Updated baksmali/smali to version 2.2.5 ([Issue 1893](https://github.com/iBotPeaches/Apktool/issues/1893))
+
 ## v2.3.4
 2018.09.05
 
