@@ -1,5 +1,6 @@
 env:
    - TERM=dumb
+   - GROOVY_TURN_OFF_JAVA_WARNINGS=true
 language: java
 dist: trusty
 matrix:
