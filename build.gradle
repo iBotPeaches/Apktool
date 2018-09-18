@@ -39,8 +39,8 @@ defaultTasks 'build', 'shadowJar', 'proguard'
 allprojects {
     apply plugin: 'java'
     apply plugin: 'license'
-    sourceCompatibility = JavaVersion.VERSION_1_7
-    targetCompatibility = JavaVersion.VERSION_1_7
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 
     license {
         header rootProject.file("brut.j.common/src/templates/apache2.0-header.txt")
@@ -88,11 +88,11 @@ if (!('release' in gradle.startParameter.taskNames)) {
 build.doFirst {
     def javaVersion = System.getProperty("java.version")
 
-    //fail the build if we java 1.5 or 1.6.
-    if (javaVersion.startsWith("1.5") || javaVersion.startsWith("1.6")) {
+    // fail the build if java (1.5/1.6/1.7)
+    if (javaVersion.startsWith("1.5") || javaVersion.startsWith("1.6") || javaVersion.startsWith("1.7")) {
         throw new GradleException("You can fix this problem!\n" +
                 "We found a " + javaVersion + " JDK\n" +
-                "Please update JAVA_HOME to use at least a 1.7 JDK\n" +
+                "Please update JAVA_HOME to use at least a 1.8 JDK\n" +
                 "Currently it is set to: " + System.getProperty("java.home")
         );
     }
@@ -113,7 +113,7 @@ subprojects {
                 commons_lang: 'org.apache.commons:commons-lang3:3.1',
                 guava: 'com.google.guava:guava:14.0',
                 junit: 'junit:junit:4.12',
-                proguard_gradle: 'net.sf.proguard:proguard-gradle:5.2.1',
+                proguard_gradle: 'net.sf.proguard:proguard-gradle:6.0.3',
                 snakeyaml: 'org.yaml:snakeyaml:1.18:android',
                 smali: 'org.smali:smali:2.2.5',
                 xmlpull: 'xpp3:xpp3:1.1.4c',
@@ -130,4 +130,9 @@ subprojects {
             exceptionFormat = 'full'
         }
     }
+}
+
+wrapper {
+    gradleVersion = '4.10'
+    distributionType = Wrapper.DistributionType.ALL
 }
