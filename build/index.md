@@ -18,7 +18,7 @@ The main project can be found below
 [https://github.com/iBotPeaches/Apktool](https://github.com/iBotPeaches/Apktool)
 
 ### Requirements
-  * JDK (7 or 8). No OpenJDK
+  * JDK8 (Oracle or OpenJDK)
   * git
 
 ### Build Steps
