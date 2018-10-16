@@ -74,6 +74,13 @@ public abstract class ResScalarValue extends ResIntBasedValue implements
 
         String body = encodeAsResXmlValue();
 
+        //id should not have content
+        //but every now and then there is something, explained by this
+        //https://stackoverflow.com/a/26073822/2527077
+        if ( "id".equals ( type ) && body != null && !body.isEmpty () ) {
+            body = "";
+        }
+
         // check for resource reference
         if (!type.equalsIgnoreCase("color")) {
             if (body.contains("@")) {
