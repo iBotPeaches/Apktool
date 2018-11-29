@@ -175,7 +175,7 @@ public class ApkDecoder {
             mAndrolib.writeOriginalFiles(mApkFile, outDir);
             writeMetaFile();
         } catch (Exception ex) {
-            throw ex;
+            Logger.getGlobal().warning(ex.getMessage());
         } finally {
             try {
                 mApkFile.close();

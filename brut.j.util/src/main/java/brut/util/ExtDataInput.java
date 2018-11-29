@@ -17,6 +17,7 @@
 package brut.util;
 
 import java.io.*;
+import java.util.logging.Logger;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
@@ -45,23 +46,23 @@ public class ExtDataInput extends DataInputDelegate {
     public void skipCheckInt(int expected) throws IOException {
         int got = readInt();
         if (got != expected) {
-            throw new IOException(String.format(
-                "Expected: 0x%08x, got: 0x%08x", expected, got));
+            Logger.getGlobal().warning(String.format(
+                    "Expected: 0x%08x, got: 0x%08x", expected, got));
         }
     }
 
     public void skipCheckShort(short expected) throws IOException {
         short got = readShort();
         if (got != expected) {
-            throw new IOException(String.format(
-                "Expected: 0x%08x, got: 0x%08x", expected, got));
+            Logger.getGlobal().warning(String.format(
+                    "Expected: 0x%08x, got: 0x%08x", expected, got));
         }
     }
 
     public void skipCheckByte(byte expected) throws IOException {
         byte got = readByte();
         if (got != expected) {
-            throw new IOException(String.format(
+            Logger.getGlobal().warning(String.format(
                     "Expected: 0x%08x, got: 0x%08x", expected, got));
         }
     }
@@ -72,7 +73,8 @@ public class ExtDataInput extends DataInputDelegate {
         if (got == possible || got < expected) {
             skipCheckChunkTypeInt(expected, -1);
         } else if (got != expected) {
-            throw new IOException(String.format("Expected: 0x%08x, got: 0x%08x", expected, got));
+            Logger.getGlobal().warning(String.format(
+                    "Expected: 0x%08x, got: 0x%08x", expected, got));
         }
     }
 
