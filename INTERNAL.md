@@ -194,7 +194,7 @@ is just a guideline but helps me to release a new version every 3 months.
 ### Social Spam
 
 The final step is to send this release into the wild via some social posting. Head to the blog
-where the release post was and send that link to Twiter, Google and whatever else you use.
+where the release post was and send that link to Twitter, Google and whatever else you use.
 
 Relax and watch the bug tracker.
 
