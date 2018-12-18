@@ -254,6 +254,7 @@ we lose the ability to quickly build just the aapt binary. So the Windows proced
 1. `source build/envsetup.sh`
 2. `lunch sdk-eng`
 3. `make OUT_DIR=out-x64 LOCAL_MULTILIB=64 USE_NINJA=false aapt`
+4. `strip out-x64/host/darwin-x86/bin/aapt_64`
 
 As of Android Oreo (API 26) all aapt binaries are 64 bit (With exception of Windows). 
 
@@ -274,7 +275,7 @@ we lose the ability to quickly build just the aapt2 binary. So the Windows proce
 1. `export ANDROID_JAVA_HOME=/Path/To/Jdk`
 2. `source build/envsetup.sh`
 3. `make OUT_DIR=out-x64 LOCAL_MULTILIB=64 USE_NINJA=false aapt2`
-4. `strip out-x64/host/darwin-x86/bin/aapt2`
+4. `strip out-x64/host/darwin-x86/bin/aapt2_64`
 
 #### Confirming aapt/aapt2 builds are static
 
