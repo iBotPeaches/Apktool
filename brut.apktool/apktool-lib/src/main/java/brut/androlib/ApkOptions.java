@@ -28,6 +28,7 @@ public class ApkOptions {
     public boolean isFramework = false;
     public boolean resourcesAreCompressed = false;
     public boolean useAapt2 = false;
+    public boolean noCrunch = false;
     public Collection<String> doNotCompress;
 
     public String frameworkFolderLocation = null;
