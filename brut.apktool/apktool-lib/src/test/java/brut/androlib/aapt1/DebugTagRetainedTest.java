@@ -20,17 +20,19 @@ import brut.androlib.*;
 import brut.directory.ExtFile;
 import brut.common.BrutException;
 import brut.util.OS;
+import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.xml.sax.SAXException;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 
 /**
  * @author Connor Tumbleson <connor.tumbleson@gmail.com>
@@ -70,16 +72,21 @@ public class DebugTagRetainedTest extends BaseTest {
     }
 
     @Test
-    public void DebugIsTruePriorToBeingFalseTest() throws IOException {
+    public void DebugIsTruePriorToBeingFalseTest() throws IOException, SAXException {
         String apk = "issue1235-new";
 
-        String expected = TestUtils.replaceNewlines("<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"no\"?>\n" +
-                "<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\" package=\"com.ibotpeaches.issue1235\" platformBuildVersionCode=\"23\" platformBuildVersionName=\"6.0-2438415\">\n" +
-                "    <application android:debuggable=\"true\"/>" +
-                "</manifest>");
+        String expected = TestUtils.replaceNewlines("<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"no\"?>" +
+                "<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\" android:compileSdkVersion=\"23\" " +
+                "android:compileSdkVersionCodename=\"6.0-2438415\" package=\"com.ibotpeaches.issue1235\" platformBuildVersionCode=\"23\" " +
+                "platformBuildVersionName=\"6.0-2438415\">    <application android:debuggable=\"true\"/></manifest>");
 
         byte[] encoded = Files.readAllBytes(Paths.get(sTmpDir + File.separator + apk + File.separator + "AndroidManifest.xml"));
         String obtained = TestUtils.replaceNewlines(new String(encoded));
-        assertEquals(expected, obtained);
+
+        XMLUnit.setIgnoreWhitespace(true);
+        XMLUnit.setIgnoreAttributeOrder(true);
+        XMLUnit.setCompareUnmatched(false);
+
+        assertXMLEqual(expected, obtained);
     }
 }

@@ -62,11 +62,11 @@ public class ExternalEntityTest extends BaseTest {
     @Test
     public void doctypeTest() throws IOException {
 
-        String expected = TestUtils.replaceNewlines("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
-                "<manifest android:versionCode=\"1\" android:versionName=\"1.0\" hardwareAccelerated=\"true\" package=\"com.ibotpeaches.doctype\" platformBuildVersionCode=\"23\" platformBuildVersionName=\"6.0-2438415\"\n" +
-                "  xmlns:android=\"http://schemas.android.com/apk/res/android\">\n" +
-                "    <supports-screens android:anyDensity=\"true\" android:smallScreens=\"true\" android:normalScreens=\"true\" android:largeScreens=\"true\" android:resizeable=\"true\" android:xlargeScreens=\"true\" />\n" +
-                "</manifest>");
+        String expected = TestUtils.replaceNewlines("<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
+                "<manifest android:versionCode=\"1\" android:versionName=\"1.0\" android:compileSdkVersion=\"23\" android:compileSdkVersionCodename=\"6.0-2438415\" " +
+                "hardwareAccelerated=\"true\" package=\"com.ibotpeaches.doctype\" platformBuildVersionCode=\"23\" platformBuildVersionName=\"6.0-2438415\"  " +
+                "xmlns:android=\"http://schemas.android.com/apk/res/android\">    <supports-screens android:anyDensity=\"true\" android:smallScreens=\"true\" " +
+                "android:normalScreens=\"true\" android:largeScreens=\"true\" android:resizeable=\"true\" android:xlargeScreens=\"true\" /></manifest>");
 
         byte[] encoded = Files.readAllBytes(Paths.get(sTestOrigDir + File.separator + "output" + File.separator + "AndroidManifest.xml"));
         String obtained = TestUtils.replaceNewlines(new String(encoded));
