@@ -225,8 +225,8 @@ we aren't building the entire AOSP package, the initial build is to just see if 
 
 We check out a certain tag. Currently we use 
 
- * aapt2 - `android-9.0.0_r3`.
- * aapt1 - `android-9.0.0_r3`.
+ * aapt2 - `android-9.0.0_r22`.
+ * aapt1 - `android-9.0.0_r22`.
 
 ### Including our modified `frameworks/base` package.
 
