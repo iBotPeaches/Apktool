@@ -101,7 +101,6 @@ public class BuildAndDecodeTest extends BaseTest {
     }
 
     @Test
-    @Ignore
     public void xmlXsdFileTest() throws BrutException {
         compareXmlFiles("res/xml/ww_box_styles_schema.xsd");
     }
