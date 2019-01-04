@@ -199,6 +199,11 @@ public class BuildAndDecodeTest extends BaseTest {
     }
 
     @Test
+    public void xmlIdsEmptyTest() throws BrutException {
+        compareXmlFiles("res/values/ids.xml");
+    }
+
+    @Test
     public void xmlReferenceAttributeTest() throws BrutException {
         compareXmlFiles("res/layout/issue1040.xml");
     }

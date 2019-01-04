@@ -35,17 +35,20 @@ public class AaptManager {
         File aaptBinary;
         String aaptVersion = getAaptBinaryName(version);
 
-        if (! OSDetection.is64Bit() && ! OSDetection.isWindows()) {
+        if (! OSDetection.is64Bit() && OSDetection.isMacOSX()) {
             throw new BrutException("32 bit OS detected. No 32 bit binaries available.");
         }
 
+        // Set the 64 bit flag
+        aaptVersion += OSDetection.is64Bit() ? "_64" : "";
+
         try {
             if (OSDetection.isMacOSX()) {
-                aaptBinary = Jar.getResourceAsFile("/prebuilt/" + aaptVersion + "/macosx/" + aaptVersion, AaptManager.class);
+                aaptBinary = Jar.getResourceAsFile("/prebuilt/macosx/" + aaptVersion, AaptManager.class);
             } else if (OSDetection.isUnix()) {
-                aaptBinary = Jar.getResourceAsFile("/prebuilt/" + aaptVersion + "/linux/" + aaptVersion, AaptManager.class);
+                aaptBinary = Jar.getResourceAsFile("/prebuilt/linux/" + aaptVersion, AaptManager.class);
             } else if (OSDetection.isWindows()) {
-                aaptBinary = Jar.getResourceAsFile("/prebuilt/" + aaptVersion + "/windows/" + aaptVersion + ".exe", AaptManager.class);
+                aaptBinary = Jar.getResourceAsFile("/prebuilt/windows/" + aaptVersion + ".exe", AaptManager.class);
             } else {
                 throw new BrutException("Could not identify platform: " + OSDetection.returnOS());
             }
