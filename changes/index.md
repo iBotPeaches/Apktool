@@ -8,6 +8,11 @@ description: Apktool - Changelog / Roadmap
 2018.xx.xx
 
  * Updated baksmali/smali to version 2.2.5 ([Issue 1893](https://github.com/iBotPeaches/Apktool/issues/1893))
+ * Fixed issue with new restriction with non-empty `ids.xml` values. ([Issue 1918](https://github.com/iBotPeaches/Apktool/issues/1918)) / Thanks gino247
+ * Fixed issue with `PlatformBuildVersion` properties changing to unexpected values. ([Issue 1909](https://github.com/iBotPeaches/Apktool/issues/1909)) / Thanks gino247
+ * Fixed issue with pending v5 Gradle upgrade, by upgrading to gradle v4.10.2. ([Issue 1943](https://github.com/iBotPeaches/Apktool/pull/1943)) / Thanks friederbluemle
+ * Added `no-crunch` support (optional) via new parameter of `nc | --no-crunch`. ([Issue 1849](https://github.com/iBotPeaches/Apktool/pull/1849)) / Thanks Novex
+ * Added 32bit binaries for unix & windows for `aapt` and `aapt2`.
 
 ## v2.3.4
 2018.09.05
@@ -18,7 +23,7 @@ description: Apktool - Changelog / Roadmap
  * Fixed issue with 0 size file being marked as doNotCompress. ([Issue 1843](https://github.com/iBotPeaches/Apktool/issues/1843)) /  Thanks alexeikh
  * Updated aapt2 to latest version to handle various edge cases. ([Issue 1817](https://github.com/iBotPeaches/Apktool/issues/1817))
  * Align the `frameworks/base` project for both `aapt1/aapt2` builds. ([Issue 1889](https://github.com/iBotPeaches/Apktool/issues/1889))
- * Update to Gradle 5.0 and fix warnings with upgrade. ([Issue 1884](https://github.com/iBotPeaches/Apktool/issues/1884))
+ * Update to Gradle 4.10 and fix warnings with upgrade. ([Issue 1884](https://github.com/iBotPeaches/Apktool/issues/1884))
 
 ## v2.3.3
 2018.04.26
