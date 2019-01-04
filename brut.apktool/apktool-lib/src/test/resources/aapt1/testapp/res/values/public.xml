@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <public type="string" name="hello_world" id="0x7f020000" />
+    <public type="xml" name="ww_box_styles_schema" id="0x7f1500df" />
 </resources>
