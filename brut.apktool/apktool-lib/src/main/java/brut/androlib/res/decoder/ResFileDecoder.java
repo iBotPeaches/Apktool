@@ -119,6 +119,14 @@ public class ResFileDecoder {
 
             decode(inDir, inFileName, outDir, outFileName, "xml");
         } catch (AndrolibException ex) {
+            // If we got an error to decode XML, lets assume the file is in raw format.
+            // This is a large assumption, that might increase runtime, but will save us for situations where
+            // XSD files are AXML`d on aapt1, but left in plaintext in aapt2.
+            if (ex.getMessage().equalsIgnoreCase("Could not decode XML")) {
+                decode(inDir, inFileName, outDir, outFileName, "raw");
+                return;
+            }
+
             LOGGER.log(Level.SEVERE, String.format(
                     "Could not decode file, replacing by FALSE value: %s",
                     inFileName), ex);
