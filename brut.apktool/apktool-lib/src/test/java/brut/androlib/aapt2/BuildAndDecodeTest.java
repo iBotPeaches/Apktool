@@ -23,7 +23,6 @@ import brut.directory.ExtFile;
 import brut.util.OS;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
