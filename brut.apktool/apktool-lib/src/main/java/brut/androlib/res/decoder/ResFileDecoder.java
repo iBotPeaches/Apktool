@@ -18,6 +18,7 @@ package brut.androlib.res.decoder;
 
 import brut.androlib.AndrolibException;
 import brut.androlib.err.CantFind9PatchChunk;
+import brut.androlib.err.RawXmlEncounteredException;
 import brut.androlib.res.data.ResResource;
 import brut.androlib.res.data.value.ResBoolValue;
 import brut.androlib.res.data.value.ResFileValue;
@@ -118,6 +119,11 @@ public class ResFileDecoder {
             }
 
             decode(inDir, inFileName, outDir, outFileName, "xml");
+        } catch (RawXmlEncounteredException ex) {
+            // If we got an error to decode XML, lets assume the file is in raw format.
+            // This is a large assumption, that might increase runtime, but will save us for situations where
+            // XSD files are AXML`d on aapt1, but left in plaintext in aapt2.
+            decode(inDir, inFileName, outDir, outFileName, "raw");
         } catch (AndrolibException ex) {
             LOGGER.log(Level.SEVERE, String.format(
                     "Could not decode file, replacing by FALSE value: %s",

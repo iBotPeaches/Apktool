@@ -19,8 +19,9 @@ package brut.androlib.res.decoder;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.logging.Logger;
 
+import brut.androlib.err.AXmlDecodingException;
+import brut.androlib.err.RawXmlEncounteredException;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.wrapper.XmlPullParserWrapper;
@@ -142,9 +143,9 @@ public class XmlPullStreamDecoder implements ResStreamDecoder {
             }
             ser.flush();
         } catch (XmlPullParserException ex) {
-            throw new AndrolibException("Could not decode XML", ex);
+            throw new AXmlDecodingException("Could not decode XML", ex);
         } catch (IOException ex) {
-            throw new AndrolibException("Could not decode XML", ex);
+            throw new RawXmlEncounteredException("Could not decode XML", ex);
         }
     }
 
@@ -155,6 +156,4 @@ public class XmlPullStreamDecoder implements ResStreamDecoder {
 
     private final XmlPullParser mParser;
     private final ExtXmlSerializer mSerial;
-
-    private final static Logger LOGGER = Logger.getLogger(XmlPullStreamDecoder.class.getName());
 }
