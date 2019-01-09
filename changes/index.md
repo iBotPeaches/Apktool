@@ -12,6 +12,7 @@ description: Apktool - Changelog / Roadmap
  * Fixed issue with `PlatformBuildVersion` properties changing to unexpected values. ([Issue 1909](https://github.com/iBotPeaches/Apktool/issues/1909)) / Thanks gino247
  * Fixed issue with pending v5 Gradle upgrade, by upgrading to gradle v4.10.2. ([Issue 1943](https://github.com/iBotPeaches/Apktool/pull/1943)) / Thanks friederbluemle
  * Added `no-crunch` support (optional) via new parameter of `nc | --no-crunch`. ([Issue 1849](https://github.com/iBotPeaches/Apktool/pull/1849)) / Thanks Novex
+ * Fixed issue with `xsd` files decoding/building improperly between aapt1/aapt2. ([Issue 1952](https://github.com/iBotPeaches/Apktool/issues/1952)) 
  * Added 32bit binaries for unix & windows for `aapt` and `aapt2`.
 
 ## v2.3.4
