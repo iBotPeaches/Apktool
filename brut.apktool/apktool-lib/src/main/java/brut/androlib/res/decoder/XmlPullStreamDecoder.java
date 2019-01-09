@@ -19,7 +19,6 @@ package brut.androlib.res.decoder;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.logging.Logger;
 
 import brut.androlib.err.AXmlDecodingException;
 import brut.androlib.err.RawXmlEncounteredException;
@@ -157,6 +156,4 @@ public class XmlPullStreamDecoder implements ResStreamDecoder {
 
     private final XmlPullParser mParser;
     private final ExtXmlSerializer mSerial;
-
-    private final static Logger LOGGER = Logger.getLogger(XmlPullStreamDecoder.class.getName());
 }
