@@ -17,6 +17,8 @@ matrix:
       osx_image: xcode9.2
     - os: windows
       language: bash
+  allow_failures:
+    - os: windows
 cache:
   directories:
     - $HOME/.gradle/caches/
