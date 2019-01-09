@@ -241,7 +241,7 @@ public class BuildAndDecodeTest extends BaseTest {
     @Test
     public void qualifiersTest() throws BrutException {
         compareValuesFiles("values-mcc004-mnc4-en-rUS-ldrtl-sw100dp-w200dp-h300dp"
-                + "-xlarge-long-round-highdr-land-desk-night-xhdpi-finger-keyssoft-12key"
+                + "-long-round-highdr-land-desk-night-xhdpi-finger-keyssoft-12key"
                 + "-navhidden-dpad-v26/strings.xml");
     }
 
