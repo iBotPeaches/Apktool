@@ -16,7 +16,7 @@ matrix:
     - os: osx
       osx_image: xcode9.2
     - os: windows
-      language: bash
+      language: shell
   allow_failures:
     - os: windows
 cache:
