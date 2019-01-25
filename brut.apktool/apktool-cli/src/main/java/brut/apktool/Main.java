@@ -36,6 +36,9 @@ import java.util.logging.*;
 public class Main {
     public static void main(String[] args) throws IOException, InterruptedException, BrutException {
 
+        // headless
+        System.setProperty("java.awt.headless", "true");
+
         // set verbosity default
         Verbosity verbosity = Verbosity.NORMAL;
 
