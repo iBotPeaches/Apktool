@@ -230,6 +230,9 @@ public class Main {
         if (cli.hasOption("use-aapt2")) {
             apkOptions.useAapt2 = true;
         }
+        if (cli.hasOption("api") || cli.hasOption("api-level")) {
+            apkOptions.forceApi = Integer.parseInt(cli.getOptionValue("api"));
+        }
         if (cli.hasOption("o") || cli.hasOption("output")) {
             outFile = new File(cli.getOptionValue("o"));
         } else {
