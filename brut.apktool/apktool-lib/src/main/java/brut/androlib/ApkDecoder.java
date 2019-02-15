@@ -377,6 +377,25 @@ public class ApkDecoder {
     private void putSdkInfo(MetaInfo meta) throws AndrolibException {
         Map<String, String> info = getResTable().getSdkInfo();
         if (info.size() > 0) {
+            String refValue;
+            if (info.get("minSdkVersion") != null) {
+                refValue = ResXmlPatcher.pullValueFromIntegers(mOutDir, info.get("minSdkVersion"));
+                if (refValue != null) {
+                    info.put("minSdkVersion", refValue);
+                }
+            }
+            if (info.get("targetSdkVersion") != null) {
+                refValue = ResXmlPatcher.pullValueFromIntegers(mOutDir, info.get("targetSdkVersion"));
+                if (refValue != null) {
+                    info.put("targetSdkVersion", refValue);
+                }
+            }
+            if (info.get("maxSdkVersion") != null) {
+                refValue = ResXmlPatcher.pullValueFromIntegers(mOutDir, info.get("maxSdkVersion"));
+                if (refValue != null) {
+                    info.put("maxSdkVersion", refValue);
+                }
+            }
             meta.sdkInfo = info;
         }
     }
