@@ -42,7 +42,7 @@ public class ResValueFactory {
                 }
                 return new ResReferenceValue(mPackage, 0, null);
             case TypedValue.TYPE_REFERENCE:
-                return newReference(value, rawValue);
+                return newReference(value, null);
             case TypedValue.TYPE_ATTRIBUTE:
                 return newReference(value, rawValue, true);
             case TypedValue.TYPE_STRING:
