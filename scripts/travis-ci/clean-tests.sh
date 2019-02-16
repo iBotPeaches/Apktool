@@ -2,7 +2,7 @@
 
 if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
     choco install jdk8
-    export PATH=$PATH:"/c/Program Files/Java/jdk1.8.0_191/bin"
+    export PATH=$PATH:"/c/Program Files/Java/jdk1.8.0_201/bin"
     ./gradlew.bat clean
 else
     ./gradlew clean
