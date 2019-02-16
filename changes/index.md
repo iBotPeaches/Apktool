@@ -17,6 +17,7 @@ description: Apktool - Changelog / Roadmap
  * Fixed issue with Apktool stealing focus on Mac environments. ([Issue 1996](https://github.com/iBotPeaches/Apktool/issues/1996))
  * Fixed issue with `array` resources having wrong types. ([Issue 1994](https://github.com/iBotPeaches/Apktool/issues/1994)) / Thanks vbarthel-fr
  * Added 32bit binaries for unix & windows for `aapt` and `aapt2`.
+ * Added automated tests on Windows. ([Issue 1975](https://github.com/iBotPeaches/Apktool/issues/1975))
 
 ## v2.3.4
 2018.09.05
