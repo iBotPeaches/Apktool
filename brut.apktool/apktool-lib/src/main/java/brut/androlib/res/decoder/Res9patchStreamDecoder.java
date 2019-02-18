@@ -65,13 +65,21 @@ public class Res9patchStreamDecoder implements ResStreamDecoder {
             drawVLine(im2, w + 1, np.padTop + 1, h - np.padBottom);
 
             int[] xDivs = np.xDivs;
-            for (int i = 0; i < xDivs.length; i += 2) {
-                drawHLine(im2, 0, xDivs[i] + 1, xDivs[i + 1]);
+            if (xDivs.length == 0) {
+                drawHLine(im2, 0, 1, w);
+            } else {
+                for (int i = 0; i < xDivs.length; i += 2) {
+                    drawHLine(im2, 0, xDivs[i] + 1, xDivs[i + 1]);
+                }
             }
 
             int[] yDivs = np.yDivs;
-            for (int i = 0; i < yDivs.length; i += 2) {
-                drawVLine(im2, 0, yDivs[i] + 1, yDivs[i + 1]);
+            if (yDivs.length == 0) {
+                drawVLine(im2, 0, 1, h);
+            } else {
+                for (int i = 0; i < yDivs.length; i += 2) {
+                    drawVLine(im2, 0, yDivs[i] + 1, yDivs[i + 1]);
+                }
             }
 
             // Some images additionally use Optical Bounds
