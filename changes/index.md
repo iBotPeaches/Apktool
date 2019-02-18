@@ -16,6 +16,7 @@ description: Apktool - Changelog / Roadmap
  * Fixed issue with malformed chunk header when decoding "special" apks. ([Issue 1976](https://github.com/iBotPeaches/Apktool/issues/1976)) / Thanks sebras
  * Fixed issue with Apktool stealing focus on Mac environments. ([Issue 1996](https://github.com/iBotPeaches/Apktool/issues/1996))
  * Fixed issue with `array` resources having wrong types. ([Issue 1994](https://github.com/iBotPeaches/Apktool/issues/1994)) / Thanks vbarthel-fr
+ * Fixed issue with 9patch images missing vertical or horizontal divs, by automatically creating them. ([Issue 1522](https://github.com/iBotPeaches/Apktool/issues/1522)) / Thanks IgorEisberg
  * Added 32bit binaries for unix & windows for `aapt` and `aapt2`.
  * Added automated tests on Windows. ([Issue 1975](https://github.com/iBotPeaches/Apktool/issues/1975))
  * Added ability for `api-level` to be passed to baksmali & smali. / Thanks IgorEisberg
