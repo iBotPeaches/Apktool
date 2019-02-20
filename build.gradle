@@ -107,7 +107,7 @@ subprojects {
 
     ext {
         depends = [
-                baksmali: 'org.smali:baksmali:2.2.5',
+                baksmali: 'org.smali:baksmali:2.2.6',
                 commons_cli: 'commons-cli:commons-cli:1.4',
                 commons_io: 'commons-io:commons-io:2.4',
                 commons_lang: 'org.apache.commons:commons-lang3:3.1',
@@ -115,7 +115,7 @@ subprojects {
                 junit: 'junit:junit:4.12',
                 proguard_gradle: 'net.sf.proguard:proguard-gradle:6.0.3',
                 snakeyaml: 'org.yaml:snakeyaml:1.18:android',
-                smali: 'org.smali:smali:2.2.5',
+                smali: 'org.smali:smali:2.2.6',
                 xmlpull: 'xpp3:xpp3:1.1.4c',
                 xmlunit: 'xmlunit:xmlunit:1.6',
         ]
