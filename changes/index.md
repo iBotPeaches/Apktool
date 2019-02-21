@@ -15,7 +15,7 @@ description: Apktool - Changelog / Roadmap
  * Fixed issue with `xsd` files decoding/building improperly between aapt1/aapt2. ([Issue 1952](https://github.com/iBotPeaches/Apktool/issues/1952))
  * Fixed issue with malformed chunk header when decoding "special" apks. ([Issue 1976](https://github.com/iBotPeaches/Apktool/issues/1976)) / Thanks sebras
  * Fixed issue with Apktool stealing focus on Mac environments. ([Issue 1996](https://github.com/iBotPeaches/Apktool/issues/1996))
- * Fixed issue with `array` resources having wrong types. ([Issue 1994](https://github.com/iBotPeaches/Apktool/issues/1994)) / Thanks vbarthel-fr
+ * Fixed issue with `array` resources having wrong types. ([Issue 1994](https://github.com/iBotPeaches/Apktool/issues/1994)), ([Issue 1922](https://github.com/iBotPeaches/Apktool/issues/1922)) / Thanks vbarthel-fr
  * Fixed issue with 9patch images missing vertical or horizontal divs, by automatically creating them. ([Issue 1522](https://github.com/iBotPeaches/Apktool/issues/1522)) / Thanks IgorEisberg
  * Fixed issue with resolving references to non-standard framework files. / Thanks IgorEisberg
  * Fixed issue with resolving SDK version codes were not explicit values. / Thanks IgorEisberg
