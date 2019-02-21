@@ -7,7 +7,7 @@ description: Apktool - Changelog / Roadmap
 ## v2.4.0 (in development)
 2018.xx.xx
 
- * Updated baksmali/smali to version 2.2.5 ([Issue 1893](https://github.com/iBotPeaches/Apktool/issues/1893))
+ * Updated baksmali/smali to version 2.2.6 ([Issue 1893](https://github.com/iBotPeaches/Apktool/issues/1893))
  * Fixed issue with new restriction with non-empty `ids.xml` values. ([Issue 1918](https://github.com/iBotPeaches/Apktool/issues/1918)) / Thanks gino247
  * Fixed issue with `PlatformBuildVersion` properties changing to unexpected values. ([Issue 1909](https://github.com/iBotPeaches/Apktool/issues/1909)) / Thanks gino247
  * Fixed issue with pending v5 Gradle upgrade, by upgrading to gradle v4.10.2. ([Issue 1943](https://github.com/iBotPeaches/Apktool/pull/1943)) / Thanks friederbluemle
