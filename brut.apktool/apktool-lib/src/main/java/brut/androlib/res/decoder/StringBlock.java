@@ -342,10 +342,10 @@ public class StringBlock {
             int high = (array[offset + 3] & 0xFF) << 8;
             int low = (array[offset + 2] & 0xFF);
             int len_value =  ((val & 0x7FFF) << 16) + (high + low);
-            return new int[] {4, len_value * 2};
+            return new int[] {offset + 4, len_value * 2};
             
         }
-        return new int[] {2, val * 2};
+        return new int[] {offset + 2, val * 2};
     }
 
     private int[] m_stringOffsets;
