@@ -36,6 +36,9 @@ import java.util.logging.*;
 public class Main {
     public static void main(String[] args) throws IOException, InterruptedException, BrutException {
 
+        // headless
+        System.setProperty("java.awt.headless", "true");
+
         // set verbosity default
         Verbosity verbosity = Verbosity.NORMAL;
 
@@ -218,11 +221,17 @@ public class Main {
         if (cli.hasOption("p") || cli.hasOption("frame-path")) {
             apkOptions.frameworkFolderLocation = cli.getOptionValue("p");
         }
+        if (cli.hasOption("nc") || cli.hasOption("no-crunch")) {
+            apkOptions.noCrunch = true;
+        }
 
         // Temporary flag to enable the use of aapt2. This will tranform in time to a use-aapt1 flag, which will be
         // legacy and eventually removed.
         if (cli.hasOption("use-aapt2")) {
             apkOptions.useAapt2 = true;
+        }
+        if (cli.hasOption("api") || cli.hasOption("api-level")) {
+            apkOptions.forceApi = Integer.parseInt(cli.getOptionValue("api"));
         }
         if (cli.hasOption("o") || cli.hasOption("output")) {
             outFile = new File(cli.getOptionValue("o"));
@@ -397,6 +406,11 @@ public class Main {
                 .desc("Copies original AndroidManifest.xml and META-INF. See project page for more info.")
                 .build();
 
+        Option noCrunchOption = Option.builder("nc")
+                .longOpt("no-crunch")
+                .desc("Disable crunching of resource files during the build step.")
+                .build();
+
         Option tagOption = Option.builder("t")
                 .longOpt("tag")
                 .desc("Tag frameworks using <tag>.")
@@ -439,6 +453,7 @@ public class Main {
             BuildOptions.addOption(aaptOption);
             BuildOptions.addOption(originalOption);
             BuildOptions.addOption(aapt2Option);
+            BuildOptions.addOption(noCrunchOption);
         }
 
         // add global options
@@ -492,6 +507,7 @@ public class Main {
         allOptions.addOption(verboseOption);
         allOptions.addOption(quietOption);
         allOptions.addOption(aapt2Option);
+        allOptions.addOption(noCrunchOption);
     }
 
     private static String verbosityHelp() {

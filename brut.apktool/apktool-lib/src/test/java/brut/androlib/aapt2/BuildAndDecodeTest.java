@@ -85,6 +85,11 @@ public class BuildAndDecodeTest extends BaseTest {
     }
 
     @Test
+    public void xmlIdsEmptyTest() throws BrutException {
+        compareXmlFiles("res/values/ids.xml");
+    }
+
+    @Test
     public void leadingDollarSignResourceNameTest() throws BrutException {
         compareXmlFiles("res/drawable/$avd_hide_password__0.xml");
     }
@@ -92,5 +97,10 @@ public class BuildAndDecodeTest extends BaseTest {
     @Test
     public void confirmManifestStructureTest() throws BrutException {
         compareXmlFiles("AndroidManifest.xml");
+    }
+
+    @Test
+    public void xmlXsdFileTest() throws BrutException {
+        compareXmlFiles("res/xml/ww_box_styles_schema.xsd");
     }
 }

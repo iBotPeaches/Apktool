@@ -350,6 +350,10 @@ final public class AndrolibResources {
                 cmd.add("-v");
             }
 
+            if (apkOptions.noCrunch) {
+                cmd.add("--no-crunch");
+            }
+
             try {
                 OS.exec(cmd.toArray(new String[0]));
                 LOGGER.fine("aapt2 compile command ran: ");
@@ -484,6 +488,9 @@ final public class AndrolibResources {
         }
         if (apkOptions.debugMode) { // inject debuggable="true" into manifest
             cmd.add("--debug-mode");
+        }
+        if (apkOptions.noCrunch) {
+            cmd.add("--no-crunch");
         }
         // force package id so that some frameworks build with correct id
         // disable if user adds own aapt (can't know if they have this feature)

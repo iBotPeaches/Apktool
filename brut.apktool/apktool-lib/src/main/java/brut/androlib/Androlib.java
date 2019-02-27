@@ -416,7 +416,7 @@ public class Androlib {
         if (apkOptions.forceBuildAll || isModified(smaliDir, dex)) {
             LOGGER.info("Smaling " + folder + " folder into " + filename + "...");
             dex.delete();
-            SmaliBuilder.build(smaliDir, dex, mMinSdkVersion);
+            SmaliBuilder.build(smaliDir, dex, apkOptions.forceApi > 0 ? apkOptions.forceApi : mMinSdkVersion);
         }
         return true;
     }

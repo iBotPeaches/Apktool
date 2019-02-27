@@ -71,7 +71,7 @@ public class SmaliBuilder {
 
         if (fileName.endsWith(".smali")) {
             try {
-                if (!SmaliMod.assembleSmaliFile(inFile, dexBuilder, false, false)) {
+                if (!SmaliMod.assembleSmaliFile(inFile, dexBuilder, mApiLevel, false, false)) {
                     throw new AndrolibException("Could not smali file: " + fileName);
                 }
             } catch (IOException | RecognitionException ex) {

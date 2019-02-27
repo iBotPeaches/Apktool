@@ -19,6 +19,7 @@ package brut.androlib.res.data.value;
 import android.util.TypedValue;
 import brut.androlib.AndrolibException;
 import brut.androlib.res.data.ResPackage;
+import brut.androlib.res.data.ResTypeSpec;
 import brut.util.Duo;
 
 /**
@@ -41,7 +42,7 @@ public class ResValueFactory {
                 }
                 return new ResReferenceValue(mPackage, 0, null);
             case TypedValue.TYPE_REFERENCE:
-                return newReference(value, rawValue);
+                return newReference(value, null);
             case TypedValue.TYPE_ATTRIBUTE:
                 return newReference(value, rawValue, true);
             case TypedValue.TYPE_STRING:
@@ -83,7 +84,7 @@ public class ResValueFactory {
         return new ResStringValue(value, rawValue);
     }
 
-    public ResBagValue bagFactory(int parent, Duo<Integer, ResScalarValue>[] items) throws AndrolibException {
+    public ResBagValue bagFactory(int parent, Duo<Integer, ResScalarValue>[] items, ResTypeSpec resTypeSpec) throws AndrolibException {
         ResReferenceValue parentVal = newReference(parent, null);
 
         if (items.length == 0) {
@@ -93,14 +94,25 @@ public class ResValueFactory {
         if (key == ResAttr.BAG_KEY_ATTR_TYPE) {
             return ResAttr.factory(parentVal, items, this, mPackage);
         }
-        // Android O Preview added an unknown enum for ResTable_map. This is hardcoded as 0 for now.
-        if (key == ResArrayValue.BAG_KEY_ARRAY_START || key == 0) {
+
+        String resTypeName = resTypeSpec.getName();
+
+        // Android O Preview added an unknown enum for c. This is hardcoded as 0 for now.
+        if (ResTypeSpec.RES_TYPE_NAME_ARRAY.equals(resTypeName)
+                || key == ResArrayValue.BAG_KEY_ARRAY_START || key == 0) {
             return new ResArrayValue(parentVal, items);
         }
-        if (key >= ResPluralsValue.BAG_KEY_PLURALS_START && key <= ResPluralsValue.BAG_KEY_PLURALS_END) {
+
+        if (ResTypeSpec.RES_TYPE_NAME_PLURALS.equals(resTypeName) ||
+                (key >= ResPluralsValue.BAG_KEY_PLURALS_START && key <= ResPluralsValue.BAG_KEY_PLURALS_END)) {
             return new ResPluralsValue(parentVal, items);
         }
-        return new ResStyleValue(parentVal, items, this);
+
+        if (ResTypeSpec.RES_TYPE_NAME_STYLES.equals(resTypeName)) {
+            return new ResStyleValue(parentVal, items, this);
+        }
+
+        throw new AndrolibException("unsupported res type name for bags. Found: " + resTypeName);
     }
 
     public ResReferenceValue newReference(int resID, String rawValue) {
