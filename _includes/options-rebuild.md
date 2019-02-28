@@ -19,5 +19,5 @@ These are all the options when building an apk.
 <blockquote>The location where framework files are loaded from</blockquote>
 <br />
 <strong><kbd>--use-aapt2</kbd> - <span class="label label-success">v2.3.2</span></strong>
-<blockquote>The location where framework files are loaded from</blockquote>
+<blockquote>Use the aapt2 binary instead of appt</blockquote>
 <br />
