@@ -449,6 +449,7 @@ public class Main {
             DecodeOptions.addOption(noAssetOption);
             DecodeOptions.addOption(forceManOption);
 
+            BuildOptions.addOption(apiLevelOption);
             BuildOptions.addOption(debugBuiOption);
             BuildOptions.addOption(aaptOption);
             BuildOptions.addOption(originalOption);
