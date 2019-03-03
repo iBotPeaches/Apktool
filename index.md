@@ -18,7 +18,7 @@ It is **NOT** intended for piracy and other non-legal uses. It could be used for
  * Helping with repetitive tasks
 
 ## Requirements
- * Java 7 (JRE 1.7)
+ * Java 8 (JRE 1.8)
  * Basic knowledge of Android SDK, AAPT and smali
 
 ## Sponsored By
