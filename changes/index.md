@@ -7,6 +7,7 @@ description: Apktool - Changelog / Roadmap
 ## v2.4.0
 2019.03.02
 
+ * Java 8 (1.8) is now required.
  * Updated baksmali/smali to version 2.2.6 ([Issue 1893](https://github.com/iBotPeaches/Apktool/issues/1893))
  * Fixed issue with new restriction with non-empty `ids.xml` values. ([Issue 1918](https://github.com/iBotPeaches/Apktool/issues/1918)) / Thanks gino247
  * Fixed issue with `PlatformBuildVersion` properties changing to unexpected values. ([Issue 1909](https://github.com/iBotPeaches/Apktool/issues/1909)) / Thanks gino247
