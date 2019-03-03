@@ -4,8 +4,8 @@ title: Apktool - Changelog
 description: Apktool - Changelog / Roadmap
 ---
 
-## v2.4.0 (in development)
-2018.xx.xx
+## v2.4.0
+2019.03.02
 
  * Updated baksmali/smali to version 2.2.6 ([Issue 1893](https://github.com/iBotPeaches/Apktool/issues/1893))
  * Fixed issue with new restriction with non-empty `ids.xml` values. ([Issue 1918](https://github.com/iBotPeaches/Apktool/issues/1918)) / Thanks gino247
