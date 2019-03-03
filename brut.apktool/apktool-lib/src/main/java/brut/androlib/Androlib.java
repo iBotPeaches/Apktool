@@ -172,15 +172,10 @@ public class Androlib {
                     unk.getCompressionLevel(file) == 0 &&
                     unk.getSize(file) != 0) {
 
-                    if (StringUtils.countMatches(file, ".") > 1) {
+                    ext = FilenameUtils.getExtension(file);
+                    if (ext.isEmpty() || (!ext.equals("png") && StringUtils.countMatches(file, ".") > 1)) {
                         ext = file;
-                    } else {
-                        ext = FilenameUtils.getExtension(file);
-                        if (ext.isEmpty()) {
-                            ext = file;
-                        }
                     }
-
                     if (!uncompressedFilesOrExts.contains(ext)) {
                         uncompressedFilesOrExts.add(ext);
                     }
