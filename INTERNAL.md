@@ -145,6 +145,12 @@ Some recent releases for understanding the pattern can be found below.
 3. [2.0.2](https://connortumbleson.com/2015/10/12/apktool-v2-0-2-released/)
 4. [2.0.0](https://connortumbleson.com/2015/04/20/apktool-v2-0-0-released/)
 
+For obtaining commit authors and counts. The following command does the legwork:
+
+    git shortlog -s -n --all --no-merges --since="05 Sept 2018"
+
+Obviously replacing the date with the release date of the last version.
+
 So write the post. I tend to always include the following:
 
 1. Image of release for featured image when reshared on socials.
