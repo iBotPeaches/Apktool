@@ -4,6 +4,11 @@ title: Apktool - Changelog
 description: Apktool - Changelog / Roadmap
 ---
 
+## v2.4.1 (in development)
+2019.xx.xx
+
+ * Fixed issue with api-level command not showing in advanced documentation. ([Issue 2027](https://github.com/iBotPeaches/Apktool/issues/2027))
+
 ## v2.4.0
 2019.03.02
 
