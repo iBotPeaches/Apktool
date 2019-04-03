@@ -112,6 +112,9 @@ public class Main {
         if (cli.hasOption("s") || cli.hasOption("no-src")) {
             decoder.setDecodeSources(ApkDecoder.DECODE_SOURCES_NONE);
         }
+        if (cli.hasOption("onlymainclasses")) {
+            decoder.setDecodeSources(ApkDecoder.DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES);
+        }
         if (cli.hasOption("d") || cli.hasOption("debug")) {
             System.err.println("SmaliDebugging has been removed in 2.1.0 onward. Please see: https://github.com/iBotPeaches/Apktool/issues/1061");
             System.exit(1);
@@ -309,6 +312,11 @@ public class Main {
                 .desc("Do not decode sources.")
                 .build();
 
+        Option onlyMainClassesOption = Option.builder("onlymainclasses")
+                .longOpt("only-main-classes")
+                .desc("Only decompile the main dex classes (classes[0-9]*.dex) in the root.")
+                .build();
+
         Option noResOption = Option.builder("r")
                 .longOpt("no-res")
                 .desc("Do not decode resources.")
@@ -468,6 +476,7 @@ public class Main {
         DecodeOptions.addOption(frameDirOption);
         DecodeOptions.addOption(forceDecOption);
         DecodeOptions.addOption(noSrcOption);
+        DecodeOptions.addOption(onlyMainClassesOption);
         DecodeOptions.addOption(noResOption);
 
         // add basic build options
