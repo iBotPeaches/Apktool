@@ -43,8 +43,14 @@ jarfile=apktool.jar
 libdir="$progdir"
 if [ ! -r "$libdir/$jarfile" ]
 then
-    echo `basename "$prog"`": can't find $jarfile"
-    exit 1
+    echo `basename "$prog"`": can't find $jarfile, attempting to build from source"
+	pushd .
+	cd "${progdir}/../.."
+	./gradlew build shadowJar
+	if [ $? -ne 0 ]
+	then
+		exit 1
+	fi
 fi
 
 javaOpts=""
