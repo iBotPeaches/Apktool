@@ -57,5 +57,5 @@ public interface Directory {
 
     public void close() throws IOException;
     
-    public final char separator = '/';
+    public final char separator = File.separatorChar;
 }
