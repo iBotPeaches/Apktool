@@ -633,6 +633,8 @@ final public class AndrolibResources {
                 return ResConfigFlags.SDK_OREO;
             case "P":
                 return ResConfigFlags.SDK_P;
+            case "Q":
+                return ResConfigFlags.SDK_Q;
             default:
                 return Integer.parseInt(sdkVersion);
         }
