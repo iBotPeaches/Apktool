@@ -888,6 +888,13 @@ public class MXSerializer implements XmlSerializer {
 
 	protected void writeElementContent(String text, Writer out)
 			throws IOException {
+
+		// For some reason, some non-empty, empty characters are surviving this far and getting filtered out
+		// So we are left with null, which causes an NPE
+		if (text == null) {
+			return;
+		}
+
 		// escape '<', '&', ']]>', <32 if necessary
 		int pos = 0;
 		for (int i = 0; i < text.length(); i++) {
