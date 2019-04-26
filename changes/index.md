@@ -12,6 +12,7 @@ description: Apktool - Changelog / Roadmap
  * Fixed issue with missing mapping for `Q` shorthand property. ([Issue 2045](https://github.com/iBotPeaches/Apktool/issues/2045))
  * Fixed issue with raw `qmg` files not decoding correctly. ([Issue 2046](https://github.com/iBotPeaches/Apktool/issues/2064))
  * Fixed issue with copying assets where output directory doesn't match initial structure. ([Issue 2046](https://github.com/iBotPeaches/Apktool/issues/2064))
+ * Fixed issue with NPE with empty attribute content during deserialization. ([Issue 2063](https://github.com/iBotPeaches/Apktool/issues/2063))
 
 ## v2.4.0
 2019.03.02
