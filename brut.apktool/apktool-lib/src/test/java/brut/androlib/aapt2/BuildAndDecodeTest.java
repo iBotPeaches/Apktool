@@ -75,6 +75,11 @@ public class BuildAndDecodeTest extends BaseTest {
     }
 
     @Test
+    public void valuesMaxLengthTest() throws BrutException {
+        compareValuesFiles("values-es/strings.xml");
+    }
+
+    @Test
     public void confirmZeroByteFileIsNotStored() throws BrutException {
         MetaInfo metaInfo = new Androlib().readMetaFile(sTestNewDir);
         assertNull(metaInfo.doNotCompress);
