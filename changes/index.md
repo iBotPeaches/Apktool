@@ -10,6 +10,8 @@ description: Apktool - Changelog / Roadmap
  * Fixed issue with api-level command not showing in advanced documentation. ([Issue 2027](https://github.com/iBotPeaches/Apktool/issues/2027))
  * Fixed issue with directory creation warning when framework directory not made. ([Issue 2048](https://github.com/iBotPeaches/Apktool/issues/2048))
  * Fixed issue with missing mapping for `Q` shorthand property. ([Issue 2045](https://github.com/iBotPeaches/Apktool/issues/2045))
+ * Fixed issue with raw `qmg` files not decoding correctly. ([Issue 2046](https://github.com/iBotPeaches/Apktool/issues/2064))
+ * Fixed issue with copying assets where output directory doesn't match initial structure. ([Issue 2046](https://github.com/iBotPeaches/Apktool/issues/2064))
 
 ## v2.4.0
 2019.03.02
