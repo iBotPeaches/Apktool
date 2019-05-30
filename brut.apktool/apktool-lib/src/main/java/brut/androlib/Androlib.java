@@ -568,6 +568,7 @@ public class Androlib {
         buildLibrary(appDir, "lib");
         buildLibrary(appDir, "libs");
         buildLibrary(appDir, "kotlin");
+        buildLibrary(appDir, "META-INF/services");
     }
 
     public void buildLibrary(File appDir, String folder) throws AndrolibException {
@@ -755,6 +756,7 @@ public class Androlib {
     private boolean isModified(File working, File stored) {
         return ! stored.exists() || BrutIO.recursiveModifiedTime(working) > BrutIO .recursiveModifiedTime(stored);
     }
+
 
     private boolean isFile(File working) {
         return working.exists();
