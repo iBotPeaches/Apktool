@@ -568,7 +568,6 @@ public class Androlib {
         buildLibrary(appDir, "lib");
         buildLibrary(appDir, "libs");
         buildLibrary(appDir, "kotlin");
-        buildLibrary(appDir, "META-INF/services");
     }
 
     public void buildLibrary(File appDir, String folder) throws AndrolibException {
@@ -579,7 +578,7 @@ public class Androlib {
         }
 
         File stored = new File(appDir, APK_DIRNAME + "/" + folder);
-        if (apkOptions.forceBuildAll || isModified(working, stored) || folder.contains("services")) {
+        if (apkOptions.forceBuildAll || isModified(working, stored)) {
             LOGGER.info("Copying libs... (/" + folder + ")");
             try {
                 OS.rmdir(stored);
@@ -797,5 +796,5 @@ public class Androlib {
             "AndroidManifest.xml" };
     private final static String[] APK_STANDARD_ALL_FILENAMES = new String[] {
             "classes.dex", "AndroidManifest.xml", "resources.arsc", "res", "r", "R",
-            "lib", "libs", "assets", "META-INF", "kotlin"};
+            "lib", "libs", "assets", "META-INF", "kotlin" };
 }
