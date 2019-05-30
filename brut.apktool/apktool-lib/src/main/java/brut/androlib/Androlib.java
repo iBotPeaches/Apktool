@@ -757,7 +757,6 @@ public class Androlib {
         return ! stored.exists() || BrutIO.recursiveModifiedTime(working) > BrutIO .recursiveModifiedTime(stored);
     }
 
-
     private boolean isFile(File working) {
         return working.exists();
     }
