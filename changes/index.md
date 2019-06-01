@@ -7,6 +7,7 @@ description: Apktool - Changelog / Roadmap
 ## v2.4.1 (in development)
 2019.xx.xx
 
+ * Updated baksmali/smali to version 2.2.7
  * Fixed issue with api-level command not showing in advanced documentation. ([Issue 2027](https://github.com/iBotPeaches/Apktool/issues/2027))
  * Fixed issue with directory creation warning when framework directory not made. ([Issue 2048](https://github.com/iBotPeaches/Apktool/issues/2048))
  * Fixed issue with missing mapping for `Q` shorthand property. ([Issue 2045](https://github.com/iBotPeaches/Apktool/issues/2045))
