@@ -240,7 +240,7 @@ public class Androlib {
             if (in.containsDir("META-INF")) {
                 in.copyToDir(originalDir, "META-INF");
 
-                if(in.containsDir("META-INF/services")){
+                if (in.containsDir("META-INF/services")) {
                     // If the original APK contains the folder META-INF/services folder
                     // that is used for service locators (like coroutines on android),
                     // copy it to the destination folder so it does not get dropped.

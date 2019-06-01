@@ -17,9 +17,7 @@
 package brut.androlib.decode;
 
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -44,6 +42,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class DecodeKotlinCoroutinesTest extends BaseTest {
     private static String apk = "test-kotlin-coroutines.apk";
+
     @BeforeClass
     public static void beforeClass() throws Exception {
         TestUtils.cleanFrameworkFile();
@@ -65,8 +64,8 @@ public class DecodeKotlinCoroutinesTest extends BaseTest {
         apkDecoder.setOutDir(new File(sTmpDir + File.separator + apk + ".out"));
         apkDecoder.setForceDelete(true);
         apkDecoder.decode();
-        File coroutinesExceptionHandler = new File(sTmpDir + File.separator + apk + ".out"+File.separator + "META-INF" + File.separator + "services", "kotlinx.coroutines.CoroutineExceptionHandler");
-        File coroutinenMainDispatcherHandler = new File(sTmpDir + File.separator + apk + ".out"+File.separator + "META-INF" + File.separator + "services", "kotlinx.coroutines.internal.MainDispatcherFactory");
+        File coroutinesExceptionHandler = new File(sTmpDir + File.separator + apk + ".out" + File.separator + "META-INF" + File.separator + "services", "kotlinx.coroutines.CoroutineExceptionHandler");
+        File coroutinenMainDispatcherHandler = new File(sTmpDir + File.separator + apk + ".out" + File.separator + "META-INF" + File.separator + "services", "kotlinx.coroutines.internal.MainDispatcherFactory");
 
         assert (coroutinesExceptionHandler.exists());
         assert (coroutinenMainDispatcherHandler.exists());
