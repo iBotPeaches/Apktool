@@ -41,10 +41,7 @@ task cleanOutputDirectory(type: Delete) {
 }
 
 task proguard(type: proguard.gradle.ProGuardTask, dependsOn: shadowJar) {
-    def outFile = jar.destinationDir.getPath() + '/' + "apktool" + '-' + project.apktool_version + '-small' + '.' + jar.extension
-
     injars shadowJar.archivePath
-    outjars outFile
 
     libraryjars "${System.properties['java.home']}/lib/rt.jar"
 
@@ -58,6 +55,9 @@ task proguard(type: proguard.gradle.ProGuardTask, dependsOn: shadowJar) {
     dontwarn 'com.google.common.util.**'
     dontwarn 'javax.xml.xpath.**'
     dontnote '**'
+
+    def outFile = jar.destinationDir.getPath() + '/' + "apktool" + '-' + project.apktool_version + '-small' + '.' + jar.extension
+    outjars outFile
 }
 
 proguard.dependsOn cleanOutputDirectory

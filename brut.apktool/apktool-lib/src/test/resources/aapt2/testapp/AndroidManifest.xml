@@ -1,3 +1,3 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"  android:compileSdkVersion="23" android:compileSdkVersionCodename="6.0-2438415" package="brut.apktool.aapt1.testapp" platformBuildVersionCode="23" platformBuildVersionName="6.0-2438415">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:appCategory="game" android:compileSdkVersion="23" android:compileSdkVersionCodename="6.0-2438415" package="brut.apktool.aapt1.testapp" platformBuildVersionCode="23" platformBuildVersionName="6.0-2438415">
 </manifest>

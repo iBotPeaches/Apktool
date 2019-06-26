@@ -26,6 +26,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.IOException;
 
 import static org.junit.Assert.*;
 
@@ -74,6 +75,11 @@ public class BuildAndDecodeTest extends BaseTest {
     }
 
     @Test
+    public void valuesMaxLengthTest() throws BrutException {
+        compareValuesFiles("values-es/strings.xml");
+    }
+
+    @Test
     public void confirmZeroByteFileIsNotStored() throws BrutException {
         MetaInfo metaInfo = new Androlib().readMetaFile(sTestNewDir);
         assertNull(metaInfo.doNotCompress);
@@ -92,6 +98,11 @@ public class BuildAndDecodeTest extends BaseTest {
     @Test
     public void leadingDollarSignResourceNameTest() throws BrutException {
         compareXmlFiles("res/drawable/$avd_hide_password__0.xml");
+    }
+
+    @Test
+    public void samsungQmgFilesHandledTest() throws IOException, BrutException {
+        compareBinaryFolder("drawable-xhdpi", true);
     }
 
     @Test

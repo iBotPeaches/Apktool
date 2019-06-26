@@ -86,4 +86,15 @@ public class InvalidSdkBoundingTest extends BaseTest {
         androlibResources.setSdkInfo(sdkInfo);
         assertEquals("26", androlibResources.checkTargetSdkVersionBounds());
     }
+
+    @Test
+    public void checkForSdkQInsaneTestValue() {
+        AndrolibResources androlibResources = new AndrolibResources();
+
+        Map<String, String> sdkInfo = new LinkedHashMap<>();
+        sdkInfo.put("targetSdkVersion", "Q");
+
+        androlibResources.setSdkInfo(sdkInfo);
+        assertEquals("10000", androlibResources.checkTargetSdkVersionBounds());
+    }
 }

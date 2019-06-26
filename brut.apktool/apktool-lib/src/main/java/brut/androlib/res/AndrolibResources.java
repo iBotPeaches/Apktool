@@ -633,6 +633,8 @@ final public class AndrolibResources {
                 return ResConfigFlags.SDK_OREO;
             case "P":
                 return ResConfigFlags.SDK_P;
+            case "Q":
+                return ResConfigFlags.SDK_Q;
             default:
                 return Integer.parseInt(sdkVersion);
         }
@@ -924,17 +926,6 @@ final public class AndrolibResources {
             } else {
                 path = parentPath.getAbsolutePath() + String.format("%1$s.local%1$sshare%1$sapktool%1$sframework", File.separatorChar);
             }
-
-            File fullPath = new File(path);
-
-            if (! fullPath.canWrite()) {
-                LOGGER.severe(String.format("WARNING: Could not write to (%1$s), using %2$s instead...",
-                        fullPath.getAbsolutePath(), System.getProperty("java.io.tmpdir")));
-                LOGGER.severe("Please be aware this is a volatile directory and frameworks could go missing, " +
-                        "please utilize --frame-path if the default storage directory is unavailable");
-
-                path = new File(System.getProperty("java.io.tmpdir")).getAbsolutePath();
-            }
         }
 
         File dir = new File(path);
@@ -953,6 +944,17 @@ final public class AndrolibResources {
                     LOGGER.severe("Can't create Framework directory: " + dir);
                 }
                 throw new AndrolibException("Can't create directory: " + dir);
+            }
+        }
+
+        if (apkOptions.frameworkFolderLocation == null) {
+            if (! dir.canWrite()) {
+                LOGGER.severe(String.format("WARNING: Could not write to (%1$s), using %2$s instead...",
+                        dir.getAbsolutePath(), System.getProperty("java.io.tmpdir")));
+                LOGGER.severe("Please be aware this is a volatile directory and frameworks could go missing, " +
+                        "please utilize --frame-path if the default storage directory is unavailable");
+
+                dir = new File(System.getProperty("java.io.tmpdir"));
             }
         }
 

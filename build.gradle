@@ -21,7 +21,7 @@ buildscript {
         options.encoding = "UTF-8"
     }
     dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.4'
+        classpath 'com.github.jengelman.gradle.plugins:shadow:5.0.0'
     }
 }
 
@@ -107,15 +107,15 @@ subprojects {
 
     ext {
         depends = [
-                baksmali: 'org.smali:baksmali:2.2.6',
+                baksmali: 'org.smali:baksmali:2.2.7',
                 commons_cli: 'commons-cli:commons-cli:1.4',
                 commons_io: 'commons-io:commons-io:2.4',
                 commons_lang: 'org.apache.commons:commons-lang3:3.1',
                 guava: 'com.google.guava:guava:14.0',
                 junit: 'junit:junit:4.12',
-                proguard_gradle: 'net.sf.proguard:proguard-gradle:6.0.3',
+                proguard_gradle: 'net.sf.proguard:proguard-gradle:6.1.0',
                 snakeyaml: 'org.yaml:snakeyaml:1.18:android',
-                smali: 'org.smali:smali:2.2.6',
+                smali: 'org.smali:smali:2.2.7',
                 xmlpull: 'xpp3:xpp3:1.1.4c',
                 xmlunit: 'xmlunit:xmlunit:1.6',
         ]
@@ -133,6 +133,6 @@ subprojects {
 }
 
 wrapper {
-    gradleVersion = '4.10'
+    gradleVersion = '5.4.1'
     distributionType = Wrapper.DistributionType.ALL
 }
