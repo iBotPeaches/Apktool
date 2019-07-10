@@ -313,10 +313,6 @@ public class ARSCDecoder {
 		ResID resId = new ResID(mResId);
 		ResResSpec spec;
 
-		if (value instanceof ResAttr) {
-			System.out.println("mSpecNames:" + mSpecNames.getString(specNamesId) + "  value:" + value);
-		}
-
 		if (value instanceof ResFileValue) {
 			String valueStr = value.toString();
 			Directory apkDir;
