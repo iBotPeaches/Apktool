@@ -29,6 +29,9 @@ public final class ResTypeSpec {
     public static final String RES_TYPE_NAME_PLURALS = "plurals";
     public static final String RES_TYPE_NAME_STYLES = "style";
     public static final String RES_TYPE_NAME_STYLES2 = "style2";
+    public static final String RES_TYPE_NAME_STYLES3 = "style3";
+    public static final String RES_TYPE_NAME_STYLES4 = "style4";
+    public static final String RES_TYPE_NAME_STYLES5 = "style5";
 
     private final String mName;
     private final Map<String, ResResSpec> mResSpecs = new LinkedHashMap<String, ResResSpec>();

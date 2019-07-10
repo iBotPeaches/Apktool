@@ -112,12 +112,25 @@ public class ResValueFactory {
             return new ResStyleValue(parentVal, items, this);
         }
 
-	if (ResTypeSpec.RES_TYPE_NAME_STYLES2.equals(resTypeName)) {
+	    if (ResTypeSpec.RES_TYPE_NAME_STYLES2.equals(resTypeName)) {
+            return new ResStyleValue(parentVal, items, this);
+        }
+
+        if (ResTypeSpec.RES_TYPE_NAME_STYLES3.equals(resTypeName)) {
+            return new ResStyleValue(parentVal, items, this);
+        }
+
+        if (ResTypeSpec.RES_TYPE_NAME_STYLES4.equals(resTypeName)) {
+            return new ResStyleValue(parentVal, items, this);
+        }
+
+        if (ResTypeSpec.RES_TYPE_NAME_STYLES5.equals(resTypeName)) {
             return new ResStyleValue(parentVal, items, this);
         }
 
         throw new AndrolibException("unsupported res type name for bags. Found: " + resTypeName);
     }
+
 
     public ResReferenceValue newReference(int resID, String rawValue) {
         return newReference(resID, rawValue, false);
