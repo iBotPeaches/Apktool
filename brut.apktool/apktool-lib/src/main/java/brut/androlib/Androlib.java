@@ -239,6 +239,14 @@ public class Androlib {
             }
             if (in.containsDir("META-INF")) {
                 in.copyToDir(originalDir, "META-INF");
+
+                if (in.containsDir("META-INF/services")) {
+                    // If the original APK contains the folder META-INF/services folder
+                    // that is used for service locators (like coroutines on android),
+                    // copy it to the destination folder so it does not get dropped.
+                    LOGGER.info("Copying META-INF/services directory");
+                    in.copyToDir(outDir, "META-INF/services");
+                }
             }
         } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
@@ -560,6 +568,7 @@ public class Androlib {
         buildLibrary(appDir, "lib");
         buildLibrary(appDir, "libs");
         buildLibrary(appDir, "kotlin");
+        buildLibrary(appDir, "META-INF/services");
     }
 
     public void buildLibrary(File appDir, String folder) throws AndrolibException {
