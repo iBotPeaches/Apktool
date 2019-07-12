@@ -16,6 +16,7 @@ description: Apktool - Changelog / Roadmap
  * Fixed issue with copying assets where output directory doesn't match initial structure. ([Issue 2046](https://github.com/iBotPeaches/Apktool/issues/2064))
  * Fixed issue with NPE with empty attribute content during deserialization. ([Issue 2063](https://github.com/iBotPeaches/Apktool/issues/2063))
  * Fixed removal of META-INF/services. ([Issue 2084](https://github.com/iBotPeaches/Apktool/issues/2084), [Issue 2018](https://github.com/iBotPeaches/Apktool/issues/2018)) (Thanks adibfara)
+ * Fixed support for "attr" bag type. ([Issue 2117](https://github.com/iBotPeaches/Apktool/issues/2117)) (Thanks visigoth)
 
 ## v2.4.0
 2019.03.02
