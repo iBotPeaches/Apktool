@@ -13,6 +13,8 @@ matrix:
       jdk: openjdk8
     - os: linux
       jdk: oraclejdk8
+    - os: linux
+      jdk: oraclejdk11
     - os: osx
       osx_image: xcode9.2
     - os: windows
