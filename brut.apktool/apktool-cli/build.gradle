@@ -48,6 +48,8 @@ task proguard(type: proguard.gradle.ProGuardTask, dependsOn: shadowJar) {
         libraryjars "${System.properties['java.home']}/lib/rt.jar"
     } else {
         libraryjars "${System.properties['java.home']}/jmods/java.base.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
+        libraryjars "${System.properties['java.home']}/jmods/java.desktop.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
+        libraryjars "${System.properties['java.home']}/jmods/java.sql.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
     }
 
     dontobfuscate
