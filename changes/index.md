@@ -18,6 +18,7 @@ description: Apktool - Changelog / Roadmap
  * Fixed issue with NPE with empty attribute content during deserialization. ([Issue 2063](https://github.com/iBotPeaches/Apktool/issues/2063))
  * Fixed removal of META-INF/services. ([Issue 2084](https://github.com/iBotPeaches/Apktool/issues/2084), [Issue 2018](https://github.com/iBotPeaches/Apktool/issues/2018)) (Thanks adibfara)
  * Fixed support for "attr" bag type. ([Issue 2117](https://github.com/iBotPeaches/Apktool/issues/2117)) (Thanks visigoth)
+ * Fixed wiping license headers of AOSP/Android4Me files. ([Issue 2093](https://github.com/iBotPeaches/Apktool/issues/2093))
  * Added enhanced wrapper file for Windows. ([Issue 2120](https://github.com/iBotPeaches/Apktool/pull/2120)) (Thanks Varstahl)
 
 ## v2.4.0
