@@ -37,11 +37,11 @@ jar {
 }
 
 task cleanOutputDirectory(type: Delete) {
-    delete fileTree(dir: jar.destinationDir.getPath(), exclude: "apktool-cli-all.jar")
+    delete fileTree(dir: jar.getDestinationDirectory().getAsFile(), exclude: "apktool-cli-all.jar")
 }
 
 task proguard(type: proguard.gradle.ProGuardTask, dependsOn: shadowJar) {
-    injars shadowJar.archivePath
+    injars shadowJar.getArchiveFile()
 
     // Java 9 and prior uses merged package for runtime, later uses split jmod files.
     if (System.getProperty("java.version").startsWith('1.')) {
@@ -61,7 +61,9 @@ task proguard(type: proguard.gradle.ProGuardTask, dependsOn: shadowJar) {
     dontwarn 'javax.xml.xpath.**'
     dontnote '**'
 
-    def outFile = jar.destinationDir.getPath() + '/' + "apktool" + '-' + project.apktool_version + '-small' + '.' + jar.extension
+    def outPath = jar.getDestinationDirectory().getAsFile().get().toString()
+    def extension = jar.archiveExtension.get().toString()
+    def outFile = outPath + '/' + "apktool" + '-' + project.apktool_version + '-small' + '.' + extension
     outjars outFile
 }
 
