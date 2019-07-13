@@ -37,13 +37,24 @@ jar {
 }
 
 task cleanOutputDirectory(type: Delete) {
-    delete fileTree(dir: jar.destinationDir.getPath(), exclude: "apktool-cli-all.jar")
+    delete fileTree(dir: jar.getDestinationDirectory().getAsFile(), exclude: "apktool-cli-all.jar")
 }
 
 task proguard(type: proguard.gradle.ProGuardTask, dependsOn: shadowJar) {
-    injars shadowJar.archivePath
+    injars shadowJar.getArchiveFile()
 
-    libraryjars "${System.properties['java.home']}/lib/rt.jar"
+    // Java 9 and prior uses merged package for runtime, later uses split jmod files.
+    if (JavaVersion.current() <= JavaVersion.VERSION_1_8) {
+        libraryjars "${System.properties['java.home']}/lib/rt.jar"
+    } else {
+        libraryjars "${System.properties['java.home']}/jmods/java.base.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
+        libraryjars "${System.properties['java.home']}/jmods/java.logging.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
+        libraryjars "${System.properties['java.home']}/jmods/java.xml.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
+        libraryjars "${System.properties['java.home']}/jmods/java.desktop.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
+        libraryjars "${System.properties['java.home']}/jmods/java.sql.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
+
+        libraryjars "${System.properties['java.home']}/jmods/jdk.unsupported.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
+    }
 
     dontobfuscate
     dontoptimize
@@ -56,7 +67,9 @@ task proguard(type: proguard.gradle.ProGuardTask, dependsOn: shadowJar) {
     dontwarn 'javax.xml.xpath.**'
     dontnote '**'
 
-    def outFile = jar.destinationDir.getPath() + '/' + "apktool" + '-' + project.apktool_version + '-small' + '.' + jar.extension
+    def outPath = jar.getDestinationDirectory().getAsFile().get().toString()
+    def extension = jar.archiveExtension.get().toString()
+    def outFile = outPath + '/' + "apktool" + '-' + project.apktool_version + '-small' + '.' + extension
     outjars outFile
 }
 
