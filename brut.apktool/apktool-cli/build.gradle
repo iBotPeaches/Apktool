@@ -43,7 +43,12 @@ task cleanOutputDirectory(type: Delete) {
 task proguard(type: proguard.gradle.ProGuardTask, dependsOn: shadowJar) {
     injars shadowJar.archivePath
 
-    libraryjars "${System.properties['java.home']}/lib/rt.jar"
+    // Java 9 and prior uses merged package for runtime, later uses split jmod files.
+    if (System.getProperty("java.version").startsWith('1.')) {
+        libraryjars "${System.properties['java.home']}/lib/rt.jar"
+    } else {
+        libraryjars "${System.getProperty('java.home')}/jmods/java.base.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
+    }
 
     dontobfuscate
     dontoptimize
