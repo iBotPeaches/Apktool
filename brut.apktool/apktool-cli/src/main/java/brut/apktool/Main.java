@@ -216,6 +216,7 @@ public class Main {
             apkOptions.aaptPath = cli.getOptionValue("a");
         }
         if (cli.hasOption("c") || cli.hasOption("copy-original")) {
+            System.err.println("-c/--copy-original has been deprecated. Removal planned for v2.5.0 (#2129)");
             apkOptions.copyOriginalFiles = true;
         }
         if (cli.hasOption("p") || cli.hasOption("frame-path")) {
