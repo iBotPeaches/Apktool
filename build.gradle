@@ -44,6 +44,8 @@ allprojects {
 
     license {
         header rootProject.file("brut.j.common/src/templates/apache2.0-header.txt")
+        exclude "**/android/content/res/*.java"
+        exclude "**/android/util/*.java"
         include "**/*.java"
         strictCheck true
 
