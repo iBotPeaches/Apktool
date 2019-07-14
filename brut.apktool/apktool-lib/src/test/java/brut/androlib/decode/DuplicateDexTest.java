@@ -16,19 +16,14 @@
 package brut.androlib.decode;
 
 import brut.androlib.*;
-import brut.androlib.aapt1.AndroidOreoSparseTest;
-import brut.androlib.aapt2.BuildAndDecodeTest;
-import brut.androlib.meta.MetaInfo;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
 import brut.util.OS;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.*;
 
 import java.io.File;
 import java.io.IOException;
 
-import static org.junit.Assert.assertTrue;
 
 public class DuplicateDexTest extends BaseTest {
 
@@ -38,7 +33,7 @@ public class DuplicateDexTest extends BaseTest {
         sTmpDir = new ExtFile(OS.createTempDirectory());
         sTestOrigDir = new ExtFile(sTmpDir, "duplicatedex-orig");
         sTestNewDir = new ExtFile(sTmpDir, "duplicatedex-new");
-        LOGGER.info("Unpacking sparse.apk...");
+        LOGGER.info("Unpacking duplicatedex.apk...");
         TestUtils.copyResourceDir(DuplicateDexTest.class, "decode/duplicatedex", sTestOrigDir);
     }
 
