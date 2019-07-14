@@ -16,12 +16,12 @@ description: Apktool - Changelog / Roadmap
  * Fixed issue with raw `qmg` files not decoding correctly. ([Issue 2046](https://github.com/iBotPeaches/Apktool/issues/2064))
  * Fixed issue with copying assets where output directory doesn't match initial structure. ([Issue 2046](https://github.com/iBotPeaches/Apktool/issues/2064))
  * Fixed issue with NPE with empty attribute content during deserialization. ([Issue 2063](https://github.com/iBotPeaches/Apktool/issues/2063))
- * Fixed removal of META-INF/services. ([Issue 2084](https://github.com/iBotPeaches/Apktool/issues/2084), [Issue 2018](https://github.com/iBotPeaches/Apktool/issues/2018)) (Thanks adibfara)
- * Fixed support for "attr" bag type. ([Issue 2117](https://github.com/iBotPeaches/Apktool/issues/2117)) (Thanks visigoth)
+ * Fixed removal of META-INF/services. ([Issue 2084](https://github.com/iBotPeaches/Apktool/issues/2084), [Issue 2018](https://github.com/iBotPeaches/Apktool/issues/2018)) Thanks adibfara
+ * Fixed support for "attr" bag type. ([Issue 2117](https://github.com/iBotPeaches/Apktool/issues/2117)) Thanks visigoth
  * Fixed wiping license headers of AOSP/Android4Me files. ([Issue 2093](https://github.com/iBotPeaches/Apktool/issues/2093))
- * Added enhanced wrapper file for Windows. ([Issue 2120](https://github.com/iBotPeaches/Apktool/pull/2120)) (Thanks Varstahl)
- * Fixed issue with MIUI package names being renamed. ([Issue 2028](https://github.com/iBotPeaches/Apktool/pull/2028)) (Thanks IgorEisberg)
- * Work-around with issue with large 9patch path spamming in uncompressed file list. ([Issue 1272](https://github.com/iBotPeaches/Apktool/issues/1272)) (Thanks IgorEisberg)
+ * Added enhanced wrapper file for Windows. ([Issue 2120](https://github.com/iBotPeaches/Apktool/pull/2120)) Thanks Varstahl
+ * Fixed issue with MIUI package names being renamed. ([Issue 2028](https://github.com/iBotPeaches/Apktool/pull/2028)) Thanks IgorEisberg
+ * Work-around with issue with large 9patch path spamming in uncompressed file list. ([Issue 1272](https://github.com/iBotPeaches/Apktool/issues/1272)) Thanks IgorEisberg
 
 ## v2.4.0
 2019.03.02
