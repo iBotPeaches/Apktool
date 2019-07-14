@@ -173,6 +173,9 @@ public class Androlib {
                     unk.getSize(file) != 0) {
 
                     ext = FilenameUtils.getExtension(file);
+
+                    // If we don't have a png extension, but we have multiple "dots", we may have another iteration
+                    // of OEM specific 9patch files. We need to record full path for these.
                     if (ext.isEmpty() || (!ext.equals("png") && StringUtils.countMatches(file, ".") > 1)) {
                         ext = file;
                     }
