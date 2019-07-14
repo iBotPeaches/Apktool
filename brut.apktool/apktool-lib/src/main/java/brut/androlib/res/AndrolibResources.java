@@ -167,22 +167,19 @@ final public class AndrolibResources {
 
         // compare resources.arsc package name to the one present in AndroidManifest
         ResPackage resPackage = resTable.getCurrentResPackage();
-        String packageOriginal = resPackage.getName();
+        String pkgOriginal = resPackage.getName();
         mPackageRenamed = resTable.getPackageRenamed();
 
         resTable.setPackageId(resPackage.getId());
-        resTable.setPackageOriginal(packageOriginal);
+        resTable.setPackageOriginal(pkgOriginal);
 
-        // 1) Check if packageOriginal === mPackageRenamed
-        // 2) Check if packageOriginal is ignored via IGNORED_PACKAGES
-        // 2a) If its ignored, make sure the mPackageRenamed isn't explicitly allowed
-        if (packageOriginal.equalsIgnoreCase(mPackageRenamed) ||
-                (Arrays.asList(IGNORED_PACKAGES).contains(packageOriginal) &&
-                ! Arrays.asList(ALLOWED_PACKAGES).contains(mPackageRenamed))) {
+        // 1) Check if pkgOriginal === mPackageRenamed
+        // 2) Check if pkgOriginal is ignored via IGNORED_PACKAGES
+        if (pkgOriginal.equalsIgnoreCase(mPackageRenamed) || (Arrays.asList(IGNORED_PACKAGES).contains(pkgOriginal))) {
             LOGGER.info("Regular manifest package...");
         } else {
-            LOGGER.info("Renamed manifest package found! Replacing " + mPackageRenamed + " with " + packageOriginal);
-            ResXmlPatcher.renameManifestPackage(new File(filePath), packageOriginal);
+            LOGGER.info("Renamed manifest package found! Replacing " + mPackageRenamed + " with " + pkgOriginal);
+            ResXmlPatcher.renameManifestPackage(new File(filePath), pkgOriginal);
         }
     }
 
@@ -1016,6 +1013,4 @@ final public class AndrolibResources {
     private final static String[] IGNORED_PACKAGES = new String[] {
             "android", "com.htc", "com.lge", "com.lge.internal", "yi", "flyme", "air.com.adobe.appentry",
             "FFFFFFFFFFFFFFFFFFFFFF" };
-
-    private final static String[] ALLOWED_PACKAGES = new String[] { };
 }
