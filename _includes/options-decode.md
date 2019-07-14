@@ -24,8 +24,8 @@ These are all the options when decoding an apk.
 <strong><kbd>-o, --output &lt;DIR></kbd></strong>
 <blockquote>The name of the folder that apk gets written to</blockquote>
 <br />
-<strong><kbd>--only-main-classes></kbd> - <span class="label label-success">v2.4.1</span></strong>
-<blockquote>Only decode dex classes in root (classes[0-9].dex)</blockquote>
+<strong><kbd>--only-main-classes</kbd> - <span class="label label-success">v2.4.1</span></strong>
+<blockquote>Only disasemble dex classes in root (classes[0-9].dex)</blockquote>
 <br />
 <strong><kbd>-p, --frame-path &lt;DIR></kbd></strong>
 <blockquote>The folder location where framework files should be stored/read from</blockquote>
