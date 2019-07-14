@@ -112,7 +112,7 @@ public class Main {
         if (cli.hasOption("s") || cli.hasOption("no-src")) {
             decoder.setDecodeSources(ApkDecoder.DECODE_SOURCES_NONE);
         }
-        if (cli.hasOption("onlymainclasses")) {
+        if (cli.hasOption("only-main-classes")) {
             decoder.setDecodeSources(ApkDecoder.DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES);
         }
         if (cli.hasOption("d") || cli.hasOption("debug")) {
