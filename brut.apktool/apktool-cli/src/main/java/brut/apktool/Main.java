@@ -312,7 +312,7 @@ public class Main {
                 .desc("Do not decode sources.")
                 .build();
 
-        Option onlyMainClassesOption = Option.builder("onlymainclasses")
+        Option onlyMainClassesOption = Option.builder()
                 .longOpt("only-main-classes")
                 .desc("Only decompile the main dex classes (classes[0-9]*.dex) in the root.")
                 .build();
@@ -454,6 +454,7 @@ public class Main {
             DecodeOptions.addOption(noDbgOption);
             DecodeOptions.addOption(keepResOption);
             DecodeOptions.addOption(analysisOption);
+            DecodeOptions.addOption(onlyMainClassesOption);
             DecodeOptions.addOption(apiLevelOption);
             DecodeOptions.addOption(noAssetOption);
             DecodeOptions.addOption(forceManOption);
@@ -476,7 +477,6 @@ public class Main {
         DecodeOptions.addOption(frameDirOption);
         DecodeOptions.addOption(forceDecOption);
         DecodeOptions.addOption(noSrcOption);
-        DecodeOptions.addOption(onlyMainClassesOption);
         DecodeOptions.addOption(noResOption);
 
         // add basic build options
