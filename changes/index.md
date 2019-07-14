@@ -20,6 +20,7 @@ description: Apktool - Changelog / Roadmap
  * Fixed support for "attr" bag type. ([Issue 2117](https://github.com/iBotPeaches/Apktool/issues/2117)) Thanks visigoth
  * Fixed wiping license headers of AOSP/Android4Me files. ([Issue 2093](https://github.com/iBotPeaches/Apktool/issues/2093))
  * Added enhanced wrapper file for Windows. ([Issue 2120](https://github.com/iBotPeaches/Apktool/pull/2120)) Thanks Varstahl
+ * Added advance command for skipping disassemble of non-root dex packages. ([Issue 2051](https://github.com/iBotPeaches/Apktool/pull/2051))
  * Fixed issue with MIUI package names being renamed. ([Issue 2028](https://github.com/iBotPeaches/Apktool/pull/2028)) Thanks IgorEisberg
  * Work-around with issue with large 9patch path spamming in uncompressed file list. ([Issue 1272](https://github.com/iBotPeaches/Apktool/issues/1272)) Thanks IgorEisberg
 
