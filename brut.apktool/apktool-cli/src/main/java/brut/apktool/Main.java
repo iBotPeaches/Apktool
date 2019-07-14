@@ -314,7 +314,7 @@ public class Main {
 
         Option onlyMainClassesOption = Option.builder()
                 .longOpt("only-main-classes")
-                .desc("Only decompile the main dex classes (classes[0-9]*.dex) in the root.")
+                .desc("Only disassemble the main dex classes (classes[0-9]*.dex) in the root.")
                 .build();
 
         Option noResOption = Option.builder("r")
