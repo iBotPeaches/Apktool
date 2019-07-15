@@ -40,9 +40,6 @@ public abstract class ResScalarValue extends ResIntBasedValue implements
 
     @Override
     public String encodeAsResXmlAttr() throws AndrolibException {
-        if (mRawValue != null) {
-            return mRawValue;
-        }
         return encodeAsResXml();
     }
 
