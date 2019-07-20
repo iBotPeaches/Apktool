@@ -9,6 +9,7 @@ description: Apktool - Changelog / Roadmap
 
  * Updated baksmali/smali to version 2.2.7
  * Upgrade to `gradle 5.4.1`
+ * Added support for Android Q Beta 4. ([Issue 2131](https://github.com/iBotPeaches/Apktool/issues/2131))
  * Fixed build issue with JDK9+ because of jmod change. ([Issue 2086](https://github.com/iBotPeaches/Apktool/issues/2086))
  * Fixed security issue with unpacking assets to unintended locations via directory traversal. ([Issue 2058](https://github.com/iBotPeaches/Apktool/pull/2058))
  * Fixed issue with api-level command not showing in advanced documentation. ([Issue 2027](https://github.com/iBotPeaches/Apktool/issues/2027))
