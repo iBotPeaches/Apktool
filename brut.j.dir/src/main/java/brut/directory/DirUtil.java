@@ -81,7 +81,8 @@ public class DirUtil {
                 if (fileName.equals("res") && !in.containsFile(fileName)) {
                     return;
                 }
-                File outFile = new File(out, fileName);
+                String cleanedFilename = BrutIO.sanitizeUnknownFile(out, fileName);
+                File outFile = new File(out, cleanedFilename);
                 outFile.getParentFile().mkdirs();
                 BrutIO.copyAndClose(in.getFileInput(fileName),
                     new FileOutputStream(outFile));
