@@ -7,7 +7,7 @@ description: Apktool - Changelog / Roadmap
 ## v2.4.1 (in development)
 2019.xx.xx
 
- * Updated baksmali/smali to version 2.2.7
+ * Updated baksmali/smali to version 2.3.0
  * Upgrade to `gradle 5.4.1`
  * Added support for Android Q Beta 4. ([Issue 2131](https://github.com/iBotPeaches/Apktool/issues/2131))
  * Fixed build issue with JDK9+ because of jmod change. ([Issue 2086](https://github.com/iBotPeaches/Apktool/issues/2086))
@@ -25,6 +25,7 @@ description: Apktool - Changelog / Roadmap
  * Added advance command for skipping disassemble of non-root dex packages. ([Issue 2051](https://github.com/iBotPeaches/Apktool/pull/2051))
  * Fixed issue with MIUI package names being renamed. ([Issue 2028](https://github.com/iBotPeaches/Apktool/pull/2028)) Thanks IgorEisberg
  * Work-around with issue with large 9patch path spamming in uncompressed file list. ([Issue 1272](https://github.com/iBotPeaches/Apktool/issues/1272)) Thanks IgorEisberg
+ * Fixed issue with NPE on annotations ([Issue 2071](https://github.com/iBotPeaches/Apktool/issues/2071))
 
 ## v2.4.0
 2019.03.02
