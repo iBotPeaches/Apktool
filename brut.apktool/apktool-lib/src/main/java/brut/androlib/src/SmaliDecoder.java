@@ -24,6 +24,7 @@ import org.jf.dexlib2.Opcodes;
 import org.jf.dexlib2.dexbacked.DexBackedDexFile;
 import org.jf.dexlib2.dexbacked.DexBackedOdexFile;
 import org.jf.dexlib2.analysis.InlineMethodResolver;
+import org.jf.dexlib2.iface.MultiDexContainer;
 
 import java.io.File;
 import java.io.IOException;
@@ -68,10 +69,27 @@ public class SmaliDecoder {
                 jobs = 6;
             }
 
-            // create the dex
-            DexBackedDexFile dexFile = DexFileFactory.loadDexEntry(mApkFile, mDexFile, true, Opcodes.forApi(mApi));
+            // create the container
+            MultiDexContainer<? extends DexBackedDexFile> container = DexFileFactory.loadDexContainer(mApkFile, Opcodes.forApi(mApi));
+            MultiDexContainer.DexEntry<? extends DexBackedDexFile> dexEntry;
+            DexBackedDexFile dexFile;
 
-            if (dexFile.isOdexFile()) {
+            // If we have 1 item, ignore the passed file. Pull the DexFile we need.
+            if (container.getDexEntryNames().size() == 1) {
+                dexEntry = container.getEntry(container.getDexEntryNames().get(0));
+            } else {
+                dexEntry = container.getEntry(mDexFile);
+            }
+
+            // Double check the passed param exists
+            if (dexEntry == null) {
+                dexEntry = container.getEntry(container.getDexEntryNames().get(0));
+            }
+
+            assert dexEntry != null;
+            dexFile = dexEntry.getDexFile();
+
+            if (dexFile.supportsOptimizedOpcodes()) {
                 throw new AndrolibException("Warning: You are disassembling an odex file without deodexing it.");
             }
 
