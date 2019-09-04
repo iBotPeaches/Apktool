@@ -127,6 +127,7 @@ public class MergePublicValues {
                     if (!libPublicValue.id.equals(newResId)) {
                         updateIdMap.put(libPublicValue.id, newResId);
                     }
+                    // In danh sách các item được thêm mới
                     System.out.println(convertEntityToXML(libPublicValue));
                     // Thêm vào trong danh sách project public mới, dùng file này thay thế file public hiện tại trong project
                     newProPublicValues.add(new PublicValue(newResId, libPublicValue.name, libPublicValue.type));
