@@ -804,6 +804,16 @@
     <public type="color" name="color_main_green" id="0x7f0500c4" />
     <public type="color" name="color_second_green" id="0x7f0500c5" />
     <public type="color" name="color_text_grey" id="0x7f0500c6" />
+    <public type="color" name="bg_main_dark_blue_1" id="0x7f0500c7" />
+    <public type="color" name="bg_main_dark_blue_2" id="0x7f0500c8" />
+    <public type="color" name="color_main_green_1" id="0x7f0500c9" />
+    <public type="color" name="color_main_green_2" id="0x7f0500ca" />
+    <public type="color" name="color_main_grey_1" id="0x7f0500cb" />
+    <public type="color" name="color_main_grey_2" id="0x7f0500cc" />
+    <public type="color" name="color_main_orange_1" id="0x7f0500cd" />
+    <public type="color" name="color_main_orange_2" id="0x7f0500ce" />
+    <public type="color" name="color_main_text_black_1" id="0x7f0500cf" />
+    <public type="color" name="color_main_text_grey_1" id="0x7f0500d0" />
     <public type="dimen" name="abc_action_bar_content_inset_material" id="0x7f060000" />
     <public type="dimen" name="abc_action_bar_content_inset_with_nav" id="0x7f060001" />
     <public type="dimen" name="abc_action_bar_default_height_material" id="0x7f060002" />
@@ -1467,6 +1477,29 @@
     <public type="drawable" name="ic_mn_coin" id="0x7f070182" />
     <public type="drawable" name="ic_sm_coin" id="0x7f070183" />
     <public type="drawable" name="selector_btn_orange" id="0x7f070184" />
+    <public type="drawable" name="$ic_launcher_foreground__0" id="0x7f070185" />
+    <public type="drawable" name="banner_rate" id="0x7f070186" />
+    <public type="drawable" name="bg_coin_reward" id="0x7f070187" />
+    <public type="drawable" name="ic_back_grey" id="0x7f070188" />
+    <public type="drawable" name="ic_checkin_banner" id="0x7f070189" />
+    <public type="drawable" name="ic_circle_selected" id="0x7f07018a" />
+    <public type="drawable" name="ic_circle_unselected" id="0x7f07018b" />
+    <public type="drawable" name="ic_coinreward_diamond" id="0x7f07018c" />
+    <public type="drawable" name="ic_download" id="0x7f07018d" />
+    <public type="drawable" name="ic_gem" id="0x7f07018e" />
+    <public type="drawable" name="ic_gem_lg" id="0x7f07018f" />
+    <public type="drawable" name="ic_gem_mn" id="0x7f070190" />
+    <public type="drawable" name="ic_gem_sm" id="0x7f070191" />
+    <public type="drawable" name="ic_menu_gemreward" id="0x7f070192" />
+    <public type="drawable" name="ic_more" id="0x7f070193" />
+    <public type="drawable" name="ic_rate_5star" id="0x7f070194" />
+    <public type="drawable" name="ic_receied_banner" id="0x7f070195" />
+    <public type="drawable" name="ic_receied_banner_gr" id="0x7f070196" />
+    <public type="drawable" name="ic_upload" id="0x7f070197" />
+    <public type="drawable" name="rounded_green_btn_normal" id="0x7f070198" />
+    <public type="drawable" name="rounded_grey_btn_normal" id="0x7f070199" />
+    <public type="drawable" name="selector_btn_green" id="0x7f07019a" />
+    <public type="drawable" name="selector_btn_yellow" id="0x7f07019b" />
     <public type="id" name="ALT" id="0x7f080000" />
     <public type="id" name="CTRL" id="0x7f080001" />
     <public type="id" name="FUNCTION" id="0x7f080002" />
@@ -1935,6 +1968,37 @@
     <public type="id" name="restart" id="0x7f0801d1" />
     <public type="id" name="reverse" id="0x7f0801d2" />
     <public type="id" name="software" id="0x7f0801d3" />
+    <public type="id" name="btn_purchase" id="0x7f0801d4" />
+    <public type="id" name="iv_back" id="0x7f0801d5" />
+    <public type="id" name="iv_circle_12_month" id="0x7f0801d6" />
+    <public type="id" name="iv_circle_1_month" id="0x7f0801d7" />
+    <public type="id" name="iv_circle_3_month" id="0x7f0801d8" />
+    <public type="id" name="iv_flag_1" id="0x7f0801d9" />
+    <public type="id" name="iv_flag_2" id="0x7f0801da" />
+    <public type="id" name="iv_flag_3" id="0x7f0801db" />
+    <public type="id" name="iv_flag_4" id="0x7f0801dc" />
+    <public type="id" name="iv_flag_5" id="0x7f0801dd" />
+    <public type="id" name="tv_download_speed" id="0x7f0801de" />
+    <public type="id" name="tv_price_12_month" id="0x7f0801df" />
+    <public type="id" name="tv_price_1_month" id="0x7f0801e0" />
+    <public type="id" name="tv_price_3_month" id="0x7f0801e1" />
+    <public type="id" name="tv_sub_title" id="0x7f0801e2" />
+    <public type="id" name="tv_title_1" id="0x7f0801e3" />
+    <public type="id" name="tv_title_2" id="0x7f0801e4" />
+    <public type="id" name="tv_upload_speed" id="0x7f0801e5" />
+    <public type="id" name="view_flags" id="0x7f0801e6" />
+    <public type="id" name="view_friday" id="0x7f0801e7" />
+    <public type="id" name="view_get_today" id="0x7f0801e8" />
+    <public type="id" name="view_list_price" id="0x7f0801e9" />
+    <public type="id" name="view_monday" id="0x7f0801ea" />
+    <public type="id" name="view_saturday" id="0x7f0801eb" />
+    <public type="id" name="view_speed" id="0x7f0801ec" />
+    <public type="id" name="view_sunday" id="0x7f0801ed" />
+    <public type="id" name="view_thursday" id="0x7f0801ee" />
+    <public type="id" name="view_title" id="0x7f0801ef" />
+    <public type="id" name="view_total_coin" id="0x7f0801f0" />
+    <public type="id" name="view_tuesday" id="0x7f0801f1" />
+    <public type="id" name="view_wednesday" id="0x7f0801f2" />
     <public type="integer" name="abc_config_activityDefaultDur" id="0x7f090000" />
     <public type="integer" name="abc_config_activityShortDur" id="0x7f090001" />
     <public type="integer" name="app_bar_elevation_anim_duration" id="0x7f090002" />
@@ -2091,6 +2155,11 @@
     <public type="layout" name="item_tabview" id="0x7f0b0086" />
     <public type="layout" name="layout_main_toolbar" id="0x7f0b0087" />
     <public type="layout" name="layout_toast" id="0x7f0b0088" />
+    <public type="layout" name="activity_result" id="0x7f0b0089" />
+    <public type="layout" name="activity_upgrade_vip" id="0x7f0b008a" />
+    <public type="layout" name="layout_checkin" id="0x7f0b008b" />
+    <public type="layout" name="layout_notification" id="0x7f0b008c" />
+    <public type="layout" name="layout_rate" id="0x7f0b008d" />
     <public type="menu" name="activity_main_drawer" id="0x7f0c0000" />
     <public type="menu" name="main" id="0x7f0c0001" />
     <public type="menu" name="menu_ac_fb_faq" id="0x7f0c0002" />

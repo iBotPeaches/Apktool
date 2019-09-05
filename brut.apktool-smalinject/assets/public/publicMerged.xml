@@ -1999,6 +1999,7 @@
     <public type="id" name="view_total_coin" id="0x7f0801f0" />
     <public type="id" name="view_tuesday" id="0x7f0801f1" />
     <public type="id" name="view_wednesday" id="0x7f0801f2" />
+    <public type="id" name="tv_status" id="0x7f0801f3" />
     <public type="integer" name="abc_config_activityDefaultDur" id="0x7f090000" />
     <public type="integer" name="abc_config_activityShortDur" id="0x7f090001" />
     <public type="integer" name="app_bar_elevation_anim_duration" id="0x7f090002" />
@@ -2445,6 +2446,13 @@
     <public type="string" name="vip_text_worldwide_location" id="0x7f0e0115" />
     <public type="string" name="vpn_connect_error" id="0x7f0e0116" />
     <public type="string" name="vpn_servers" id="0x7f0e0117" />
+    <public type="string" name="step_get_2_server_failed" id="0x7f0e0118" />
+    <public type="string" name="step_get_vip_1_server_failed" id="0x7f0e0119" />
+    <public type="string" name="step_get_vip_1_server_successful" id="0x7f0e011a" />
+    <public type="string" name="step_get_vip_2_server_successful" id="0x7f0e011b" />
+    <public type="string" name="step_get_vip_2_servers" id="0x7f0e011c" />
+    <public type="string" name="step_prepare_get_servers" id="0x7f0e011d" />
+    <public type="string" name="step_start_get_vip_1_servers" id="0x7f0e011e" />
     <public type="style" name="ACDialogTheme" id="0x7f0f0000" />
     <public type="style" name="ACFbBaseTheme" id="0x7f0f0001" />
     <public type="style" name="ADRatingBar" id="0x7f0f0002" />

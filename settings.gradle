@@ -4,6 +4,5 @@ include 'brut.j.common',
         'brut.apktool:apktool-lib',
         'brut.apktool:apktool-cli',
         'brut.apktool:apktool-smalinject'
-include 'apktool-inject'
 include 'brut.apktool-smalinject'
 

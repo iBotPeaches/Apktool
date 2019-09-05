@@ -1455,49 +1455,50 @@
     <public type="id" name="tv_server_sub_info" id="0x7f0800e0" />
     <public type="id" name="tv_server_type" id="0x7f0800e1" />
     <public type="id" name="tv_servers_name" id="0x7f0800e2" />
-    <public type="id" name="tv_sub_title" id="0x7f0800e3" />
-    <public type="id" name="tv_title" id="0x7f0800e4" />
-    <public type="id" name="tv_title_1" id="0x7f0800e5" />
-    <public type="id" name="tv_title_2" id="0x7f0800e6" />
-    <public type="id" name="tv_total_time_connected" id="0x7f0800e7" />
-    <public type="id" name="tv_upload_speed" id="0x7f0800e8" />
-    <public type="id" name="tv_vip_label" id="0x7f0800e9" />
-    <public type="id" name="tv_virtual_ip_info" id="0x7f0800ea" />
-    <public type="id" name="uniform" id="0x7f0800eb" />
-    <public type="id" name="unlabeled" id="0x7f0800ec" />
-    <public type="id" name="up" id="0x7f0800ed" />
-    <public type="id" name="useLogo" id="0x7f0800ee" />
-    <public type="id" name="view_bg" id="0x7f0800ef" />
-    <public type="id" name="view_bg_2" id="0x7f0800f0" />
-    <public type="id" name="view_bg_3" id="0x7f0800f1" />
-    <public type="id" name="view_clicked" id="0x7f0800f2" />
-    <public type="id" name="view_divider" id="0x7f0800f3" />
-    <public type="id" name="view_empty" id="0x7f0800f4" />
-    <public type="id" name="view_flags" id="0x7f0800f5" />
-    <public type="id" name="view_friday" id="0x7f0800f6" />
-    <public type="id" name="view_get_today" id="0x7f0800f7" />
-    <public type="id" name="view_infor" id="0x7f0800f8" />
-    <public type="id" name="view_list_price" id="0x7f0800f9" />
-    <public type="id" name="view_monday" id="0x7f0800fa" />
-    <public type="id" name="view_offset_helper" id="0x7f0800fb" />
-    <public type="id" name="view_pager" id="0x7f0800fc" />
-    <public type="id" name="view_saturday" id="0x7f0800fd" />
-    <public type="id" name="view_select_server" id="0x7f0800fe" />
-    <public type="id" name="view_speed" id="0x7f0800ff" />
-    <public type="id" name="view_sunday" id="0x7f080100" />
-    <public type="id" name="view_swipe_refresh" id="0x7f080101" />
-    <public type="id" name="view_thursday" id="0x7f080102" />
-    <public type="id" name="view_title" id="0x7f080103" />
-    <public type="id" name="view_toolbar" id="0x7f080104" />
-    <public type="id" name="view_total_coin" id="0x7f080105" />
-    <public type="id" name="view_tuesday" id="0x7f080106" />
-    <public type="id" name="view_wednesday" id="0x7f080107" />
-    <public type="id" name="viewpump_layout_res" id="0x7f080108" />
-    <public type="id" name="viewpump_tag_id" id="0x7f080109" />
-    <public type="id" name="visible" id="0x7f08010a" />
-    <public type="id" name="withText" id="0x7f08010b" />
-    <public type="id" name="wrap" id="0x7f08010c" />
-    <public type="id" name="wrap_content" id="0x7f08010d" />
+    <public type="id" name="tv_status" id="0x7f0800e3" />
+    <public type="id" name="tv_sub_title" id="0x7f0800e4" />
+    <public type="id" name="tv_title" id="0x7f0800e5" />
+    <public type="id" name="tv_title_1" id="0x7f0800e6" />
+    <public type="id" name="tv_title_2" id="0x7f0800e7" />
+    <public type="id" name="tv_total_time_connected" id="0x7f0800e8" />
+    <public type="id" name="tv_upload_speed" id="0x7f0800e9" />
+    <public type="id" name="tv_vip_label" id="0x7f0800ea" />
+    <public type="id" name="tv_virtual_ip_info" id="0x7f0800eb" />
+    <public type="id" name="uniform" id="0x7f0800ec" />
+    <public type="id" name="unlabeled" id="0x7f0800ed" />
+    <public type="id" name="up" id="0x7f0800ee" />
+    <public type="id" name="useLogo" id="0x7f0800ef" />
+    <public type="id" name="view_bg" id="0x7f0800f0" />
+    <public type="id" name="view_bg_2" id="0x7f0800f1" />
+    <public type="id" name="view_bg_3" id="0x7f0800f2" />
+    <public type="id" name="view_clicked" id="0x7f0800f3" />
+    <public type="id" name="view_divider" id="0x7f0800f4" />
+    <public type="id" name="view_empty" id="0x7f0800f5" />
+    <public type="id" name="view_flags" id="0x7f0800f6" />
+    <public type="id" name="view_friday" id="0x7f0800f7" />
+    <public type="id" name="view_get_today" id="0x7f0800f8" />
+    <public type="id" name="view_infor" id="0x7f0800f9" />
+    <public type="id" name="view_list_price" id="0x7f0800fa" />
+    <public type="id" name="view_monday" id="0x7f0800fb" />
+    <public type="id" name="view_offset_helper" id="0x7f0800fc" />
+    <public type="id" name="view_pager" id="0x7f0800fd" />
+    <public type="id" name="view_saturday" id="0x7f0800fe" />
+    <public type="id" name="view_select_server" id="0x7f0800ff" />
+    <public type="id" name="view_speed" id="0x7f080100" />
+    <public type="id" name="view_sunday" id="0x7f080101" />
+    <public type="id" name="view_swipe_refresh" id="0x7f080102" />
+    <public type="id" name="view_thursday" id="0x7f080103" />
+    <public type="id" name="view_title" id="0x7f080104" />
+    <public type="id" name="view_toolbar" id="0x7f080105" />
+    <public type="id" name="view_total_coin" id="0x7f080106" />
+    <public type="id" name="view_tuesday" id="0x7f080107" />
+    <public type="id" name="view_wednesday" id="0x7f080108" />
+    <public type="id" name="viewpump_layout_res" id="0x7f080109" />
+    <public type="id" name="viewpump_tag_id" id="0x7f08010a" />
+    <public type="id" name="visible" id="0x7f08010b" />
+    <public type="id" name="withText" id="0x7f08010c" />
+    <public type="id" name="wrap" id="0x7f08010d" />
+    <public type="id" name="wrap_content" id="0x7f08010e" />
     <public type="integer" name="abc_config_activityDefaultDur" id="0x7f090000" />
     <public type="integer" name="abc_config_activityShortDur" id="0x7f090001" />
     <public type="integer" name="app_bar_elevation_anim_duration" id="0x7f090002" />
@@ -1696,17 +1697,24 @@
     <public type="string" name="state_starting" id="0x7f0e0066" />
     <public type="string" name="state_wait" id="0x7f0e0067" />
     <public type="string" name="status_bar_notification_info_overflow" id="0x7f0e0068" />
-    <public type="string" name="surf_tip_msg" id="0x7f0e0069" />
-    <public type="string" name="tap_to_connect" id="0x7f0e006a" />
-    <public type="string" name="text_dlg_avoid_msg" id="0x7f0e006b" />
-    <public type="string" name="text_dlg_avoid_positive" id="0x7f0e006c" />
-    <public type="string" name="text_dlg_note" id="0x7f0e006d" />
-    <public type="string" name="text_type_vip" id="0x7f0e006e" />
-    <public type="string" name="vip_text_faster_connection" id="0x7f0e006f" />
-    <public type="string" name="vip_text_tab_faster_servers" id="0x7f0e0070" />
-    <public type="string" name="vip_text_tab_free" id="0x7f0e0071" />
-    <public type="string" name="vpn_connect_error" id="0x7f0e0072" />
-    <public type="string" name="vpn_servers" id="0x7f0e0073" />
+    <public type="string" name="step_get_2_server_failed" id="0x7f0e0069" />
+    <public type="string" name="step_get_vip_1_server_failed" id="0x7f0e006a" />
+    <public type="string" name="step_get_vip_1_server_successful" id="0x7f0e006b" />
+    <public type="string" name="step_get_vip_2_server_successful" id="0x7f0e006c" />
+    <public type="string" name="step_get_vip_2_servers" id="0x7f0e006d" />
+    <public type="string" name="step_prepare_get_servers" id="0x7f0e006e" />
+    <public type="string" name="step_start_get_vip_1_servers" id="0x7f0e006f" />
+    <public type="string" name="surf_tip_msg" id="0x7f0e0070" />
+    <public type="string" name="tap_to_connect" id="0x7f0e0071" />
+    <public type="string" name="text_dlg_avoid_msg" id="0x7f0e0072" />
+    <public type="string" name="text_dlg_avoid_positive" id="0x7f0e0073" />
+    <public type="string" name="text_dlg_note" id="0x7f0e0074" />
+    <public type="string" name="text_type_vip" id="0x7f0e0075" />
+    <public type="string" name="vip_text_faster_connection" id="0x7f0e0076" />
+    <public type="string" name="vip_text_tab_faster_servers" id="0x7f0e0077" />
+    <public type="string" name="vip_text_tab_free" id="0x7f0e0078" />
+    <public type="string" name="vpn_connect_error" id="0x7f0e0079" />
+    <public type="string" name="vpn_servers" id="0x7f0e007a" />
     <public type="style" name="AlertDialog.AppCompat" id="0x7f0f0000" />
     <public type="style" name="AlertDialog.AppCompat.Light" id="0x7f0f0001" />
     <public type="style" name="Animation.AppCompat.Dialog" id="0x7f0f0002" />
