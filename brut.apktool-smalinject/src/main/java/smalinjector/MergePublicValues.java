@@ -18,6 +18,9 @@ import java.util.*;
 
 public class MergePublicValues {
 
+    private static final int HEX_STEP = 65536;
+    private static final int FIRST_HEX_VALUE = 2130771968;
+
     public Map<String, List<PublicValue>> originLibPublicMap = new HashMap<>();
     public Map<String, List<PublicValue>> originProPublicMap = new HashMap<>();
     public Map<Integer, Integer> updateIdMap = new HashMap<>();
@@ -26,7 +29,8 @@ public class MergePublicValues {
     private List<PublicValue> originLibPublicValues = new ArrayList<>();
     private List<PublicValue> originProPublicValues = new ArrayList<>();
 
-    private SortedSet<String> publicTypes = new TreeSet<>();
+    private SortedSet<String> mergePublicTypes = new TreeSet<>();
+    private SortedSet<String> proPublicTypes = new TreeSet<>();
 
     private void loadResourceIds(Map<String, File> resourceFiles) throws ParserConfigurationException, SAXException, IOException {
         for (Map.Entry<String, File> entry : resourceFiles.entrySet()) {
@@ -39,7 +43,7 @@ public class MergePublicValues {
                         String resourceName = attributes.getValue("name");
                         Integer resourceId = Integer.decode(attributes.getValue("id"));
 
-                        publicTypes.add(resourceType);
+                        mergePublicTypes.add(resourceType);
 
                         PublicValue publicValue = new PublicValue(resourceId, resourceName, resourceType);
                         if (entry.getKey().equals("LIB_RES")) {
@@ -47,6 +51,7 @@ public class MergePublicValues {
                                 originLibPublicValues.add(new PublicValue(resourceId, resourceName, resourceType));
                             }
                         } else {
+                            proPublicTypes.add(resourceType);
                             if (!originProPublicValues.contains(publicValue)) {
                                 originProPublicValues.add(new PublicValue(resourceId, resourceName, resourceType));
                             }
@@ -55,8 +60,8 @@ public class MergePublicValues {
                 }
             });
         }
-        originLibPublicValues.sort(Comparator.comparingInt(o -> o.id));
-        originProPublicValues.sort(Comparator.comparingInt(o -> o.id));
+        this.originLibPublicValues.sort(Comparator.comparingInt(o -> o.id));
+        this.originProPublicValues.sort(Comparator.comparingInt(o -> o.id));
     }
 
     private Map<String, List<PublicValue>> loadPublicTypes(List<PublicValue> publicValues) {
@@ -83,23 +88,24 @@ public class MergePublicValues {
 
     public void loadPublicTypes(Map<String, File> publicFiles) throws IOException, SAXException, ParserConfigurationException {
         loadResourceIds(publicFiles);
-        originLibPublicMap = loadPublicTypes(originLibPublicValues);
-        originProPublicMap = loadPublicTypes(originProPublicValues);
+        this.originLibPublicMap = loadPublicTypes(this.originLibPublicValues);
+        this.originProPublicMap = loadPublicTypes(this.originProPublicValues);
     }
 
     public void mergePublicValues() {
-        for (String publicType : publicTypes) {
+        int proPublicTypesSize = this.proPublicTypes.size();
+        for (String publicType : this.mergePublicTypes) {
 
-            boolean proHasResType = originProPublicMap.containsKey(publicType);
-            boolean libHasResType = originLibPublicMap.containsKey(publicType);
+            boolean proHasResType = this.originProPublicMap.containsKey(publicType);
+            boolean libHasResType = this.originLibPublicMap.containsKey(publicType);
 
             // Kiểm tra 2 file lib và project có cùng type
             if (proHasResType && libHasResType) {
-                List<PublicValue> tempOriginProPublicValues = originProPublicMap.get(publicType);
-                List<PublicValue> tempOriginLibPublicValues = originLibPublicMap.get(publicType);
+                List<PublicValue> tempOriginProPublicValues = this.originProPublicMap.get(publicType);
+                List<PublicValue> tempOriginLibPublicValues = this.originLibPublicMap.get(publicType);
 
                 // Thêm tất cả các phần tử type hiện tại của project public
-                newProPublicValues.addAll(tempOriginProPublicValues);
+                this.newProPublicValues.addAll(tempOriginProPublicValues);
                 // Lấy giá trị id cuối cùng type hiện tại của project public
                 Integer newResId = tempOriginProPublicValues.get(tempOriginProPublicValues.size() - 1).id;
                 // Tăng lên 1 nếu có phần từ mới thì update id này cho nó
@@ -114,7 +120,7 @@ public class MergePublicValues {
                             breakNestedLoop = true;
                             // Nếu id của lib khác id của project, cập nhật id mới cho lib
                             if (!libPublicValue.id.equals(proPublicValue.id)) {
-                                updateIdMap.put(libPublicValue.id, proPublicValue.id);
+                                this.updateIdMap.put(libPublicValue.id, proPublicValue.id);
                             }
                             break;
                         }
@@ -125,12 +131,10 @@ public class MergePublicValues {
                     }
                     // Kiểm tra và update map id phục vụ cập nhật smali
                     if (!libPublicValue.id.equals(newResId)) {
-                        updateIdMap.put(libPublicValue.id, newResId);
+                        this.updateIdMap.put(libPublicValue.id, newResId);
                     }
-                    // In danh sách các item được thêm mới
-                    System.out.println(convertEntityToXML(libPublicValue));
                     // Thêm vào trong danh sách project public mới, dùng file này thay thế file public hiện tại trong project
-                    newProPublicValues.add(new PublicValue(newResId, libPublicValue.name, libPublicValue.type));
+                    this.newProPublicValues.add(new PublicValue(newResId, libPublicValue.name, libPublicValue.type));
                     newResId++;
                 }
                 continue;
@@ -138,12 +142,21 @@ public class MergePublicValues {
 
             // Nếu chỉ 1 trong 2 file có type đó thì tự động thêm vào danh sách project public mới mà ko cần kiểm tra
             if (proHasResType) {
-                newProPublicValues.addAll(originProPublicMap.get(publicType));
+                this.newProPublicValues.addAll(this.originProPublicMap.get(publicType));
                 continue;
             }
 
             if (libHasResType) {
-                newProPublicValues.addAll(originLibPublicMap.get(publicType));
+                // Xử lý update public id mới cho cái type ko có trong project public
+                int newId = ++proPublicTypesSize * HEX_STEP + FIRST_HEX_VALUE;
+                List<PublicValue> tempOriginLibPublicValues = this.originLibPublicMap.get(publicType);
+                for (PublicValue libPublicValue : tempOriginLibPublicValues) {
+                    int newResId = newId;
+                    this.updateIdMap.put(libPublicValue.id, newResId);
+                    libPublicValue.id = newResId;
+                    newId++;
+                }
+                this.newProPublicValues.addAll(tempOriginLibPublicValues);
             }
         }
     }
