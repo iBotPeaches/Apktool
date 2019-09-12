@@ -27,6 +27,7 @@ public class Smalinjector {
             AndrolibResources androlibResources = new AndrolibResources();
             ExtMXSerializer xmlSerializer = androlibResources.getResXmlSerializer();
             smalinjector.generatePublicXml(smalinjector.newProPublicValues, xmlSerializer, outputMergedPublicFilePath);
+            smalinjector.generateReplaceIdMap(smalinjector.updateIdMap);
         } catch (AndrolibException | SAXException | ParserConfigurationException | IOException e) {
             e.printStackTrace();
         }
