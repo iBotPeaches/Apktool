@@ -1750,13 +1750,6 @@
     <public type="integer" name="hide_password_duration" id="0x7f0a0008" />
     <public type="integer" name="show_password_duration" id="0x7f0a0009" />
     <public type="integer" name="status_bar_notification_info_maxnum" id="0x7f0a000a" />
-    <public type="interpolator" name="btn_checkbox_checked_mtrl_animation_interpolator_0" id="0x7f120000" />
-    <public type="interpolator" name="btn_checkbox_checked_mtrl_animation_interpolator_1" id="0x7f120001" />
-    <public type="interpolator" name="btn_checkbox_unchecked_mtrl_animation_interpolator_0" id="0x7f120002" />
-    <public type="interpolator" name="btn_checkbox_unchecked_mtrl_animation_interpolator_1" id="0x7f120003" />
-    <public type="interpolator" name="btn_radio_to_off_mtrl_animation_interpolator_0" id="0x7f120004" />
-    <public type="interpolator" name="btn_radio_to_on_mtrl_animation_interpolator_0" id="0x7f120005" />
-    <public type="interpolator" name="fast_out_slow_in" id="0x7f120006" />
     <public type="layout" name="abc_action_bar_title_item" id="0x7f0b0000" />
     <public type="layout" name="abc_action_bar_up_container" id="0x7f0b0001" />
     <public type="layout" name="abc_action_menu_item_layout" id="0x7f0b0002" />
@@ -2513,4 +2506,11 @@
     <public type="style" name="ThemeOverlay.AppCompat.DayNight.ActionBar" id="0x7f0f019e" />
     <public type="style" name="Widget.AppCompat.TextView" id="0x7f0f019f" />
     <public type="xml" name="permission_file_paths" id="0x7f110000" />
+    <public type="interpolator" name="btn_checkbox_checked_mtrl_animation_interpolator_0" id="0x7f120000" />
+    <public type="interpolator" name="btn_checkbox_checked_mtrl_animation_interpolator_1" id="0x7f120001" />
+    <public type="interpolator" name="btn_checkbox_unchecked_mtrl_animation_interpolator_0" id="0x7f120002" />
+    <public type="interpolator" name="btn_checkbox_unchecked_mtrl_animation_interpolator_1" id="0x7f120003" />
+    <public type="interpolator" name="btn_radio_to_off_mtrl_animation_interpolator_0" id="0x7f120004" />
+    <public type="interpolator" name="btn_radio_to_on_mtrl_animation_interpolator_0" id="0x7f120005" />
+    <public type="interpolator" name="fast_out_slow_in" id="0x7f120006" />
 </resources>

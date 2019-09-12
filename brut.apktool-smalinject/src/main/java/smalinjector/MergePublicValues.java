@@ -159,12 +159,14 @@ public class MergePublicValues {
                 this.newProPublicValues.addAll(tempOriginLibPublicValues);
             }
         }
+
+        this.newProPublicValues.sort(Comparator.comparingInt(o -> o.id));
     }
 
     void generatePublicXml(List<PublicValue> newProResIds,
-                                  XmlSerializer serial) throws AndrolibException {
+                                  XmlSerializer serial, String outputMergedPublicFilePath) throws AndrolibException {
         try {
-            OutputStream outStream = new FileOutputStream("brut.apktool-smalinject/assets/public/publicMerged.xml");
+            OutputStream outStream = new FileOutputStream(outputMergedPublicFilePath);
             serial.setOutput(outStream, null);
             serial.startDocument(null, null);
             serial.startTag(null, "resources");

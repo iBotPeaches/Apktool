@@ -1,8 +1,17 @@
-plugins {
-    id 'java'
-}
+import org.apache.tools.ant.filters.*
 
-version 'unspecified'
+processResources {
+    from('src/main/resources/properties') {
+        include '**/*.properties'
+        into 'properties'
+        filter(ReplaceTokens, tokens: [version: project.apktool_version, gitrev: project.hash] )
+    }
+    from('src/main/resources/') {
+        include '**/*.jar'
+    }
+
+    includeEmptyDirs = false
+}
 
 sourceCompatibility = 1.8
 
