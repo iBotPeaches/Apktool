@@ -99,16 +99,19 @@ final public class AndrolibResources {
             throws AndrolibException {
         int id = 0;
         int value = 0;
+        int index = 0;
 
-        for (ResPackage resPackage : pkgs) {
+        for (int i = 0; i < pkgs.length; i++) {
+            ResPackage resPackage = pkgs[i];
             if (resPackage.getResSpecCount() > value && ! resPackage.getName().equalsIgnoreCase("android")) {
                 value = resPackage.getResSpecCount();
                 id = resPackage.getId();
+                index = i;
             }
         }
 
         // if id is still 0, we only have one pkgId which is "android" -> 1
-        return (id == 0) ? pkgs[0] : pkgs[1];
+        return (id == 0) ? pkgs[0] : pkgs[index];
     }
 
     public ResPackage loadFrameworkPkg(ResTable resTable, int id, String frameTag)
