@@ -38,6 +38,10 @@ public class Res9patchStreamDecoder implements ResStreamDecoder {
         try {
             byte[] data = IOUtils.toByteArray(in);
 
+            if (data.length == 0) {
+                return;
+            }
+
             BufferedImage im = ImageIO.read(new ByteArrayInputStream(data));
             int w = im.getWidth(), h = im.getHeight();
 
