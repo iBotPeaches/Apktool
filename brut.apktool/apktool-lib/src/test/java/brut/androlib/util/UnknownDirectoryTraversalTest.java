@@ -1,6 +1,6 @@
 /**
- *  Copyright (C) 2018 Ryszard Wiśniewski <brut.alll@gmail.com>
- *  Copyright (C) 2018 Connor Tumbleson <connor.tumbleson@gmail.com>
+ *  Copyright (C) 2019 Ryszard Wiśniewski <brut.alll@gmail.com>
+ *  Copyright (C) 2019 Connor Tumbleson <connor.tumbleson@gmail.com>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -69,6 +69,18 @@ public class UnknownDirectoryTraversalTest extends BaseTest {
     @Test(expected = InvalidUnknownFileException.class)
     public void noFilePassedTest() throws IOException, BrutException {
         BrutIO.sanitizeUnknownFile(sTmpDir, "");
+    }
+
+    @Test(expected = TraversalUnknownFileException.class)
+    public void invalidBackwardPathOnWindows() throws IOException, BrutException {
+        String invalidPath;
+        if (! OSDetection.isWindows()) {
+            invalidPath = "../../app";
+        } else {
+            invalidPath = "..\\..\\app.exe";
+        }
+
+        BrutIO.sanitizeUnknownFile(sTmpDir, invalidPath);
     }
 
     @Test

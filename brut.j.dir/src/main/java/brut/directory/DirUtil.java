@@ -1,6 +1,6 @@
 /**
- *  Copyright (C) 2018 Ryszard Wiśniewski <brut.alll@gmail.com>
- *  Copyright (C) 2018 Connor Tumbleson <connor.tumbleson@gmail.com>
+ *  Copyright (C) 2019 Ryszard Wiśniewski <brut.alll@gmail.com>
+ *  Copyright (C) 2019 Connor Tumbleson <connor.tumbleson@gmail.com>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -81,7 +81,8 @@ public class DirUtil {
                 if (fileName.equals("res") && !in.containsFile(fileName)) {
                     return;
                 }
-                File outFile = new File(out, fileName);
+                String cleanedFilename = BrutIO.sanitizeUnknownFile(out, fileName);
+                File outFile = new File(out, cleanedFilename);
                 outFile.getParentFile().mkdirs();
                 BrutIO.copyAndClose(in.getFileInput(fileName),
                     new FileOutputStream(outFile));

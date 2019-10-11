@@ -1,6 +1,6 @@
 /**
- *  Copyright (C) 2018 Ryszard Wiśniewski <brut.alll@gmail.com>
- *  Copyright (C) 2018 Connor Tumbleson <connor.tumbleson@gmail.com>
+ *  Copyright (C) 2019 Ryszard Wiśniewski <brut.alll@gmail.com>
+ *  Copyright (C) 2019 Connor Tumbleson <connor.tumbleson@gmail.com>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ public final class ResTypeSpec {
     public static final String RES_TYPE_NAME_ARRAY = "array";
     public static final String RES_TYPE_NAME_PLURALS = "plurals";
     public static final String RES_TYPE_NAME_STYLES = "style";
+    public static final String RES_TYPE_NAME_ATTR = "attr";
 
     private final String mName;
     private final Map<String, ResResSpec> mResSpecs = new LinkedHashMap<String, ResResSpec>();

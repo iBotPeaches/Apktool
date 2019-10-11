@@ -1,6 +1,6 @@
 /**
- *  Copyright (C) 2018 Ryszard Wiśniewski <brut.alll@gmail.com>
- *  Copyright (C) 2018 Connor Tumbleson <connor.tumbleson@gmail.com>
+ *  Copyright (C) 2019 Ryszard Wiśniewski <brut.alll@gmail.com>
+ *  Copyright (C) 2019 Connor Tumbleson <connor.tumbleson@gmail.com>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -144,6 +144,7 @@ public class ApkDecoder {
                         mAndrolib.decodeSourcesRaw(mApkFile, outDir, "classes.dex");
                         break;
                     case DECODE_SOURCES_SMALI:
+                    case DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES:
                         mAndrolib.decodeSourcesSmali(mApkFile, outDir, "classes.dex", mBakDeb, mApi);
                         break;
                 }
@@ -161,6 +162,13 @@ public class ApkDecoder {
                                     break;
                                 case DECODE_SOURCES_SMALI:
                                     mAndrolib.decodeSourcesSmali(mApkFile, outDir, file, mBakDeb, mApi);
+                                    break;
+                                case DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES:
+                                    if (file.startsWith("classes") && file.endsWith(".dex")) {
+                                        mAndrolib.decodeSourcesSmali(mApkFile, outDir, file, mBakDeb, mApi);
+                                    } else {
+                                        mAndrolib.decodeSourcesRaw(mApkFile, outDir, file);
+                                    }
                                     break;
                             }
                         }
@@ -184,7 +192,7 @@ public class ApkDecoder {
     }
 
     public void setDecodeSources(short mode) throws AndrolibException {
-        if (mode != DECODE_SOURCES_NONE && mode != DECODE_SOURCES_SMALI) {
+        if (mode != DECODE_SOURCES_NONE && mode != DECODE_SOURCES_SMALI && mode != DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES) {
             throw new AndrolibException("Invalid decode sources mode: " + mode);
         }
         mDecodeSources = mode;
@@ -316,6 +324,7 @@ public class ApkDecoder {
 
     public final static short DECODE_SOURCES_NONE = 0x0000;
     public final static short DECODE_SOURCES_SMALI = 0x0001;
+    public final static short DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES = 0x0010;
 
     public final static short DECODE_RESOURCES_NONE = 0x0100;
     public final static short DECODE_RESOURCES_FULL = 0x0101;

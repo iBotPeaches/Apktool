@@ -1,6 +1,6 @@
 /**
- *  Copyright (C) 2018 Ryszard Wiśniewski <brut.alll@gmail.com>
- *  Copyright (C) 2018 Connor Tumbleson <connor.tumbleson@gmail.com>
+ *  Copyright (C) 2019 Ryszard Wiśniewski <brut.alll@gmail.com>
+ *  Copyright (C) 2019 Connor Tumbleson <connor.tumbleson@gmail.com>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -110,6 +110,10 @@ public class ResValueFactory {
 
         if (ResTypeSpec.RES_TYPE_NAME_STYLES.equals(resTypeName)) {
             return new ResStyleValue(parentVal, items, this);
+        }
+
+        if (ResTypeSpec.RES_TYPE_NAME_ATTR.equals(resTypeName)) {
+            return new ResAttr(parentVal, 0, null, null, null);
         }
 
         throw new AndrolibException("unsupported res type name for bags. Found: " + resTypeName);

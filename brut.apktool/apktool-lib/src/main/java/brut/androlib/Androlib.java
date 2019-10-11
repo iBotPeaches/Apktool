@@ -1,6 +1,6 @@
 /**
- *  Copyright (C) 2018 Ryszard Wiśniewski <brut.alll@gmail.com>
- *  Copyright (C) 2018 Connor Tumbleson <connor.tumbleson@gmail.com>
+ *  Copyright (C) 2019 Ryszard Wiśniewski <brut.alll@gmail.com>
+ *  Copyright (C) 2019 Connor Tumbleson <connor.tumbleson@gmail.com>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -172,15 +172,13 @@ public class Androlib {
                     unk.getCompressionLevel(file) == 0 &&
                     unk.getSize(file) != 0) {
 
-                    if (StringUtils.countMatches(file, ".") > 1) {
-                        ext = file;
-                    } else {
-                        ext = FilenameUtils.getExtension(file);
-                        if (ext.isEmpty()) {
-                            ext = file;
-                        }
-                    }
+                    ext = FilenameUtils.getExtension(file);
 
+                    // If we don't have a png extension, but we have multiple "dots", we may have another iteration
+                    // of OEM specific 9patch files. We need to record full path for these.
+                    if (ext.isEmpty() || (!ext.equals("png") && StringUtils.countMatches(file, ".") > 1)) {
+                        ext = file;
+                    }
                     if (!uncompressedFilesOrExts.contains(ext)) {
                         uncompressedFilesOrExts.add(ext);
                     }
