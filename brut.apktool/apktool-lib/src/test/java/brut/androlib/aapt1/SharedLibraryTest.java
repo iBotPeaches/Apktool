@@ -1,4 +1,4 @@
-/**
+/*
  *  Copyright (C) 2019 Ryszard Wiśniewski <brut.alll@gmail.com>
  *  Copyright (C) 2019 Connor Tumbleson <connor.tumbleson@gmail.com>
  *
