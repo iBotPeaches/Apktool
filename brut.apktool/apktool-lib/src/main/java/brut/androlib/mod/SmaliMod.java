@@ -59,7 +59,7 @@ public class SmaliMod {
         InputStream is = new FileInputStream(smaliFile);
         InputStreamReader reader = new InputStreamReader(is, "UTF-8");
 
-        lexer = new smaliFlexLexer(reader);
+        lexer = new smaliFlexLexer(reader, apiLevel);
         ((smaliFlexLexer)lexer).setSourceFile(smaliFile);
         tokens = new CommonTokenStream((TokenSource) lexer);
 

@@ -45,9 +45,11 @@ task proguard(type: proguard.gradle.ProGuardTask, dependsOn: shadowJar) {
 
     // Java 9 and prior uses merged package for runtime, later uses split jmod files.
     if (JavaVersion.current() <= JavaVersion.VERSION_1_8) {
+        libraryjars "${System.properties['java.home']}/lib/jce.jar"
         libraryjars "${System.properties['java.home']}/lib/rt.jar"
     } else {
         libraryjars "${System.properties['java.home']}/jmods/java.base.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
+        libraryjars "${System.properties['java.home']}/jmods/java.compiler.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
         libraryjars "${System.properties['java.home']}/jmods/java.logging.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
         libraryjars "${System.properties['java.home']}/jmods/java.xml.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
         libraryjars "${System.properties['java.home']}/jmods/java.desktop.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
