@@ -339,13 +339,12 @@ public class AXmlResourceParser implements XmlResourceParser {
 
         // some attributes will return "", we must rely on the resource_id and refer to the frameworks
         // to match the resource id to the name. ex: 0x101021C = versionName
-        if (value.length() != 0) {
+        if (value.length() != 0 && !android_ns.equals(getAttributeNamespace(index))) {
             return value;
         } else {
             try {
                 value = mAttrDecoder.decodeManifestAttr(getAttributeNameResource(index));
             } catch (AndrolibException e) {
-                value = "";
             }
             return value;
         }
