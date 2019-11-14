@@ -478,6 +478,7 @@ public class Main {
         DecodeOptions.addOption(forceDecOption);
         DecodeOptions.addOption(noSrcOption);
         DecodeOptions.addOption(noResOption);
+        DecodeOptions.addOption(onlyMainClassesOption);
 
         // add basic build options
         BuildOptions.addOption(outputBuiOption);
