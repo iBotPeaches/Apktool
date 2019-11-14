@@ -3,8 +3,8 @@
 if [ "$TRAVIS_OS_NAME" = "windows" ]; then
     export GRADLE_OPTS=-Dorg.gradle.daemon=false
     choco install jdk8
-    export PATH=$PATH:"/c/Program Files/Java/jdk1.8.0_221/bin"
-    export JAVA_HOME="/c/Program Files/Java/jdk1.8.0_221"
+    export PATH=$PATH:"/c/Program Files/Java/jdk1.8.0_231/bin"
+    export JAVA_HOME="/c/Program Files/Java/jdk1.8.0_231"
     ./gradlew.bat clean
 else
     ./gradlew clean
