@@ -519,6 +519,7 @@ public class Main {
         allOptions.addOption(quietOption);
         allOptions.addOption(aapt2Option);
         allOptions.addOption(noCrunchOption);
+        allOptions.addOption(onlyMainClassesOption);
     }
 
     private static String verbosityHelp() {
