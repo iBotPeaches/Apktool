@@ -457,6 +457,7 @@ public class Main {
             DecodeOptions.addOption(apiLevelOption);
             DecodeOptions.addOption(noAssetOption);
             DecodeOptions.addOption(forceManOption);
+            DecodeOptions.addOption(onlyMainClassesOption);
 
             BuildOptions.addOption(apiLevelOption);
             BuildOptions.addOption(debugBuiOption);
@@ -477,7 +478,6 @@ public class Main {
         DecodeOptions.addOption(forceDecOption);
         DecodeOptions.addOption(noSrcOption);
         DecodeOptions.addOption(noResOption);
-        DecodeOptions.addOption(onlyMainClassesOption);
 
         // add basic build options
         BuildOptions.addOption(outputBuiOption);
@@ -519,6 +519,7 @@ public class Main {
         allOptions.addOption(quietOption);
         allOptions.addOption(aapt2Option);
         allOptions.addOption(noCrunchOption);
+        allOptions.addOption(onlyMainClassesOption);
     }
 
     private static String verbosityHelp() {
