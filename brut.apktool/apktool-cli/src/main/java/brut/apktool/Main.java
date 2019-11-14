@@ -454,10 +454,10 @@ public class Main {
             DecodeOptions.addOption(noDbgOption);
             DecodeOptions.addOption(keepResOption);
             DecodeOptions.addOption(analysisOption);
+            DecodeOptions.addOption(onlyMainClassesOption);
             DecodeOptions.addOption(apiLevelOption);
             DecodeOptions.addOption(noAssetOption);
             DecodeOptions.addOption(forceManOption);
-            DecodeOptions.addOption(onlyMainClassesOption);
 
             BuildOptions.addOption(apiLevelOption);
             BuildOptions.addOption(debugBuiOption);
