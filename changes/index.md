@@ -27,6 +27,7 @@ description: Apktool - Changelog / Roadmap
  * Work-around with issue with large 9patch path spamming in uncompressed file list. ([Issue 1272](https://github.com/iBotPeaches/Apktool/issues/1272)) Thanks IgorEisberg
  * Fixed issue with NPE on annotations ([Issue 2071](https://github.com/iBotPeaches/Apktool/issues/2071))
  * Fixed issue with garbled attributes ([Issue 1576](https://github.com/iBotPeaches/Apktool/issues/1576)) Thanks brianairb
+ * Fixed regression with `--only-main-classes` ([Issue 2226](https://github.com/iBotPeaches/Apktool/pull/2226)) Thanks realityJie
 
 ## v2.4.0
 2019.03.02
