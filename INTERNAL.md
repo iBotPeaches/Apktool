@@ -262,10 +262,9 @@ we lose the ability to quickly build just the aapt binary. So the Windows proced
 1. `source build/envsetup.sh`
 2. `lunch sdk-eng`
 3. `make LOCAL_MULTILIB=64 USE_NINJA=false aapt`
-4. `strip out/host/darwin-x86/bin/aapt`
-5. `strip out/host/darwin-x86/bin/aapt_64`
+4. `strip out/host/darwin-x86/bin/aapt_64`
 
-32/64 bit binaries will be built for all platforms.
+32/64 bit binaries will be built for Unix and Mac.
 
 ### Building the aapt2 binary.
 
@@ -286,8 +285,7 @@ we lose the ability to quickly build just the aapt2 binary. So the Windows proce
 1. `export ANDROID_JAVA_HOME=/Path/To/Jdk`
 2. `source build/envsetup.sh`
 3. `make LOCAL_MULTILIB=64 USE_NINJA=false aapt2`
-4. `strip out/host/darwin-x86/bin/aapt2`
-5. `strip out/host/darwin-x86/bin/aapt2_64`
+4. `strip out/host/darwin-x86/bin/aapt2_64`
 
 #### Confirming aapt/aapt2 builds are static
 
