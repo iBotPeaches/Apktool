@@ -28,6 +28,7 @@ description: Apktool - Changelog / Roadmap
  * Fixed issue with NPE on annotations ([Issue 2071](https://github.com/iBotPeaches/Apktool/issues/2071))
  * Fixed issue with garbled attributes ([Issue 1576](https://github.com/iBotPeaches/Apktool/issues/1576)) Thanks brianairb
  * Fixed regression with `--only-main-classes` ([Issue 2226](https://github.com/iBotPeaches/Apktool/pull/2226)) Thanks realityJie
+ * Fixed 32bit binary issue with Window aapt/aapt2 builds. ([Issue 2141](https://github.com/iBotPeaches/Apktool/issues/2141)) Thanks Furniel
 
 ## v2.4.0
 2019.03.02
