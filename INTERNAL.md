@@ -224,7 +224,7 @@ original as they were.
 ### First we need the AOSP source
 
 As cheesy as it is, just follow this [downloading](https://source.android.com/source/downloading.html) link in order
-to get the source downloaded. This is no small download, expect to use 40-60GB.
+to get the source downloaded. This is no small download, expect to use 80-100GB.
 
 After that, you need to build AOSP via this [documentation](https://source.android.com/source/building.html) guide. Now
 we aren't building the entire AOSP package, the initial build is to just see if you are capable of building it.
@@ -264,7 +264,7 @@ we lose the ability to quickly build just the aapt binary. So the Windows proced
 3. `make LOCAL_MULTILIB=64 USE_NINJA=false aapt`
 4. `strip out/host/darwin-x86/bin/aapt_64`
 
-32/64 bit binaries will be built for Unix and Mac.
+32/64 bit binaries will be built for Unix and Windows.
 
 ### Building the aapt2 binary.
 
