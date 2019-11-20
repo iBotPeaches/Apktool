@@ -30,6 +30,7 @@ description: Apktool - Changelog / Roadmap
  * Fixed regression with `--only-main-classes` ([Issue 2226](https://github.com/iBotPeaches/Apktool/pull/2226)) Thanks realityJie
  * Fixed 32bit binary issue with Window aapt/aapt2 builds. ([Issue 2141](https://github.com/iBotPeaches/Apktool/issues/2141)) Thanks Furniel
  * Fixed issue with JVM not knowing bitness on Windows in some situations. ([Issue 2105](https://github.com/iBotPeaches/Apktool/issues/2105))
+ * Fixed issue with long path commands due to recording compression. ([Issue 1272](https://github.com/iBotPeaches/Apktool/issues/1272)) Thanks peret
 
 ## v2.4.0
 2019.03.02
