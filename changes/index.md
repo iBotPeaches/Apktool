@@ -7,9 +7,11 @@ description: Apktool - Changelog / Roadmap
 ## v2.4.1
 2019.11.19
 
- * Updated baksmali/smali to version 2.2.7
- * Upgrade to `gradle 5.4.1`
+ * Updated baksmali/smali to version 2.3.4
+ * Upgrade to `gradle 5.6.2`
+ * Added support for Android Q (10) Final. ([Issue 2131](https://github.com/iBotPeaches/Apktool/issues/2131))
  * Fixed build issue with JDK9+ because of jmod change. ([Issue 2086](https://github.com/iBotPeaches/Apktool/issues/2086))
+ * Fixed security issue with unpacking assets to unintended locations via directory traversal. ([Issue 2058](https://github.com/iBotPeaches/Apktool/pull/2058))
  * Fixed issue with api-level command not showing in advanced documentation. ([Issue 2027](https://github.com/iBotPeaches/Apktool/issues/2027))
  * Fixed issue with directory creation warning when framework directory not made. ([Issue 2048](https://github.com/iBotPeaches/Apktool/issues/2048))
  * Fixed issue with missing mapping for `Q` shorthand property. ([Issue 2045](https://github.com/iBotPeaches/Apktool/issues/2045))
@@ -23,6 +25,12 @@ description: Apktool - Changelog / Roadmap
  * Added advance command for skipping disassemble of non-root dex packages. ([Issue 2051](https://github.com/iBotPeaches/Apktool/pull/2051))
  * Fixed issue with MIUI package names being renamed. ([Issue 2028](https://github.com/iBotPeaches/Apktool/pull/2028)) Thanks IgorEisberg
  * Work-around with issue with large 9patch path spamming in uncompressed file list. ([Issue 1272](https://github.com/iBotPeaches/Apktool/issues/1272)) Thanks IgorEisberg
+ * Fixed issue with NPE on annotations ([Issue 2071](https://github.com/iBotPeaches/Apktool/issues/2071))
+ * Fixed issue with garbled attributes ([Issue 1576](https://github.com/iBotPeaches/Apktool/issues/1576)) Thanks brianairb
+ * Fixed regression with `--only-main-classes` ([Issue 2226](https://github.com/iBotPeaches/Apktool/pull/2226)) Thanks realityJie
+ * Fixed 32bit binary issue with Window aapt/aapt2 builds. ([Issue 2141](https://github.com/iBotPeaches/Apktool/issues/2141)) Thanks Furniel
+ * Fixed issue with JVM not knowing bitness on Windows in some situations. ([Issue 2105](https://github.com/iBotPeaches/Apktool/issues/2105))
+ * Fixed issue with long path commands due to recording compression. ([Issue 1272](https://github.com/iBotPeaches/Apktool/issues/1272)) Thanks peret
 
 ## v2.4.0
 2019.03.02
