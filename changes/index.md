@@ -4,8 +4,8 @@ title: Apktool - Changelog
 description: Apktool - Changelog / Roadmap
 ---
 
-## v2.4.1 (in development)
-2019.xx.xx
+## v2.4.1
+2019.11.19
 
  * Updated baksmali/smali to version 2.2.7
  * Upgrade to `gradle 5.4.1`
