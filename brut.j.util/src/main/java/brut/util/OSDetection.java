@@ -33,6 +33,12 @@ public class OSDetection {
     }
 
     public static boolean is64Bit() {
+        if (isWindows()) {
+            String arch = System.getenv("PROCESSOR_ARCHITECTURE");
+            String wow64Arch = System.getenv("PROCESSOR_ARCHITEW6432");
+
+            return arch != null && arch.endsWith("64") || wow64Arch != null && wow64Arch.endsWith("64");
+        }
         return Bit.equalsIgnoreCase("64");
     }
 
