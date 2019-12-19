@@ -16,15 +16,21 @@
  */
 package brut.util;
 
-import brut.common.BrutException;
+import org.apache.commons.io.IOUtils;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 
-import org.apache.commons.io.IOUtils;
+import brut.common.BrutException;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
@@ -79,7 +85,14 @@ abstract public class Jar {
             if (in == null) {
                 throw new FileNotFoundException(resourcePath);
             }
-            File fileOut = File.createTempFile(tmpPrefix, null);
+            long n = ThreadLocalRandom.current().nextLong();
+            if (n == Long.MIN_VALUE) {
+                n = 0;      // corner case
+            } else {
+                n = Math.abs(n);
+            }
+            String suffix = Long.toString(n) + ".tmp";
+            File fileOut = File.createTempFile(tmpPrefix, suffix);
             fileOut.deleteOnExit();
             OutputStream out = new FileOutputStream(fileOut);
             IOUtils.copy(in, out);
