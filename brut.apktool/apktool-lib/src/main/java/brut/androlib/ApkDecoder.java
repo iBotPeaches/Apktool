@@ -152,7 +152,9 @@ public class ApkDecoder {
 
             if (hasMultipleSources()) {
                 // foreach unknown dex file in root, lets disassemble it
-                Set<String> files = mApkFile.getDirectory().getFiles(true);
+                // 修改：是否迭代解压，这里修改为False，因为在添加OAid的获取后，移动联盟的aar包中，assets里有dex文件。
+                // 不可且不需要反编译，如果迭代就会导致代码去反编译这个文件
+                Set<String> files = mApkFile.getDirectory().getFiles(false);
                 for (String file : files) {
                     if (file.endsWith(".dex")) {
                         if (! file.equalsIgnoreCase("classes.dex")) {
