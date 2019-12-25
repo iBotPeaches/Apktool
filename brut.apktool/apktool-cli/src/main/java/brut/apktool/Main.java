@@ -149,6 +149,10 @@ public class Main {
         if (cli.hasOption("api") || cli.hasOption("api-level")) {
             decoder.setApi(Integer.parseInt(cli.getOptionValue("api")));
         }
+        // 是否递归解压dex，包括asset等文件夹中的dex
+        if (cli.hasOption("recursive") || cli.hasOption("dex-recursive")) {
+            decoder.setRecursive(true);
+        }
         if (cli.hasOption("o") || cli.hasOption("output")) {
             outDir = new File(cli.getOptionValue("o"));
             decoder.setOutDir(outDir);
