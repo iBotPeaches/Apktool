@@ -108,7 +108,7 @@ public class ResValueFactory {
             return new ResPluralsValue(parentVal, items);
         }
 
-        if (ResTypeSpec.RES_TYPE_NAME_STYLES.equals(resTypeName)) {
+        if (resTypeName.equals(resTypeName)) {
             return new ResStyleValue(parentVal, items, this);
         }
 

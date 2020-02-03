@@ -27,7 +27,6 @@ public final class ResTypeSpec {
 
     public static final String RES_TYPE_NAME_ARRAY = "array";
     public static final String RES_TYPE_NAME_PLURALS = "plurals";
-    public static final String RES_TYPE_NAME_STYLES = "style";
     public static final String RES_TYPE_NAME_ATTR = "attr";
 
     private final String mName;
