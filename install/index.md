@@ -28,12 +28,18 @@ title: Apktool - How to Install
     1. Make sure both files are executable (`chmod +x`)
     1. Try running <kbd>apktool</kbd> via cli
 
-  * **Mac OS X**:
+  * **macOS**:
     1. Download Mac [wrapper script](https://raw.githubusercontent.com/iBotPeaches/Apktool/master/scripts/osx/apktool) (Right click, Save Link As `apktool`)
     1. Download apktool-2 ([find newest here](https://bitbucket.org/iBotPeaches/apktool/downloads/))
     1. Rename downloaded jar to `apktool.jar`
     1. Move both files (`apktool.jar` & `apktool`) to `/usr/local/bin` (root needed)
     1. Make sure both files are executable (`chmod +x`)
+    1. Try running <kbd>apktool</kbd> via cli
+ 
+    Or you can install apktool via _Homebrew_:
+    1. Install Homebrew as described [in this page](https://brew.sh/)
+    1. Execute command `brew install apktool` in terminal (no root needed).
+ The latest version will be installed in `/usr/local/Cellar/apktool/[version]/` and linked to `/usr/local/bin/apktool`.
     1. Try running <kbd>apktool</kbd> via cli
 
 **Note** - Wrapper scripts are not needed, but helpful so you don't have to type <kbd>java -jar apktool.jar</kbd> over and over.
