@@ -4,6 +4,11 @@ title: Apktool - Changelog
 description: Apktool - Changelog / Roadmap
 ---
 
+## v2.4.2
+2020.xx.xx
+
+ * Added support for `JAVA_HOME` environmental on Windows if defined. (Thanks vldmrrr)
+
 ## v2.4.1
 2019.11.19
 
