@@ -9,6 +9,7 @@ description: Apktool - Changelog / Roadmap
 
  * Added support for `JAVA_HOME` environmental on Windows if defined. (Thanks vldmrrr)
  * Update license headers to reflect start copyright date & remove javadoc style. (Thanks friederbluemle)
+ * Fixed issue with binary name clash in multi-threaded environments. ([Issue 2251](https://github.com/iBotPeaches/Apktool/issues/2251)) Thanks chris-sharl
 
 ## v2.4.1
 2019.11.19
