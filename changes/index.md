@@ -8,6 +8,7 @@ description: Apktool - Changelog / Roadmap
 2020.xx.xx
 
  * Added support for `JAVA_HOME` environmental on Windows if defined. (Thanks vldmrrr)
+ * Update license headers to reflect start copyright date & remove javadoc style. (Thanks friederbluemle)
 
 ## v2.4.1
 2019.11.19
