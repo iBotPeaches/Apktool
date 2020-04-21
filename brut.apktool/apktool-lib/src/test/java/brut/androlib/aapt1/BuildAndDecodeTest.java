@@ -502,6 +502,12 @@ public class BuildAndDecodeTest extends BaseTest {
     }
 
     @Test
+    public void confirmZeroByteFileIsStored() throws BrutException {
+        MetaInfo metaInfo = new Androlib().readMetaFile(sTestNewDir);
+        assertTrue(metaInfo.doNotCompress.contains("assets/0byte_file.jpg"));
+    }
+
+    @Test
     public void drawableXxhdpiTest() throws BrutException, IOException {
         compareResFolder("drawable-xxhdpi");
     }
