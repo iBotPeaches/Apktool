@@ -11,6 +11,7 @@ versionInfo:
   versionName: '1.0'
 compressionType: false
 doNotCompress:
+- assets/0byte_file.jpg
 - arsc
 - png
 - mp3
