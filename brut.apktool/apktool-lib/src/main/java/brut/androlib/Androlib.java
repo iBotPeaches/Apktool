@@ -163,10 +163,10 @@ public class Androlib {
         try {
             Directory unk = apkFile.getDirectory();
             Set<String> files = unk.getFiles(true);
-            String ext = "";
 
             for (String file : files) {
                 if (isAPKFileNames(file) && unk.getCompressionLevel(file) == 0) {
+                    String ext = "";
                     if (unk.getSize(file) != 0) {
                         ext = FilenameUtils.getExtension(file);
                     }
