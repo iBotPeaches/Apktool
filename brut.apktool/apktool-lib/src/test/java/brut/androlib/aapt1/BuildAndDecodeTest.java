@@ -493,11 +493,11 @@ public class BuildAndDecodeTest extends BaseTest {
     }
 
     @Test
-    public void confirmZeroByteFileIsNotStored() throws BrutException {
+    public void confirmZeroByteFileExtensionIsNotStored() throws BrutException {
         MetaInfo metaInfo = new Androlib().readMetaFile(sTestNewDir);
 
         for (String item : metaInfo.doNotCompress) {
-            assertNotSame(item, "empty");
+            assertFalse(item.equals("jpg"));
         }
     }
 
