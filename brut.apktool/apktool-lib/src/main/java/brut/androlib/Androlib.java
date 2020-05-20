@@ -466,7 +466,12 @@ public class Androlib {
                 LOGGER.info("Building resources...");
 
                 if (apkOptions.debugMode) {
-                    ResXmlPatcher.removeApplicationDebugTag(new File(appDir, "AndroidManifest.xml"));
+                    if (apkOptions.isAapt2()) {
+                        LOGGER.info("Using aapt2 - setting 'debuggable' attribute to 'true' in AndroidManifest.xml");
+                        ResXmlPatcher.setApplicationDebugTagTrue(new File(appDir, "AndroidManifest.xml"));
+                    } else {
+                        ResXmlPatcher.removeApplicationDebugTag(new File(appDir, "AndroidManifest.xml"));
+                    }
                 }
 
                 File apkFile = File.createTempFile("APKTOOL", null);
