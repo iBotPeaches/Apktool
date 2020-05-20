@@ -1,0 +1,12 @@
+version: 2.0.0
+apkFileName: issue1235.apk
+isFrameworkApk: false
+usesFramework:
+  ids:
+  - 1
+packageInfo:
+  forcedPackageId: '127'
+versionInfo:
+  versionCode: '1'
+  versionName: '1.0'
+compressionType: false
