@@ -761,6 +761,9 @@ final public class AndrolibResources {
             serial.startTag(null, "resources");
 
             for (ResResSpec spec : pkg.listResSpecs()) {
+                if (spec.getName().contains("$")) {
+                    continue;
+                }
                 serial.startTag(null, "public");
                 serial.attribute(null, "type", spec.getType().getName());
                 serial.attribute(null, "name", spec.getName());
@@ -888,7 +891,7 @@ final public class AndrolibResources {
             out.putNextEntry(entry);
             out.write(data);
             out.closeEntry();
-            
+
             //Write fake AndroidManifest.xml file to support original aapt
             entry = zip.getEntry("AndroidManifest.xml");
             if (entry != null) {
