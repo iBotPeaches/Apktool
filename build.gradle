@@ -26,7 +26,7 @@ buildscript {
 }
 
 plugins {
-    id "com.github.hierynomus.license" version "0.14.0"
+    id "com.github.hierynomus.license" version "0.15.0"
 }
 
 apply from: 'gradle/functions.gradle'
@@ -47,9 +47,12 @@ allprojects {
         exclude "**/android/content/res/*.java"
         exclude "**/android/util/*.java"
         include "**/*.java"
+        mapping {
+            java='SLASHSTAR_STYLE'
+        }
         strictCheck true
 
-        ext.year = Calendar.getInstance().get(Calendar.YEAR)
+        ext.year = '2010'
         ext.brut = 'Ryszard Wiśniewski'
         ext.brutEmail = 'brut.alll@gmail.com'
         ext.ibot = 'Connor Tumbleson'

@@ -1,6 +1,6 @@
-/**
- *  Copyright (C) 2019 Ryszard Wiśniewski <brut.alll@gmail.com>
- *  Copyright (C) 2019 Connor Tumbleson <connor.tumbleson@gmail.com>
+/*
+ *  Copyright (C) 2010 Ryszard Wiśniewski <brut.alll@gmail.com>
+ *  Copyright (C) 2010 Connor Tumbleson <connor.tumbleson@gmail.com>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,15 +16,21 @@
  */
 package brut.util;
 
-import brut.common.BrutException;
+import org.apache.commons.io.IOUtils;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 
-import org.apache.commons.io.IOUtils;
+import brut.common.BrutException;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
@@ -79,12 +85,16 @@ abstract public class Jar {
             if (in == null) {
                 throw new FileNotFoundException(resourcePath);
             }
-            File fileOut = File.createTempFile(tmpPrefix, null);
+            long suffix = ThreadLocalRandom.current().nextLong();
+            suffix = suffix == Long.MIN_VALUE ? 0 : Math.abs(suffix);
+            File fileOut = File.createTempFile(tmpPrefix, suffix + ".tmp");
             fileOut.deleteOnExit();
+
             OutputStream out = new FileOutputStream(fileOut);
             IOUtils.copy(in, out);
             in.close();
             out.close();
+
             return fileOut;
         } catch (IOException ex) {
             throw new BrutException("Could not extract resource: " + resourcePath, ex);
