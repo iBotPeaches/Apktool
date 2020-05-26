@@ -304,7 +304,7 @@ for shared dependencies.
 This skips the testing suite (which currently takes 2-4 minutes). Use this when making quick builds and save the testing
 suite before pushing to GitHub.
 
-    ./gradlew build shadowJar proguard -Dtest.debug
+    ./gradlew test --debug-jvm
 
 This enables debugging on the test suite. This starts the debugger on port 5005 which you can connect with IntelliJ.
 
@@ -314,4 +314,4 @@ This runs the library project of Apktool, selecting a specific test to run. Come
 only wanting to run that one. The asterisk is used to the full path to the test can be ignored. You can additionally
 match this with the debugging parameter to debug a specific test. This command can be found below.
 
-    ./gradlew :brut.apktool:apktool-lib:test --tests "*BuildAndDecodeTest" -Dtest.debug
+    ./gradlew :brut.apktool:apktool-lib:test --tests "*BuildAndDecodeTest" --debug-jvm
