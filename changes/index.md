@@ -11,6 +11,7 @@ description: Apktool - Changelog / Roadmap
  * Update license headers to reflect start copyright date & remove javadoc style. (Thanks friederbluemle)
  * Fixed issue with binary name clash in multi-threaded environments. ([Issue 2251](https://github.com/iBotPeaches/Apktool/issues/2251)) Thanks chris-sharl
  * Fixed issue with `resources.arsc` file being compressed in framework files. ([Issue 2323](https://github.com/iBotPeaches/Apktool/issues/2323))
+ * Fixed issue with empty files being compressed breaking applications. ([Issue 2333](https://github.com/iBotPeaches/Apktool/issues/2333)) / (Thanks peret)
 
 ## v2.4.1
 2019.11.19
