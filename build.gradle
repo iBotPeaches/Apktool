@@ -26,7 +26,7 @@ buildscript {
 }
 
 plugins {
-    id "com.github.hierynomus.license" version "0.14.0"
+    id "com.github.hierynomus.license" version "0.15.0"
 }
 
 apply from: 'gradle/functions.gradle'
@@ -47,9 +47,12 @@ allprojects {
         exclude "**/android/content/res/*.java"
         exclude "**/android/util/*.java"
         include "**/*.java"
+        mapping {
+            java='SLASHSTAR_STYLE'
+        }
         strictCheck true
 
-        ext.year = Calendar.getInstance().get(Calendar.YEAR)
+        ext.year = '2010'
         ext.brut = 'Ryszard Wiśniewski'
         ext.brutEmail = 'brut.alll@gmail.com'
         ext.ibot = 'Connor Tumbleson'
@@ -109,7 +112,7 @@ subprojects {
 
     ext {
         depends = [
-                baksmali: 'org.smali:baksmali:2.3.4',
+                baksmali: 'org.smali:baksmali:2.4.0',
                 commons_cli: 'commons-cli:commons-cli:1.4',
                 commons_io: 'commons-io:commons-io:2.4',
                 commons_lang: 'org.apache.commons:commons-lang3:3.1',
@@ -117,7 +120,7 @@ subprojects {
                 junit: 'junit:junit:4.12',
                 proguard_gradle: 'net.sf.proguard:proguard-gradle:6.1.1',
                 snakeyaml: 'org.yaml:snakeyaml:1.18:android',
-                smali: 'org.smali:smali:2.3.4',
+                smali: 'org.smali:smali:2.4.0',
                 xmlpull: 'xpp3:xpp3:1.1.4c',
                 xmlunit: 'xmlunit:xmlunit:1.6',
         ]

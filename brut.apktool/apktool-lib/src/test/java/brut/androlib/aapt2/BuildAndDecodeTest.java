@@ -1,6 +1,6 @@
-/**
- *  Copyright (C) 2019 Ryszard Wiśniewski <brut.alll@gmail.com>
- *  Copyright (C) 2019 Connor Tumbleson <connor.tumbleson@gmail.com>
+/*
+ *  Copyright (C) 2010 Ryszard Wiśniewski <brut.alll@gmail.com>
+ *  Copyright (C) 2010 Connor Tumbleson <connor.tumbleson@gmail.com>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -80,9 +80,15 @@ public class BuildAndDecodeTest extends BaseTest {
     }
 
     @Test
-    public void confirmZeroByteFileIsNotStored() throws BrutException {
+    public void confirmZeroByteFileExtensionIsNotStored() throws BrutException {
         MetaInfo metaInfo = new Androlib().readMetaFile(sTestNewDir);
-        assertNull(metaInfo.doNotCompress);
+        assertFalse(metaInfo.doNotCompress.contains("jpg"));
+    }
+
+    @Test
+    public void confirmZeroByteFileIsStored() throws BrutException {
+        MetaInfo metaInfo = new Androlib().readMetaFile(sTestNewDir);
+        assertTrue(metaInfo.doNotCompress.contains("assets/0byte_file.jpg"));
     }
 
     @Test

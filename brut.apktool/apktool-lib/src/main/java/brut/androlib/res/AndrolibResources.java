@@ -1,6 +1,6 @@
-/**
- *  Copyright (C) 2019 Ryszard Wiśniewski <brut.alll@gmail.com>
- *  Copyright (C) 2019 Connor Tumbleson <connor.tumbleson@gmail.com>
+/*
+ *  Copyright (C) 2010 Ryszard Wiśniewski <brut.alll@gmail.com>
+ *  Copyright (C) 2010 Connor Tumbleson <connor.tumbleson@gmail.com>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -883,6 +883,7 @@ final public class AndrolibResources {
             crc.update(data);
             entry = new ZipEntry("resources.arsc");
             entry.setSize(data.length);
+            entry.setMethod(ZipOutputStream.STORED);
             entry.setCrc(crc.getValue());
             out.putNextEntry(entry);
             out.write(data);

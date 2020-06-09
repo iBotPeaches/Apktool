@@ -1,6 +1,6 @@
-/**
- *  Copyright (C) 2019 Ryszard Wiśniewski <brut.alll@gmail.com>
- *  Copyright (C) 2019 Connor Tumbleson <connor.tumbleson@gmail.com>
+/*
+ *  Copyright (C) 2010 Ryszard Wiśniewski <brut.alll@gmail.com>
+ *  Copyright (C) 2010 Connor Tumbleson <connor.tumbleson@gmail.com>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -35,10 +35,7 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
 import brut.androlib.AndrolibException;
@@ -68,6 +65,37 @@ public final class ResXmlPatcher {
                 if (debugAttr != null) {
                     attr.removeNamedItem("android:debuggable");
                 }
+
+                saveDocument(file, doc);
+
+            } catch (SAXException | ParserConfigurationException | IOException | TransformerException ignored) {
+            }
+        }
+    }
+
+    /**
+     * Sets "debug" tag in the file to true
+     *
+     * @param file AndroidManifest file
+     * @throws AndrolibException
+     */
+    public static void setApplicationDebugTagTrue(File file) throws AndrolibException {
+        if (file.exists()) {
+            try {
+                Document doc = loadDocument(file);
+                Node application = doc.getElementsByTagName("application").item(0);
+
+                // load attr
+                NamedNodeMap attr = application.getAttributes();
+                Node debugAttr = attr.getNamedItem("android:debuggable");
+
+                if (debugAttr == null) {
+                    debugAttr = doc.createAttribute("android:debuggable");
+                    attr.setNamedItem(debugAttr);
+                }
+
+                // set application:debuggable to 'true
+                debugAttr.setNodeValue("true");
 
                 saveDocument(file, doc);
 
