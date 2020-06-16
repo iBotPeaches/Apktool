@@ -13,6 +13,7 @@ description: Apktool - Changelog / Roadmap
  * Fixed issue with `resources.arsc` file being compressed in framework files. ([Issue 2323](https://github.com/iBotPeaches/Apktool/issues/2323))
  * Fixed issue with empty files being compressed breaking applications. ([Issue 2333](https://github.com/iBotPeaches/Apktool/issues/2333)) / (Thanks peret)
  * Fixed handling with debug mode while using aapt2. ([Issue 2328](https://github.com/iBotPeaches/Apktool/issues/2328)) / Thanks Comnir)
+ * Properly return non-zero error if invalid parameters. (Thanks Giszmo)
 
 ## v2.4.1
 2019.11.19
