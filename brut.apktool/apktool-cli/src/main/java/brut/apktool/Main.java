@@ -54,6 +54,7 @@ public class Main {
         } catch (ParseException ex) {
             System.err.println(ex.getMessage());
             usage();
+            System.exit(1);
             return;
         }
 
