@@ -12,5 +12,5 @@
     test10="\u0005"
     test11=" foo  bar   "
     test12="foo \n bar"
-    test15="005"
+    test15="5"
 />
