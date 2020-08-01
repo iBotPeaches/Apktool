@@ -61,8 +61,7 @@ public class DoubleExtensionUnknownFileTest extends BaseTest {
         Assume.assumeTrue(apkDecoderFile.exists());
         ApkDecoder apkDecoder = new ApkDecoder(apkDecoderFile);
         ExtFile decodedApk = new ExtFile(sTmpDir + File.separator + apk + ".out");
-        File outDir = new File(sTmpDir + File.separator + apk + ".out");
-        apkDecoder.setOutDir(outDir);
+        apkDecoder.setOutDir(new File(sTmpDir + File.separator + apk + ".out"));
         apkDecoder.decode();
 
         MetaInfo metaInfo = new Androlib().readMetaFile(decodedApk);
