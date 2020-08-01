@@ -26,6 +26,7 @@ import brut.common.BrutException;
 import brut.util.OS;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.AfterClass;
+import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -56,9 +57,12 @@ public class DoubleExtensionUnknownFileTest extends BaseTest {
         String apk = "issue1244.apk";
 
         // decode issue1244.apk
-        ApkDecoder apkDecoder = new ApkDecoder(new File(sTmpDir + File.separator + apk));
+        File apkDecoderFile = new File(sTmpDir + File.separator + apk);
+        Assume.assumeTrue(apkDecoderFile.exists());
+        ApkDecoder apkDecoder = new ApkDecoder(apkDecoderFile);
         ExtFile decodedApk = new ExtFile(sTmpDir + File.separator + apk + ".out");
-        apkDecoder.setOutDir(new File(sTmpDir + File.separator + apk + ".out"));
+        File outDir = new File(sTmpDir + File.separator + apk + ".out");
+        apkDecoder.setOutDir(outDir);
         apkDecoder.decode();
 
         MetaInfo metaInfo = new Androlib().readMetaFile(decodedApk);
