@@ -26,13 +26,13 @@ buildscript {
 }
 
 plugins {
-    id "com.github.hierynomus.license" version "0.15.0"
+    id 'com.github.hierynomus.license' version '0.15.0'
 }
 
 apply from: 'gradle/functions.gradle'
 
 def apktoolversion_major = '2.4.2'
-def apktoolversion_minor = 'SNAPSHOT';
+def apktoolversion_minor = 'SNAPSHOT'
 
 defaultTasks 'build', 'shadowJar', 'proguard'
 
@@ -48,7 +48,7 @@ allprojects {
         exclude "**/android/util/*.java"
         include "**/*.java"
         mapping {
-            java='SLASHSTAR_STYLE'
+            java = 'SLASHSTAR_STYLE'
         }
         strictCheck true
 

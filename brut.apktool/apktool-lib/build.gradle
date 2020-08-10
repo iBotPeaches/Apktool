@@ -15,6 +15,8 @@
  */
 import org.apache.tools.ant.filters.*
 
+apply plugin: 'java-library'
+
 processResources {
   from('src/main/resources/properties') {
     include '**/*.properties'
@@ -29,19 +31,21 @@ processResources {
 }
 
 dependencies {
-    compile("junit:junit:4.10") {
+    testImplementation("junit:junit:4.10") {
         exclude(module: 'hamcrest-core')
     }
 
-    compile project(':brut.j.dir'),
-            project(':brut.j.util'),
-            project(':brut.j.common'),
-            depends.baksmali,
-            depends.smali,
-            depends.snakeyaml,
-            depends.xmlpull,
-            depends.guava,
-            depends.commons_lang
+    api project(':brut.j.dir'),
+        project(':brut.j.util'),
+        project(':brut.j.common')
 
-    testCompile depends.xmlunit
+    implementation depends.baksmali,
+                   depends.smali,
+                   depends.snakeyaml,
+                   depends.xmlpull,
+                   depends.guava,
+                   depends.commons_lang,
+                   depends.commons_io
+
+    testImplementation depends.xmlunit
 }
