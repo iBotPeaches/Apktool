@@ -15,6 +15,6 @@
  */
 
 dependencies {
-    testCompile depends.junit
+    testImplementation depends.junit
 }
 
