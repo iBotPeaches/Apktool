@@ -115,7 +115,8 @@ public class XmlPullStreamDecoder implements ResStreamDecoder {
                             if (name != null && value != null) {
                                 if (name.equalsIgnoreCase("minSdkVersion")
                                         || name.equalsIgnoreCase("targetSdkVersion")
-                                        || name.equalsIgnoreCase("maxSdkVersion")) {
+                                        || name.equalsIgnoreCase("maxSdkVersion")
+                                        || name.equalsIgnoreCase("compileSdkVersion")) {
                                     resTable.addSdkInfo(name, value);
                                 } else {
                                     resTable.clearSdkInfo();

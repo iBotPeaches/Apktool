@@ -16,17 +16,20 @@
 apply plugin: 'com.github.johnrengelman.shadow'
 
 dependencies {
-    compile depends.commons_cli
-    compile project(':brut.apktool:apktool-lib')
+    implementation depends.commons_cli
+    implementation project(':brut.apktool:apktool-lib')
 }
 
 buildscript {
     repositories {
         mavenCentral()
+        jcenter()
     }
 
     dependencies {
-        classpath depends.proguard_gradle
+        classpath(depends.proguard_gradle) {
+            exclude group: 'com.android.tools.build'
+        }
     }
 }
 

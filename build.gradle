@@ -21,18 +21,18 @@ buildscript {
         options.encoding = "UTF-8"
     }
     dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:5.1.0'
+        classpath 'com.github.jengelman.gradle.plugins:shadow:6.0.0'
     }
 }
 
 plugins {
-    id "com.github.hierynomus.license" version "0.15.0"
+    id 'com.github.hierynomus.license' version '0.15.0'
 }
 
 apply from: 'gradle/functions.gradle'
 
 def apktoolversion_major = '2.4.2'
-def apktoolversion_minor = 'SNAPSHOT';
+def apktoolversion_minor = 'SNAPSHOT'
 
 defaultTasks 'build', 'shadowJar', 'proguard'
 
@@ -48,7 +48,7 @@ allprojects {
         exclude "**/android/util/*.java"
         include "**/*.java"
         mapping {
-            java='SLASHSTAR_STYLE'
+            java = 'SLASHSTAR_STYLE'
         }
         strictCheck true
 
@@ -118,7 +118,7 @@ subprojects {
                 commons_lang: 'org.apache.commons:commons-lang3:3.1',
                 guava: 'com.google.guava:guava:14.0',
                 junit: 'junit:junit:4.12',
-                proguard_gradle: 'net.sf.proguard:proguard-gradle:6.1.1',
+                proguard_gradle: 'com.guardsquare:proguard-gradle:7.0.0',
                 snakeyaml: 'org.yaml:snakeyaml:1.18:android',
                 smali: 'org.smali:smali:2.4.0',
                 xmlpull: 'xpp3:xpp3:1.1.4c',
