@@ -6,7 +6,7 @@ description: Apktool - Changelog / Roadmap
 
 ## v2.4.2
 2020.xx.xx
-
+ **Android 11 Support** ([Issue 2399](https://github.com/iBotPeaches/Apktool/issues/2399))
  * Upgrade to `gradle 6.4.1`
  * Added support for `JAVA_HOME` environmental on Windows if defined. (Thanks vldmrrr)
  * Update license headers to reflect start copyright date & remove javadoc style. (Thanks friederbluemle)
