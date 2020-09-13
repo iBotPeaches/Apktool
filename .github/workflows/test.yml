@@ -1,5 +1,5 @@
 name: Java CI
-on: [push, pull_request]
+on: [push]
 
 jobs:
   build-and-test-with-Java-8-and-later:
