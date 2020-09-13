@@ -104,6 +104,10 @@ public class BuildAndDecodeTest extends BaseTest {
     @Test
     public void leadingDollarSignResourceNameTest() throws BrutException {
         compareXmlFiles("res/drawable/$avd_hide_password__0.xml");
+        compareXmlFiles("res/drawable/$avd_show_password__0.xml");
+        compareXmlFiles("res/drawable/$avd_show_password__1.xml");
+        compareXmlFiles("res/drawable/$avd_show_password__2.xml");
+        compareXmlFiles("res/drawable/avd_show_password.xml");
     }
 
     @Test
