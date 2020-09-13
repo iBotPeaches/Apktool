@@ -4,11 +4,14 @@ title: Apktool - Changelog
 description: Apktool - Changelog / Roadmap
 ---
 
-## v2.4.2
+## v2.5.0
 2020.xx.xx
 
- **Android 11 Support** ([Issue 2399](https://github.com/iBotPeaches/Apktool/issues/2399))
+ * **Android 11 Support** ([Issue 2399](https://github.com/iBotPeaches/Apktool/issues/2399))
  * Upgrade to `gradle 6.4.1`
+ * Replaced TravisCI with GitHub Actions
+ * Deprecate 32bit
+ * Added support for SDK Codename "S" (Android 12?)
  * Added support for `JAVA_HOME` environmental on Windows if defined. (Thanks vldmrrr)
  * Update license headers to reflect start copyright date & remove javadoc style. (Thanks friederbluemle)
  * Fixed issue with binary name clash in multi-threaded environments. ([Issue 2251](https://github.com/iBotPeaches/Apktool/issues/2251)) Thanks chris-sharl
