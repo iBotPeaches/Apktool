@@ -1,0 +1,33 @@
+name: CI
+on: [push]
+
+jobs:
+  build-and-test-with-Java-8-and-later:
+    name: Build/Test (JDK ${{ matrix.java }}, ${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      max-parallel: 10
+      matrix:
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+        java: [8, 9, 10, 11, 12, 13, 14]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - uses: actions/checkout@v2
+      - name: Set up JDK ${{ matrix.java }}
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.java }}
+      - name: Build and test
+        run: ./gradlew.bat build shadowJar proguard
+        if: startsWith(matrix.os, 'windows') == true
+      - name: Build and test
+        run: ./gradlew build shadowJar proguard
+        if: startsWith(matrix.os, 'windows') != true
