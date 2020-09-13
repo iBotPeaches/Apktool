@@ -17,7 +17,7 @@
 package brut.androlib.res.data;
 
 import brut.androlib.AndrolibException;
-import brut.androlib.err.UndefinedResObject;
+import brut.androlib.err.UndefinedResObjectException;
 import java.util.*;
 
 /**
@@ -70,7 +70,7 @@ public final class ResTypeSpec {
     public ResResSpec getResSpec(String name) throws AndrolibException {
         ResResSpec spec = getResSpecUnsafe(name);
         if (spec == null) {
-            throw new UndefinedResObject(String.format("resource spec: %s/%s", getName(), name));
+            throw new UndefinedResObjectException(String.format("resource spec: %s/%s", getName(), name));
         }
         return spec;
     }

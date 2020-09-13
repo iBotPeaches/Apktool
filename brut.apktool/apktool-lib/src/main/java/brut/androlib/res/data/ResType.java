@@ -17,7 +17,7 @@
 package brut.androlib.res.data;
 
 import brut.androlib.AndrolibException;
-import brut.androlib.err.UndefinedResObject;
+import brut.androlib.err.UndefinedResObjectException;
 import java.util.*;
 
 /**
@@ -38,7 +38,7 @@ public class ResType {
     public ResResource getResource(ResResSpec spec) throws AndrolibException {
         ResResource res = mResources.get(spec);
         if (res == null) {
-            throw new UndefinedResObject(String.format("resource: spec=%s, config=%s", spec, this));
+            throw new UndefinedResObjectException(String.format("resource: spec=%s, config=%s", spec, this));
         }
         return res;
     }
