@@ -88,11 +88,11 @@ public class InvalidSdkBoundingTest extends BaseTest {
     }
 
     @Test
-    public void checkForSdkQInsaneTestValue() {
+    public void checkForSdkDevelopmentInsaneTestValue() {
         AndrolibResources androlibResources = new AndrolibResources();
 
         Map<String, String> sdkInfo = new LinkedHashMap<>();
-        sdkInfo.put("targetSdkVersion", "Q");
+        sdkInfo.put("targetSdkVersion", "S");
 
         androlibResources.setSdkInfo(sdkInfo);
         assertEquals("10000", androlibResources.checkTargetSdkVersionBounds());
