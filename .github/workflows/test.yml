@@ -1,0 +1,32 @@
+name: Java CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build-and-test-with-Java-8-and-later:
+    name: Build -> Test (JVM ${{ matrix.java }}, ${{ matrix.architecture }}, ${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      max-parallel: 10
+      matrix:
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+        java: [8, 9, 10, 11, 12, 13, 14]
+        architecture: [x32, x64]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK ${{ matrix.java }}
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.java }}
+          architecture: ${{ matrix.architecture }}
+      - name: Build and test
+        run: gradlew.exe build shadowJar proguard
+        if: startsWith(matrix.os, 'windows') == true
+      - name: Build and test
+        run: ./gradlew build shadowJar proguard
+        if: startsWith(matrix.os, 'windows') != true
