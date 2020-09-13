@@ -1,9 +1,9 @@
-name: Java CI
+name: CI
 on: [push]
 
 jobs:
   build-and-test-with-Java-8-and-later:
-    name: Build -> Test (JVM ${{ matrix.java }}, ${{ matrix.os }})
+    name: Build/Test (JVM ${{ matrix.java }}, ${{ matrix.os }})
     strategy:
       fail-fast: false
       max-parallel: 10
