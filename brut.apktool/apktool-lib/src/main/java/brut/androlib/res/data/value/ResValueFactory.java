@@ -44,6 +44,7 @@ public class ResValueFactory {
             case TypedValue.TYPE_REFERENCE:
                 return newReference(value, null);
             case TypedValue.TYPE_ATTRIBUTE:
+            case TypedValue.TYPE_DYNAMIC_ATTRIBUTE:
                 return newReference(value, rawValue, true);
             case TypedValue.TYPE_STRING:
                 return new ResStringValue(rawValue, value);
@@ -57,8 +58,6 @@ public class ResValueFactory {
                 return new ResBoolValue(value != 0, value, rawValue);
             case TypedValue.TYPE_DYNAMIC_REFERENCE:
                 return newReference(value, rawValue);
-            case TypedValue.TYPE_DYNAMIC_ATTRIBUTE:
-                return newReference(value, rawValue, true);
         }
 
         if (type >= TypedValue.TYPE_FIRST_COLOR_INT && type <= TypedValue.TYPE_LAST_COLOR_INT) {
