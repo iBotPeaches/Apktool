@@ -17,7 +17,7 @@
 package brut.androlib.res.decoder;
 
 import brut.androlib.AndrolibException;
-import brut.androlib.err.CantFind9PatchChunk;
+import brut.androlib.err.CantFind9PatchChunkException;
 import brut.androlib.err.RawXmlEncounteredException;
 import brut.androlib.res.data.ResResource;
 import brut.androlib.res.data.value.ResBoolValue;
@@ -93,7 +93,7 @@ public class ResFileDecoder {
                     try {
                         decode(inDir, inFileName, outDir, outFileName, "9patch");
                         return;
-                    } catch (CantFind9PatchChunk ex) {
+                    } catch (CantFind9PatchChunkException ex) {
                         LOGGER.log(
                                 Level.WARNING,
                                 String.format(

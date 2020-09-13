@@ -19,19 +19,7 @@ package brut.androlib.err;
 import brut.androlib.AndrolibException;
 
 public class AXmlDecodingException extends AndrolibException {
-
-    public AXmlDecodingException(Throwable cause) {
-        super(cause);
-    }
-
     public AXmlDecodingException(String message, Throwable cause) {
         super(message, cause);
-    }
-
-    public AXmlDecodingException(String message) {
-        super(message);
-    }
-
-    public AXmlDecodingException() {
     }
 }
