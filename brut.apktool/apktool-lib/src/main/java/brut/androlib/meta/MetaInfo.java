@@ -69,12 +69,4 @@ public class MetaInfo {
     public static MetaInfo load(InputStream is) {
         return getYaml().loadAs(is, MetaInfo.class);
     }
-
-    public static MetaInfo load(File file) throws IOException {
-        try (
-                InputStream fis = new FileInputStream(file)
-        ) {
-            return load(fis);
-        }
-    }
 }

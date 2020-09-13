@@ -30,7 +30,6 @@ import org.xmlpull.v1.XmlSerializer;
  */
 public class ResArrayValue extends ResBagValue implements
         ResValuesXmlSerializable {
-    private String mRawItems;
 
     ResArrayValue(ResReferenceValue parent, Duo<Integer, ResScalarValue>[] items) {
         super(parent);
