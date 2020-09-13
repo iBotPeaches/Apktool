@@ -26,7 +26,7 @@ jobs:
         with:
           java-version: ${{ matrix.java }}
       - name: Build and test
-        run: gradlew.bat build shadowJar proguard
+        run: ./gradlew.bat build shadowJar proguard
         if: startsWith(matrix.os, 'windows') == true
       - name: Build and test
         run: ./gradlew build shadowJar proguard
