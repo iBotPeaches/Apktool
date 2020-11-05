@@ -27,7 +27,7 @@ After all of this, if you are ready to report a bug. Please make sure to follow 
 [Report a bug here](https://github.com/iBotPeaches/Apktool/issues/new)
 
 ### I want to work on the project
-Great! Explore and fix some bugs while you are here. You may find the project [here](https://github.com/iBotPeaches/Apktool) and [contributing hints](https://github.com/iBotPeaches/Apktool/blob/master/CONTRIBUTING.md).
+Great! Explore and fix some bugs while you are here. You may find the project [here](https://github.com/iBotPeaches/Apktool) and [contributing hints](https://github.com/iBotPeaches/Apktool/blob/master/.github/CONTRIBUTING.md).
 
 ### This documentation could use some work
 Good thing it is open source! Clean up the documentation [here](https://github.com/iBotPeaches/Apktool/tree/gh-pages).
