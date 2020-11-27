@@ -21,6 +21,7 @@ import android.util.TypedValue;
 import brut.androlib.AndrolibException;
 import brut.androlib.res.data.ResID;
 import brut.androlib.res.xml.ResXmlEncoders;
+import brut.common.BrutException;
 import brut.util.ExtDataInput;
 import com.google.common.io.LittleEndianDataInputStream;
 import java.io.DataInput;
@@ -339,15 +340,15 @@ public class AXmlResourceParser implements XmlResourceParser {
 
         // some attributes will return "", we must rely on the resource_id and refer to the frameworks
         // to match the resource id to the name. ex: 0x101021C = versionName
-        if (value.length() != 0 && !android_ns.equals(getAttributeNamespace(index))) {
-            return value;
-        } else {
+        if (value.length() == 0 || android_ns.equals(getAttributeNamespace(index))) {
             try {
-                value = mAttrDecoder.decodeManifestAttr(getAttributeNameResource(index));
-            } catch (AndrolibException e) {
-            }
-            return value;
+                int resourceId = getAttributeNameResource(index);
+                if (resourceId != 0) {
+                    value = mAttrDecoder.decodeManifestAttr(getAttributeNameResource(index));
+                }
+            } catch (AndrolibException | NullPointerException e) { }
         }
+        return value;
     }
 
     @Override
