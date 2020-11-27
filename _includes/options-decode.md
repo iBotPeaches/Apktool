@@ -9,7 +9,7 @@ These are all the options when decoding an apk.
 <strong><kbd>-f, --force</kbd></strong>
 <blockquote>Force delete destination directory. Use when trying to decode to a folder that already exists</blockquote>
 <br />
-<strong><kbd>--force-manifest</kbd> - <span class="label label-success">v2.3.1</span></strong>
+<strong><kbd>--force-manifest</kbd> - <span class="label label-success">v2.3.1</span> - <span class="label label-info">Used for analysis</span></strong>
 <blockquote>Forces decode of AndroidManifest regardless of decoding of resources flag.</blockquote>
 <br />
 <strong><kbd>--keep-broken-res</kbd></strong> - <span class="label label-danger">Advanced</span>
