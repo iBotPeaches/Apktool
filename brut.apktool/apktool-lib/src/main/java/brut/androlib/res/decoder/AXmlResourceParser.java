@@ -21,7 +21,6 @@ import android.util.TypedValue;
 import brut.androlib.AndrolibException;
 import brut.androlib.res.data.ResID;
 import brut.androlib.res.xml.ResXmlEncoders;
-import brut.common.BrutException;
 import brut.util.ExtDataInput;
 import com.google.common.io.LittleEndianDataInputStream;
 import java.io.DataInput;
