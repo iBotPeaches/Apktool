@@ -224,7 +224,7 @@ original as they were.
 ### First we need the AOSP source
 
 As cheesy as it is, just follow this [downloading](https://source.android.com/source/downloading.html) link in order
-to get the source downloaded. This is no small download, expect to use 80-100GB.
+to get the source downloaded. This is no small download, expect to use 150-250GB.
 
 After that, you need to build AOSP via this [documentation](https://source.android.com/source/building.html) guide. Now
 we aren't building the entire AOSP package, the initial build is to just see if you are capable of building it.
@@ -236,27 +236,25 @@ We check out a certain tag or branch. Currently we use
 
 ### Including our modified `frameworks/base` package.
 
-There is probably a more automated way to do this, but for now just remove all the files in `frameworks/base`. Now
-you can clone the modified repo from first step into this directory.
+There is probably a more automated way to do this, but for now:
+
+1. `cd frameworks/base`
+2. `git remote add origin git@github.com:iBotPeaches/platform_frameworks_base.git`
+3. `git fetch origin -v`
+4. `git checkout origin/master`
 
 ### Building the aapt1 (Legacy) binary.
 
-The steps below are different per flavor and operating system. For cross compiling the Windows binary on Unix,
-we lose the ability to quickly build just the aapt binary. So the Windows procedure builds the entire Sdk.
+The steps below are different per flavor and operating system.
 
-#### Unix
+#### Linux / Windows
 1. `source build/envsetup.sh`
 2. `lunch sdk-eng`
 3. `make LOCAL_MULTILIB=64 USE_NINJA=false aapt`
 4. `strip out/host/linux-x86/bin/aapt`
 5. `strip out/host/linux-x86/bin/aapt_64`
-
-#### Windows
-1. `source build/envsetup.sh`
-2. `lunch sdk-eng`
-3. `make LOCAL_MULTILIB=64 USE_NINJA=false aapt`
-4. `strip out/host/windows-x86/bin/aapt.exe`
-5. `strip out/host/windows-x86/bin/aapt_64.exe`
+6. `strip out/host/windows-x86/bin/aapt.exe`
+7. `strip out/host/windows-x86/bin/aapt_64.exe`
 
 #### Mac
 1. `source build/envsetup.sh`
@@ -264,22 +262,18 @@ we lose the ability to quickly build just the aapt binary. So the Windows proced
 3. `make LOCAL_MULTILIB=64 USE_NINJA=false aapt`
 4. `strip out/host/darwin-x86/bin/aapt_64`
 
-32/64 bit binaries will be built for Unix and Windows.
+32/64 bit binaries will be built for Linux and Windows.
 
 ### Building the aapt2 binary.
 
-The steps below are different per flavor and operating system. For cross compiling the Windows binary on Unix,
-we lose the ability to quickly build just the aapt2 binary. So the Windows procedure builds the entire Sdk.
+The steps below are different per flavor and operating system.
 
-#### Unix
+#### Linux / Windows
 1. `make LOCAL_MULTILIB=64 USE_NINJA=false aapt2`
 2. `strip out/host/linux-x86/bin/aapt2`
 3. `strip out/host/linux-x86/bin/aapt2_64`
-
-#### Windows
-1. `make PRODUCT-sdk-win_sdk USE_NINJA=false`
-2. `strip out/host/windows-x86/bin/aapt2.exe`
-3. `strip out/host/windows-x86/bin/aapt2_64.exe`
+4. `strip out/host/windows-x86/bin/aapt2.exe`
+5. `strip out/host/windows-x86/bin/aapt2_64.exe`
 
 #### Mac
 1. `export ANDROID_JAVA_HOME=/Path/To/Jdk`
