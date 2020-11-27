@@ -20,6 +20,7 @@ description: Apktool - Changelog / Roadmap
  * Fixed handling with debug mode while using aapt2. ([Issue 2328](https://github.com/iBotPeaches/Apktool/issues/2328)) / Thanks Comnir)
  * Fixed issue with handling of non-standard XML files on Windows. ([Issue 2386](https://github.com/iBotPeaches/Apktool/issues/2386))
  * Properly return non-zero error if invalid parameters. (Thanks Giszmo)
+ * Added testcases for `classes#.dex` disassembling on aapt1/aapt2. ([Issue 2411](https://github.com/iBotPeaches/Apktool/issues/2411))
  * Support for new `compileSdkVersion` property for `SdkInfo`. ([Issue 2368](https://github.com/iBotPeaches/Apktool/issues/2368))
 
 ## v2.4.1
