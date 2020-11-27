@@ -552,11 +552,21 @@ public class BuildAndDecodeTest extends BaseTest {
     @Test
     public void multipleDexTest() throws BrutException, IOException {
         compareBinaryFolder("/smali_classes2", false);
+        compareBinaryFolder("/smali_classes3", false);
+
+        File classes2Dex = new File(sTestOrigDir, "build/apk/classes2.dex");
+        File classes3Dex = new File(sTestOrigDir, "build/apk/classes3.dex");
+
+        assertTrue(classes2Dex.isFile());
+        assertTrue(classes3Dex.isFile());
     }
 
     @Test
     public void singleDexTest() throws BrutException, IOException {
         compareBinaryFolder("/smali", false);
+
+        File classesDex = new File(sTestOrigDir, "build/apk/classes.dex");
+        assertTrue(classesDex.isFile());
     }
 
     @Test
