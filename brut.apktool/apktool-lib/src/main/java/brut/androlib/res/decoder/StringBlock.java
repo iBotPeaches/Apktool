@@ -121,7 +121,7 @@ public class StringBlock {
     public String getHTML(int index) {
         String raw = getString(index);
         if (raw == null) {
-            return raw;
+            return null;
         }
         int[] style = getStyle(index);
         if (style == null) {
