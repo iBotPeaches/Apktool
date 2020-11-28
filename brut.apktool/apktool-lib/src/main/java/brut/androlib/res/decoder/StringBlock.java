@@ -94,15 +94,15 @@ public class StringBlock {
         int offset = m_stringOffsets[index];
         int length;
 
+        int[] val;
         if (m_isUTF8) {
-            int[] val = getUtf8(m_strings, offset);
+            val = getUtf8(m_strings, offset);
             offset = val[0];
-            length = val[1];
         } else {
-            int[] val = getUtf16(m_strings, offset);
+            val = getUtf16(m_strings, offset);
             offset += val[0];
-            length = val[1];
         }
+        length = val[1];
         return decodeString(offset, length);
     }
 
