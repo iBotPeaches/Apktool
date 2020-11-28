@@ -264,20 +264,21 @@ public class StringBlock {
             return null;
         }
         int offset = m_styleOffsets[index] / 4;
-        int style[];
-        {
-            int count = 0;
-            for (int i = offset; i < m_styles.length; ++i) {
-                if (m_styles[i] == -1) {
-                    break;
-                }
-                count += 1;
+        int count = 0;
+        int[] style;
+
+        for (int i = offset; i < m_styles.length; ++i) {
+            if (m_styles[i] == -1) {
+                break;
             }
-            if (count == 0 || (count % 3) != 0) {
-                return null;
-            }
-            style = new int[count];
+            count += 1;
         }
+
+        if (count == 0 || (count % 3) != 0) {
+            return null;
+        }
+        style = new int[count];
+
         for (int i = offset, j = 0; i < m_styles.length;) {
             if (m_styles[i] == -1) {
                 break;
