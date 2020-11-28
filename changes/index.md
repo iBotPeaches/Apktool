@@ -11,7 +11,7 @@ description: Apktool - Changelog / Roadmap
  * Updated baksmali/smali to version 2.4.0
  * Upgrade to `gradle 6.4.1`
  * Replaced TravisCI with GitHub Actions
- * Deprecate 32bit ([Issue 2110](https://github.com/iBotPeaches/Apktool/issues/2210))
+ * Deprecate 32bit ([Issue 2110](https://github.com/iBotPeaches/Apktool/issues/2210), [Issue 2053](https://github.com/iBotPeaches/Apktool/issues/2053))
  * Added support for SDK Codename "S" (Android 12?)
  * Added support for `JAVA_HOME` environmental on Windows if defined. (Thanks vldmrrr)
  * Update license headers to reflect start copyright date & remove javadoc style. (Thanks friederbluemle)
