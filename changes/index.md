@@ -23,6 +23,7 @@ description: Apktool - Changelog / Roadmap
  * Fixed issue with NPE disassembling manifest with attributes with no resourceId. ([Issue 2300](https://github.com/iBotPeaches/Apktool/issues/2300))
  * Fixed issue with aapt2 and strict dummy properties, changing bool(false) to ref(null). ([Issue 2438](https://github.com/iBotPeaches/Apktool/issues/2438))
  * Properly return non-zero error if invalid parameters. (Thanks Giszmo)
+ * Added helpful error message when framework directory cannot be written. ([Issue 2343](https://github.com/iBotPeaches/Apktool/issues/2343))
  * Added testcases for `classes#.dex` disassembling on aapt1/aapt2. ([Issue 2411](https://github.com/iBotPeaches/Apktool/issues/2411))
  * Support for new `compileSdkVersion` property for `SdkInfo`. ([Issue 2368](https://github.com/iBotPeaches/Apktool/issues/2368))
 
