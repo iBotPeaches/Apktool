@@ -7,7 +7,7 @@ description: Apktool - Changelog / Roadmap
 ## v2.5.0
 2020.xx.xx
 
- * **Android 11 Support** ([Issue 2399](https://github.com/iBotPeaches/Apktool/issues/2399), [Issue 2397](https://github.com/iBotPeaches/Apktool/issues/2397), [Issue 2369](https://github.com/iBotPeaches/Apktool/issues/2369))
+ * **Android 11 Support** ([Issue 2399](https://github.com/iBotPeaches/Apktool/issues/2399), [Issue 2397](https://github.com/iBotPeaches/Apktool/issues/2397), [Issue 2369](https://github.com/iBotPeaches/Apktool/issues/2369), [Issue 2167](https://github.com/iBotPeaches/Apktool/issues/2167))
  * Updated baksmali/smali to version 2.4.0
  * Upgrade to `gradle 6.4.1`
  * Replaced TravisCI with GitHub Actions
