@@ -7,6 +7,7 @@ This would be a lookup table of old->new resourceIds leveraging the API of dexli
 properly would nullify the need to do [#191](https://github.com/iBotPeaches/Apktool/issues/191)
 
 Suggestions: [#244](https://github.com/iBotPeaches/Apktool/issues/244)
+Discussions: [#2062](https://github.com/iBotPeaches/Apktool/issues/2062)
 
 ## Implicit Qualifiers Cleanup
 Currently we have a mismatch between reading the folders and reading the qualifiers which leads to a mismatch between
