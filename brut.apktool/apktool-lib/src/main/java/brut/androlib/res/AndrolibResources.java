@@ -984,7 +984,9 @@ final public class AndrolibResources {
                 if (apkOptions.frameworkFolderLocation != null) {
                     LOGGER.severe("Can't create Framework directory: " + dir);
                 }
-                throw new AndrolibException("Can't create directory: " + dir);
+                throw new AndrolibException(String.format(
+                        "Can't create directory: (%s). Pass a writable path with --frame-path {DIR}. ", dir
+                ));
             }
         }
 
