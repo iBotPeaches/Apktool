@@ -7,3 +7,14 @@ This would be a lookup table of old->new resourceIds leveraging the API of dexli
 properly would nullify the need to do [#191](https://github.com/iBotPeaches/Apktool/issues/191)
 
 Suggestions: [#244](https://github.com/iBotPeaches/Apktool/issues/244)
+
+## Implicit Qualifiers Cleanup
+Currently we have a mismatch between reading the folders and reading the qualifiers which leads to a mismatch between
+implicit qualifiers like version (-v4, v13, etc).
+
+This was first spotted in bug [#1272](https://github.com/iBotPeaches/Apktool/issues/1272).
+
+This was attempted to be fixed in [!1758](https://github.com/iBotPeaches/Apktool/pull/1758/files), but had to be
+reverted due to [this](https://github.com/iBotPeaches/Apktool/issues/1272#issuecomment-379345005).
+
+Suggestions: [#2237](https://github.com/iBotPeaches/Apktool/issues/2237)
