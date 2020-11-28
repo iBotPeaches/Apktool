@@ -20,6 +20,7 @@ description: Apktool - Changelog / Roadmap
  * Fixed handling with debug mode while using aapt2. ([Issue 2328](https://github.com/iBotPeaches/Apktool/issues/2328), [Issue 2364](https://github.com/iBotPeaches/Apktool/issues/2364)) / Thanks Comnir)
  * Fixed issue with handling of XML files using `$` in resource name. ([Issue 2386](https://github.com/iBotPeaches/Apktool/issues/2386), [Issue 2217](https://github.com/iBotPeaches/Apktool/issues/2271))
  * Fixed issue with NPE disassembling manifest with attributes with no resourceId. ([Issue 2300](https://github.com/iBotPeaches/Apktool/issues/2300))
+ * Fixed issue with aapt2 and strict dummy properties, changing bool(false) to ref(null). ([Issue 2438](https://github.com/iBotPeaches/Apktool/issues/2438))
  * Properly return non-zero error if invalid parameters. (Thanks Giszmo)
  * Added testcases for `classes#.dex` disassembling on aapt1/aapt2. ([Issue 2411](https://github.com/iBotPeaches/Apktool/issues/2411))
  * Support for new `compileSdkVersion` property for `SdkInfo`. ([Issue 2368](https://github.com/iBotPeaches/Apktool/issues/2368))
