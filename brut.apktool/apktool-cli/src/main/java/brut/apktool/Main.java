@@ -543,7 +543,7 @@ public class Main {
                         "Copyright 2010 Ryszard Wiśniewski <brut.alll@gmail.com>\n" +
                         "Copyright 2010 Connor Tumbleson <connor.tumbleson@gmail.com>" );
         if (isAdvanceMode()) {
-            System.out.println("Apache License 2.0 (http://www.apache.org/licenses/LICENSE-2.0)\n");
+            System.out.println("Apache License 2.0 (https://www.apache.org/licenses/LICENSE-2.0)\n");
         }else {
             System.out.println("");
         }
@@ -563,7 +563,7 @@ public class Main {
 
         // print out more information
         System.out.println(
-                "For additional info, see: http://ibotpeaches.github.io/Apktool/ \n"
+                "For additional info, see: https://ibotpeaches.github.io/Apktool/ \n"
                         + "For smali/baksmali info, see: https://github.com/JesusFreke/smali");
     }
 
