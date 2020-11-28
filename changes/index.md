@@ -19,6 +19,7 @@ description: Apktool - Changelog / Roadmap
  * Fixed issue with empty files being compressed breaking applications. ([Issue 2333](https://github.com/iBotPeaches/Apktool/issues/2333)) / (Thanks peret)
  * Fixed handling with debug mode while using aapt2. ([Issue 2328](https://github.com/iBotPeaches/Apktool/issues/2328)) / Thanks Comnir)
  * Fixed issue with handling of non-standard XML files on Windows. ([Issue 2386](https://github.com/iBotPeaches/Apktool/issues/2386))
+ * Fixed issue with NPE disassembling manifest with attributes with no resourceId. ([Issue 2300](https://github.com/iBotPeaches/Apktool/issues/2300))
  * Properly return non-zero error if invalid parameters. (Thanks Giszmo)
  * Added testcases for `classes#.dex` disassembling on aapt1/aapt2. ([Issue 2411](https://github.com/iBotPeaches/Apktool/issues/2411))
  * Support for new `compileSdkVersion` property for `SdkInfo`. ([Issue 2368](https://github.com/iBotPeaches/Apktool/issues/2368))
