@@ -54,8 +54,6 @@ public class StringBlock {
         StringBlock block = new StringBlock();
         block.m_isUTF8 = (flags & UTF8_FLAG) != 0;
         block.m_stringOffsets = reader.readIntArray(stringCount);
-        block.m_stringOwns = new int[stringCount];
-        Arrays.fill(block.m_stringOwns, -1);
 
         if (styleCount != 0) {
             block.m_styleOffsets = reader.readIntArray(styleCount);
@@ -353,7 +351,6 @@ public class StringBlock {
     private int[] m_styleOffsets;
     private int[] m_styles;
     private boolean m_isUTF8;
-    private int[] m_stringOwns;
 
     private final CharsetDecoder UTF16LE_DECODER = Charset.forName("UTF-16LE").newDecoder();
     private final CharsetDecoder UTF8_DECODER = Charset.forName("UTF-8").newDecoder();
