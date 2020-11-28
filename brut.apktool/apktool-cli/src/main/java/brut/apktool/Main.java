@@ -210,7 +210,6 @@ public class Main {
             apkOptions.forceBuildAll = true;
         }
         if (cli.hasOption("d") || cli.hasOption("debug")) {
-            System.out.println("SmaliDebugging has been removed in 2.1.0 onward. Please see: https://github.com/iBotPeaches/Apktool/issues/1061");
             apkOptions.debugMode = true;
         }
         if (cli.hasOption("v") || cli.hasOption("verbose")) {
