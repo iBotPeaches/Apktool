@@ -17,7 +17,7 @@ description: Apktool - Changelog / Roadmap
  * Fixed issue with binary name clash in multi-threaded environments. ([Issue 2251](https://github.com/iBotPeaches/Apktool/issues/2251)) Thanks chris-sharl
  * Fixed issue with `resources.arsc` file being compressed in framework files. ([Issue 2323](https://github.com/iBotPeaches/Apktool/issues/2323))
  * Fixed issue with empty files being compressed breaking applications. ([Issue 2333](https://github.com/iBotPeaches/Apktool/issues/2333)) / (Thanks peret)
- * Fixed handling with debug mode while using aapt2. ([Issue 2328](https://github.com/iBotPeaches/Apktool/issues/2328)) / Thanks Comnir)
+ * Fixed handling with debug mode while using aapt2. ([Issue 2328](https://github.com/iBotPeaches/Apktool/issues/2328), [Issue 2364](https://github.com/iBotPeaches/Apktool/issues/2364)) / Thanks Comnir)
  * Fixed issue with handling of XML files using `$` in resource name. ([Issue 2386](https://github.com/iBotPeaches/Apktool/issues/2386), [Issue 2217](https://github.com/iBotPeaches/Apktool/issues/2271))
  * Fixed issue with NPE disassembling manifest with attributes with no resourceId. ([Issue 2300](https://github.com/iBotPeaches/Apktool/issues/2300))
  * Properly return non-zero error if invalid parameters. (Thanks Giszmo)
