@@ -23,6 +23,7 @@ import brut.androlib.err.OutDirExistsException;
 import brut.common.BrutException;
 import brut.directory.DirectoryException;
 import brut.util.AaptManager;
+import brut.util.OSDetection;
 import org.apache.commons.cli.*;
 
 import java.io.File;
@@ -51,6 +52,10 @@ public class Main {
 
         try {
             commandLine = parser.parse(allOptions, args, false);
+
+            if (! OSDetection.is64Bit()) {
+                System.err.println("32 bit support is deprecated. Apktool will not support 32bit on v1.6.0.");
+            }
         } catch (ParseException ex) {
             System.err.println(ex.getMessage());
             usage();
