@@ -516,9 +516,11 @@ public class ARSCDecoder {
                     mType = mPkg.getOrCreateConfig(new ResConfigFlags());
                 }
 
-                ResValue value = new ResBoolValue(false, 0, null);
-                ResResource res = new ResResource(mType, spec, value);
+                // We are going to make dummy attributes a null reference (@null) now instead of a boolean false.
+                // This is because aapt2 is much more strict when it comes to what we can put in an application.
+                ResValue value = new ResReferenceValue(mPkg, 0, "");
 
+                ResResource res = new ResResource(mType, spec, value);
                 mPkg.addResource(res);
                 mType.addResource(res);
                 spec.addResource(res);
