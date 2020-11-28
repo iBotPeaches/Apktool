@@ -296,7 +296,7 @@ public class AXmlResourceParser implements XmlResourceParser {
         if (value.length() == 0) {
             ResID resourceId = new ResID(getAttributeNameResource(index));
             if (resourceId.package_ == PRIVATE_PKG_ID) {
-                value = getNonDefaultNamespaceUri();
+                value = getNonDefaultNamespaceUri(offset);
             } else {
                 value = android_ns;
             }
@@ -305,15 +305,19 @@ public class AXmlResourceParser implements XmlResourceParser {
         return value;
     }
 
-    private String getNonDefaultNamespaceUri() {
-        int offset = m_namespaces.getCurrentCount() + 1;
-        String prefix = m_strings.getString(m_namespaces.get(offset, true));
-
-        if (! prefix.equalsIgnoreCase("android")) {
-            return  m_strings.getString(m_namespaces.get(offset, false));
+    private String getNonDefaultNamespaceUri(int offset) {
+        String prefix = m_strings.getString(m_namespaces.getPrefix(offset));
+        if (prefix != null) {
+            return  m_strings.getString(m_namespaces.getUri(offset));
         }
 
-        return android_ns;
+        // If we are here. There is some clever obfuscation going on. Our reference points to the namespace are gone.
+        // Normally we could take the index * attributeCount to get an offset.
+        // That would point to the URI in the StringBlock table, but that is empty.
+        // We have the namespaces that can't be touched in the opening tag.
+        // Though no known way to correlate them at this time.
+        // So return the res-auto namespace.
+        return "http://schemas.android.com/apk/res-auto";
     }
 
     @Override
@@ -985,7 +989,7 @@ public class AXmlResourceParser implements XmlResourceParser {
     private StringBlock m_strings;
     private int[] m_resourceIDs;
     private NamespaceStack m_namespaces = new NamespaceStack();
-    private String android_ns = "http://schemas.android.com/apk/res/android";
+    private final String android_ns = "http://schemas.android.com/apk/res/android";
     private boolean m_decreaseDepth;
     private int m_event;
     private int m_lineNumber;
