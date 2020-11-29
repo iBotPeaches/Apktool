@@ -23,7 +23,7 @@ description: Apktool - Changelog / Roadmap
  * Fixed issue with NPE disassembling manifest with attributes with no resourceId. ([Issue 2300](https://github.com/iBotPeaches/Apktool/issues/2300))
  * Fixed issue with aapt2 and strict dummy properties, changing bool(false) to ref(null). ([Issue 2438](https://github.com/iBotPeaches/Apktool/issues/2438), [Issue 1903](https://github.com/iBotPeaches/Apktool/issues/1903))
  * Fixed issue with non-standard namespaces in obfuscated application. ([Issue 2317](https://github.com/iBotPeaches/Apktool/issues/2317), [Issue 2188](https://github.com/iBotPeaches/Apktool/issues/2188))
- * Fixed NPE when trying to find a referent of a missing resource. ([Issue 1945](https://github.com/iBotPeaches/Apktool/issues/1945))
+ * Fixed NPE when trying to find a referent of a missing resource. ([Issue 1945](https://github.com/iBotPeaches/Apktool/issues/1945), [Issue 2146](https://github.com/iBotPeaches/Apktool/issues/2146))
  * Properly return non-zero error if invalid parameters. (Thanks Giszmo)
  * Added helpful error message when framework directory cannot be written. ([Issue 2343](https://github.com/iBotPeaches/Apktool/issues/2343))
  * Added testcases for `classes#.dex` disassembling on aapt1/aapt2. ([Issue 2411](https://github.com/iBotPeaches/Apktool/issues/2411))
