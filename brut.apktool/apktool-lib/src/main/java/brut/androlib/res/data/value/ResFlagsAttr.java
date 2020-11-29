@@ -155,6 +155,9 @@ public class ResFlagsAttr extends ResAttr {
 
         public String getValue() throws AndrolibException {
             if (value == null) {
+                if (ref.referentIsNull()) {
+                    return "@null";
+                }
                 value = ref.getReferent().getName();
             }
             return value;
