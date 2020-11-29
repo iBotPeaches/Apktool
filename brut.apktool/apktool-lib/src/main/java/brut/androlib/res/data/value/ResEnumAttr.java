@@ -17,6 +17,7 @@
 package brut.androlib.res.data.value;
 
 import brut.androlib.AndrolibException;
+import brut.androlib.res.data.ResResSpec;
 import brut.androlib.res.data.ResResource;
 import brut.util.Duo;
 import java.io.IOException;
@@ -51,9 +52,12 @@ public class ResEnumAttr extends ResAttr {
             throws AndrolibException, IOException {
         for (Duo<ResReferenceValue, ResIntValue> duo : mItems) {
             int intVal = duo.m2.getValue();
+            ResResSpec m1Referent = duo.m1.getReferent();
 
             serializer.startTag(null, "enum");
-            serializer.attribute(null, "name", duo.m1.getReferent().getName());
+            serializer.attribute(null, "name",
+                    m1Referent != null ? m1Referent.getName() : "@null"
+            );
             serializer.attribute(null, "value", String.valueOf(intVal));
             serializer.endTag(null, "enum");
         }
