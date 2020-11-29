@@ -19,3 +19,13 @@ This was attempted to be fixed in [!1758](https://github.com/iBotPeaches/Apktool
 reverted due to [this](https://github.com/iBotPeaches/Apktool/issues/1272#issuecomment-379345005).
 
 Suggestions: [#2237](https://github.com/iBotPeaches/Apktool/issues/2237)
+
+## Qualifier Plugin System
+For some OEMs, past and present. They re-use qualifiers that AOSP ends up using. This with CTS is becoming very
+rare and pretty much a problem of the past, but now custom modifications and more "off the cuff" OEMs are doing
+it. 
+
+Apktool can't do anything because it stays true to AOSP. It would need a plugin system that controls how to
+read the qualifiers. Or even an override file.
+
+Suggestions: [#1420](https://github.com/iBotPeaches/Apktool/issues/1420)
