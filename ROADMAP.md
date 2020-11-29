@@ -29,3 +29,11 @@ Apktool can't do anything because it stays true to AOSP. It would need a plugin 
 read the qualifiers. Or even an override file.
 
 Suggestions: [#1420](https://github.com/iBotPeaches/Apktool/issues/1420)
+
+## Library System
+May like using Apktool outside of the cli tool. We should make it easier to consume, whether via
+maven, jitpack, etc.
+
+Additionally, some documentation on how to do this.
+
+Suggestions: [#1301](https://github.com/iBotPeaches/Apktool/issues/1301), [#2102](https://github.com/iBotPeaches/Apktool/issues/2102)
