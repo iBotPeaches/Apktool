@@ -37,3 +37,12 @@ maven, jitpack, etc.
 Additionally, some documentation on how to do this.
 
 Suggestions: [#1301](https://github.com/iBotPeaches/Apktool/issues/1301), [#2102](https://github.com/iBotPeaches/Apktool/issues/2102)
+
+## Non-reference Resources
+Some applications may shove resources into the /res folder, but have no references to them. Apktool follows
+the resource table, so these files are effectively abandoned.
+
+Crawling the filesystem for non-checked files would be slow especially having to cross check with already
+parsed files.
+
+Suggestions: [#1366](https://github.com/iBotPeaches/Apktool/issues/1366)
