@@ -25,5 +25,6 @@
   subs:
     - Utility
     - Empty Framework Dir
+    - List Framework Dir
     - Decode
     - Rebuild
