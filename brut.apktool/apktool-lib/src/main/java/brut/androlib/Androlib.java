@@ -714,6 +714,10 @@ public class Androlib {
         mAndRes.installFramework(frameFile);
     }
 
+    public void listFrameworks() throws AndrolibException {
+        mAndRes.listFrameworkDirectory();
+    }
+
     public void emptyFrameworkDirectory() throws AndrolibException {
         mAndRes.emptyFrameworkDirectory();
     }
