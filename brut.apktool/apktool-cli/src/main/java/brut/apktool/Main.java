@@ -73,7 +73,7 @@ public class Main {
 
         // check for advance mode
         if (commandLine.hasOption("advance") || commandLine.hasOption("advanced")) {
-            setAdvanceMode(true);
+            setAdvanceMode();
         }
 
         boolean cmdFound = false;
@@ -89,6 +89,9 @@ public class Main {
                 cmdFound = true;
             } else if (opt.equalsIgnoreCase("empty-framework-dir")) {
                 cmdEmptyFrameworkDirectory(commandLine);
+                cmdFound = true;
+            } else if (opt.equalsIgnoreCase("list-frameworks")) {
+                cmdListFrameworks(commandLine);
                 cmdFound = true;
             } else if (opt.equalsIgnoreCase("publicize-resources")) {
                 cmdPublicizeResources(commandLine);
@@ -272,6 +275,15 @@ public class Main {
             apkOptions.frameworkTag = cli.getOptionValue("t");
         }
         new Androlib(apkOptions).installFramework(new File(apkName));
+    }
+
+    private static void cmdListFrameworks(CommandLine cli) throws AndrolibException {
+        ApkOptions apkOptions = new ApkOptions();
+        if (cli.hasOption("p") || cli.hasOption("frame-path")) {
+            apkOptions.frameworkFolderLocation = cli.getOptionValue("p");
+        }
+
+        new Androlib(apkOptions).listFrameworks();
     }
 
     private static void cmdPublicizeResources(CommandLine cli) throws AndrolibException {
@@ -497,6 +509,9 @@ public class Main {
         emptyFrameworkOptions.addOption(forceDecOption);
         emptyFrameworkOptions.addOption(frameIfDirOption);
 
+        // add list framework options
+        listFrameworkOptions.addOption(frameIfDirOption);
+
         // add all, loop existing cats then manually add advance
         for (Object op : normalOptions.getOptions()) {
             allOptions.addOption((Option)op);
@@ -561,6 +576,7 @@ public class Main {
         if (isAdvanceMode()) {
             formatter.printHelp("apktool " + verbosityHelp() + "publicize-resources <file_path>", emptyOptions);
             formatter.printHelp("apktool " + verbosityHelp() + "empty-framework-dir [options]", emptyFrameworkOptions);
+            formatter.printHelp("apktool " + verbosityHelp() + "list-frameworks [options]", listFrameworkOptions);
             System.out.println("");
         } else {
             System.out.println("");
@@ -634,8 +650,8 @@ public class Main {
         return advanceMode;
     }
 
-    private static void setAdvanceMode(boolean advanceMode) {
-        Main.advanceMode = advanceMode;
+    private static void setAdvanceMode() {
+        Main.advanceMode = true;
     }
 
     private enum Verbosity {
@@ -651,6 +667,7 @@ public class Main {
     private final static Options allOptions;
     private final static Options emptyOptions;
     private final static Options emptyFrameworkOptions;
+    private final static Options listFrameworkOptions;
 
     static {
         //normal and advance usage output
@@ -661,5 +678,6 @@ public class Main {
         allOptions = new Options();
         emptyOptions = new Options();
         emptyFrameworkOptions = new Options();
+        listFrameworkOptions = new Options();
     }
 }
