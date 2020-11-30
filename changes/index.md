@@ -27,6 +27,7 @@ description: Apktool - Changelog / Roadmap
  * Properly return non-zero error if invalid parameters. (Thanks Giszmo)
  * Added helpful error message when framework directory cannot be written. ([Issue 2343](https://github.com/iBotPeaches/Apktool/issues/2343))
  * Added testcases for `classes#.dex` disassembling on aapt1/aapt2. ([Issue 2411](https://github.com/iBotPeaches/Apktool/issues/2411))
+ * Added `apktool list-frameworks`. ([Issue 1913](https://github.com/iBotPeaches/Apktool/issues/1913))
  * Support for new `compileSdkVersion` property for `SdkInfo`. ([Issue 2368](https://github.com/iBotPeaches/Apktool/issues/2368))
 
 ## v2.4.1
