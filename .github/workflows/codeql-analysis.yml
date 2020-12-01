@@ -3,8 +3,16 @@ name: "CodeQL"
 on:
   push:
     branches: [ master ]
+    paths:
+      - '**.java'
+      - '**.gradle'
+      - 'brut.apktool/apktool-lib/src/main/resources/**'
   pull_request:
     branches: [ master ]
+    paths:
+      - '**.java'
+      - '**.gradle'
+      - 'brut.apktool/apktool-lib/src/main/resources/**'
 
 jobs:
   analyze:
