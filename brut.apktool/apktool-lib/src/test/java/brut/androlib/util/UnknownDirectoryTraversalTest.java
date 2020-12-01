@@ -56,14 +56,14 @@ public class UnknownDirectoryTraversalTest extends BaseTest {
 
     @Test
     public void validRootFileTest() throws IOException, BrutException {
-        String rootLocation = OSDetection.isWindows() ? "C:/" : File.separator;
+        String rootLocation = (OSDetection.isWindows() ? "C:" : "") + File.separator;
         String validFilename = BrutIO.sanitizeUnknownFile(sTmpDir, rootLocation + "file");
         assertEquals("file", validFilename);
     }
 
     @Test
     public void validRootMultipleDepthFileTest() throws IOException, BrutException {
-        String rootLocation = (OSDetection.isWindows() ? "C:/" : File.separator) + "folder" + File.separator;
+        String rootLocation = (OSDetection.isWindows() ? "C:" : "") + File.separator + "folder" + File.separator;
         String validFilename = BrutIO.sanitizeUnknownFile(sTmpDir, rootLocation + "file");
         assertEquals("folder" + File.separator + "file", validFilename);
     }
