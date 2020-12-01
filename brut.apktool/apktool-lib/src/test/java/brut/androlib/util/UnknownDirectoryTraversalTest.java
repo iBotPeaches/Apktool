@@ -20,7 +20,6 @@ import brut.androlib.BaseTest;
 import brut.androlib.TestUtils;
 import brut.common.BrutException;
 import brut.common.InvalidUnknownFileException;
-import brut.common.RootUnknownFileException;
 import brut.common.TraversalUnknownFileException;
 import brut.directory.ExtFile;
 import brut.util.BrutIO;
@@ -55,16 +54,25 @@ public class UnknownDirectoryTraversalTest extends BaseTest {
         assertTrue(validFile.isFile());
     }
 
+    @Test
+    public void validRootFileTest() throws IOException, BrutException {
+        String rootLocation = OSDetection.isWindows() ? "C:/" : File.separator;
+        String validFilename = BrutIO.sanitizeUnknownFile(sTmpDir, rootLocation + "file");
+        assertEquals("file", validFilename);
+    }
+
+    @Test
+    public void validRootMultipleDepthFileTest() throws IOException, BrutException {
+        String rootLocation = (OSDetection.isWindows() ? "C:/" : File.separator) + "folder" + File.separator;
+        String validFilename = BrutIO.sanitizeUnknownFile(sTmpDir, rootLocation + "file");
+        assertEquals("folder" + File.separator + "file", validFilename);
+    }
+
     @Test(expected = TraversalUnknownFileException.class)
     public void invalidBackwardFileTest() throws IOException, BrutException {
         BrutIO.sanitizeUnknownFile(sTmpDir, "../file");
     }
 
-    @Test(expected = RootUnknownFileException.class)
-    public void invalidRootFileTest() throws IOException, BrutException {
-        String rootLocation = OSDetection.isWindows() ? "C:/" : File.separator;
-        BrutIO.sanitizeUnknownFile(sTmpDir, rootLocation + "file");
-    }
 
     @Test(expected = InvalidUnknownFileException.class)
     public void noFilePassedTest() throws IOException, BrutException {
