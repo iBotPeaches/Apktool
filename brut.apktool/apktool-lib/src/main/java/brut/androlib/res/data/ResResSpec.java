@@ -37,7 +37,7 @@ public class ResResSpec {
 
         ResResSpec resResSpec = type.getResSpecUnsafe(name);
         if (resResSpec != null) {
-            cleanName = name + "_APKTOOL_DUPLICATENAME_" + id.toString();
+            cleanName = String.format("APKTOOL_DUPLICATE_%s_%s", type.toString(), id.toString());
         } else {
             cleanName = ((name == null || name.isEmpty()) ? ("APKTOOL_DUMMYVAL_" + id.toString()) : name);
         }
