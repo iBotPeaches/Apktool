@@ -24,7 +24,6 @@ import java.util.zip.ZipOutputStream;
 
 import brut.common.BrutException;
 import brut.common.InvalidUnknownFileException;
-import brut.common.RootUnknownFileException;
 import brut.common.TraversalUnknownFileException;
 import org.apache.commons.io.IOUtils;
 
@@ -77,13 +76,9 @@ public class BrutIO {
         return crc;
     }
 
-    public static String sanitizeUnknownFile(final File directory, final String entry) throws IOException, BrutException {
+    public static String sanitizeUnknownFile(final File directory, String entry) throws IOException, BrutException {
         if (entry.length() == 0) {
             throw new InvalidUnknownFileException("Invalid Unknown File - " + entry);
-        }
-
-        if (new File(entry).isAbsolute()) {
-            throw new RootUnknownFileException("Absolute Unknown Files is not allowed - " + entry);
         }
 
         final String canonicalDirPath = directory.getCanonicalPath() + File.separator;
