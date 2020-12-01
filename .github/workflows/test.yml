@@ -1,5 +1,10 @@
 name: CI
-on: [push]
+on:
+  push:
+    paths:
+      - '**.java'
+      - '**.gradle'
+      - 'brut.apktool/apktool-lib/src/main/resources/**'
 
 jobs:
   build-and-test-with-Java-8-and-later:
