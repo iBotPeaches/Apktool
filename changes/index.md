@@ -4,8 +4,13 @@ title: Apktool - Changelog
 description: Apktool - Changelog / Roadmap
 ---
 
-## v2.5.0
+## v2.5.1
 2020.xx.xx
+
+ * Under Development
+
+## v2.5.0
+2020.12.02
 
  * **Android 11 Support** ([Issue 2399](https://github.com/iBotPeaches/Apktool/issues/2399), [Issue 2397](https://github.com/iBotPeaches/Apktool/issues/2397), [Issue 2369](https://github.com/iBotPeaches/Apktool/issues/2369), [Issue 2167](https://github.com/iBotPeaches/Apktool/issues/2167))
  * Updated baksmali/smali to version 2.4.0 ([Issue 2006](https://github.com/iBotPeaches/Apktool/issues/2006), [Issue 1718](https://github.com/iBotPeaches/Apktool/issues/1718))
