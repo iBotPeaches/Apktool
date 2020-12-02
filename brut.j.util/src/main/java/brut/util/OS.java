@@ -38,12 +38,13 @@ public class OS {
             return;
         }
         File[] files = dir.listFiles();
-        for (int i = 0; i < files.length; i++) {
-            File file = files[i];
-            if (file.isDirectory()) {
-                rmdir(file);
-            } else {
-                file.delete();
+        if (files != null) {
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    rmdir(file);
+                } else {
+                    file.delete();
+                }
             }
         }
         dir.delete();
@@ -61,22 +62,23 @@ public class OS {
     public static void cpdir(File src, File dest) throws BrutException {
         dest.mkdirs();
         File[] files = src.listFiles();
-        for (int i = 0; i < files.length; i++) {
-            File file = files[i];
-            File destFile = new File(dest.getPath() + File.separatorChar
-                + file.getName());
-            if (file.isDirectory()) {
-                cpdir(file, destFile);
-                continue;
-            }
-            try {
-                InputStream in = new FileInputStream(file);
-                OutputStream out = new FileOutputStream(destFile);
-                IOUtils.copy(in, out);
-                in.close();
-                out.close();
-            } catch (IOException ex) {
-                throw new BrutException("Could not copy file: " + file, ex);
+        if (files != null) {
+            for (File file : files) {
+                File destFile = new File(dest.getPath() + File.separatorChar
+                        + file.getName());
+                if (file.isDirectory()) {
+                    cpdir(file, destFile);
+                    continue;
+                }
+                try {
+                    InputStream in = new FileInputStream(file);
+                    OutputStream out = new FileOutputStream(destFile);
+                    IOUtils.copy(in, out);
+                    in.close();
+                    out.close();
+                } catch (IOException ex) {
+                    throw new BrutException("Could not copy file: " + file, ex);
+                }
             }
         }
     }
