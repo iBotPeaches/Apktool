@@ -8,6 +8,7 @@ description: Apktool - Changelog / Roadmap
 2020.xx.xx
 
  * Updated aapt2 with patches for `attr-private` and remove reserved pkgIds. (Thanks MrIkso)
+ * Fix NPE when decoding to a custom non-empty root directory. ([Issue 2455](https://github.com/iBotPeaches/Apktool/issues/2455))
 
 ## v2.5.0
 2020.12.02
