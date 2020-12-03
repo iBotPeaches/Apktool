@@ -7,7 +7,7 @@ description: Apktool - Changelog / Roadmap
 ## v2.5.1
 2020.xx.xx
 
- * Under Development
+ * Updated aapt2 with patches for `attr-private` and remove reserved pkgIds. (Thanks MrIkso)
 
 ## v2.5.0
 2020.12.02
