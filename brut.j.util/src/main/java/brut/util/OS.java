@@ -38,8 +38,11 @@ public class OS {
             return;
         }
         File[] files = dir.listFiles();
-        for (int i = 0; i < files.length; i++) {
-            File file = files[i];
+        if (files == null) {
+            return;
+        }
+
+        for (File file : files) {
             if (file.isDirectory()) {
                 rmdir(file);
             } else {
@@ -61,10 +64,12 @@ public class OS {
     public static void cpdir(File src, File dest) throws BrutException {
         dest.mkdirs();
         File[] files = src.listFiles();
-        for (int i = 0; i < files.length; i++) {
-            File file = files[i];
-            File destFile = new File(dest.getPath() + File.separatorChar
-                + file.getName());
+        if (files == null) {
+            return;
+        }
+
+        for (File file : files) {
+            File destFile = new File(dest.getPath() + File.separatorChar + file.getName());
             if (file.isDirectory()) {
                 cpdir(file, destFile);
                 continue;
