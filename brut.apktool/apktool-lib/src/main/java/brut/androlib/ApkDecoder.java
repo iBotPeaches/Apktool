@@ -340,8 +340,6 @@ public class ApkDecoder {
     public final static short DECODE_ASSETS_NONE = 0x0000;
     public final static short DECODE_ASSETS_FULL = 0x0001;
 
-    public final static short DECODE_NO_CREATE_DUMMY = 0x0001;
-    
     private File getOutDir() throws AndrolibException {
         if (mOutDir == null) {
             throw new AndrolibException("Out dir not set");
