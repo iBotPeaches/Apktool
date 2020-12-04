@@ -64,7 +64,7 @@ final public class AndrolibResources {
     public ResPackage loadMainPkg(ResTable resTable, ExtFile apkFile)
             throws AndrolibException {
         LOGGER.info("Loading resource table...");
-        ResPackage[] pkgs = getResPackagesFromApk(apkFile, resTable, sKeepBroken);
+        ResPackage[] pkgs = getResPackagesFromApk(apkFile, resTable, sKeepBroken, sCreateDummy);
         ResPackage pkg = null;
 
         switch (pkgs.length) {
@@ -120,7 +120,7 @@ final public class AndrolibResources {
 
         LOGGER.info("Loading resource table from file: " + apk);
         mFramework = new ExtFile(apk);
-        ResPackage[] pkgs = getResPackagesFromApk(mFramework, resTable, true);
+        ResPackage[] pkgs = getResPackagesFromApk(mFramework, resTable, true, sCreateDummy);
 
         ResPackage pkg;
         if (pkgs.length > 1) {
@@ -781,13 +781,13 @@ final public class AndrolibResources {
         }
     }
 
-    private ResPackage[] getResPackagesFromApk(ExtFile apkFile,ResTable resTable, boolean keepBroken)
+    private ResPackage[] getResPackagesFromApk(ExtFile apkFile,ResTable resTable, boolean keepBroken, boolean createDummy)
             throws AndrolibException {
         try {
             Directory dir = apkFile.getDirectory();
             BufferedInputStream bfi = new BufferedInputStream(dir.getFileInput("resources.arsc"));
             try {
-                return ARSCDecoder.decode(bfi, false, keepBroken, resTable).getPackages();
+                return ARSCDecoder.decode(bfi, false, keepBroken, createDummy, resTable).getPackages();
             } finally {
                 try {
                     bfi.close();
@@ -887,7 +887,7 @@ final public class AndrolibResources {
             in = zip.getInputStream(entry);
             byte[] data = IOUtils.toByteArray(in);
 
-            ARSCData arsc = ARSCDecoder.decode(new ByteArrayInputStream(data), true, true);
+            ARSCData arsc = ARSCDecoder.decode(new ByteArrayInputStream(data), true, true, true);
             publicizeResources(data, arsc.getFlagsOffsets());
 
             File outFile = new File(getFrameworkDir(), String.valueOf(arsc
@@ -946,7 +946,7 @@ final public class AndrolibResources {
     }
 
     public void publicizeResources(byte[] arsc) throws AndrolibException {
-        publicizeResources(arsc, ARSCDecoder.decode(new ByteArrayInputStream(arsc), true, true).getFlagsOffsets());
+        publicizeResources(arsc, ARSCDecoder.decode(new ByteArrayInputStream(arsc), true, true, true).getFlagsOffsets());
     }
 
     public void publicizeResources(byte[] arsc, FlagsOffset[] flagsOffsets)
@@ -1052,6 +1052,7 @@ final public class AndrolibResources {
 
     // TODO: dirty static hack. I have to refactor decoding mechanisms.
     public static boolean sKeepBroken = false;
+    public static boolean sCreateDummy = true;
 
     private final static Logger LOGGER = Logger.getLogger(AndrolibResources.class.getName());
 

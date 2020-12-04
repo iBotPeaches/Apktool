@@ -35,16 +35,16 @@ import org.apache.commons.io.input.CountingInputStream;
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
 public class ARSCDecoder {
-    public static ARSCData decode(InputStream arscStream, boolean findFlagsOffsets, boolean keepBroken)
+    public static ARSCData decode(InputStream arscStream, boolean findFlagsOffsets, boolean keepBroken, boolean createDummy)
             throws AndrolibException {
-        return decode(arscStream, findFlagsOffsets, keepBroken, new ResTable());
+        return decode(arscStream, findFlagsOffsets, keepBroken,createDummy, new ResTable());
     }
 
-    public static ARSCData decode(InputStream arscStream, boolean findFlagsOffsets, boolean keepBroken,
+    public static ARSCData decode(InputStream arscStream, boolean findFlagsOffsets, boolean keepBroken,boolean createDummy,
                                   ResTable resTable)
             throws AndrolibException {
         try {
-            ARSCDecoder decoder = new ARSCDecoder(arscStream, resTable, findFlagsOffsets, keepBroken);
+            ARSCDecoder decoder = new ARSCDecoder(arscStream, resTable, findFlagsOffsets, keepBroken, createDummy);
             ResPackage[] pkgs = decoder.readTableHeader();
             return new ARSCData(pkgs, decoder.mFlagsOffsets == null
                     ? null
@@ -54,7 +54,7 @@ public class ARSCDecoder {
         }
     }
 
-    private ARSCDecoder(InputStream arscStream, ResTable resTable, boolean storeFlagsOffsets, boolean keepBroken) {
+    private ARSCDecoder(InputStream arscStream, ResTable resTable, boolean storeFlagsOffsets, boolean keepBroken, boolean createDummy) {
         arscStream = mCountIn = new CountingInputStream(arscStream);
         if (storeFlagsOffsets) {
             mFlagsOffsets = new ArrayList<FlagsOffset>();
@@ -67,6 +67,7 @@ public class ARSCDecoder {
         mIn = new ExtDataInput((DataInput) new LittleEndianDataInputStream(arscStream));
         mResTable = resTable;
         mKeepBroken = keepBroken;
+        mCreateDummy = createDummy;
     }
 
     private ResPackage[] readTableHeader() throws IOException, AndrolibException {
@@ -182,7 +183,8 @@ public class ARSCDecoder {
 
             type = nextChunk().type;
 
-            addMissingResSpecs();
+            if(mCreateDummy)
+                addMissingResSpecs();
         }
     }
 
@@ -556,6 +558,7 @@ public class ARSCDecoder {
     private final CountingInputStream mCountIn;
     private final List<FlagsOffset> mFlagsOffsets;
     private final boolean mKeepBroken;
+    private boolean mCreateDummy = true;
 
     private Header mHeader;
     private StringBlock mTableStrings;
