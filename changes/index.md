@@ -9,6 +9,7 @@ description: Apktool - Changelog / Roadmap
 
  * Updated aapt2 with patches for `attr-private` and remove reserved pkgIds. (Thanks MrIkso)
  * Fix NPE when decoding to a custom non-empty root directory. ([Issue 2455](https://github.com/iBotPeaches/Apktool/issues/2455))
+ * Duplicate dummy resource names are now `APKTOOL_DUPLICATE_{Type}_{RESID}` to prevent starting with numeric ([Issue 2229](https://github.com/iBotPeaches/Apktool/issues/2229))
 
 ## v2.5.0
 2020.12.02
