@@ -34,8 +34,8 @@ public class StringBlockWithSurrogatePairInUtf8Test {
     @Test
     public void decodeSurrogatePair_when_givesAsThreeOctetsFromInvalidRangeOfUtf8() {
         // See: https://github.com/iBotPeaches/Apktool/issues/2299
-        final String actual0 = new StringBlock(new byte[] {	(byte) 0xED, (byte) 0xA0, (byte) 0xBD, (byte) 0xED, (byte) 0xB4, (byte) 0x86}, true).decodeString(0, 6);
-        assertEquals("Incorrect decoding", "\uD83D\uDD06", actual0);
+        final String actual = new StringBlock(new byte[] {	(byte) 0xED, (byte) 0xA0, (byte) 0xBD, (byte) 0xED, (byte) 0xB4, (byte) 0x86}, true).decodeString(0, 6);
+        assertEquals("Incorrect decoding", "\uD83D\uDD06", actual);
     }
 
     @Test
@@ -43,7 +43,7 @@ public class StringBlockWithSurrogatePairInUtf8Test {
         // \u10FFFF is encoded in UTF-8 as "0xDBFF 0xDFFF" (4-byte encoding),
         // but when used in Android resources which are encoded in UTF-8, 3-byte encoding is used,
         // so each of these is encoded as 3-bytes
-        final String actual0 = new StringBlock(new byte[] {	(byte) 0xED, (byte) 0xAF, (byte) 0xBF, (byte) 0xED, (byte) 0xBF, (byte) 0xBF}, true).decodeString(0, 6);
-        assertEquals("Incorrect decoding", "\uDBFF\uDFFF", actual0);
+        final String actual = new StringBlock(new byte[] {	(byte) 0xED, (byte) 0xAF, (byte) 0xBF, (byte) 0xED, (byte) 0xBF, (byte) 0xBF}, true).decodeString(0, 6);
+        assertEquals("Incorrect decoding", "\uDBFF\uDFFF", actual);
     }
 }
