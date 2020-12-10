@@ -298,10 +298,22 @@ public class StringBlock {
 
     @VisibleForTesting
     String decodeString(int offset, int length) {
+        final ByteBuffer wrappedBuffer = ByteBuffer.wrap(m_strings, offset, length);
         try {
-            return (m_isUTF8 ? UTF8_DECODER : UTF16LE_DECODER).decode(
-                    ByteBuffer.wrap(m_strings, offset, length)).toString();
+            return (m_isUTF8 ? UTF8_DECODER : UTF16LE_DECODER).decode(wrappedBuffer).toString();
         } catch (CharacterCodingException ex) {
+            LOGGER.warning("Failed to decode a string at offset " + offset + " of length " + length);
+            if (!m_isUTF8) {
+                return null;
+            }
+        }
+
+        try {
+            // in some places, Android uses 3-byte UTF-8 sequences instead of 4-bytes.
+            // If decoding failed, we try to use CESU-8 decoder, which is closer to what Android actually uses.
+            return CESU8_DECODER.decode(wrappedBuffer).toString();
+        } catch (CharacterCodingException e) {
+            LOGGER.warning("Failed to decode a string with CESU-8 decoder.");
             return null;
         }
     }
@@ -362,6 +374,7 @@ public class StringBlock {
 
     private final CharsetDecoder UTF16LE_DECODER = Charset.forName("UTF-16LE").newDecoder();
     private final CharsetDecoder UTF8_DECODER = Charset.forName("UTF-8").newDecoder();
+    private final CharsetDecoder CESU8_DECODER = Charset.forName("CESU8").newDecoder();
     private static final Logger LOGGER = Logger.getLogger(StringBlock.class.getName());
 
     // ResChunk_header = header.type (0x0001) + header.headerSize (0x001C)
