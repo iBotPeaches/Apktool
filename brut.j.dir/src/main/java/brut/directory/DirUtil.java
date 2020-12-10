@@ -17,14 +17,20 @@
 package brut.directory;
 
 import brut.common.BrutException;
+import brut.common.InvalidUnknownFileException;
+import brut.common.RootUnknownFileException;
+import brut.common.TraversalUnknownFileException;
 import brut.util.BrutIO;
 import brut.util.OS;
 import java.io.*;
+import java.util.logging.Logger;
 
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
 public class DirUtil {
+    private static final Logger LOGGER = Logger.getLogger("");
+
     public static void copyToDir(Directory in, Directory out)
             throws DirectoryException {
         for (String fileName : in.getFiles(true)) {
@@ -84,15 +90,12 @@ public class DirUtil {
                 String cleanedFilename = BrutIO.sanitizeUnknownFile(out, fileName);
                 File outFile = new File(out, cleanedFilename);
                 outFile.getParentFile().mkdirs();
-                BrutIO.copyAndClose(in.getFileInput(fileName),
-                    new FileOutputStream(outFile));
+                BrutIO.copyAndClose(in.getFileInput(fileName), new FileOutputStream(outFile));
             }
-        } catch (IOException ex) {
-            throw new DirectoryException(
-                "Error copying file: " + fileName, ex);
-        } catch (BrutException ex) {
-            throw new DirectoryException(
-                "Error copying file: " + fileName, ex);
+        } catch (RootUnknownFileException | InvalidUnknownFileException | TraversalUnknownFileException exception) {
+            LOGGER.warning(String.format("Skipping file %s (%s)", fileName, exception.getMessage()));
+        } catch (IOException | BrutException ex) {
+            throw new DirectoryException("Error copying file: " + fileName, ex);
         }
     }
 }
