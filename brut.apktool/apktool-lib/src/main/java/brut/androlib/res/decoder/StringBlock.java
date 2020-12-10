@@ -18,6 +18,8 @@ package brut.androlib.res.decoder;
 
 import brut.androlib.res.xml.ResXmlEncoders;
 import brut.util.ExtDataInput;
+import com.google.common.annotations.VisibleForTesting;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.*;
@@ -254,6 +256,12 @@ public class StringBlock {
     private StringBlock() {
     }
 
+    @VisibleForTesting
+    StringBlock(byte[] strings, boolean isUTF8) {
+        m_strings = strings;
+        m_isUTF8 = isUTF8;
+    }
+
     /**
      * Returns style information - array of int triplets, where in each triplet:
      * * first int is index of tag name ('b','i', etc.) * second int is tag
@@ -288,7 +296,8 @@ public class StringBlock {
         return style;
     }
 
-    private String decodeString(int offset, int length) {
+    @VisibleForTesting
+    String decodeString(int offset, int length) {
         try {
             return (m_isUTF8 ? UTF8_DECODER : UTF16LE_DECODER).decode(
                     ByteBuffer.wrap(m_strings, offset, length)).toString();
