@@ -28,7 +28,7 @@ it.
 Apktool can't do anything because it stays true to AOSP. It would need a plugin system that controls how to
 read the qualifiers. Or even an override file.
 
-Suggestions: [#1420](https://github.com/iBotPeaches/Apktool/issues/1420)
+Suggestions: [#1420](https://github.com/iBotPeaches/Apktool/issues/1420), [#2474](https://github.com/iBotPeaches/Apktool/issues/2474)
 
 ## Library System
 May like using Apktool outside of the cli tool. We should make it easier to consume, whether via
