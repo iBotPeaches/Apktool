@@ -41,4 +41,5 @@ bar"</string>
     <string name="test_string39"><font size="17">[Ţåþ ţö ţýþé þåššŵöŕð one two three</font>]</string>
     <string name="test_string40">[<font size="17">]Ţåþ ţö ţýþé þåššŵöŕð one two three</font></string>
     <string name="test_string41"><font size="17">[Ţåþ ţö ţýþé þåššŵöŕð one two three]</font></string>
+    <string name="test_string42">🔆</string>
 </resources>

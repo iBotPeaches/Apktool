@@ -2,4 +2,5 @@
 <resources>
     <string name="app_name">testapp</string>
     <string name="long_string_32767" />
+    <string name="surrogate_issue_2299">🔆</string>
 </resources>
