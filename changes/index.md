@@ -8,9 +8,10 @@ description: Apktool - Changelog / Roadmap
 2020.xx.xx
 
  * Updated aapt2 with patches for `attr-private` and remove reserved pkgIds. (Thanks MrIkso)
+ * Changed zipslip exceptions to skip file instead of exit on failure. ([Issue 2201](https://github.com/iBotPeaches/Apktool/issues/2201))
+ * Changed dummy resource names to `APKTOOL_DUPLICATE_{Type}_{RESID}` to prevent starting with numeric ([Issue 2229](https://github.com/iBotPeaches/Apktool/issues/2229))
  * Fix decoding issues with code points over > 0x10000. ([Issue 2299](https://github.com/iBotPeaches/Apktool/issues/2299)) / (Thanks Comnir)
  * Fix NPE when decoding to a custom non-empty root directory. ([Issue 2455](https://github.com/iBotPeaches/Apktool/issues/2455))
- * Duplicate dummy resource names are now `APKTOOL_DUPLICATE_{Type}_{RESID}` to prevent starting with numeric ([Issue 2229](https://github.com/iBotPeaches/Apktool/issues/2229))
 
 ## v2.5.0
 2020.12.02
