@@ -22,9 +22,9 @@ But if you have succeeded at decoding and building, but the app doesn't work on 
  * rebuild apk without doing any changes to it (<kbd>apktool d</kbd> & <kbd>apktool b</kbd>). If apktool succeeds, but apk won't work, then it's probably an apktool bug and you should report it.
  * if an app was working earlier, but after doing some changes - it doesn't, this may be a bug of apktool, but more likely it's your fault.
  
-After all of this, if you are ready to report a bug. Please make sure to follow the [Issue Template](https://github.com/iBotPeaches/Apktool/blob/master/.github/ISSUE_TEMPLATE.md).
+After all of this, if you are ready to report a bug. Please make sure to follow the [Issue Template](https://github.com/iBotPeaches/Apktool/blob/master/.github/ISSUE_TEMPLATE/bug-report.md).
  
-[Report a bug here](https://github.com/iBotPeaches/Apktool/issues/new)
+[Report a bug here](https://github.com/iBotPeaches/Apktool/issues/new?assignees=&labels=&template=bug-report.md&title=%5BBUG%5D), [Submit a feature request](https://github.com/iBotPeaches/Apktool/issues/new?assignees=&labels=&template=feature-request.md&title=%5BFEAT%5D)
 
 ### I want to work on the project
 Great! Explore and fix some bugs while you are here. You may find the project [here](https://github.com/iBotPeaches/Apktool) and [contributing hints](https://github.com/iBotPeaches/Apktool/blob/master/.github/CONTRIBUTING.md).
