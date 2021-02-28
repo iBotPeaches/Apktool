@@ -18,8 +18,8 @@ package brut.androlib.res.decoder;
 
 import brut.androlib.AndrolibException;
 import brut.androlib.err.UndefinedResObjectException;
-import brut.androlib.res.data.ResPackage;
 import brut.androlib.res.data.ResResSpec;
+import brut.androlib.res.data.ResTable;
 import brut.androlib.res.data.value.ResAttr;
 import brut.androlib.res.data.value.ResScalarValue;
 
@@ -29,14 +29,13 @@ import brut.androlib.res.data.value.ResScalarValue;
 public class ResAttrDecoder {
     public String decode(int type, int value, String rawValue, int attrResId)
             throws AndrolibException {
-        ResScalarValue resValue = mCurrentPackage.getValueFactory().factory(
-                type, value, rawValue);
+        ResScalarValue resValue = mResTable.getCurrentResPackage().getValueFactory()
+                .factory(type, value, rawValue);
 
         String decoded = null;
         if (attrResId > 0) {
             try {
-                ResAttr attr = (ResAttr) getCurrentPackage().getResTable()
-                        .getResSpec(attrResId).getDefaultResource().getValue();
+                ResAttr attr = (ResAttr) getResTable().getResSpec(attrResId).getDefaultResource().getValue();
 
                 decoded = attr.convertToResXmlFormat(resValue);
             } catch (UndefinedResObjectException | ClassCastException ex) {
@@ -51,7 +50,7 @@ public class ResAttrDecoder {
         throws AndrolibException {
 
         if (attrResId != 0) {
-            ResResSpec resResSpec = getCurrentPackage().getResTable().getResSpec(attrResId);
+            ResResSpec resResSpec = getResTable().getResSpec(attrResId);
 
             if (resResSpec != null) {
                 return resResSpec.getName();
@@ -61,16 +60,16 @@ public class ResAttrDecoder {
         return null;
     }
 
-    public ResPackage getCurrentPackage() throws AndrolibException {
-        if (mCurrentPackage == null) {
-            throw new AndrolibException("Current package not set");
+    public void setResTable(ResTable resTable) {
+        mResTable = resTable;
+    }
+
+    public ResTable getResTable() throws AndrolibException {
+        if (mResTable == null) {
+            throw new AndrolibException("Current resTable not set.");
         }
-        return mCurrentPackage;
+        return mResTable;
     }
 
-    public void setCurrentPackage(ResPackage currentPackage) {
-        mCurrentPackage = currentPackage;
-    }
-
-    private ResPackage mCurrentPackage;
+    private ResTable mResTable;
 }
