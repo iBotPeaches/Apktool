@@ -1,6 +1,6 @@
-/**
- *  Copyright (C) 2018 Ryszard Wiśniewski <brut.alll@gmail.com>
- *  Copyright (C) 2018 Connor Tumbleson <connor.tumbleson@gmail.com>
+/*
+ *  Copyright (C) 2010 Ryszard Wiśniewski <brut.alll@gmail.com>
+ *  Copyright (C) 2010 Connor Tumbleson <connor.tumbleson@gmail.com>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -30,7 +30,6 @@ import org.xmlpull.v1.XmlSerializer;
  */
 public class ResArrayValue extends ResBagValue implements
         ResValuesXmlSerializable {
-    private String mRawItems;
 
     ResArrayValue(ResReferenceValue parent, Duo<Integer, ResScalarValue>[] items) {
         super(parent);
@@ -96,7 +95,7 @@ public class ResArrayValue extends ResBagValue implements
     }
 
     private final ResScalarValue[] mItems;
-    private final String AllowedArrayTypes[] = {"string", "integer"};
+    private final String[] AllowedArrayTypes = {"string", "integer"};
 
     public static final int BAG_KEY_ARRAY_START = 0x02000000;
 }

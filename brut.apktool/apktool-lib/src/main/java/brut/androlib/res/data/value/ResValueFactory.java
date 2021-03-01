@@ -1,6 +1,6 @@
-/**
- *  Copyright (C) 2018 Ryszard Wiśniewski <brut.alll@gmail.com>
- *  Copyright (C) 2018 Connor Tumbleson <connor.tumbleson@gmail.com>
+/*
+ *  Copyright (C) 2010 Ryszard Wiśniewski <brut.alll@gmail.com>
+ *  Copyright (C) 2010 Connor Tumbleson <connor.tumbleson@gmail.com>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -44,6 +44,7 @@ public class ResValueFactory {
             case TypedValue.TYPE_REFERENCE:
                 return newReference(value, null);
             case TypedValue.TYPE_ATTRIBUTE:
+            case TypedValue.TYPE_DYNAMIC_ATTRIBUTE:
                 return newReference(value, rawValue, true);
             case TypedValue.TYPE_STRING:
                 return new ResStringValue(rawValue, value);
@@ -57,8 +58,6 @@ public class ResValueFactory {
                 return new ResBoolValue(value != 0, value, rawValue);
             case TypedValue.TYPE_DYNAMIC_REFERENCE:
                 return newReference(value, rawValue);
-            case TypedValue.TYPE_DYNAMIC_ATTRIBUTE:
-                return newReference(value, rawValue, true);
         }
 
         if (type >= TypedValue.TYPE_FIRST_COLOR_INT && type <= TypedValue.TYPE_LAST_COLOR_INT) {
@@ -110,6 +109,10 @@ public class ResValueFactory {
 
         if (ResTypeSpec.RES_TYPE_NAME_STYLES.equals(resTypeName)) {
             return new ResStyleValue(parentVal, items, this);
+        }
+
+        if (ResTypeSpec.RES_TYPE_NAME_ATTR.equals(resTypeName)) {
+            return new ResAttr(parentVal, 0, null, null, null);
         }
 
         throw new AndrolibException("unsupported res type name for bags. Found: " + resTypeName);

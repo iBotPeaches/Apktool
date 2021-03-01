@@ -21,18 +21,18 @@ buildscript {
         options.encoding = "UTF-8"
     }
     dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:5.0.0'
+        classpath 'com.github.jengelman.gradle.plugins:shadow:6.1.0'
     }
 }
 
 plugins {
-    id "com.github.hierynomus.license" version "0.14.0"
+    id 'com.github.hierynomus.license' version '0.15.0'
 }
 
 apply from: 'gradle/functions.gradle'
 
-def apktoolversion_major = '2.4.1'
-def apktoolversion_minor = 'SNAPSHOT';
+def apktoolversion_major = '2.5.1'
+def apktoolversion_minor = 'SNAPSHOT'
 
 defaultTasks 'build', 'shadowJar', 'proguard'
 
@@ -44,10 +44,15 @@ allprojects {
 
     license {
         header rootProject.file("brut.j.common/src/templates/apache2.0-header.txt")
+        exclude "**/android/content/res/*.java"
+        exclude "**/android/util/*.java"
         include "**/*.java"
+        mapping {
+            java = 'SLASHSTAR_STYLE'
+        }
         strictCheck true
 
-        ext.year = Calendar.getInstance().get(Calendar.YEAR)
+        ext.year = '2010'
         ext.brut = 'Ryszard Wiśniewski'
         ext.brutEmail = 'brut.alll@gmail.com'
         ext.ibot = 'Connor Tumbleson'
@@ -107,15 +112,15 @@ subprojects {
 
     ext {
         depends = [
-                baksmali: 'org.smali:baksmali:2.2.7',
+                baksmali: 'org.smali:baksmali:2.4.0',
                 commons_cli: 'commons-cli:commons-cli:1.4',
                 commons_io: 'commons-io:commons-io:2.4',
                 commons_lang: 'org.apache.commons:commons-lang3:3.1',
                 guava: 'com.google.guava:guava:14.0',
                 junit: 'junit:junit:4.12',
-                proguard_gradle: 'net.sf.proguard:proguard-gradle:6.1.0',
+                proguard_gradle: 'com.guardsquare:proguard-gradle:7.0.0',
                 snakeyaml: 'org.yaml:snakeyaml:1.18:android',
-                smali: 'org.smali:smali:2.2.7',
+                smali: 'org.smali:smali:2.4.0',
                 xmlpull: 'xpp3:xpp3:1.1.4c',
                 xmlunit: 'xmlunit:xmlunit:1.6',
         ]
@@ -130,9 +135,4 @@ subprojects {
             exceptionFormat = 'full'
         }
     }
-}
-
-wrapper {
-    gradleVersion = '5.4.1'
-    distributionType = Wrapper.DistributionType.ALL
 }

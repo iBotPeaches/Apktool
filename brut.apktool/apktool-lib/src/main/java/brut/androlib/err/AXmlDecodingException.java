@@ -1,6 +1,6 @@
-/**
- *  Copyright (C) 2018 Ryszard Wiśniewski <brut.alll@gmail.com>
- *  Copyright (C) 2018 Connor Tumbleson <connor.tumbleson@gmail.com>
+/*
+ *  Copyright (C) 2010 Ryszard Wiśniewski <brut.alll@gmail.com>
+ *  Copyright (C) 2010 Connor Tumbleson <connor.tumbleson@gmail.com>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -19,19 +19,7 @@ package brut.androlib.err;
 import brut.androlib.AndrolibException;
 
 public class AXmlDecodingException extends AndrolibException {
-
-    public AXmlDecodingException(Throwable cause) {
-        super(cause);
-    }
-
     public AXmlDecodingException(String message, Throwable cause) {
         super(message, cause);
-    }
-
-    public AXmlDecodingException(String message) {
-        super(message);
-    }
-
-    public AXmlDecodingException() {
     }
 }

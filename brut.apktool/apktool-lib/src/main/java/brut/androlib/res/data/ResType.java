@@ -1,6 +1,6 @@
-/**
- *  Copyright (C) 2018 Ryszard Wiśniewski <brut.alll@gmail.com>
- *  Copyright (C) 2018 Connor Tumbleson <connor.tumbleson@gmail.com>
+/*
+ *  Copyright (C) 2010 Ryszard Wiśniewski <brut.alll@gmail.com>
+ *  Copyright (C) 2010 Connor Tumbleson <connor.tumbleson@gmail.com>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 package brut.androlib.res.data;
 
 import brut.androlib.AndrolibException;
-import brut.androlib.err.UndefinedResObject;
+import brut.androlib.err.UndefinedResObjectException;
 import java.util.*;
 
 /**
@@ -38,7 +38,7 @@ public class ResType {
     public ResResource getResource(ResResSpec spec) throws AndrolibException {
         ResResource res = mResources.get(spec);
         if (res == null) {
-            throw new UndefinedResObject(String.format("resource: spec=%s, config=%s", spec, this));
+            throw new UndefinedResObjectException(String.format("resource: spec=%s, config=%s", spec, this));
         }
         return res;
     }

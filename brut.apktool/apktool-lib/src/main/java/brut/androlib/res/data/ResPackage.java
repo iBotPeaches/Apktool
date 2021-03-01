@@ -1,6 +1,6 @@
-/**
- *  Copyright (C) 2018 Ryszard Wiśniewski <brut.alll@gmail.com>
- *  Copyright (C) 2018 Connor Tumbleson <connor.tumbleson@gmail.com>
+/*
+ *  Copyright (C) 2010 Ryszard Wiśniewski <brut.alll@gmail.com>
+ *  Copyright (C) 2010 Connor Tumbleson <connor.tumbleson@gmail.com>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 package brut.androlib.res.data;
 
 import brut.androlib.AndrolibException;
-import brut.androlib.err.UndefinedResObject;
+import brut.androlib.err.UndefinedResObjectException;
 import brut.androlib.res.data.value.ResFileValue;
 import brut.androlib.res.data.value.ResValueFactory;
 import brut.androlib.res.xml.ResValuesXmlSerializable;
@@ -53,10 +53,10 @@ public class ResPackage {
         return mResSpecs.containsKey(resID);
     }
 
-    public ResResSpec getResSpec(ResID resID) throws UndefinedResObject {
+    public ResResSpec getResSpec(ResID resID) throws UndefinedResObjectException {
         ResResSpec spec = mResSpecs.get(resID);
         if (spec == null) {
-            throw new UndefinedResObject("resource spec: " + resID.toString());
+            throw new UndefinedResObjectException("resource spec: " + resID.toString());
         }
         return spec;
     }
@@ -72,7 +72,7 @@ public class ResPackage {
     public ResType getConfig(ResConfigFlags flags) throws AndrolibException {
         ResType config = mConfigs.get(flags);
         if (config == null) {
-            throw new UndefinedResObject("config: " + flags);
+            throw new UndefinedResObjectException("config: " + flags);
         }
         return config;
     }
@@ -101,7 +101,7 @@ public class ResPackage {
     public ResTypeSpec getType(String typeName) throws AndrolibException {
         ResTypeSpec type = mTypes.get(typeName);
         if (type == null) {
-            throw new UndefinedResObject("type: " + typeName);
+            throw new UndefinedResObjectException("type: " + typeName);
         }
         return type;
     }

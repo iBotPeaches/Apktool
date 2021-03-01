@@ -224,64 +224,62 @@ original as they were.
 ### First we need the AOSP source
 
 As cheesy as it is, just follow this [downloading](https://source.android.com/source/downloading.html) link in order
-to get the source downloaded. This is no small download, expect to use 40-60GB.
+to get the source downloaded. This is no small download, expect to use 150-250GB.
 
 After that, you need to build AOSP via this [documentation](https://source.android.com/source/building.html) guide. Now
 we aren't building the entire AOSP package, the initial build is to just see if you are capable of building it.
 
-We check out a certain tag. Currently we use 
+We check out a certain tag or branch. Currently we use 
 
- * aapt2 - `android-9.0.0_r22`.
- * aapt1 - `android-9.0.0_r22`.
+ * aapt2 - `master`.
+ * aapt1 - `master`.
 
 ### Including our modified `frameworks/base` package.
 
-There is probably a more automated way to do this, but for now just remove all the files in `frameworks/base`. Now
-you can clone the modified repo from first step into this directory.
+There is probably a more automated way to do this, but for now:
+
+1. `cd frameworks/base`
+2. `git remote add origin git@github.com:iBotPeaches/platform_frameworks_base.git`
+3. `git fetch origin -v`
+4. `git checkout origin/master`
 
 ### Building the aapt1 (Legacy) binary.
 
-The steps below are different per flavor and operating system. For cross compiling the Windows binary on Unix,
-we lose the ability to quickly build just the aapt binary. So the Windows procedure builds the entire Sdk.
+The steps below are different per flavor and operating system.
 
-#### Unix
+#### Linux / Windows
 1. `source build/envsetup.sh`
 2. `lunch sdk-eng`
-3. `make OUT_DIR=out-x64 LOCAL_MULTILIB=64 USE_NINJA=false aapt`
-4. `strip out-x64/host/linux-x86/bin/aapt`
-
-#### Windows
-1. `source build/envsetup.sh`
-2. `lunch sdk-eng`
-3. `make PRODUCT-sdk-win_sdk USE_NINJA=false`
-4. `strip out/host/windows-x86/bin/aapt.exe`
+3. `make LOCAL_MULTILIB=64 USE_NINJA=false aapt`
+4. `strip out/host/linux-x86/bin/aapt`
+5. `strip out/host/linux-x86/bin/aapt_64`
+6. `strip out/host/windows-x86/bin/aapt.exe`
+7. `strip out/host/windows-x86/bin/aapt_64.exe`
 
 #### Mac
 1. `source build/envsetup.sh`
 2. `lunch sdk-eng`
-3. `make OUT_DIR=out-x64 LOCAL_MULTILIB=64 USE_NINJA=false aapt`
-4. `strip out-x64/host/darwin-x86/bin/aapt_64`
+3. `make LOCAL_MULTILIB=64 USE_NINJA=false aapt`
+4. `strip out/host/darwin-x86/bin/aapt_64`
 
-As of Android Oreo (API 26) all aapt binaries are 64 bit (With exception of Windows). 
+32/64 bit binaries will be built for Linux and Windows.
 
 ### Building the aapt2 binary.
 
-The steps below are different per flavor and operating system. For cross compiling the Windows binary on Unix,
-we lose the ability to quickly build just the aapt2 binary. So the Windows procedure builds the entire Sdk.
+The steps below are different per flavor and operating system.
 
-#### Unix
-1. `make OUT_DIR=out-x64 LOCAL_MULTILIB=64 USE_NINJA=false aapt2`
-2. `strip out-x64/host/linux-x86/bin/aapt2`
-
-#### Windows
-1. `make PRODUCT-sdk-win_sdk USE_NINJA=false`
-2. `strip out/host/windows-x86/bin/aapt2.exe`
+#### Linux / Windows
+1. `make LOCAL_MULTILIB=64 USE_NINJA=false aapt2`
+2. `strip out/host/linux-x86/bin/aapt2`
+3. `strip out/host/linux-x86/bin/aapt2_64`
+4. `strip out/host/windows-x86/bin/aapt2.exe`
+5. `strip out/host/windows-x86/bin/aapt2_64.exe`
 
 #### Mac
 1. `export ANDROID_JAVA_HOME=/Path/To/Jdk`
 2. `source build/envsetup.sh`
-3. `make OUT_DIR=out-x64 LOCAL_MULTILIB=64 USE_NINJA=false aapt2`
-4. `strip out-x64/host/darwin-x86/bin/aapt2_64`
+3. `make LOCAL_MULTILIB=64 USE_NINJA=false aapt2`
+4. `strip out/host/darwin-x86/bin/aapt2_64`
 
 #### Confirming aapt/aapt2 builds are static
 
@@ -300,7 +298,7 @@ for shared dependencies.
 This skips the testing suite (which currently takes 2-4 minutes). Use this when making quick builds and save the testing
 suite before pushing to GitHub.
 
-    ./gradlew build shadowJar proguard -Dtest.debug
+    ./gradlew test --debug-jvm
 
 This enables debugging on the test suite. This starts the debugger on port 5005 which you can connect with IntelliJ.
 
@@ -310,4 +308,4 @@ This runs the library project of Apktool, selecting a specific test to run. Come
 only wanting to run that one. The asterisk is used to the full path to the test can be ignored. You can additionally
 match this with the debugging parameter to debug a specific test. This command can be found below.
 
-    ./gradlew :brut.apktool:apktool-lib:test --tests "*BuildAndDecodeTest" -Dtest.debug
+    ./gradlew :brut.apktool:apktool-lib:test --tests "*BuildAndDecodeTest" --debug-jvm

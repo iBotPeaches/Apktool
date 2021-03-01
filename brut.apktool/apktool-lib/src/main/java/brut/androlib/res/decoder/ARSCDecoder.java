@@ -1,6 +1,6 @@
-/**
- *  Copyright (C) 2018 Ryszard Wiśniewski <brut.alll@gmail.com>
- *  Copyright (C) 2018 Connor Tumbleson <connor.tumbleson@gmail.com>
+/*
+ *  Copyright (C) 2010 Ryszard Wiśniewski <brut.alll@gmail.com>
+ *  Copyright (C) 2010 Connor Tumbleson <connor.tumbleson@gmail.com>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -516,9 +516,11 @@ public class ARSCDecoder {
                     mType = mPkg.getOrCreateConfig(new ResConfigFlags());
                 }
 
-                ResValue value = new ResBoolValue(false, 0, null);
-                ResResource res = new ResResource(mType, spec, value);
+                // We are going to make dummy attributes a null reference (@null) now instead of a boolean false.
+                // This is because aapt2 is much more strict when it comes to what we can put in an application.
+                ResValue value = new ResReferenceValue(mPkg, 0, "");
 
+                ResResource res = new ResResource(mType, spec, value);
                 mPkg.addResource(res);
                 mType.addResource(res);
                 spec.addResource(res);

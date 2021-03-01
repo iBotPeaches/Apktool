@@ -1,6 +1,6 @@
-/**
- *  Copyright (C) 2018 Ryszard Wiśniewski <brut.alll@gmail.com>
- *  Copyright (C) 2018 Connor Tumbleson <connor.tumbleson@gmail.com>
+/*
+ *  Copyright (C) 2010 Ryszard Wiśniewski <brut.alll@gmail.com>
+ *  Copyright (C) 2010 Connor Tumbleson <connor.tumbleson@gmail.com>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -99,16 +99,19 @@ final public class AndrolibResources {
             throws AndrolibException {
         int id = 0;
         int value = 0;
+        int index = 0;
 
-        for (ResPackage resPackage : pkgs) {
+        for (int i = 0; i < pkgs.length; i++) {
+            ResPackage resPackage = pkgs[i];
             if (resPackage.getResSpecCount() > value && ! resPackage.getName().equalsIgnoreCase("android")) {
                 value = resPackage.getResSpecCount();
                 id = resPackage.getId();
+                index = i;
             }
         }
 
         // if id is still 0, we only have one pkgId which is "android" -> 1
-        return (id == 0) ? pkgs[0] : pkgs[1];
+        return (id == 0) ? pkgs[0] : pkgs[index];
     }
 
     public ResPackage loadFrameworkPkg(ResTable resTable, int id, String frameTag)
@@ -167,22 +170,19 @@ final public class AndrolibResources {
 
         // compare resources.arsc package name to the one present in AndroidManifest
         ResPackage resPackage = resTable.getCurrentResPackage();
-        String packageOriginal = resPackage.getName();
+        String pkgOriginal = resPackage.getName();
         mPackageRenamed = resTable.getPackageRenamed();
 
         resTable.setPackageId(resPackage.getId());
-        resTable.setPackageOriginal(packageOriginal);
+        resTable.setPackageOriginal(pkgOriginal);
 
-        // 1) Check if packageOriginal === mPackageRenamed
-        // 2) Check if packageOriginal is ignored via IGNORED_PACKAGES
-        // 2a) If its ignored, make sure the mPackageRenamed isn't explicitly allowed
-        if (packageOriginal.equalsIgnoreCase(mPackageRenamed) ||
-                (Arrays.asList(IGNORED_PACKAGES).contains(packageOriginal) &&
-                ! Arrays.asList(ALLOWED_PACKAGES).contains(mPackageRenamed))) {
+        // 1) Check if pkgOriginal === mPackageRenamed
+        // 2) Check if pkgOriginal is ignored via IGNORED_PACKAGES
+        if (pkgOriginal.equalsIgnoreCase(mPackageRenamed) || (Arrays.asList(IGNORED_PACKAGES).contains(pkgOriginal))) {
             LOGGER.info("Regular manifest package...");
         } else {
-            LOGGER.info("Renamed manifest package found! Replacing " + mPackageRenamed + " with " + packageOriginal);
-            ResXmlPatcher.renameManifestPackage(new File(filePath), packageOriginal);
+            LOGGER.info("Renamed manifest package found! Replacing " + mPackageRenamed + " with " + pkgOriginal);
+            ResXmlPatcher.renameManifestPackage(new File(filePath), pkgOriginal);
         }
     }
 
@@ -317,8 +317,31 @@ final public class AndrolibResources {
         return Integer.toString(target);
     }
 
+    private File createDoNotCompressExtensionsFile(ApkOptions apkOptions) throws AndrolibException {
+        if (apkOptions.doNotCompress == null || apkOptions.doNotCompress.isEmpty()) {
+            return null;
+        }
+
+        File doNotCompressFile;
+        try {
+            doNotCompressFile = File.createTempFile("APKTOOL", null);
+            doNotCompressFile.deleteOnExit();
+
+            BufferedWriter fileWriter = new BufferedWriter(new FileWriter(doNotCompressFile));
+            for (String extension : apkOptions.doNotCompress) {
+                fileWriter.write(extension);
+                fileWriter.newLine();
+            }
+            fileWriter.close();
+
+            return doNotCompressFile;
+        } catch (IOException ex) {
+            throw new AndrolibException(ex);
+        }
+    }
+
     private void aapt2Package(File apkFile, File manifest, File resDir, File rawDir, File assetDir, File[] include,
-                              List<String> cmd)
+                              List<String> cmd, boolean customAapt)
             throws AndrolibException {
 
         List<String> compileCommand = new ArrayList<>(cmd);
@@ -425,7 +448,13 @@ final public class AndrolibResources {
             cmd.add("-x");
         }
 
-        if (apkOptions.doNotCompress != null) {
+        if (apkOptions.doNotCompress != null && !customAapt) {
+            // Use custom -e option to avoid limits on commandline length.
+            // Can only be used when custom aapt binary is not used.
+            String extensionsFilePath = createDoNotCompressExtensionsFile(apkOptions).getAbsolutePath();
+            cmd.add("-e");
+            cmd.add(extensionsFilePath);
+        } else if (apkOptions.doNotCompress != null) {
             for (String file : apkOptions.doNotCompress) {
                 cmd.add("-0");
                 cmd.add(file);
@@ -541,12 +570,19 @@ final public class AndrolibResources {
             cmd.add("-x");
         }
 
-        if (apkOptions.doNotCompress != null) {
+        if (apkOptions.doNotCompress != null && !customAapt) {
+            // Use custom -e option to avoid limits on commandline length.
+            // Can only be used when custom aapt binary is not used.
+            String extensionsFilePath = createDoNotCompressExtensionsFile(apkOptions).getAbsolutePath();
+            cmd.add("-e");
+            cmd.add(extensionsFilePath);
+        } else if (apkOptions.doNotCompress != null) {
             for (String file : apkOptions.doNotCompress) {
                 cmd.add("-0");
                 cmd.add(file);
             }
         }
+
         if (!apkOptions.resourcesAreCompressed) {
             cmd.add("-0");
             cmd.add("arsc");
@@ -598,7 +634,7 @@ final public class AndrolibResources {
         }
 
         if (apkOptions.isAapt2()) {
-            aapt2Package(apkFile, manifest, resDir, rawDir, assetDir, include, cmd);
+            aapt2Package(apkFile, manifest, resDir, rawDir, assetDir, include, cmd, customAapt);
             return;
         }
         aapt1Package(apkFile, manifest, resDir, rawDir, assetDir, include, cmd, customAapt);
@@ -635,6 +671,10 @@ final public class AndrolibResources {
                 return ResConfigFlags.SDK_P;
             case "Q":
                 return ResConfigFlags.SDK_Q;
+            case "R":
+                return ResConfigFlags.SDK_R;
+            case "S":
+                return ResConfigFlags.SDK_S;
             default:
                 return Integer.parseInt(sdkVersion);
         }
@@ -814,6 +854,20 @@ final public class AndrolibResources {
         }
     }
 
+    public void listFrameworkDirectory() throws AndrolibException {
+        File dir = getFrameworkDir();
+        if (dir == null) {
+            LOGGER.severe("No framework directory found. Nothing to list.");
+            return;
+        }
+
+        for (File file : Objects.requireNonNull(dir.listFiles())) {
+            if (file.isFile() && file.getName().endsWith(".apk")) {
+                LOGGER.info(file.getName());
+            }
+        }
+    }
+
     public void installFramework(File frameFile) throws AndrolibException {
         installFramework(frameFile, apkOptions.frameworkTag);
     }
@@ -847,6 +901,7 @@ final public class AndrolibResources {
             crc.update(data);
             entry = new ZipEntry("resources.arsc");
             entry.setSize(data.length);
+            entry.setMethod(ZipOutputStream.STORED);
             entry.setCrc(crc.getValue());
             out.putNextEntry(entry);
             out.write(data);
@@ -943,7 +998,9 @@ final public class AndrolibResources {
                 if (apkOptions.frameworkFolderLocation != null) {
                     LOGGER.severe("Can't create Framework directory: " + dir);
                 }
-                throw new AndrolibException("Can't create directory: " + dir);
+                throw new AndrolibException(String.format(
+                        "Can't create directory: (%s). Pass a writable path with --frame-path {DIR}. ", dir
+                ));
             }
         }
 
@@ -1014,9 +1071,6 @@ final public class AndrolibResources {
     private boolean mSparseResources = false;
 
     private final static String[] IGNORED_PACKAGES = new String[] {
-            "android", "com.htc", "miui", "com.lge", "com.lge.internal", "yi", "com.miui.core", "flyme",
-            "air.com.adobe.appentry", "FFFFFFFFFFFFFFFFFFFFFF" };
-
-    private final static String[] ALLOWED_PACKAGES = new String[] {
-            "com.miui" };
+            "android", "com.htc", "com.lge", "com.lge.internal", "yi", "flyme", "air.com.adobe.appentry",
+            "FFFFFFFFFFFFFFFFFFFFFF" };
 }

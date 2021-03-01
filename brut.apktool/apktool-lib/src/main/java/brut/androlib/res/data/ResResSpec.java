@@ -1,6 +1,6 @@
-/**
- *  Copyright (C) 2018 Ryszard Wiśniewski <brut.alll@gmail.com>
- *  Copyright (C) 2018 Connor Tumbleson <connor.tumbleson@gmail.com>
+/*
+ *  Copyright (C) 2010 Ryszard Wiśniewski <brut.alll@gmail.com>
+ *  Copyright (C) 2010 Connor Tumbleson <connor.tumbleson@gmail.com>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 package brut.androlib.res.data;
 
 import brut.androlib.AndrolibException;
-import brut.androlib.err.UndefinedResObject;
+import brut.androlib.err.UndefinedResObjectException;
 import java.util.*;
 import org.apache.commons.lang3.StringUtils;
 
@@ -37,7 +37,7 @@ public class ResResSpec {
 
         ResResSpec resResSpec = type.getResSpecUnsafe(name);
         if (resResSpec != null) {
-            cleanName = name + "_APKTOOL_DUPLICATENAME_" + id.toString();
+            cleanName = String.format("APKTOOL_DUPLICATE_%s_%s", type.toString(), id.toString());
         } else {
             cleanName = ((name == null || name.isEmpty()) ? ("APKTOOL_DUMMYVAL_" + id.toString()) : name);
         }
@@ -58,7 +58,7 @@ public class ResResSpec {
     public ResResource getResource(ResConfigFlags config) throws AndrolibException {
         ResResource res = mResources.get(config);
         if (res == null) {
-            throw new UndefinedResObject(String.format("resource: spec=%s, config=%s", this, config));
+            throw new UndefinedResObjectException(String.format("resource: spec=%s, config=%s", this, config));
         }
         return res;
     }

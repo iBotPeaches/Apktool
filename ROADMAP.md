@@ -7,3 +7,42 @@ This would be a lookup table of old->new resourceIds leveraging the API of dexli
 properly would nullify the need to do [#191](https://github.com/iBotPeaches/Apktool/issues/191)
 
 Suggestions: [#244](https://github.com/iBotPeaches/Apktool/issues/244)
+Discussions: [#2062](https://github.com/iBotPeaches/Apktool/issues/2062)
+
+## Implicit Qualifiers Cleanup
+Currently we have a mismatch between reading the folders and reading the qualifiers which leads to a mismatch between
+implicit qualifiers like version (-v4, v13, etc).
+
+This was first spotted in bug [#1272](https://github.com/iBotPeaches/Apktool/issues/1272).
+
+This was attempted to be fixed in [!1758](https://github.com/iBotPeaches/Apktool/pull/1758/files), but had to be
+reverted due to [this](https://github.com/iBotPeaches/Apktool/issues/1272#issuecomment-379345005).
+
+Suggestions: [#2237](https://github.com/iBotPeaches/Apktool/issues/2237)
+
+## Qualifier Plugin System
+For some OEMs, past and present. They re-use qualifiers that AOSP ends up using. This with CTS is becoming very
+rare and pretty much a problem of the past, but now custom modifications and more "off the cuff" OEMs are doing
+it. 
+
+Apktool can't do anything because it stays true to AOSP. It would need a plugin system that controls how to
+read the qualifiers. Or even an override file.
+
+Suggestions: [#1420](https://github.com/iBotPeaches/Apktool/issues/1420), [#2474](https://github.com/iBotPeaches/Apktool/issues/2474)
+
+## Library System
+May like using Apktool outside of the cli tool. We should make it easier to consume, whether via
+maven, jitpack, etc.
+
+Additionally, some documentation on how to do this.
+
+Suggestions: [#1301](https://github.com/iBotPeaches/Apktool/issues/1301), [#2102](https://github.com/iBotPeaches/Apktool/issues/2102)
+
+## Non-reference Resources
+Some applications may shove resources into the /res folder, but have no references to them. Apktool follows
+the resource table, so these files are effectively abandoned.
+
+Crawling the filesystem for non-checked files would be slow especially having to cross check with already
+parsed files.
+
+Suggestions: [#1366](https://github.com/iBotPeaches/Apktool/issues/1366)

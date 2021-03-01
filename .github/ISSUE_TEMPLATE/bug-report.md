@@ -1,3 +1,12 @@
+---
+name: Bug Report
+about: Report a bug in Apktool
+title: "[BUG]"
+labels: ''
+assignees: ''
+
+---
+
 ### Information
 1. **Apktool Version (`apktool -version`)** -
 2. **Operating System (Mac, Linux, Windows)** -

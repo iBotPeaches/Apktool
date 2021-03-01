@@ -1,6 +1,6 @@
-/**
- *  Copyright (C) 2018 Ryszard Wiśniewski <brut.alll@gmail.com>
- *  Copyright (C) 2018 Connor Tumbleson <connor.tumbleson@gmail.com>
+/*
+ *  Copyright (C) 2010 Ryszard Wiśniewski <brut.alll@gmail.com>
+ *  Copyright (C) 2010 Connor Tumbleson <connor.tumbleson@gmail.com>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -19,19 +19,7 @@ package brut.androlib.err;
 import brut.androlib.AndrolibException;
 
 public class RawXmlEncounteredException extends AndrolibException {
-
-    public RawXmlEncounteredException(Throwable cause) {
-        super(cause);
-    }
-
     public RawXmlEncounteredException(String message, Throwable cause) {
         super(message, cause);
-    }
-
-    public RawXmlEncounteredException(String message) {
-        super(message);
-    }
-
-    public RawXmlEncounteredException() {
     }
 }

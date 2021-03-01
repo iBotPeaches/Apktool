@@ -1,6 +1,6 @@
-/**
- *  Copyright (C) 2018 Ryszard Wiśniewski <brut.alll@gmail.com>
- *  Copyright (C) 2018 Connor Tumbleson <connor.tumbleson@gmail.com>
+/*
+ *  Copyright (C) 2010 Ryszard Wiśniewski <brut.alll@gmail.com>
+ *  Copyright (C) 2010 Connor Tumbleson <connor.tumbleson@gmail.com>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 package brut.androlib.res.data;
 
 import brut.androlib.AndrolibException;
-import brut.androlib.err.UndefinedResObject;
+import brut.androlib.err.UndefinedResObjectException;
 import brut.androlib.meta.VersionInfo;
 import brut.androlib.res.AndrolibResources;
 import brut.androlib.res.data.value.ResValue;
@@ -83,7 +83,7 @@ public class ResTable {
         if (mAndRes != null) {
             return mAndRes.loadFrameworkPkg(this, id, mAndRes.apkOptions.frameworkTag);
         }
-        throw new UndefinedResObject(String.format("package: id=%d", id));
+        throw new UndefinedResObjectException(String.format("package: id=%d", id));
     }
 
     public ResPackage getHighestSpecPackage() throws AndrolibException {
@@ -115,7 +115,7 @@ public class ResTable {
     public ResPackage getPackage(String name) throws AndrolibException {
         ResPackage pkg = mPackagesByName.get(name);
         if (pkg == null) {
-            throw new UndefinedResObject("package: name=" + name);
+            throw new UndefinedResObjectException("package: name=" + name);
         }
         return pkg;
     }

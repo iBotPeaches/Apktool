@@ -1,6 +1,6 @@
-/**
- *  Copyright (C) 2018 Ryszard Wiśniewski <brut.alll@gmail.com>
- *  Copyright (C) 2018 Connor Tumbleson <connor.tumbleson@gmail.com>
+/*
+ *  Copyright (C) 2010 Ryszard Wiśniewski <brut.alll@gmail.com>
+ *  Copyright (C) 2010 Connor Tumbleson <connor.tumbleson@gmail.com>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -21,20 +21,8 @@ import brut.androlib.AndrolibException;
 /**
  * @author Ryszard Wiśniewski <brut.alll@gmail.com>
  */
-public class CantFind9PatchChunk extends AndrolibException {
-
-	public CantFind9PatchChunk(Throwable cause) {
-		super(cause);
-	}
-
-	public CantFind9PatchChunk(String message, Throwable cause) {
-		super(message, cause);
-	}
-
-	public CantFind9PatchChunk(String message) {
+public class UndefinedResObjectException extends AndrolibException {
+	public UndefinedResObjectException(String message) {
 		super(message);
-	}
-
-	public CantFind9PatchChunk() {
 	}
 }

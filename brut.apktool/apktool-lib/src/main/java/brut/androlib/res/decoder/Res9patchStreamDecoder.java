@@ -1,6 +1,6 @@
-/**
- *  Copyright (C) 2018 Ryszard Wiśniewski <brut.alll@gmail.com>
- *  Copyright (C) 2018 Connor Tumbleson <connor.tumbleson@gmail.com>
+/*
+ *  Copyright (C) 2010 Ryszard Wiśniewski <brut.alll@gmail.com>
+ *  Copyright (C) 2010 Connor Tumbleson <connor.tumbleson@gmail.com>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -17,14 +17,13 @@
 package brut.androlib.res.decoder;
 
 import brut.androlib.AndrolibException;
-import brut.androlib.err.CantFind9PatchChunk;
+import brut.androlib.err.CantFind9PatchChunkException;
 import brut.util.ExtDataInput;
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 import java.io.*;
 import javax.imageio.ImageIO;
-import javax.imageio.ImageTypeSpecifier;
 
 import org.apache.commons.io.IOUtils;
 
@@ -37,6 +36,10 @@ public class Res9patchStreamDecoder implements ResStreamDecoder {
             throws AndrolibException {
         try {
             byte[] data = IOUtils.toByteArray(in);
+
+            if (data.length == 0) {
+                return;
+            }
 
             BufferedImage im = ImageIO.read(new ByteArrayInputStream(data));
             int w = im.getWidth(), h = im.getHeight();
@@ -106,7 +109,7 @@ public class Res9patchStreamDecoder implements ResStreamDecoder {
                     int y = h - i;
                     im2.setRGB(w + 1, y, OI_COLOR);
                 }
-            } catch (CantFind9PatchChunk t) {
+            } catch (CantFind9PatchChunkException t) {
                 // This chunk might not exist
             }
 
@@ -143,7 +146,7 @@ public class Res9patchStreamDecoder implements ResStreamDecoder {
             try {
                 size = di.readInt();
             } catch (IOException ex) {
-                throw new CantFind9PatchChunk("Cant find nine patch chunk", ex);
+                throw new CantFind9PatchChunkException("Cant find nine patch chunk", ex);
             }
             if (di.readInt() == magic) {
                 return;

@@ -1,6 +1,6 @@
-/**
- *  Copyright (C) 2018 Ryszard Wiśniewski <brut.alll@gmail.com>
- *  Copyright (C) 2018 Connor Tumbleson <connor.tumbleson@gmail.com>
+/*
+ *  Copyright (C) 2010 Ryszard Wiśniewski <brut.alll@gmail.com>
+ *  Copyright (C) 2010 Connor Tumbleson <connor.tumbleson@gmail.com>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -493,12 +493,18 @@ public class BuildAndDecodeTest extends BaseTest {
     }
 
     @Test
-    public void confirmZeroByteFileIsNotStored() throws BrutException {
+    public void confirmZeroByteFileExtensionIsNotStored() throws BrutException {
         MetaInfo metaInfo = new Androlib().readMetaFile(sTestNewDir);
 
         for (String item : metaInfo.doNotCompress) {
-            assertNotSame(item, "empty");
+            assertFalse(item.equals("jpg"));
         }
+    }
+
+    @Test
+    public void confirmZeroByteFileIsStored() throws BrutException {
+        MetaInfo metaInfo = new Androlib().readMetaFile(sTestNewDir);
+        assertTrue(metaInfo.doNotCompress.contains("assets/0byte_file.jpg"));
     }
 
     @Test
@@ -546,11 +552,21 @@ public class BuildAndDecodeTest extends BaseTest {
     @Test
     public void multipleDexTest() throws BrutException, IOException {
         compareBinaryFolder("/smali_classes2", false);
+        compareBinaryFolder("/smali_classes3", false);
+
+        File classes2Dex = new File(sTestOrigDir, "build/apk/classes2.dex");
+        File classes3Dex = new File(sTestOrigDir, "build/apk/classes3.dex");
+
+        assertTrue(classes2Dex.isFile());
+        assertTrue(classes3Dex.isFile());
     }
 
     @Test
     public void singleDexTest() throws BrutException, IOException {
         compareBinaryFolder("/smali", false);
+
+        File classesDex = new File(sTestOrigDir, "build/apk/classes.dex");
+        assertTrue(classesDex.isFile());
     }
 
     @Test

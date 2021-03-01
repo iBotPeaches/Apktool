@@ -1,6 +1,6 @@
-/**
- *  Copyright (C) 2018 Ryszard Wiśniewski <brut.alll@gmail.com>
- *  Copyright (C) 2018 Connor Tumbleson <connor.tumbleson@gmail.com>
+/*
+ *  Copyright (C) 2010 Ryszard Wiśniewski <brut.alll@gmail.com>
+ *  Copyright (C) 2010 Connor Tumbleson <connor.tumbleson@gmail.com>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
 package brut.androlib.mod;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+
 import org.antlr.runtime.*;
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
@@ -54,14 +56,14 @@ public class SmaliMod {
                                             boolean printTokens) throws IOException, RecognitionException {
 
         CommonTokenStream tokens;
-        LexerErrorInterface lexer;
+        smaliFlexLexer lexer;
 
         InputStream is = new FileInputStream(smaliFile);
-        InputStreamReader reader = new InputStreamReader(is, "UTF-8");
+        InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8);
 
-        lexer = new smaliFlexLexer(reader);
-        ((smaliFlexLexer)lexer).setSourceFile(smaliFile);
-        tokens = new CommonTokenStream((TokenSource) lexer);
+        lexer = new smaliFlexLexer(reader, apiLevel);
+        (lexer).setSourceFile(smaliFile);
+        tokens = new CommonTokenStream(lexer);
 
         if (printTokens) {
             tokens.getTokens();
@@ -88,7 +90,7 @@ public class SmaliMod {
             return false;
         }
 
-        CommonTree t = (CommonTree) result.getTree();
+        CommonTree t = result.getTree();
 
         CommonTreeNodeStream treeStream = new CommonTreeNodeStream(t);
         treeStream.setTokenStream(tokens);

@@ -1,6 +1,6 @@
-/**
- *  Copyright (C) 2018 Ryszard Wiśniewski <brut.alll@gmail.com>
- *  Copyright (C) 2018 Connor Tumbleson <connor.tumbleson@gmail.com>
+/*
+ *  Copyright (C) 2010 Ryszard Wiśniewski <brut.alll@gmail.com>
+ *  Copyright (C) 2010 Connor Tumbleson <connor.tumbleson@gmail.com>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -18,11 +18,11 @@ package brut.androlib.res.decoder;
 
 import brut.androlib.res.xml.ResXmlEncoders;
 import brut.util.ExtDataInput;
+import com.google.common.annotations.VisibleForTesting;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.*;
-import java.util.Arrays;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -54,8 +54,6 @@ public class StringBlock {
         StringBlock block = new StringBlock();
         block.m_isUTF8 = (flags & UTF8_FLAG) != 0;
         block.m_stringOffsets = reader.readIntArray(stringCount);
-        block.m_stringOwns = new int[stringCount];
-        Arrays.fill(block.m_stringOwns, -1);
 
         if (styleCount != 0) {
             block.m_styleOffsets = reader.readIntArray(styleCount);
@@ -98,15 +96,15 @@ public class StringBlock {
         int offset = m_stringOffsets[index];
         int length;
 
+        int[] val;
         if (m_isUTF8) {
-            int[] val = getUtf8(m_strings, offset);
+            val = getUtf8(m_strings, offset);
             offset = val[0];
-            length = val[1];
         } else {
-            int[] val = getUtf16(m_strings, offset);
+            val = getUtf16(m_strings, offset);
             offset += val[0];
-            length = val[1];
         }
+        length = val[1];
         return decodeString(offset, length);
     }
 
@@ -125,7 +123,7 @@ public class StringBlock {
     public String getHTML(int index) {
         String raw = getString(index);
         if (raw == null) {
-            return raw;
+            return null;
         }
         int[] style = getStyle(index);
         if (style == null) {
@@ -258,6 +256,12 @@ public class StringBlock {
     private StringBlock() {
     }
 
+    @VisibleForTesting
+    StringBlock(byte[] strings, boolean isUTF8) {
+        m_strings = strings;
+        m_isUTF8 = isUTF8;
+    }
+
     /**
      * Returns style information - array of int triplets, where in each triplet:
      * * first int is index of tag name ('b','i', etc.) * second int is tag
@@ -268,20 +272,21 @@ public class StringBlock {
             return null;
         }
         int offset = m_styleOffsets[index] / 4;
-        int style[];
-        {
-            int count = 0;
-            for (int i = offset; i < m_styles.length; ++i) {
-                if (m_styles[i] == -1) {
-                    break;
-                }
-                count += 1;
+        int count = 0;
+        int[] style;
+
+        for (int i = offset; i < m_styles.length; ++i) {
+            if (m_styles[i] == -1) {
+                break;
             }
-            if (count == 0 || (count % 3) != 0) {
-                return null;
-            }
-            style = new int[count];
+            count += 1;
         }
+
+        if (count == 0 || (count % 3) != 0) {
+            return null;
+        }
+        style = new int[count];
+
         for (int i = offset, j = 0; i < m_styles.length;) {
             if (m_styles[i] == -1) {
                 break;
@@ -291,11 +296,24 @@ public class StringBlock {
         return style;
     }
 
-    private String decodeString(int offset, int length) {
+    @VisibleForTesting
+    String decodeString(int offset, int length) {
+        final ByteBuffer wrappedBuffer = ByteBuffer.wrap(m_strings, offset, length);
         try {
-            return (m_isUTF8 ? UTF8_DECODER : UTF16LE_DECODER).decode(
-                    ByteBuffer.wrap(m_strings, offset, length)).toString();
+            return (m_isUTF8 ? UTF8_DECODER : UTF16LE_DECODER).decode(wrappedBuffer).toString();
         } catch (CharacterCodingException ex) {
+            LOGGER.warning("Failed to decode a string at offset " + offset + " of length " + length);
+            if (!m_isUTF8) {
+                return null;
+            }
+        }
+
+        try {
+            // in some places, Android uses 3-byte UTF-8 sequences instead of 4-bytes.
+            // If decoding failed, we try to use CESU-8 decoder, which is closer to what Android actually uses.
+            return CESU8_DECODER.decode(wrappedBuffer).toString();
+        } catch (CharacterCodingException e) {
+            LOGGER.warning("Failed to decode a string with CESU-8 decoder.");
             return null;
         }
     }
@@ -353,10 +371,10 @@ public class StringBlock {
     private int[] m_styleOffsets;
     private int[] m_styles;
     private boolean m_isUTF8;
-    private int[] m_stringOwns;
 
     private final CharsetDecoder UTF16LE_DECODER = Charset.forName("UTF-16LE").newDecoder();
     private final CharsetDecoder UTF8_DECODER = Charset.forName("UTF-8").newDecoder();
+    private final CharsetDecoder CESU8_DECODER = Charset.forName("CESU8").newDecoder();
     private static final Logger LOGGER = Logger.getLogger(StringBlock.class.getName());
 
     // ResChunk_header = header.type (0x0001) + header.headerSize (0x001C)
