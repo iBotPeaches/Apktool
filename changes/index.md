@@ -6,7 +6,9 @@ description: Apktool - Changelog / Roadmap
 
 ## v2.5.1
 2020.xx.xx
-
+ 
+ * Upgrade to baksmali/smali 2.5.2
+ * Upgrade to `gradle 6.8.3`
  * Updated aapt2 with patches for `attr-private` and remove reserved pkgIds. (Thanks MrIkso)
  * Changed zipslip exceptions to skip file instead of exit on failure. ([Issue 2201](https://github.com/iBotPeaches/Apktool/issues/2201))
  * Changed dummy resource names to `APKTOOL_DUPLICATE_{Type}_{RESID}` to prevent starting with numeric ([Issue 2229](https://github.com/iBotPeaches/Apktool/issues/2229))
