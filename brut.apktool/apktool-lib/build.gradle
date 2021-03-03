@@ -41,7 +41,6 @@ dependencies {
 
     implementation depends.baksmali,
                    depends.smali,
-                   depends.dexlib2,
                    depends.snakeyaml,
                    depends.xmlpull,
                    depends.guava,
