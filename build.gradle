@@ -69,25 +69,25 @@ allprojects {
 }
 
 if (!('release' in gradle.startParameter.taskNames)) {
-    def hash = getCheckedOutGitCommitHash();
+    def hash = getCheckedOutGitCommitHash()
 
     if (hash == null) {
         project.ext.set("hash", "dirty")
         project.ext.set("apktool_version", apktoolversion_major + "-dirty")
-        println "Building SNAPSHOT (no .git folder found)";
+        println "Building SNAPSHOT (no .git folder found)"
     } else {
-        project.ext.set("hash", hash);
-        project.ext.set("apktool_version", apktoolversion_major + "-" + hash + "-SNAPSHOT");
-        println "Building SNAPSHOT (" + getCheckedOutBranch() + "): " + hash;
+        project.ext.set("hash", hash)
+        project.ext.set("apktool_version", apktoolversion_major + "-" + hash + "-SNAPSHOT")
+        println "Building SNAPSHOT (" + getCheckedOutBranch() + "): " + hash
     }
 } else {
     project.ext.set("hash", "")
     if (apktoolversion_minor.length() > 0) {
-        project.ext.set("apktool_version", apktoolversion_major + "-" + apktoolversion_minor);
+        project.ext.set("apktool_version", apktoolversion_major + "-" + apktoolversion_minor)
     } else {
-        project.ext.set("apktool_version", apktoolversion_major);
+        project.ext.set("apktool_version", apktoolversion_major)
     }
-    println "Building RELEASE (" + getCheckedOutBranch() + "): " + project.ext.apktool_version;
+    println "Building RELEASE (" + getCheckedOutBranch() + "): " + project.ext.apktool_version
 }
 
 build.doFirst {
@@ -99,7 +99,7 @@ build.doFirst {
                 "We found a " + javaVersion + " JDK\n" +
                 "Please update JAVA_HOME to use at least a 1.8 JDK\n" +
                 "Currently it is set to: " + System.getProperty("java.home")
-        );
+        )
     }
 }
 

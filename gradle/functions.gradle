@@ -1,3 +1,5 @@
+import org.codehaus.groovy.runtime.MethodClosure
+
 /**
  *  Copyright 2014 Ryszard Wiśniewski <brut.alll@gmail.com>
  *
@@ -21,8 +23,8 @@ def getCheckedOutGitCommitHash() {
     def head
     try {
         head = new File(gitFolder + "HEAD").text.split(":")
-    } catch(Exception e) {
-        return null;
+    } catch(Exception ignored) {
+        return null
     }
 
     def isCommit = head.length == 1
@@ -38,13 +40,13 @@ def getCheckedOutBranch() {
     def head
     try {
         head = new File(gitFolder + "HEAD").text.split("/")
-        return head[2].trim();
-    } catch(Exception e) {
-        return "SNAPSHOT";
+        return head[2].trim()
+    } catch(Exception ignored) {
+        return "SNAPSHOT"
     }
 }
 
 ext {
-    getCheckedOutGitCommitHash = this.&getCheckedOutGitCommitHash
-    getCheckedOutBranch = this.&getCheckedOutBranch
+    getCheckedOutGitCommitHash = this.&getCheckedOutGitCommitHash as MethodClosure
+    getCheckedOutBranch = this.&getCheckedOutBranch as MethodClosure
 }

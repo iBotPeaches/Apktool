@@ -13,6 +13,8 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+import proguard.gradle.ProGuardTask
+
 apply plugin: 'com.github.johnrengelman.shadow'
 
 dependencies {
@@ -43,7 +45,7 @@ task cleanOutputDirectory(type: Delete) {
     delete fileTree(dir: jar.getDestinationDirectory().getAsFile(), exclude: "apktool-cli-all.jar")
 }
 
-task proguard(type: proguard.gradle.ProGuardTask, dependsOn: shadowJar) {
+task proguard(type: ProGuardTask, dependsOn: shadowJar) {
     injars shadowJar.getArchiveFile()
 
     // Java 9 and prior uses merged package for runtime, later uses split jmod files.
