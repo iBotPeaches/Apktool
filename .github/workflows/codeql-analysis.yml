@@ -2,13 +2,13 @@ name: "CodeQL"
 
 on:
   push:
-    branches: [ master ]
     paths:
       - '**.java'
       - '**.gradle'
       - 'brut.apktool/apktool-lib/src/main/resources/**'
   pull_request:
-    branches: [ master ]
+    branches:
+      - master
     paths:
       - '**.java'
       - '**.gradle'
@@ -22,7 +22,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: [ 'java' ]
+        language: ['java']
 
     steps:
     - name: Checkout repository
