@@ -302,8 +302,8 @@ public class StringBlock {
         try {
             return (m_isUTF8 ? UTF8_DECODER : UTF16LE_DECODER).decode(wrappedBuffer).toString();
         } catch (CharacterCodingException ex) {
-            LOGGER.warning("Failed to decode a string at offset " + offset + " of length " + length);
             if (!m_isUTF8) {
+                LOGGER.warning("Failed to decode a string at offset " + offset + " of length " + length);
                 return null;
             }
         }
