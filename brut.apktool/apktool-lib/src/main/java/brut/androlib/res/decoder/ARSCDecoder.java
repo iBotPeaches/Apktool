@@ -123,12 +123,19 @@ public class ARSCDecoder {
         mPkg = new ResPackage(mResTable, id, name);
 
         nextChunk();
-        while (mHeader.type == Header.TYPE_LIBRARY) {
-            readLibraryType();
-        }
-
-        while (mHeader.type == Header.TYPE_SPEC_TYPE) {
-            readTableTypeSpec();
+        boolean flag = true;
+        while (flag) {
+            switch (mHeader.type) {
+                case Header.TYPE_LIBRARY:
+                    readLibraryType();
+                    break;
+                case Header.TYPE_SPEC_TYPE:
+                    readTableTypeSpec();
+                    break;
+                default:
+                    flag = false;
+                    break;
+            }
         }
 
         return mPkg;
