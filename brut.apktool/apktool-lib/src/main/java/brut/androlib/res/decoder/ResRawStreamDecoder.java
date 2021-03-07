@@ -17,14 +17,12 @@
 package brut.androlib.res.decoder;
 
 import brut.androlib.AndrolibException;
+import org.apache.commons.io.IOUtils;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import org.apache.commons.io.IOUtils;
 
-/**
- * @author Ryszard Wiśniewski <brut.alll@gmail.com>
- */
 public class ResRawStreamDecoder implements ResStreamDecoder {
     @Override
     public void decode(InputStream in, OutputStream out)

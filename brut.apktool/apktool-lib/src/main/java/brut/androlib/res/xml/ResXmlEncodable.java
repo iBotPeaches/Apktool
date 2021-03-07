@@ -18,9 +18,6 @@ package brut.androlib.res.xml;
 
 import brut.androlib.AndrolibException;
 
-/**
- * @author Ryszard Wiśniewski <brut.alll@gmail.com>
- */
 public interface ResXmlEncodable {
     public String encodeAsResXmlAttr() throws AndrolibException;
 

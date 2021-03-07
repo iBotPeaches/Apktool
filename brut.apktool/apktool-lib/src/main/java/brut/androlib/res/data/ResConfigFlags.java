@@ -18,9 +18,6 @@ package brut.androlib.res.data;
 
 import java.util.logging.Logger;
 
-/**
- * @author Ryszard Wiśniewski <brut.alll@gmail.com>
- */
 public class ResConfigFlags {
     public final short mcc;
     public final short mnc;

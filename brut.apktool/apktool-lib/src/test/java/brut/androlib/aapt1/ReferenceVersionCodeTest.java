@@ -33,9 +33,6 @@ import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
 
-/**
- * @author Connor Tumbleson <connor.tumbleson@gmail.com>
- */
 public class ReferenceVersionCodeTest extends BaseTest {
 
     @BeforeClass

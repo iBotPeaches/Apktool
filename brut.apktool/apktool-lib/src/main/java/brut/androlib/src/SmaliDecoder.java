@@ -29,9 +29,6 @@ import org.jf.dexlib2.iface.MultiDexContainer;
 import java.io.File;
 import java.io.IOException;
 
-/**
- * @author Ryszard Wiśniewski <brut.alll@gmail.com>
- */
 public class SmaliDecoder {
 
     public static void decode(File apkFile, File outDir, String dexName, boolean bakdeb, int api)

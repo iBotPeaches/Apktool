@@ -30,9 +30,6 @@ import java.io.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * @author Ryszard Wiśniewski <brut.alll@gmail.com>
- */
 public class ResFileDecoder {
     private final ResStreamDecoderContainer mDecoders;
 

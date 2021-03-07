@@ -19,14 +19,12 @@ package brut.androlib.res.data.value;
 import brut.androlib.AndrolibException;
 import brut.androlib.res.data.ResResource;
 import brut.util.Duo;
+import org.xmlpull.v1.XmlSerializer;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Comparator;
-import org.xmlpull.v1.XmlSerializer;
 
-/**
- * @author Ryszard Wiśniewski <brut.alll@gmail.com>
- */
 public class ResFlagsAttr extends ResAttr {
     ResFlagsAttr(ResReferenceValue parent, int type, Integer min, Integer max,
                  Boolean l10n, Duo<ResReferenceValue, ResIntValue>[] items) {

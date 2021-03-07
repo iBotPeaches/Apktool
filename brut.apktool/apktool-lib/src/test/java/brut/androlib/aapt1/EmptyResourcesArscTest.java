@@ -32,9 +32,6 @@ import java.util.logging.Logger;
 
 import static org.junit.Assert.assertTrue;
 
-/**
- * @author Connor Tumbleson <connor.tumbleson@gmail.com>
- */
 public class EmptyResourcesArscTest {
     @BeforeClass
     public static void beforeClass() throws Exception {

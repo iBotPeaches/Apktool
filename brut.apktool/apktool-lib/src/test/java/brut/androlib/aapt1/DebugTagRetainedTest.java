@@ -34,9 +34,6 @@ import java.nio.file.Paths;
 import static org.junit.Assert.assertTrue;
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 
-/**
- * @author Connor Tumbleson <connor.tumbleson@gmail.com>
- */
 public class DebugTagRetainedTest extends BaseTest {
 
     @BeforeClass

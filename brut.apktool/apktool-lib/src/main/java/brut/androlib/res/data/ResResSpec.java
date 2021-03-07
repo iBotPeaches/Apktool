@@ -18,12 +18,13 @@ package brut.androlib.res.data;
 
 import brut.androlib.AndrolibException;
 import brut.androlib.err.UndefinedResObjectException;
-import java.util.*;
 import org.apache.commons.lang3.StringUtils;
 
-/**
- * @author Ryszard Wiśniewski <brut.alll@gmail.com>
- */
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
+
 public class ResResSpec {
     private final ResID mId;
     private final String mName;

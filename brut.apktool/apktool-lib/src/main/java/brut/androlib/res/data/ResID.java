@@ -16,9 +16,6 @@
  */
 package brut.androlib.res.data;
 
-/**
- * @author Ryszard Wiśniewski <brut.alll@gmail.com>
- */
 public class ResID {
     public final int package_;
     public final int type;

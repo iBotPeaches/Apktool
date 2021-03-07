@@ -25,9 +25,6 @@ import brut.util.Duo;
 import java.util.*;
 import java.util.logging.Logger;
 
-/**
- * @author Ryszard Wiśniewski <brut.alll@gmail.com>
- */
 public class ResPackage {
     private final ResTable mResTable;
     private final int mId;

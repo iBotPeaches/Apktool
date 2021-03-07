@@ -17,6 +17,8 @@
 package brut.util;
 
 import brut.common.BrutException;
+import org.apache.commons.io.IOUtils;
+
 import java.io.*;
 import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
@@ -24,11 +26,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-import org.apache.commons.io.IOUtils;
-
-/**
- * @author Ryszard Wiśniewski <brut.alll@gmail.com>
- */
 public class OS {
 
     private static final Logger LOGGER = Logger.getLogger("");

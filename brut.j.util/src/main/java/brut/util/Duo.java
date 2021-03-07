@@ -16,9 +16,6 @@
  */
 package brut.util;
 
-/**
- * @author Ryszard Wiśniewski <brut.alll@gmail.com>
- */
 public class Duo<T1, T2> {
     public final T1 m1;
     public final T2 m2;

@@ -25,20 +25,15 @@ import java.nio.ByteBuffer;
 import java.nio.charset.*;
 import java.util.logging.Logger;
 
-/**
- * @author Ryszard Wiśniewski <brut.alll@gmail.com>
- * @author Dmitry Skiba
- *
- *         Block of strings, used in binary xml and arsc.
- *
- *         TODO: - implement get()
- *
- */
 public class StringBlock {
 
     /**
      * Reads whole (including chunk type) string block from stream. Stream must
      * be at the chunk type.
+     * @param reader ExtDataInput
+     * @return StringBlock
+     *
+     * @throws IOException Parsing resources.arsc error
      */
     public static StringBlock read(ExtDataInput reader) throws IOException {
         reader.skipCheckChunkTypeInt(CHUNK_STRINGPOOL_TYPE, CHUNK_NULL_TYPE);
@@ -81,6 +76,7 @@ public class StringBlock {
 
     /**
      * Returns number of strings in block.
+     * @return int
      */
     public int getCount() {
         return m_stringOffsets != null ? m_stringOffsets.length : 0;
@@ -88,6 +84,8 @@ public class StringBlock {
 
     /**
      * Returns raw string (without any styling information) at specified index.
+     * @param index int
+     * @return String
      */
     public String getString(int index) {
         if (index < 0 || m_stringOffsets == null || index >= m_stringOffsets.length) {
@@ -109,16 +107,9 @@ public class StringBlock {
     }
 
     /**
-     * Not yet implemented.
-     *
-     * Returns string with style information (if any).
-     */
-    public CharSequence get(int index) {
-        return getString(index);
-    }
-
-    /**
      * Returns string with style tags (html-like).
+     * @param index int
+     * @return String
      */
     public String getHTML(int index) {
         String raw = getString(index);
@@ -228,6 +219,9 @@ public class StringBlock {
 
     /**
      * Finds index of the string. Returns -1 if the string was not found.
+     *
+     * @param string String to index location of
+     * @return int (Returns -1 if not found)
      */
     public int find(String string) {
         if (string == null) {

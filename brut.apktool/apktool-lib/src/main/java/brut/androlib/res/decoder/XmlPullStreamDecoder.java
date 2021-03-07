@@ -16,12 +16,11 @@
  */
 package brut.androlib.res.decoder;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
+import brut.androlib.AndrolibException;
 import brut.androlib.err.AXmlDecodingException;
 import brut.androlib.err.RawXmlEncounteredException;
+import brut.androlib.res.data.ResTable;
+import brut.androlib.res.util.ExtXmlSerializer;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.wrapper.XmlPullParserWrapper;
@@ -29,13 +28,10 @@ import org.xmlpull.v1.wrapper.XmlPullWrapperFactory;
 import org.xmlpull.v1.wrapper.XmlSerializerWrapper;
 import org.xmlpull.v1.wrapper.classic.StaticXmlSerializerWrapper;
 
-import brut.androlib.AndrolibException;
-import brut.androlib.res.data.ResTable;
-import brut.androlib.res.util.ExtXmlSerializer;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
-/**
- * @author Ryszard Wiśniewski <brut.alll@gmail.com>
- */
 public class XmlPullStreamDecoder implements ResStreamDecoder {
     public XmlPullStreamDecoder(XmlPullParser parser,
                                 ExtXmlSerializer serializer) {

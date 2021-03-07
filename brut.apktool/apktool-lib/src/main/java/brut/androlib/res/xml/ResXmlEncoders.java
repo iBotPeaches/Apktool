@@ -17,16 +17,12 @@
 package brut.androlib.res.xml;
 
 import brut.util.Duo;
+import org.apache.commons.lang3.StringUtils;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-
-/**
- * @author Ryszard Wiśniewski <brut.alll@gmail.com>
- */
 public final class ResXmlEncoders {
 
     public static String escapeXmlChars(String str) {

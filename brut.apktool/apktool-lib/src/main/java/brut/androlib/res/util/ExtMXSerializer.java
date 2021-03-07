@@ -16,12 +16,12 @@
  */
 package brut.androlib.res.util;
 
-import java.io.*;
 import org.xmlpull.renamed.MXSerializer;
 
-/**
- * @author Ryszard Wiśniewski <brut.alll@gmail.com>
- */
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.Writer;
+
 public class ExtMXSerializer extends MXSerializer implements ExtXmlSerializer {
     @Override
     public void startDocument(String encoding, Boolean standalone)

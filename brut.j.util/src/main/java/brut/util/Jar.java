@@ -16,25 +16,16 @@
  */
 package brut.util;
 
+import brut.common.BrutException;
 import org.apache.commons.io.IOUtils;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
-import brut.common.BrutException;
-
-/**
- * @author Ryszard Wiśniewski <brut.alll@gmail.com>
- */
 abstract public class Jar {
     private final static Set<String> mLoaded = new HashSet<String>();
     private final static Map<String, File> mExtracted = new HashMap<String, File>();

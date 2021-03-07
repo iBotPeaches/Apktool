@@ -16,19 +16,20 @@
  */
 package brut.androlib.mod;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-
-import org.antlr.runtime.*;
+import org.antlr.runtime.CommonTokenStream;
+import org.antlr.runtime.RecognitionException;
+import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.apache.commons.io.IOUtils;
 import org.jf.dexlib2.writer.builder.DexBuilder;
-import org.jf.smali.*;
+import org.jf.smali.smaliFlexLexer;
+import org.jf.smali.smaliParser;
+import org.jf.smali.smaliTreeWalker;
 
-/**
- * @author Ryszard Wiśniewski <brut.alll@gmail.com>
- */
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+
 public class SmaliMod {
 
     public static boolean assembleSmaliFile(String smali, DexBuilder dexBuilder, int apiLevel, boolean verboseErrors,

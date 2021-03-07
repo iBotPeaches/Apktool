@@ -23,9 +23,6 @@ import brut.androlib.res.data.ResResSpec;
 import brut.androlib.res.data.value.ResAttr;
 import brut.androlib.res.data.value.ResScalarValue;
 
-/**
- * @author Ryszard Wiśniewski <brut.alll@gmail.com>
- */
 public class ResAttrDecoder {
     public String decode(int type, int value, String rawValue, int attrResId)
             throws AndrolibException {

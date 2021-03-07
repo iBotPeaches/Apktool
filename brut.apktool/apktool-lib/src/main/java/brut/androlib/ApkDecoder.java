@@ -38,9 +38,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.logging.Logger;
 
-/**
- * @author Ryszard Wiśniewski <brut.alll@gmail.com>
- */
 public class ApkDecoder {
     public ApkDecoder() {
         this(new Androlib());

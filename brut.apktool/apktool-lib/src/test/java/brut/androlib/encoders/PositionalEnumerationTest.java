@@ -22,9 +22,6 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-/**
- * @author Connor Tumbleson <connor.tumbleson@gmail.com>
- */
 public class PositionalEnumerationTest extends BaseTest {
 
     @Test

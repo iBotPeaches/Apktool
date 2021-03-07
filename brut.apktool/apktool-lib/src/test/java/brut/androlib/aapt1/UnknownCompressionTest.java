@@ -30,9 +30,6 @@ import java.io.IOException;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
 
-/**
- * @author Connor Tumbleson <connor.tumbleson@gmail.com>
- */
 public class UnknownCompressionTest extends BaseTest {
 
     @BeforeClass

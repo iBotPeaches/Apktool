@@ -21,25 +21,23 @@ import brut.androlib.ApkDecoder;
 import brut.androlib.BaseTest;
 import brut.androlib.TestUtils;
 import brut.androlib.meta.MetaInfo;
-import brut.directory.ExtFile;
 import brut.common.BrutException;
+import brut.directory.ExtFile;
 import brut.util.OS;
-
-import java.awt.image.BufferedImage;
-import java.io.*;
-import java.util.Map;
-
 import brut.util.OSDetection;
-import org.junit.*;
-
-import static org.junit.Assert.*;
-import static org.junit.Assume.*;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.Map;
 
-/**
- * @author Ryszard Wiśniewski <brut.alll@gmail.com>
- */
+import static org.junit.Assert.*;
+import static org.junit.Assume.assumeTrue;
+
 public class BuildAndDecodeTest extends BaseTest {
 
     @BeforeClass

@@ -18,9 +18,6 @@ package brut.util;
 
 import java.io.*;
 
-/**
- * @author Ryszard Wiśniewski <brut.alll@gmail.com>
- */
 public class ExtDataInput extends DataInputDelegate {
     public ExtDataInput(InputStream in) {
         this((DataInput) new DataInputStream(in));

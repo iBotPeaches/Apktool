@@ -19,9 +19,6 @@ package brut.util;
 import java.io.DataInput;
 import java.io.IOException;
 
-/**
- * @author Ryszard Wiśniewski <brut.alll@gmail.com>
- */
 abstract public class DataInputDelegate implements DataInput {
     protected final DataInput mDelegate;
 

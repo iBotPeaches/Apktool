@@ -16,9 +16,6 @@
  */
 package brut.androlib.res.data.value;
 
-/**
- * @author Ryszard Wiśniewski <brut.alll@gmail.com>
- */
 public class ResValue {
 
 }

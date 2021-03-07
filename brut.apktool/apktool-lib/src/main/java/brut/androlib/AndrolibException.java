@@ -18,9 +18,6 @@ package brut.androlib;
 
 import brut.common.BrutException;
 
-/**
- * @author Ryszard Wiśniewski <brut.alll@gmail.com>
- */
 public class AndrolibException extends BrutException {
     public AndrolibException() {
     }

@@ -31,9 +31,6 @@ import java.io.File;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-/**
- * @author Connor Tumbleson <connor.tumbleson@gmail.com>
- */
 public class OutsideOfDirectoryEntryTest extends BaseTest {
 
     @BeforeClass

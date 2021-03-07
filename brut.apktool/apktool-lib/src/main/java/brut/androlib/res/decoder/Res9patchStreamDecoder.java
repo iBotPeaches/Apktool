@@ -19,17 +19,14 @@ package brut.androlib.res.decoder;
 import brut.androlib.AndrolibException;
 import brut.androlib.err.CantFind9PatchChunkException;
 import brut.util.ExtDataInput;
+import org.apache.commons.io.IOUtils;
+
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 import java.io.*;
-import javax.imageio.ImageIO;
 
-import org.apache.commons.io.IOUtils;
-
-/**
- * @author Ryszard Wiśniewski <brut.alll@gmail.com>
- */
 public class Res9patchStreamDecoder implements ResStreamDecoder {
     @Override
     public void decode(InputStream in, OutputStream out)

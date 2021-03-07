@@ -21,9 +21,6 @@ import java.io.InputStream;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-/**
- * @author Ryszard Wiśniewski <brut.alll@gmail.com>
- */
 public class ApktoolProperties {
     public static String get(String key) {
         return get().getProperty(key);

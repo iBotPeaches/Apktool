@@ -18,7 +18,16 @@ package brut.androlib;
 
 import brut.androlib.res.AndrolibResources;
 import brut.common.BrutException;
-import brut.directory.*;
+import brut.directory.DirUtil;
+import brut.directory.Directory;
+import brut.directory.FileDirectory;
+import brut.util.OS;
+import org.custommonkey.xmlunit.ElementQualifier;
+import org.w3c.dom.Element;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.XmlPullParserFactory;
+
 import java.io.*;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -26,14 +35,6 @@ import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 
-import brut.util.OS;
-import org.custommonkey.xmlunit.ElementQualifier;
-import org.w3c.dom.Element;
-import org.xmlpull.v1.*;
-
-/**
- * @author Ryszard Wiśniewski <brut.alll@gmail.com>
- */
 public abstract class TestUtils {
 
     public static Map<String, String> parseStringsXml(File file)
