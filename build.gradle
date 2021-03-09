@@ -31,7 +31,6 @@ plugins {
 
 apply from: 'gradle/functions.gradle'
 
-group = 'org.apktool'
 version = '2.5.1'
 def suffix = 'SNAPSHOT'
 
@@ -69,7 +68,7 @@ allprojects {
     gradle.startParameter.excludedTaskNames += "licenseTest"
 }
 
-def apktoolVersion = 'unspecified'
+def mavenVersion = 'unspecified'
 if (!('release' in gradle.startParameter.taskNames)) {
     def hash = getCheckedOutGitCommitHash()
 
@@ -80,7 +79,7 @@ if (!('release' in gradle.startParameter.taskNames)) {
     } else {
         project.ext.set("hash", hash)
         project.ext.set("apktool_version", version + "-" + hash + "-SNAPSHOT")
-        apktoolVersion = version + "-dev"
+        mavenVersion = version + "-SNAPSHOT"
         println "Building SNAPSHOT (" + getCheckedOutBranch() + "): " + hash
     }
 } else {
@@ -90,7 +89,7 @@ if (!('release' in gradle.startParameter.taskNames)) {
     } else {
         project.ext.set("apktool_version", version)
     }
-    apktoolVersion = version
+    mavenVersion = version
     println "Building RELEASE (" + getCheckedOutBranch() + "): " + project.ext.apktool_version
 }
 
@@ -120,17 +119,17 @@ subprojects {
 
     ext {
         depends = [
-                baksmali: 'org.smali:baksmali:2.5.2',
-                commons_cli: 'commons-cli:commons-cli:1.4',
-                commons_io: 'commons-io:commons-io:2.4',
-                commons_lang: 'org.apache.commons:commons-lang3:3.1',
-                guava: 'com.google.guava:guava:14.0',
-                junit: 'junit:junit:4.12',
-                proguard_gradle: 'com.guardsquare:proguard-gradle:7.0.0',
-                snakeyaml: 'org.yaml:snakeyaml:1.18:android',
-                smali: 'org.smali:smali:2.5.2',
-                xmlpull: 'xpp3:xpp3:1.1.4c',
-                xmlunit: 'xmlunit:xmlunit:1.6',
+            baksmali: 'org.smali:baksmali:2.5.2',
+            commons_cli: 'commons-cli:commons-cli:1.4',
+            commons_io: 'commons-io:commons-io:2.4',
+            commons_lang: 'org.apache.commons:commons-lang3:3.1',
+            guava: 'com.google.guava:guava:14.0',
+            junit: 'junit:junit:4.12',
+            proguard_gradle: 'com.guardsquare:proguard-gradle:7.0.0',
+            snakeyaml: 'org.yaml:snakeyaml:1.18:android',
+            smali: 'org.smali:smali:2.5.2',
+            xmlpull: 'xpp3:xpp3:1.1.4c',
+            xmlunit: 'xmlunit:xmlunit:1.6',
         ]
     }
 
@@ -150,19 +149,13 @@ subprojects {
 
         publishing {
             publications {
-                mavenJava(MavenPublication) {
-                    groupId = group
-                    artifactId = project.name
-                    version = apktoolVersion
+                maven(MavenPublication) {
+                    from components.java
 
-                    versionMapping {
-                        usage('java-api') {
-                            fromResolutionOf('runtimeClasspath')
-                        }
-                        usage('java-runtime') {
-                            fromResolutionResult()
-                        }
-                    }
+                    groupId = 'org.apktool'
+                    artifactId = 'apktool-lib'
+                    version = mavenVersion
+
                     pom {
                         name = 'Apktool'
                         description = 'A tool for reverse engineering Android apk files.'
@@ -189,7 +182,7 @@ subprojects {
                         scm {
                             connection = 'scm:git:git://github.com/iBotPeaches/Apktool.git'
                             developerConnection = 'scm:git:git@github.com:iBotPeaches/Apktool.git'
-                            url = 'https://ibotpeaches.github.io/Apktool'
+                            url = 'https://github.com/iBotPeaches/Apktool'
                         }
                     }
                 }
@@ -197,7 +190,11 @@ subprojects {
             if (rootProject.hasProperty('ossrhUsername') && rootProject.hasProperty('ossrhPassword')) {
                 repositories {
                     maven {
-                        url = 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
+                        if (mavenVersion.endsWith('-SNAPSHOT')) {
+                            url = 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
+                        } else {
+                            url = 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
+                        }
                         credentials {
                             username ossrhUsername
                             password ossrhPassword
@@ -209,7 +206,7 @@ subprojects {
 
         signing {
             required { gradle.taskGraph.hasTask('publish') }
-            sign(publishing.publications["mavenJava"])
+            sign(publishing.publications["maven"])
         }
 
         java {
