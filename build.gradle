@@ -143,17 +143,19 @@ subprojects {
         }
     }
 
-    if (project.name == 'apktool-lib') {
+    def mavenProjects = ['apktool-lib', 'brut.j.common', 'brut.j.util', 'brut.j.dir']
+
+    if (project.name in mavenProjects) {
         apply plugin: 'maven-publish'
         apply plugin: 'signing'
 
         publishing {
             publications {
                 maven(MavenPublication) {
-                    from components.java
+                    from project.components.java
 
                     groupId = 'org.apktool'
-                    artifactId = 'apktool-lib'
+                    artifactId = project.name
                     version = mavenVersion
 
                     pom {
