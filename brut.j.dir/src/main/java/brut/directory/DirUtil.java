@@ -25,9 +25,6 @@ import brut.util.OS;
 import java.io.*;
 import java.util.logging.Logger;
 
-/**
- * @author Ryszard Wiśniewski <brut.alll@gmail.com>
- */
 public class DirUtil {
     private static final Logger LOGGER = Logger.getLogger("");
 

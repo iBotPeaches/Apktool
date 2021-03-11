@@ -31,9 +31,6 @@ import java.io.File;
 
 import static org.junit.Assert.assertTrue;
 
-/**
- * @author Connor Tumbleson <connor.tumbleson@gmail.com>
- */
 public class BuildAndDecodeJarTest extends BaseTest {
 
     @BeforeClass

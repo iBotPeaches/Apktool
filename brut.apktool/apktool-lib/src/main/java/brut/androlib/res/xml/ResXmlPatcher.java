@@ -16,10 +16,12 @@
  */
 package brut.androlib.res.xml;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.logging.Logger;
+import brut.androlib.AndrolibException;
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -29,27 +31,19 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
+import javax.xml.xpath.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.logging.Logger;
 
-import org.w3c.dom.*;
-import org.xml.sax.SAXException;
-
-import brut.androlib.AndrolibException;
-
-/**
- * @author Connor Tumbleson <connor.tumbleson@gmail.com>
- */
 public final class ResXmlPatcher {
 
     /**
      * Removes "debug" tag from file
      *
      * @param file AndroidManifest file
-     * @throws AndrolibException
+     * @throws AndrolibException Error reading Manifest file
      */
     public static void removeApplicationDebugTag(File file) throws AndrolibException {
         if (file.exists()) {
@@ -77,9 +71,8 @@ public final class ResXmlPatcher {
      * Sets "debug" tag in the file to true
      *
      * @param file AndroidManifest file
-     * @throws AndrolibException
      */
-    public static void setApplicationDebugTagTrue(File file) throws AndrolibException {
+    public static void setApplicationDebugTagTrue(File file) {
         if (file.exists()) {
             try {
                 Document doc = loadDocument(file);
@@ -105,18 +98,17 @@ public final class ResXmlPatcher {
     }
 
     /**
-     * Any @string reference in a <provider> value in AndroidManifest.xml will break on
+     * Any @string reference in a provider value in AndroidManifest.xml will break on
      * build, thus preventing the application from installing. This is from a bug/error
      * in AOSP where public resources cannot be part of an authorities attribute within
-     * a <provider> tag.
+     * a provider tag.
      *
      * This finds any reference and replaces it with the literal value found in the
      * res/values/strings.xml file.
      *
      * @param file File for AndroidManifest.xml
-     * @throws AndrolibException
      */
-    public static void fixingPublicAttrsInProviderAttributes(File file) throws AndrolibException {
+    public static void fixingPublicAttrsInProviderAttributes(File file) {
         boolean saved = false;
         if (file.exists()) {
             try {
@@ -177,9 +169,8 @@ public final class ResXmlPatcher {
      * @param saved boolean on whether we need to save
      * @param provider Node we are attempting to replace
      * @return boolean
-     * @throws AndrolibException setting node value failed
      */
-    private static boolean isSaved(File file, boolean saved, Node provider) throws AndrolibException {
+    private static boolean isSaved(File file, boolean saved, Node provider) {
         String reference = provider.getNodeValue();
         String replacement = pullValueFromStrings(file.getParentFile(), reference);
 
@@ -196,9 +187,8 @@ public final class ResXmlPatcher {
      * @param directory Root directory of apk
      * @param key String reference (ie @string/foo)
      * @return String|null
-     * @throws AndrolibException
      */
-    public static String pullValueFromStrings(File directory, String key) throws AndrolibException {
+    public static String pullValueFromStrings(File directory, String key) {
         if (key == null || ! key.contains("@")) {
             return null;
         }
@@ -231,9 +221,8 @@ public final class ResXmlPatcher {
      * @param directory Root directory of apk
      * @param key Integer reference (ie @integer/foo)
      * @return String|null
-     * @throws AndrolibException
      */
-    public static String pullValueFromIntegers(File directory, String key) throws AndrolibException {
+    public static String pullValueFromIntegers(File directory, String key) {
         if (key == null || ! key.contains("@")) {
             return null;
         }
@@ -264,9 +253,8 @@ public final class ResXmlPatcher {
      * Removes attributes like "versionCode" and "versionName" from file.
      *
      * @param file File representing AndroidManifest.xml
-     * @throws AndrolibException
      */
-    public static void removeManifestVersions(File file) throws AndrolibException {
+    public static void removeManifestVersions(File file) {
         if (file.exists()) {
             try {
                 Document doc = loadDocument(file);
@@ -293,9 +281,8 @@ public final class ResXmlPatcher {
      *
      * @param file File for AndroidManifest.xml
      * @param packageOriginal Package name to replace
-     * @throws AndrolibException
      */
-    public static void renameManifestPackage(File file, String packageOriginal) throws AndrolibException {
+    public static void renameManifestPackage(File file, String packageOriginal) {
         try {
             Document doc = loadDocument(file);
 

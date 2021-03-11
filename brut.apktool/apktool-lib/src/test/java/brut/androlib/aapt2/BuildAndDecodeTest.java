@@ -30,9 +30,6 @@ import java.io.IOException;
 
 import static org.junit.Assert.*;
 
-/**
- * @author Ryszard Wiśniewski <brut.alll@gmail.com>
- */
 public class BuildAndDecodeTest extends BaseTest {
 
     @BeforeClass

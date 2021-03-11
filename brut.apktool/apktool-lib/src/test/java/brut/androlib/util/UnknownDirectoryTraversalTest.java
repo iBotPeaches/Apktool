@@ -35,9 +35,6 @@ import java.io.IOException;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-/**
- * @author Connor Tumbleson <connor.tumbleson@gmail.com>
- */
 public class UnknownDirectoryTraversalTest extends BaseTest {
 
     @BeforeClass

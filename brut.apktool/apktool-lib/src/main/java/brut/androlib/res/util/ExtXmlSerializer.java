@@ -16,12 +16,10 @@
  */
 package brut.androlib.res.util;
 
-import java.io.IOException;
 import org.xmlpull.v1.XmlSerializer;
 
-/**
- * @author Ryszard Wiśniewski <brut.alll@gmail.com>
- */
+import java.io.IOException;
+
 public interface ExtXmlSerializer extends XmlSerializer {
 
     public ExtXmlSerializer newLine() throws IOException;

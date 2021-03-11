@@ -18,9 +18,6 @@ package brut.androlib.err;
 
 import brut.androlib.AndrolibException;
 
-/**
- * @author Ryszard Wiśniewski <brut.alll@gmail.com>
- */
 public class CantFind9PatchChunkException extends AndrolibException {
 	public CantFind9PatchChunkException(String message, Throwable cause) {
 		super(message, cause);

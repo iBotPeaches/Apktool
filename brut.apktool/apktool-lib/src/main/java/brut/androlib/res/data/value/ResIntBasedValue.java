@@ -16,9 +16,6 @@
  */
 package brut.androlib.res.data.value;
 
-/**
- * @author Matt Mastracci <matthew@mastracci.com>
- */
 public class ResIntBasedValue extends ResValue {
     private final int mRawIntValue;
 

@@ -30,10 +30,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.logging.*;
 
-/**
- * @author Ryszard Wiśniewski <brut.alll@gmail.com>
- * @author Connor Tumbleson <connor.tumbleson@gmail.com>
- */
 public class Main {
     public static void main(String[] args) throws IOException, InterruptedException, BrutException {
 

@@ -22,9 +22,6 @@ import brut.androlib.res.data.ResPackage;
 import brut.androlib.res.data.ResTypeSpec;
 import brut.util.Duo;
 
-/**
- * @author Ryszard Wiśniewski <brut.alll@gmail.com>
- */
 public class ResValueFactory {
     private final ResPackage mPackage;
 

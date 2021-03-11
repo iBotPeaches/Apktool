@@ -16,9 +16,6 @@
  */
 package brut.common;
 
-/**
- * @author Ryszard Wiśniewski <brut.alll@gmail.com>
- */
 public class BrutException extends Exception {
     public BrutException(Throwable cause) {
         super(cause);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008 Android4ME
+ * Copyright 2008 Android4ME / Dmitry Skiba
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,6 @@
  */
 package android.util;
 
-/**
- * @author Dmitry Skiba
- * 
- */
 public interface AttributeSet {
 	int getAttributeCount();
 

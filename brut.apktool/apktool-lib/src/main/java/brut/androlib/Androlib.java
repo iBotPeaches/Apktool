@@ -45,9 +45,6 @@ import java.util.zip.ZipOutputStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
-/**
- * @author Ryszard Wiśniewski <brut.alll@gmail.com>
- */
 public class Androlib {
     private final AndrolibResources mAndRes = new AndrolibResources();
     protected final ResUnknownFiles mResUnknownFiles = new ResUnknownFiles();

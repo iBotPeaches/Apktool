@@ -42,6 +42,22 @@ For example for the `2.2.1` release.
 
     git tag -a v2.2.1 -m "changed version to v2.2.1"
 
+### Prepare for publishing.
+
+New to Apktool is publishing releases to Maven, so plugin authors can directly integrate. You
+need a `gradle.properties` file in root with the structure:
+
+```
+signing.keyId={gpgKeyId}
+signing.password={gpgPassphrase}
+signing.secretKeyRingFile={gpgSecretKingRingLocation}
+
+ossrhUsername={sonatypeUsername}
+ossrhPassword={sonatypePassword}
+```
+
+If `release` or `snapshot` is used publishing will be automatically attempted.
+
 ### Building the binary.
 
 In order to maintain a clean slate. Run `gradlew clean` to start from a clean slate. Now lets build
@@ -93,7 +109,7 @@ We upload the binaries into 3 places.
 
 1. [Bitbucket Downloads](https://bitbucket.org/iBotPeaches/apktool/downloads)
 2. [Github Releases](https://github.com/iBotPeaches/Apktool/releases) - Since `2.2.1`.
-3. [Backup Mirror](http://connortumbleson.com/apktool/)
+3. [Backup Mirror](https://connortumbleson.com/apktool/)
 
 #### Bitbucket
 

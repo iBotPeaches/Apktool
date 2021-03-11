@@ -18,12 +18,10 @@ package brut.androlib.res.xml;
 
 import brut.androlib.AndrolibException;
 import brut.androlib.res.data.ResResource;
-import java.io.IOException;
 import org.xmlpull.v1.XmlSerializer;
 
-/**
- * @author Ryszard Wiśniewski <brut.alll@gmail.com>
- */
+import java.io.IOException;
+
 public interface ResValuesXmlSerializable {
     public void serializeToResValuesXml(XmlSerializer serializer,
                                         ResResource res) throws IOException, AndrolibException;

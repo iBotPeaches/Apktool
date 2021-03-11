@@ -34,9 +34,6 @@ import java.io.IOException;
 
 import static org.junit.Assert.assertTrue;
 
-/**
- * @author Connor Tumbleson <connor.tumbleson@gmail.com>
- */
 public class DoubleExtensionUnknownFileTest extends BaseTest {
 
     @BeforeClass

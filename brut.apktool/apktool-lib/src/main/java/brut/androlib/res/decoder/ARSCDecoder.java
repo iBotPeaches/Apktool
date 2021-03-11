@@ -31,9 +31,6 @@ import java.util.*;
 import java.util.logging.Logger;
 import org.apache.commons.io.input.CountingInputStream;
 
-/**
- * @author Ryszard Wiśniewski <brut.alll@gmail.com>
- */
 public class ARSCDecoder {
     public static ARSCData decode(InputStream arscStream, boolean findFlagsOffsets, boolean keepBroken)
             throws AndrolibException {

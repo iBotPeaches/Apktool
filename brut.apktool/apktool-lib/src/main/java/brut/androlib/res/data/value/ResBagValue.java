@@ -20,12 +20,10 @@ import brut.androlib.AndrolibException;
 import brut.androlib.res.data.ResResource;
 import brut.androlib.res.xml.ResValuesXmlSerializable;
 import brut.util.Duo;
-import java.io.IOException;
 import org.xmlpull.v1.XmlSerializer;
 
-/**
- * @author Ryszard Wiśniewski <brut.alll@gmail.com>
- */
+import java.io.IOException;
+
 public class ResBagValue extends ResValue implements ResValuesXmlSerializable {
     protected final ResReferenceValue mParent;
 

@@ -19,9 +19,6 @@ package brut.androlib.res.data;
 import brut.androlib.AndrolibException;
 import brut.androlib.res.data.value.ResValue;
 
-/**
- * @author Ryszard Wiśniewski <brut.alll@gmail.com>
- */
 public class ResResource {
     private final ResType mConfig;
     private final ResResSpec mResSpec;

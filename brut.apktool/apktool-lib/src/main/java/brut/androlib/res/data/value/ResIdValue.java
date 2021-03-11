@@ -19,12 +19,10 @@ package brut.androlib.res.data.value;
 import brut.androlib.AndrolibException;
 import brut.androlib.res.data.ResResource;
 import brut.androlib.res.xml.ResValuesXmlSerializable;
-import java.io.IOException;
 import org.xmlpull.v1.XmlSerializer;
 
-/**
- * @author Ryszard Wiśniewski <brut.alll@gmail.com>
- */
+import java.io.IOException;
+
 public class ResIdValue extends ResValue implements ResValuesXmlSerializable {
     @Override
     public void serializeToResValuesXml(XmlSerializer serializer,

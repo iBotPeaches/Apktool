@@ -17,7 +17,7 @@ package android.util;
 
 /**
  * Container for a dynamically typed data value. Primarily used with
- * {@link android.content.res.Resources} for holding resource values.
+ * Resources for holding resource values.
  */
 public class TypedValue {
     /** The value contains no data. */
@@ -196,14 +196,13 @@ public class TypedValue {
     /* ------------------------------------------------------------ */
 
     /**
-     * If {@link #density} is equal to this value, then the density should be
+     * If density is equal to this value, then the density should be
      * treated as the system's default density value:
-     * {@link DisplayMetrics#DENSITY_DEFAULT}.
      */
     public static final int DENSITY_DEFAULT = 0;
 
     /**
-     * If {@link #density} is equal to this value, then there is no density
+     * If density is equal to this value, then there is no density
      * associated with the resource and it should not be scaled.
      */
     public static final int DENSITY_NONE = 0xffff;
@@ -243,13 +242,11 @@ public class TypedValue {
     private static final String[] FRACTION_UNIT_STRS = new String[] { "%", "%p" };
 
     /**
-     * Perform type conversion as per {@link #coerceToString()} on an explicitly
+     * Perform type conversion as per coerceToString on an explicitly
      * supplied type and data.
      *
-     * @param type
-     *            The data type identifier.
-     * @param data
-     *            The data value.
+     * @param type The data type identifier.
+     * @param data The data value.
      *
      * @return String The coerced string value. If the value is null or the type
      *         is not known, null is returned.

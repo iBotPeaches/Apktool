@@ -20,9 +20,6 @@ import brut.androlib.AndrolibException;
 import brut.androlib.err.UndefinedResObjectException;
 import java.util.*;
 
-/**
- * @author Ryszard Wiśniewski <brut.alll@gmail.com>
- */
 public final class ResTypeSpec {
 
     public static final String RES_TYPE_NAME_ARRAY = "array";

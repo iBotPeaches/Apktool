@@ -23,28 +23,24 @@ import brut.androlib.res.data.ResID;
 import brut.androlib.res.xml.ResXmlEncoders;
 import brut.util.ExtDataInput;
 import com.google.common.io.LittleEndianDataInputStream;
+import org.xmlpull.v1.XmlPullParserException;
 import java.io.DataInput;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.xmlpull.v1.XmlPullParserException;
 
 /**
- * @author Ryszard Wiśniewski <brut.alll@gmail.com>
- * @author Dmitry Skiba
+ * Binary xml files parser.
  *
- *         Binary xml files parser.
+ * Parser has only two states: (1) Operational state, which parser
+ * obtains after first successful call to next() and retains until
+ * open(), close(), or failed call to next(). (2) Closed state, which
+ * parser obtains after open(), close(), or failed call to next(). In
+ * this state methods return invalid values or throw exceptions.
  *
- *         Parser has only two states: (1) Operational state, which parser
- *         obtains after first successful call to next() and retains until
- *         open(), close(), or failed call to next(). (2) Closed state, which
- *         parser obtains after open(), close(), or failed call to next(). In
- *         this state methods return invalid values or throw exceptions.
- *
- *         TODO: * check all methods in closed state
- *
+ * TODO: * check all methods in closed state
  */
 public class AXmlResourceParser implements XmlResourceParser {
 

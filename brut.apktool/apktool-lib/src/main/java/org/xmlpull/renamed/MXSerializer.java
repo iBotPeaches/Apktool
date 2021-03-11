@@ -16,12 +16,12 @@
  */
 package org.xmlpull.renamed;
 
+import org.xmlpull.v1.XmlSerializer;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-
-import org.xmlpull.v1.XmlSerializer;
 
 /**
  * Implementation of XmlSerializer interface from XmlPull V1 API. This
@@ -1009,7 +1009,6 @@ public class MXSerializer implements XmlSerializer {
 		}
 	}
 
-	/** simple utility method -- good for debugging */
 	protected static final String printable(String s) {
 		if (s == null) {
 			return "null";

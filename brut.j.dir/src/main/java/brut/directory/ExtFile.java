@@ -20,9 +20,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 
-/**
- * @author Ryszard Wiśniewski <brut.alll@gmail.com>
- */
 public class ExtFile extends File {
     public ExtFile(File file) {
         super(file.getPath());

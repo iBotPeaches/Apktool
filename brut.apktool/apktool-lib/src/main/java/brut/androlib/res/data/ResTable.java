@@ -23,9 +23,6 @@ import brut.androlib.res.AndrolibResources;
 import brut.androlib.res.data.value.ResValue;
 import java.util.*;
 
-/**
- * @author Ryszard Wiśniewski <brut.alll@gmail.com>
- */
 public class ResTable {
     private final AndrolibResources mAndRes;
 

@@ -21,9 +21,6 @@ import brut.androlib.err.UndefinedResObjectException;
 import brut.androlib.res.data.ResPackage;
 import brut.androlib.res.data.ResResSpec;
 
-/**
- * @author Ryszard Wiśniewski <brut.alll@gmail.com>
- */
 public class ResReferenceValue extends ResIntValue {
     private final ResPackage mPackage;
     private final boolean mTheme;

@@ -22,9 +22,6 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @author Ryszard Wiśniewski <brut.alll@gmail.com>
- */
 public class ResStreamDecoderContainer {
     private final Map<String, ResStreamDecoder> mDecoders = new HashMap<String, ResStreamDecoder>();
 
