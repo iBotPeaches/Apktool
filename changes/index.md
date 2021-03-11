@@ -7,6 +7,7 @@ description: Apktool - Changelog / Roadmap
 ## v2.5.1
 2020.xx.xx
  
+ * Published to Maven Central ([Issue 2529](https://github.com/iBotPeaches/Apktool/issues/2529))
  * Upgrade to baksmali/smali 2.5.2
  * Upgrade to `gradle 6.8.3`
  * Updated aapt2 with patches for `attr-private` and remove reserved pkgIds. (Thanks MrIkso)
