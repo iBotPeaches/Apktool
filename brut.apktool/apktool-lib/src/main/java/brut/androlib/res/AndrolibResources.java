@@ -813,7 +813,7 @@ final public class AndrolibResources {
         }
 
         if (id == 1) {
-            try (InputStream in = AndrolibResources.class.getResourceAsStream("/brut/androlib/android-framework.jar");
+            try (InputStream in = getAndroidFrameworkResourcesAsStream();
                  OutputStream out = new FileOutputStream(apk)) {
                 IOUtils.copy(in, out);
                 return apk;
@@ -946,8 +946,7 @@ final public class AndrolibResources {
         publicizeResources(arsc, ARSCDecoder.decode(new ByteArrayInputStream(arsc), true, true).getFlagsOffsets());
     }
 
-    public void publicizeResources(byte[] arsc, FlagsOffset[] flagsOffsets)
-            throws AndrolibException {
+    public void publicizeResources(byte[] arsc, FlagsOffset[] flagsOffsets) {
         for (FlagsOffset flags : flagsOffsets) {
             int offset = flags.offset + 3;
             int end = offset + 4 * flags.count;
@@ -1031,12 +1030,8 @@ final public class AndrolibResources {
         return apkOptions.isAapt2() ? 2 : 1;
     }
 
-    public File getAndroidResourcesFile() throws AndrolibException {
-        try {
-            return Jar.getResourceAsFile("/brut/androlib/android-framework.jar");
-        } catch (BrutException ex) {
-            throw new AndrolibException(ex);
-        }
+    public InputStream getAndroidFrameworkResourcesAsStream() {
+        return Jar.class.getResourceAsStream("/brut/androlib/android-framework.jar");
     }
 
     public void close() throws IOException {
