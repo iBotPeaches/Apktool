@@ -92,8 +92,7 @@ final public class AndrolibResources {
         return pkg;
     }
 
-    public ResPackage selectPkgWithMostResSpecs(ResPackage[] pkgs)
-            throws AndrolibException {
+    public ResPackage selectPkgWithMostResSpecs(ResPackage[] pkgs) {
         int id = 0;
         int value = 0;
         int index = 0;

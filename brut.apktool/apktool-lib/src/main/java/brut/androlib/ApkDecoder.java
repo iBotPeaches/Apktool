@@ -228,7 +228,7 @@ public class ApkDecoder {
         }
     }
 
-    public void setTargetSdkVersion() throws AndrolibException, IOException {
+    public void setTargetSdkVersion() throws AndrolibException {
         if (mResTable == null) {
             mResTable = mAndrolib.getResTable(mApkFile);
         }
@@ -247,7 +247,7 @@ public class ApkDecoder {
         mForceDelete = forceDelete;
     }
 
-    public void setFrameworkTag(String tag) throws AndrolibException {
+    public void setFrameworkTag(String tag) {
         mAndrolib.apkOptions.frameworkTag = tag;
     }
 
@@ -437,21 +437,21 @@ public class ApkDecoder {
         meta.versionInfo = info;
     }
 
-    private void putUnknownInfo(MetaInfo meta) throws AndrolibException {
+    private void putUnknownInfo(MetaInfo meta) {
         meta.unknownFiles = mAndrolib.mResUnknownFiles.getUnknownFiles();
     }
 
-    private void putFileCompressionInfo(MetaInfo meta) throws AndrolibException {
+    private void putFileCompressionInfo(MetaInfo meta) {
         if (mUncompressedFiles != null && !mUncompressedFiles.isEmpty()) {
             meta.doNotCompress = mUncompressedFiles;
         }
     }
 
-    private void putSparseResourcesInfo(MetaInfo meta) throws AndrolibException {
+    private void putSparseResourcesInfo(MetaInfo meta) {
         meta.sparseResources = mResTable.getSparseResources();
     }
 
-    private void putSharedLibraryInfo(MetaInfo meta) throws AndrolibException {
+    private void putSharedLibraryInfo(MetaInfo meta) {
         meta.sharedLibrary = mResTable.getSharedLibrary();
     }
 

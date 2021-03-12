@@ -517,8 +517,7 @@ public class AXmlResourceParser implements XmlResourceParser {
 
     // ///////////////////////////////// dummies
     @Override
-    public void setInput(InputStream stream, String inputEncoding)
-            throws XmlPullParserException {
+    public void setInput(InputStream stream, String inputEncoding) {
         open(stream);
     }
 
@@ -538,12 +537,12 @@ public class AXmlResourceParser implements XmlResourceParser {
     }
 
     @Override
-    public boolean isEmptyElementTag() throws XmlPullParserException {
+    public boolean isEmptyElementTag() {
         return false;
     }
 
     @Override
-    public boolean isWhitespace() throws XmlPullParserException {
+    public boolean isWhitespace() {
         return false;
     }
 

@@ -17,19 +17,24 @@
 package brut.androlib.res.decoder;
 
 import android.util.TypedValue;
-import brut.androlib.Androlib;
 import brut.androlib.AndrolibException;
 import brut.androlib.res.data.*;
 import brut.androlib.res.data.value.*;
 import brut.util.Duo;
-import brut.androlib.res.data.ResTable;
 import brut.util.ExtDataInput;
 import com.google.common.io.LittleEndianDataInputStream;
-import java.io.*;
-import java.math.BigInteger;
-import java.util.*;
-import java.util.logging.Logger;
 import org.apache.commons.io.input.CountingInputStream;
+
+import java.io.DataInput;
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.logging.Logger;
 
 public class ARSCDecoder {
     public static ARSCData decode(InputStream arscStream, boolean findFlagsOffsets, boolean keepBroken)
@@ -468,7 +473,7 @@ public class ARSCDecoder {
                 colorMode, isInvalid, size);
     }
 
-    private char[] unpackLanguageOrRegion(byte in0, byte in1, char base) throws AndrolibException {
+    private char[] unpackLanguageOrRegion(byte in0, byte in1, char base) {
         // check high bit, if so we have a packed 3 letter code
         if (((in0 >> 7) & 1) == 1) {
             int first = in1 & 0x1F;
@@ -482,7 +487,7 @@ public class ARSCDecoder {
         return new char[] { (char) in0, (char) in1 };
     }
 
-    private String readScriptOrVariantChar(int length) throws AndrolibException, IOException {
+    private String readScriptOrVariantChar(int length) throws IOException {
         StringBuilder string = new StringBuilder(16);
 
         while(length-- != 0) {
