@@ -332,7 +332,6 @@ public class ARSCDecoder {
                 throw ex;
             }
         }
-        mPkg.addResource(res);
     }
 
     private ResBagValue readComplexEntry() throws IOException, AndrolibException {
@@ -530,7 +529,6 @@ public class ARSCDecoder {
                 ResValue value = new ResReferenceValue(mPkg, 0, "");
 
                 ResResource res = new ResResource(mType, spec, value);
-                mPkg.addResource(res);
                 mType.addResource(res);
                 spec.addResource(res);
             }
