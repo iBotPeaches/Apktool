@@ -117,14 +117,6 @@ public class ResTable {
         return pkg;
     }
 
-    public boolean hasPackage(int id) {
-        return mPackagesById.containsKey(id);
-    }
-
-    public boolean hasPackage(String name) {
-        return mPackagesByName.containsKey(name);
-    }
-
     public ResValue getValue(String package_, String type, String name) throws AndrolibException {
         return getPackage(package_).getType(type).getResSpec(name).getDefaultResource().getValue();
     }

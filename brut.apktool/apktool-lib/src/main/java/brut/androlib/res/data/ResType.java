@@ -28,10 +28,6 @@ public class ResType {
         this.mFlags = flags;
     }
 
-    public Set<ResResource> listResources() {
-        return new LinkedHashSet<ResResource>(mResources.values());
-    }
-
     public ResResource getResource(ResResSpec spec) throws AndrolibException {
         ResResource res = mResources.get(spec);
         if (res == null) {
@@ -40,21 +36,12 @@ public class ResType {
         return res;
     }
 
-    public Set<ResResSpec> listResSpecs() {
-        return mResources.keySet();
-    }
-
     public ResConfigFlags getFlags() {
         return mFlags;
     }
 
     public void addResource(ResResource res) throws AndrolibException {
         addResource(res, false);
-    }
-
-    public void removeResource(ResResource res) throws AndrolibException {
-        ResResSpec spec = res.getResSpec();
-        mResources.remove(spec);
     }
 
     public void addResource(ResResource res, boolean overwrite) throws AndrolibException {

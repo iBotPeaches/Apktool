@@ -58,41 +58,17 @@ public class ResPackage {
         return spec;
     }
 
-    public List<ResType> getConfigs() {
-        return new ArrayList<ResType>(mConfigs.values());
-    }
-
-    public boolean hasConfig(ResConfigFlags flags) {
-        return mConfigs.containsKey(flags);
-    }
-
-    public ResType getConfig(ResConfigFlags flags) throws AndrolibException {
-        ResType config = mConfigs.get(flags);
-        if (config == null) {
-            throw new UndefinedResObjectException("config: " + flags);
-        }
-        return config;
-    }
-
     public int getResSpecCount() {
         return mResSpecs.size();
     }
 
-    public ResType getOrCreateConfig(ResConfigFlags flags) throws AndrolibException {
+    public ResType getOrCreateConfig(ResConfigFlags flags) {
         ResType config = mConfigs.get(flags);
         if (config == null) {
             config = new ResType(flags);
             mConfigs.put(flags, config);
         }
         return config;
-    }
-
-    public List<ResTypeSpec> listTypes() {
-        return new ArrayList<ResTypeSpec>(mTypes.values());
-    }
-
-    public boolean hasType(String typeName) {
-        return mTypes.containsKey(typeName);
     }
 
     public ResTypeSpec getType(String typeName) throws AndrolibException {
@@ -151,7 +127,7 @@ public class ResPackage {
         return mSynthesizedRes.contains(resId);
     }
 
-    public void removeResSpec(ResResSpec spec) throws AndrolibException {
+    public void removeResSpec(ResResSpec spec) {
         mResSpecs.remove(spec.getId());
     }
 
@@ -161,24 +137,12 @@ public class ResPackage {
         }
     }
 
-    public void addConfig(ResType config) throws AndrolibException {
-        if (mConfigs.put(config.getFlags(), config) != null) {
-            throw new AndrolibException("Multiple configs: " + config);
-        }
-    }
-
-    public void addType(ResTypeSpec type) throws AndrolibException {
+    public void addType(ResTypeSpec type) {
         if (mTypes.containsKey(type.getName())) {
             LOGGER.warning("Multiple types detected! " + type + " ignored!");
         } else {
             mTypes.put(type.getName(), type);
         }
-    }
-
-    public void addResource(ResResource res) {
-    }
-
-    public void removeResource(ResResource res) {
     }
 
     public void addSynthesizedRes(int resId) {

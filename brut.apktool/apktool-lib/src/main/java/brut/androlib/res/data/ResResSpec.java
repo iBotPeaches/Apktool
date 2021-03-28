@@ -64,24 +64,12 @@ public class ResResSpec {
         return res;
     }
 
-    public boolean hasResource(ResType config) {
-        return hasResource(config.getFlags());
-    }
-
-    private boolean hasResource(ResConfigFlags flags) {
-        return mResources.containsKey(flags);
-    }
-
     public ResResource getDefaultResource() throws AndrolibException {
         return getResource(new ResConfigFlags());
     }
 
     public boolean hasDefaultResource() {
         return mResources.containsKey(new ResConfigFlags());
-    }
-
-    public String getFullName() {
-        return getFullName(false, false);
     }
 
     public String getFullName(ResPackage relativeToPackage, boolean excludeType) {
@@ -122,11 +110,6 @@ public class ResResSpec {
         if (mResources.put(flags, res) != null && !overwrite) {
             throw new AndrolibException(String.format("Multiple resources: spec=%s, config=%s", this, flags));
         }
-    }
-
-    public void removeResource(ResResource res) throws AndrolibException {
-        ResConfigFlags flags = res.getConfig().getFlags();
-        mResources.remove(flags);
     }
 
     @Override

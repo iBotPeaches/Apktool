@@ -52,16 +52,8 @@ public final class ResTypeSpec {
         return mId;
     }
 
-    public int getEntryCount() {
-        return mEntryCount;
-    }
-
     public boolean isString() {
         return mName.equalsIgnoreCase("string");
-    }
-
-    public Set<ResResSpec> listResSpecs() {
-        return new LinkedHashSet<ResResSpec>(mResSpecs.values());
     }
 
     public ResResSpec getResSpec(String name) throws AndrolibException {
@@ -76,7 +68,7 @@ public final class ResTypeSpec {
         return mResSpecs.get(name);
     }
 
-    public void removeResSpec(ResResSpec spec) throws AndrolibException {
+    public void removeResSpec(ResResSpec spec) {
         mResSpecs.remove(spec.getName());
     }
 
