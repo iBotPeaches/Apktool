@@ -24,7 +24,7 @@ import java.util.LinkedHashSet;
 public class FileDirectory extends AbstractDirectory {
     private File mDir;
 
-    public FileDirectory(ExtFile dir, String folder) throws DirectoryException, UnsupportedEncodingException {
+    public FileDirectory(ExtFile dir, String folder) throws DirectoryException {
         this(new File(dir.toString().replaceAll("%20", " "), folder));
     }
 
