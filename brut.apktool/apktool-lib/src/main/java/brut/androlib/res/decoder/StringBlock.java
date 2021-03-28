@@ -75,14 +75,6 @@ public class StringBlock {
     }
 
     /**
-     * Returns number of strings in block.
-     * @return int
-     */
-    public int getCount() {
-        return m_stringOffsets != null ? m_stringOffsets.length : 0;
-    }
-
-    /**
      * Returns raw string (without any styling information) at specified index.
      * @param index int
      * @return String
@@ -314,15 +306,6 @@ public class StringBlock {
 
     private static final int getShort(byte[] array, int offset) {
         return (array[offset + 1] & 0xff) << 8 | array[offset] & 0xff;
-    }
-
-    private static final int getShort(int[] array, int offset) {
-        int value = array[offset / 4];
-        if ((offset % 4) / 2 == 0) {
-            return (value & 0xFFFF);
-        } else {
-            return (value >>> 16);
-        }
     }
 
     private static final int[] getUtf8(byte[] array, int offset) {
