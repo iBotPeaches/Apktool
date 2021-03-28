@@ -39,35 +39,8 @@ abstract public class Jar {
         return file;
     }
 
-    public static File getResourceAsFile(String name) throws BrutException {
-        return getResourceAsFile(name, Class.class);
-    }
-
-    public static void load(String libPath) {
-        if (mLoaded.contains(libPath)) {
-            return;
-        }
-
-        File libFile;
-        try {
-            libFile = getResourceAsFile(libPath);
-        } catch (BrutException ex) {
-            throw new UnsatisfiedLinkError(ex.getMessage());
-        }
-
-        System.load(libFile.getAbsolutePath());
-    }
-
-    public static File extractToTmp(String resourcePath) throws BrutException {
-        return extractToTmp(resourcePath, Class.class);
-    }
-
     public static File extractToTmp(String resourcePath, Class clazz) throws BrutException {
         return extractToTmp(resourcePath, "brut_util_Jar_", clazz);
-    }
-
-    public static File extractToTmp(String resourcePath, String tmpPrefix) throws BrutException {
-        return extractToTmp(resourcePath, tmpPrefix, Class.class);
     }
 
     public static File extractToTmp(String resourcePath, String tmpPrefix, Class clazz) throws BrutException {

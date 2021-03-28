@@ -49,7 +49,7 @@ public class OS {
         dir.delete();
     }
         
-    public static void rmfile(String file) throws BrutException {
+    public static void rmfile(String file) {
     	File del = new File(file);
     	del.delete();
     }
@@ -83,21 +83,21 @@ public class OS {
         }
     }
 
-    public static void cpdir(String src, String dest) throws BrutException {
-        cpdir(new File(src), new File(dest));
-    }
-
     public static void exec(String[] cmd) throws BrutException {
-        Process ps = null;
-        int exitValue = -99;
+        Process ps;
+        int exitValue;
+
         try {
             ProcessBuilder builder = new ProcessBuilder(cmd);
             ps = builder.start();
+
             new StreamForwarder(ps.getErrorStream(), "ERROR").start();
             new StreamForwarder(ps.getInputStream(), "OUTPUT").start();
+
             exitValue = ps.waitFor();
-            if (exitValue != 0)
+            if (exitValue != 0) {
                 throw new BrutException("could not exec (exit code = " + exitValue + "): " + Arrays.toString(cmd));
+            }
         } catch (IOException ex) {
             throw new BrutException("could not exec: " + Arrays.toString(cmd), ex);
         } catch (InterruptedException ex) {
