@@ -210,18 +210,18 @@ public class AXmlResourceParser implements XmlResourceParser {
     }
 
     @Override
-    public int getNamespaceCount(int depth) throws XmlPullParserException {
+    public int getNamespaceCount(int depth) {
         return m_namespaces.getAccumulatedCount(depth);
     }
 
     @Override
-    public String getNamespacePrefix(int pos) throws XmlPullParserException {
+    public String getNamespacePrefix(int pos) {
         int prefix = m_namespaces.getPrefix(pos);
         return m_strings.getString(prefix);
     }
 
     @Override
-    public String getNamespaceUri(int pos) throws XmlPullParserException {
+    public String getNamespaceUri(int pos) {
         int uri = m_namespaces.getUri(pos);
         return m_strings.getString(uri);
     }
@@ -603,12 +603,7 @@ public class AXmlResourceParser implements XmlResourceParser {
 
         public final void reset() {
             m_dataLength = 0;
-            m_count = 0;
             m_depth = 0;
-        }
-
-        public final int getTotalCount() {
-            return m_count;
         }
 
         public final int getCurrentCount() {
@@ -648,35 +643,6 @@ public class AXmlResourceParser implements XmlResourceParser {
             m_data[offset + 1] = uri;
             m_data[offset + 2] = count + 1;
             m_dataLength += 2;
-            m_count += 1;
-        }
-
-        public final boolean pop(int prefix, int uri) {
-            if (m_dataLength == 0) {
-                return false;
-            }
-            int offset = m_dataLength - 1;
-            int count = m_data[offset];
-            for (int i = 0, o = offset - 2; i != count; ++i, o -= 2) {
-                if (m_data[o] != prefix || m_data[o + 1] != uri) {
-                    continue;
-                }
-                count -= 1;
-                if (i == 0) {
-                    m_data[o] = count;
-                    o -= (1 + count * 2);
-                    m_data[o] = count;
-                } else {
-                    m_data[offset] = count;
-                    offset -= (1 + 2 + count * 2);
-                    m_data[offset] = count;
-                    System.arraycopy(m_data, o + 2, m_data, o, m_dataLength - o);
-                }
-                m_dataLength -= 2;
-                m_count -= 1;
-                return true;
-            }
-            return false;
         }
 
         public final boolean pop() {
@@ -694,7 +660,6 @@ public class AXmlResourceParser implements XmlResourceParser {
             offset -= (1 + count * 2);
             m_data[offset] = count;
             m_dataLength -= 2;
-            m_count -= 1;
             return true;
         }
 
@@ -708,10 +673,6 @@ public class AXmlResourceParser implements XmlResourceParser {
 
         public final int findPrefix(int uri) {
             return find(uri, false);
-        }
-
-        public final int findUri(int prefix) {
-            return find(prefix, true);
         }
 
         public final int getDepth() {
@@ -737,7 +698,6 @@ public class AXmlResourceParser implements XmlResourceParser {
                 return;
             }
             m_dataLength -= 2 + count * 2;
-            m_count -= count;
             m_depth -= 1;
         }
 
@@ -799,12 +759,7 @@ public class AXmlResourceParser implements XmlResourceParser {
 
         private int[] m_data;
         private int m_dataLength;
-        private int m_count;
         private int m_depth;
-    }
-
-    final StringBlock getStrings() {
-        return m_strings;
     }
 
     private final int getAttributeOffset(int index) {
