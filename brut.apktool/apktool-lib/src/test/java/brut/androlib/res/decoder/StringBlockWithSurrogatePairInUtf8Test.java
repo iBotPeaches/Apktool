@@ -57,12 +57,13 @@ public class StringBlockWithSurrogatePairInUtf8Test {
         final byte[] bytesWithCharactersBeforeSurrogatePair = {'G', 'o', 'o', 'd', ' ', 'm', 'o', 'r', 'n', 'i', 'n', 'g', '!', ' ',
                 (byte) 0xED, (byte) 0xA0, (byte) 0xBD, (byte) 0xED, (byte) 0xB1, (byte) 0x8B,
                 ' ', 'S', 'u', 'n', ' ',
-                (byte) 0xED, (byte) 0xA0, (byte) 0xBD, (byte) 0xED, (byte) 0xBC, (byte) 0x9E
+                (byte) 0xED, (byte) 0xA0, (byte) 0xBC, (byte) 0xED, (byte) 0xBC, (byte) 0x9E
         };
         final String actual2 = new StringBlock(bytesWithCharactersBeforeSurrogatePair, true).decodeString(0, 31);
 
-        // D83D -> ED 0xA0 0xBD
+        // D83D -> 0xED 0xA0 0xBD
         // DC4B -> 0xED 0xB1 0x8B
+        // D83C -> 0xED 0xA0 0xBC
         // DF1E -> 0xED 0xBC 0x9E
         assertEquals("Incorrect decoding when there are valid characters before the surrogate pair",
                 "Good morning! \uD83D\uDC4B Sun \uD83C\uDF1E", actual2);
