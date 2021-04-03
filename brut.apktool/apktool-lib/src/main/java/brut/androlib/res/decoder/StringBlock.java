@@ -284,8 +284,8 @@ public class StringBlock {
 
     @VisibleForTesting
     String decodeString(int offset, int length) {
-        final ByteBuffer wrappedBuffer = ByteBuffer.wrap(m_strings, offset, length);
         try {
+            final ByteBuffer wrappedBuffer = ByteBuffer.wrap(m_strings, offset, length);
             return (m_isUTF8 ? UTF8_DECODER : UTF16LE_DECODER).decode(wrappedBuffer).toString();
         } catch (CharacterCodingException ex) {
             if (!m_isUTF8) {
@@ -295,9 +295,10 @@ public class StringBlock {
         }
 
         try {
+            final ByteBuffer wrappedBufferRetry = ByteBuffer.wrap(m_strings, offset, length);
             // in some places, Android uses 3-byte UTF-8 sequences instead of 4-bytes.
             // If decoding failed, we try to use CESU-8 decoder, which is closer to what Android actually uses.
-            return CESU8_DECODER.decode(wrappedBuffer).toString();
+            return CESU8_DECODER.decode(wrappedBufferRetry).toString();
         } catch (CharacterCodingException e) {
             LOGGER.warning("Failed to decode a string with CESU-8 decoder.");
             return null;

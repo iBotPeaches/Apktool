@@ -52,6 +52,21 @@ public class StringBlockWithSurrogatePairInUtf8Test {
         // See: https://github.com/iBotPeaches/Apktool/issues/2299
         final String actual = new StringBlock(new byte[] {	(byte) 0xED, (byte) 0xA0, (byte) 0xBD, (byte) 0xED, (byte) 0xB4, (byte) 0x86}, true).decodeString(0, 6);
         assertEquals("Incorrect decoding", "\uD83D\uDD06", actual);
+
+        // See: https://github.com/iBotPeaches/Apktool/issues/2546
+        final byte[] bytesWithCharactersBeforeSurrogatePair = {'G', 'o', 'o', 'd', ' ', 'm', 'o', 'r', 'n', 'i', 'n', 'g', '!', ' ',
+                (byte) 0xED, (byte) 0xA0, (byte) 0xBD, (byte) 0xED, (byte) 0xB1, (byte) 0x8B,
+                ' ', 'S', 'u', 'n', ' ',
+                (byte) 0xED, (byte) 0xA0, (byte) 0xBC, (byte) 0xED, (byte) 0xBC, (byte) 0x9E
+        };
+        final String actual2 = new StringBlock(bytesWithCharactersBeforeSurrogatePair, true).decodeString(0, 31);
+
+        // D83D -> 0xED 0xA0 0xBD
+        // DC4B -> 0xED 0xB1 0x8B
+        // D83C -> 0xED 0xA0 0xBC
+        // DF1E -> 0xED 0xBC 0x9E
+        assertEquals("Incorrect decoding when there are valid characters before the surrogate pair",
+                "Good morning! \uD83D\uDC4B Sun \uD83C\uDF1E", actual2);
     }
 
     @Test
