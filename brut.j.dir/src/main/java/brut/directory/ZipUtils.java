@@ -31,7 +31,7 @@ public class ZipUtils {
 
     private static Collection<String> mDoNotCompress;
     
-    private ZipUtils(){
+    private ZipUtils() {
         // Private constructor for utility class
     }
 
