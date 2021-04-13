@@ -72,9 +72,9 @@ public class OS {
                 continue;
             }
             try {
-                try(InputStream in = new FileInputStream(file)){
-                    try(OutputStream out = new FileOutputStream(destFile)){
-                        IOUtils.copy(in, out);               
+                try (InputStream in = new FileInputStream(file)) {
+                    try (OutputStream out = new FileOutputStream(destFile)) {
+                        IOUtils.copy(in, out);
                     }
                 }
             } catch (IOException ex) {
@@ -188,7 +188,7 @@ public class OS {
                 while ((line = reader.readLine()) != null) {
                     buffer.append(line).append('\n');
                 }
-            } catch (IOException ignored) {}
+            } catch (IOException ignored) {}            
         }
 
         public String get() {
