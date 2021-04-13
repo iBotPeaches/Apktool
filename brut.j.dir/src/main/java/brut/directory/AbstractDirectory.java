@@ -260,15 +260,15 @@ public abstract class AbstractDirectory implements Directory {
         return new ParsedPath(path.substring(0, pos), path.substring(pos + 1));        
     }
 
-    abstract protected void loadFiles();
-    abstract protected void loadDirs();
-    abstract protected InputStream getFileInputLocal(String name)
+    protected abstract void loadFiles();
+    protected abstract void loadDirs();
+    protected abstract InputStream getFileInputLocal(String name)
         throws DirectoryException;
-    abstract protected OutputStream getFileOutputLocal(String name)
+    protected abstract OutputStream getFileOutputLocal(String name)
         throws DirectoryException;
-    abstract protected AbstractDirectory createDirLocal(String name)
+    protected abstract AbstractDirectory createDirLocal(String name)
         throws DirectoryException;
-    abstract protected void removeFileLocal(String name);
+    protected abstract void removeFileLocal(String name);
     
     
     private class ParsedPath {
