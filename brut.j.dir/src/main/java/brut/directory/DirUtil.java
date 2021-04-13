@@ -28,7 +28,7 @@ import java.util.logging.Logger;
 public class DirUtil {
     private static final Logger LOGGER = Logger.getLogger("");
 
-    private DirUtil(){
+    private DirUtil() {
         // Private constructor for utility class
     }
     
