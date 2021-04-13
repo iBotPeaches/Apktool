@@ -173,7 +173,7 @@ public class OS {
     }
 
     static class StreamCollector implements Runnable {
-        private final StringBuffer buffer = new StringBuffer();
+        private final StringBuilder buffer = new StringBuilder();
         private final InputStream inputStream;
 
         public StreamCollector(InputStream inputStream) {
