@@ -19,7 +19,7 @@ package brut.util;
 import java.io.DataInput;
 import java.io.IOException;
 
-abstract public class DataInputDelegate implements DataInput {
+public abstract class DataInputDelegate implements DataInput {
     protected final DataInput mDelegate;
 
     public DataInputDelegate(DataInput delegate) {
