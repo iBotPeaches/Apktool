@@ -72,11 +72,11 @@ public class OS {
                 continue;
             }
             try {
-                InputStream in = new FileInputStream(file);
-                OutputStream out = new FileOutputStream(destFile);
-                IOUtils.copy(in, out);
-                in.close();
-                out.close();
+                try (InputStream in = new FileInputStream(file)) {
+                    try (OutputStream out = new FileOutputStream(destFile)) {
+                        IOUtils.copy(in, out);
+                    }
+                }
             } catch (IOException ex) {
                 throw new BrutException("Could not copy file: " + file, ex);
             }
@@ -173,7 +173,7 @@ public class OS {
     }
 
     static class StreamCollector implements Runnable {
-        private final StringBuffer buffer = new StringBuffer();
+        private final StringBuilder buffer = new StringBuilder();
         private final InputStream inputStream;
 
         public StreamCollector(InputStream inputStream) {

@@ -30,6 +30,10 @@ import java.util.zip.ZipOutputStream;
 public class ZipUtils {
 
     private static Collection<String> mDoNotCompress;
+    
+    private ZipUtils() {
+        // Private constructor for utility class
+    }
 
     public static void zipFolders(final File folder, final File zip, final File assets, final Collection<String> doNotCompress)
             throws BrutException, IOException {

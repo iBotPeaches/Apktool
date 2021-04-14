@@ -44,7 +44,7 @@ public abstract class AbstractDirectory implements Directory {
             return mFiles;
         }
         if (mFilesRecursive == null) {
-            mFilesRecursive = new LinkedHashSet<String>(mFiles);
+            mFilesRecursive = new LinkedHashSet<>(mFiles);
             for (Map.Entry<String, ? extends Directory> dir : getAbstractDirs().entrySet()) {
                 for (String path : dir.getValue().getFiles(true)) {
                     mFilesRecursive.add(dir.getKey() + separator + path);
@@ -93,7 +93,7 @@ public abstract class AbstractDirectory implements Directory {
     @Override
     public Map<String, Directory> getDirs(boolean recursive)
             throws UnsupportedOperationException {
-        return new LinkedHashMap<String, Directory>(getAbstractDirs(recursive));
+        return new LinkedHashMap<>(getAbstractDirs(recursive));
     }
 
     @Override
@@ -225,7 +225,7 @@ public abstract class AbstractDirectory implements Directory {
             return mDirs;
         }
 
-        Map<String, AbstractDirectory> dirs = new LinkedHashMap<String, AbstractDirectory>(mDirs);
+        Map<String, AbstractDirectory> dirs = new LinkedHashMap<>(mDirs);
         for (Map.Entry<String, AbstractDirectory> dir : getAbstractDirs().entrySet()) {
             for (Map.Entry<String, AbstractDirectory> subdir : dir.getValue().getAbstractDirs(
                     true).entrySet()) {
@@ -260,15 +260,15 @@ public abstract class AbstractDirectory implements Directory {
         return new ParsedPath(path.substring(0, pos), path.substring(pos + 1));        
     }
 
-    abstract protected void loadFiles();
-    abstract protected void loadDirs();
-    abstract protected InputStream getFileInputLocal(String name)
+    protected abstract void loadFiles();
+    protected abstract void loadDirs();
+    protected abstract InputStream getFileInputLocal(String name)
         throws DirectoryException;
-    abstract protected OutputStream getFileOutputLocal(String name)
+    protected abstract OutputStream getFileOutputLocal(String name)
         throws DirectoryException;
-    abstract protected AbstractDirectory createDirLocal(String name)
+    protected abstract AbstractDirectory createDirLocal(String name)
         throws DirectoryException;
-    abstract protected void removeFileLocal(String name);
+    protected abstract void removeFileLocal(String name);
     
     
     private class ParsedPath {

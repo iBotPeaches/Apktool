@@ -21,14 +21,11 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.*;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
-abstract public class Jar {
-    private final static Set<String> mLoaded = new HashSet<String>();
-    private final static Map<String, File> mExtracted = new HashMap<String, File>();
+public abstract class Jar {
+    private static final Map<String, File> mExtracted = new HashMap<>();
 
     public static File getResourceAsFile(String name, Class clazz) throws BrutException {
         File file = mExtracted.get(name);

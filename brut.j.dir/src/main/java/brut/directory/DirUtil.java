@@ -28,6 +28,10 @@ import java.util.logging.Logger;
 public class DirUtil {
     private static final Logger LOGGER = Logger.getLogger("");
 
+    private DirUtil() {
+        // Private constructor for utility class
+    }
+    
     public static void copyToDir(Directory in, Directory out)
             throws DirectoryException {
         for (String fileName : in.getFiles(true)) {
