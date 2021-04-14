@@ -188,7 +188,7 @@ public class OS {
                 while ((line = reader.readLine()) != null) {
                     buffer.append(line).append('\n');
                 }
-            } catch (IOException ignored) {}            
+            } catch (IOException ignored) {}
         }
 
         public String get() {
