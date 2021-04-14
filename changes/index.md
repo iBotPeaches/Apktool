@@ -10,6 +10,10 @@ description: Apktool - Changelog / Roadmap
  * Published to Maven Central ([Issue 2529](https://github.com/iBotPeaches/Apktool/issues/2529))
  * Upgrade to baksmali/smali 2.5.2
  * Upgrade to `gradle 6.8.3`
+ * Upgrade to `snakeyaml 1.28` (Thanks Goooler)
+ * Upgrade to `guava 30.1.1-jre` (Thanks Goooler)
+ * Upgrade to `junit 4.13.2` (Thanks Goooler)
+ * Upgrade to `commons-lang 3.12.0` (Thanks Goooler)
  * Updated aapt2 with patches for `attr-private` and remove reserved pkgIds. (Thanks MrIkso)
  * Changed zipslip exceptions to skip file instead of exit on failure. ([Issue 2201](https://github.com/iBotPeaches/Apktool/issues/2201))
  * Changed dummy resource names to `APKTOOL_DUPLICATE_{Type}_{RESID}` to prevent starting with numeric ([Issue 2229](https://github.com/iBotPeaches/Apktool/issues/2229))
