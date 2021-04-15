@@ -26,7 +26,7 @@ processResources {
   from('src/main/resources/') {
     include '**/*.jar'
   }
-  
+
   includeEmptyDirs = false
 }
 
