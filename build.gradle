@@ -127,7 +127,7 @@ subprojects {
             commons_lang: 'org.apache.commons:commons-lang3:3.12.0',
             guava: 'com.google.guava:guava:30.1.1-jre',
             junit: 'junit:junit:4.13.2',
-            proguard_gradle: 'com.guardsquare:proguard-gradle:7.0.0',
+            proguard_gradle: 'com.guardsquare:proguard-gradle:7.1.0-beta2',
             snakeyaml: 'org.yaml:snakeyaml:1.28:android',
             smali: 'org.smali:smali:2.5.2',
             xmlpull: 'xpp3:xpp3:1.1.4c',
