@@ -98,7 +98,7 @@ if (!('release' in gradle.startParameter.taskNames)) {
         project.ext.set("hash", hash)
         project.ext.set("apktool_version", version + "-" + hash + "-SNAPSHOT")
         mavenVersion = version + "-SNAPSHOT"
-        println "Building SNAPSHOT (" + getCheckedOutBranch() + "): " + hash
+        println "Building SNAPSHOT (${getCheckedOutBranch()}): $hash"
     }
 } else {
     project.ext.set("hash", "")
@@ -108,7 +108,7 @@ if (!('release' in gradle.startParameter.taskNames)) {
         project.ext.set("apktool_version", version)
     }
     mavenVersion = version
-    println "Building RELEASE (" + getCheckedOutBranch() + "): " + project.ext.apktool_version
+    println "Building RELEASE (${getCheckedOutBranch()}): $project.ext.apktool_version"
 }
 
 build.doFirst {
