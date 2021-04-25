@@ -16,11 +16,30 @@ import java.nio.charset.StandardCharsets
  *  limitations under the License.
  */
 buildscript {
+    ext {
+        year = '2010'
+        brut = 'Ryszard Wiśniewski'
+        brutEmail = 'brut.alll@gmail.com'
+        ibot = 'Connor Tumbleson'
+        ibotEmail = 'connor.tumbleson@gmail.com'
+
+        depends = [
+                baksmali       : 'org.smali:baksmali:2.5.2',
+                commons_cli    : 'commons-cli:commons-cli:1.4',
+                commons_io     : 'commons-io:commons-io:2.8.0',
+                commons_lang   : 'org.apache.commons:commons-lang3:3.12.0',
+                guava          : 'com.google.guava:guava:30.1.1-jre',
+                junit          : 'junit:junit:4.13.2',
+                proguard_gradle: 'com.guardsquare:proguard-gradle:7.0.1',
+                snakeyaml      : 'org.yaml:snakeyaml:1.28:android',
+                smali          : 'org.smali:smali:2.5.2',
+                xmlpull        : 'xpp3:xpp3:1.1.4c',
+                xmlunit        : 'xmlunit:xmlunit:1.6',
+        ]
+    }
+
     repositories {
         mavenCentral()
-    }
-    tasks.withType(JavaCompile) {
-        options.encoding = StandardCharsets.UTF_8.toString()
     }
     dependencies {
         classpath 'com.github.jengelman.gradle.plugins:shadow:6.1.0'
@@ -53,21 +72,18 @@ allprojects {
             java = 'SLASHSTAR_STYLE'
         }
         strictCheck true
-
-        ext.year = '2010'
-        ext.brut = 'Ryszard Wiśniewski'
-        ext.brutEmail = 'brut.alll@gmail.com'
-        ext.ibot = 'Connor Tumbleson'
-        ext.ibotEmail = 'connor.tumbleson@gmail.com'
-    }
-
-    tasks.withType(JavaCompile) {
-        options.compilerArgs += ["-Xlint:-options"]
     }
 
     // license plugin automatically fires these tasks, disable them and run them during releases
-    gradle.startParameter.excludedTaskNames += "licenseMain"
-    gradle.startParameter.excludedTaskNames += "licenseTest"
+    gradle.startParameter.excludedTaskNames += [
+            "licenseMain",
+            "licenseTest"
+    ]
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = StandardCharsets.UTF_8.toString()
+    options.compilerArgs += ["-Xlint:-options"]
 }
 
 def mavenVersion = 'unspecified'
@@ -82,7 +98,7 @@ if (!('release' in gradle.startParameter.taskNames)) {
         project.ext.set("hash", hash)
         project.ext.set("apktool_version", version + "-" + hash + "-SNAPSHOT")
         mavenVersion = version + "-SNAPSHOT"
-        println "Building SNAPSHOT (" + getCheckedOutBranch() + "): " + hash
+        println "Building SNAPSHOT (${getCheckedOutBranch()}): $hash"
     }
 } else {
     project.ext.set("hash", "")
@@ -92,7 +108,7 @@ if (!('release' in gradle.startParameter.taskNames)) {
         project.ext.set("apktool_version", version)
     }
     mavenVersion = version
-    println "Building RELEASE (" + getCheckedOutBranch() + "): " + project.ext.apktool_version
+    println "Building RELEASE (${getCheckedOutBranch()}): $project.ext.apktool_version"
 }
 
 build.doFirst {
@@ -118,22 +134,6 @@ task snapshot {
 
 subprojects {
     apply plugin: 'java'
-
-    ext {
-        depends = [
-            baksmali: 'org.smali:baksmali:2.5.2',
-            commons_cli: 'commons-cli:commons-cli:1.4',
-            commons_io: 'commons-io:commons-io:2.8.0',
-            commons_lang: 'org.apache.commons:commons-lang3:3.12.0',
-            guava: 'com.google.guava:guava:30.1.1-jre',
-            junit: 'junit:junit:4.13.2',
-            proguard_gradle: 'com.guardsquare:proguard-gradle:7.0.1',
-            snakeyaml: 'org.yaml:snakeyaml:1.28:android',
-            smali: 'org.smali:smali:2.5.2',
-            xmlpull: 'xpp3:xpp3:1.1.4c',
-            xmlunit: 'xmlunit:xmlunit:1.6',
-        ]
-    }
 
     repositories {
         mavenCentral()
