@@ -10,7 +10,7 @@ These are all the options when decoding an apk.
 <blockquote>Force delete destination directory. Use when trying to decode to a folder that already exists</blockquote>
 <br />
 <strong><kbd>--force-manifest</kbd> - <span class="label label-success">v2.3.1</span> - <span class="label label-info">Used for analysis</span></strong>
-<blockquote>Forces decode of AndroidManifest regardless of decoding of resources flag.</blockquote>
+<blockquote>Forces decode of AndroidManifest regardless of decoding of resources flag. Will more than likely prevent rebuild as used for static analysis of the manifest.</blockquote>
 <br />
 <strong><kbd>--keep-broken-res</kbd></strong> - <span class="label label-danger">Advanced</span>
 <blockquote>If there is an error like "Invalid Config Flags Detected. Dropping Resources...". This means that APK has a different structure then Apktool can handle. This might be a newer Android version or a random APK that doesn't match standards. Running this will allow the decode, but then you have to manually fix the folders with -ERR in them.</blockquote>
