@@ -7,6 +7,17 @@ set java_exe=java.exe
 
 if defined JAVA_HOME (
 set java_exe="%JAVA_HOME%\bin\java.exe"
+) else ( rem in case not defined JAVA_HOME
+rem to work with jre 1.8 installed by IntelliJ IDEA in default folders uncomment the next line (with specific one )
+rem set java_exe= "%UserProfile%\.jdks\corretto-1.8.0_292\jre\bin\java.exe"
+rem to work with any jre installed by IntelliJ IDEA in default folders uncomment the next line
+rem for /d %%D in ("%UserProfile%\.jdks\*") do set java_exe= "%%~fD\jre\bin\java.exe"
+
+rem to work with jdk 16 uncomment the next line (with specific one )
+rem set java_exe= "C:\Program Files\Java\jdk-16.0.1\bin\java.exe"
+rem to work with any jdk present uncomment the next line
+rem set java_exe= "C:\Program Files\Java\j*\bin\java.exe" -dont work
+for /d %%D in ("C:\Program Files\Java\jdk*") do set java_exe= "%%~fD\bin\java.exe"
 )
 
 rem Find the highest version .jar available in the same directory as the script
