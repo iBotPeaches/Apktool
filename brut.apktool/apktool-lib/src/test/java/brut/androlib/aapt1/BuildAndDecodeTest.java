@@ -568,6 +568,11 @@ public class BuildAndDecodeTest extends BaseTest {
     }
 
     @Test
+    public void confirmNestedAssetDirectoriesTest() throws BrutException, IOException {
+        compareBinaryFolder("/assets/Assets", false);
+    }
+
+    @Test
     public void confirmKotlinFolderPersistsTest() {
         checkFolderExists("/kotlin");
     }
