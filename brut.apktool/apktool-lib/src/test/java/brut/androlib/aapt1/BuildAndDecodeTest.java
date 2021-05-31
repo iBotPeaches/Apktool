@@ -495,7 +495,7 @@ public class BuildAndDecodeTest extends BaseTest {
         MetaInfo metaInfo = new Androlib().readMetaFile(sTestNewDir);
 
         for (String item : metaInfo.doNotCompress) {
-            assertFalse(item.equals("jpg"));
+            assertNotEquals("jpg", item);
         }
     }
 

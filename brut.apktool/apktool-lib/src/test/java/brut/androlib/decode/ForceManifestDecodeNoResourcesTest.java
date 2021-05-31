@@ -30,12 +30,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class ForceManifestDecodeNoResourcesTest extends BaseTest {
 
-    private byte[] xmlHeader = new byte[] {
+    private final byte[] xmlHeader = new byte[] {
             0x3C, // <
             0x3F, // ?
             0x78, // x
@@ -68,7 +67,7 @@ public class ForceManifestDecodeNoResourcesTest extends BaseTest {
         // lets probe filetype of manifest, we should detect XML
         File manifestFile = new File(output + File.separator + "AndroidManifest.xml");
         byte[] magic = TestUtils.readHeaderOfFile(manifestFile, 6);
-        assertTrue(Arrays.equals(this.xmlHeader, magic));
+        assertArrayEquals(this.xmlHeader, magic);
 
         // confirm resources.arsc still exists, as its raw
         File resourcesArsc = new File(output + File.separator + "resources.arsc");
@@ -87,7 +86,7 @@ public class ForceManifestDecodeNoResourcesTest extends BaseTest {
         // lets probe filetype of manifest, we should detect XML
         File manifestFile = new File(output + File.separator + "AndroidManifest.xml");
         byte[] magic = TestUtils.readHeaderOfFile(manifestFile, 6);
-        assertTrue(Arrays.equals(this.xmlHeader, magic));
+        assertArrayEquals(this.xmlHeader, magic);
 
         // confirm resources.arsc does not exist
         File resourcesArsc = new File(output + File.separator + "resources.arsc");
@@ -106,7 +105,7 @@ public class ForceManifestDecodeNoResourcesTest extends BaseTest {
         // lets probe filetype of manifest, we should detect XML
         File manifestFile = new File(output + File.separator + "AndroidManifest.xml");
         byte[] magic = TestUtils.readHeaderOfFile(manifestFile, 6);
-        assertTrue(Arrays.equals(this.xmlHeader, magic));
+        assertArrayEquals(this.xmlHeader, magic);
 
         // confirm resources.arsc does not exist
         File resourcesArsc = new File(output + File.separator + "resources.arsc");
