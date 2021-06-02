@@ -49,16 +49,16 @@ final public class AndrolibResources {
         return getResTable(apkFile, true);
     }
 
-    public ResTable getResTable(ExtFile apkFile, boolean loadMainPkg)
+    public ResTable getResTable(ExtFile apkFile, boolean loadPackages)
             throws AndrolibException {
         ResTable resTable = new ResTable(this);
-        if (loadMainPkg) {
-            loadMainPkg(resTable, apkFile);
+        if (loadPackages) {
+            loadPackages(resTable, apkFile);
         }
         return resTable;
     }
 
-    public ResPackage loadMainPkg(ResTable resTable, ExtFile apkFile)
+    public void loadPackages(ResTable resTable, ExtFile apkFile)
             throws AndrolibException {
         LOGGER.info("Loading resource table...");
         ResPackage[] pkgs = getResPackagesFromApk(apkFile, resTable, sKeepBroken);
@@ -89,7 +89,13 @@ final public class AndrolibResources {
         }
 
         resTable.addPackage(pkg, true);
-        return pkg;
+
+        // Load non main packages.
+        for (ResPackage _pkg: pkgs) {
+            if (! resTable.listMainPackages().contains(_pkg)) {
+                resTable.addPackage(_pkg, false);
+            }
+        }
     }
 
     public ResPackage selectPkgWithMostResSpecs(ResPackage[] pkgs) {
@@ -144,9 +150,7 @@ final public class AndrolibResources {
         // Set ResAttrDecoder
         duo.m2.setAttrDecoder(new ResAttrDecoder());
         ResAttrDecoder attrDecoder = duo.m2.getAttrDecoder();
-
-        // Fake ResPackage
-        attrDecoder.setCurrentPackage(new ResPackage(resTable, 0, null));
+        attrDecoder.setResTable(resTable);
 
         Directory inApk, out;
         try {
@@ -188,8 +192,7 @@ final public class AndrolibResources {
         Duo<ResFileDecoder, AXmlResourceParser> duo = getResFileDecoder();
         ResFileDecoder fileDecoder = duo.m1;
         ResAttrDecoder attrDecoder = duo.m2.getAttrDecoder();
-
-        attrDecoder.setCurrentPackage(resTable.listMainPackages().iterator().next());
+        attrDecoder.setResTable(resTable);
 
         Directory inApk, in = null, out;
         try {
@@ -223,8 +226,7 @@ final public class AndrolibResources {
         Duo<ResFileDecoder, AXmlResourceParser> duo = getResFileDecoder();
         ResFileDecoder fileDecoder = duo.m1;
         ResAttrDecoder attrDecoder = duo.m2.getAttrDecoder();
-
-        attrDecoder.setCurrentPackage(resTable.listMainPackages().iterator().next());
+        attrDecoder.setResTable(resTable);
         Directory inApk, in = null, out;
 
         try {
@@ -246,9 +248,9 @@ final public class AndrolibResources {
         }
 
         ExtMXSerializer xmlSerializer = getResXmlSerializer();
-        for (ResPackage pkg : resTable.listMainPackages()) {
-            attrDecoder.setCurrentPackage(pkg);
+        attrDecoder.setResTable(resTable);
 
+        for (ResPackage pkg : resTable.listMainPackages()) {
             LOGGER.info("Decoding file-resources...");
             for (ResResource res : pkg.listFiles()) {
                 fileDecoder.decode(res, in, out);
@@ -902,7 +904,7 @@ final public class AndrolibResources {
             out.putNextEntry(entry);
             out.write(data);
             out.closeEntry();
-            
+
             //Write fake AndroidManifest.xml file to support original aapt
             entry = zip.getEntry("AndroidManifest.xml");
             if (entry != null) {
