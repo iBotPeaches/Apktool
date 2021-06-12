@@ -31,5 +31,5 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v2
         with:
-          name: apktool.jar.zip
+          name: apktool.jar
           path: brut.apktool/apktool-cli/build/libs/apktool-*-small.jar
