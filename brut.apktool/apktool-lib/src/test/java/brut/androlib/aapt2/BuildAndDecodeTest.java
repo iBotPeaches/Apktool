@@ -123,6 +123,11 @@ public class BuildAndDecodeTest extends BaseTest {
     }
 
     @Test
+    public void confirmNestedAssetDirectoriesTest() throws BrutException, IOException {
+        compareBinaryFolder("/assets/Assets", false);
+    }
+
+    @Test
     public void multipleDexTest() throws BrutException, IOException {
         compareBinaryFolder("/smali_classes2", false);
         compareBinaryFolder("/smali_classes3", false);
