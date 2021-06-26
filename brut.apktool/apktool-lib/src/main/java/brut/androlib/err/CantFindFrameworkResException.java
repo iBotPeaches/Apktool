@@ -27,5 +27,10 @@ public class CantFindFrameworkResException extends AndrolibException {
 		return mPkgId;
 	}
 
+	@Override
+	public String getMessage() {
+		return String.format("Can't find framework resources for package of id: %d", this.getPkgId());
+	}
+
 	private final int mPkgId;
 }
