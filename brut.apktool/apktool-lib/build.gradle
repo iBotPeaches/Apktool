@@ -28,14 +28,12 @@ processResources {
     include '**/*.jar'
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
   }
-  
+
   includeEmptyDirs = false
 }
 
 dependencies {
-    testImplementation("junit:junit:4.10") {
-        exclude(module: 'hamcrest-core')
-    }
+    testImplementation depends.junit
 
     api project(':brut.j.dir'),
         project(':brut.j.util'),

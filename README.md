@@ -11,7 +11,7 @@ It is NOT intended for piracy and other non-legal uses. It could be used for loc
 
 #### Support
 - [Project Page](https://ibotpeaches.github.io/Apktool/)
-- [#apktool on freenode](http://webchat.freenode.net/?channels=apktool)
+- [#apktool on libera.chat](https://web.libera.chat/)
 
 #### Sponsored by
 
@@ -32,7 +32,7 @@ If you discover a security vulnerability within Apktool, please send an e-mail t
 - [Documentation](https://ibotpeaches.github.io/Apktool/documentation/)
 - [Bug Reports](https://github.com/iBotPeaches/Apktool/issues)
 - [Chat on Gitter](https://gitter.im/iBotPeaches/Apktool)
-- [Changelog/Information](http://ibotpeaches.github.io/Apktool/changes/)
+- [Changelog/Information](https://ibotpeaches.github.io/Apktool/changes/)
 - [XDA Post](https://forum.xda-developers.com/t/util-dec-2-2020-apktool-tool-for-reverse-engineering-apk-files.1755243/)
 - [Source (Github)](https://github.com/iBotPeaches/Apktool)
 - [Source (Bitbucket)](https://bitbucket.org/iBotPeaches/apktool/)

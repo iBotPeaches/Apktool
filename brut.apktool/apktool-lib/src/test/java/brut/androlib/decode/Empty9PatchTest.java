@@ -29,6 +29,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class Empty9PatchTest extends BaseTest {
@@ -58,6 +59,6 @@ public class Empty9PatchTest extends BaseTest {
 
         File aPng =  new File(sTestOrigDir,"res/drawable-xhdpi/empty.9.png");
         assertTrue(aPng.isFile());
-        assertTrue(aPng.length() == 0);
+        assertEquals(0, aPng.length());
     }
 }

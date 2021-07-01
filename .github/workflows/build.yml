@@ -1,0 +1,35 @@
+name: Build
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Build apktool.jar
+
+    steps:
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ matrix.java }}-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: ${{ runner.os }}-${{ matrix.java }}-gradle-
+
+      - uses: actions/checkout@v2
+
+      - name: Set up JDK 10
+        uses: actions/setup-java@v1
+        with:
+          java-version: 10
+
+      - name: Build
+        run: ./gradlew build shadowJar proguard
+
+      - name: Upload
+        uses: actions/upload-artifact@v2
+        with:
+          name: apktool.jar
+          path: brut.apktool/apktool-cli/build/libs/apktool-*-small.jar
