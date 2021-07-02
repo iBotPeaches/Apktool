@@ -22,9 +22,11 @@ processResources {
     include '**/*.properties'
     into 'properties'
     filter(ReplaceTokens, tokens: [version: project.apktool_version, gitrev: project.hash] )
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
   }
   from('src/main/resources/') {
     include '**/*.jar'
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
   }
 
   includeEmptyDirs = false

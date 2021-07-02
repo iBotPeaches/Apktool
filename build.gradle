@@ -26,12 +26,12 @@ buildscript {
         depends = [
                 baksmali       : 'org.smali:baksmali:2.5.2',
                 commons_cli    : 'commons-cli:commons-cli:1.4',
-                commons_io     : 'commons-io:commons-io:2.8.0',
+                commons_io     : 'commons-io:commons-io:2.10.0',
                 commons_lang   : 'org.apache.commons:commons-lang3:3.12.0',
                 guava          : 'com.google.guava:guava:30.1.1-jre',
                 junit          : 'junit:junit:4.13.2',
-                proguard_gradle: 'com.guardsquare:proguard-gradle:7.0.1',
-                snakeyaml      : 'org.yaml:snakeyaml:1.28:android',
+                proguard_gradle: 'com.guardsquare:proguard-gradle:7.1.0',
+                snakeyaml      : 'org.yaml:snakeyaml:1.29:android',
                 smali          : 'org.smali:smali:2.5.2',
                 xmlpull        : 'xpp3:xpp3:1.1.4c',
                 xmlunit        : 'xmlunit:xmlunit:1.6',
@@ -47,7 +47,7 @@ buildscript {
 }
 
 plugins {
-    id 'com.github.hierynomus.license' version '0.15.0'
+    id 'com.github.hierynomus.license' version '0.16.1'
 }
 
 apply from: 'gradle/functions.gradle'
