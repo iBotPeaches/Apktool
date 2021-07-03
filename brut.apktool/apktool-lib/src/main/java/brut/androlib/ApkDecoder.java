@@ -71,10 +71,6 @@ public class ApkDecoder {
         mOutDir = outDir;
     }
 
-    public void setApiLevel(int apiLevel) {
-        mApiLevel = apiLevel;
-    }
-
     public void decode() throws AndrolibException, IOException, DirectoryException {
         try {
             File outDir = getOutDir();
@@ -219,6 +215,10 @@ public class ApkDecoder {
         if (mResTable != null) {
             mResTable.setAnalysisMode(mode);
         }
+    }
+
+    public void setApiLevel(int apiLevel) {
+        mApiLevel = apiLevel;
     }
 
     public void setBaksmaliDebugMode(boolean bakDeb) {
@@ -420,11 +420,11 @@ public class ApkDecoder {
         meta.versionInfo = info;
     }
 
-    private void putSharedLibraryInfo(MetaInfo meta) {
+    private void putSharedLibraryInfo(MetaInfo meta) throws AndrolibException {
         meta.sharedLibrary = mResTable.getSharedLibrary();
     }
 
-    private void putSparseResourcesInfo(MetaInfo meta) {
+    private void putSparseResourcesInfo(MetaInfo meta) throws AndrolibException {
         meta.sparseResources = mResTable.getSparseResources();
     }
 
@@ -454,5 +454,5 @@ public class ApkDecoder {
     private boolean mBakDeb = true;
     private Collection<String> mUncompressedFiles;
     private boolean mAnalysisMode = false;
-    private int mApiLevel = 15;
+    private int mApiLevel = 0;
 }
