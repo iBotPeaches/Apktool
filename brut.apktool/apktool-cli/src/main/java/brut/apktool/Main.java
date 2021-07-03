@@ -149,7 +149,7 @@ public class Main {
             decoder.setFrameworkDir(cli.getOptionValue("p"));
         }
         if (cli.hasOption("m") || cli.hasOption("match-original")) {
-            decoder.setAnalysisMode(true, false);
+            decoder.setAnalysisMode(true);
         }
         if (cli.hasOption("api") || cli.hasOption("api-level")) {
             decoder.setApiLevel(Integer.parseInt(cli.getOptionValue("api")));

@@ -103,7 +103,6 @@ public class ApkDecoder {
                         mAndrolib.decodeResourcesRaw(mApkFile, outDir);
                         if (mForceDecodeManifest == FORCE_DECODE_MANIFEST_FULL) {
                             setTargetSdkVersion();
-                            setAnalysisMode(mAnalysisMode, true);
 
                             // done after raw decoding of resources because copyToDir overwrites dest files
                             if (hasManifest()) {
@@ -113,7 +112,6 @@ public class ApkDecoder {
                         break;
                     case DECODE_RESOURCES_FULL:
                         setTargetSdkVersion();
-                        setAnalysisMode(mAnalysisMode, true);
 
                         if (hasManifest()) {
                             mAndrolib.decodeManifestWithResources(mApkFile, outDir, getResTable());
@@ -216,14 +214,10 @@ public class ApkDecoder {
         mDecodeAssets = mode;
     }
 
-    public void setAnalysisMode(boolean mode, boolean pass) throws AndrolibException{
+    public void setAnalysisMode(boolean mode) {
         mAnalysisMode = mode;
 
-        // only set mResTable, once it exists
-        if (pass) {
-            if (mResTable == null) {
-                mResTable = getResTable();
-            }
+        if (mResTable != null) {
             mResTable.setAnalysisMode(mode);
         }
     }
@@ -268,6 +262,7 @@ public class ApkDecoder {
                         "Apk doesn't contain either AndroidManifest.xml file or resources.arsc file");
             }
             mResTable = mAndrolib.getResTable(mApkFile, hasResources);
+            mResTable.setAnalysisMode(mAnalysisMode);
         }
         return mResTable;
     }
