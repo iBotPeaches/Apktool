@@ -93,9 +93,6 @@ public class ApkDecoder {
 
             LOGGER.info("Using Apktool " + Androlib.getVersion() + " on " + mApkFile.getName());
 
-            // recreate the resource table in case it was already created
-            mResTable = null;
-
             if (hasResources()) {
                 switch (mDecodeResources) {
                     case DECODE_RESOURCES_NONE:
