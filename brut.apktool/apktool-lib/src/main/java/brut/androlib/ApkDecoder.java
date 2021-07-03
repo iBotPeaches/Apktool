@@ -102,8 +102,6 @@ public class ApkDecoder {
                     case DECODE_RESOURCES_NONE:
                         mAndrolib.decodeResourcesRaw(mApkFile, outDir);
                         if (mForceDecodeManifest == FORCE_DECODE_MANIFEST_FULL) {
-                            setTargetSdkVersion();
-
                             // done after raw decoding of resources because copyToDir overwrites dest files
                             if (hasManifest()) {
                                 mAndrolib.decodeManifestWithResources(mApkFile, outDir, getResTable());
@@ -111,8 +109,6 @@ public class ApkDecoder {
                         }
                         break;
                     case DECODE_RESOURCES_FULL:
-                        setTargetSdkVersion();
-
                         if (hasManifest()) {
                             mAndrolib.decodeManifestWithResources(mApkFile, outDir, getResTable());
                         }
@@ -219,17 +215,6 @@ public class ApkDecoder {
 
         if (mResTable != null) {
             mResTable.setAnalysisMode(mode);
-        }
-    }
-
-    public void setTargetSdkVersion() throws AndrolibException {
-        if (mResTable == null) {
-            mResTable = mAndrolib.getResTable(mApkFile);
-        }
-
-        Map<String, String> sdkInfo = mResTable.getSdkInfo();
-        if (sdkInfo.get("targetSdkVersion") != null) {
-            mApiLevel = Integer.parseInt(sdkInfo.get("targetSdkVersion"));
         }
     }
 
