@@ -152,7 +152,7 @@ public class Main {
             decoder.setAnalysisMode(true, false);
         }
         if (cli.hasOption("api") || cli.hasOption("api-level")) {
-            decoder.setApi(Integer.parseInt(cli.getOptionValue("api")));
+            decoder.setApiLevel(Integer.parseInt(cli.getOptionValue("api")));
         }
         if (cli.hasOption("o") || cli.hasOption("output")) {
             outDir = new File(cli.getOptionValue("o"));

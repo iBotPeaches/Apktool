@@ -71,8 +71,8 @@ public class ApkDecoder {
         mOutDir = outDir;
     }
 
-    public void setApi(int api) {
-        mApi = api;
+    public void setApiLevel(int apiLevel) {
+        mApiLevel = apiLevel;
     }
 
     public void decode() throws AndrolibException, IOException, DirectoryException {
@@ -142,7 +142,7 @@ public class ApkDecoder {
                         break;
                     case DECODE_SOURCES_SMALI:
                     case DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES:
-                        mAndrolib.decodeSourcesSmali(mApkFile, outDir, "classes.dex", mBakDeb, mApi);
+                        mAndrolib.decodeSourcesSmali(mApkFile, outDir, "classes.dex", mBakDeb, mApiLevel);
                         break;
                 }
             }
@@ -158,11 +158,11 @@ public class ApkDecoder {
                                     mAndrolib.decodeSourcesRaw(mApkFile, outDir, file);
                                     break;
                                 case DECODE_SOURCES_SMALI:
-                                    mAndrolib.decodeSourcesSmali(mApkFile, outDir, file, mBakDeb, mApi);
+                                    mAndrolib.decodeSourcesSmali(mApkFile, outDir, file, mBakDeb, mApiLevel);
                                     break;
                                 case DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES:
                                     if (file.startsWith("classes") && file.endsWith(".dex")) {
-                                        mAndrolib.decodeSourcesSmali(mApkFile, outDir, file, mBakDeb, mApi);
+                                        mAndrolib.decodeSourcesSmali(mApkFile, outDir, file, mBakDeb, mApiLevel);
                                     } else {
                                         mAndrolib.decodeSourcesRaw(mApkFile, outDir, file);
                                     }
@@ -235,12 +235,12 @@ public class ApkDecoder {
 
         Map<String, String> sdkInfo = mResTable.getSdkInfo();
         if (sdkInfo.get("targetSdkVersion") != null) {
-            mApi = Integer.parseInt(sdkInfo.get("targetSdkVersion"));
+            mApiLevel = Integer.parseInt(sdkInfo.get("targetSdkVersion"));
         }
     }
 
-    public void setBaksmaliDebugMode(boolean bakdeb) {
-        mBakDeb = bakdeb;
+    public void setBaksmaliDebugMode(boolean bakDeb) {
+        mBakDeb = bakDeb;
     }
 
     public void setForceDelete(boolean forceDelete) {
@@ -471,5 +471,5 @@ public class ApkDecoder {
     private boolean mBakDeb = true;
     private Collection<String> mUncompressedFiles;
     private boolean mAnalysisMode = false;
-    private int mApi = 15;
+    private int mApiLevel = 15;
 }

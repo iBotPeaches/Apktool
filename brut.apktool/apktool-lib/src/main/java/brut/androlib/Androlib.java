@@ -81,7 +81,7 @@ public class Androlib {
         }
     }
 
-    public void decodeSourcesSmali(File apkFile, File outDir, String filename, boolean bakdeb, int api)
+    public void decodeSourcesSmali(File apkFile, File outDir, String filename, boolean bakDeb, int apiLevel)
             throws AndrolibException {
         try {
             File smaliDir;
@@ -93,7 +93,7 @@ public class Androlib {
             OS.rmdir(smaliDir);
             smaliDir.mkdirs();
             LOGGER.info("Baksmaling " + filename + "...");
-            SmaliDecoder.decode(apkFile, smaliDir, filename, bakdeb, api);
+            SmaliDecoder.decode(apkFile, smaliDir, filename, bakDeb, apiLevel);
         } catch (BrutException ex) {
             throw new AndrolibException(ex);
         }

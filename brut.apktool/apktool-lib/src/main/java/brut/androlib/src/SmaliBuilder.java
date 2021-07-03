@@ -85,7 +85,7 @@ public class SmaliBuilder {
 
     private final ExtFile mSmaliDir;
     private final File mDexFile;
-    private int mApiLevel = 0;
+    private final int mApiLevel;
 
     private final static Logger LOGGER = Logger.getLogger(SmaliBuilder.class.getName());
 }
