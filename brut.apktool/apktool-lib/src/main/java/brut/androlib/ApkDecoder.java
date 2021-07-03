@@ -67,7 +67,7 @@ public class ApkDecoder {
         mResTable = null;
     }
 
-    public void setOutDir(File outDir) throws AndrolibException {
+    public void setOutDir(File outDir) {
         mOutDir = outDir;
     }
 
@@ -342,7 +342,7 @@ public class ApkDecoder {
         mAndrolib.writeMetaFile(mOutDir, meta);
     }
 
-    private void putUsesFramework(MetaInfo meta) throws AndrolibException {
+    private void putUsesFramework(MetaInfo meta) {
         Set<ResPackage> pkgs = mResTable.listFramePackages();
         if (pkgs.isEmpty()) {
             return;
@@ -363,7 +363,7 @@ public class ApkDecoder {
         }
     }
 
-    private void putSdkInfo(MetaInfo meta) throws AndrolibException {
+    private void putSdkInfo(MetaInfo meta) {
         Map<String, String> info = mResTable.getSdkInfo();
         if (info.size() > 0) {
             String refValue;
@@ -411,7 +411,7 @@ public class ApkDecoder {
         meta.packageInfo.forcedPackageId = String.valueOf(id);
     }
 
-    private void putVersionInfo(MetaInfo meta) throws AndrolibException {
+    private void putVersionInfo(MetaInfo meta) {
         VersionInfo info = mResTable.getVersionInfo();
         String refValue = ResXmlPatcher.pullValueFromStrings(mOutDir, info.versionName);
         if (refValue != null) {
@@ -420,11 +420,11 @@ public class ApkDecoder {
         meta.versionInfo = info;
     }
 
-    private void putSharedLibraryInfo(MetaInfo meta) throws AndrolibException {
+    private void putSharedLibraryInfo(MetaInfo meta) {
         meta.sharedLibrary = mResTable.getSharedLibrary();
     }
 
-    private void putSparseResourcesInfo(MetaInfo meta) throws AndrolibException {
+    private void putSparseResourcesInfo(MetaInfo meta) {
         meta.sparseResources = mResTable.getSparseResources();
     }
 
