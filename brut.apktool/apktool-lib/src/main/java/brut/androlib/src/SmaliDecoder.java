@@ -31,17 +31,17 @@ import java.io.IOException;
 
 public class SmaliDecoder {
 
-    public static void decode(File apkFile, File outDir, String dexName, boolean bakdeb, int api)
+    public static void decode(File apkFile, File outDir, String dexName, boolean bakDeb, int apiLevel)
             throws AndrolibException {
-        new SmaliDecoder(apkFile, outDir, dexName, bakdeb, api).decode();
+        new SmaliDecoder(apkFile, outDir, dexName, bakDeb, apiLevel).decode();
     }
 
-    private SmaliDecoder(File apkFile, File outDir, String dexName, boolean bakdeb, int api) {
+    private SmaliDecoder(File apkFile, File outDir, String dexName, boolean bakDeb, int apiLevel) {
         mApkFile = apkFile;
-        mOutDir  = outDir;
+        mOutDir = outDir;
         mDexFile = dexName;
-        mBakDeb  = bakdeb;
-        mApi     = api;
+        mBakDeb = bakDeb;
+        mApiLevel = apiLevel;
     }
 
     private void decode() throws AndrolibException {
@@ -67,7 +67,7 @@ public class SmaliDecoder {
             }
 
             // create the container
-            MultiDexContainer<? extends DexBackedDexFile> container = DexFileFactory.loadDexContainer(mApkFile, Opcodes.forApi(mApi));
+            MultiDexContainer<? extends DexBackedDexFile> container = DexFileFactory.loadDexContainer(mApkFile, mApiLevel > 0 ? Opcodes.forApi(mApiLevel) : null);
             MultiDexContainer.DexEntry<? extends DexBackedDexFile> dexEntry;
             DexBackedDexFile dexFile;
 
@@ -105,5 +105,5 @@ public class SmaliDecoder {
     private final File mOutDir;
     private final String mDexFile;
     private final boolean mBakDeb;
-    private final int mApi;
+    private final int mApiLevel;
 }

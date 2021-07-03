@@ -149,10 +149,10 @@ public class Main {
             decoder.setFrameworkDir(cli.getOptionValue("p"));
         }
         if (cli.hasOption("m") || cli.hasOption("match-original")) {
-            decoder.setAnalysisMode(true, false);
+            decoder.setAnalysisMode(true);
         }
         if (cli.hasOption("api") || cli.hasOption("api-level")) {
-            decoder.setApi(Integer.parseInt(cli.getOptionValue("api")));
+            decoder.setApiLevel(Integer.parseInt(cli.getOptionValue("api")));
         }
         if (cli.hasOption("o") || cli.hasOption("output")) {
             outDir = new File(cli.getOptionValue("o"));

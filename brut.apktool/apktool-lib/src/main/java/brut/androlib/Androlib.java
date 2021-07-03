@@ -31,8 +31,7 @@ import brut.androlib.src.SmaliBuilder;
 import brut.androlib.src.SmaliDecoder;
 import brut.common.BrutException;
 import brut.directory.*;
-import brut.util.BrutIO;
-import brut.util.OS;
+import brut.util.*;
 import java.io.*;
 import java.util.*;
 import java.util.logging.Logger;
@@ -81,7 +80,7 @@ public class Androlib {
         }
     }
 
-    public void decodeSourcesSmali(File apkFile, File outDir, String filename, boolean bakdeb, int api)
+    public void decodeSourcesSmali(File apkFile, File outDir, String filename, boolean bakDeb, int apiLevel)
             throws AndrolibException {
         try {
             File smaliDir;
@@ -93,7 +92,7 @@ public class Androlib {
             OS.rmdir(smaliDir);
             smaliDir.mkdirs();
             LOGGER.info("Baksmaling " + filename + "...");
-            SmaliDecoder.decode(apkFile, smaliDir, filename, bakdeb, api);
+            SmaliDecoder.decode(apkFile, smaliDir, filename, bakDeb, apiLevel);
         } catch (BrutException ex) {
             throw new AndrolibException(ex);
         }
@@ -193,7 +192,7 @@ public class Androlib {
         return false;
     }
 
-    public void decodeUnknownFiles(ExtFile apkFile, File outDir, ResTable resTable)
+    public void decodeUnknownFiles(ExtFile apkFile, File outDir)
             throws AndrolibException {
         LOGGER.info("Copying unknown files...");
         File unknownOut = new File(outDir, UNK_DIRNAME);
