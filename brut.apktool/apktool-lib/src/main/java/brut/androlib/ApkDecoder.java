@@ -97,6 +97,9 @@ public class ApkDecoder {
 
             LOGGER.info("Using Apktool " + Androlib.getVersion() + " on " + mApkFile.getName());
 
+            // recreate the resource table in case it was already created
+            mResTable = null;
+
             if (hasResources()) {
                 switch (mDecodeResources) {
                     case DECODE_RESOURCES_NONE:
@@ -168,7 +171,7 @@ public class ApkDecoder {
             }
 
             mAndrolib.decodeRawFiles(mApkFile, outDir, mDecodeAssets);
-            mAndrolib.decodeUnknownFiles(mApkFile, outDir, mResTable);
+            mAndrolib.decodeUnknownFiles(mApkFile, outDir);
             mUncompressedFiles = new ArrayList<String>();
             mAndrolib.recordUncompressedFiles(mApkFile, mUncompressedFiles);
             mAndrolib.writeOriginalFiles(mApkFile, outDir);
@@ -324,8 +327,8 @@ public class ApkDecoder {
         meta.version = Androlib.getVersion();
         meta.apkFileName = mApkFile.getName();
 
-        if (mDecodeResources != DECODE_RESOURCES_NONE && (hasManifest() || hasResources())) {
-            meta.isFrameworkApk = mAndrolib.isFrameworkApk(getResTable());
+        if (mResTable != null) {
+            meta.isFrameworkApk = mAndrolib.isFrameworkApk(mResTable);
             putUsesFramework(meta);
             putSdkInfo(meta);
             putPackageInfo(meta);
@@ -340,7 +343,7 @@ public class ApkDecoder {
     }
 
     private void putUsesFramework(MetaInfo meta) throws AndrolibException {
-        Set<ResPackage> pkgs = getResTable().listFramePackages();
+        Set<ResPackage> pkgs = mResTable.listFramePackages();
         if (pkgs.isEmpty()) {
             return;
         }
@@ -361,7 +364,7 @@ public class ApkDecoder {
     }
 
     private void putSdkInfo(MetaInfo meta) throws AndrolibException {
-        Map<String, String> info = getResTable().getSdkInfo();
+        Map<String, String> info = mResTable.getSdkInfo();
         if (info.size() > 0) {
             String refValue;
             if (info.get("minSdkVersion") != null) {
@@ -387,12 +390,12 @@ public class ApkDecoder {
     }
 
     private void putPackageInfo(MetaInfo meta) throws AndrolibException {
-        String renamed = getResTable().getPackageRenamed();
-        String original = getResTable().getPackageOriginal();
+        String renamed = mResTable.getPackageRenamed();
+        String original = mResTable.getPackageOriginal();
 
-        int id = getResTable().getPackageId();
+        int id = mResTable.getPackageId();
         try {
-            id = getResTable().getPackage(renamed).getId();
+            id = mResTable.getPackage(renamed).getId();
         } catch (UndefinedResObjectException ignored) {}
 
         if (Strings.isNullOrEmpty(original)) {
@@ -409,12 +412,20 @@ public class ApkDecoder {
     }
 
     private void putVersionInfo(MetaInfo meta) throws AndrolibException {
-        VersionInfo info = getResTable().getVersionInfo();
+        VersionInfo info = mResTable.getVersionInfo();
         String refValue = ResXmlPatcher.pullValueFromStrings(mOutDir, info.versionName);
         if (refValue != null) {
             info.versionName = refValue;
         }
         meta.versionInfo = info;
+    }
+
+    private void putSharedLibraryInfo(MetaInfo meta) {
+        meta.sharedLibrary = mResTable.getSharedLibrary();
+    }
+
+    private void putSparseResourcesInfo(MetaInfo meta) {
+        meta.sparseResources = mResTable.getSparseResources();
     }
 
     private void putUnknownInfo(MetaInfo meta) {
@@ -425,14 +436,6 @@ public class ApkDecoder {
         if (mUncompressedFiles != null && !mUncompressedFiles.isEmpty()) {
             meta.doNotCompress = mUncompressedFiles;
         }
-    }
-
-    private void putSparseResourcesInfo(MetaInfo meta) {
-        meta.sparseResources = mResTable.getSparseResources();
-    }
-
-    private void putSharedLibraryInfo(MetaInfo meta) {
-        meta.sharedLibrary = mResTable.getSharedLibrary();
     }
 
     private final Androlib mAndrolib;
