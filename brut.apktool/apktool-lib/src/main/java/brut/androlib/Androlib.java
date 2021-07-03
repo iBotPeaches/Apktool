@@ -50,14 +50,13 @@ public class Androlib {
     public ApkOptions apkOptions;
     private int mMinSdkVersion = 0;
 
+    public Androlib() {
+        this(new ApkOptions());
+    }
+
     public Androlib(ApkOptions apkOptions) {
         this.apkOptions = apkOptions;
         mAndRes.apkOptions = apkOptions;
-    }
-
-    public Androlib() {
-        this.apkOptions = new ApkOptions();
-        mAndRes.apkOptions = this.apkOptions;
     }
 
     public ResTable getResTable(ExtFile apkFile)
@@ -68,6 +67,10 @@ public class Androlib {
     public ResTable getResTable(ExtFile apkFile, boolean loadMainPkg)
             throws AndrolibException {
         return mAndRes.getResTable(apkFile, loadMainPkg);
+    }
+
+    public int getMinSdkVersion() {
+        return mMinSdkVersion;
     }
 
     public void decodeSourcesRaw(ExtFile apkFile, File outDir, String filename)
@@ -92,7 +95,10 @@ public class Androlib {
             OS.rmdir(smaliDir);
             smaliDir.mkdirs();
             LOGGER.info("Baksmaling " + filename + "...");
-            SmaliDecoder.decode(apkFile, smaliDir, filename, bakDeb, apiLevel);
+            apiLevel = SmaliDecoder.decode(apkFile, smaliDir, filename, bakDeb, apiLevel);
+            if (mMinSdkVersion == 0 || mMinSdkVersion > apiLevel) {
+                mMinSdkVersion = apiLevel;
+            }
         } catch (BrutException ex) {
             throw new AndrolibException(ex);
         }
@@ -809,5 +815,5 @@ public class Androlib {
             "lib", "libs", "assets", "META-INF", "kotlin" };
     private final static Pattern NO_COMPRESS_PATTERN = Pattern.compile("(" +
             "jpg|jpeg|png|gif|wav|mp2|mp3|ogg|aac|mpg|mpeg|mid|midi|smf|jet|rtttl|imy|xmf|mp4|" +
-            "m4a|m4v|3gp|3gpp|3g2|3gpp2|amr|awb|wma|wmv|webm|mkv)$");
+            "m4a|m4v|3gp|3gpp|3g2|3gpp2|amr|awb|wma|wmv|webm|webp|mkv)$");
 }

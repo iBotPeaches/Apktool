@@ -332,6 +332,8 @@ public class ApkDecoder {
             putVersionInfo(meta);
             putSharedLibraryInfo(meta);
             putSparseResourcesInfo(meta);
+        } else {
+            putMinSdkInfo(meta);
         }
         putUnknownInfo(meta);
         putFileCompressionInfo(meta);
@@ -383,6 +385,15 @@ public class ApkDecoder {
                 }
             }
             meta.sdkInfo = info;
+        }
+    }
+
+    private void putMinSdkInfo(MetaInfo meta) {
+        int minSdkVersion = mAndrolib.getMinSdkVersion();
+        if (minSdkVersion > 0) {
+            Map<String, String> sdkInfo = new LinkedHashMap<>();
+            sdkInfo.put("minSdkVersion", Integer.toString(minSdkVersion));
+            meta.sdkInfo = sdkInfo;
         }
     }
 

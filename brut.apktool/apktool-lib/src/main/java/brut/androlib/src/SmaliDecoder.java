@@ -31,9 +31,9 @@ import java.io.IOException;
 
 public class SmaliDecoder {
 
-    public static void decode(File apkFile, File outDir, String dexName, boolean bakDeb, int apiLevel)
+    public static int decode(File apkFile, File outDir, String dexName, boolean bakDeb, int apiLevel)
             throws AndrolibException {
-        new SmaliDecoder(apkFile, outDir, dexName, bakDeb, apiLevel).decode();
+        return new SmaliDecoder(apkFile, outDir, dexName, bakDeb, apiLevel).decode();
     }
 
     private SmaliDecoder(File apkFile, File outDir, String dexName, boolean bakDeb, int apiLevel) {
@@ -44,7 +44,7 @@ public class SmaliDecoder {
         mApiLevel = apiLevel;
     }
 
-    private void decode() throws AndrolibException {
+    private int decode() throws AndrolibException {
         try {
             final BaksmaliOptions options = new BaksmaliOptions();
 
@@ -96,6 +96,8 @@ public class SmaliDecoder {
             }
 
             Baksmali.disassembleDexFile(dexFile, mOutDir, jobs, options);
+
+            return dexFile.getOpcodes().api;
         } catch (IOException ex) {
             throw new AndrolibException(ex);
         }
