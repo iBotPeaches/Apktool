@@ -32,6 +32,10 @@ import brut.androlib.src.SmaliDecoder;
 import brut.common.BrutException;
 import brut.directory.*;
 import brut.util.*;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.jf.dexlib2.iface.DexFile;
+
 import java.io.*;
 import java.util.*;
 import java.util.logging.Logger;
@@ -40,9 +44,6 @@ import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 
 public class Androlib {
     private final AndrolibResources mAndRes = new AndrolibResources();
@@ -95,9 +96,10 @@ public class Androlib {
             OS.rmdir(smaliDir);
             smaliDir.mkdirs();
             LOGGER.info("Baksmaling " + filename + "...");
-            apiLevel = SmaliDecoder.decode(apkFile, smaliDir, filename, bakDeb, apiLevel);
-            if (mMinSdkVersion == 0 || mMinSdkVersion > apiLevel) {
-                mMinSdkVersion = apiLevel;
+            DexFile dexFile = SmaliDecoder.decode(apkFile, smaliDir, filename, bakDeb, apiLevel);
+            int minSdkVersion = dexFile.getOpcodes().api;
+            if (mMinSdkVersion == 0 || mMinSdkVersion > minSdkVersion) {
+                mMinSdkVersion = minSdkVersion;
             }
         } catch (BrutException ex) {
             throw new AndrolibException(ex);
