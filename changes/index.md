@@ -18,7 +18,9 @@ description: Apktool - Changelog / Roadmap
  * Upgrade to `commons-io 2.10.0` (Thanks Goooler)
  * Upgrade to `proguard 7.1.0` (Thanks Goooler)
  * Upgrade to `license.hierynomus 0.16.1` (Thanks Gooler)
- * Updated aapt2 with patches for `attr-private` and remove reserved pkgIds. (Thanks MrIkso)
+ * Upgrade aapt2 with patches for `attr-private` and remove reserved pkgIds. (Thanks MrIkso)
+ * Add lazy init for ResTable for optimizations. ([Issue 2604](https://github.com/iBotPeaches/Apktool/pull/2604)) / (Thanks IgorEisberg)
+ * Add automatic disassemble/assemble JAR files without specifying api level. ([Issue 2605](https://github.com/iBotPeaches/Apktool/pull/2605)) / (Thanks IgorEisberg)
  * Changed zipslip exceptions to skip file instead of exit on failure. ([Issue 2201](https://github.com/iBotPeaches/Apktool/issues/2201))
  * Changed dummy resource names to `APKTOOL_DUPLICATE_{Type}_{RESID}` to prevent starting with numeric ([Issue 2229](https://github.com/iBotPeaches/Apktool/issues/2229))
  * Fix decoding issue requiring specific order of chunks (library/table). ([Issue 2099](https://github.com/iBotPeaches/Apktool/issues/2099)) / (Thanks LoyieKing)
@@ -28,7 +30,6 @@ description: Apktool - Changelog / Roadmap
  * Fix Android 11 dex NPE due to hidden api restriction flags. ([Issue 2499](https://github.com/iBotPeaches/Apktool/issues/2499)) / (Thanks JesusFreke)
  * Reduce code smell failures. ([Issue 2554](https://github.com/iBotPeaches/Apktool/pull/2554)) / (Thanks matteobaccan)
  * Reduce code smells & correct improper opcode use for baksmali. ([Issue 2604](https://github.com/iBotPeaches/Apktool/pull/2604)) / (Thanks IgorEisberg)
- * Introduce lazy init for ResTable for optimizations. ([Issue 2604](https://github.com/iBotPeaches/Apktool/pull/2604)) / (Thanks IgorEisberg)
  * Remove unused targetSdkVersion for source disassemble as value was not populated yet. ([Issue 2604](https://github.com/iBotPeaches/Apktool/pull/2604)) / (Thanks IgorEisberg)
 
 ## v2.5.0
