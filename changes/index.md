@@ -4,7 +4,7 @@ title: Apktool - Changelog
 description: Apktool - Changelog / Roadmap
 ---
 
-## v2.5.1
+## v2.5.1-SNAPSHOT
 2020.xx.xx
  
  * **Android 12 Support** ([Issue 2580](https://github.com/iBotPeaches/Apktool/issues/2580))
