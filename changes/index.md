@@ -28,6 +28,7 @@ description: Apktool - Changelog / Roadmap
  * Fix decoding issues with surrogate pair emojis. ([Issue 2546](https://github.com/iBotPeaches/Apktool/issues/2546)) / (Thanks Comnir)
  * Fix NPE when decoding to a custom non-empty root directory. ([Issue 2455](https://github.com/iBotPeaches/Apktool/issues/2455))
  * Fix Android 11 dex NPE due to hidden api restriction flags. ([Issue 2499](https://github.com/iBotPeaches/Apktool/issues/2499)) / (Thanks JesusFreke)
+ * Fix dummy resources being built as type resources vs item resources. ([Issue 2603](https://github.com/iBotPeaches/Apktool/issues/2603))
  * Reduce code smell failures. ([Issue 2554](https://github.com/iBotPeaches/Apktool/pull/2554)) / (Thanks matteobaccan)
  * Reduce code smells & correct improper opcode use for baksmali. ([Issue 2604](https://github.com/iBotPeaches/Apktool/pull/2604)) / (Thanks IgorEisberg)
  * Remove unused targetSdkVersion for source disassemble as value was not populated yet. ([Issue 2604](https://github.com/iBotPeaches/Apktool/pull/2604)) / (Thanks IgorEisberg)
