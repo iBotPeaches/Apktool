@@ -142,6 +142,9 @@ public class Main {
         if (cli.hasOption("no-assets")) {
             decoder.setDecodeAssets(ApkDecoder.DECODE_ASSETS_NONE);
         }
+        if(cli.hasOption("no-dummy")){
+            decoder.setDecodeCreateDummy(false);
+        }
         if (cli.hasOption("k") || cli.hasOption("keep-broken-res")) {
             decoder.setKeepBrokenResources(true);
         }
@@ -345,6 +348,11 @@ public class Main {
                 .desc("Do not decode assets.")
                 .build();
 
+        Option noDummyOption = Option.builder()
+                .longOpt("no-dummy")
+                .desc("Do not make dummy attributes.")
+                .build();
+
         Option debugDecOption = Option.builder("d")
                 .longOpt("debug")
                 .desc("REMOVED (DOES NOT WORK): Decode in debug mode.")
@@ -471,6 +479,7 @@ public class Main {
             DecodeOptions.addOption(apiLevelOption);
             DecodeOptions.addOption(noAssetOption);
             DecodeOptions.addOption(forceManOption);
+            DecodeOptions.addOption(noDummyOption);
 
             BuildOptions.addOption(apiLevelOption);
             BuildOptions.addOption(debugBuiOption);
@@ -527,6 +536,7 @@ public class Main {
         allOptions.addOption(noDbgOption);
         allOptions.addOption(forceManOption);
         allOptions.addOption(noAssetOption);
+        allOptions.addOption(noDummyOption);
         allOptions.addOption(keepResOption);
         allOptions.addOption(debugBuiOption);
         allOptions.addOption(aaptOption);

@@ -75,7 +75,8 @@ public class ApkDecoder {
         try {
             File outDir = getOutDir();
             AndrolibResources.sKeepBroken = mKeepBrokenResources;
-
+            AndrolibResources.sCreateDummy = mCreateDummy;
+            
             if (!mForceDelete && outDir.exists()) {
                 throw new OutDirExistsException();
             }
@@ -234,6 +235,10 @@ public class ApkDecoder {
         mKeepBrokenResources = keepBrokenResources;
     }
 
+    public void setDecodeCreateDummy(boolean decodeCreateDummy){
+        mCreateDummy = decodeCreateDummy;
+    }
+    
     public void setFrameworkDir(String dir) {
         mAndrolib.apkOptions.frameworkFolderLocation = dir;
     }
@@ -457,6 +462,7 @@ public class ApkDecoder {
     private short mDecodeResources = DECODE_RESOURCES_FULL;
     private short mForceDecodeManifest = FORCE_DECODE_MANIFEST_NONE;
     private short mDecodeAssets = DECODE_ASSETS_FULL;
+    private boolean mCreateDummy = true;
     private boolean mForceDelete = false;
     private boolean mKeepBrokenResources = false;
     private boolean mBakDeb = true;
