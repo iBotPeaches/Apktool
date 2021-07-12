@@ -65,8 +65,8 @@ public class ResStringValue extends ResScalarValue {
         if (val == null || val.isEmpty()) {
             return val;
         }
-        return allDigits.matcher(val).matches() ? "\\ " + val : val;
+        return allDigits.matcher(val).matches() ? "\\ " + val.trim() : val;
     }
 
-    private static final Pattern allDigits = Pattern.compile("\\d{9,}");
+    private static final Pattern allDigits = Pattern.compile("(\\s+)?\\d{9,}");
 }
