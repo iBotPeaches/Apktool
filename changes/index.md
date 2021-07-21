@@ -15,7 +15,7 @@ description: Apktool - Changelog / Roadmap
  * Upgrade to `guava 30.1.1-jre` (Thanks Goooler)
  * Upgrade to `junit 4.13.2` (Thanks Goooler)
  * Upgrade to `commons-lang 3.12.0` (Thanks Goooler)
- * Upgrade to `commons-io 2.10.0` (Thanks Goooler)
+ * Upgrade to `commons-io 2.11.0` (Thanks Goooler)
  * Upgrade to `proguard 7.1.0` (Thanks Goooler)
  * Upgrade to `license.hierynomus 0.16.1` (Thanks Gooler)
  * Upgrade aapt2 with patches for `attr-private` and remove reserved pkgIds. (Thanks MrIkso)
