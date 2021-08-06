@@ -30,7 +30,7 @@ public class AndroidManifestResourceParser extends AXmlResourceParser {
      * type for a manifest meta-data value based on the string in the unencoded XML. However, 
      * some apps intentionally coerce integers to be strings by prepending an escaped space. 
      * For details/discussion, see https://stackoverflow.com/questions/2154945/how-to-force-a-meta-data-value-to-type-string
-     * For aapt1, the escaped space is dropped. For aapt2, the escaped space is preserved.
+     * With aapt1, the escaped space is dropped when encoded. For aapt2, the escaped space is preserved.
      */
     private static final Pattern PATTERN_NUMERIC_STRING = Pattern.compile("\\s?\\d+");
 
