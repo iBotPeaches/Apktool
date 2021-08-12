@@ -37,11 +37,17 @@ dependencies {
 
     api project(':brut.j.dir'),
         project(':brut.j.util'),
-        project(':brut.j.common')
+        project(':brut.j.common'),
+        project(':dexlib2')
 
-    implementation depends.baksmali,
-                   depends.smali,
-                   depends.snakeyaml,
+    implementation(depends.baksmali) {
+        exclude module: 'dexlib2'
+    }
+
+    implementation(depends.smali) {
+        exclude module: 'dexlib2'
+    }
+    implementation depends.snakeyaml,
                    depends.xmlpull,
                    depends.guava,
                    depends.commons_lang,

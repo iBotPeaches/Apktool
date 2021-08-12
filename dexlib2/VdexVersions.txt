@@ -1,0 +1,42 @@
+7b49e6cade09bc65b3b5f22d45fc9d0a7184e4f2 - 0
+    - introduction of vdex files
+5d5a36bddbc008cd52a3207aa2b31177c47f9a49 - 0
+    - verifier deps
+4acefd33064d37b41ca55c3c9355345a20e5f9c2 - 0
+    - quickening info
+f54e5df37cb42d9a83fc54b375da5ef335d604a9 - 1
+    - dex file count + dex location checksum
+7498105ec7497bae2ba9f1a697da9efa0c979654 - 2
+    - verify profile
+3eba863e41d531340392d9ec64e17963ac898d81 - 3
+97fa9928c07d3e0ee631235e9619fb0f8949ed7a - 4
+6e54f78c7c1e01c1a91a458c6e51cca1c7d13ad4 - 5
+71fa64f4a1cf113b0d2ec00d05a168de07302032 - 6
+    - TODO: separate update from previous commit - need to check previous commits
+de4b08ff24c330d5b36b5c4dc8664ed4848eeca6 - 7
+b02ba93fb8089ae70229c4e3e90478cb4a9e4668 - 8
+ba118827465d12177f3996e50133960087b1c916 - 9
+bf755fefbfcfbb2677a519c12efe7890f3879854 - 10
+b4c6acbf281c1cf960444e35bcac254a1f77c3ed - 11
+    - changed layout of post-dex data in the vdex file.
+    - shouldn't have any impact on deodexing
+210531f8775c89feb90d430cd5b6026b4cf8ef89 - 13
+    - adds offset to QuickeningInfo structure before each dex file
+    - version 12 was a previous commit of this, which was reverted and recommited
+8892c6bd9235e7ae697039c901aaeea1597a7473 - 14
+8740c66cbfbeb3b7f306279c843650c3b18f2dca - 15
+    - Adds CompactDex code item
+c3a22aa19bbe35ff8447460b29e07d42937a39de - 16
+    - Add shared separate data section for compact dex
+8e9a5e82fe4f1beb6daddefb7b55226573f406be - 17
+    - unclear why version bumped? Due to previous commit that mistakenly didn't bump?
+20b2ce459f681f8c41bf0f5df31a24d4eb781f50 - 18
+    - unclear why version bumped? Due to previous commit that mistakenly didn't bump?
+3a29355967f29999ba81b5772ec66d3ddee9ce3e - 19, 1
+    - added separate version for dex section
+3a29355967f29999ba81b5772ec66d3ddee9ce3e - 19, 2
+    - Add owned section for CompactDex
+feb228244619237d110d8817865d7647f37b9b4f - 20, 2
+    - Improve `verified`, add `redefined` class status in VerifierDeps
+35a3f6a09931ee631a0377ee3ca98a7fb1f4f61d - 21, 2
+    - Add bootclasspath checksums
