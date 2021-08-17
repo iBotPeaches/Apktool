@@ -21,9 +21,10 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Set up JDK 10
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v2
         with:
-          java-version: 10
+          distribution: 'zulu'
+          java-version: 14
 
       - name: Build
         run: ./gradlew build shadowJar proguard
