@@ -138,7 +138,7 @@ final public class AndrolibResources {
     public void decodeManifest(ResTable resTable, ExtFile apkFile, File outDir)
             throws AndrolibException {
 
-        Duo<ResFileDecoder, AXmlResourceParser> duo = getManifestFileDecoder();
+        Duo<ResFileDecoder, AXmlResourceParser> duo = getManifestFileDecoder(false);
         ResFileDecoder fileDecoder = duo.m1;
 
         // Set ResAttrDecoder
@@ -185,7 +185,7 @@ final public class AndrolibResources {
     public void decodeManifestWithResources(ResTable resTable, ExtFile apkFile, File outDir)
             throws AndrolibException {
 
-        Duo<ResFileDecoder, AXmlResourceParser> duo = getResFileDecoder();
+        Duo<ResFileDecoder, AXmlResourceParser> duo = getManifestFileDecoder(true);
         ResFileDecoder fileDecoder = duo.m1;
         ResAttrDecoder attrDecoder = duo.m2.getAttrDecoder();
 
@@ -708,11 +708,13 @@ final public class AndrolibResources {
         return new Duo<ResFileDecoder, AXmlResourceParser>(new ResFileDecoder(decoders), axmlParser);
     }
 
-    public Duo<ResFileDecoder, AXmlResourceParser> getManifestFileDecoder() {
+    public Duo<ResFileDecoder, AXmlResourceParser> getManifestFileDecoder(boolean withResources) {
         ResStreamDecoderContainer decoders = new ResStreamDecoderContainer();
 
-        AXmlResourceParser axmlParser = new AXmlResourceParser();
-
+        AXmlResourceParser axmlParser = new AndroidManifestResourceParser();
+        if (withResources) {
+            axmlParser.setAttrDecoder(new ResAttrDecoder());
+        }
         decoders.setDecoder("xml", new XmlPullStreamDecoder(axmlParser,getResXmlSerializer()));
 
         return new Duo<ResFileDecoder, AXmlResourceParser>(new ResFileDecoder(decoders), axmlParser);
