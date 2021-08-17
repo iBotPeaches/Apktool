@@ -24,7 +24,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           distribution: 'zulu'
-          java-version: 14
+          java-version: 10
 
       - name: Build
         run: ./gradlew build shadowJar proguard
