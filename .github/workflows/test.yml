@@ -7,11 +7,13 @@ on:
       - '**.java'
       - '**.gradle'
       - 'brut.apktool/apktool-lib/src/main/resources/**'
+      - '.github/workflows/**'
   pull_request:
     paths:
       - '**.java'
       - '**.gradle'
       - 'brut.apktool/apktool-lib/src/main/resources/**'
+      - '.github/workflows/**'
 
 jobs:
   build-and-test-with-Java-8-and-later:
