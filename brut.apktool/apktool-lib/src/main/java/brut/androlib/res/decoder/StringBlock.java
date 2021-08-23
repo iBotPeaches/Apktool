@@ -18,6 +18,7 @@ package brut.androlib.res.decoder;
 
 import brut.androlib.res.xml.ResXmlEncoders;
 import brut.util.ExtDataInput;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
 import com.google.common.base.Splitter.MapSplitter;
 import com.google.common.collect.ComparisonChain;
