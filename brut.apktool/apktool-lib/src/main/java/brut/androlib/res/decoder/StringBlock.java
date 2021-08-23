@@ -232,10 +232,7 @@ public class StringBlock {
         }
         string.append(ResXmlEncoders.escapeXmlChars(raw.substring(lastIndex)));
 
-        String res = string.toString();
-
-        LOGGER.severe(res);
-        return res;
+        return string.toString();
     }
 
     /**
