@@ -98,10 +98,157 @@ public class StringBlock {
         return decodeString(offset, length);
     }
 
+    private static class Tag implements Comparable<Tag> {
+        private static final MapSplitter ATTRIBUTES_SPLITTER =
+            Splitter.on(';').withKeyValueSeparator(Splitter.on('=').limit(2));
+
+        private final String tag;
+        private final Type type;
+        private final int position;
+        private final int matchingTagPosition;
+
+        Tag(String tag, Type type, int position, int matchingTagPosition) {
+            this.tag = ResXmlEncoders.escapeXmlChars(tag);
+            this.type = type;
+            this.position = position;
+            this.matchingTagPosition = matchingTagPosition;
+        }
+
+        @Override
+        public int compareTo(Tag o) {
+            return ComparisonChain.start()
+                .compare(position, o.position)
+                // When one tag closes where another starts, we always close before opening.
+                .compare(type, o.type, this.tag.equals(o.tag) ? explicit(Type.OPEN, Type.CLOSE) : explicit(Type.CLOSE, Type.OPEN))
+                // Open first the tag which closes last, and close first the tag which opened last.
+                .compare(matchingTagPosition, o.matchingTagPosition, reverseOrder())
+                // When two tags open and close together, we order alphabetically. When they close,
+                // we reversed the order. This ensures that the XML tags are properly nested.
+                .compare(tag, o.tag, type.equals(Type.OPEN) ? naturalOrder() : reverseOrder())
+                .result();
+        }
+
+        @Override
+        public String toString() {
+            // "tag" can either be just the tag or have the form "tag;attr1=value1;attr2=value2;[...]".
+            int separatorIdx = tag.indexOf(';');
+            String actualTag = separatorIdx == -1 ? tag : tag.substring(0, separatorIdx);
+
+            switch (type) {
+                case OPEN:
+                    if (separatorIdx != -1) {
+                        StringJoiner attributes = new StringJoiner(" ");
+                        ATTRIBUTES_SPLITTER
+                            .split(tag.substring(separatorIdx + 1, tag.endsWith(";") ? tag.length() - 1: tag.length()))
+                            .forEach((key, value) -> attributes.add(String.format("%s=\"%s\"", key, value)));
+                        return String.format("<%s %s>", actualTag, attributes);
+                    }
+                    return String.format("<%s>", actualTag);
+                case CLOSE:
+                    return String.format("</%s>", actualTag);
+            }
+            throw new IllegalStateException();
+        }
+
+        private enum Type {
+            OPEN,
+            CLOSE
+        }
+    }
+
+    private static class Span {
+        private String tag;
+        private int firstChar, lastChar;
+
+        Span(String val, int firstIndex, int lastIndex) {
+            this.tag = val;
+            this.firstChar = firstIndex;
+            this.lastChar = lastIndex;
+        }
+
+        String getTag() {
+            return tag;
+        }
+
+        int getFirstChar() {
+            return firstChar;
+        }
+
+        int getLastChar() {
+            return lastChar;
+        }
+    }
+
+    private static class StyledString {
+        String val;
+        int[] styles;
+
+        StyledString(String raw, int[] stylesArr) {
+            this.val = raw;
+            this.styles = stylesArr;
+        }
+
+        String getValue() {
+            return val;
+        }
+
+        List<Span> getSpanList(StringBlock stringBlock) {
+            ArrayList<Span> spanList = new ArrayList<>();
+            for (int i = 0; i != styles.length; i += 3) {
+                spanList.add(new Span(stringBlock.getString(styles[i]), styles[i + 1], styles[i + 2]));
+            }
+            return spanList;
+        }
+    }
+
+    String processStyledString(StyledString styledString) {
+
+        ArrayList<Tag> sortedTagsList = new ArrayList<>();
+
+        styledString.getSpanList(this).stream()
+            .flatMap(
+                span ->
+                    Stream.of(
+                        // "+ 1" because the last char is included.
+                        new Tag(
+                            span.getTag(), Tag.Type.OPEN, span.getFirstChar(), span.getLastChar() + 1),
+                        // "+ 1" because the last char is included.
+                        new Tag(
+                            span.getTag(),
+                            Tag.Type.CLOSE,
+                            span.getLastChar() + 1,
+                            span.getFirstChar())))
+            // So we can edit the string in place, we need to start from the end.
+            .sorted(naturalOrder())
+            .forEach(tag -> sortedTagsList.add(tag));
+
+        String raw = styledString.getValue();
+        StringBuilder string = new StringBuilder(raw.length() + 32);
+        int lastIndex = 0;
+        for (Tag tag : sortedTagsList) {
+            string.append(ResXmlEncoders.escapeXmlChars(raw.substring(lastIndex, tag.position)));
+            string.append(tag.toString());
+            lastIndex = tag.position;
+        }
+        string.append(ResXmlEncoders.escapeXmlChars(raw.substring(lastIndex)));
+
+        String res = string.toString();
+
+        LOGGER.severe(res);
+        return res;
+    }
+
+    /**
+     * Not yet implemented.
+     *
+     * Returns string with style information (if any).
+     */
+    public CharSequence get(int index) {
+        return getString(index);
+    }
+
     /**
      * Returns string with style tags (html-like).
-     * @param index int
-     * @return String
      */
     public String getHTML(int index) {
         String raw = getString(index);
@@ -117,54 +264,9 @@ public class StringBlock {
         if (style[1] > raw.length()) {
             return ResXmlEncoders.escapeXmlChars(raw);
         }
-        StringBuilder html = new StringBuilder(raw.length() + 32);
-        int[] opened = new int[style.length / 3];
-        boolean[] unclosed = new boolean[style.length / 3];
-        int offset = 0, depth = 0;
-        while (true) {
-            int i = -1, j;
-            for (j = 0; j != style.length; j += 3) {
-                if (style[j + 1] == -1) {
-                    continue;
-                }
-                if (i == -1 || style[i + 1] > style[j + 1]) {
-                    i = j;
-                }
-            }
-            int start = ((i != -1) ? style[i + 1] : raw.length());
-            for (j = depth - 1; j >= 0; j--) {
-                int last = opened[j];
-                int end = style[last + 2];
-                if (end >= start) {
-                    if (style[last + 1] == -1 && end != -1) {
-                        unclosed[j] = true;
-                    }
-                    break;
-                }
-                if (offset <= end) {
-                    html.append(ResXmlEncoders.escapeXmlChars(raw.substring(offset, end + 1)));
-                    offset = end + 1;
-                }
-                outputStyleTag(getString(style[last]), html, true);
-            }
-            depth = j + 1;
-            if (offset < start) {
-                html.append(ResXmlEncoders.escapeXmlChars(raw.substring(offset, start)));
-                if (j >= 0 && unclosed.length >= j && unclosed[j]) {
-                    if (unclosed.length > (j + 1) && unclosed[j + 1] || unclosed.length == 1) {
-                        outputStyleTag(getString(style[opened[j]]), html, true);
-                    }
-                }
-                offset = start;
-            }
-            if (i == -1) {
-                break;
-            }
-            outputStyleTag(getString(style[i]), html, false);
-            style[i + 1] = -1;
-            opened[depth++] = i;
-        }
-        return html.toString();
+
+        StyledString styledString = new StyledString(raw, style);
+        return processStyledString(styledString);
     }
 
     private void outputStyleTag(String tag, StringBuilder builder, boolean close) {
