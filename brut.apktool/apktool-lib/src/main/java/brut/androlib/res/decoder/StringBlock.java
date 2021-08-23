@@ -18,12 +18,21 @@ package brut.androlib.res.decoder;
 
 import brut.androlib.res.xml.ResXmlEncoders;
 import brut.util.ExtDataInput;
-import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Splitter;
+import com.google.common.base.Splitter.MapSplitter;
+import com.google.common.collect.ComparisonChain;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.charset.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringJoiner;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
+
+import static com.google.common.collect.Ordering.explicit;
+import static java.util.Comparator.naturalOrder;
+import static java.util.Comparator.reverseOrder;
 
 public class StringBlock {
 
