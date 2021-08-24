@@ -1,13 +1,60 @@
-name: Build
+name: CI
 on:
   push:
-    branches:
-      - master
+    paths:
+      - '**.java'
+      - '**.gradle'
+      - 'brut.apktool/apktool-lib/src/main/resources/**'
+      - '.github/workflows/**'
+  pull_request:
+    paths:
+      - '**.java'
+      - '**.gradle'
+      - 'brut.apktool/apktool-lib/src/main/resources/**'
+      - '.github/workflows/**'
 
 jobs:
-  build:
+  build-and-test-with-Java-8-and-later:
+    runs-on: ${{ matrix.os }}
+    name: Build/Test (JDK ${{ matrix.java }}, ${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      max-parallel: 10
+      matrix:
+        os: [ ubuntu-latest, macOS-latest, windows-latest ]
+        java: [ 8, 9, 10, 11, 12, 13, 14 ]
+
+    steps:
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ matrix.java }}-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: ${{ runner.os }}-${{ matrix.java }}-gradle-
+
+      - uses: actions/checkout@v2
+
+      - name: Set up JDK ${{ matrix.java }}
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'zulu'
+          java-version: ${{ matrix.java }}
+
+      - name: Build and test
+        if: startsWith(matrix.os, 'windows') == true
+        run: ./gradlew.bat build shadowJar proguard
+
+      - name: Build and test
+        if: startsWith(matrix.os, 'windows') != true
+        run: ./gradlew build shadowJar proguard
+
+  upload-artifact:
     runs-on: ubuntu-latest
     name: Build apktool.jar
+    if: github.repository == 'iBotPeaches/Apktool' && github.ref == 'refs/heads/master'
+    needs:
+      - build-and-test-with-Java-8-and-later
 
     steps:
       - uses: actions/cache@v2
@@ -34,3 +81,27 @@ jobs:
         with:
           name: apktool.jar
           path: brut.apktool/apktool-cli/build/libs/apktool-*-small.jar
+
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'java' ]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v1
+        with:
+          languages: ${{ matrix.language }}
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v1
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v1
