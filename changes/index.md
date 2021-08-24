@@ -10,7 +10,7 @@ description: Apktool - Changelog / Roadmap
  * **Android 12 Support** ([Issue 2580](https://github.com/iBotPeaches/Apktool/issues/2580))
  * Published to Maven Central ([Issue 2529](https://github.com/iBotPeaches/Apktool/issues/2529))
  * Upgrade to baksmali/smali 2.5.2
- * Upgrade to `gradle 7.1.0`
+ * Upgrade to `gradle 7.2` (Thanks Gooler)
  * Upgrade to `snakeyaml 1.29` (Thanks Goooler)
  * Upgrade to `guava 30.1.1-jre` (Thanks Goooler)
  * Upgrade to `junit 4.13.2` (Thanks Goooler)
@@ -19,6 +19,7 @@ description: Apktool - Changelog / Roadmap
  * Upgrade to `proguard 7.1.1` (Thanks Goooler)
  * Upgrade to `license.hierynomus 0.16.1` (Thanks Gooler)
  * Upgrade to `jengelman.shadow 7.0.0` (Thanks Gooler)
+ * Upgrade to `actions/setup-java@v2` (Thanks Gooler)
  * Added `.gitattributes` (Thanks Gooler)
  * Upgrade aapt2 with patches for `attr-private` and remove reserved pkgIds. (Thanks MrIkso)
  * Add lazy init for ResTable for optimizations. ([Issue 2604](https://github.com/iBotPeaches/Apktool/pull/2604)) / (Thanks IgorEisberg)
