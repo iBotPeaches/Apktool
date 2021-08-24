@@ -6,7 +6,7 @@
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
@@ -316,13 +316,13 @@ public class StringBlock {
         if ((val & 0x80) != 0) {
             offset += 2;
         } else {
-            offset += 1;	
+            offset += 1;
         }
         // And we read only the utf-8 encoded length of the string
         val = array[offset];
         offset += 1;
         if ((val & 0x80) != 0) {
-        	int low = (array[offset] & 0xFF); 
+        	int low = (array[offset] & 0xFF);
         	length = ((val & 0x7F) << 8) + low;
             offset += 1;
         } else {
@@ -330,7 +330,7 @@ public class StringBlock {
         }
         return new int[] { offset, length};
     }
-    
+
     private static final int[] getUtf16(byte[] array, int offset) {
         int val = ((array[offset + 1] & 0xFF) << 8 | array[offset] & 0xFF);
 
@@ -339,7 +339,7 @@ public class StringBlock {
             int low = (array[offset + 2] & 0xFF);
             int len_value =  ((val & 0x7FFF) << 16) + (high + low);
             return new int[] {4, len_value * 2};
-            
+
         }
         return new int[] {2, val * 2};
     }
