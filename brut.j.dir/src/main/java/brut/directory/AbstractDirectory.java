@@ -6,7 +6,7 @@
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *       https://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
@@ -115,7 +115,7 @@ public abstract class AbstractDirectory implements Directory {
             getFiles().add(parsed.subpath);
             return getFileOutputLocal(parsed.subpath);
         }
-        
+
         Directory dir;
         // IMPOSSIBLE_EXCEPTION
         try {
@@ -150,7 +150,7 @@ public abstract class AbstractDirectory implements Directory {
             getAbstractDirs().put(parsed.subpath, dir);
             return dir;
         }
-        
+
         if (getAbstractDirs().containsKey(parsed.dir)) {
             dir = getAbstractDirs().get(parsed.dir);
         } else {
@@ -251,13 +251,13 @@ public abstract class AbstractDirectory implements Directory {
         }
         return new SubPath(getAbstractDirs().get(parsed.dir), parsed.subpath);
     }
-    
+
     private ParsedPath parsePath(String path) {
         int pos = path.indexOf(separator);
         if (pos == -1) {
             return new ParsedPath(null, path);
         }
-        return new ParsedPath(path.substring(0, pos), path.substring(pos + 1));        
+        return new ParsedPath(path.substring(0, pos), path.substring(pos + 1));
     }
 
     protected abstract void loadFiles();
@@ -269,8 +269,8 @@ public abstract class AbstractDirectory implements Directory {
     protected abstract AbstractDirectory createDirLocal(String name)
         throws DirectoryException;
     protected abstract void removeFileLocal(String name);
-    
-    
+
+
     private class ParsedPath {
         public String dir;
         public String subpath;
@@ -278,8 +278,8 @@ public abstract class AbstractDirectory implements Directory {
             this.dir = dir;
             this.subpath = subpath;
         }
-    }    
-    
+    }
+
     private class SubPath {
         public AbstractDirectory dir;
         public String path;

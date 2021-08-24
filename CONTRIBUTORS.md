@@ -9,4 +9,4 @@ This product includes software developed by:
   * Tahseen Ur Rehman (http://code.google.com/p/radixtree/)
   * Connor Tumbleson (connor.tumbleson@gmail.com)
   * Android Open Source Project (http://source.android.com/)
-  * The Apache Software Foundation (http://www.apache.org/)
+  * The Apache Software Foundation (https://www.apache.org/)
