@@ -40,14 +40,12 @@ buildscript {
 
     repositories {
         mavenCentral()
+        gradlePluginPortal()
     }
     dependencies {
         classpath "gradle.plugin.com.github.jengelman.gradle.plugins:shadow:7.0.0"
+        classpath "gradle.plugin.com.hierynomus.gradle.plugins:license-gradle-plugin:0.16.1"
     }
-}
-
-plugins {
-    id 'com.github.hierynomus.license' version '0.16.1'
 }
 
 apply from: 'gradle/functions.gradle'
@@ -59,7 +57,8 @@ defaultTasks 'build', 'shadowJar', 'proguard'
 
 allprojects {
     apply plugin: 'java'
-    apply plugin: 'license'
+    apply plugin: 'com.github.hierynomus.license'
+
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
 
