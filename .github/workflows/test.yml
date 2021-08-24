@@ -7,11 +7,13 @@ on:
       - '**.java'
       - '**.gradle'
       - 'brut.apktool/apktool-lib/src/main/resources/**'
+      - '.github/workflows/**'
   pull_request:
     paths:
       - '**.java'
       - '**.gradle'
       - 'brut.apktool/apktool-lib/src/main/resources/**'
+      - '.github/workflows/**'
 
 jobs:
   build-and-test-with-Java-8-and-later:
@@ -36,8 +38,9 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Set up JDK ${{ matrix.java }}
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v2
         with:
+          distribution: 'zulu'
           java-version: ${{ matrix.java }}
 
       - name: Build and test
