@@ -36,6 +36,7 @@ description: Apktool - Changelog / Roadmap
  * Reduce code smell failures. ([Issue 2554](https://github.com/iBotPeaches/Apktool/pull/2554)) / (Thanks matteobaccan)
  * Reduce code smells & correct improper opcode use for baksmali. ([Issue 2604](https://github.com/iBotPeaches/Apktool/pull/2604)) / (Thanks IgorEisberg)
  * Remove unused targetSdkVersion for source disassemble as value was not populated yet. ([Issue 2604](https://github.com/iBotPeaches/Apktool/pull/2604)) / (Thanks IgorEisberg)
+ * Remove duplicate workflows for 1 unified GitHub Action workflow. ([Issue 2633](https://github.com/iBotPeaches/Apktool/pull/2633)) / (Thanks Gooler)
 
 ## v2.5.0
 2020.12.02
