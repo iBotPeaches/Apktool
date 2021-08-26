@@ -468,7 +468,8 @@ public class MXSerializer implements XmlSerializer {
 				// now check that prefix is still in scope
 				for (int p = namespaceEnd - 1; p > i; --p) {
 					if (prefix == namespacePrefix[p]) {
-                    } // too bad - prefix is redeclared with different namespace
+                        // too bad - prefix is redeclared with different namespace
+                    }
                 }
 				return prefix;
 			}
