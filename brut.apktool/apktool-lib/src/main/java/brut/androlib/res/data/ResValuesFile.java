@@ -17,13 +17,14 @@
 package brut.androlib.res.data;
 
 import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.Set;
 
 public class ResValuesFile {
     private final ResPackage mPackage;
     private final ResTypeSpec mType;
     private final ResType mConfig;
-    private final Set<ResResource> mResources = new LinkedHashSet<ResResource>();
+    private final Set<ResResource> mResources = new LinkedHashSet<>();
 
     public ResValuesFile(ResPackage pkg, ResTypeSpec type, ResType config) {
         this.mPackage = pkg;
@@ -62,13 +63,10 @@ public class ResValuesFile {
             return false;
         }
         final ResValuesFile other = (ResValuesFile) obj;
-        if (this.mType != other.mType && (this.mType == null || !this.mType.equals(other.mType))) {
+        if (!Objects.equals(this.mType, other.mType)) {
             return false;
         }
-        if (this.mConfig != other.mConfig && (this.mConfig == null || !this.mConfig.equals(other.mConfig))) {
-            return false;
-        }
-        return true;
+        return Objects.equals(this.mConfig, other.mConfig);
     }
 
     @Override

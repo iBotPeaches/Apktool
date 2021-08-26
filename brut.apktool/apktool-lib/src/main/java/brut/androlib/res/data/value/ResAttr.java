@@ -96,9 +96,9 @@ public class ResAttr extends ResBagValue implements ResValuesXmlSerializable {
         for (; i < items.length; i++) {
             int resId = items[i].m1;
             pkg.addSynthesizedRes(resId);
-            attrItems[j++] = new Duo<ResReferenceValue, ResIntValue>(
-                    factory.newReference(resId, null),
-                    (ResIntValue) items[i].m2);
+            attrItems[j++] = new Duo<>(
+                factory.newReference(resId, null),
+                (ResIntValue) items[i].m2);
         }
         switch (type & 0xff0000) {
             case TYPE_ENUM:

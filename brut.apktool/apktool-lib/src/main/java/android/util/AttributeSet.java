@@ -26,7 +26,7 @@ public interface AttributeSet {
 
 	int getAttributeNameResource(int index);
 
-	int getAttributeListValue(int index, String options[], int defaultValue);
+	int getAttributeListValue(int index, String[] options, int defaultValue);
 
 	boolean getAttributeBooleanValue(int index, boolean defaultValue);
 
@@ -49,7 +49,7 @@ public interface AttributeSet {
 	String getAttributeValue(String namespace, String attribute);
 
 	int getAttributeListValue(String namespace, String attribute,
-			String options[], int defaultValue);
+                              String[] options, int defaultValue);
 
 	boolean getAttributeBooleanValue(String namespace, String attribute,
 			boolean defaultValue);

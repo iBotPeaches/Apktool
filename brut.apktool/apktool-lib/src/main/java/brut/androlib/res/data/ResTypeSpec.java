@@ -28,7 +28,7 @@ public final class ResTypeSpec {
     public static final String RES_TYPE_NAME_ATTR = "attr";
 
     private final String mName;
-    private final Map<String, ResResSpec> mResSpecs = new LinkedHashMap<String, ResResSpec>();
+    private final Map<String, ResResSpec> mResSpecs = new LinkedHashMap<>();
 
     private final ResTable mResTable;
     private final ResPackage mPackage;

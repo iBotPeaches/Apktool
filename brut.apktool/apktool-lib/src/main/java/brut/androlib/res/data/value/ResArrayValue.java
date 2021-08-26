@@ -51,17 +51,17 @@ public class ResArrayValue extends ResBagValue implements
         serializer.attribute(null, "name", res.getResSpec().getName());
 
         // lets check if we need to add formatted="false" to this array
-        for (int i = 0; i < mItems.length; i++) {
-            if (mItems[i].hasMultipleNonPositionalSubstitutions()) {
+        for (ResScalarValue item : mItems) {
+            if (item.hasMultipleNonPositionalSubstitutions()) {
                 serializer.attribute(null, "formatted", "false");
                 break;
             }
         }
 
         // add <item>'s
-        for (int i = 0; i < mItems.length; i++) {
+        for (ResScalarValue mItem : mItems) {
             serializer.startTag(null, "item");
-            serializer.text(mItems[i].encodeAsResXmlNonEscapedItemValue());
+            serializer.text(mItem.encodeAsResXmlNonEscapedItemValue());
             serializer.endTag(null, "item");
         }
         serializer.endTag(null, type);
@@ -72,16 +72,16 @@ public class ResArrayValue extends ResBagValue implements
             return null;
         }
         String type = mItems[0].getType();
-        for (int i = 0; i < mItems.length; i++) {
-            if (mItems[i].encodeAsResXmlItemValue().startsWith("@string")) {
+        for (ResScalarValue mItem : mItems) {
+            if (mItem.encodeAsResXmlItemValue().startsWith("@string")) {
                 return "string";
-            } else if (mItems[i].encodeAsResXmlItemValue().startsWith("@drawable")) {
+            } else if (mItem.encodeAsResXmlItemValue().startsWith("@drawable")) {
                 return null;
-            } else if (mItems[i].encodeAsResXmlItemValue().startsWith("@integer")) {
+            } else if (mItem.encodeAsResXmlItemValue().startsWith("@integer")) {
                 return "integer";
             } else if (!"string".equals(type) && !"integer".equals(type)) {
                 return null;
-            } else if (!type.equals(mItems[i].getType())) {
+            } else if (!type.equals(mItem.getType())) {
                 return null;
             }
         }

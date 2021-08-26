@@ -22,7 +22,7 @@ import java.util.*;
 
 public class ResType {
     private final ResConfigFlags mFlags;
-    private final Map<ResResSpec, ResResource> mResources = new LinkedHashMap<ResResSpec, ResResource>();
+    private final Map<ResResSpec, ResResource> mResources = new LinkedHashMap<>();
 
     public ResType(ResConfigFlags flags) {
         this.mFlags = flags;

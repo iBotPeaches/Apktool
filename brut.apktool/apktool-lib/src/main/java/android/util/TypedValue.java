@@ -217,7 +217,7 @@ public class TypedValue {
 
     private static final float MANTISSA_MULT = 1.0f / (1 << TypedValue.COMPLEX_MANTISSA_SHIFT);
     private static final float[] RADIX_MULTS = new float[] {
-            1.0f * MANTISSA_MULT, 1.0f / (1 << 7) * MANTISSA_MULT,
+        MANTISSA_MULT, 1.0f / (1 << 7) * MANTISSA_MULT,
             1.0f / (1 << 15) * MANTISSA_MULT, 1.0f / (1 << 23) * MANTISSA_MULT };
 
     /**
@@ -251,7 +251,7 @@ public class TypedValue {
      * @return String The coerced string value. If the value is null or the type
      *         is not known, null is returned.
      */
-    public static final String coerceToString(int type, int data) {
+    public static String coerceToString(int type, int data) {
         switch (type) {
             case TYPE_NULL:
                 return null;
@@ -262,11 +262,11 @@ public class TypedValue {
             case TYPE_FLOAT:
                 return Float.toString(Float.intBitsToFloat(data));
             case TYPE_DIMENSION:
-                return Float.toString(complexToFloat(data))
+                return complexToFloat(data)
                         + DIMENSION_UNIT_STRS[(data >> COMPLEX_UNIT_SHIFT)
                         & COMPLEX_UNIT_MASK];
             case TYPE_FRACTION:
-                return Float.toString(complexToFloat(data) * 100)
+                return complexToFloat(data) * 100
                         + FRACTION_UNIT_STRS[(data >> COMPLEX_UNIT_SHIFT)
                         & COMPLEX_UNIT_MASK];
             case TYPE_INT_HEX:
@@ -286,22 +286,19 @@ public class TypedValue {
                     res = res.substring(2);
                     break;
                 case TYPE_INT_COLOR_ARGB4:// #AARRGGBB->#ARGB
-                    res = new StringBuffer().append(vals[0]).append(vals[2])
-                            .append(vals[4]).append(vals[6]).toString();
+                    res = String.valueOf(vals[0]) + vals[2] +
+                        vals[4] + vals[6];
                     break;
                 case TYPE_INT_COLOR_RGB4:// #FFRRGGBB->#RGB
-                    res = new StringBuffer().append(vals[2]).append(vals[4])
-                            .append(vals[6]).toString();
+                    res = String.valueOf(vals[2]) + vals[4] +
+                        vals[6];
                     break;
             }
             return "#" + res;
         } else if (type >= TYPE_FIRST_INT && type <= TYPE_LAST_INT) {
-            String res;
-            switch (type) {
-                default:
-                case TYPE_INT_DEC:
-                    res = Integer.toString(data);
-                    break;
+            String res = null;
+            if (type == TYPE_INT_DEC) {
+                res = Integer.toString(data);
             }
             return res;
         }

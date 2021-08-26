@@ -27,7 +27,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public abstract class Jar {
     private static final Map<String, File> mExtracted = new HashMap<>();
 
-    public static File getResourceAsFile(String name, Class clazz) throws BrutException {
+    public static File getResourceAsFile(String name, Class<?> clazz) throws BrutException {
         File file = mExtracted.get(name);
         if (file == null) {
             file = extractToTmp(name, clazz);
@@ -36,11 +36,11 @@ public abstract class Jar {
         return file;
     }
 
-    public static File extractToTmp(String resourcePath, Class clazz) throws BrutException {
+    public static File extractToTmp(String resourcePath, Class<?> clazz) throws BrutException {
         return extractToTmp(resourcePath, "brut_util_Jar_", clazz);
     }
 
-    public static File extractToTmp(String resourcePath, String tmpPrefix, Class clazz) throws BrutException {
+    public static File extractToTmp(String resourcePath, String tmpPrefix, Class<?> clazz) throws BrutException {
         try {
             InputStream in = clazz.getResourceAsStream(resourcePath);
             if (in == null) {

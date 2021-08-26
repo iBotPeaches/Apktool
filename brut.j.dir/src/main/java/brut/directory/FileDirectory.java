@@ -22,7 +22,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 
 public class FileDirectory extends AbstractDirectory {
-    private File mDir;
+    private final File mDir;
 
     public FileDirectory(ExtFile dir, String folder) throws DirectoryException {
         this(new File(dir.toString().replaceAll("%20", " "), folder));
@@ -101,19 +101,18 @@ public class FileDirectory extends AbstractDirectory {
     }
 
     private void loadAll() {
-        mFiles = new LinkedHashSet<String>();
-        mDirs = new LinkedHashMap<String, AbstractDirectory>();
+        mFiles = new LinkedHashSet<>();
+        mDirs = new LinkedHashMap<>();
 
         File[] files = getDir().listFiles();
-        for (int i = 0; i < files.length; i++) {
-            File file = files[i];
+        for (File file : files) {
             if (file.isFile()) {
                 mFiles.add(file.getName());
             } else {
                 // IMPOSSIBLE_EXCEPTION
                 try {
                     mDirs.put(file.getName(), new FileDirectory(file));
-                } catch (DirectoryException e) {}
+                } catch (DirectoryException ignored) {}
             }
         }
     }

@@ -59,9 +59,6 @@ public class ResID {
             return false;
         }
         final ResID other = (ResID) obj;
-        if (this.id != other.id) {
-            return false;
-        }
-        return true;
+        return this.id == other.id;
     }
 }

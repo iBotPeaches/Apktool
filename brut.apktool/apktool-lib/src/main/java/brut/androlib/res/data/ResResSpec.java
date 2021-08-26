@@ -30,7 +30,7 @@ public class ResResSpec {
     private final String mName;
     private final ResPackage mPackage;
     private final ResTypeSpec mType;
-    private final Map<ResConfigFlags, ResResource> mResources = new LinkedHashMap<ResConfigFlags, ResResource>();
+    private final Map<ResConfigFlags, ResResource> mResources = new LinkedHashMap<>();
 
     public ResResSpec(ResID id, String name, ResPackage pkg, ResTypeSpec type) {
         this.mId = id;
@@ -38,7 +38,7 @@ public class ResResSpec {
 
         ResResSpec resResSpec = type.getResSpecUnsafe(name);
         if (resResSpec != null) {
-            cleanName = String.format("APKTOOL_DUPLICATE_%s_%s", type.toString(), id.toString());
+            cleanName = String.format("APKTOOL_DUPLICATE_%s_%s", type, id.toString());
         } else {
             cleanName = ((name == null || name.isEmpty()) ? ("APKTOOL_DUMMYVAL_" + id.toString()) : name);
         }
@@ -49,7 +49,7 @@ public class ResResSpec {
     }
 
     public Set<ResResource> listResources() {
-        return new LinkedHashSet<ResResource>(mResources.values());
+        return new LinkedHashSet<>(mResources.values());
     }
 
     public ResResource getResource(ResType config) throws AndrolibException {

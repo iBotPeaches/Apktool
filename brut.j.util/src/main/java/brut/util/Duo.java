@@ -16,6 +16,8 @@
  */
 package brut.util;
 
+import java.util.Objects;
+
 public class Duo<T1, T2> {
     public final T1 m1;
     public final T2 m2;
@@ -34,13 +36,10 @@ public class Duo<T1, T2> {
             return false;
         }
         final Duo<T1, T2> other = (Duo<T1, T2>) obj;
-        if (this.m1 != other.m1 && (this.m1 == null || !this.m1.equals(other.m1))) {
+        if (!Objects.equals(this.m1, other.m1)) {
             return false;
         }
-        if (this.m2 != other.m2 && (this.m2 == null || !this.m2.equals(other.m2))) {
-            return false;
-        }
-        return true;
+        return Objects.equals(this.m2, other.m2);
     }
 
     @Override

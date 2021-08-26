@@ -324,11 +324,8 @@ public final class ResXmlPatcher {
         DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
         // Not using the parse(File) method on purpose, so that we can control when
         // to close it. Somehow parse(File) does not seem to close the file in all cases.
-        FileInputStream inputStream = new FileInputStream(file);
-        try {
-        	return docBuilder.parse(inputStream);
-        } finally {
-        	inputStream.close();
+        try (FileInputStream inputStream = new FileInputStream(file)) {
+            return docBuilder.parse(inputStream);
         }
     }
 

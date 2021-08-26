@@ -176,7 +176,7 @@ public class BuildAndDecodeTest extends BaseTest {
     public void storedMp3FilesAreNotCompressedTest() throws BrutException {
         ExtFile extFile = new ExtFile(sTmpDir, "testapp.apk");
         Integer built = extFile.getDirectory().getCompressionLevel("res/raw/rain.mp3");
-        assertEquals(new Integer(0), built);
+        assertEquals(Integer.valueOf(0), built);
     }
 
     @Test

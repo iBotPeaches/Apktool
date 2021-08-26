@@ -29,7 +29,7 @@ public class StringExConstructor extends Constructor {
 
     private class ConstructStringEx extends AbstractConstruct {
         public Object construct(Node node) {
-            String val = (String) constructScalar((ScalarNode) node);
+            String val = constructScalar((ScalarNode) node);
             return YamlStringEscapeUtils.unescapeString(val);
         }
     }

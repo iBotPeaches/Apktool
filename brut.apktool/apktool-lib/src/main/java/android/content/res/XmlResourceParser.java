@@ -30,5 +30,5 @@ public interface XmlResourceParser extends XmlPullParser, AttributeSet {
 	 * Close this interface to the resource. Calls on the interface are no
 	 * longer value after this call.
 	 */
-	public void close();
+    void close();
 }

@@ -34,8 +34,8 @@ public class ResStyleValue extends ResBagValue implements
 
         mItems = new Duo[items.length];
         for (int i = 0; i < items.length; i++) {
-            mItems[i] = new Duo<ResReferenceValue, ResScalarValue>(
-                    factory.newReference(items[i].m1, null), items[i].m2);
+            mItems[i] = new Duo<>(
+                factory.newReference(items[i].m1, null), items[i].m2);
         }
     }
 
@@ -49,16 +49,16 @@ public class ResStyleValue extends ResBagValue implements
         } else if (res.getResSpec().getName().indexOf('.') != -1) {
             serializer.attribute(null, "parent", "");
         }
-        for (int i = 0; i < mItems.length; i++) {
-            ResResSpec spec = mItems[i].m1.getReferent();
+        for (Duo<ResReferenceValue, ResScalarValue> mItem : mItems) {
+            ResResSpec spec = mItem.m1.getReferent();
 
             if (spec == null) {
                 LOGGER.fine(String.format("null reference: m1=0x%08x(%s), m2=0x%08x(%s)",
-                        mItems[i].m1.getRawIntValue(), mItems[i].m1.getType(), mItems[i].m2.getRawIntValue(), mItems[i].m2.getType()));
+                    mItem.m1.getRawIntValue(), mItem.m1.getType(), mItem.m2.getRawIntValue(), mItem.m2.getType()));
                 continue;
             }
 
-            String name = null;
+            String name;
             String value = null;
 
             ResValue resource = spec.getDefaultResource().getValue();
@@ -66,14 +66,14 @@ public class ResStyleValue extends ResBagValue implements
                 continue;
             } else if (resource instanceof ResAttr) {
                 ResAttr attr = (ResAttr) resource;
-                value = attr.convertToResXmlFormat(mItems[i].m2);
+                value = attr.convertToResXmlFormat(mItem.m2);
                 name = spec.getFullName(res.getResSpec().getPackage(), true);
             } else {
                 name = "@" + spec.getFullName(res.getResSpec().getPackage(), false);
             }
 
             if (value == null) {
-                value = mItems[i].m2.encodeAsResXmlValue();
+                value = mItem.m2.encodeAsResXmlValue();
             }
 
             if (value == null) {

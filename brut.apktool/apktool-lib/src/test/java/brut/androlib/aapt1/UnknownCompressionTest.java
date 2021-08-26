@@ -79,7 +79,7 @@ public class UnknownCompressionTest extends BaseTest {
         // Check that control = rebuilt (both stored)
         // Add extra check for checking = 0 to enforce check for stored just in case control breaks
         assertEquals(control, rebuilt);
-        assertEquals(new Integer(0), rebuilt);
+        assertEquals(Integer.valueOf(0), rebuilt);
     }
 
     @Test
@@ -88,7 +88,7 @@ public class UnknownCompressionTest extends BaseTest {
         Integer rebuilt = sTestNewDir.getDirectory().getCompressionLevel("test.json");
 
         assertEquals(control, rebuilt);
-        assertEquals(new Integer(8), rebuilt);
+        assertEquals(Integer.valueOf(8), rebuilt);
     }
 
     @Test
@@ -97,6 +97,6 @@ public class UnknownCompressionTest extends BaseTest {
         Integer rebuilt = sTestNewDir.getDirectory().getCompressionLevel("950x150.png");
 
         assertEquals(control, rebuilt);
-        assertEquals(new Integer(8), rebuilt);
+        assertEquals(Integer.valueOf(8), rebuilt);
     }
 }

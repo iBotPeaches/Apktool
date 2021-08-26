@@ -62,7 +62,7 @@ final public class AndrolibResources {
             throws AndrolibException {
         LOGGER.info("Loading resource table...");
         ResPackage[] pkgs = getResPackagesFromApk(apkFile, resTable, sKeepBroken);
-        ResPackage pkg = null;
+        ResPackage pkg;
 
         switch (pkgs.length) {
             case 1:
@@ -71,14 +71,11 @@ final public class AndrolibResources {
             case 2:
                 if (pkgs[0].getName().equals("android")) {
                     LOGGER.warning("Skipping \"android\" package group");
-                    pkg = pkgs[1];
-                    break;
                 } else if (pkgs[0].getName().equals("com.htc")) {
                     LOGGER.warning("Skipping \"htc\" package group");
-                    pkg = pkgs[1];
-                    break;
                 }
-
+                pkg = pkgs[1];
+                break;
             default:
                 pkg = selectPkgWithMostResSpecs(pkgs);
                 break;
@@ -128,7 +125,7 @@ final public class AndrolibResources {
         }
 
         if (pkg.getId() != id) {
-            throw new AndrolibException("Expected pkg of id: " + String.valueOf(id) + ", got: " + pkg.getId());
+            throw new AndrolibException("Expected pkg of id: " + id + ", got: " + pkg.getId());
         }
 
         resTable.addPackage(pkg, false);
@@ -619,7 +616,7 @@ final public class AndrolibResources {
 
         String aaptPath = apkOptions.aaptPath;
         boolean customAapt = !aaptPath.isEmpty();
-        List<String> cmd = new ArrayList<String>();
+        List<String> cmd = new ArrayList<>();
 
         try {
             String aaptCommand = AaptManager.getAaptExecutionCommand(aaptPath, getAaptBinaryFile());
@@ -705,7 +702,7 @@ final public class AndrolibResources {
         axmlParser.setAttrDecoder(new ResAttrDecoder());
         decoders.setDecoder("xml", new XmlPullStreamDecoder(axmlParser, getResXmlSerializer()));
 
-        return new Duo<ResFileDecoder, AXmlResourceParser>(new ResFileDecoder(decoders), axmlParser);
+        return new Duo<>(new ResFileDecoder(decoders), axmlParser);
     }
 
     public Duo<ResFileDecoder, AXmlResourceParser> getManifestFileDecoder(boolean withResources) {
@@ -717,7 +714,7 @@ final public class AndrolibResources {
         }
         decoders.setDecoder("xml", new XmlPullStreamDecoder(axmlParser,getResXmlSerializer()));
 
-        return new Duo<ResFileDecoder, AXmlResourceParser>(new ResFileDecoder(decoders), axmlParser);
+        return new Duo<>(new ResFileDecoder(decoders), axmlParser);
     }
 
     public ExtMXSerializer getResXmlSerializer() {
@@ -783,15 +780,10 @@ final public class AndrolibResources {
             throws AndrolibException {
         try {
             Directory dir = apkFile.getDirectory();
-            BufferedInputStream bfi = new BufferedInputStream(dir.getFileInput("resources.arsc"));
-            try {
+            try (BufferedInputStream bfi = new BufferedInputStream(dir.getFileInput("resources.arsc"))) {
                 return ARSCDecoder.decode(bfi, false, keepBroken, resTable).getPackages();
-            } finally {
-                try {
-                    bfi.close();
-                } catch (IOException ignored) {}
             }
-        } catch (DirectoryException ex) {
+        } catch (DirectoryException | IOException ex) {
             throw new AndrolibException("Could not load resources.arsc from file: " + apkFile, ex);
         }
     }
@@ -808,7 +800,7 @@ final public class AndrolibResources {
             }
         }
 
-        apk = new File(dir, String.valueOf(id) + ".apk");
+        apk = new File(dir, id + ".apk");
         if (apk.exists()) {
             return apk;
         }
@@ -888,8 +880,8 @@ final public class AndrolibResources {
             ARSCData arsc = ARSCDecoder.decode(new ByteArrayInputStream(data), true, true);
             publicizeResources(data, arsc.getFlagsOffsets());
 
-            File outFile = new File(getFrameworkDir(), String.valueOf(arsc
-                    .getOnePackage().getId())
+            File outFile = new File(getFrameworkDir(), arsc
+                .getOnePackage().getId()
                     + (tag == null ? "" : '-' + tag)
                     + ".apk");
 

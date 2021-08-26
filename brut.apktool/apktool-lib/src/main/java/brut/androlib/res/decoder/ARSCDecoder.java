@@ -59,7 +59,7 @@ public class ARSCDecoder {
     private ARSCDecoder(InputStream arscStream, ResTable resTable, boolean storeFlagsOffsets, boolean keepBroken) {
         arscStream = mCountIn = new CountingInputStream(arscStream);
         if (storeFlagsOffsets) {
-            mFlagsOffsets = new ArrayList<FlagsOffset>();
+            mFlagsOffsets = new ArrayList<>();
         } else {
             mFlagsOffsets = null;
         }
@@ -251,7 +251,7 @@ public class ARSCDecoder {
         }
 
         mType = flags.isInvalid && !mKeepBroken ? null : mPkg.getOrCreateConfig(flags);
-        HashMap<Integer, EntryData> offsetsToEntryData = new HashMap<Integer, EntryData>();
+        HashMap<Integer, EntryData> offsetsToEntryData = new HashMap<>();
 
         for (int offset : entryOffsets) {
             if (offset == -1 || offsetsToEntryData.containsKey(offset)) {
@@ -327,7 +327,7 @@ public class ARSCDecoder {
             if (mKeepBroken) {
                 mType.addResource(res, true);
                 spec.addResource(res, true);
-                LOGGER.warning(String.format("Duplicate Resource Detected. Ignoring duplicate: %s", res.toString()));
+                LOGGER.warning(String.format("Duplicate Resource Detected. Ignoring duplicate: %s", res));
             } else {
                 throw ex;
             }
@@ -347,12 +347,10 @@ public class ARSCDecoder {
             resId = mIn.readInt();
             resValue = readValue();
 
-            if (resValue instanceof ResScalarValue) {
-                items[i] = new Duo<Integer, ResScalarValue>(resId, (ResScalarValue) resValue);
-            } else {
+            if (!(resValue instanceof ResScalarValue)) {
                 resValue = new ResStringValue(resValue.toString(), resValue.getRawIntValue());
-                items[i] = new Duo<Integer, ResScalarValue>(resId, (ResScalarValue) resValue);
             }
+            items[i] = new Duo<>(resId, (ResScalarValue) resValue);
         }
 
         return factory.bagFactory(parent, items, mTypeSpec);
@@ -574,7 +572,7 @@ public class ARSCDecoder {
     private int mResId;
     private int mTypeIdOffset = 0;
     private boolean[] mMissingResSpecs;
-    private HashMap<Integer, ResTypeSpec> mResTypeSpecs = new HashMap<>();
+    private final HashMap<Integer, ResTypeSpec> mResTypeSpecs = new HashMap<>();
 
     private final static short ENTRY_FLAG_COMPLEX = 0x0001;
     private final static short ENTRY_FLAG_PUBLIC = 0x0002;

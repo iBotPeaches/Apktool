@@ -272,8 +272,8 @@ public abstract class AbstractDirectory implements Directory {
 
 
     private class ParsedPath {
-        public String dir;
-        public String subpath;
+        public final String dir;
+        public final String subpath;
         public ParsedPath(String dir, String subpath) {
             this.dir = dir;
             this.subpath = subpath;
@@ -281,8 +281,8 @@ public abstract class AbstractDirectory implements Directory {
     }
 
     private class SubPath {
-        public AbstractDirectory dir;
-        public String path;
+        public final AbstractDirectory dir;
+        public final String path;
 
         public SubPath(AbstractDirectory dir, String path) {
             this.dir = dir;

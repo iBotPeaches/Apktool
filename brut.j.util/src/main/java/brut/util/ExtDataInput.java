@@ -80,9 +80,9 @@ public class ExtDataInput extends DataInputDelegate {
      */
     public final int skipBytes(int n) throws IOException {
         int total = 0;
-        int cur = 0;
+        int cur;
 
-        while ((total < n) && ((cur = (int) super.skipBytes(n - total)) > 0)) {
+        while ((total < n) && ((cur = super.skipBytes(n - total)) > 0)) {
             total += cur;
         }
 

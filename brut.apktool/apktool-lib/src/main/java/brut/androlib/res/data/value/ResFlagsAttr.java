@@ -23,7 +23,6 @@ import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Comparator;
 
 public class ResFlagsAttr extends ResAttr {
     ResFlagsAttr(ResReferenceValue parent, int type, Integer min, Integer max,
@@ -55,8 +54,7 @@ public class ResFlagsAttr extends ResAttr {
         FlagItem[] flagItems = new FlagItem[mFlags.length];
         int[] flags = new int[mFlags.length];
         int flagsCount = 0;
-        for (int i = 0; i < mFlags.length; i++) {
-            FlagItem flagItem = mFlags[i];
+        for (FlagItem flagItem : mFlags) {
             int flag = flagItem.flag;
 
             if ((intVal & flag) != flag) {
@@ -74,20 +72,18 @@ public class ResFlagsAttr extends ResAttr {
     @Override
     protected void serializeBody(XmlSerializer serializer, ResResource res)
             throws AndrolibException, IOException {
-        for (int i = 0; i < mItems.length; i++) {
-            FlagItem item = mItems[i];
-
+        for (FlagItem item : mItems) {
             serializer.startTag(null, "flag");
             serializer.attribute(null, "name", item.getValue());
             serializer.attribute(null, "value",
-                    String.format("0x%08x", item.flag));
+                String.format("0x%08x", item.flag));
             serializer.endTag(null, "flag");
         }
     }
 
     private boolean isSubpartOf(int flag, int[] flags) {
-        for (int i = 0; i < flags.length; i++) {
-            if ((flags[i] & flag) == flag) {
+        for (int j : flags) {
+            if ((j & flag) == flag) {
                 return true;
             }
         }
@@ -95,12 +91,12 @@ public class ResFlagsAttr extends ResAttr {
     }
 
     private String renderFlags(FlagItem[] flags) throws AndrolibException {
-        String ret = "";
-        for (int i = 0; i < flags.length; i++) {
-            ret += "|" + flags[i].getValue();
+        StringBuilder ret = new StringBuilder();
+        for (FlagItem flag : flags) {
+            ret.append("|").append(flag.getValue());
         }
-        if (ret.isEmpty()) {
-            return ret;
+        if (ret.length() == 0) {
+            return ret.toString();
         }
         return ret.substring(1);
     }
@@ -115,8 +111,7 @@ public class ResFlagsAttr extends ResAttr {
         FlagItem[] flags = new FlagItem[mItems.length];
         int flagsCount = 0;
 
-        for (int i = 0; i < mItems.length; i++) {
-            FlagItem item = mItems[i];
+        for (FlagItem item : mItems) {
             if (item.flag == 0) {
                 zeroFlags[zeroFlagsCount++] = item;
             } else {
@@ -127,13 +122,7 @@ public class ResFlagsAttr extends ResAttr {
         mZeroFlags = Arrays.copyOf(zeroFlags, zeroFlagsCount);
         mFlags = Arrays.copyOf(flags, flagsCount);
 
-        Arrays.sort(mFlags, new Comparator<FlagItem>() {
-            @Override
-            public int compare(FlagItem o1, FlagItem o2) {
-                return Integer.valueOf(Integer.bitCount(o2.flag)).compareTo(
-                        Integer.bitCount(o1.flag));
-            }
-        });
+        Arrays.sort(mFlags, (o1, o2) -> Integer.compare(Integer.bitCount(o2.flag), Integer.bitCount(o1.flag)));
     }
 
     private final FlagItem[] mItems;
