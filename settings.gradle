@@ -1,5 +1,9 @@
-include 'brut.j.common',
-        'brut.j.util',
-        'brut.j.dir',
-        'brut.apktool:apktool-lib',
-        'brut.apktool:apktool-cli'
+sourceControl {
+    gitRepository("https://github.com/robertsmd/smali.git") {
+	producesModule("org.smali:smali")
+	producesModule("org.smali:baksmali")
+    }
+}
+
+include 'brut.j.common', 'brut.j.util', 'brut.j.dir', 'brut.apktool:apktool-lib', 'brut.apktool:apktool-cli'
+

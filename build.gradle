@@ -24,7 +24,6 @@ buildscript {
         ibotEmail = 'connor.tumbleson@gmail.com'
 
         depends = [
-                baksmali       : 'org.smali:baksmali:2.5.2',
                 commons_cli    : 'commons-cli:commons-cli:1.4',
                 commons_io     : 'commons-io:commons-io:2.11.0',
                 commons_lang   : 'org.apache.commons:commons-lang3:3.12.0',
@@ -32,9 +31,10 @@ buildscript {
                 junit          : 'junit:junit:4.13.2',
                 proguard_gradle: 'com.guardsquare:proguard-gradle:7.1.1',
                 snakeyaml      : 'org.yaml:snakeyaml:1.29:android',
-                smali          : 'org.smali:smali:2.5.2',
                 xmlpull        : 'xpp3:xpp3:1.1.4c',
                 xmlunit        : 'xmlunit:xmlunit:1.6',
+                smali          : 'org.smali:smali',
+                baksmali       : 'org.smali:baksmali'
         ]
     }
 
@@ -45,6 +45,7 @@ buildscript {
     dependencies {
         classpath "gradle.plugin.com.github.jengelman.gradle.plugins:shadow:7.0.0"
         classpath "gradle.plugin.com.hierynomus.gradle.plugins:license-gradle-plugin:0.16.1"
+        
     }
 }
 
@@ -54,6 +55,11 @@ version = '2.5.1'
 def suffix = 'SNAPSHOT'
 
 defaultTasks 'build', 'shadowJar', 'proguard'
+
+subprojects {
+    tasks.withType(Javadoc).all { enabled = false }
+}
+
 
 allprojects {
     apply plugin: 'java'
@@ -78,7 +84,26 @@ allprojects {
             "licenseMain",
             "licenseTest"
     ]
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        implementation('org.smali:smali') {
+            version {
+                branch = 'master'
+            }
+       }
+        implementation('org.smali:baksmali') {
+            version {
+                branch = 'master'
+            }
+       }
+    }   
+
 }
+
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = StandardCharsets.UTF_8.toString()
