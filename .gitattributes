@@ -2,3 +2,6 @@
 
 *.bat text eol=crlf
 *.jar binary
+/brut.apktool/apktool-lib/src/main/resources/prebuilt/windows/* binary
+/brut.apktool/apktool-lib/src/main/resources/prebuilt/macosx/* binary
+/brut.apktool/apktool-lib/src/main/resources/prebuilt/linux/* binary
