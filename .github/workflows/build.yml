@@ -1,11 +1,8 @@
 name: CI
 on:
   push:
-    paths:
-      - '**.java'
-      - '**.gradle'
-      - 'brut.apktool/apktool-lib/src/main/resources/**'
-      - '.github/workflows/**'
+    branches:
+      - master
   pull_request:
     paths:
       - '**.java'
