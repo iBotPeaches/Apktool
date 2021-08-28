@@ -18,7 +18,7 @@ jobs:
       fail-fast: true
       matrix:
         os: [ ubuntu-latest, macOS-latest, windows-latest ]
-        java: [ 8, 9, 10, 11, 12, 13, 14 ]
+        java: [ 8, 9, 10, 11, 12, 13, 14, 15, 16 ]
 
     steps:
       - uses: actions/cache@v2
