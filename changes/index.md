@@ -21,7 +21,9 @@ description: Apktool - Changelog / Roadmap
  * Upgrade to `jengelman.shadow 7.0.0` (Thanks Goooler)
  * Upgrade to `actions/setup-java@v2` (Thanks Goooler)
  * Added `.gitattributes` (Thanks Goooler)
+ * Added support for SDK in Development (Tiramisu, API 32?)
  * Upgrade aapt2 with patches for `attr-private` and remove reserved pkgIds. (Thanks MrIkso)
+ * Upgrade aapt1 with patches for a static binary on Mac arch.
  * Add lazy init for ResTable for optimizations. ([Issue 2604](https://github.com/iBotPeaches/Apktool/pull/2604)) / (Thanks IgorEisberg)
  * Add automatic disassemble/assemble JAR files without specifying api level. ([Issue 2605](https://github.com/iBotPeaches/Apktool/pull/2605)) / (Thanks IgorEisberg)
  * Changed zipslip exceptions to skip file instead of exit on failure. ([Issue 2201](https://github.com/iBotPeaches/Apktool/issues/2201))
