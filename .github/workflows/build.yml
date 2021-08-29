@@ -1,4 +1,6 @@
 name: CI
+env:
+  BINARY_PATH: brut.apktool/apktool-lib/src/main/resources/prebuilt
 on:
   push:
     branches:
@@ -11,6 +13,19 @@ on:
       - '.github/workflows/**'
 
 jobs:
+  analyze-mac-aapt-binaries:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        file: [aapt_64, aapt2_64]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Verify Static
+        run: grep -q "@rpath" $BINARY_PATH/macosx/${{ matrix.file}}
+
+
   build-and-test-with-Java-8-and-later:
     runs-on: ${{ matrix.os }}
     name: Build/Test (JDK ${{ matrix.java }}, ${{ matrix.os }})
