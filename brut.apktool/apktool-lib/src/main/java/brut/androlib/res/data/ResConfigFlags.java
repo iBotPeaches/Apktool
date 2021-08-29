@@ -541,7 +541,7 @@ public class ResConfigFlags {
 
     // AOSP has this as 10,000 for dev purposes.
     // platform_frameworks_base/commit/c7a1109a1fe0771d4c9b572dcf178e2779fc4f2d
-    public final static int SDK_S = 10000;
+    public final static int SDK_DEVELOPMENT = 10000;
 
     public final static byte ORIENTATION_ANY = 0;
     public final static byte ORIENTATION_PORT = 1;
