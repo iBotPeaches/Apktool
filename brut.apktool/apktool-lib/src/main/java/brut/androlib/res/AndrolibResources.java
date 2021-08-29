@@ -671,6 +671,9 @@ final public class AndrolibResources {
                 return ResConfigFlags.SDK_R;
             case "S":
                 return ResConfigFlags.SDK_S;
+            case "T":
+            case "Tiramisu":
+                return ResConfigFlags.SDK_DEVELOPMENT;
             default:
                 return Integer.parseInt(sdkVersion);
         }
