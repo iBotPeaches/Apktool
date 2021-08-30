@@ -23,7 +23,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Verify Static
-        run: otool -L ${{ env.BINARY_PATH }}/macosx/${{ matrix.file}} | grep -q "@rpath"
+        run: otool -L ${{ env.BINARY_PATH }}/macosx/${{ matrix.file }} | grep -q "@rpath"
 
   analyze-linux-aapt:
     runs-on: ubuntu-latest
@@ -35,7 +35,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Verify Static
-        run: ldd ${{ env.BINARY_PATH }}/macosx/${{ matrix.file}} | grep -q "not a dynamic executable"
+        run: ldd ${{ env.BINARY_PATH }}/linux/${{ matrix.file }} | grep -q "not a dynamic executable"
 
   analyze-windows-aapt:
     runs-on: ubuntu-latest
@@ -47,7 +47,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Verify Static
-        run: ldd ${{ env.BINARY_PATH }}/macosx/${{ matrix.file}} | grep -q "not a dynamic executable"
+        run: ldd ${{ env.BINARY_PATH }}/windows/${{ matrix.file }} | grep -q "not a dynamic executable"
 
   build-and-test-with-Java-8-and-later:
     runs-on: ${{ matrix.os }}
