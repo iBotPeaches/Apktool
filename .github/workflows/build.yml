@@ -1,11 +1,8 @@
 name: CI
 on:
   push:
-    paths:
-      - '**.java'
-      - '**.gradle'
-      - 'brut.apktool/apktool-lib/src/main/resources/**'
-      - '.github/workflows/**'
+    branches:
+      - master
   pull_request:
     paths:
       - '**.java'
@@ -18,11 +15,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     name: Build/Test (JDK ${{ matrix.java }}, ${{ matrix.os }})
     strategy:
-      fail-fast: false
-      max-parallel: 10
+      fail-fast: true
       matrix:
         os: [ ubuntu-latest, macOS-latest, windows-latest ]
-        java: [ 8, 9, 10, 11, 12, 13, 14 ]
+        java: [ 8, 9, 10, 11, 12, 13, 14, 15, 16 ]
 
     steps:
       - uses: actions/cache@v2

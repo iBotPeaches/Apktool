@@ -245,7 +245,7 @@ to get the source downloaded. This is no small download, expect to use 150-250GB
 After that, you need to build AOSP via this [documentation](https://source.android.com/source/building.html) guide. Now
 we aren't building the entire AOSP package, the initial build is to just see if you are capable of building it.
 
-We check out a certain tag or branch. Currently we use 
+We check out a certain tag or branch. Currently we use
 
  * aapt2 - `master`.
  * aapt1 - `master`.
@@ -266,7 +266,7 @@ The steps below are different per flavor and operating system.
 #### Linux / Windows
 1. `source build/envsetup.sh`
 2. `lunch sdk-eng`
-3. `make LOCAL_MULTILIB=64 USE_NINJA=false aapt`
+3. `m aapt`
 4. `strip out/host/linux-x86/bin/aapt`
 5. `strip out/host/linux-x86/bin/aapt_64`
 6. `strip out/host/windows-x86/bin/aapt.exe`
@@ -274,9 +274,8 @@ The steps below are different per flavor and operating system.
 
 #### Mac
 1. `source build/envsetup.sh`
-2. `lunch sdk-eng`
-3. `make LOCAL_MULTILIB=64 USE_NINJA=false aapt`
-4. `strip out/host/darwin-x86/bin/aapt_64`
+2. `m aapt`
+3. `strip out/host/darwin-x86/bin/aapt_64`
 
 32/64 bit binaries will be built for Linux and Windows.
 
@@ -285,7 +284,7 @@ The steps below are different per flavor and operating system.
 The steps below are different per flavor and operating system.
 
 #### Linux / Windows
-1. `make LOCAL_MULTILIB=64 USE_NINJA=false aapt2`
+1. `m aapt2`
 2. `strip out/host/linux-x86/bin/aapt2`
 3. `strip out/host/linux-x86/bin/aapt2_64`
 4. `strip out/host/windows-x86/bin/aapt2.exe`
@@ -294,7 +293,7 @@ The steps below are different per flavor and operating system.
 #### Mac
 1. `export ANDROID_JAVA_HOME=/Path/To/Jdk`
 2. `source build/envsetup.sh`
-3. `make LOCAL_MULTILIB=64 USE_NINJA=false aapt2`
+3. `m aapt2`
 4. `strip out/host/darwin-x86/bin/aapt2_64`
 
 #### Confirming aapt/aapt2 builds are static
