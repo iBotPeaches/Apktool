@@ -124,7 +124,17 @@ public class StringBlock {
             this.position = position;
             this.matchingTagPosition = matchingTagPosition;
         }
-
+        
+        /**
+         * compares this tag and another, returning the order that should be between them.
+         * order by:
+         *      position
+         *      closing tag has precedence over openning tag (unless it is the same tag)
+         *      tags that are enclosed in others should appear later if openning tag, or first if closing tag
+         *      lexicographical sort. openning tag and closing tag in reverse so that one tag will be contained in the other and not each contain the other partially
+         * @param o - the other tag object to compare to
+         * @return the order in between this object and the other
+         */
         @Override
         public int compareTo(Tag o) {
             return ComparisonChain.start()
@@ -139,6 +149,10 @@ public class StringBlock {
                 .result();
         }
 
+        /**
+         * formats the tag value and attributes according to whether the tag is an openning or closing tag
+         * @return the formatted tag value as a string
+         */
         @Override
         public String toString() {
             // "tag" can either be just the tag or have the form "tag;attr1=value1;attr2=value2;[...]".
@@ -212,6 +226,11 @@ public class StringBlock {
         }
     }
 
+    /**
+     *
+     * @param styledString - the raw string with its corresponding styling tags and their locations
+     * @return a formatted styled string that contains the styling tag in the correct locations
+     */
     String processStyledString(StyledString styledString) {
 
         ArrayList<Tag> sortedTagsList = new ArrayList<>();
@@ -238,21 +257,12 @@ public class StringBlock {
         int lastIndex = 0;
         for (Tag tag : sortedTagsList) {
             string.append(ResXmlEncoders.escapeXmlChars(raw.substring(lastIndex, tag.position)));
-            string.append(tag.toString());
+            string.append(tag);
             lastIndex = tag.position;
         }
         string.append(ResXmlEncoders.escapeXmlChars(raw.substring(lastIndex)));
 
         return string.toString();
-    }
-
-    /**
-     * Not yet implemented.
-     *
-     * Returns string with style information (if any).
-     */
-    public CharSequence get(int index) {
-        return getString(index);
     }
 
     /**
@@ -275,48 +285,6 @@ public class StringBlock {
 
         StyledString styledString = new StyledString(raw, style);
         return processStyledString(styledString);
-    }
-
-    private void outputStyleTag(String tag, StringBuilder builder, boolean close) {
-        builder.append('<');
-        if (close) {
-            builder.append('/');
-        }
-
-        int pos = tag.indexOf(';');
-        if (pos == -1) {
-            builder.append(tag);
-        } else {
-            builder.append(tag.substring(0, pos));
-            if (!close) {
-                boolean loop = true;
-                while (loop) {
-                    int pos2 = tag.indexOf('=', pos + 1);
-
-                    // malformed style information will cause crash. so
-                    // prematurely end style tags, if recreation
-                    // cannot be created.
-                    if (pos2 != -1) {
-                        builder.append(' ').append(tag.substring(pos + 1, pos2)).append("=\"");
-                        pos = tag.indexOf(';', pos2 + 1);
-
-                        String val;
-                        if (pos != -1) {
-                            val = tag.substring(pos2 + 1, pos);
-                        } else {
-                            loop = false;
-                            val = tag.substring(pos2 + 1);
-                        }
-
-                        builder.append(ResXmlEncoders.escapeXmlChars(val)).append('"');
-                    } else {
-                        loop = false;
-                    }
-
-                }
-            }
-        }
-        builder.append('>');
     }
 
     /**
