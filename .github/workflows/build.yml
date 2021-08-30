@@ -13,7 +13,7 @@ on:
       - '.github/workflows/**'
 
 jobs:
-  analyze-mac-aapt-binaries:
+  analyze-mac-aapt:
     runs-on: macos-latest
     strategy:
       matrix:
@@ -23,11 +23,35 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Verify Static
-        run: grep -q "@rpath" $BINARY_PATH/macosx/${{ matrix.file}}
+        run: otool -L ${{ env.BINARY_PATH }}/macosx/${{ matrix.file}} | grep -q "@rpath"
 
+  analyze-linux-aapt:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        file: [aapt, aapt_64, aapt2, aapt2_64]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Verify Static
+        run: ldd ${{ env.BINARY_PATH }}/macosx/${{ matrix.file}} | grep -q "not a dynamic executable"
+
+  analyze-windows-aapt:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        file: [aapt.exe, aapt_64.exe, aapt2.exe, aapt2_64.exe]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Verify Static
+        run: ldd ${{ env.BINARY_PATH }}/macosx/${{ matrix.file}} | grep -q "not a dynamic executable"
 
   build-and-test-with-Java-8-and-later:
     runs-on: ${{ matrix.os }}
+    needs: [analyze-macos-aapt, analyze-linux-aapt, analyze-windows-aapt]
     name: Build/Test (JDK ${{ matrix.java }}, ${{ matrix.os }})
     strategy:
       fail-fast: true
