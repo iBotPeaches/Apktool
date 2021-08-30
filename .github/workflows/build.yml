@@ -22,6 +22,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Verify Executable
+        run: ${{ env.BINARY_PATH }}/macosx/${{ matrix.file }}
+
       - name: Verify Static
         run: otool -L ${{ env.BINARY_PATH }}/macosx/${{ matrix.file }} | grep -q "@rpath"
 
@@ -34,6 +37,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Verify Executable
+        run: ${{ env.BINARY_PATH }}/linux/${{ matrix.file }}
+
+      - name: Verify Static
+        run: ldd
+
       - name: Verify Static
         run: ldd ${{ env.BINARY_PATH }}/linux/${{ matrix.file }} | grep -q "not a dynamic executable"
 
@@ -45,6 +54,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+
+      - name: Verify Executable
+        run: ${{ env.BINARY_PATH }}/windows/${{ matrix.file }}
 
       - name: Verify Static
         run: ldd ${{ env.BINARY_PATH }}/windows/${{ matrix.file }} | grep -q "not a dynamic executable"
