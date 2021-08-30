@@ -51,7 +51,10 @@ jobs:
 
   build-and-test-with-Java-8-and-later:
     runs-on: ${{ matrix.os }}
-    needs: [analyze-macos-aapt, analyze-linux-aapt, analyze-windows-aapt]
+    needs:
+      - analyze-mac-aapt
+      - analyze-linux-aapt
+      - analyze-windows-aapt
     name: Build/Test (JDK ${{ matrix.java }}, ${{ matrix.os }})
     strategy:
       fail-fast: true
