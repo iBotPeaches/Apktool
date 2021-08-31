@@ -29,6 +29,7 @@ description: Apktool - Changelog / Roadmap
  * Changed zipslip exceptions to skip file instead of exit on failure. ([Issue 2201](https://github.com/iBotPeaches/Apktool/issues/2201))
  * Changed dummy resource names to `APKTOOL_DUPLICATE_{Type}_{RESID}` to prevent starting with numeric ([Issue 2229](https://github.com/iBotPeaches/Apktool/issues/2229))
  * Changed all Apache License links to `https`. ([Issue 2635](https://github.com/iBotPeaches/Apktool/pull/2635)) / (Thanks Goooler)
+ * Changed `getHTML()` processor to leverage BundleTool for handling complex string values. ([Issue 2632](https://github.com/iBotPeaches/Apktool/issues/2632)) / (Thanks itaybia)
  * Fix decoding issue requiring specific order of chunks (library/table). ([Issue 2099](https://github.com/iBotPeaches/Apktool/issues/2099)) / (Thanks LoyieKing)
  * Fix decoding issues with code points over > 0x10000. ([Issue 2299](https://github.com/iBotPeaches/Apktool/issues/2299)) / (Thanks Comnir)
  * Fix decoding issues with surrogate pair emojis. ([Issue 2546](https://github.com/iBotPeaches/Apktool/issues/2546)) / (Thanks Comnir)
