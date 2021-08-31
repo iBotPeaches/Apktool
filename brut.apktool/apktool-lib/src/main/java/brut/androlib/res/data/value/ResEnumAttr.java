@@ -80,5 +80,5 @@ public class ResEnumAttr extends ResAttr {
     }
 
     private final Duo<ResReferenceValue, ResIntValue>[] mItems;
-    private final Map<Integer, String> mItemsCache = new HashMap<Integer, String>();
+    private final Map<Integer, String> mItemsCache = new HashMap<>();
 }

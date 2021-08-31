@@ -41,8 +41,8 @@ public class DirUtil {
 
     public static void copyToDir(Directory in, Directory out,
             String[] fileNames) throws DirectoryException {
-        for (int i = 0; i < fileNames.length; i++) {
-            copyToDir(in, out, fileNames[i]);
+        for (String fileName : fileNames) {
+            copyToDir(in, out, fileName);
         }
     }
 
@@ -73,8 +73,8 @@ public class DirUtil {
 
     public static void copyToDir(Directory in, File out, String[] fileNames)
             throws DirectoryException {
-        for (int i = 0; i < fileNames.length; i++) {
-            copyToDir(in, out, fileNames[i]);
+        for (String fileName : fileNames) {
+            copyToDir(in, out, fileName);
         }
     }
 

@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ResStreamDecoderContainer {
-    private final Map<String, ResStreamDecoder> mDecoders = new HashMap<String, ResStreamDecoder>();
+    private final Map<String, ResStreamDecoder> mDecoders = new HashMap<>();
 
     public void decode(InputStream in, OutputStream out, String decoderName)
             throws AndrolibException {

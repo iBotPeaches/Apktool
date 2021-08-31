@@ -345,7 +345,7 @@ public class AXmlResourceParser implements XmlResourceParser {
                 if (resourceId != 0) {
                     value = mAttrDecoder.decodeManifestAttr(getAttributeNameResource(index));
                 }
-            } catch (AndrolibException | NullPointerException e) { }
+            } catch (AndrolibException | NullPointerException ignored) {}
         }
         return value;
     }
@@ -601,12 +601,12 @@ public class AXmlResourceParser implements XmlResourceParser {
             m_data = new int[32];
         }
 
-        public final void reset() {
+        public void reset() {
             m_dataLength = 0;
             m_depth = 0;
         }
 
-        public final int getCurrentCount() {
+        public int getCurrentCount() {
             if (m_dataLength == 0) {
                 return 0;
             }
@@ -614,7 +614,7 @@ public class AXmlResourceParser implements XmlResourceParser {
             return m_data[offset];
         }
 
-        public final int getAccumulatedCount(int depth) {
+        public int getAccumulatedCount(int depth) {
             if (m_dataLength == 0 || depth < 0) {
                 return 0;
             }
@@ -631,7 +631,7 @@ public class AXmlResourceParser implements XmlResourceParser {
             return accumulatedCount;
         }
 
-        public final void push(int prefix, int uri) {
+        public void push(int prefix, int uri) {
             if (m_depth == 0) {
                 increaseDepth();
             }
@@ -645,7 +645,7 @@ public class AXmlResourceParser implements XmlResourceParser {
             m_dataLength += 2;
         }
 
-        public final boolean pop() {
+        public boolean pop() {
             if (m_dataLength == 0) {
                 return false;
             }
@@ -663,23 +663,23 @@ public class AXmlResourceParser implements XmlResourceParser {
             return true;
         }
 
-        public final int getPrefix(int index) {
+        public int getPrefix(int index) {
             return get(index, true);
         }
 
-        public final int getUri(int index) {
+        public int getUri(int index) {
             return get(index, false);
         }
 
-        public final int findPrefix(int uri) {
+        public int findPrefix(int uri) {
             return find(uri, false);
         }
 
-        public final int getDepth() {
+        public int getDepth() {
             return m_depth;
         }
 
-        public final void increaseDepth() {
+        public void increaseDepth() {
             ensureDataCapacity(2);
             int offset = m_dataLength;
             m_data[offset] = 0;
@@ -688,7 +688,7 @@ public class AXmlResourceParser implements XmlResourceParser {
             m_depth += 1;
         }
 
-        public final void decreaseDepth() {
+        public void decreaseDepth() {
             if (m_dataLength == 0) {
                 return;
             }
@@ -712,7 +712,7 @@ public class AXmlResourceParser implements XmlResourceParser {
             m_data = newData;
         }
 
-        private final int find(int prefixOrUri, boolean prefix) {
+        private int find(int prefixOrUri, boolean prefix) {
             if (m_dataLength == 0) {
                 return -1;
             }
@@ -736,7 +736,7 @@ public class AXmlResourceParser implements XmlResourceParser {
             return -1;
         }
 
-        private final int get(int index, boolean prefix) {
+        private int get(int index, boolean prefix) {
             if (m_dataLength == 0 || index < 0) {
                 return -1;
             }
@@ -762,7 +762,7 @@ public class AXmlResourceParser implements XmlResourceParser {
         private int m_depth;
     }
 
-    private final int getAttributeOffset(int index) {
+    private int getAttributeOffset(int index) {
         if (m_event != START_TAG) {
             throw new IndexOutOfBoundsException("Current event is not START_TAG.");
         }
@@ -773,7 +773,7 @@ public class AXmlResourceParser implements XmlResourceParser {
         return offset;
     }
 
-    private final int findAttribute(String namespace, String attribute) {
+    private int findAttribute(String namespace, String attribute) {
         if (m_strings == null || attribute == null) {
             return -1;
         }
@@ -791,7 +791,7 @@ public class AXmlResourceParser implements XmlResourceParser {
         return -1;
     }
 
-    private final void resetEventInfo() {
+    private void resetEventInfo() {
         m_event = -1;
         m_lineNumber = -1;
         m_name = -1;
@@ -802,7 +802,7 @@ public class AXmlResourceParser implements XmlResourceParser {
         m_styleAttribute = -1;
     }
 
-    private final void doNext() throws IOException {
+    private void doNext() throws IOException {
         // Delayed initialization.
         if (m_strings == null) {
             m_reader.skipCheckInt(CHUNK_AXML_FILE, CHUNK_AXML_FILE_BROKEN);
@@ -938,7 +938,7 @@ public class AXmlResourceParser implements XmlResourceParser {
     private boolean m_operational = false;
     private StringBlock m_strings;
     private int[] m_resourceIDs;
-    private NamespaceStack m_namespaces = new NamespaceStack();
+    private final NamespaceStack m_namespaces = new NamespaceStack();
     private final String android_ns = "http://schemas.android.com/apk/res/android";
     private boolean m_decreaseDepth;
     private int m_event;

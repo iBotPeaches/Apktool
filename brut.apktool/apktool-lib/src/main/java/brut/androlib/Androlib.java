@@ -25,7 +25,6 @@ import brut.androlib.res.data.ResUnknownFiles;
 import brut.common.InvalidUnknownFileException;
 import brut.common.RootUnknownFileException;
 import brut.common.TraversalUnknownFileException;
-import brut.directory.ExtFile;
 import brut.androlib.res.xml.ResXmlPatcher;
 import brut.androlib.src.SmaliBuilder;
 import brut.androlib.src.SmaliDecoder;
@@ -48,7 +47,7 @@ import java.util.zip.ZipOutputStream;
 public class Androlib {
     private final AndrolibResources mAndRes = new AndrolibResources();
     protected final ResUnknownFiles mResUnknownFiles = new ResUnknownFiles();
-    public ApkOptions apkOptions;
+    public final ApkOptions apkOptions;
     private int mMinSdkVersion = 0;
 
     public Androlib() {
@@ -779,8 +778,8 @@ public class Androlib {
     }
 
     private boolean isModified(File[] working, File[] stored) {
-        for (int i = 0; i < stored.length; i++) {
-            if (!stored[i].exists()) {
+        for (File file : stored) {
+            if (!file.exists()) {
                 return true;
             }
         }

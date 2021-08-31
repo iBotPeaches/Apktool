@@ -186,7 +186,7 @@ public class Main {
         } catch (CantFindFrameworkResException ex) {
             System.err
                     .println("Can't find framework resources for package of id: "
-                            + String.valueOf(ex.getPkgId())
+                            + ex.getPkgId()
                             + ". You must install proper "
                             + "framework files, see project website for more info.");
             System.exit(1);
@@ -509,17 +509,17 @@ public class Main {
         listFrameworkOptions.addOption(frameIfDirOption);
 
         // add all, loop existing cats then manually add advance
-        for (Object op : normalOptions.getOptions()) {
-            allOptions.addOption((Option)op);
+        for (Option op : normalOptions.getOptions()) {
+            allOptions.addOption(op);
         }
-        for (Object op : DecodeOptions.getOptions()) {
-            allOptions.addOption((Option)op);
+        for (Option op : DecodeOptions.getOptions()) {
+            allOptions.addOption(op);
         }
-        for (Object op : BuildOptions.getOptions()) {
-            allOptions.addOption((Option)op);
+        for (Option op : BuildOptions.getOptions()) {
+            allOptions.addOption(op);
         }
-        for (Object op : frameOptions.getOptions()) {
-            allOptions.addOption((Option)op);
+        for (Option op : frameOptions.getOptions()) {
+            allOptions.addOption(op);
         }
         allOptions.addOption(apiLevelOption);
         allOptions.addOption(analysisOption);
@@ -561,7 +561,7 @@ public class Main {
         if (isAdvanceMode()) {
             System.out.println("Apache License 2.0 (https://www.apache.org/licenses/LICENSE-2.0)\n");
         }else {
-            System.out.println("");
+            System.out.println();
         }
 
         // 4 usage outputs (general, frameworks, decode, build)
@@ -573,10 +573,8 @@ public class Main {
             formatter.printHelp("apktool " + verbosityHelp() + "publicize-resources <file_path>", emptyOptions);
             formatter.printHelp("apktool " + verbosityHelp() + "empty-framework-dir [options]", emptyFrameworkOptions);
             formatter.printHelp("apktool " + verbosityHelp() + "list-frameworks [options]", listFrameworkOptions);
-            System.out.println("");
-        } else {
-            System.out.println("");
         }
+        System.out.println();
 
         // print out more information
         System.out.println(

@@ -25,12 +25,15 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.DataInput;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 public class Res9patchStreamDecoder implements ResStreamDecoder {
     @Override
-    public void decode(InputStream in, OutputStream out)
-            throws AndrolibException {
+    public void decode(InputStream in, OutputStream out) throws AndrolibException {
         try {
             byte[] data = IOUtils.toByteArray(in);
 
@@ -111,9 +114,7 @@ public class Res9patchStreamDecoder implements ResStreamDecoder {
             }
 
             ImageIO.write(im2, "png", out);
-        } catch (IOException ex) {
-            throw new AndrolibException(ex);
-        } catch (NullPointerException ex) {
+        } catch (IOException | NullPointerException ex) {
             // In my case this was triggered because a .png file was
             // containing a html document instead of an image.
             // This could be more verbose and try to MIME ?
@@ -122,21 +123,21 @@ public class Res9patchStreamDecoder implements ResStreamDecoder {
     }
 
     private NinePatch getNinePatch(byte[] data) throws AndrolibException,
-            IOException {
+        IOException {
         ExtDataInput di = new ExtDataInput(new ByteArrayInputStream(data));
         find9patchChunk(di, NP_CHUNK_TYPE);
         return NinePatch.decode(di);
     }
 
     private OpticalInset getOpticalInset(byte[] data) throws AndrolibException,
-            IOException {
+        IOException {
         ExtDataInput di = new ExtDataInput(new ByteArrayInputStream(data));
         find9patchChunk(di, OI_CHUNK_TYPE);
         return OpticalInset.decode(di);
     }
 
     private void find9patchChunk(DataInput di, int magic) throws AndrolibException,
-            IOException {
+        IOException {
         di.skipBytes(8);
         while (true) {
             int size;
@@ -197,19 +198,18 @@ public class Res9patchStreamDecoder implements ResStreamDecoder {
             int[] xDivs = di.readIntArray(numXDivs);
             int[] yDivs = di.readIntArray(numYDivs);
 
-            return new NinePatch(padLeft, padRight, padTop, padBottom, xDivs,
-                    yDivs);
+            return new NinePatch(padLeft, padRight, padTop, padBottom, xDivs, yDivs);
         }
     }
 
     private static class OpticalInset {
-	    public final int layoutBoundsLeft, layoutBoundsTop, layoutBoundsRight, layoutBoundsBottom;
+        public final int layoutBoundsLeft, layoutBoundsTop, layoutBoundsRight, layoutBoundsBottom;
 
         public OpticalInset(int layoutBoundsLeft, int layoutBoundsTop,
-                int layoutBoundsRight, int layoutBoundsBottom) {
-            this.layoutBoundsLeft   = layoutBoundsLeft;
-            this.layoutBoundsTop    = layoutBoundsTop;
-            this.layoutBoundsRight  = layoutBoundsRight;
+                            int layoutBoundsRight, int layoutBoundsBottom) {
+            this.layoutBoundsLeft = layoutBoundsLeft;
+            this.layoutBoundsTop = layoutBoundsTop;
+            this.layoutBoundsRight = layoutBoundsRight;
             this.layoutBoundsBottom = layoutBoundsBottom;
         }
 
@@ -219,7 +219,7 @@ public class Res9patchStreamDecoder implements ResStreamDecoder {
             int layoutBoundsRight = Integer.reverseBytes(di.readInt());
             int layoutBoundsBottom = Integer.reverseBytes(di.readInt());
             return new OpticalInset(layoutBoundsLeft, layoutBoundsTop,
-                    layoutBoundsRight, layoutBoundsBottom);
+                layoutBoundsRight, layoutBoundsBottom);
         }
     }
 }

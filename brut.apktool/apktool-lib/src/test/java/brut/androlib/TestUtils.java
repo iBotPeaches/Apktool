@@ -45,7 +45,7 @@ public abstract class TestUtils {
 
             int eventType;
             String key = null;
-            Map<String, String> map = new HashMap<String, String>();
+            Map<String, String> map = new HashMap<>();
             while ((eventType = xpp.next()) != XmlPullParser.END_DOCUMENT) {
                 switch (eventType) {
                     case XmlPullParser.START_TAG:
@@ -78,14 +78,14 @@ public abstract class TestUtils {
         }
     }
 
-    public static void copyResourceDir(Class class_, String dirPath, File out) throws BrutException {
+    public static void copyResourceDir(Class<?> class_, String dirPath, File out) throws BrutException {
         if (!out.exists()) {
             out.mkdirs();
         }
         copyResourceDir(class_, dirPath, new FileDirectory(out));
     }
 
-    public static void copyResourceDir(Class class_, String dirPath, Directory out) throws BrutException {
+    public static void copyResourceDir(Class<?> class_, String dirPath, Directory out) throws BrutException {
         if (class_ == null) {
             class_ = Class.class;
         }

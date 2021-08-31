@@ -16,46 +16,62 @@
  */
 package brut.directory;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Map;
 import java.util.Set;
 
 public interface Directory {
-    public Set<String> getFiles();
-    public Set<String> getFiles(boolean recursive);
-    public Map<String, Directory> getDirs();
-    public Map<String, Directory> getDirs(boolean recursive);
+    Set<String> getFiles();
 
-    public boolean containsFile(String path);
-    public boolean containsDir(String path);
+    Set<String> getFiles(boolean recursive);
 
-    public InputStream getFileInput(String path) throws DirectoryException;
-    public OutputStream getFileOutput(String path) throws DirectoryException;
-    public Directory getDir(String path) throws PathNotExist;
-    public Directory createDir(String path) throws DirectoryException;
+    Map<String, Directory> getDirs();
 
-    public boolean removeFile(String path);
+    Map<String, Directory> getDirs(boolean recursive);
 
-    public void copyToDir(Directory out) throws DirectoryException;
-    public void copyToDir(Directory out, String[] fileNames)
+    boolean containsFile(String path);
+
+    boolean containsDir(String path);
+
+    InputStream getFileInput(String path) throws DirectoryException;
+
+    OutputStream getFileOutput(String path) throws DirectoryException;
+
+    Directory getDir(String path) throws PathNotExist;
+
+    Directory createDir(String path) throws DirectoryException;
+
+    boolean removeFile(String path);
+
+    void copyToDir(Directory out) throws DirectoryException;
+
+    void copyToDir(Directory out, String[] fileNames)
         throws DirectoryException;
-    public void copyToDir(Directory out, String fileName)
-        throws DirectoryException;
-    public void copyToDir(File out) throws DirectoryException;
-    public void copyToDir(File out, String[] fileNames)
-        throws DirectoryException;
-    public void copyToDir(File out, String fileName)
+
+    void copyToDir(Directory out, String fileName)
         throws DirectoryException;
 
-    public long getSize(String fileName)
-            throws DirectoryException;
-    public long getCompressedSize(String fileName)
-            throws DirectoryException;
-    public int getCompressionLevel(String fileName)
-            throws DirectoryException;
+    void copyToDir(File out) throws DirectoryException;
 
+    void copyToDir(File out, String[] fileNames)
+        throws DirectoryException;
 
-    public void close() throws IOException;
+    void copyToDir(File out, String fileName)
+        throws DirectoryException;
 
-    public final char separator = '/';
+    long getSize(String fileName)
+        throws DirectoryException;
+
+    long getCompressedSize(String fileName)
+        throws DirectoryException;
+
+    int getCompressionLevel(String fileName)
+        throws DirectoryException;
+
+    void close() throws IOException;
+
+    char separator = '/';
 }

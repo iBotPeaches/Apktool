@@ -33,7 +33,7 @@ import java.nio.file.Paths;
 import static org.junit.Assert.assertTrue;
 
 public class DecodeKotlinCoroutinesTest extends BaseTest {
-    private static String apk = "test-kotlin-coroutines.apk";
+    private static final String apk = "test-kotlin-coroutines.apk";
 
     @BeforeClass
     public static void beforeClass() throws Exception {

@@ -26,10 +26,10 @@ import java.util.*;
 public class ResTable {
     private final AndrolibResources mAndRes;
 
-    private final Map<Integer, ResPackage> mPackagesById = new HashMap<Integer, ResPackage>();
-    private final Map<String, ResPackage> mPackagesByName = new HashMap<String, ResPackage>();
-    private final Set<ResPackage> mMainPackages = new LinkedHashSet<ResPackage>();
-    private final Set<ResPackage> mFramePackages = new LinkedHashSet<ResPackage>();
+    private final Map<Integer, ResPackage> mPackagesById = new HashMap<>();
+    private final Map<String, ResPackage> mPackagesByName = new HashMap<>();
+    private final Set<ResPackage> mMainPackages = new LinkedHashSet<>();
+    private final Set<ResPackage> mFramePackages = new LinkedHashSet<>();
 
     private String mPackageRenamed;
     private String mPackageOriginal;
@@ -38,8 +38,8 @@ public class ResTable {
     private boolean mSharedLibrary = false;
     private boolean mSparseResources = false;
 
-    private Map<String, String> mSdkInfo = new LinkedHashMap<>();
-    private VersionInfo mVersionInfo = new VersionInfo();
+    private final Map<String, String> mSdkInfo = new LinkedHashMap<>();
+    private final VersionInfo mVersionInfo = new VersionInfo();
 
     public ResTable() {
         mAndRes = null;
@@ -124,7 +124,7 @@ public class ResTable {
     public void addPackage(ResPackage pkg, boolean main) throws AndrolibException {
         Integer id = pkg.getId();
         if (mPackagesById.containsKey(id)) {
-            throw new AndrolibException("Multiple packages: id=" + id.toString());
+            throw new AndrolibException("Multiple packages: id=" + id);
         }
         String name = pkg.getName();
         if (mPackagesByName.containsKey(name)) {

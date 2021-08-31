@@ -32,8 +32,8 @@ public class ResPluralsValue extends ResBagValue implements
         super(parent);
 
         mItems = new ResScalarValue[6];
-        for (int i = 0; i < items.length; i++) {
-            mItems[items[i].m1 - BAG_KEY_PLURALS_START] = items[i].m2;
+        for (Duo<Integer, ResScalarValue> item : items) {
+            mItems[item.m1 - BAG_KEY_PLURALS_START] = item.m2;
         }
     }
 

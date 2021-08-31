@@ -69,15 +69,15 @@ public class MXSerializer implements XmlSerializer {
 	protected int depth = 0;
 
 	// element stack
-	protected String elNamespace[] = new String[2];
-	protected String elName[] = new String[elNamespace.length];
-	protected String elPrefix[] = new String[elNamespace.length];
-	protected int elNamespaceCount[] = new int[elNamespace.length];
+	protected String[] elNamespace = new String[2];
+	protected String[] elName = new String[elNamespace.length];
+	protected String[] elPrefix = new String[elNamespace.length];
+	protected int[] elNamespaceCount = new int[elNamespace.length];
 
 	// namespace stack
 	protected int namespaceEnd = 0;
-	protected String namespacePrefix[] = new String[8];
-	protected String namespaceUri[] = new String[namespacePrefix.length];
+	protected String[] namespacePrefix = new String[8];
+	protected String[] namespaceUri = new String[namespacePrefix.length];
 
 	protected boolean finished;
 	protected boolean pastRoot;
@@ -92,9 +92,9 @@ public class MXSerializer implements XmlSerializer {
 
 	// buffer output if needed to write escaped String see text(String)
 	private static final int BUF_LEN = Runtime.getRuntime().freeMemory() > 1000000L ? 8 * 1024 : 256;
-	protected char buf[] = new char[BUF_LEN];
+	protected char[] buf = new char[BUF_LEN];
 
-	protected static final String precomputedPrefixes[];
+	protected static final String[] precomputedPrefixes;
 
 	static {
 		precomputedPrefixes = new String[32]; // arbitrary number ...
@@ -103,7 +103,7 @@ public class MXSerializer implements XmlSerializer {
 		}
 	}
 
-	private boolean checkNamesInterned = false;
+	private final boolean checkNamesInterned = false;
 
 	private void checkInterning(String name) {
 		if (namesInterned && name != name.intern()) {
@@ -157,7 +157,7 @@ public class MXSerializer implements XmlSerializer {
 					+ elStackSize + " ==> " + newSize);
 		}
 		final boolean needsCopying = elStackSize > 0;
-		String[] arr = null;
+		String[] arr;
 		// reuse arr local variable slot
 		arr = new String[newSize];
 		if (needsCopying)
@@ -242,7 +242,7 @@ public class MXSerializer implements XmlSerializer {
 	 * requested chnages.
 	 */
 	protected void rebuildIndentationBuf() {
-		if (doIndent == false)
+		if (!doIndent)
 			return;
 		final int maxIndent = 65; // hardcoded maximum indentation size in characters
 		int bufSize = 0;
@@ -277,7 +277,7 @@ public class MXSerializer implements XmlSerializer {
 
 	protected void writeIndent() throws IOException {
 		final int start = writeLineSepartor ? 0 : offsetNewLine;
-		final int level = (depth > maxIndentLevel) ? maxIndentLevel : depth;
+		final int level = Math.min(depth, maxIndentLevel);
 
 		out.write(indentationBuf, start, ((level - 1) * indentationJump) + offsetNewLine);
 	}
@@ -288,15 +288,19 @@ public class MXSerializer implements XmlSerializer {
 		if (name == null) {
 			throw new IllegalArgumentException("property name can not be null");
 		}
-		if (PROPERTY_SERIALIZER_INDENTATION.equals(name)) {
-			indentationString = (String) value;
-		} else if (PROPERTY_SERIALIZER_LINE_SEPARATOR.equals(name)) {
-			lineSeparator = (String) value;
-		} else if (PROPERTY_LOCATION.equals(name)) {
-			location = (String) value;
-		} else {
-			throw new IllegalStateException("unsupported property " + name);
-		}
+        switch (name) {
+            case PROPERTY_SERIALIZER_INDENTATION:
+                indentationString = (String) value;
+                break;
+            case PROPERTY_SERIALIZER_LINE_SEPARATOR:
+                lineSeparator = (String) value;
+                break;
+            case PROPERTY_LOCATION:
+                location = (String) value;
+                break;
+            default:
+                throw new IllegalStateException("unsupported property " + name);
+        }
 		writeLineSepartor = lineSeparator != null && lineSeparator.length() > 0;
 		writeIndentation = indentationString != null
 				&& indentationString.length() > 0;
@@ -314,15 +318,16 @@ public class MXSerializer implements XmlSerializer {
 		if (name == null) {
 			throw new IllegalArgumentException("property name can not be null");
 		}
-		if (PROPERTY_SERIALIZER_INDENTATION.equals(name)) {
-			return indentationString;
-		} else if (PROPERTY_SERIALIZER_LINE_SEPARATOR.equals(name)) {
-			return lineSeparator;
-		} else if (PROPERTY_LOCATION.equals(name)) {
-			return location;
-		} else {
-			return null;
-		}
+        switch (name) {
+            case PROPERTY_SERIALIZER_INDENTATION:
+                return indentationString;
+            case PROPERTY_SERIALIZER_LINE_SEPARATOR:
+                return lineSeparator;
+            case PROPERTY_LOCATION:
+                return location;
+            default:
+                return null;
+        }
 	}
 
 	private String getLocation() {
@@ -370,7 +375,7 @@ public class MXSerializer implements XmlSerializer {
 		if (standalone != null) {
 			out.write(" standalone=");
 			out.write(attributeUseApostrophe ? '\'' : '"');
-			if (standalone.booleanValue()) {
+			if (standalone) {
 				out.write("yes");
 			} else {
 				out.write("no");
@@ -404,14 +409,6 @@ public class MXSerializer implements XmlSerializer {
 			checkInterning(prefix);
 		} else if (prefix == null) {
 			throw new IllegalArgumentException("prefix must be not null" + getLocation());
-		}
-
-		// check that prefix is not duplicated ...
-		for (int i = elNamespaceCount[depth]; i < namespaceEnd; i++) {
-			if (prefix == namespacePrefix[i]) {
-				// Toss out extra namespaces at same depth to fix #1456
-				return;
-			}
 		}
 
 		if (!namesInterned) {
@@ -456,15 +453,12 @@ public class MXSerializer implements XmlSerializer {
 
 		// first check if namespace is already in scope
 		for (int i = namespaceEnd - 1; i >= 0; --i) {
-			if (namespace == namespaceUri[i]) {
+			if (namespace.equals(namespaceUri[i])) {
 				final String prefix = namespacePrefix[i];
-				if (nonEmpty && prefix.length() == 0)
-					continue;
-				// now check that prefix is still in scope
-				for (int p = namespaceEnd - 1; p > i; --p) {
-					if (prefix == namespacePrefix[p])
-						continue; // too bad - prefix is redeclared with different namespace
-				}
+				if (nonEmpty && prefix.length() == 0) {
+				    continue;
+                }
+
 				return prefix;
 			}
 		}
@@ -477,30 +471,21 @@ public class MXSerializer implements XmlSerializer {
 	}
 
 	private String generatePrefix(String namespace) {
-		while (true) {
-			++autoDeclaredPrefixes;
-			// fast lookup uses table that was pre-initialized in static{} ....
-			final String prefix = autoDeclaredPrefixes < precomputedPrefixes.length
-					? precomputedPrefixes[autoDeclaredPrefixes]
-					: ("n" + autoDeclaredPrefixes).intern();
+        ++autoDeclaredPrefixes;
+        // fast lookup uses table that was pre-initialized in static{} ....
+        final String prefix = autoDeclaredPrefixes < precomputedPrefixes.length
+            ? precomputedPrefixes[autoDeclaredPrefixes]
+            : ("n" + autoDeclaredPrefixes).intern();
 
-			// make sure this prefix is not declared in any scope (avoid hiding in-scope prefixes)!
-			for (int i = namespaceEnd - 1; i >= 0; --i) {
-				if (prefix == namespacePrefix[i]) {
-					continue; // prefix is already declared - generate new and try again
-				}
-			}
-			// declare prefix
+        // declare prefix
+        if (namespaceEnd >= namespacePrefix.length) {
+            ensureNamespacesCapacity();
+        }
+        namespacePrefix[namespaceEnd] = prefix;
+        namespaceUri[namespaceEnd] = namespace;
+        ++namespaceEnd;
 
-			if (namespaceEnd >= namespacePrefix.length) {
-				ensureNamespacesCapacity();
-			}
-			namespacePrefix[namespaceEnd] = prefix;
-			namespaceUri[namespaceEnd] = namespace;
-			++namespaceEnd;
-
-			return prefix;
-		}
+        return prefix;
 	}
 
 	@Override
@@ -713,8 +698,7 @@ public class MXSerializer implements XmlSerializer {
 		if (startTagIncomplete) {
 			writeNamespaceDeclarations();
 			out.write(" />"); // space is added to make it easier to work in XHTML!!!
-			--depth;
-		} else {
+        } else {
 			if (doIndent && seenTag) {
 				writeIndent();
 			}
@@ -726,9 +710,9 @@ public class MXSerializer implements XmlSerializer {
 			}
 			out.write(name);
 			out.write('>');
-			--depth;
-		}
-		namespaceEnd = elNamespaceCount[depth];
+        }
+        --depth;
+        namespaceEnd = elNamespaceCount[depth];
 		startTagIncomplete = false;
 		seenTag = true;
 		return this;
@@ -1009,7 +993,7 @@ public class MXSerializer implements XmlSerializer {
 		}
 	}
 
-	protected static final String printable(String s) {
+	protected static String printable(String s) {
 		if (s == null) {
 			return "null";
 		}
@@ -1022,7 +1006,7 @@ public class MXSerializer implements XmlSerializer {
 		return retval.toString();
 	}
 
-	protected static final String printable(char ch) {
+	protected static String printable(char ch) {
 		StringBuffer retval = new StringBuffer();
 		addPrintable(retval, ch);
 		return retval.toString();
@@ -1049,7 +1033,7 @@ public class MXSerializer implements XmlSerializer {
 			retval.append("\\\"");
 			break;
 		case '\'':
-			retval.append("\\\'");
+			retval.append("\\'");
 			break;
 		case '\\':
 			retval.append("\\\\");
@@ -1057,7 +1041,7 @@ public class MXSerializer implements XmlSerializer {
 		default:
 			if (ch < 0x20 || ch > 0x7e) {
 				final String ss = "0000" + Integer.toString(ch, 16);
-				retval.append("\\u" + ss.substring(ss.length() - 4));
+				retval.append("\\u").append(ss.substring(ss.length() - 4));
 			} else {
 				retval.append(ch);
 			}

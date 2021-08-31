@@ -102,14 +102,12 @@ public final class ResXmlEncoders {
                 wasSpace = false;
                 switch (c) {
                     case '\\':
+                    case '"':
                         out.append('\\');
                         break;
                     case '\'':
                     case '\n':
                         enclose = true;
-                        break;
-                    case '"':
-                        out.append('\\');
                         break;
                     case '<':
                         isInStyleTag = true;
@@ -154,7 +152,7 @@ public final class ResXmlEncoders {
         int pos = 0;
         int count = 0;
         for (Integer sub : subs) {
-            out.append(str.substring(pos, ++sub)).append(++count).append('$');
+            out.append(str, pos, ++sub).append(++count).append('$');
             pos = sub;
         }
         out.append(str.substring(pos));
