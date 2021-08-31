@@ -411,14 +411,6 @@ public class MXSerializer implements XmlSerializer {
 			throw new IllegalArgumentException("prefix must be not null" + getLocation());
 		}
 
-		// check that prefix is not duplicated ...
-		for (int i = elNamespaceCount[depth]; i < namespaceEnd; i++) {
-			if (prefix == namespacePrefix[i]) {
-				// Toss out extra namespaces at same depth to fix #1456
-				return;
-			}
-		}
-
 		if (!namesInterned) {
 			namespace = namespace.intern();
 		} else if (checkNamesInterned) {
@@ -461,16 +453,12 @@ public class MXSerializer implements XmlSerializer {
 
 		// first check if namespace is already in scope
 		for (int i = namespaceEnd - 1; i >= 0; --i) {
-			if (namespace == namespaceUri[i]) {
+			if (namespace.equals(namespaceUri[i])) {
 				final String prefix = namespacePrefix[i];
-				if (nonEmpty && prefix.length() == 0)
-					continue;
-				// now check that prefix is still in scope
-				for (int p = namespaceEnd - 1; p > i; --p) {
-					if (prefix == namespacePrefix[p]) {
-                        // too bad - prefix is redeclared with different namespace
-                    }
+				if (nonEmpty && prefix.length() == 0) {
+				    continue;
                 }
+
 				return prefix;
 			}
 		}
@@ -483,30 +471,21 @@ public class MXSerializer implements XmlSerializer {
 	}
 
 	private String generatePrefix(String namespace) {
-		while (true) {
-			++autoDeclaredPrefixes;
-			// fast lookup uses table that was pre-initialized in static{} ....
-			final String prefix = autoDeclaredPrefixes < precomputedPrefixes.length
-					? precomputedPrefixes[autoDeclaredPrefixes]
-					: ("n" + autoDeclaredPrefixes).intern();
+        ++autoDeclaredPrefixes;
+        // fast lookup uses table that was pre-initialized in static{} ....
+        final String prefix = autoDeclaredPrefixes < precomputedPrefixes.length
+            ? precomputedPrefixes[autoDeclaredPrefixes]
+            : ("n" + autoDeclaredPrefixes).intern();
 
-			// make sure this prefix is not declared in any scope (avoid hiding in-scope prefixes)!
-			for (int i = namespaceEnd - 1; i >= 0; --i) {
-				if (prefix == namespacePrefix[i]) {
-                    // prefix is already declared - generate new and try again
-                }
-			}
-			// declare prefix
+        // declare prefix
+        if (namespaceEnd >= namespacePrefix.length) {
+            ensureNamespacesCapacity();
+        }
+        namespacePrefix[namespaceEnd] = prefix;
+        namespaceUri[namespaceEnd] = namespace;
+        ++namespaceEnd;
 
-			if (namespaceEnd >= namespacePrefix.length) {
-				ensureNamespacesCapacity();
-			}
-			namespacePrefix[namespaceEnd] = prefix;
-			namespaceUri[namespaceEnd] = namespace;
-			++namespaceEnd;
-
-			return prefix;
-		}
+        return prefix;
 	}
 
 	@Override
