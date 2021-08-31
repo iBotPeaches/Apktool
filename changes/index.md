@@ -39,6 +39,7 @@ description: Apktool - Changelog / Roadmap
  * Fix numeric string meta-data losing context of data type. ([Issue 2611](https://github.com/iBotPeaches/Apktool/issues/2611)) / (Thanks codylund)
  * Reduce code smell failures. ([Issue 2554](https://github.com/iBotPeaches/Apktool/pull/2554)) / (Thanks matteobaccan)
  * Reduce code smells & correct improper opcode use for baksmali. ([Issue 2604](https://github.com/iBotPeaches/Apktool/pull/2604)) / (Thanks IgorEisberg)
+ * Reduce code smells for unused logic, unneeded casting and newer Java language features. (Thanks Goooler)
  * Remove unused targetSdkVersion for source disassemble as value was not populated yet. ([Issue 2604](https://github.com/iBotPeaches/Apktool/pull/2604)) / (Thanks IgorEisberg)
  * Remove duplicate workflows for 1 unified GitHub Action workflow. ([Issue 2633](https://github.com/iBotPeaches/Apktool/pull/2633)) / (Thanks Goooler)
 
