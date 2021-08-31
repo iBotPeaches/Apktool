@@ -69,11 +69,7 @@ final public class AndrolibResources {
                 pkg = pkgs[0];
                 break;
             case 2:
-                if (pkgs[0].getName().equals("android")) {
-                    LOGGER.warning("Skipping \"android\" package group");
-                } else if (pkgs[0].getName().equals("com.htc")) {
-                    LOGGER.warning("Skipping \"htc\" package group");
-                }
+                LOGGER.warning("Skipping package group: " + pkgs[0].getName());
                 pkg = pkgs[1];
                 break;
             default:
