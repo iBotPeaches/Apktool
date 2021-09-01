@@ -50,7 +50,7 @@ public class Main {
             commandLine = parser.parse(allOptions, args, false);
 
             if (! OSDetection.is64Bit()) {
-                System.err.println("32 bit support is deprecated. Apktool will not support 32bit on v2.6.0.");
+                System.err.println("32 bit support is deprecated. Apktool will not support 32bit on v3.0.0.");
             }
         } catch (ParseException ex) {
             System.err.println(ex.getMessage());
@@ -223,7 +223,7 @@ public class Main {
             apkOptions.aaptPath = cli.getOptionValue("a");
         }
         if (cli.hasOption("c") || cli.hasOption("copy-original")) {
-            System.err.println("-c/--copy-original has been deprecated. Removal planned for v2.6.0 (#2129)");
+            System.err.println("-c/--copy-original has been deprecated. Removal planned for v3.0.0 (#2129)");
             apkOptions.copyOriginalFiles = true;
         }
         if (cli.hasOption("p") || cli.hasOption("frame-path")) {
