@@ -9,6 +9,7 @@ description: Apktool - Changelog / Roadmap
  
  * **Android 12 Support** ([Issue 2580](https://github.com/iBotPeaches/Apktool/issues/2580))
  * Published to Maven Central ([Issue 2529](https://github.com/iBotPeaches/Apktool/issues/2529))
+ * Upgrade internal aapt/aapt2 to ([7691c of frameworks_base](https://github.com/iBotPeaches/platform_frameworks_base/commit/63f688ebacc6a92ddf298ef6a88edc996017691c))
  * Upgrade to baksmali/smali 2.5.2
  * Upgrade to `gradle 7.2` (Thanks Goooler)
  * Upgrade to `snakeyaml 1.29` (Thanks Goooler)
@@ -22,6 +23,9 @@ description: Apktool - Changelog / Roadmap
  * Upgrade to `actions/setup-java@v2` (Thanks Goooler)
  * Added `.gitattributes` (Thanks Goooler)
  * Added support for SDK in Development (Tiramisu, API 32?)
+ * Added automatic execution of aapt/aapt2 binaries during CI process to find broken builds.
+ * Added automatic `ldd/otool -L` execution during CI process to identify non-static "fat" aapt/aapt2 builds.
+ * Added test execution on Java 15/16 (Now 8-16) during CI process.
  * Upgrade aapt2 with patches for `attr-private` and remove reserved pkgIds. (Thanks MrIkso)
  * Upgrade aapt1 with patches for a static binary on Mac arch.
  * Add lazy init for ResTable for optimizations. ([Issue 2604](https://github.com/iBotPeaches/Apktool/pull/2604)) / (Thanks IgorEisberg)
