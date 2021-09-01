@@ -1,4 +1,6 @@
 name: CI
+env:
+  BINARY_PATH: brut.apktool/apktool-lib/src/main/resources/prebuilt
 on:
   push:
     branches:
@@ -11,8 +13,57 @@ on:
       - '.github/workflows/**'
 
 jobs:
+  analyze-mac-aapt:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        file: [aapt_64, aapt2_64]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Verify Executable
+        run: ${{ env.BINARY_PATH }}/macosx/${{ matrix.file }} version
+
+      - name: Output Static
+        run: otool -L ${{ env.BINARY_PATH }}/macosx/${{ matrix.file }} || true
+
+  analyze-linux-aapt:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        file: [aapt, aapt_64, aapt2, aapt2_64]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Verify Executable
+        run: ${{ env.BINARY_PATH }}/linux/${{ matrix.file }} version
+
+      - name: Output Static
+        run: ldd ${{ env.BINARY_PATH }}/linux/${{ matrix.file }} || true
+
+  analyze-windows-aapt:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        file: [aapt.exe, aapt_64.exe, aapt2.exe, aapt2_64.exe]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Verify Executable
+        run: ${{ env.BINARY_PATH }}/windows/${{ matrix.file }} version
+
+      - name: Output Static
+        run: ldd ${{ env.BINARY_PATH }}/windows/${{ matrix.file }} || true
+
   build-and-test-with-Java-8-and-later:
     runs-on: ${{ matrix.os }}
+    needs:
+      - analyze-mac-aapt
+      - analyze-linux-aapt
+      - analyze-windows-aapt
     name: Build/Test (JDK ${{ matrix.java }}, ${{ matrix.os }})
     strategy:
       fail-fast: true
