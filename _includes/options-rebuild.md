@@ -6,7 +6,7 @@ These are all the options when building an apk.
 <strong><kbd>-api, --api-level &lt;API></kbd> - <span class="label label-success">v2.4.0</span></strong>
 <blockquote>The numeric api-level of the smali files to build against (defaults to minSdkVersion)</blockquote>
 <br />
-<strong><kbd>-c, --copy-original</kbd> - <span class="label label-danger">Removal - v2.6.0</span></strong>
+<strong><kbd>-c, --copy-original</kbd> - <span class="label label-danger">Removal - v3.0.0</span></strong>
 <blockquote>Copies original <kbd>AndroidManifest.xml</kbd> and <kbd>META-INF</kbd> folder into built apk. Scheduled for <strong>deprecation</strong>.</blockquote>
 <br />
 <strong><kbd>-d, --debug</kbd> - <span class="label label-success">v2.4.0</span></strong>
