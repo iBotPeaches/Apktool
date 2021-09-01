@@ -25,8 +25,8 @@ jobs:
       - name: Verify Executable
         run: ${{ env.BINARY_PATH }}/macosx/${{ matrix.file }} version
 
-      - name: Verify Static
-        run: otool -L ${{ env.BINARY_PATH }}/macosx/${{ matrix.file }}
+      - name: Output Static
+        run: otool -L ${{ env.BINARY_PATH }}/macosx/${{ matrix.file }} || true
 
   analyze-linux-aapt:
     runs-on: ubuntu-latest
@@ -40,8 +40,8 @@ jobs:
       - name: Verify Executable
         run: ${{ env.BINARY_PATH }}/linux/${{ matrix.file }} version
 
-      - name: Verify Static
-        run: ldd ${{ env.BINARY_PATH }}/linux/${{ matrix.file }}
+      - name: Output Static
+        run: ldd ${{ env.BINARY_PATH }}/linux/${{ matrix.file }} || true
 
   analyze-windows-aapt:
     runs-on: windows-latest
@@ -55,8 +55,8 @@ jobs:
       - name: Verify Executable
         run: ${{ env.BINARY_PATH }}/windows/${{ matrix.file }} version
 
-      - name: Verify Static
-        run: ldd ${{ env.BINARY_PATH }}/windows/${{ matrix.file }}
+      - name: Output Static
+        run: ldd ${{ env.BINARY_PATH }}/windows/${{ matrix.file }} || true
 
   build-and-test-with-Java-8-and-later:
     runs-on: ${{ matrix.os }}
