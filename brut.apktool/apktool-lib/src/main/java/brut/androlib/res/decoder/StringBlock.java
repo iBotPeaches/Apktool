@@ -124,7 +124,7 @@ public class StringBlock {
             this.position = position;
             this.matchingTagPosition = matchingTagPosition;
         }
-        
+
         /**
          * compares this tag and another, returning the order that should be between them.
          * order by:
@@ -266,7 +266,8 @@ public class StringBlock {
     }
 
     /**
-     * Returns string with style tags (html-like).
+     * @param index Location (index) of string to process to HTML
+     * @return String Returns string with style tags (html-like).
      */
     public String getHTML(int index) {
         String raw = getString(index);
