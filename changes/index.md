@@ -6,7 +6,7 @@ description: Apktool - Changelog / Roadmap
 
 ## v2.6.1
 2021.xx.xx
- * TBA
+ * Fix `licenseFormat[Test/Main]` to properly inject variables into license preamble.
 
 ## v2.6.0
 2021.09.02
