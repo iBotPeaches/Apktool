@@ -17,12 +17,6 @@ import java.nio.charset.StandardCharsets
  */
 buildscript {
     ext {
-        year = '2010'
-        brut = 'Ryszard Wiśniewski'
-        brutEmail = 'brut.alll@gmail.com'
-        ibot = 'Connor Tumbleson'
-        ibotEmail = 'connor.tumbleson@gmail.com'
-
         depends = [
                 baksmali       : 'org.smali:baksmali:2.5.2',
                 commons_cli    : 'commons-cli:commons-cli:1.4',
@@ -69,6 +63,13 @@ allprojects {
         include "**/*.java"
         mapping {
             java = 'SLASHSTAR_STYLE'
+        }
+        ext {
+            year = '2010'
+            brut = 'Ryszard Wiśniewski'
+            brutEmail = 'brut.alll@gmail.com'
+            ibot = 'Connor Tumbleson'
+            ibotEmail = 'connor.tumbleson@gmail.com'
         }
         strictCheck true
     }
