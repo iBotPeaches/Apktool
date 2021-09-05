@@ -157,7 +157,6 @@ public class Main {
         }
         if (cli.hasOption("o") || cli.hasOption("output")) {
             outDir = new File(cli.getOptionValue("o"));
-            decoder.setOutDir(outDir);
         } else {
             // make out folder manually using name of apk
             String outName = apkName;
@@ -167,9 +166,9 @@ public class Main {
             // make file from path
             outName = new File(outName).getName();
             outDir = new File(outName);
-            decoder.setOutDir(outDir);
         }
 
+        decoder.setOutDir(outDir);
         decoder.setApkFile(new File(apkName));
 
         try {
