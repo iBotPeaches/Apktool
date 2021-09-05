@@ -18,6 +18,7 @@ package brut.androlib.aapt2;
 
 import brut.androlib.*;
 import brut.androlib.meta.MetaInfo;
+import brut.androlib.options.BuildOptions;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
 import brut.util.OS;
@@ -42,13 +43,13 @@ public class BuildAndDecodeTest extends BaseTest {
         LOGGER.info("Unpacking testapp...");
         TestUtils.copyResourceDir(BuildAndDecodeTest.class, "aapt2/testapp/", sTestOrigDir);
 
-        ApkOptions apkOptions = new ApkOptions();
-        apkOptions.useAapt2 = true;
-        apkOptions.verbose = true;
+        BuildOptions buildOptions = new BuildOptions();
+        buildOptions.useAapt2 = true;
+        buildOptions.verbose = true;
 
         LOGGER.info("Building testapp.apk...");
         File testApk = new File(sTmpDir, "testapp.apk");
-        new Androlib(apkOptions).build(sTestOrigDir, testApk);
+        new Androlib(buildOptions).build(sTestOrigDir, testApk);
 
         LOGGER.info("Decoding testapp.apk...");
         ApkDecoder apkDecoder = new ApkDecoder(testApk);

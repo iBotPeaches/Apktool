@@ -17,6 +17,7 @@
 package brut.androlib.decode;
 
 import brut.androlib.*;
+import brut.androlib.options.BuildOptions;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
 import brut.util.OS;
@@ -53,8 +54,8 @@ public class DuplicateDexTest extends BaseTest {
         apkDecoder.decode();
 
         LOGGER.info("Building duplicatedex.apk...");
-        ApkOptions apkOptions = new ApkOptions();
-        new Androlib(apkOptions).build(sTestNewDir, testApk);
+        BuildOptions buildOptions = new BuildOptions();
+        new Androlib(buildOptions).build(sTestNewDir, testApk);
     }
 
     @Test
@@ -68,8 +69,8 @@ public class DuplicateDexTest extends BaseTest {
         apkDecoder.decode();
 
         LOGGER.info("Building duplicatedex.apk...");
-        ApkOptions apkOptions = new ApkOptions();
-        new Androlib(apkOptions).build(sTestNewDir, testApk);
+        BuildOptions buildOptions = new BuildOptions();
+        new Androlib(buildOptions).build(sTestNewDir, testApk);
     }
 
 }
