@@ -207,7 +207,7 @@ public class Main {
         String[] args = cli.getArgs();
         String appDirName = args.length < 2 ? "." : args[1];
         File outFile;
-        brut.androlib.options.BuildOptions buildOptions = new BuildOptions();
+        BuildOptions buildOptions = new BuildOptions();
 
         // check for build options
         if (cli.hasOption("f") || cli.hasOption("force-all")) {
@@ -463,20 +463,20 @@ public class Main {
 
         // check for advance mode
         if (isAdvanceMode()) {
-            DecodeOptions.addOption(noDbgOption);
-            DecodeOptions.addOption(keepResOption);
-            DecodeOptions.addOption(analysisOption);
-            DecodeOptions.addOption(onlyMainClassesOption);
-            DecodeOptions.addOption(apiLevelOption);
-            DecodeOptions.addOption(noAssetOption);
-            DecodeOptions.addOption(forceManOption);
+            decodeOptions.addOption(noDbgOption);
+            decodeOptions.addOption(keepResOption);
+            decodeOptions.addOption(analysisOption);
+            decodeOptions.addOption(onlyMainClassesOption);
+            decodeOptions.addOption(apiLevelOption);
+            decodeOptions.addOption(noAssetOption);
+            decodeOptions.addOption(forceManOption);
 
-            BuildOptions.addOption(apiLevelOption);
-            BuildOptions.addOption(debugBuiOption);
-            BuildOptions.addOption(aaptOption);
-            BuildOptions.addOption(originalOption);
-            BuildOptions.addOption(aapt2Option);
-            BuildOptions.addOption(noCrunchOption);
+            buildOptions.addOption(apiLevelOption);
+            buildOptions.addOption(debugBuiOption);
+            buildOptions.addOption(aaptOption);
+            buildOptions.addOption(originalOption);
+            buildOptions.addOption(aapt2Option);
+            buildOptions.addOption(noCrunchOption);
         }
 
         // add global options
@@ -484,17 +484,17 @@ public class Main {
         normalOptions.addOption(advanceOption);
 
         // add basic decode options
-        DecodeOptions.addOption(frameTagOption);
-        DecodeOptions.addOption(outputDecOption);
-        DecodeOptions.addOption(frameDirOption);
-        DecodeOptions.addOption(forceDecOption);
-        DecodeOptions.addOption(noSrcOption);
-        DecodeOptions.addOption(noResOption);
+        decodeOptions.addOption(frameTagOption);
+        decodeOptions.addOption(outputDecOption);
+        decodeOptions.addOption(frameDirOption);
+        decodeOptions.addOption(forceDecOption);
+        decodeOptions.addOption(noSrcOption);
+        decodeOptions.addOption(noResOption);
 
         // add basic build options
-        BuildOptions.addOption(outputBuiOption);
-        BuildOptions.addOption(frameDirOption);
-        BuildOptions.addOption(forceBuiOption);
+        buildOptions.addOption(outputBuiOption);
+        buildOptions.addOption(frameDirOption);
+        buildOptions.addOption(forceBuiOption);
 
         // add basic framework options
         frameOptions.addOption(tagOption);
@@ -511,10 +511,10 @@ public class Main {
         for (Option op : normalOptions.getOptions()) {
             allOptions.addOption(op);
         }
-        for (Option op : DecodeOptions.getOptions()) {
+        for (Option op : decodeOptions.getOptions()) {
             allOptions.addOption(op);
         }
-        for (Option op : BuildOptions.getOptions()) {
+        for (Option op : buildOptions.getOptions()) {
             allOptions.addOption(op);
         }
         for (Option op : frameOptions.getOptions()) {
@@ -566,8 +566,8 @@ public class Main {
         // 4 usage outputs (general, frameworks, decode, build)
         formatter.printHelp("apktool " + verbosityHelp(), normalOptions);
         formatter.printHelp("apktool " + verbosityHelp() + "if|install-framework [options] <framework.apk>", frameOptions);
-        formatter.printHelp("apktool " + verbosityHelp() + "d[ecode] [options] <file_apk>", DecodeOptions);
-        formatter.printHelp("apktool " + verbosityHelp() + "b[uild] [options] <app_path>", BuildOptions);
+        formatter.printHelp("apktool " + verbosityHelp() + "d[ecode] [options] <file_apk>", decodeOptions);
+        formatter.printHelp("apktool " + verbosityHelp() + "b[uild] [options] <app_path>", buildOptions);
         if (isAdvanceMode()) {
             formatter.printHelp("apktool " + verbosityHelp() + "publicize-resources <file_path>", emptyOptions);
             formatter.printHelp("apktool " + verbosityHelp() + "empty-framework-dir [options]", emptyFrameworkOptions);
@@ -654,8 +654,8 @@ public class Main {
     private static boolean advanceMode = false;
 
     private final static Options normalOptions;
-    private final static Options DecodeOptions;
-    private final static Options BuildOptions;
+    private final static Options decodeOptions;
+    private final static Options buildOptions;
     private final static Options frameOptions;
     private final static Options allOptions;
     private final static Options emptyOptions;
@@ -665,8 +665,8 @@ public class Main {
     static {
         //normal and advance usage output
         normalOptions = new Options();
-        BuildOptions = new Options();
-        DecodeOptions = new Options();
+        buildOptions = new Options();
+        decodeOptions = new Options();
         frameOptions = new Options();
         allOptions = new Options();
         emptyOptions = new Options();
