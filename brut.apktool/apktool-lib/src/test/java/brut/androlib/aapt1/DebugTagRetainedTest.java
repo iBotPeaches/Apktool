@@ -17,6 +17,7 @@
 package brut.androlib.aapt1;
 
 import brut.androlib.*;
+import brut.androlib.options.BuildOptions;
 import brut.directory.ExtFile;
 import brut.common.BrutException;
 import brut.util.OS;
@@ -46,11 +47,11 @@ public class DebugTagRetainedTest extends BaseTest {
         TestUtils.copyResourceDir(DebugTagRetainedTest.class, "aapt1/issue1235/", sTestOrigDir);
 
         LOGGER.info("Building issue1235.apk...");
-        ApkOptions apkOptions = new ApkOptions();
-        apkOptions.debugMode = true;
+        BuildOptions buildOptions = new BuildOptions();
+        buildOptions.debugMode = true;
 
         File testApk = new File(sTmpDir, "issue1235.apk");
-        new Androlib(apkOptions).build(sTestOrigDir, testApk);
+        new Androlib(buildOptions).build(sTestOrigDir, testApk);
 
         LOGGER.info("Decoding issue1235.apk...");
         ApkDecoder apkDecoder = new ApkDecoder(testApk);

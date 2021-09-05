@@ -17,6 +17,7 @@
 package brut.androlib.aapt2;
 
 import brut.androlib.*;
+import brut.androlib.options.BuildOptions;
 import brut.androlib.res.data.ResTable;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
@@ -43,13 +44,13 @@ public class NonStandardPkgIdTest extends BaseTest {
         LOGGER.info("Unpacking pkgid8...");
         TestUtils.copyResourceDir(BuildAndDecodeTest.class, "aapt2/pkgid8/", sTestOrigDir);
 
-        ApkOptions apkOptions = new ApkOptions();
-        apkOptions.useAapt2 = true;
-        apkOptions.verbose = true;
+        BuildOptions buildOptions = new BuildOptions();
+        buildOptions.useAapt2 = true;
+        buildOptions.verbose = true;
 
         LOGGER.info("Building pkgid8.apk...");
         File testApk = new File(sTmpDir, "pkgid8.apk");
-        new Androlib(apkOptions).build(sTestOrigDir, testApk);
+        new Androlib(buildOptions).build(sTestOrigDir, testApk);
 
         LOGGER.info("Decoding pkgid8.apk...");
         ApkDecoder apkDecoder = new ApkDecoder(testApk);

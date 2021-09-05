@@ -17,6 +17,7 @@
 package brut.androlib.aapt2;
 
 import brut.androlib.*;
+import brut.androlib.options.BuildOptions;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
 import brut.util.OS;
@@ -46,13 +47,13 @@ public class DebuggableTrueAddedTest extends BaseTest {
         TestUtils.copyResourceDir(DebuggableTrueAddedTest.class, "aapt2/issue2328/debuggable-missing", sTestOrigDir);
 
         LOGGER.info("Building issue2328-debuggable-missing.apk...");
-        ApkOptions apkOptions = new ApkOptions();
-        apkOptions.debugMode = true;
-        apkOptions.useAapt2 = true;
-        apkOptions.verbose = true;
+        BuildOptions buildOptions = new BuildOptions();
+        buildOptions.debugMode = true;
+        buildOptions.useAapt2 = true;
+        buildOptions.verbose = true;
 
         File testApk = new File(sTmpDir, "issue2328-debuggable-missing.apk");
-        new Androlib(apkOptions).build(sTestOrigDir, testApk);
+        new Androlib(buildOptions).build(sTestOrigDir, testApk);
 
         LOGGER.info("Decoding issue2328-debuggable-missing.apk...");
         ApkDecoder apkDecoder = new ApkDecoder(testApk);

@@ -20,6 +20,7 @@ import brut.androlib.*;
 import brut.androlib.err.CantFindFrameworkResException;
 import brut.androlib.err.InFileNotFoundException;
 import brut.androlib.err.OutDirExistsException;
+import brut.androlib.options.BuildOptions;
 import brut.common.BrutException;
 import brut.directory.DirectoryException;
 import brut.util.AaptManager;
@@ -207,39 +208,39 @@ public class Main {
         String[] args = cli.getArgs();
         String appDirName = args.length < 2 ? "." : args[1];
         File outFile;
-        ApkOptions apkOptions = new ApkOptions();
+        brut.androlib.options.BuildOptions buildOptions = new BuildOptions();
 
         // check for build options
         if (cli.hasOption("f") || cli.hasOption("force-all")) {
-            apkOptions.forceBuildAll = true;
+            buildOptions.forceBuildAll = true;
         }
         if (cli.hasOption("d") || cli.hasOption("debug")) {
-            apkOptions.debugMode = true;
+            buildOptions.debugMode = true;
         }
         if (cli.hasOption("v") || cli.hasOption("verbose")) {
-            apkOptions.verbose = true;
+            buildOptions.verbose = true;
         }
         if (cli.hasOption("a") || cli.hasOption("aapt")) {
-            apkOptions.aaptPath = cli.getOptionValue("a");
+            buildOptions.aaptPath = cli.getOptionValue("a");
         }
         if (cli.hasOption("c") || cli.hasOption("copy-original")) {
             System.err.println("-c/--copy-original has been deprecated. Removal planned for v3.0.0 (#2129)");
-            apkOptions.copyOriginalFiles = true;
+            buildOptions.copyOriginalFiles = true;
         }
         if (cli.hasOption("p") || cli.hasOption("frame-path")) {
-            apkOptions.frameworkFolderLocation = cli.getOptionValue("p");
+            buildOptions.frameworkFolderLocation = cli.getOptionValue("p");
         }
         if (cli.hasOption("nc") || cli.hasOption("no-crunch")) {
-            apkOptions.noCrunch = true;
+            buildOptions.noCrunch = true;
         }
 
         // Temporary flag to enable the use of aapt2. This will tranform in time to a use-aapt1 flag, which will be
         // legacy and eventually removed.
         if (cli.hasOption("use-aapt2")) {
-            apkOptions.useAapt2 = true;
+            buildOptions.useAapt2 = true;
         }
         if (cli.hasOption("api") || cli.hasOption("api-level")) {
-            apkOptions.forceApi = Integer.parseInt(cli.getOptionValue("api"));
+            buildOptions.forceApi = Integer.parseInt(cli.getOptionValue("api"));
         }
         if (cli.hasOption("o") || cli.hasOption("output")) {
             outFile = new File(cli.getOptionValue("o"));
@@ -250,9 +251,9 @@ public class Main {
         // try and build apk
         try {
             if (cli.hasOption("a") || cli.hasOption("aapt")) {
-                apkOptions.aaptVersion = AaptManager.getAaptVersion(cli.getOptionValue("a"));
+                buildOptions.aaptVersion = AaptManager.getAaptVersion(cli.getOptionValue("a"));
             }
-            new Androlib(apkOptions).build(new File(appDirName), outFile);
+            new Androlib(buildOptions).build(new File(appDirName), outFile);
         } catch (BrutException ex) {
             System.err.println(ex.getMessage());
             System.exit(1);
@@ -263,23 +264,23 @@ public class Main {
         int paraCount = cli.getArgList().size();
         String apkName = cli.getArgList().get(paraCount - 1);
 
-        ApkOptions apkOptions = new ApkOptions();
+        brut.androlib.options.BuildOptions buildOptions = new BuildOptions();
         if (cli.hasOption("p") || cli.hasOption("frame-path")) {
-            apkOptions.frameworkFolderLocation = cli.getOptionValue("p");
+            buildOptions.frameworkFolderLocation = cli.getOptionValue("p");
         }
         if (cli.hasOption("t") || cli.hasOption("tag")) {
-            apkOptions.frameworkTag = cli.getOptionValue("t");
+            buildOptions.frameworkTag = cli.getOptionValue("t");
         }
-        new Androlib(apkOptions).installFramework(new File(apkName));
+        new Androlib(buildOptions).installFramework(new File(apkName));
     }
 
     private static void cmdListFrameworks(CommandLine cli) throws AndrolibException {
-        ApkOptions apkOptions = new ApkOptions();
+        brut.androlib.options.BuildOptions buildOptions = new BuildOptions();
         if (cli.hasOption("p") || cli.hasOption("frame-path")) {
-            apkOptions.frameworkFolderLocation = cli.getOptionValue("p");
+            buildOptions.frameworkFolderLocation = cli.getOptionValue("p");
         }
 
-        new Androlib(apkOptions).listFrameworks();
+        new Androlib(buildOptions).listFrameworks();
     }
 
     private static void cmdPublicizeResources(CommandLine cli) throws AndrolibException {
@@ -290,16 +291,16 @@ public class Main {
     }
 
     private static void cmdEmptyFrameworkDirectory(CommandLine cli) throws AndrolibException {
-        ApkOptions apkOptions = new ApkOptions();
+        brut.androlib.options.BuildOptions buildOptions = new BuildOptions();
 
         if (cli.hasOption("f") || cli.hasOption("force")) {
-            apkOptions.forceDeleteFramework = true;
+            buildOptions.forceDeleteFramework = true;
         }
         if (cli.hasOption("p") || cli.hasOption("frame-path")) {
-            apkOptions.frameworkFolderLocation = cli.getOptionValue("p");
+            buildOptions.frameworkFolderLocation = cli.getOptionValue("p");
         }
 
-        new Androlib(apkOptions).emptyFrameworkDirectory();
+        new Androlib(buildOptions).emptyFrameworkDirectory();
     }
 
     private static void _version() {

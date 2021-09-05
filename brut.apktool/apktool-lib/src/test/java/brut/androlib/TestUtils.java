@@ -16,6 +16,7 @@
  */
 package brut.androlib;
 
+import brut.androlib.options.BuildOptions;
 import brut.androlib.res.AndrolibResources;
 import brut.common.BrutException;
 import brut.directory.DirUtil;
@@ -137,7 +138,7 @@ public abstract class TestUtils {
 
     static File getFrameworkDir() throws AndrolibException {
         AndrolibResources androlibResources = new AndrolibResources();
-        androlibResources.apkOptions = new ApkOptions();
+        androlibResources.buildOptions = new BuildOptions();
         return androlibResources.getFrameworkDir();
     }
 
