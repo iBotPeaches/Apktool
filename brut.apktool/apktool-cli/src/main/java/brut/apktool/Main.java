@@ -306,7 +306,6 @@ public class Main {
         System.out.println(Androlib.getVersion());
     }
 
-    @SuppressWarnings("static-access")
     private static void _Options() {
 
         // create options
