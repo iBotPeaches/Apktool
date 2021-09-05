@@ -32,7 +32,7 @@ import java.io.IOException;
 import java.util.logging.*;
 
 public class Main {
-    public static void main(String[] args) throws IOException, InterruptedException, BrutException {
+    public static void main(String[] args) throws BrutException {
 
         // headless
         System.setProperty("java.awt.headless", "true");
@@ -204,7 +204,7 @@ public class Main {
         }
     }
 
-    private static void cmdBuild(CommandLine cli) throws BrutException {
+    private static void cmdBuild(CommandLine cli) {
         String[] args = cli.getArgs();
         String appDirName = args.length < 2 ? "." : args[1];
         File outFile;
@@ -234,7 +234,7 @@ public class Main {
             buildOptions.noCrunch = true;
         }
 
-        // Temporary flag to enable the use of aapt2. This will tranform in time to a use-aapt1 flag, which will be
+        // Temporary flag to enable the use of aapt2. This will transform in time to a use-aapt1 flag, which will be
         // legacy and eventually removed.
         if (cli.hasOption("use-aapt2")) {
             buildOptions.useAapt2 = true;
