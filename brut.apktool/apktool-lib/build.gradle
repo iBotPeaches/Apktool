@@ -13,23 +13,24 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-import org.apache.tools.ant.filters.*
+
+import org.apache.tools.ant.filters.ReplaceTokens
 
 apply plugin: 'java-library'
 
 processResources {
-  from('src/main/resources/properties') {
-    include '**/*.properties'
-    into 'properties'
-    filter(ReplaceTokens, tokens: [version: project.apktool_version, gitrev: project.hash] )
-    duplicatesStrategy = DuplicatesStrategy.INCLUDE
-  }
-  from('src/main/resources/') {
-    include '**/*.jar'
-    duplicatesStrategy = DuplicatesStrategy.INCLUDE
-  }
+    from('src/main/resources/properties') {
+        include '**/*.properties'
+        into 'properties'
+        filter(ReplaceTokens, tokens: [version: project.apktool_version, gitrev: project.hash])
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    }
+    from('src/main/resources/') {
+        include '**/*.jar'
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    }
 
-  includeEmptyDirs = false
+    includeEmptyDirs = false
 }
 
 dependencies {
@@ -40,12 +41,12 @@ dependencies {
         project(':brut.j.common')
 
     implementation depends.baksmali,
-                   depends.smali,
-                   depends.snakeyaml,
-                   depends.xmlpull,
-                   depends.guava,
-                   depends.commons_lang,
-                   depends.commons_io
+        depends.smali,
+        depends.snakeyaml,
+        depends.xmlpull,
+        depends.guava,
+        depends.commons_lang,
+        depends.commons_io
 
     testImplementation depends.xmlunit
 }

@@ -23,12 +23,12 @@ def getCheckedOutGitCommitHash() {
     def head
     try {
         head = new File(gitFolder + "HEAD").text.split(":")
-    } catch(Exception ignored) {
+    } catch (Exception ignored) {
         return null
     }
 
     def isCommit = head.length == 1
-    if(isCommit) return head[0].trim().take(takeFromHash)
+    if (isCommit) return head[0].trim().take(takeFromHash)
 
     def refHead = new File(gitFolder + head[1].trim())
     refHead.text.trim().take takeFromHash
@@ -41,7 +41,7 @@ def getCheckedOutBranch() {
     try {
         head = new File(gitFolder + "HEAD").text.split("/")
         return head[2].trim()
-    } catch(Exception ignored) {
+    } catch (Exception ignored) {
         return "SNAPSHOT"
     }
 }
