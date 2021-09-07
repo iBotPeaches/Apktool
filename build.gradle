@@ -39,6 +39,7 @@ buildscript {
     dependencies {
         classpath "gradle.plugin.com.github.jengelman.gradle.plugins:shadow:7.0.0"
         classpath "gradle.plugin.com.hierynomus.gradle.plugins:license-gradle-plugin:0.16.1"
+        classpath "com.diffplug.spotless:spotless-plugin-gradle:5.15.0"
     }
 }
 
@@ -79,6 +80,15 @@ allprojects {
         "licenseMain",
         "licenseTest"
     ]
+}
+
+subprojects {
+    apply plugin: "com.diffplug.spotless"
+    spotless {
+        java {
+            googleJavaFormat('1.7').aosp()
+        }
+    }
 }
 
 tasks.withType(JavaCompile).configureEach {
