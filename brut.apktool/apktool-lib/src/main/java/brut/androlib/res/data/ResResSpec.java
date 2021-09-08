@@ -34,8 +34,8 @@ public class ResResSpec {
     private final ResTypeSpec mType;
     private final Map<ResConfigFlags, ResResource> mResources = new LinkedHashMap<>();
 
-    public ResResSpec(ResID id, String name, int mFlags, ResPackage pkg, ResTypeSpec type) {
-        this.mFlags = mFlags;
+    public ResResSpec(ResID id, String name, int flags, ResPackage pkg, ResTypeSpec type) {
+        this.mFlags = flags;
         this.mId = id;
         String cleanName;
 
