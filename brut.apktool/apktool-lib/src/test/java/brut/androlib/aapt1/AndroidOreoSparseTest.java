@@ -16,18 +16,17 @@
  */
 package brut.androlib.aapt1;
 
+import static org.junit.Assert.assertTrue;
+
 import brut.androlib.*;
 import brut.androlib.options.BuildOptions;
-import brut.directory.ExtFile;
 import brut.common.BrutException;
+import brut.directory.ExtFile;
 import brut.util.OS;
+import java.io.File;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.io.File;
-
-import static org.junit.Assert.assertTrue;
 
 public class AndroidOreoSparseTest extends BaseTest {
     @BeforeClass

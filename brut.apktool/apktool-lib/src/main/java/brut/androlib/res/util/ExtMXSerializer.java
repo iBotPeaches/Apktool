@@ -16,11 +16,10 @@
  */
 package brut.androlib.res.util;
 
-import org.xmlpull.renamed.MXSerializer;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
+import org.xmlpull.renamed.MXSerializer;
 
 public class ExtMXSerializer extends MXSerializer implements ExtXmlSerializer {
     @Override
@@ -53,7 +52,8 @@ public class ExtMXSerializer extends MXSerializer implements ExtXmlSerializer {
     }
 
     @Override
-    public void setProperty(String name, Object value) throws IllegalArgumentException, IllegalStateException {
+    public void setProperty(String name, Object value)
+            throws IllegalArgumentException, IllegalStateException {
         if (PROPERTY_DEFAULT_ENCODING.equals(name)) {
             mDefaultEncoding = (String) value;
         } else {
@@ -74,5 +74,4 @@ public class ExtMXSerializer extends MXSerializer implements ExtXmlSerializer {
 
     private String mDefaultEncoding;
     private boolean mIsDisabledAttrEscape = false;
-
 }

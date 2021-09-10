@@ -18,14 +18,13 @@ package brut.directory;
 
 import brut.common.BrutException;
 import brut.util.BrutIO;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
-
 import java.io.*;
 import java.util.Collection;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 
 public class ZipUtils {
 
@@ -35,7 +34,11 @@ public class ZipUtils {
         // Private constructor for utility class
     }
 
-    public static void zipFolders(final File folder, final File zip, final File assets, final Collection<String> doNotCompress)
+    public static void zipFolders(
+            final File folder,
+            final File zip,
+            final File assets,
+            final Collection<String> doNotCompress)
             throws BrutException, IOException {
 
         mDoNotCompress = doNotCompress;
@@ -54,20 +57,26 @@ public class ZipUtils {
         processFolder(folder, outputStream, folder.getPath().length() + 1);
     }
 
-    private static void processFolder(final File folder, final ZipOutputStream zipOutputStream, final int prefixLength)
+    private static void processFolder(
+            final File folder, final ZipOutputStream zipOutputStream, final int prefixLength)
             throws BrutException, IOException {
         for (final File file : folder.listFiles()) {
             if (file.isFile()) {
-                final String cleanedPath = BrutIO.sanitizeUnknownFile(folder, file.getPath().substring(prefixLength));
+                final String cleanedPath =
+                        BrutIO.sanitizeUnknownFile(folder, file.getPath().substring(prefixLength));
                 final ZipEntry zipEntry = new ZipEntry(BrutIO.normalizePath(cleanedPath));
 
-                // aapt binary by default takes in parameters via -0 arsc to list extensions that shouldn't be
+                // aapt binary by default takes in parameters via -0 arsc to list extensions that
+                // shouldn't be
                 // compressed. We will replicate that behavior
                 final String extension = FilenameUtils.getExtension(file.getAbsolutePath());
-                if (mDoNotCompress != null && (mDoNotCompress.contains(extension) || mDoNotCompress.contains(zipEntry.getName()))) {
+                if (mDoNotCompress != null
+                        && (mDoNotCompress.contains(extension)
+                                || mDoNotCompress.contains(zipEntry.getName()))) {
                     zipEntry.setMethod(ZipEntry.STORED);
                     zipEntry.setSize(file.length());
-                    BufferedInputStream unknownFile = new BufferedInputStream(new FileInputStream(file));
+                    BufferedInputStream unknownFile =
+                            new BufferedInputStream(new FileInputStream(file));
                     CRC32 crc = BrutIO.calculateCrc(unknownFile);
                     zipEntry.setCrc(crc.getValue());
                     unknownFile.close();

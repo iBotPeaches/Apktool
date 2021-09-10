@@ -36,7 +36,8 @@ public final class ResTypeSpec {
     private final int mId;
     private final int mEntryCount;
 
-    public ResTypeSpec(String name, ResTable resTable, ResPackage package_, int id, int entryCount) {
+    public ResTypeSpec(
+            String name, ResTable resTable, ResPackage package_, int id, int entryCount) {
         this.mName = name;
         this.mResTable = resTable;
         this.mPackage = package_;
@@ -59,7 +60,8 @@ public final class ResTypeSpec {
     public ResResSpec getResSpec(String name) throws AndrolibException {
         ResResSpec spec = getResSpecUnsafe(name);
         if (spec == null) {
-            throw new UndefinedResObjectException(String.format("resource spec: %s/%s", getName(), name));
+            throw new UndefinedResObjectException(
+                    String.format("resource spec: %s/%s", getName(), name));
         }
         return spec;
     }
@@ -74,7 +76,8 @@ public final class ResTypeSpec {
 
     public void addResSpec(ResResSpec spec) throws AndrolibException {
         if (mResSpecs.put(spec.getName(), spec) != null) {
-            throw new AndrolibException(String.format("Multiple res specs: %s/%s", getName(), spec.getName()));
+            throw new AndrolibException(
+                    String.format("Multiple res specs: %s/%s", getName(), spec.getName()));
         }
     }
 

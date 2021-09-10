@@ -16,23 +16,22 @@
  */
 package brut.androlib.decode;
 
+import static org.junit.Assert.assertTrue;
+
 import brut.androlib.Androlib;
 import brut.androlib.ApkDecoder;
 import brut.androlib.BaseTest;
 import brut.androlib.TestUtils;
 import brut.androlib.meta.MetaInfo;
-import brut.directory.ExtFile;
 import brut.common.BrutException;
+import brut.directory.ExtFile;
 import brut.util.OS;
+import java.io.File;
+import java.io.IOException;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.io.File;
-import java.io.IOException;
-
-import static org.junit.Assert.assertTrue;
 
 public class DoubleExtensionUnknownFileTest extends BaseTest {
 
@@ -40,7 +39,8 @@ public class DoubleExtensionUnknownFileTest extends BaseTest {
     public static void beforeClass() throws Exception {
         TestUtils.cleanFrameworkFile();
         sTmpDir = new ExtFile(OS.createTempDirectory());
-        TestUtils.copyResourceDir(DoubleExtensionUnknownFileTest.class, "decode/issue1244/", sTmpDir);
+        TestUtils.copyResourceDir(
+                DoubleExtensionUnknownFileTest.class, "decode/issue1244/", sTmpDir);
     }
 
     @AfterClass

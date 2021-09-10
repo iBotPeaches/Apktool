@@ -16,11 +16,11 @@
  */
 package brut.androlib.encoders;
 
+import static org.junit.Assert.assertEquals;
+
 import brut.androlib.BaseTest;
 import brut.androlib.res.xml.ResXmlEncoders;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public class PositionalEnumerationTest extends BaseTest {
 
@@ -46,17 +46,22 @@ public class PositionalEnumerationTest extends BaseTest {
 
     @Test
     public void threePositionalArgumentsTest() {
-        assertEquals(" %1$s, %2$s and %3$d other", enumerateArguments(" %1$s, %2$s and %3$d other"));
+        assertEquals(
+                " %1$s, %2$s and %3$d other", enumerateArguments(" %1$s, %2$s and %3$d other"));
     }
 
     @Test
     public void fourArgumentsTest() {
-        assertEquals("%1$s, %2$s, and %3$d other and %4$d.", enumerateArguments("%s, %s, and %d other and %d."));
+        assertEquals(
+                "%1$s, %2$s, and %3$d other and %4$d.",
+                enumerateArguments("%s, %s, and %d other and %d."));
     }
 
     @Test
     public void fourPositionalArgumentsTest() {
-        assertEquals(" %1$s, %2$s and %3$d other and %4$d.", enumerateArguments(" %1$s, %2$s and %3$d other and %4$d."));
+        assertEquals(
+                " %1$s, %2$s and %3$d other and %4$d.",
+                enumerateArguments(" %1$s, %2$s and %3$d other and %4$d."));
     }
 
     private String enumerateArguments(String value) {

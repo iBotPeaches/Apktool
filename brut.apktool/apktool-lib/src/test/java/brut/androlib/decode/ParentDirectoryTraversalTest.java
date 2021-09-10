@@ -22,12 +22,11 @@ import brut.androlib.TestUtils;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
 import brut.util.OS;
+import java.io.File;
+import java.io.IOException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.io.File;
-import java.io.IOException;
 
 public class ParentDirectoryTraversalTest extends BaseTest {
 

@@ -21,11 +21,9 @@ import brut.androlib.options.BuildOptions;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
 import brut.util.OS;
-import org.junit.*;
-
 import java.io.File;
 import java.io.IOException;
-
+import org.junit.*;
 
 public class DuplicateDexTest extends BaseTest {
 
@@ -72,5 +70,4 @@ public class DuplicateDexTest extends BaseTest {
         BuildOptions buildOptions = new BuildOptions();
         new Androlib(buildOptions).build(sTestNewDir, testApk);
     }
-
 }

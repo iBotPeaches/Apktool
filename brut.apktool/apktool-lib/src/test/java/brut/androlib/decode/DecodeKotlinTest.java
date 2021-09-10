@@ -16,21 +16,20 @@
  */
 package brut.androlib.decode;
 
+import static org.junit.Assert.assertTrue;
+
 import brut.androlib.ApkDecoder;
 import brut.androlib.BaseTest;
 import brut.androlib.TestUtils;
-import brut.directory.ExtFile;
 import brut.common.BrutException;
+import brut.directory.ExtFile;
 import brut.util.OS;
+import java.io.File;
+import java.io.IOException;
 import org.apache.commons.io.FileUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.io.File;
-import java.io.IOException;
-
-import static org.junit.Assert.assertTrue;
 
 public class DecodeKotlinTest extends BaseTest {
 
@@ -65,7 +64,8 @@ public class DecodeKotlinTest extends BaseTest {
 
     @Test
     public void kotlinDecodeTest() throws IOException {
-        File kotlinActivity = new File(sTestNewDir, "smali/org/example/kotlin/mixed/KotlinActivity.smali");
+        File kotlinActivity =
+                new File(sTestNewDir, "smali/org/example/kotlin/mixed/KotlinActivity.smali");
 
         assertTrue(FileUtils.readFileToString(kotlinActivity).contains("KotlinActivity.kt"));
     }

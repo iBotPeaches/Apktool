@@ -16,21 +16,20 @@
  */
 package brut.androlib.decode;
 
+import static org.junit.Assert.*;
+
 import brut.androlib.BaseTest;
 import brut.androlib.TestUtils;
 import brut.androlib.res.decoder.Res9patchStreamDecoder;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
 import brut.util.OS;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import javax.imageio.ImageIO;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.*;
-
-import static org.junit.Assert.*;
 
 public class MissingDiv9PatchTest extends BaseTest {
 
@@ -57,11 +56,11 @@ public class MissingDiv9PatchTest extends BaseTest {
         BufferedImage image = ImageIO.read(new ByteArrayInputStream(outputStream.toByteArray()));
         int height = image.getHeight() - 1;
 
-        // First and last pixel will be invisible, so lets check the first column and ensure its all black
+        // First and last pixel will be invisible, so lets check the first column and ensure its all
+        // black
         for (int y = 1; y < height; y++) {
             assertEquals("y coordinate failed at: " + y, NP_COLOR, image.getRGB(0, y));
         }
-
     }
 
     private FileInputStream getFileInputStream() throws IOException {

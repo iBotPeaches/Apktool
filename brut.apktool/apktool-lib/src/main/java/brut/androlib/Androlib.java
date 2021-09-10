@@ -23,19 +23,15 @@ import brut.androlib.res.AndrolibResources;
 import brut.androlib.res.data.ResPackage;
 import brut.androlib.res.data.ResTable;
 import brut.androlib.res.data.ResUnknownFiles;
-import brut.common.InvalidUnknownFileException;
-import brut.common.RootUnknownFileException;
-import brut.common.TraversalUnknownFileException;
 import brut.androlib.res.xml.ResXmlPatcher;
 import brut.androlib.src.SmaliBuilder;
 import brut.androlib.src.SmaliDecoder;
 import brut.common.BrutException;
+import brut.common.InvalidUnknownFileException;
+import brut.common.RootUnknownFileException;
+import brut.common.TraversalUnknownFileException;
 import brut.directory.*;
 import brut.util.*;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.jf.dexlib2.iface.DexFile;
-
 import java.io.*;
 import java.util.*;
 import java.util.logging.Logger;
@@ -44,6 +40,9 @@ import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.jf.dexlib2.iface.DexFile;
 
 public class Androlib {
     private final AndrolibResources mAndRes = new AndrolibResources();
@@ -60,13 +59,11 @@ public class Androlib {
         mAndRes.buildOptions = buildOptions;
     }
 
-    public ResTable getResTable(ExtFile apkFile)
-            throws AndrolibException {
+    public ResTable getResTable(ExtFile apkFile) throws AndrolibException {
         return mAndRes.getResTable(apkFile, true);
     }
 
-    public ResTable getResTable(ExtFile apkFile, boolean loadMainPkg)
-            throws AndrolibException {
+    public ResTable getResTable(ExtFile apkFile, boolean loadMainPkg) throws AndrolibException {
         return mAndRes.getResTable(apkFile, loadMainPkg);
     }
 
@@ -84,14 +81,18 @@ public class Androlib {
         }
     }
 
-    public void decodeSourcesSmali(File apkFile, File outDir, String filename, boolean bakDeb, int apiLevel)
+    public void decodeSourcesSmali(
+            File apkFile, File outDir, String filename, boolean bakDeb, int apiLevel)
             throws AndrolibException {
         try {
             File smaliDir;
             if (filename.equalsIgnoreCase("classes.dex")) {
                 smaliDir = new File(outDir, SMALI_DIRNAME);
             } else {
-                smaliDir = new File(outDir, SMALI_DIRNAME + "_" + filename.substring(0, filename.indexOf(".")));
+                smaliDir =
+                        new File(
+                                outDir,
+                                SMALI_DIRNAME + "_" + filename.substring(0, filename.indexOf(".")));
             }
             OS.rmdir(smaliDir);
             smaliDir.mkdirs();
@@ -106,8 +107,7 @@ public class Androlib {
         }
     }
 
-    public void decodeManifestRaw(ExtFile apkFile, File outDir)
-            throws AndrolibException {
+    public void decodeManifestRaw(ExtFile apkFile, File outDir) throws AndrolibException {
         try {
             LOGGER.info("Copying raw manifest...");
             apkFile.getDirectory().copyToDir(outDir, APK_MANIFEST_FILENAMES);
@@ -121,8 +121,7 @@ public class Androlib {
         mAndRes.decodeManifest(resTable, apkFile, outDir);
     }
 
-    public void decodeResourcesRaw(ExtFile apkFile, File outDir)
-            throws AndrolibException {
+    public void decodeResourcesRaw(ExtFile apkFile, File outDir) throws AndrolibException {
         try {
             LOGGER.info("Copying raw resources...");
             apkFile.getDirectory().copyToDir(outDir, APK_RESOURCES_FILENAMES);
@@ -166,7 +165,8 @@ public class Androlib {
         }
     }
 
-    public void recordUncompressedFiles(ExtFile apkFile, Collection<String> uncompressedFilesOrExts) throws AndrolibException {
+    public void recordUncompressedFiles(ExtFile apkFile, Collection<String> uncompressedFilesOrExts)
+            throws AndrolibException {
         try {
             Directory unk = apkFile.getDirectory();
             Set<String> files = unk.getFiles(true);
@@ -200,8 +200,7 @@ public class Androlib {
         return false;
     }
 
-    public void decodeUnknownFiles(ExtFile apkFile, File outDir)
-            throws AndrolibException {
+    public void decodeUnknownFiles(ExtFile apkFile, File outDir) throws AndrolibException {
         LOGGER.info("Copying unknown files...");
         File unknownOut = new File(outDir, UNK_DIRNAME);
         try {
@@ -216,7 +215,8 @@ public class Androlib {
                     unk.copyToDir(unknownOut, file);
                     // lets record the name of the file, and its compression type
                     // so that we may re-include it the same way
-                    mResUnknownFiles.addUnknownFileInfo(file, String.valueOf(unk.getCompressionLevel(file)));
+                    mResUnknownFiles.addUnknownFileInfo(
+                            file, String.valueOf(unk.getCompressionLevel(file)));
                 }
             }
         } catch (DirectoryException ex) {
@@ -224,8 +224,7 @@ public class Androlib {
         }
     }
 
-    public void writeOriginalFiles(ExtFile apkFile, File outDir)
-            throws AndrolibException {
+    public void writeOriginalFiles(ExtFile apkFile, File outDir) throws AndrolibException {
         LOGGER.info("Copying original files...");
         File originalDir = new File(outDir, "original");
         if (!originalDir.exists()) {
@@ -253,8 +252,7 @@ public class Androlib {
         }
     }
 
-    public void writeMetaFile(File mOutDir, MetaInfo meta)
-            throws AndrolibException {
+    public void writeMetaFile(File mOutDir, MetaInfo meta) throws AndrolibException {
         try {
             meta.save(new File(mOutDir, "apktool.yml"));
         } catch (IOException ex) {
@@ -262,11 +260,8 @@ public class Androlib {
         }
     }
 
-    public MetaInfo readMetaFile(ExtFile appDir)
-            throws AndrolibException {
-        try(
-                InputStream in = appDir.getDirectory().getFileInput("apktool.yml")
-        ) {
+    public MetaInfo readMetaFile(ExtFile appDir) throws AndrolibException {
+        try (InputStream in = appDir.getDirectory().getFileInput("apktool.yml")) {
             return MetaInfo.load(in);
         } catch (DirectoryException | IOException ex) {
             throw new AndrolibException(ex);
@@ -277,8 +272,7 @@ public class Androlib {
         build(new ExtFile(appDir), outFile);
     }
 
-    public void build(ExtFile appDir, File outFile)
-            throws BrutException {
+    public void build(ExtFile appDir, File outFile) throws BrutException {
         LOGGER.info("Using Apktool " + Androlib.getVersion());
 
         MetaInfo meta = readMetaFile(appDir);
@@ -300,7 +294,12 @@ public class Androlib {
 
         if (outFile == null) {
             String outFileName = meta.apkFileName;
-            outFile = new File(appDir, "dist" + File.separator + (outFileName == null ? "out.apk" : outFileName));
+            outFile =
+                    new File(
+                            appDir,
+                            "dist"
+                                    + File.separator
+                                    + (outFileName == null ? "out.apk" : outFileName));
         }
 
         new File(appDir, APK_DIRNAME).mkdirs();
@@ -353,15 +352,14 @@ public class Androlib {
         }
     }
 
-    public void buildSources(File appDir)
-            throws AndrolibException {
-        if (!buildSourcesRaw(appDir, "classes.dex") && !buildSourcesSmali(appDir, "smali", "classes.dex")) {
+    public void buildSources(File appDir) throws AndrolibException {
+        if (!buildSourcesRaw(appDir, "classes.dex")
+                && !buildSourcesSmali(appDir, "smali", "classes.dex")) {
             LOGGER.warning("Could not find sources");
         }
     }
 
-    public void buildNonDefaultSources(ExtFile appDir)
-            throws AndrolibException {
+    public void buildNonDefaultSources(ExtFile appDir) throws AndrolibException {
         try {
             // loop through any smali_ directories for multi-dex apks
             Map<String, Directory> dirs = appDir.getDirectory().getDirs();
@@ -370,7 +368,8 @@ public class Androlib {
                 if (name.startsWith("smali_")) {
                     String filename = name.substring(name.indexOf("_") + 1) + ".dex";
 
-                    if (!buildSourcesRaw(appDir, filename) && !buildSourcesSmali(appDir, name, filename)) {
+                    if (!buildSourcesRaw(appDir, filename)
+                            && !buildSourcesSmali(appDir, name, filename)) {
                         LOGGER.warning("Could not find sources");
                     }
                 }
@@ -382,18 +381,18 @@ public class Androlib {
                 for (File dex : dexFiles) {
 
                     // skip classes.dex because we have handled it in buildSources()
-                    if (dex.getName().endsWith(".dex") && ! dex.getName().equalsIgnoreCase("classes.dex")) {
+                    if (dex.getName().endsWith(".dex")
+                            && !dex.getName().equalsIgnoreCase("classes.dex")) {
                         buildSourcesRaw(appDir, dex.getName());
                     }
                 }
             }
-        } catch(DirectoryException ex) {
+        } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
         }
     }
 
-    public boolean buildSourcesRaw(File appDir, String filename)
-            throws AndrolibException {
+    public boolean buildSourcesRaw(File appDir, String filename) throws AndrolibException {
         File working = new File(appDir, filename);
         if (!working.exists()) {
             return false;
@@ -418,37 +417,41 @@ public class Androlib {
             return false;
         }
         File dex = new File(appDir, APK_DIRNAME + "/" + filename);
-        if (! buildOptions.forceBuildAll) {
+        if (!buildOptions.forceBuildAll) {
             LOGGER.info("Checking whether sources has changed...");
         }
         if (buildOptions.forceBuildAll || isModified(smaliDir, dex)) {
             LOGGER.info("Smaling " + folder + " folder into " + filename + "...");
             dex.delete();
-            SmaliBuilder.build(smaliDir, dex, buildOptions.forceApi > 0 ? buildOptions.forceApi : mMinSdkVersion);
+            SmaliBuilder.build(
+                    smaliDir,
+                    dex,
+                    buildOptions.forceApi > 0 ? buildOptions.forceApi : mMinSdkVersion);
         }
         return true;
     }
 
-    public void buildResources(ExtFile appDir, UsesFramework usesFramework)
-            throws BrutException {
-        if (!buildResourcesRaw(appDir) && !buildResourcesFull(appDir, usesFramework)
+    public void buildResources(ExtFile appDir, UsesFramework usesFramework) throws BrutException {
+        if (!buildResourcesRaw(appDir)
+                && !buildResourcesFull(appDir, usesFramework)
                 && !buildManifest(appDir, usesFramework)) {
             LOGGER.warning("Could not find resources");
         }
     }
 
-    public boolean buildResourcesRaw(ExtFile appDir)
-            throws AndrolibException {
+    public boolean buildResourcesRaw(ExtFile appDir) throws AndrolibException {
         try {
             if (!new File(appDir, "resources.arsc").exists()) {
                 return false;
             }
             File apkDir = new File(appDir, APK_DIRNAME);
-            if (! buildOptions.forceBuildAll) {
+            if (!buildOptions.forceBuildAll) {
                 LOGGER.info("Checking whether resources has changed...");
             }
-            if (buildOptions.forceBuildAll || isModified(newFiles(APK_RESOURCES_FILENAMES, appDir),
-                    newFiles(APK_RESOURCES_FILENAMES, apkDir))) {
+            if (buildOptions.forceBuildAll
+                    || isModified(
+                            newFiles(APK_RESOURCES_FILENAMES, appDir),
+                            newFiles(APK_RESOURCES_FILENAMES, apkDir))) {
                 LOGGER.info("Copying raw resources...");
                 appDir.getDirectory().copyToDir(apkDir, APK_RESOURCES_FILENAMES);
             }
@@ -464,22 +467,28 @@ public class Androlib {
             if (!new File(appDir, "res").exists()) {
                 return false;
             }
-            if (! buildOptions.forceBuildAll) {
+            if (!buildOptions.forceBuildAll) {
                 LOGGER.info("Checking whether resources has changed...");
             }
             File apkDir = new File(appDir, APK_DIRNAME);
             File resourceFile = new File(apkDir.getParent(), "resources.zip");
 
-            if (buildOptions.forceBuildAll || isModified(newFiles(APP_RESOURCES_FILENAMES, appDir),
-                    newFiles(APK_RESOURCES_FILENAMES, apkDir)) || (buildOptions.isAapt2() && !isFile(resourceFile))) {
+            if (buildOptions.forceBuildAll
+                    || isModified(
+                            newFiles(APP_RESOURCES_FILENAMES, appDir),
+                            newFiles(APK_RESOURCES_FILENAMES, apkDir))
+                    || (buildOptions.isAapt2() && !isFile(resourceFile))) {
                 LOGGER.info("Building resources...");
 
                 if (buildOptions.debugMode) {
                     if (buildOptions.isAapt2()) {
-                        LOGGER.info("Using aapt2 - setting 'debuggable' attribute to 'true' in AndroidManifest.xml");
-                        ResXmlPatcher.setApplicationDebugTagTrue(new File(appDir, "AndroidManifest.xml"));
+                        LOGGER.info(
+                                "Using aapt2 - setting 'debuggable' attribute to 'true' in AndroidManifest.xml");
+                        ResXmlPatcher.setApplicationDebugTagTrue(
+                                new File(appDir, "AndroidManifest.xml"));
                     } else {
-                        ResXmlPatcher.removeApplicationDebugTag(new File(appDir, "AndroidManifest.xml"));
+                        ResXmlPatcher.removeApplicationDebugTag(
+                                new File(appDir, "AndroidManifest.xml"));
                     }
                 }
 
@@ -491,9 +500,13 @@ public class Androlib {
                 if (!ninePatch.exists()) {
                     ninePatch = null;
                 }
-                mAndRes.aaptPackage(apkFile, new File(appDir,
-                                "AndroidManifest.xml"), new File(appDir, "res"),
-                        ninePatch, null, parseUsesFramework(usesFramework));
+                mAndRes.aaptPackage(
+                        apkFile,
+                        new File(appDir, "AndroidManifest.xml"),
+                        new File(appDir, "res"),
+                        ninePatch,
+                        null,
+                        parseUsesFramework(usesFramework));
 
                 Directory tmpDir = new ExtFile(apkFile).getDirectory();
 
@@ -501,8 +514,10 @@ public class Androlib {
                 // Apktool assumes it will have a rebuilt arsc file, when it doesn't. So if we
                 // encounter a copy error, move to a warning and continue on. (#1730)
                 try {
-                    tmpDir.copyToDir(apkDir,
-                            tmpDir.containsDir("res") ? APK_RESOURCES_FILENAMES
+                    tmpDir.copyToDir(
+                            apkDir,
+                            tmpDir.containsDir("res")
+                                    ? APK_RESOURCES_FILENAMES
                                     : APK_RESOURCES_WITHOUT_RES_FILENAMES);
                 } catch (DirectoryException ex) {
                     LOGGER.warning(ex.getMessage());
@@ -517,8 +532,7 @@ public class Androlib {
         }
     }
 
-    public boolean buildManifestRaw(ExtFile appDir)
-            throws AndrolibException {
+    public boolean buildManifestRaw(ExtFile appDir) throws AndrolibException {
         try {
             File apkDir = new File(appDir, APK_DIRNAME);
             LOGGER.info("Copying raw AndroidManifest.xml...");
@@ -529,20 +543,21 @@ public class Androlib {
         }
     }
 
-    public boolean buildManifest(ExtFile appDir, UsesFramework usesFramework)
-            throws BrutException {
+    public boolean buildManifest(ExtFile appDir, UsesFramework usesFramework) throws BrutException {
         try {
             if (!new File(appDir, "AndroidManifest.xml").exists()) {
                 return false;
             }
-            if (! buildOptions.forceBuildAll) {
+            if (!buildOptions.forceBuildAll) {
                 LOGGER.info("Checking whether resources has changed...");
             }
 
             File apkDir = new File(appDir, APK_DIRNAME);
 
-            if (buildOptions.forceBuildAll || isModified(newFiles(APK_MANIFEST_FILENAMES, appDir),
-                    newFiles(APK_MANIFEST_FILENAMES, apkDir))) {
+            if (buildOptions.forceBuildAll
+                    || isModified(
+                            newFiles(APK_MANIFEST_FILENAMES, appDir),
+                            newFiles(APK_MANIFEST_FILENAMES, apkDir))) {
                 LOGGER.info("Building AndroidManifest.xml...");
 
                 File apkFile = File.createTempFile("APKTOOL", null);
@@ -553,8 +568,12 @@ public class Androlib {
                     ninePatch = null;
                 }
 
-                mAndRes.aaptPackage(apkFile, new File(appDir,
-                                "AndroidManifest.xml"), null, ninePatch, null,
+                mAndRes.aaptPackage(
+                        apkFile,
+                        new File(appDir, "AndroidManifest.xml"),
+                        null,
+                        ninePatch,
+                        null,
                         parseUsesFramework(usesFramework));
 
                 Directory tmpDir = new ExtFile(apkFile).getDirectory();
@@ -579,7 +598,7 @@ public class Androlib {
     public void buildLibrary(File appDir, String folder) throws AndrolibException {
         File working = new File(appDir, folder);
 
-        if (! working.exists()) {
+        if (!working.exists()) {
             return;
         }
 
@@ -595,8 +614,7 @@ public class Androlib {
         }
     }
 
-    public void buildCopyOriginalFiles(File appDir)
-            throws AndrolibException {
+    public void buildCopyOriginalFiles(File appDir) throws AndrolibException {
         if (buildOptions.copyOriginalFiles) {
             File originalDir = new File(appDir, "original");
             if (originalDir.exists()) {
@@ -630,10 +648,9 @@ public class Androlib {
                 throw new AndrolibException("Unable to rename temporary file");
             }
 
-            try (
-                    ZipFile inputFile = new ZipFile(tempFile);
-                    ZipOutputStream actualOutput = new ZipOutputStream(new FileOutputStream(outFile))
-            ) {
+            try (ZipFile inputFile = new ZipFile(tempFile);
+                    ZipOutputStream actualOutput =
+                            new ZipOutputStream(new FileOutputStream(outFile))) {
                 copyExistingFiles(inputFile, actualOutput);
                 copyUnknownFiles(appDir, actualOutput, files);
             } catch (IOException | BrutException ex) {
@@ -645,7 +662,8 @@ public class Androlib {
         }
     }
 
-    private void copyExistingFiles(ZipFile inputFile, ZipOutputStream outputFile) throws IOException {
+    private void copyExistingFiles(ZipFile inputFile, ZipOutputStream outputFile)
+            throws IOException {
         // First, copy the contents from the existing outFile:
         Enumeration<? extends ZipEntry> entries = inputFile.entries();
         while (entries.hasMoreElements()) {
@@ -656,7 +674,7 @@ public class Androlib {
             outputFile.putNextEntry(entry);
 
             // No need to create directory entries in the final apk
-            if (! entry.isDirectory()) {
+            if (!entry.isDirectory()) {
                 BrutIO.copy(inputFile, outputFile, entry);
             }
 
@@ -664,18 +682,28 @@ public class Androlib {
         }
     }
 
-    private void copyUnknownFiles(File appDir, ZipOutputStream outputFile, Map<String, String> files)
+    private void copyUnknownFiles(
+            File appDir, ZipOutputStream outputFile, Map<String, String> files)
             throws BrutException, IOException {
         File unknownFileDir = new File(appDir, UNK_DIRNAME);
 
         // loop through unknown files
-        for (Map.Entry<String,String> unknownFileInfo : files.entrySet()) {
+        for (Map.Entry<String, String> unknownFileInfo : files.entrySet()) {
             File inputFile;
 
             try {
-                inputFile = new File(unknownFileDir, BrutIO.sanitizeUnknownFile(unknownFileDir, unknownFileInfo.getKey()));
-            } catch (RootUnknownFileException | InvalidUnknownFileException | TraversalUnknownFileException exception) {
-                LOGGER.warning(String.format("Skipping file %s (%s)", unknownFileInfo.getKey(), exception.getMessage()));
+                inputFile =
+                        new File(
+                                unknownFileDir,
+                                BrutIO.sanitizeUnknownFile(
+                                        unknownFileDir, unknownFileInfo.getKey()));
+            } catch (RootUnknownFileException
+                    | InvalidUnknownFileException
+                    | TraversalUnknownFileException exception) {
+                LOGGER.warning(
+                        String.format(
+                                "Skipping file %s (%s)",
+                                unknownFileInfo.getKey(), exception.getMessage()));
                 continue;
             }
 
@@ -685,12 +713,16 @@ public class Androlib {
 
             ZipEntry newEntry = new ZipEntry(unknownFileInfo.getKey());
             int method = Integer.parseInt(unknownFileInfo.getValue());
-            LOGGER.fine(String.format("Copying unknown file %s with method %d", unknownFileInfo.getKey(), method));
+            LOGGER.fine(
+                    String.format(
+                            "Copying unknown file %s with method %d",
+                            unknownFileInfo.getKey(), method));
             if (method == ZipEntry.STORED) {
                 newEntry.setMethod(ZipEntry.STORED);
                 newEntry.setSize(inputFile.length());
                 newEntry.setCompressedSize(-1);
-                BufferedInputStream unknownFile = new BufferedInputStream(new FileInputStream(inputFile));
+                BufferedInputStream unknownFile =
+                        new BufferedInputStream(new FileInputStream(inputFile));
                 CRC32 crc = BrutIO.calculateCrc(unknownFile);
                 newEntry.setCrc(crc.getValue());
             } else {
@@ -724,8 +756,7 @@ public class Androlib {
         mAndRes.publicizeResources(arscFile);
     }
 
-    public void installFramework(File frameFile)
-            throws AndrolibException {
+    public void installFramework(File frameFile) throws AndrolibException {
         mAndRes.installFramework(frameFile);
     }
 
@@ -750,8 +781,7 @@ public class Androlib {
         return ApktoolProperties.get("application.version");
     }
 
-    private File[] parseUsesFramework(UsesFramework usesFramework)
-            throws AndrolibException {
+    private File[] parseUsesFramework(UsesFramework usesFramework) throws AndrolibException {
         if (usesFramework == null) {
             return null;
         }
@@ -771,7 +801,8 @@ public class Androlib {
     }
 
     private boolean isModified(File working, File stored) {
-        return ! stored.exists() || BrutIO.recursiveModifiedTime(working) > BrutIO .recursiveModifiedTime(stored);
+        return !stored.exists()
+                || BrutIO.recursiveModifiedTime(working) > BrutIO.recursiveModifiedTime(stored);
     }
 
     private boolean isFile(File working) {
@@ -799,23 +830,35 @@ public class Androlib {
         mAndRes.close();
     }
 
-    private final static Logger LOGGER = Logger.getLogger(Androlib.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(Androlib.class.getName());
 
-    private final static String SMALI_DIRNAME = "smali";
-    private final static String APK_DIRNAME = "build/apk";
-    private final static String UNK_DIRNAME = "unknown";
-    private final static String[] APK_RESOURCES_FILENAMES = new String[] {
-            "resources.arsc", "AndroidManifest.xml", "res" };
-    private final static String[] APK_RESOURCES_WITHOUT_RES_FILENAMES = new String[] {
-            "resources.arsc", "AndroidManifest.xml" };
-    private final static String[] APP_RESOURCES_FILENAMES = new String[] {
-            "AndroidManifest.xml", "res" };
-    private final static String[] APK_MANIFEST_FILENAMES = new String[] {
-            "AndroidManifest.xml" };
-    private final static String[] APK_STANDARD_ALL_FILENAMES = new String[] {
-            "classes.dex", "AndroidManifest.xml", "resources.arsc", "res", "r", "R",
-            "lib", "libs", "assets", "META-INF", "kotlin" };
-    private final static Pattern NO_COMPRESS_PATTERN = Pattern.compile("(" +
-            "jpg|jpeg|png|gif|wav|mp2|mp3|ogg|aac|mpg|mpeg|mid|midi|smf|jet|rtttl|imy|xmf|mp4|" +
-            "m4a|m4v|3gp|3gpp|3g2|3gpp2|amr|awb|wma|wmv|webm|webp|mkv)$");
+    private static final String SMALI_DIRNAME = "smali";
+    private static final String APK_DIRNAME = "build/apk";
+    private static final String UNK_DIRNAME = "unknown";
+    private static final String[] APK_RESOURCES_FILENAMES =
+            new String[] {"resources.arsc", "AndroidManifest.xml", "res"};
+    private static final String[] APK_RESOURCES_WITHOUT_RES_FILENAMES =
+            new String[] {"resources.arsc", "AndroidManifest.xml"};
+    private static final String[] APP_RESOURCES_FILENAMES =
+            new String[] {"AndroidManifest.xml", "res"};
+    private static final String[] APK_MANIFEST_FILENAMES = new String[] {"AndroidManifest.xml"};
+    private static final String[] APK_STANDARD_ALL_FILENAMES =
+            new String[] {
+                "classes.dex",
+                "AndroidManifest.xml",
+                "resources.arsc",
+                "res",
+                "r",
+                "R",
+                "lib",
+                "libs",
+                "assets",
+                "META-INF",
+                "kotlin"
+            };
+    private static final Pattern NO_COMPRESS_PATTERN =
+            Pattern.compile(
+                    "("
+                            + "jpg|jpeg|png|gif|wav|mp2|mp3|ogg|aac|mpg|mpeg|mid|midi|smf|jet|rtttl|imy|xmf|mp4|"
+                            + "m4a|m4v|3gp|3gpp|3g2|3gpp2|amr|awb|wma|wmv|webm|webp|mkv)$");
 }

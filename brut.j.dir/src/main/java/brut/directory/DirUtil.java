@@ -32,15 +32,14 @@ public class DirUtil {
         // Private constructor for utility class
     }
 
-    public static void copyToDir(Directory in, Directory out)
-            throws DirectoryException {
+    public static void copyToDir(Directory in, Directory out) throws DirectoryException {
         for (String fileName : in.getFiles(true)) {
             copyToDir(in, out, fileName);
         }
     }
 
-    public static void copyToDir(Directory in, Directory out,
-            String[] fileNames) throws DirectoryException {
+    public static void copyToDir(Directory in, Directory out, String[] fileNames)
+            throws DirectoryException {
         for (String fileName : fileNames) {
             copyToDir(in, out, fileName);
         }
@@ -64,8 +63,7 @@ public class DirUtil {
         }
     }
 
-    public static void copyToDir(Directory in, File out)
-            throws DirectoryException {
+    public static void copyToDir(Directory in, File out) throws DirectoryException {
         for (String fileName : in.getFiles(true)) {
             copyToDir(in, out, fileName);
         }
@@ -93,8 +91,11 @@ public class DirUtil {
                 outFile.getParentFile().mkdirs();
                 BrutIO.copyAndClose(in.getFileInput(fileName), new FileOutputStream(outFile));
             }
-        } catch (RootUnknownFileException | InvalidUnknownFileException | TraversalUnknownFileException exception) {
-            LOGGER.warning(String.format("Skipping file %s (%s)", fileName, exception.getMessage()));
+        } catch (RootUnknownFileException
+                | InvalidUnknownFileException
+                | TraversalUnknownFileException exception) {
+            LOGGER.warning(
+                    String.format("Skipping file %s (%s)", fileName, exception.getMessage()));
         } catch (IOException | BrutException ex) {
             throw new DirectoryException("Error copying file: " + fileName, ex);
         }

@@ -26,13 +26,12 @@ import brut.androlib.meta.VersionInfo;
 import brut.androlib.res.AndrolibResources;
 import brut.androlib.res.data.ResPackage;
 import brut.androlib.res.data.ResTable;
-import brut.directory.ExtFile;
 import brut.androlib.res.xml.ResXmlPatcher;
 import brut.common.BrutException;
 import brut.directory.DirectoryException;
+import brut.directory.ExtFile;
 import brut.util.OS;
 import com.google.common.base.Strings;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -60,7 +59,8 @@ public class ApkDecoder {
         if (mApkFile != null) {
             try {
                 mApkFile.close();
-            } catch (IOException ignored) {}
+            } catch (IOException ignored) {
+            }
         }
 
         mApkFile = new ExtFile(apkFile);
@@ -98,9 +98,11 @@ public class ApkDecoder {
                     case DECODE_RESOURCES_NONE:
                         mAndrolib.decodeResourcesRaw(mApkFile, outDir);
                         if (mForceDecodeManifest == FORCE_DECODE_MANIFEST_FULL) {
-                            // done after raw decoding of resources because copyToDir overwrites dest files
+                            // done after raw decoding of resources because copyToDir overwrites
+                            // dest files
                             if (hasManifest()) {
-                                mAndrolib.decodeManifestWithResources(mApkFile, outDir, getResTable());
+                                mAndrolib.decodeManifestWithResources(
+                                        mApkFile, outDir, getResTable());
                             }
                         }
                         break;
@@ -118,8 +120,7 @@ public class ApkDecoder {
                     if (mDecodeResources == DECODE_RESOURCES_FULL
                             || mForceDecodeManifest == FORCE_DECODE_MANIFEST_FULL) {
                         mAndrolib.decodeManifestFull(mApkFile, outDir, getResTable());
-                    }
-                    else {
+                    } else {
                         mAndrolib.decodeManifestRaw(mApkFile, outDir);
                     }
                 }
@@ -132,7 +133,8 @@ public class ApkDecoder {
                         break;
                     case DECODE_SOURCES_SMALI:
                     case DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES:
-                        mAndrolib.decodeSourcesSmali(mApkFile, outDir, "classes.dex", mBakDeb, mApiLevel);
+                        mAndrolib.decodeSourcesSmali(
+                                mApkFile, outDir, "classes.dex", mBakDeb, mApiLevel);
                         break;
                 }
             }
@@ -142,17 +144,19 @@ public class ApkDecoder {
                 Set<String> files = mApkFile.getDirectory().getFiles(true);
                 for (String file : files) {
                     if (file.endsWith(".dex")) {
-                        if (! file.equalsIgnoreCase("classes.dex")) {
-                            switch(mDecodeSources) {
+                        if (!file.equalsIgnoreCase("classes.dex")) {
+                            switch (mDecodeSources) {
                                 case DECODE_SOURCES_NONE:
                                     mAndrolib.decodeSourcesRaw(mApkFile, outDir, file);
                                     break;
                                 case DECODE_SOURCES_SMALI:
-                                    mAndrolib.decodeSourcesSmali(mApkFile, outDir, file, mBakDeb, mApiLevel);
+                                    mAndrolib.decodeSourcesSmali(
+                                            mApkFile, outDir, file, mBakDeb, mApiLevel);
                                     break;
                                 case DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES:
                                     if (file.startsWith("classes") && file.endsWith(".dex")) {
-                                        mAndrolib.decodeSourcesSmali(mApkFile, outDir, file, mBakDeb, mApiLevel);
+                                        mAndrolib.decodeSourcesSmali(
+                                                mApkFile, outDir, file, mBakDeb, mApiLevel);
                                     } else {
                                         mAndrolib.decodeSourcesRaw(mApkFile, outDir, file);
                                     }
@@ -172,12 +176,15 @@ public class ApkDecoder {
         } finally {
             try {
                 mApkFile.close();
-            } catch (IOException ignored) {}
+            } catch (IOException ignored) {
+            }
         }
     }
 
     public void setDecodeSources(short mode) throws AndrolibException {
-        if (mode != DECODE_SOURCES_NONE && mode != DECODE_SOURCES_SMALI && mode != DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES) {
+        if (mode != DECODE_SOURCES_NONE
+                && mode != DECODE_SOURCES_SMALI
+                && mode != DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES) {
             throw new AndrolibException("Invalid decode sources mode: " + mode);
         }
         mDecodeSources = mode;
@@ -240,7 +247,7 @@ public class ApkDecoder {
         if (mResTable == null) {
             boolean hasResources = hasResources();
             boolean hasManifest = hasManifest();
-            if (! (hasManifest || hasResources)) {
+            if (!(hasManifest || hasResources)) {
                 throw new AndrolibException(
                         "Apk doesn't contain either AndroidManifest.xml file or resources.arsc file");
             }
@@ -263,7 +270,7 @@ public class ApkDecoder {
             Set<String> files = mApkFile.getDirectory().getFiles(false);
             for (String file : files) {
                 if (file.endsWith(".dex")) {
-                    if (! file.equalsIgnoreCase("classes.dex")) {
+                    if (!file.equalsIgnoreCase("classes.dex")) {
                         return true;
                     }
                 }
@@ -297,18 +304,18 @@ public class ApkDecoder {
         }
     }
 
-    public final static short DECODE_SOURCES_NONE = 0x0000;
-    public final static short DECODE_SOURCES_SMALI = 0x0001;
-    public final static short DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES = 0x0010;
+    public static final short DECODE_SOURCES_NONE = 0x0000;
+    public static final short DECODE_SOURCES_SMALI = 0x0001;
+    public static final short DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES = 0x0010;
 
-    public final static short DECODE_RESOURCES_NONE = 0x0100;
-    public final static short DECODE_RESOURCES_FULL = 0x0101;
+    public static final short DECODE_RESOURCES_NONE = 0x0100;
+    public static final short DECODE_RESOURCES_FULL = 0x0101;
 
-    public final static short FORCE_DECODE_MANIFEST_NONE = 0x0000;
-    public final static short FORCE_DECODE_MANIFEST_FULL = 0x0001;
+    public static final short FORCE_DECODE_MANIFEST_NONE = 0x0000;
+    public static final short FORCE_DECODE_MANIFEST_FULL = 0x0001;
 
-    public final static short DECODE_ASSETS_NONE = 0x0000;
-    public final static short DECODE_ASSETS_FULL = 0x0001;
+    public static final short DECODE_ASSETS_NONE = 0x0000;
+    public static final short DECODE_ASSETS_FULL = 0x0001;
 
     private File getOutDir() throws AndrolibException {
         if (mOutDir == null) {
@@ -371,7 +378,8 @@ public class ApkDecoder {
                 }
             }
             if (info.get("targetSdkVersion") != null) {
-                refValue = ResXmlPatcher.pullValueFromIntegers(mOutDir, info.get("targetSdkVersion"));
+                refValue =
+                        ResXmlPatcher.pullValueFromIntegers(mOutDir, info.get("targetSdkVersion"));
                 if (refValue != null) {
                     info.put("targetSdkVersion", refValue);
                 }
@@ -402,7 +410,8 @@ public class ApkDecoder {
         int id = mResTable.getPackageId();
         try {
             id = mResTable.getPackage(renamed).getId();
-        } catch (UndefinedResObjectException ignored) {}
+        } catch (UndefinedResObjectException ignored) {
+        }
 
         if (Strings.isNullOrEmpty(original)) {
             return;
@@ -446,7 +455,7 @@ public class ApkDecoder {
 
     private final Androlib mAndrolib;
 
-    private final static Logger LOGGER = Logger.getLogger(Androlib.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(Androlib.class.getName());
 
     private ExtFile mApkFile;
     private File mOutDir;

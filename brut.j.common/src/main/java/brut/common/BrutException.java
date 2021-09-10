@@ -29,6 +29,5 @@ public class BrutException extends Exception {
         super(message);
     }
 
-    public BrutException() {
-    }
+    public BrutException() {}
 }

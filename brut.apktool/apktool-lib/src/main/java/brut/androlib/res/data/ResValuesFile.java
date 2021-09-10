@@ -33,8 +33,11 @@ public class ResValuesFile {
     }
 
     public String getPath() {
-        return "values" + mConfig.getFlags().getQualifiers() + "/"
-                + mType.getName() + (mType.getName().endsWith("s") ? "" : "s")
+        return "values"
+                + mConfig.getFlags().getQualifiers()
+                + "/"
+                + mType.getName()
+                + (mType.getName().endsWith("s") ? "" : "s")
                 + ".xml";
     }
 

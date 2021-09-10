@@ -17,8 +17,7 @@
 package brut.directory;
 
 public class PathAlreadyExists extends DirectoryException {
-    public PathAlreadyExists() {
-    }
+    public PathAlreadyExists() {}
 
     public PathAlreadyExists(Throwable throwable) {
         super(throwable);

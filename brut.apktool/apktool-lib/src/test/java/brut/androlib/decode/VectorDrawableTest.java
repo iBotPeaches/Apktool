@@ -16,20 +16,19 @@
  */
 package brut.androlib.decode;
 
+import static org.junit.Assert.assertTrue;
+
 import brut.androlib.ApkDecoder;
 import brut.androlib.BaseTest;
 import brut.androlib.TestUtils;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
 import brut.util.OS;
+import java.io.File;
+import java.io.IOException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.io.File;
-import java.io.IOException;
-
-import static org.junit.Assert.assertTrue;
 
 public class VectorDrawableTest extends BaseTest {
 
@@ -61,7 +60,7 @@ public class VectorDrawableTest extends BaseTest {
     }
 
     private void checkFileExists(String path) {
-        File f =  new File(sTestOrigDir, path);
+        File f = new File(sTestOrigDir, path);
 
         assertTrue(f.isFile());
     }

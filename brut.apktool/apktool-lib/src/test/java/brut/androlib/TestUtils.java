@@ -23,23 +23,21 @@ import brut.directory.DirUtil;
 import brut.directory.Directory;
 import brut.directory.FileDirectory;
 import brut.util.OS;
-import org.custommonkey.xmlunit.ElementQualifier;
-import org.w3c.dom.Element;
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-import org.xmlpull.v1.XmlPullParserFactory;
-
 import java.io.*;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
+import org.custommonkey.xmlunit.ElementQualifier;
+import org.w3c.dom.Element;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.XmlPullParserFactory;
 
 public abstract class TestUtils {
 
-    public static Map<String, String> parseStringsXml(File file)
-            throws BrutException {
+    public static Map<String, String> parseStringsXml(File file) throws BrutException {
         try {
             XmlPullParser xpp = XmlPullParserFactory.newInstance().newPullParser();
             xpp.setInput(new FileReader(file));
@@ -79,14 +77,16 @@ public abstract class TestUtils {
         }
     }
 
-    public static void copyResourceDir(Class<?> class_, String dirPath, File out) throws BrutException {
+    public static void copyResourceDir(Class<?> class_, String dirPath, File out)
+            throws BrutException {
         if (!out.exists()) {
             out.mkdirs();
         }
         copyResourceDir(class_, dirPath, new FileDirectory(out));
     }
 
-    public static void copyResourceDir(Class<?> class_, String dirPath, Directory out) throws BrutException {
+    public static void copyResourceDir(Class<?> class_, String dirPath, Directory out)
+            throws BrutException {
         if (class_ == null) {
             class_ = Class.class;
         }
@@ -109,7 +109,10 @@ public abstract class TestUtils {
         if (dirURL.getProtocol().equals("jar")) {
             String jarPath;
             try {
-                jarPath = URLDecoder.decode(dirURL.getPath().substring(5, dirURL.getPath().indexOf("!")), "UTF-8");
+                jarPath =
+                        URLDecoder.decode(
+                                dirURL.getPath().substring(5, dirURL.getPath().indexOf("!")),
+                                "UTF-8");
                 DirUtil.copyToDir(new FileDirectory(jarPath), out);
             } catch (UnsupportedEncodingException ex) {
                 throw new BrutException(ex);
@@ -156,7 +159,8 @@ public abstract class TestUtils {
                 testType = test.getAttribute("type");
             }
 
-            return controlType.equals(testType) && control.getAttribute("name").equals(test.getAttribute("name"));
+            return controlType.equals(testType)
+                    && control.getAttribute("name").equals(test.getAttribute("name"));
         }
     }
 

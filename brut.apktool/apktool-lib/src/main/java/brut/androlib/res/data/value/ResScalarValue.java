@@ -21,12 +21,11 @@ import brut.androlib.res.data.ResResource;
 import brut.androlib.res.xml.ResValuesXmlSerializable;
 import brut.androlib.res.xml.ResXmlEncodable;
 import brut.androlib.res.xml.ResXmlEncoders;
+import java.io.IOException;
 import org.xmlpull.v1.XmlSerializer;
 
-import java.io.IOException;
-
-public abstract class ResScalarValue extends ResIntBasedValue implements
-        ResXmlEncodable, ResValuesXmlSerializable {
+public abstract class ResScalarValue extends ResIntBasedValue
+        implements ResXmlEncodable, ResValuesXmlSerializable {
     protected final String mType;
     protected final String mRawValue;
 
@@ -57,7 +56,7 @@ public abstract class ResScalarValue extends ResIntBasedValue implements
     }
 
     public String encodeAsResXmlNonEscapedItemValue() throws AndrolibException {
-        return encodeAsResXmlValue().replace("&amp;", "&").replace("&lt;","<");
+        return encodeAsResXmlValue().replace("&amp;", "&").replace("&lt;", "<");
     }
 
     public boolean hasMultipleNonPositionalSubstitutions() throws AndrolibException {
@@ -65,8 +64,8 @@ public abstract class ResScalarValue extends ResIntBasedValue implements
     }
 
     @Override
-    public void serializeToResValuesXml(XmlSerializer serializer,
-                                        ResResource res) throws IOException, AndrolibException {
+    public void serializeToResValuesXml(XmlSerializer serializer, ResResource res)
+            throws IOException, AndrolibException {
         String type = res.getResSpec().getType().getName();
         boolean item = !"reference".equals(mType) && !type.equals(mType);
 
@@ -115,9 +114,8 @@ public abstract class ResScalarValue extends ResIntBasedValue implements
         return mType;
     }
 
-    protected void serializeExtraXmlAttrs(XmlSerializer serializer,
-                                          ResResource res) throws IOException {
-    }
+    protected void serializeExtraXmlAttrs(XmlSerializer serializer, ResResource res)
+            throws IOException {}
 
     protected abstract String encodeAsResXml() throws AndrolibException;
 }

@@ -16,12 +16,11 @@
  */
 package brut.androlib.meta;
 
-import org.apache.commons.lang3.StringEscapeUtils;
-import org.apache.commons.lang3.text.translate.CharSequenceTranslator;
-
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.text.translate.CharSequenceTranslator;
 
 public class YamlStringEscapeUtils {
 
@@ -35,7 +34,8 @@ public class YamlStringEscapeUtils {
      * @param escapeForwardSlash TODO
      * @return the escaped string
      */
-    private static String escapeJavaStyleString(String str, boolean escapeSingleQuotes, boolean escapeForwardSlash) {
+    private static String escapeJavaStyleString(
+            String str, boolean escapeSingleQuotes, boolean escapeForwardSlash) {
         if (str == null) {
             return null;
         }
@@ -56,8 +56,9 @@ public class YamlStringEscapeUtils {
      * @param escapeForwardSlash TODO
      * @throws IOException if an IOException occurs
      */
-    private static void escapeJavaStyleString(Writer out, String str, boolean escapeSingleQuote,
-                                              boolean escapeForwardSlash) throws IOException {
+    private static void escapeJavaStyleString(
+            Writer out, String str, boolean escapeSingleQuote, boolean escapeForwardSlash)
+            throws IOException {
         if (out == null) {
             throw new IllegalArgumentException("The Writer must not be null");
         }
@@ -78,19 +79,19 @@ public class YamlStringEscapeUtils {
                 out.write("\\u00" + CharSequenceTranslator.hex(ch));
             } else if (ch < 32) {
                 switch (ch) {
-                    case '\t' :
+                    case '\t':
                         out.write('\\');
                         out.write('t');
                         break;
-                    case '\n' :
+                    case '\n':
                         out.write('\\');
                         out.write('n');
                         break;
-                    case '\r' :
+                    case '\r':
                         out.write('\\');
                         out.write('r');
                         break;
-                    default :
+                    default:
                         if (ch > 0xf) {
                             out.write("\\u00" + CharSequenceTranslator.hex(ch));
                         } else {
@@ -100,27 +101,27 @@ public class YamlStringEscapeUtils {
                 }
             } else {
                 switch (ch) {
-                    case '\'' :
+                    case '\'':
                         if (escapeSingleQuote) {
                             out.write('\\');
                         }
                         out.write('\'');
                         break;
-                    case '"' :
+                    case '"':
                         out.write('\\');
                         out.write('"');
                         break;
-                    case '\\' :
+                    case '\\':
                         out.write('\\');
                         out.write('\\');
                         break;
-                    case '/' :
+                    case '/':
                         if (escapeForwardSlash) {
                             out.write('\\');
                         }
                         out.write('/');
                         break;
-                    default :
+                    default:
                         out.write(ch);
                         break;
                 }
@@ -129,12 +130,11 @@ public class YamlStringEscapeUtils {
     }
 
     /**
-     * <p>Unescapes any Java literals found in the <code>String</code>.
-     * For example, it will turn a sequence of <code>'\'</code> and
-     * <code>'n'</code> into a newline character, unless the <code>'\'</code>
-     * is preceded by another <code>'\'</code>.</p>
+     * Unescapes any Java literals found in the <code>String</code>. For example, it will turn a
+     * sequence of <code>'\'</code> and <code>'n'</code> into a newline character, unless the <code>
+     * '\'</code> is preceded by another <code>'\'</code>.
      *
-     * @param str  the <code>String</code> to unescape, may be null
+     * @param str the <code>String</code> to unescape, may be null
      * @return a new unescaped <code>String</code>, <code>null</code> if null string input
      */
     public static String unescapeString(String str) {

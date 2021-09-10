@@ -16,21 +16,20 @@
  */
 package brut.androlib.aapt1;
 
+import static org.junit.Assert.assertTrue;
+
 import brut.androlib.Androlib;
 import brut.androlib.ApkDecoder;
-import brut.androlib.options.BuildOptions;
 import brut.androlib.TestUtils;
-import brut.directory.ExtFile;
+import brut.androlib.options.BuildOptions;
 import brut.common.BrutException;
+import brut.directory.ExtFile;
 import brut.util.OS;
+import java.io.File;
+import java.util.logging.Logger;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.io.File;
-import java.util.logging.Logger;
-
-import static org.junit.Assert.assertTrue;
 
 public class EmptyResourcesArscTest {
     @BeforeClass
@@ -69,5 +68,5 @@ public class EmptyResourcesArscTest {
     private static ExtFile sTestOrigDir;
     private static ExtFile sTestNewDir;
 
-    private final static Logger LOGGER = Logger.getLogger(EmptyResourcesArscTest.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(EmptyResourcesArscTest.class.getName());
 }

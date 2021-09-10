@@ -16,6 +16,9 @@
  */
 package brut.androlib.aapt1;
 
+import static org.junit.Assert.*;
+import static org.junit.Assume.assumeTrue;
+
 import brut.androlib.Androlib;
 import brut.androlib.ApkDecoder;
 import brut.androlib.BaseTest;
@@ -25,18 +28,14 @@ import brut.common.BrutException;
 import brut.directory.ExtFile;
 import brut.util.OS;
 import brut.util.OSDetection;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
-
-import static org.junit.Assert.*;
-import static org.junit.Assume.assumeTrue;
+import javax.imageio.ImageIO;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 public class BuildAndDecodeTest extends BaseTest {
 
@@ -163,7 +162,8 @@ public class BuildAndDecodeTest extends BaseTest {
 
     @Test
     public void valuesExtraLongExactLengthTest() throws BrutException {
-        Map<String, String> strs = TestUtils.parseStringsXml(new File(sTestNewDir, "res/values-en/strings.xml"));
+        Map<String, String> strs =
+                TestUtils.parseStringsXml(new File(sTestNewDir, "res/values-en/strings.xml"));
 
         // long_string6 should be exactly 0x8888 chars of "a"
         // the valuesExtraLongTest() should handle this
@@ -238,9 +238,10 @@ public class BuildAndDecodeTest extends BaseTest {
 
     @Test
     public void qualifiersTest() throws BrutException {
-        compareValuesFiles("values-mcc004-mnc4-en-rUS-ldrtl-sw100dp-w200dp-h300dp"
-                + "-long-round-highdr-land-desk-night-xhdpi-finger-keyssoft-12key"
-                + "-navhidden-dpad-v26/strings.xml");
+        compareValuesFiles(
+                "values-mcc004-mnc4-en-rUS-ldrtl-sw100dp-w200dp-h300dp"
+                        + "-long-round-highdr-land-desk-night-xhdpi-finger-keyssoft-12key"
+                        + "-navhidden-dpad-v26/strings.xml");
     }
 
     @Test
@@ -392,7 +393,7 @@ public class BuildAndDecodeTest extends BaseTest {
         String location = slash + "res" + slash + "drawable-xhdpi" + slash;
 
         File control = new File((sTestOrigDir + location), "9patch.9.png");
-        File test =  new File((sTestNewDir + location), "9patch.9.png");
+        File test = new File((sTestNewDir + location), "9patch.9.png");
 
         BufferedImage controlImage = ImageIO.read(control);
         BufferedImage testImage = ImageIO.read(test);
@@ -440,21 +441,26 @@ public class BuildAndDecodeTest extends BaseTest {
         BufferedImage testImage = ImageIO.read(test);
 
         // Check entire image as we cannot mess this up
-        final int w = controlImage.getWidth(),
-                  h = controlImage.getHeight();
+        final int w = controlImage.getWidth(), h = controlImage.getHeight();
 
         final int[] controlImageGrid = controlImage.getRGB(0, 0, w, h, null, 0, w);
         final int[] testImageGrid = testImage.getRGB(0, 0, w, h, null, 0, w);
 
         for (int i = 0; i < controlImageGrid.length; i++) {
-            assertEquals("Image lost Optical Bounds at i = " + i, controlImageGrid[i], testImageGrid[i]);
+            assertEquals(
+                    "Image lost Optical Bounds at i = " + i, controlImageGrid[i], testImageGrid[i]);
         }
     }
 
     @Test
     public void robust9patchTest() throws IOException {
-        String[] ninePatches = {"ic_notification_overlay.9.png", "status_background.9.png",
-                "search_bg_transparent.9.png", "screenshot_panel.9.png", "recents_lower_gradient.9.png"};
+        String[] ninePatches = {
+            "ic_notification_overlay.9.png",
+            "status_background.9.png",
+            "search_bg_transparent.9.png",
+            "screenshot_panel.9.png",
+            "recents_lower_gradient.9.png"
+        };
 
         char slash = File.separatorChar;
         String location = slash + "res" + slash + "drawable-xxhdpi" + slash;
@@ -473,8 +479,16 @@ public class BuildAndDecodeTest extends BaseTest {
                 if (isTransparent(controlImage.getRGB(i, 0))) {
                     assertTrue(isTransparent(testImage.getRGB(i, 0)));
                 } else {
-                    assertEquals("Image lost npTc chunk on image " + ninePatch + " at (x, y) (" + i + "," + 0 + ")",
-                            controlImage.getRGB(i, 0), testImage.getRGB(i, 0));
+                    assertEquals(
+                            "Image lost npTc chunk on image "
+                                    + ninePatch
+                                    + " at (x, y) ("
+                                    + i
+                                    + ","
+                                    + 0
+                                    + ")",
+                            controlImage.getRGB(i, 0),
+                            testImage.getRGB(i, 0));
                 }
             }
 
@@ -483,8 +497,16 @@ public class BuildAndDecodeTest extends BaseTest {
                 if (isTransparent(controlImage.getRGB(0, i))) {
                     assertTrue(isTransparent(testImage.getRGB(0, i)));
                 } else {
-                    assertEquals("Image lost npTc chunk on image " + ninePatch + " at (x, y) (" + 0 + "," + i + ")",
-                            controlImage.getRGB(0, i), testImage.getRGB(0, i));
+                    assertEquals(
+                            "Image lost npTc chunk on image "
+                                    + ninePatch
+                                    + " at (x, y) ("
+                                    + 0
+                                    + ","
+                                    + i
+                                    + ")",
+                            controlImage.getRGB(0, i),
+                            testImage.getRGB(0, i));
                 }
             }
         }
@@ -543,7 +565,7 @@ public class BuildAndDecodeTest extends BaseTest {
 
     @Test
     public void unicodeAssetTest() throws BrutException, IOException {
-        assumeTrue(! OSDetection.isWindows());
+        assumeTrue(!OSDetection.isWindows());
         compareAssetsFolder("unicode-txt");
     }
 

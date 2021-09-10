@@ -17,12 +17,10 @@
 package brut.androlib.res.xml;
 
 import brut.androlib.AndrolibException;
-import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -32,10 +30,11 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.*;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.logging.Logger;
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 public final class ResXmlPatcher {
 
@@ -62,7 +61,10 @@ public final class ResXmlPatcher {
 
                 saveDocument(file, doc);
 
-            } catch (SAXException | ParserConfigurationException | IOException | TransformerException ignored) {
+            } catch (SAXException
+                    | ParserConfigurationException
+                    | IOException
+                    | TransformerException ignored) {
             }
         }
     }
@@ -92,18 +94,20 @@ public final class ResXmlPatcher {
 
                 saveDocument(file, doc);
 
-            } catch (SAXException | ParserConfigurationException | IOException | TransformerException ignored) {
+            } catch (SAXException
+                    | ParserConfigurationException
+                    | IOException
+                    | TransformerException ignored) {
             }
         }
     }
 
     /**
-     * Any @string reference in a provider value in AndroidManifest.xml will break on
-     * build, thus preventing the application from installing. This is from a bug/error
-     * in AOSP where public resources cannot be part of an authorities attribute within
-     * a provider tag.
+     * Any @string reference in a provider value in AndroidManifest.xml will break on build, thus
+     * preventing the application from installing. This is from a bug/error in AOSP where public
+     * resources cannot be part of an authorities attribute within a provider tag.
      *
-     * This finds any reference and replaces it with the literal value found in the
+     * <p>This finds any reference and replaces it with the literal value found in the
      * res/values/strings.xml file.
      *
      * @param file File for AndroidManifest.xml
@@ -156,8 +160,11 @@ public final class ResXmlPatcher {
                     saveDocument(file, doc);
                 }
 
-            }  catch (SAXException | ParserConfigurationException | IOException |
-                    XPathExpressionException | TransformerException ignored) {
+            } catch (SAXException
+                    | ParserConfigurationException
+                    | IOException
+                    | XPathExpressionException
+                    | TransformerException ignored) {
             }
         }
     }
@@ -189,7 +196,7 @@ public final class ResXmlPatcher {
      * @return String|null
      */
     public static String pullValueFromStrings(File directory, String key) {
-        if (key == null || ! key.contains("@")) {
+        if (key == null || !key.contains("@")) {
             return null;
         }
 
@@ -200,7 +207,8 @@ public final class ResXmlPatcher {
             try {
                 Document doc = loadDocument(file);
                 XPath xPath = XPathFactory.newInstance().newXPath();
-                XPathExpression expression = xPath.compile("/resources/string[@name=" + '"' + key + "\"]/text()");
+                XPathExpression expression =
+                        xPath.compile("/resources/string[@name=" + '"' + key + "\"]/text()");
 
                 Object result = expression.evaluate(doc, XPathConstants.STRING);
 
@@ -208,7 +216,10 @@ public final class ResXmlPatcher {
                     return (String) result;
                 }
 
-            }  catch (SAXException | ParserConfigurationException | IOException | XPathExpressionException ignored) {
+            } catch (SAXException
+                    | ParserConfigurationException
+                    | IOException
+                    | XPathExpressionException ignored) {
             }
         }
 
@@ -223,7 +234,7 @@ public final class ResXmlPatcher {
      * @return String|null
      */
     public static String pullValueFromIntegers(File directory, String key) {
-        if (key == null || ! key.contains("@")) {
+        if (key == null || !key.contains("@")) {
             return null;
         }
 
@@ -234,7 +245,8 @@ public final class ResXmlPatcher {
             try {
                 Document doc = loadDocument(file);
                 XPath xPath = XPathFactory.newInstance().newXPath();
-                XPathExpression expression = xPath.compile("/resources/integer[@name=" + '"' + key + "\"]/text()");
+                XPathExpression expression =
+                        xPath.compile("/resources/integer[@name=" + '"' + key + "\"]/text()");
 
                 Object result = expression.evaluate(doc, XPathConstants.STRING);
 
@@ -242,7 +254,10 @@ public final class ResXmlPatcher {
                     return (String) result;
                 }
 
-            }  catch (SAXException | ParserConfigurationException | IOException | XPathExpressionException ignored) {
+            } catch (SAXException
+                    | ParserConfigurationException
+                    | IOException
+                    | XPathExpressionException ignored) {
             }
         }
 
@@ -271,7 +286,10 @@ public final class ResXmlPatcher {
                 }
                 saveDocument(file, doc);
 
-            } catch (SAXException | ParserConfigurationException | IOException | TransformerException ignored) {
+            } catch (SAXException
+                    | ParserConfigurationException
+                    | IOException
+                    | TransformerException ignored) {
             }
         }
     }
@@ -295,12 +313,14 @@ public final class ResXmlPatcher {
             nodeAttr.setNodeValue(packageOriginal);
             saveDocument(file, doc);
 
-        } catch (SAXException | ParserConfigurationException | IOException | TransformerException ignored) {
+        } catch (SAXException
+                | ParserConfigurationException
+                | IOException
+                | TransformerException ignored) {
         }
     }
 
     /**
-     *
      * @param file File to load into Document
      * @return Document
      * @throws IOException
@@ -330,7 +350,6 @@ public final class ResXmlPatcher {
     }
 
     /**
-     *
      * @param file File to save Document to (ie AndroidManifest.xml)
      * @param doc Document being saved
      * @throws IOException
@@ -348,10 +367,14 @@ public final class ResXmlPatcher {
         transformer.transform(source, result);
     }
 
-    private static final String ACCESS_EXTERNAL_DTD = "http://javax.xml.XMLConstants/property/accessExternalDTD";
-    private static final String ACCESS_EXTERNAL_SCHEMA = "http://javax.xml.XMLConstants/property/accessExternalSchema";
-    private static final String FEATURE_LOAD_DTD = "http://apache.org/xml/features/nonvalidating/load-external-dtd";
-    private static final String FEATURE_DISABLE_DOCTYPE_DECL = "http://apache.org/xml/features/disallow-doctype-decl";
+    private static final String ACCESS_EXTERNAL_DTD =
+            "http://javax.xml.XMLConstants/property/accessExternalDTD";
+    private static final String ACCESS_EXTERNAL_SCHEMA =
+            "http://javax.xml.XMLConstants/property/accessExternalSchema";
+    private static final String FEATURE_LOAD_DTD =
+            "http://apache.org/xml/features/nonvalidating/load-external-dtd";
+    private static final String FEATURE_DISABLE_DOCTYPE_DECL =
+            "http://apache.org/xml/features/disallow-doctype-decl";
 
     private static final Logger LOGGER = Logger.getLogger(ResXmlPatcher.class.getName());
 }

@@ -21,14 +21,11 @@ import brut.androlib.res.data.ResResource;
 import brut.androlib.res.xml.ResValuesXmlSerializable;
 import brut.androlib.res.xml.ResXmlEncoders;
 import brut.util.Duo;
+import java.io.IOException;
 import org.xmlpull.v1.XmlSerializer;
 
-import java.io.IOException;
-
-public class ResPluralsValue extends ResBagValue implements
-        ResValuesXmlSerializable {
-    ResPluralsValue(ResReferenceValue parent,
-                    Duo<Integer, ResScalarValue>[] items) {
+public class ResPluralsValue extends ResBagValue implements ResValuesXmlSerializable {
+    ResPluralsValue(ResReferenceValue parent, Duo<Integer, ResScalarValue>[] items) {
         super(parent);
 
         mItems = new ResScalarValue[6];
@@ -38,8 +35,8 @@ public class ResPluralsValue extends ResBagValue implements
     }
 
     @Override
-    public void serializeToResValuesXml(XmlSerializer serializer,
-                                        ResResource res) throws IOException, AndrolibException {
+    public void serializeToResValuesXml(XmlSerializer serializer, ResResource res)
+            throws IOException, AndrolibException {
         serializer.startTag(null, "plurals");
         serializer.attribute(null, "name", res.getResSpec().getName());
         for (int i = 0; i < mItems.length; i++) {
@@ -50,7 +47,9 @@ public class ResPluralsValue extends ResBagValue implements
 
             serializer.startTag(null, "item");
             serializer.attribute(null, "quantity", QUANTITY_MAP[i]);
-            serializer.text(ResXmlEncoders.enumerateNonPositionalSubstitutionsIfRequired(item.encodeAsResXmlNonEscapedItemValue()));
+            serializer.text(
+                    ResXmlEncoders.enumerateNonPositionalSubstitutionsIfRequired(
+                            item.encodeAsResXmlNonEscapedItemValue()));
             serializer.endTag(null, "item");
         }
         serializer.endTag(null, "plurals");
@@ -60,5 +59,6 @@ public class ResPluralsValue extends ResBagValue implements
 
     public static final int BAG_KEY_PLURALS_START = 0x01000004;
     public static final int BAG_KEY_PLURALS_END = 0x01000009;
-    private static final String[] QUANTITY_MAP = new String[] { "other", "zero", "one", "two", "few", "many" };
+    private static final String[] QUANTITY_MAP =
+            new String[] {"other", "zero", "one", "two", "few", "many"};
 }

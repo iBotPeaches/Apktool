@@ -17,20 +17,19 @@
 package brut.androlib.res.decoder;
 
 import android.util.TypedValue;
-
 import java.util.regex.Pattern;
 
-/**
- * AXmlResourceParser specifically for parsing encoded AndroidManifest.xml.
- */
+/** AXmlResourceParser specifically for parsing encoded AndroidManifest.xml. */
 public class AndroidManifestResourceParser extends AXmlResourceParser {
 
     /**
-     * Pattern for matching numeric string meta-data values. aapt automatically infers the
-     * type for a manifest meta-data value based on the string in the unencoded XML. However,
-     * some apps intentionally coerce integers to be strings by prepending an escaped space.
-     * For details/discussion, see https://stackoverflow.com/questions/2154945/how-to-force-a-meta-data-value-to-type-string
-     * With aapt1, the escaped space is dropped when encoded. For aapt2, the escaped space is preserved.
+     * Pattern for matching numeric string meta-data values. aapt automatically infers the type for
+     * a manifest meta-data value based on the string in the unencoded XML. However, some apps
+     * intentionally coerce integers to be strings by prepending an escaped space. For
+     * details/discussion, see
+     * https://stackoverflow.com/questions/2154945/how-to-force-a-meta-data-value-to-type-string
+     * With aapt1, the escaped space is dropped when encoded. For aapt2, the escaped space is
+     * preserved.
      */
     private static final Pattern PATTERN_NUMERIC_STRING = Pattern.compile("\\s?\\d+");
 
@@ -51,8 +50,8 @@ public class AndroidManifestResourceParser extends AXmlResourceParser {
 
     private boolean isNumericStringMetadataAttributeValue(int index, String value) {
         return "meta-data".equalsIgnoreCase(super.getName())
-            && "value".equalsIgnoreCase(super.getAttributeName(index))
-            && super.getAttributeValueType(index) == TypedValue.TYPE_STRING
-            && PATTERN_NUMERIC_STRING.matcher(value).matches();
+                && "value".equalsIgnoreCase(super.getAttributeName(index))
+                && super.getAttributeValueType(index) == TypedValue.TYPE_STRING
+                && PATTERN_NUMERIC_STRING.matcher(value).matches();
     }
 }

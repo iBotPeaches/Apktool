@@ -20,17 +20,15 @@ import brut.common.BrutException;
 import brut.common.InvalidUnknownFileException;
 import brut.common.RootUnknownFileException;
 import brut.common.TraversalUnknownFileException;
-import org.apache.commons.io.IOUtils;
-
 import java.io.*;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
+import org.apache.commons.io.IOUtils;
 
 public class BrutIO {
-    public static void copyAndClose(InputStream in, OutputStream out)
-            throws IOException {
+    public static void copyAndClose(InputStream in, OutputStream out) throws IOException {
         try {
             IOUtils.copy(in, out);
         } finally {
@@ -68,13 +66,14 @@ public class BrutIO {
         CRC32 crc = new CRC32();
         int bytesRead;
         byte[] buffer = new byte[8192];
-        while((bytesRead = input.read(buffer)) != -1) {
+        while ((bytesRead = input.read(buffer)) != -1) {
             crc.update(buffer, 0, bytesRead);
         }
         return crc;
     }
 
-    public static String sanitizeUnknownFile(final File directory, final String entry) throws IOException, BrutException {
+    public static String sanitizeUnknownFile(final File directory, final String entry)
+            throws IOException, BrutException {
         if (entry.length() == 0) {
             throw new InvalidUnknownFileException("Invalid Unknown File");
         }
@@ -105,19 +104,15 @@ public class BrutIO {
     }
 
     public static void copy(File inputFile, ZipOutputStream outputFile) throws IOException {
-        try (
-                FileInputStream fis = new FileInputStream(inputFile)
-        ) {
+        try (FileInputStream fis = new FileInputStream(inputFile)) {
             IOUtils.copy(fis, outputFile);
         }
     }
 
-    public static void copy(ZipFile inputFile, ZipOutputStream outputFile, ZipEntry entry) throws IOException {
-        try (
-                InputStream is = inputFile.getInputStream(entry)
-        ) {
+    public static void copy(ZipFile inputFile, ZipOutputStream outputFile, ZipEntry entry)
+            throws IOException {
+        try (InputStream is = inputFile.getInputStream(entry)) {
             IOUtils.copy(is, outputFile);
         }
     }
-
 }

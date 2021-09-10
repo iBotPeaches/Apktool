@@ -19,8 +19,7 @@ package brut.androlib;
 import brut.common.BrutException;
 
 public class AndrolibException extends BrutException {
-    public AndrolibException() {
-    }
+    public AndrolibException() {}
 
     public AndrolibException(String message) {
         super(message);

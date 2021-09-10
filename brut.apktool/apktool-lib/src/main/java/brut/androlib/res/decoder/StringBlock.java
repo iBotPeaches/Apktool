@@ -16,13 +16,16 @@
  */
 package brut.androlib.res.decoder;
 
+import static com.google.common.collect.Ordering.explicit;
+import static java.util.Comparator.naturalOrder;
+import static java.util.Comparator.reverseOrder;
+
 import brut.androlib.res.xml.ResXmlEncoders;
 import brut.util.ExtDataInput;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
 import com.google.common.base.Splitter.MapSplitter;
 import com.google.common.collect.ComparisonChain;
-
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.*;
@@ -32,18 +35,14 @@ import java.util.StringJoiner;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
-import static com.google.common.collect.Ordering.explicit;
-import static java.util.Comparator.naturalOrder;
-import static java.util.Comparator.reverseOrder;
-
 public class StringBlock {
 
     /**
-     * Reads whole (including chunk type) string block from stream. Stream must
-     * be at the chunk type.
+     * Reads whole (including chunk type) string block from stream. Stream must be at the chunk
+     * type.
+     *
      * @param reader ExtDataInput
      * @return StringBlock
-     *
      * @throws IOException Parsing resources.arsc error
      */
     public static StringBlock read(ExtDataInput reader) throws IOException {
@@ -87,6 +86,7 @@ public class StringBlock {
 
     /**
      * Returns raw string (without any styling information) at specified index.
+     *
      * @param index int
      * @return String
      */
@@ -111,7 +111,7 @@ public class StringBlock {
 
     private static class Tag implements Comparable<Tag> {
         private static final MapSplitter ATTRIBUTES_SPLITTER =
-            Splitter.on(';').withKeyValueSeparator(Splitter.on('=').limit(2));
+                Splitter.on(';').withKeyValueSeparator(Splitter.on('=').limit(2));
 
         private final String tag;
         private final Type type;
@@ -126,36 +126,46 @@ public class StringBlock {
         }
 
         /**
-         * compares this tag and another, returning the order that should be between them.
-         * order by:
-         *      position
-         *      closing tag has precedence over openning tag (unless it is the same tag)
-         *      tags that are enclosed in others should appear later if openning tag, or first if closing tag
-         *      lexicographical sort. openning tag and closing tag in reverse so that one tag will be contained in the other and not each contain the other partially
+         * compares this tag and another, returning the order that should be between them. order by:
+         * position closing tag has precedence over openning tag (unless it is the same tag) tags
+         * that are enclosed in others should appear later if openning tag, or first if closing tag
+         * lexicographical sort. openning tag and closing tag in reverse so that one tag will be
+         * contained in the other and not each contain the other partially
+         *
          * @param o - the other tag object to compare to
          * @return the order in between this object and the other
          */
         @Override
         public int compareTo(Tag o) {
             return ComparisonChain.start()
-                .compare(position, o.position)
-                // When one tag closes where another starts, we always close before opening.
-                .compare(type, o.type, this.tag.equals(o.tag) ? explicit(Type.OPEN, Type.CLOSE) : explicit(Type.CLOSE, Type.OPEN))
-                // Open first the tag which closes last, and close first the tag which opened last.
-                .compare(matchingTagPosition, o.matchingTagPosition, reverseOrder())
-                // When two tags open and close together, we order alphabetically. When they close,
-                // we reversed the order. This ensures that the XML tags are properly nested.
-                .compare(tag, o.tag, type.equals(Type.OPEN) ? naturalOrder() : reverseOrder())
-                .result();
+                    .compare(position, o.position)
+                    // When one tag closes where another starts, we always close before opening.
+                    .compare(
+                            type,
+                            o.type,
+                            this.tag.equals(o.tag)
+                                    ? explicit(Type.OPEN, Type.CLOSE)
+                                    : explicit(Type.CLOSE, Type.OPEN))
+                    // Open first the tag which closes last, and close first the tag which opened
+                    // last.
+                    .compare(matchingTagPosition, o.matchingTagPosition, reverseOrder())
+                    // When two tags open and close together, we order alphabetically. When they
+                    // close,
+                    // we reversed the order. This ensures that the XML tags are properly nested.
+                    .compare(tag, o.tag, type.equals(Type.OPEN) ? naturalOrder() : reverseOrder())
+                    .result();
         }
 
         /**
-         * formats the tag value and attributes according to whether the tag is an openning or closing tag
+         * formats the tag value and attributes according to whether the tag is an openning or
+         * closing tag
+         *
          * @return the formatted tag value as a string
          */
         @Override
         public String toString() {
-            // "tag" can either be just the tag or have the form "tag;attr1=value1;attr2=value2;[...]".
+            // "tag" can either be just the tag or have the form
+            // "tag;attr1=value1;attr2=value2;[...]".
             int separatorIdx = tag.indexOf(';');
             String actualTag = separatorIdx == -1 ? tag : tag.substring(0, separatorIdx);
 
@@ -164,8 +174,16 @@ public class StringBlock {
                     if (separatorIdx != -1) {
                         StringJoiner attributes = new StringJoiner(" ");
                         ATTRIBUTES_SPLITTER
-                            .split(tag.substring(separatorIdx + 1, tag.endsWith(";") ? tag.length() - 1: tag.length()))
-                            .forEach((key, value) -> attributes.add(String.format("%s=\"%s\"", key, value)));
+                                .split(
+                                        tag.substring(
+                                                separatorIdx + 1,
+                                                tag.endsWith(";")
+                                                        ? tag.length() - 1
+                                                        : tag.length()))
+                                .forEach(
+                                        (key, value) ->
+                                                attributes.add(
+                                                        String.format("%s=\"%s\"", key, value)));
                         return String.format("<%s %s>", actualTag, attributes);
                     }
                     return String.format("<%s>", actualTag);
@@ -220,14 +238,14 @@ public class StringBlock {
         List<Span> getSpanList(StringBlock stringBlock) {
             ArrayList<Span> spanList = new ArrayList<>();
             for (int i = 0; i != styles.length; i += 3) {
-                spanList.add(new Span(stringBlock.getString(styles[i]), styles[i + 1], styles[i + 2]));
+                spanList.add(
+                        new Span(stringBlock.getString(styles[i]), styles[i + 1], styles[i + 2]));
             }
             return spanList;
         }
     }
 
     /**
-     *
      * @param styledString - the raw string with its corresponding styling tags and their locations
      * @return a formatted styled string that contains the styling tag in the correct locations
      */
@@ -236,21 +254,24 @@ public class StringBlock {
         ArrayList<Tag> sortedTagsList = new ArrayList<>();
 
         styledString.getSpanList(this).stream()
-            .flatMap(
-                span ->
-                    Stream.of(
-                        // "+ 1" because the last char is included.
-                        new Tag(
-                            span.getTag(), Tag.Type.OPEN, span.getFirstChar(), span.getLastChar() + 1),
-                        // "+ 1" because the last char is included.
-                        new Tag(
-                            span.getTag(),
-                            Tag.Type.CLOSE,
-                            span.getLastChar() + 1,
-                            span.getFirstChar())))
-            // So we can edit the string in place, we need to start from the end.
-            .sorted(naturalOrder())
-            .forEach(tag -> sortedTagsList.add(tag));
+                .flatMap(
+                        span ->
+                                Stream.of(
+                                        // "+ 1" because the last char is included.
+                                        new Tag(
+                                                span.getTag(),
+                                                Tag.Type.OPEN,
+                                                span.getFirstChar(),
+                                                span.getLastChar() + 1),
+                                        // "+ 1" because the last char is included.
+                                        new Tag(
+                                                span.getTag(),
+                                                Tag.Type.CLOSE,
+                                                span.getLastChar() + 1,
+                                                span.getFirstChar())))
+                // So we can edit the string in place, we need to start from the end.
+                .sorted(naturalOrder())
+                .forEach(tag -> sortedTagsList.add(tag));
 
         String raw = styledString.getValue();
         StringBuilder string = new StringBuilder(raw.length() + 32);
@@ -318,8 +339,7 @@ public class StringBlock {
         return -1;
     }
 
-    private StringBlock() {
-    }
+    private StringBlock() {}
 
     @VisibleForTesting
     StringBlock(byte[] strings, boolean isUTF8) {
@@ -328,12 +348,12 @@ public class StringBlock {
     }
 
     /**
-     * Returns style information - array of int triplets, where in each triplet:
-     * * first int is index of tag name ('b','i', etc.) * second int is tag
-     * start index in string * third int is tag end index in string
+     * Returns style information - array of int triplets, where in each triplet: * first int is
+     * index of tag name ('b','i', etc.) * second int is tag start index in string * third int is
+     * tag end index in string
      */
     private int[] getStyle(int index) {
-        if (m_styleOffsets == null || m_styles == null|| index >= m_styleOffsets.length) {
+        if (m_styleOffsets == null || m_styles == null || index >= m_styleOffsets.length) {
             return null;
         }
         int offset = m_styleOffsets[index] / 4;
@@ -352,7 +372,7 @@ public class StringBlock {
         }
         style = new int[count];
 
-        for (int i = offset, j = 0; i < m_styles.length;) {
+        for (int i = offset, j = 0; i < m_styles.length; ) {
             if (m_styles[i] == -1) {
                 break;
             }
@@ -368,7 +388,8 @@ public class StringBlock {
             return (m_isUTF8 ? UTF8_DECODER : UTF16LE_DECODER).decode(wrappedBuffer).toString();
         } catch (CharacterCodingException ex) {
             if (!m_isUTF8) {
-                LOGGER.warning("Failed to decode a string at offset " + offset + " of length " + length);
+                LOGGER.warning(
+                        "Failed to decode a string at offset " + offset + " of length " + length);
                 return null;
             }
         }
@@ -376,7 +397,8 @@ public class StringBlock {
         try {
             final ByteBuffer wrappedBufferRetry = ByteBuffer.wrap(m_strings, offset, length);
             // in some places, Android uses 3-byte UTF-8 sequences instead of 4-bytes.
-            // If decoding failed, we try to use CESU-8 decoder, which is closer to what Android actually uses.
+            // If decoding failed, we try to use CESU-8 decoder, which is closer to what Android
+            // actually uses.
             return CESU8_DECODER.decode(wrappedBufferRetry).toString();
         } catch (CharacterCodingException e) {
             LOGGER.warning("Failed to decode a string with CESU-8 decoder.");
@@ -401,13 +423,13 @@ public class StringBlock {
         val = array[offset];
         offset += 1;
         if ((val & 0x80) != 0) {
-        	int low = (array[offset] & 0xFF);
-        	length = ((val & 0x7F) << 8) + low;
+            int low = (array[offset] & 0xFF);
+            length = ((val & 0x7F) << 8) + low;
             offset += 1;
         } else {
             length = val;
         }
-        return new int[] { offset, length};
+        return new int[] {offset, length};
     }
 
     private static int[] getUtf16(byte[] array, int offset) {
@@ -416,9 +438,8 @@ public class StringBlock {
         if ((val & 0x8000) != 0) {
             int high = (array[offset + 3] & 0xFF) << 8;
             int low = (array[offset + 2] & 0xFF);
-            int len_value =  ((val & 0x7FFF) << 16) + (high + low);
+            int len_value = ((val & 0x7FFF) << 16) + (high + low);
             return new int[] {4, len_value * 2};
-
         }
         return new int[] {2, val * 2};
     }

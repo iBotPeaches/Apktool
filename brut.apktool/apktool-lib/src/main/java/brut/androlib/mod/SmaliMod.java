@@ -16,6 +16,8 @@
  */
 package brut.androlib.mod;
 
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.Token;
@@ -26,12 +28,14 @@ import org.jf.smali.smaliFlexLexer;
 import org.jf.smali.smaliParser;
 import org.jf.smali.smaliTreeWalker;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-
 public class SmaliMod {
-    public static boolean assembleSmaliFile(File smaliFile,DexBuilder dexBuilder, int apiLevel, boolean verboseErrors,
-                                            boolean printTokens) throws IOException, RecognitionException {
+    public static boolean assembleSmaliFile(
+            File smaliFile,
+            DexBuilder dexBuilder,
+            int apiLevel,
+            boolean verboseErrors,
+            boolean printTokens)
+            throws IOException, RecognitionException {
 
         CommonTokenStream tokens;
         smaliFlexLexer lexer;
@@ -46,13 +50,14 @@ public class SmaliMod {
         if (printTokens) {
             tokens.getTokens();
 
-            for (int i=0; i<tokens.size(); i++) {
+            for (int i = 0; i < tokens.size(); i++) {
                 Token token = tokens.get(i);
                 if (token.getChannel() == smaliParser.HIDDEN) {
                     continue;
                 }
 
-                System.out.println(smaliParser.tokenNames[token.getType()] + ": " + token.getText());
+                System.out.println(
+                        smaliParser.tokenNames[token.getType()] + ": " + token.getText());
             }
         }
 

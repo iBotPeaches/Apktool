@@ -20,9 +20,8 @@ import brut.androlib.AndrolibException;
 import brut.androlib.res.data.ResResource;
 import brut.androlib.res.xml.ResValuesXmlSerializable;
 import brut.util.Duo;
-import org.xmlpull.v1.XmlSerializer;
-
 import java.io.IOException;
+import org.xmlpull.v1.XmlSerializer;
 
 public class ResBagValue extends ResValue implements ResValuesXmlSerializable {
     protected final ResReferenceValue mParent;
@@ -32,22 +31,19 @@ public class ResBagValue extends ResValue implements ResValuesXmlSerializable {
     }
 
     @Override
-    public void serializeToResValuesXml(XmlSerializer serializer,
-                                        ResResource res) throws IOException, AndrolibException {
+    public void serializeToResValuesXml(XmlSerializer serializer, ResResource res)
+            throws IOException, AndrolibException {
         String type = res.getResSpec().getType().getName();
         if ("style".equals(type)) {
-            new ResStyleValue(mParent, new Duo[0], null)
-                    .serializeToResValuesXml(serializer, res);
+            new ResStyleValue(mParent, new Duo[0], null).serializeToResValuesXml(serializer, res);
             return;
         }
         if ("array".equals(type)) {
-            new ResArrayValue(mParent, new Duo[0]).serializeToResValuesXml(
-                    serializer, res);
+            new ResArrayValue(mParent, new Duo[0]).serializeToResValuesXml(serializer, res);
             return;
         }
         if ("plurals".equals(type)) {
-            new ResPluralsValue(mParent, new Duo[0]).serializeToResValuesXml(
-                    serializer, res);
+            new ResPluralsValue(mParent, new Duo[0]).serializeToResValuesXml(serializer, res);
             return;
         }
 

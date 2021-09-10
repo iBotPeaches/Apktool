@@ -16,20 +16,19 @@
  */
 package brut.androlib.aapt2;
 
+import static org.junit.Assert.*;
+
 import brut.androlib.*;
 import brut.androlib.meta.MetaInfo;
 import brut.androlib.options.BuildOptions;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
 import brut.util.OS;
+import java.io.File;
+import java.io.IOException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.io.File;
-import java.io.IOException;
-
-import static org.junit.Assert.*;
 
 public class BuildAndDecodeTest extends BaseTest {
 

@@ -87,7 +87,8 @@ public class ResTable {
         int id = 0;
         int value = 0;
         for (ResPackage resPackage : mPackagesById.values()) {
-            if (resPackage.getResSpecCount() > value && !resPackage.getName().equalsIgnoreCase("android")) {
+            if (resPackage.getResSpecCount() > value
+                    && !resPackage.getName().equalsIgnoreCase("android")) {
                 value = resPackage.getResSpecCount();
                 id = resPackage.getId();
             }

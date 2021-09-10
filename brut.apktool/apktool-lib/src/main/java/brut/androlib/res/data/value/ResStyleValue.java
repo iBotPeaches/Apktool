@@ -21,27 +21,26 @@ import brut.androlib.res.data.ResResSpec;
 import brut.androlib.res.data.ResResource;
 import brut.androlib.res.xml.ResValuesXmlSerializable;
 import brut.util.Duo;
-import org.xmlpull.v1.XmlSerializer;
-
 import java.io.IOException;
 import java.util.logging.Logger;
+import org.xmlpull.v1.XmlSerializer;
 
-public class ResStyleValue extends ResBagValue implements
-        ResValuesXmlSerializable {
-    ResStyleValue(ResReferenceValue parent,
-                  Duo<Integer, ResScalarValue>[] items, ResValueFactory factory) {
+public class ResStyleValue extends ResBagValue implements ResValuesXmlSerializable {
+    ResStyleValue(
+            ResReferenceValue parent,
+            Duo<Integer, ResScalarValue>[] items,
+            ResValueFactory factory) {
         super(parent);
 
         mItems = new Duo[items.length];
         for (int i = 0; i < items.length; i++) {
-            mItems[i] = new Duo<>(
-                factory.newReference(items[i].m1, null), items[i].m2);
+            mItems[i] = new Duo<>(factory.newReference(items[i].m1, null), items[i].m2);
         }
     }
 
     @Override
-    public void serializeToResValuesXml(XmlSerializer serializer,
-                                        ResResource res) throws IOException, AndrolibException {
+    public void serializeToResValuesXml(XmlSerializer serializer, ResResource res)
+            throws IOException, AndrolibException {
         serializer.startTag(null, "style");
         serializer.attribute(null, "name", res.getResSpec().getName());
         if (!mParent.isNull() && !mParent.referentIsNull()) {
@@ -53,8 +52,13 @@ public class ResStyleValue extends ResBagValue implements
             ResResSpec spec = mItem.m1.getReferent();
 
             if (spec == null) {
-                LOGGER.fine(String.format("null reference: m1=0x%08x(%s), m2=0x%08x(%s)",
-                    mItem.m1.getRawIntValue(), mItem.m1.getType(), mItem.m2.getRawIntValue(), mItem.m2.getType()));
+                LOGGER.fine(
+                        String.format(
+                                "null reference: m1=0x%08x(%s), m2=0x%08x(%s)",
+                                mItem.m1.getRawIntValue(),
+                                mItem.m1.getType(),
+                                mItem.m2.getRawIntValue(),
+                                mItem.m2.getType()));
                 continue;
             }
 

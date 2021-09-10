@@ -184,5 +184,5 @@ public class ResPackage {
         return mValueFactory;
     }
 
-    private final static Logger LOGGER = Logger.getLogger(ResPackage.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(ResPackage.class.getName());
 }

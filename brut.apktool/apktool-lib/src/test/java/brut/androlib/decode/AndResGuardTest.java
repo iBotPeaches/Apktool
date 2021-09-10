@@ -16,17 +16,17 @@
  */
 package brut.androlib.decode;
 
+import static org.junit.Assert.*;
+
 import brut.androlib.ApkDecoder;
 import brut.androlib.BaseTest;
 import brut.androlib.TestUtils;
-import brut.directory.ExtFile;
 import brut.common.BrutException;
+import brut.directory.ExtFile;
 import brut.util.OS;
 import java.io.File;
 import java.io.IOException;
-
 import org.junit.*;
-import static org.junit.Assert.*;
 
 public class AndResGuardTest extends BaseTest {
 
@@ -53,7 +53,7 @@ public class AndResGuardTest extends BaseTest {
         apkDecoder.setOutDir(new File(sTmpDir + File.separator + apk + ".out"));
         apkDecoder.decode();
 
-        File aPng =  new File(sTestOrigDir,"res/mipmap-hdpi-v4/a.png");
+        File aPng = new File(sTestOrigDir, "res/mipmap-hdpi-v4/a.png");
         assertTrue(aPng.isFile());
     }
 }

@@ -32,7 +32,10 @@ public class ResValueFactory {
     public ResScalarValue factory(int type, int value, String rawValue) throws AndrolibException {
         switch (type) {
             case TypedValue.TYPE_NULL:
-                if (value == TypedValue.DATA_NULL_UNDEFINED) { // Special case $empty as explicitly defined empty value
+                if (value
+                        == TypedValue
+                                .DATA_NULL_UNDEFINED) { // Special case $empty as explicitly defined
+                    // empty value
                     return new ResStringValue(null, value);
                 } else if (value == TypedValue.DATA_NULL_EMPTY) {
                     return new ResEmptyValue(value, rawValue, type);
@@ -74,13 +77,15 @@ public class ResValueFactory {
         if (value.startsWith("res/")) {
             return new ResFileValue(value, rawValue);
         }
-        if (value.startsWith("r/") || value.startsWith("R/")) { //AndroResGuard
+        if (value.startsWith("r/") || value.startsWith("R/")) { // AndroResGuard
             return new ResFileValue(value, rawValue);
         }
         return new ResStringValue(value, rawValue);
     }
 
-    public ResBagValue bagFactory(int parent, Duo<Integer, ResScalarValue>[] items, ResTypeSpec resTypeSpec) throws AndrolibException {
+    public ResBagValue bagFactory(
+            int parent, Duo<Integer, ResScalarValue>[] items, ResTypeSpec resTypeSpec)
+            throws AndrolibException {
         ResReferenceValue parentVal = newReference(parent, null);
 
         if (items.length == 0) {
@@ -95,12 +100,14 @@ public class ResValueFactory {
 
         // Android O Preview added an unknown enum for c. This is hardcoded as 0 for now.
         if (ResTypeSpec.RES_TYPE_NAME_ARRAY.equals(resTypeName)
-                || key == ResArrayValue.BAG_KEY_ARRAY_START || key == 0) {
+                || key == ResArrayValue.BAG_KEY_ARRAY_START
+                || key == 0) {
             return new ResArrayValue(parentVal, items);
         }
 
-        if (ResTypeSpec.RES_TYPE_NAME_PLURALS.equals(resTypeName) ||
-                (key >= ResPluralsValue.BAG_KEY_PLURALS_START && key <= ResPluralsValue.BAG_KEY_PLURALS_END)) {
+        if (ResTypeSpec.RES_TYPE_NAME_PLURALS.equals(resTypeName)
+                || (key >= ResPluralsValue.BAG_KEY_PLURALS_START
+                        && key <= ResPluralsValue.BAG_KEY_PLURALS_END)) {
             return new ResPluralsValue(parentVal, items);
         }
 

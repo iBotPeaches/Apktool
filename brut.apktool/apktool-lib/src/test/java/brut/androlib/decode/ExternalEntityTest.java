@@ -16,23 +16,22 @@
  */
 package brut.androlib.decode;
 
+import static org.junit.Assert.assertEquals;
+
 import brut.androlib.Androlib;
 import brut.androlib.ApkDecoder;
 import brut.androlib.BaseTest;
 import brut.androlib.TestUtils;
-import brut.directory.ExtFile;
 import brut.common.BrutException;
+import brut.directory.ExtFile;
 import brut.util.OS;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-
-import static org.junit.Assert.assertEquals;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 public class ExternalEntityTest extends BaseTest {
 
@@ -59,13 +58,22 @@ public class ExternalEntityTest extends BaseTest {
     @Test
     public void doctypeTest() throws IOException {
 
-        String expected = TestUtils.replaceNewlines("<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
-                "<manifest android:versionCode=\"1\" android:versionName=\"1.0\" android:compileSdkVersion=\"23\" android:compileSdkVersionCodename=\"6.0-2438415\" " +
-                "hardwareAccelerated=\"true\" package=\"com.ibotpeaches.doctype\" platformBuildVersionCode=\"24\" platformBuildVersionName=\"6.0-2456767\"  " +
-                "xmlns:android=\"http://schemas.android.com/apk/res/android\">    <supports-screens android:anyDensity=\"true\" android:smallScreens=\"true\" " +
-                "android:normalScreens=\"true\" android:largeScreens=\"true\" android:resizeable=\"true\" android:xlargeScreens=\"true\" /></manifest>");
+        String expected =
+                TestUtils.replaceNewlines(
+                        "<?xml version=\"1.0\" encoding=\"utf-8\"?>"
+                                + "<manifest android:versionCode=\"1\" android:versionName=\"1.0\" android:compileSdkVersion=\"23\" android:compileSdkVersionCodename=\"6.0-2438415\" "
+                                + "hardwareAccelerated=\"true\" package=\"com.ibotpeaches.doctype\" platformBuildVersionCode=\"24\" platformBuildVersionName=\"6.0-2456767\"  "
+                                + "xmlns:android=\"http://schemas.android.com/apk/res/android\">    <supports-screens android:anyDensity=\"true\" android:smallScreens=\"true\" "
+                                + "android:normalScreens=\"true\" android:largeScreens=\"true\" android:resizeable=\"true\" android:xlargeScreens=\"true\" /></manifest>");
 
-        byte[] encoded = Files.readAllBytes(Paths.get(sTestOrigDir + File.separator + "output" + File.separator + "AndroidManifest.xml"));
+        byte[] encoded =
+                Files.readAllBytes(
+                        Paths.get(
+                                sTestOrigDir
+                                        + File.separator
+                                        + "output"
+                                        + File.separator
+                                        + "AndroidManifest.xml"));
         String obtained = TestUtils.replaceNewlines(new String(encoded));
         assertEquals(expected, obtained);
     }

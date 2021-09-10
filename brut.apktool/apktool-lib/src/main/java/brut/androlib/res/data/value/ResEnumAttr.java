@@ -20,22 +20,25 @@ import brut.androlib.AndrolibException;
 import brut.androlib.res.data.ResResSpec;
 import brut.androlib.res.data.ResResource;
 import brut.util.Duo;
-import org.xmlpull.v1.XmlSerializer;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import org.xmlpull.v1.XmlSerializer;
 
 public class ResEnumAttr extends ResAttr {
-    ResEnumAttr(ResReferenceValue parent, int type, Integer min, Integer max,
-                Boolean l10n, Duo<ResReferenceValue, ResIntValue>[] items) {
+    ResEnumAttr(
+            ResReferenceValue parent,
+            int type,
+            Integer min,
+            Integer max,
+            Boolean l10n,
+            Duo<ResReferenceValue, ResIntValue>[] items) {
         super(parent, type, min, max, l10n);
         mItems = items;
     }
 
     @Override
-    public String convertToResXmlFormat(ResScalarValue value)
-            throws AndrolibException {
+    public String convertToResXmlFormat(ResScalarValue value) throws AndrolibException {
         if (value instanceof ResIntValue) {
             String ret = decodeValue(((ResIntValue) value).getValue());
             if (ret != null) {
@@ -53,9 +56,7 @@ public class ResEnumAttr extends ResAttr {
             ResResSpec m1Referent = duo.m1.getReferent();
 
             serializer.startTag(null, "enum");
-            serializer.attribute(null, "name",
-                    m1Referent != null ? m1Referent.getName() : "@null"
-            );
+            serializer.attribute(null, "name", m1Referent != null ? m1Referent.getName() : "@null");
             serializer.attribute(null, "value", String.valueOf(intVal));
             serializer.endTag(null, "enum");
         }

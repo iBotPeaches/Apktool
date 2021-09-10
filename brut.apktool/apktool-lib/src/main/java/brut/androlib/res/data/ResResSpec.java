@@ -18,12 +18,11 @@ package brut.androlib.res.data;
 
 import brut.androlib.AndrolibException;
 import brut.androlib.err.UndefinedResObjectException;
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import org.apache.commons.lang3.StringUtils;
 
 public class ResResSpec {
     private final ResID mId;
@@ -40,7 +39,10 @@ public class ResResSpec {
         if (resResSpec != null) {
             cleanName = String.format("APKTOOL_DUPLICATE_%s_%s", type, id.toString());
         } else {
-            cleanName = ((name == null || name.isEmpty()) ? ("APKTOOL_DUMMYVAL_" + id.toString()) : name);
+            cleanName =
+                    ((name == null || name.isEmpty())
+                            ? ("APKTOOL_DUMMYVAL_" + id.toString())
+                            : name);
         }
 
         this.mName = cleanName;
@@ -59,7 +61,8 @@ public class ResResSpec {
     public ResResource getResource(ResConfigFlags config) throws AndrolibException {
         ResResource res = mResources.get(config);
         if (res == null) {
-            throw new UndefinedResObjectException(String.format("resource: spec=%s, config=%s", this, config));
+            throw new UndefinedResObjectException(
+                    String.format("resource: spec=%s, config=%s", this, config));
         }
         return res;
     }
@@ -78,7 +81,8 @@ public class ResResSpec {
 
     public String getFullName(boolean excludePackage, boolean excludeType) {
         return (excludePackage ? "" : getPackage().getName() + ":")
-                + (excludeType ? "" : getType().getName() + "/") + getName();
+                + (excludeType ? "" : getType().getName() + "/")
+                + getName();
     }
 
     public ResID getId() {
@@ -108,7 +112,8 @@ public class ResResSpec {
     public void addResource(ResResource res, boolean overwrite) throws AndrolibException {
         ResConfigFlags flags = res.getConfig().getFlags();
         if (mResources.put(flags, res) != null && !overwrite) {
-            throw new AndrolibException(String.format("Multiple resources: spec=%s, config=%s", this, flags));
+            throw new AndrolibException(
+                    String.format("Multiple resources: spec=%s, config=%s", this, flags));
         }
     }
 

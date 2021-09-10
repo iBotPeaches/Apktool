@@ -16,17 +16,17 @@
  */
 package brut.androlib.aapt1;
 
+import static org.junit.Assert.*;
+
 import brut.androlib.ApkDecoder;
 import brut.androlib.BaseTest;
 import brut.androlib.TestUtils;
-import brut.directory.ExtFile;
 import brut.common.BrutException;
+import brut.directory.ExtFile;
 import brut.util.OS;
 import java.io.File;
 import java.io.IOException;
-
 import org.junit.*;
-import static org.junit.Assert.*;
 
 public class SkipAssetTest extends BaseTest {
 
@@ -56,7 +56,8 @@ public class SkipAssetTest extends BaseTest {
         apkDecoder.decode();
 
         checkFileDoesNotExist("assets" + File.separator + "kotlin.kotlin_builtins");
-        checkFileDoesNotExist("assets" + File.separator + "ranges" + File.separator + "ranges.kotlin_builtins");
+        checkFileDoesNotExist(
+                "assets" + File.separator + "ranges" + File.separator + "ranges.kotlin_builtins");
     }
 
     @Test
@@ -73,17 +74,18 @@ public class SkipAssetTest extends BaseTest {
         apkDecoder.decode();
 
         checkFileDoesExist("assets" + File.separator + "kotlin.kotlin_builtins");
-        checkFileDoesExist("assets" + File.separator + "ranges" + File.separator + "ranges.kotlin_builtins");
+        checkFileDoesExist(
+                "assets" + File.separator + "ranges" + File.separator + "ranges.kotlin_builtins");
     }
 
     private void checkFileDoesNotExist(String path) throws BrutException {
-        File f =  new File(sTestOrigDir, path);
+        File f = new File(sTestOrigDir, path);
 
         assertFalse(f.isFile());
     }
 
     private void checkFileDoesExist(String path) throws BrutException {
-        File f =  new File(sTestOrigDir, path);
+        File f = new File(sTestOrigDir, path);
 
         assertTrue(f.isFile());
     }

@@ -16,13 +16,13 @@
  */
 package brut.androlib;
 
+import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
+import static org.junit.Assert.*;
+
 import brut.androlib.meta.MetaInfo;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
 import brut.directory.FileDirectory;
-import org.custommonkey.xmlunit.*;
-import org.xml.sax.SAXException;
-
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -30,9 +30,8 @@ import java.io.Reader;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
-
-import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
-import static org.junit.Assert.*;
+import org.custommonkey.xmlunit.*;
+import org.xml.sax.SAXException;
 
 public class BaseTest {
 
@@ -68,9 +67,9 @@ public class BaseTest {
         for (String filename : files) {
 
             File control = new File((sTestOrigDir + location), filename);
-            File test =  new File((sTestNewDir + location), filename);
+            File test = new File((sTestNewDir + location), filename);
 
-            if (! test.isFile() || ! control.isFile()) {
+            if (!test.isFile() || !control.isFile()) {
                 exists = false;
             }
         }
@@ -98,8 +97,8 @@ public class BaseTest {
         compareXmlFiles(path, null);
     }
 
-    protected  void checkFolderExists(String path) {
-        File f =  new File(sTestNewDir, path);
+    protected void checkFolderExists(String path) {
+        File f = new File(sTestNewDir, path);
 
         assertTrue(f.isDirectory());
     }
@@ -135,5 +134,5 @@ public class BaseTest {
     protected static ExtFile sTestOrigDir;
     protected static ExtFile sTestNewDir;
 
-    protected final static Logger LOGGER = Logger.getLogger(BaseTest.class.getName());
+    protected static final Logger LOGGER = Logger.getLogger(BaseTest.class.getName());
 }

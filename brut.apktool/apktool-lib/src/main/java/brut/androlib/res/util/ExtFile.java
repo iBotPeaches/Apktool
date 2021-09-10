@@ -18,7 +18,6 @@ package brut.androlib.res.util;
 
 import java.io.File;
 
-
 public class ExtFile extends brut.directory.ExtFile {
     public ExtFile(File file) {
         super(file.getPath());

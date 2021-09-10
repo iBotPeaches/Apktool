@@ -16,24 +16,23 @@
  */
 package brut.androlib.aapt1;
 
+import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
+import static org.junit.Assert.assertTrue;
+
 import brut.androlib.*;
 import brut.androlib.options.BuildOptions;
-import brut.directory.ExtFile;
 import brut.common.BrutException;
+import brut.directory.ExtFile;
 import brut.util.OS;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.xml.sax.SAXException;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
-import static org.junit.Assert.assertTrue;
-import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 
 public class DebugTagRetainedTest extends BaseTest {
 
@@ -73,12 +72,21 @@ public class DebugTagRetainedTest extends BaseTest {
     public void DebugIsTruePriorToBeingFalseTest() throws IOException, SAXException {
         String apk = "issue1235-new";
 
-        String expected = TestUtils.replaceNewlines("<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"no\"?>" +
-                "<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\" android:compileSdkVersion=\"23\" " +
-                "android:compileSdkVersionCodename=\"6.0-2438415\" package=\"com.ibotpeaches.issue1235\" platformBuildVersionCode=\"20\" " +
-                "platformBuildVersionName=\"4.4W.2-1537038\">    <application android:debuggable=\"true\"/></manifest>");
+        String expected =
+                TestUtils.replaceNewlines(
+                        "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"no\"?>"
+                                + "<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\" android:compileSdkVersion=\"23\" "
+                                + "android:compileSdkVersionCodename=\"6.0-2438415\" package=\"com.ibotpeaches.issue1235\" platformBuildVersionCode=\"20\" "
+                                + "platformBuildVersionName=\"4.4W.2-1537038\">    <application android:debuggable=\"true\"/></manifest>");
 
-        byte[] encoded = Files.readAllBytes(Paths.get(sTmpDir + File.separator + apk + File.separator + "AndroidManifest.xml"));
+        byte[] encoded =
+                Files.readAllBytes(
+                        Paths.get(
+                                sTmpDir
+                                        + File.separator
+                                        + apk
+                                        + File.separator
+                                        + "AndroidManifest.xml"));
         String obtained = TestUtils.replaceNewlines(new String(encoded));
 
         XMLUnit.setIgnoreWhitespace(true);

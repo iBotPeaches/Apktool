@@ -48,7 +48,8 @@ public interface AttributeSet {
 
     String getAttributeValue(String namespace, String attribute);
 
-    int getAttributeListValue(String namespace, String attribute, String[] options, int defaultValue);
+    int getAttributeListValue(
+            String namespace, String attribute, String[] options, int defaultValue);
 
     boolean getAttributeBooleanValue(String namespace, String attribute, boolean defaultValue);
 

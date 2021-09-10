@@ -85,14 +85,12 @@ public abstract class AbstractDirectory implements Directory {
     }
 
     @Override
-    public Map<String, Directory> getDirs()
-            throws UnsupportedOperationException {
+    public Map<String, Directory> getDirs() throws UnsupportedOperationException {
         return getDirs(false);
     }
 
     @Override
-    public Map<String, Directory> getDirs(boolean recursive)
-            throws UnsupportedOperationException {
+    public Map<String, Directory> getDirs(boolean recursive) throws UnsupportedOperationException {
         return new LinkedHashMap<>(getAbstractDirs(recursive));
     }
 
@@ -102,7 +100,7 @@ public abstract class AbstractDirectory implements Directory {
         if (subpath.dir != null) {
             return subpath.dir.getFileInput(subpath.path);
         }
-        if (! getFiles().contains(subpath.path)) {
+        if (!getFiles().contains(subpath.path)) {
             throw new PathNotExist(path);
         }
         return getFileInputLocal(subpath.path);
@@ -132,7 +130,7 @@ public abstract class AbstractDirectory implements Directory {
         if (subpath.dir != null) {
             return subpath.dir.getDir(subpath.path);
         }
-        if (! getAbstractDirs().containsKey(subpath.path)) {
+        if (!getAbstractDirs().containsKey(subpath.path)) {
             throw new PathNotExist(path);
         }
         return getAbstractDirs().get(subpath.path);
@@ -172,7 +170,7 @@ public abstract class AbstractDirectory implements Directory {
         if (subpath.dir != null) {
             return subpath.dir.removeFile(subpath.path);
         }
-        if (! getFiles().contains(subpath.path)) {
+        if (!getFiles().contains(subpath.path)) {
             return false;
         }
         removeFileLocal(subpath.path);
@@ -184,13 +182,11 @@ public abstract class AbstractDirectory implements Directory {
         DirUtil.copyToDir(out, out);
     }
 
-    public void copyToDir(Directory out, String[] fileNames)
-            throws DirectoryException {
+    public void copyToDir(Directory out, String[] fileNames) throws DirectoryException {
         DirUtil.copyToDir(out, out, fileNames);
     }
 
-    public void copyToDir(Directory out, String fileName)
-            throws DirectoryException {
+    public void copyToDir(Directory out, String fileName) throws DirectoryException {
         DirUtil.copyToDir(out, out, fileName);
     }
 
@@ -198,19 +194,16 @@ public abstract class AbstractDirectory implements Directory {
         DirUtil.copyToDir(this, out);
     }
 
-    public void copyToDir(File out, String[] fileNames)
-            throws DirectoryException {
+    public void copyToDir(File out, String[] fileNames) throws DirectoryException {
         DirUtil.copyToDir(this, out, fileNames);
     }
 
-    public void copyToDir(File out, String fileName)
-            throws DirectoryException {
+    public void copyToDir(File out, String fileName) throws DirectoryException {
         DirUtil.copyToDir(this, out, fileName);
     }
 
-    public int getCompressionLevel(String fileName)
-            throws DirectoryException {
-        return -1;  // Unknown
+    public int getCompressionLevel(String fileName) throws DirectoryException {
+        return -1; // Unknown
     }
 
     protected Map<String, AbstractDirectory> getAbstractDirs() {
@@ -227,26 +220,22 @@ public abstract class AbstractDirectory implements Directory {
 
         Map<String, AbstractDirectory> dirs = new LinkedHashMap<>(mDirs);
         for (Map.Entry<String, AbstractDirectory> dir : getAbstractDirs().entrySet()) {
-            for (Map.Entry<String, AbstractDirectory> subdir : dir.getValue().getAbstractDirs(
-                    true).entrySet()) {
-                dirs.put(dir.getKey() + separator + subdir.getKey(),
-                        subdir.getValue());
+            for (Map.Entry<String, AbstractDirectory> subdir :
+                    dir.getValue().getAbstractDirs(true).entrySet()) {
+                dirs.put(dir.getKey() + separator + subdir.getKey(), subdir.getValue());
             }
         }
         return dirs;
     }
 
-
-    public void close() throws IOException {
-
-    }
+    public void close() throws IOException {}
 
     private SubPath getSubPath(String path) throws PathNotExist {
         ParsedPath parsed = parsePath(path);
         if (parsed.dir == null) {
             return new SubPath(null, parsed.subpath);
         }
-        if (! getAbstractDirs().containsKey(parsed.dir)) {
+        if (!getAbstractDirs().containsKey(parsed.dir)) {
             throw new PathNotExist(path);
         }
         return new SubPath(getAbstractDirs().get(parsed.dir), parsed.subpath);
@@ -261,19 +250,21 @@ public abstract class AbstractDirectory implements Directory {
     }
 
     protected abstract void loadFiles();
-    protected abstract void loadDirs();
-    protected abstract InputStream getFileInputLocal(String name)
-        throws DirectoryException;
-    protected abstract OutputStream getFileOutputLocal(String name)
-        throws DirectoryException;
-    protected abstract AbstractDirectory createDirLocal(String name)
-        throws DirectoryException;
-    protected abstract void removeFileLocal(String name);
 
+    protected abstract void loadDirs();
+
+    protected abstract InputStream getFileInputLocal(String name) throws DirectoryException;
+
+    protected abstract OutputStream getFileOutputLocal(String name) throws DirectoryException;
+
+    protected abstract AbstractDirectory createDirLocal(String name) throws DirectoryException;
+
+    protected abstract void removeFileLocal(String name);
 
     private class ParsedPath {
         public final String dir;
         public final String subpath;
+
         public ParsedPath(String dir, String subpath) {
             this.dir = dir;
             this.subpath = subpath;

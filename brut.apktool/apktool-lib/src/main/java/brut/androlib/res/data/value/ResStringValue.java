@@ -19,10 +19,9 @@ package brut.androlib.res.data.value;
 import brut.androlib.AndrolibException;
 import brut.androlib.res.data.ResResource;
 import brut.androlib.res.xml.ResXmlEncoders;
-import org.xmlpull.v1.XmlSerializer;
-
 import java.io.IOException;
 import java.util.regex.Pattern;
+import org.xmlpull.v1.XmlSerializer;
 
 public class ResStringValue extends ResScalarValue {
 
@@ -41,7 +40,8 @@ public class ResStringValue extends ResScalarValue {
 
     @Override
     public String encodeAsResXmlItemValue() {
-        return ResXmlEncoders.enumerateNonPositionalSubstitutionsIfRequired(ResXmlEncoders.encodeAsXmlValue(mRawValue));
+        return ResXmlEncoders.enumerateNonPositionalSubstitutionsIfRequired(
+                ResXmlEncoders.encodeAsXmlValue(mRawValue));
     }
 
     @Override
@@ -55,7 +55,8 @@ public class ResStringValue extends ResScalarValue {
     }
 
     @Override
-    protected void serializeExtraXmlAttrs(XmlSerializer serializer, ResResource res) throws IOException {
+    protected void serializeExtraXmlAttrs(XmlSerializer serializer, ResResource res)
+            throws IOException {
         if (ResXmlEncoders.hasMultipleNonPositionalSubstitutions(mRawValue)) {
             serializer.attribute(null, "formatted", "false");
         }

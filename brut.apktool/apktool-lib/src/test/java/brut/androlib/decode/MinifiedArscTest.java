@@ -16,22 +16,21 @@
  */
 package brut.androlib.decode;
 
+import static org.junit.Assert.assertEquals;
+
 import brut.androlib.ApkDecoder;
 import brut.androlib.BaseTest;
 import brut.androlib.TestUtils;
-import brut.directory.ExtFile;
 import brut.common.BrutException;
+import brut.directory.ExtFile;
 import brut.util.OS;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-
-import static org.junit.Assert.assertEquals;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 public class MinifiedArscTest extends BaseTest {
 
@@ -60,13 +59,24 @@ public class MinifiedArscTest extends BaseTest {
 
     @Test
     public void checkIfMinifiedArscLayoutFileMatchesTest() throws IOException {
-        String expected = TestUtils.replaceNewlines("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
-                "<LinearLayout n1:orientation=\"vertical\" n1:layout_width=\"fill_parent\" n1:layout_height=\"fill_parent\"\n" +
-                "  xmlns:n1=\"http://schemas.android.com/apk/res/android\">\n" +
-                "    <com.ibotpeaches.issue1157.MyCustomView n1:max=\"100\" n2:default_value=\"1.0\" n2:max_value=\"5.0\" n2:min_value=\"0.2\" xmlns:n2=\"http://schemas.android.com/apk/res-auto\" />\n" +
-                "</LinearLayout>");
+        String expected =
+                TestUtils.replaceNewlines(
+                        "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+                                + "<LinearLayout n1:orientation=\"vertical\" n1:layout_width=\"fill_parent\" n1:layout_height=\"fill_parent\"\n"
+                                + "  xmlns:n1=\"http://schemas.android.com/apk/res/android\">\n"
+                                + "    <com.ibotpeaches.issue1157.MyCustomView n1:max=\"100\" n2:default_value=\"1.0\" n2:max_value=\"5.0\" n2:min_value=\"0.2\" xmlns:n2=\"http://schemas.android.com/apk/res-auto\" />\n"
+                                + "</LinearLayout>");
 
-        byte[] encoded = Files.readAllBytes(Paths.get(sTestNewDir + File.separator + "res" + File.separator + "xml" + File.separator + "custom.xml"));
+        byte[] encoded =
+                Files.readAllBytes(
+                        Paths.get(
+                                sTestNewDir
+                                        + File.separator
+                                        + "res"
+                                        + File.separator
+                                        + "xml"
+                                        + File.separator
+                                        + "custom.xml"));
         String obtained = TestUtils.replaceNewlines(new String(encoded));
         assertEquals(expected, obtained);
     }

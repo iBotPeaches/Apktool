@@ -16,20 +16,19 @@
  */
 package brut.androlib.aapt1;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
+
 import brut.androlib.*;
 import brut.androlib.options.BuildOptions;
-import brut.directory.ExtFile;
 import brut.common.BrutException;
+import brut.directory.ExtFile;
 import brut.util.OS;
+import java.io.File;
+import java.io.IOException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.io.File;
-import java.io.IOException;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
 
 public class UnknownCompressionTest extends BaseTest {
 
@@ -37,7 +36,8 @@ public class UnknownCompressionTest extends BaseTest {
     public static void beforeClass() throws Exception {
         TestUtils.cleanFrameworkFile();
         sTmpDir = new ExtFile(OS.createTempDirectory());
-        TestUtils.copyResourceDir(UnknownCompressionTest.class, "aapt1/unknown_compression/", sTmpDir);
+        TestUtils.copyResourceDir(
+                UnknownCompressionTest.class, "aapt1/unknown_compression/", sTmpDir);
 
         String apk = "deflated_unknowns.apk";
         BuildOptions buildOptions = new BuildOptions();
@@ -63,8 +63,10 @@ public class UnknownCompressionTest extends BaseTest {
 
     @Test
     public void pkmExtensionDeflatedTest() throws BrutException, IOException {
-        Integer control = sTestOrigDir.getDirectory().getCompressionLevel("assets/bin/Data/test.pkm");
-        Integer rebuilt = sTestNewDir.getDirectory().getCompressionLevel("assets/bin/Data/test.pkm");
+        Integer control =
+                sTestOrigDir.getDirectory().getCompressionLevel("assets/bin/Data/test.pkm");
+        Integer rebuilt =
+                sTestNewDir.getDirectory().getCompressionLevel("assets/bin/Data/test.pkm");
 
         // Check that control = rebuilt (both deflated)
         // Add extra check for checking not equal to 0, just in case control gets broken
@@ -74,8 +76,14 @@ public class UnknownCompressionTest extends BaseTest {
 
     @Test
     public void doubleExtensionStoredTest() throws BrutException, IOException {
-        Integer control = sTestOrigDir.getDirectory().getCompressionLevel("assets/bin/Data/two.extension.file");
-        Integer rebuilt = sTestNewDir.getDirectory().getCompressionLevel("assets/bin/Data/two.extension.file");
+        Integer control =
+                sTestOrigDir
+                        .getDirectory()
+                        .getCompressionLevel("assets/bin/Data/two.extension.file");
+        Integer rebuilt =
+                sTestNewDir
+                        .getDirectory()
+                        .getCompressionLevel("assets/bin/Data/two.extension.file");
 
         // Check that control = rebuilt (both stored)
         // Add extra check for checking = 0 to enforce check for stored just in case control breaks

@@ -16,6 +16,8 @@
  */
 package brut.androlib.decode;
 
+import static junit.framework.Assert.assertTrue;
+
 import brut.androlib.ApkDecoder;
 import brut.androlib.BaseTest;
 import brut.androlib.TestUtils;
@@ -25,13 +27,10 @@ import brut.androlib.res.data.value.ResValue;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
 import brut.util.OS;
+import java.io.File;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.io.File;
-
-import static junit.framework.Assert.assertTrue;
 
 public class DecodeArrayTest extends BaseTest {
 
@@ -55,7 +54,8 @@ public class DecodeArrayTest extends BaseTest {
         ResTable resTable = apkDecoder.getResTable();
         ResValue value = resTable.getResSpec(0x7f020001).getDefaultResource().getValue();
 
-        assertTrue("Not a ResArrayValue. Found: " + value.getClass(), value instanceof ResArrayValue);
+        assertTrue(
+                "Not a ResArrayValue. Found: " + value.getClass(), value instanceof ResArrayValue);
     }
 
     @Test
@@ -66,6 +66,7 @@ public class DecodeArrayTest extends BaseTest {
         ResTable resTable = apkDecoder.getResTable();
         ResValue value = resTable.getResSpec(0x7f020000).getDefaultResource().getValue();
 
-        assertTrue("Not a ResArrayValue. Found: " + value.getClass(), value instanceof ResArrayValue);
+        assertTrue(
+                "Not a ResArrayValue. Found: " + value.getClass(), value instanceof ResArrayValue);
     }
 }

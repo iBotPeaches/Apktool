@@ -29,8 +29,7 @@ public class ResReferenceValue extends ResIntValue {
         this(package_, value, rawValue, false);
     }
 
-    public ResReferenceValue(ResPackage package_, int value, String rawValue,
-                             boolean theme) {
+    public ResReferenceValue(ResPackage package_, int value, String rawValue, boolean theme) {
         super(value, rawValue, "reference");
         mPackage = package_;
         mTheme = theme;
@@ -46,12 +45,15 @@ public class ResReferenceValue extends ResIntValue {
         if (spec == null) {
             return "@null";
         }
-        boolean newId = spec.hasDefaultResource() && spec.getDefaultResource().getValue() instanceof ResIdValue;
+        boolean newId =
+                spec.hasDefaultResource()
+                        && spec.getDefaultResource().getValue() instanceof ResIdValue;
 
         // generate the beginning to fix @android
         String mStart = (mTheme ? '?' : '@') + (newId ? "+" : "");
 
-        return mStart + spec.getFullName(mPackage, mTheme && spec.getType().getName().equals("attr"));
+        return mStart
+                + spec.getFullName(mPackage, mTheme && spec.getType().getName().equals("attr"));
     }
 
     public ResResSpec getReferent() throws AndrolibException {

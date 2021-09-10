@@ -16,21 +16,20 @@
  */
 package brut.androlib.aapt1;
 
+import static org.junit.Assert.assertTrue;
+
 import brut.androlib.*;
 import brut.androlib.options.BuildOptions;
-import brut.directory.ExtFile;
 import brut.common.BrutException;
+import brut.directory.ExtFile;
 import brut.util.OS;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-
-import static org.junit.Assert.assertTrue;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 public class SharedLibraryTest extends BaseTest {
 
@@ -107,7 +106,8 @@ public class SharedLibraryTest extends BaseTest {
         // build library.apk (shared library)
         ExtFile libraryApk = new ExtFile(sTmpDir, library + ".out");
         new Androlib(buildOptions).build(libraryApk, null);
-        assertTrue(fileExists(library + ".out" + File.separator + "dist" + File.separator + library));
+        assertTrue(
+                fileExists(library + ".out" + File.separator + "dist" + File.separator + library));
     }
 
     private boolean fileExists(String filepath) {

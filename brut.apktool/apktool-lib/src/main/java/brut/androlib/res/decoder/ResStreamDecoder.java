@@ -21,6 +21,5 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 public interface ResStreamDecoder {
-    void decode(InputStream in, OutputStream out)
-            throws AndrolibException;
+    void decode(InputStream in, OutputStream out) throws AndrolibException;
 }

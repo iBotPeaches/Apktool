@@ -17,12 +17,11 @@
 package brut.util;
 
 import brut.common.BrutException;
-import org.apache.commons.io.IOUtils;
-
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
+import org.apache.commons.io.IOUtils;
 
 public abstract class Jar {
     private static final Map<String, File> mExtracted = new HashMap<>();
@@ -40,7 +39,8 @@ public abstract class Jar {
         return extractToTmp(resourcePath, "brut_util_Jar_", clazz);
     }
 
-    public static File extractToTmp(String resourcePath, String tmpPrefix, Class<?> clazz) throws BrutException {
+    public static File extractToTmp(String resourcePath, String tmpPrefix, Class<?> clazz)
+            throws BrutException {
         try {
             InputStream in = clazz.getResourceAsStream(resourcePath);
             if (in == null) {

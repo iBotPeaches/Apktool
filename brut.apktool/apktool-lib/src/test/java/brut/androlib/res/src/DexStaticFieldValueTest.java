@@ -16,22 +16,21 @@
  */
 package brut.androlib.res.src;
 
+import static org.junit.Assert.assertEquals;
+
 import brut.androlib.*;
 import brut.androlib.aapt2.BuildAndDecodeTest;
 import brut.androlib.options.BuildOptions;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
 import brut.util.OS;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-
-import static org.junit.Assert.assertEquals;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 public class DexStaticFieldValueTest extends BaseTest {
 
@@ -65,26 +64,33 @@ public class DexStaticFieldValueTest extends BaseTest {
 
     @Test
     public void disassembleDexFileToKeepDefaultParameters() throws IOException {
-        String expected = TestUtils.replaceNewlines(
-                ".class public LHelloWorld;\n"
-                        + ".super Ljava/lang/Object;\n"
-                        + "\n"
-                        + "\n"
-                        + "# static fields\n"
-                        + ".field private static b:Z = false\n"
-                        + "\n"
-                        + ".field private static c:Z = true\n"
-                        + "\n"
-                        + "\n"
-                        + "# direct methods\n"
-                        + ".method public static main([Ljava/lang/String;)V\n"
-                        + "    .locals 1\n"
-                        + "\n"
-                        + "    return-void\n"
-                        + ".end method");
+        String expected =
+                TestUtils.replaceNewlines(
+                        ".class public LHelloWorld;\n"
+                                + ".super Ljava/lang/Object;\n"
+                                + "\n"
+                                + "\n"
+                                + "# static fields\n"
+                                + ".field private static b:Z = false\n"
+                                + "\n"
+                                + ".field private static c:Z = true\n"
+                                + "\n"
+                                + "\n"
+                                + "# direct methods\n"
+                                + ".method public static main([Ljava/lang/String;)V\n"
+                                + "    .locals 1\n"
+                                + "\n"
+                                + "    return-void\n"
+                                + ".end method");
 
-        byte[] encoded = Files.readAllBytes(Paths.get(sTestNewDir + File.separator + "smali" + File.separator
-            + "HelloWorld.smali"));
+        byte[] encoded =
+                Files.readAllBytes(
+                        Paths.get(
+                                sTestNewDir
+                                        + File.separator
+                                        + "smali"
+                                        + File.separator
+                                        + "HelloWorld.smali"));
 
         String obtained = TestUtils.replaceNewlines(new String(encoded));
         assertEquals(expected, obtained);

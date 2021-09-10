@@ -16,24 +16,23 @@
  */
 package brut.androlib.aapt2;
 
+import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
+import static org.junit.Assert.assertTrue;
+
 import brut.androlib.*;
 import brut.androlib.options.BuildOptions;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
 import brut.util.OS;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.xml.sax.SAXException;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
-import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
-import static org.junit.Assert.assertTrue;
 
 public class DebuggableTrueAddedTest extends BaseTest {
 
@@ -44,7 +43,8 @@ public class DebuggableTrueAddedTest extends BaseTest {
         sTestOrigDir = new ExtFile(sTmpDir, "issue2328-debuggable-missing-orig");
         sTestNewDir = new ExtFile(sTmpDir, "issue2328-debuggable-missing-new");
         LOGGER.info("Unpacking issue2328-debuggable-missing...");
-        TestUtils.copyResourceDir(DebuggableTrueAddedTest.class, "aapt2/issue2328/debuggable-missing", sTestOrigDir);
+        TestUtils.copyResourceDir(
+                DebuggableTrueAddedTest.class, "aapt2/issue2328/debuggable-missing", sTestOrigDir);
 
         LOGGER.info("Building issue2328-debuggable-missing.apk...");
         BuildOptions buildOptions = new BuildOptions();
@@ -75,12 +75,21 @@ public class DebuggableTrueAddedTest extends BaseTest {
     public void DebugIsTruePriorToBeingFalseTest() throws IOException, SAXException {
         String apk = "issue2328-debuggable-missing-new";
 
-        String expected = TestUtils.replaceNewlines("<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"no\"?>" +
-                "<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\" android:compileSdkVersion=\"23\" " +
-                "android:compileSdkVersionCodename=\"6.0-2438415\" package=\"com.ibotpeaches.issue2328\" platformBuildVersionCode=\"23\" " +
-                "platformBuildVersionName=\"6.0-2438415\">    <application android:debuggable=\"true\"/></manifest>");
+        String expected =
+                TestUtils.replaceNewlines(
+                        "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"no\"?>"
+                                + "<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\" android:compileSdkVersion=\"23\" "
+                                + "android:compileSdkVersionCodename=\"6.0-2438415\" package=\"com.ibotpeaches.issue2328\" platformBuildVersionCode=\"23\" "
+                                + "platformBuildVersionName=\"6.0-2438415\">    <application android:debuggable=\"true\"/></manifest>");
 
-        byte[] encoded = Files.readAllBytes(Paths.get(sTmpDir + File.separator + apk + File.separator + "AndroidManifest.xml"));
+        byte[] encoded =
+                Files.readAllBytes(
+                        Paths.get(
+                                sTmpDir
+                                        + File.separator
+                                        + apk
+                                        + File.separator
+                                        + "AndroidManifest.xml"));
         String obtained = TestUtils.replaceNewlines(new String(encoded));
 
         XMLUnit.setIgnoreWhitespace(true);

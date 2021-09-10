@@ -19,14 +19,18 @@ package brut.androlib.res.data.value;
 import brut.androlib.AndrolibException;
 import brut.androlib.res.data.ResResource;
 import brut.util.Duo;
-import org.xmlpull.v1.XmlSerializer;
-
 import java.io.IOException;
 import java.util.Arrays;
+import org.xmlpull.v1.XmlSerializer;
 
 public class ResFlagsAttr extends ResAttr {
-    ResFlagsAttr(ResReferenceValue parent, int type, Integer min, Integer max,
-                 Boolean l10n, Duo<ResReferenceValue, ResIntValue>[] items) {
+    ResFlagsAttr(
+            ResReferenceValue parent,
+            int type,
+            Integer min,
+            Integer max,
+            Boolean l10n,
+            Duo<ResReferenceValue, ResIntValue>[] items) {
         super(parent, type, min, max, l10n);
 
         mItems = new FlagItem[items.length];
@@ -36,9 +40,8 @@ public class ResFlagsAttr extends ResAttr {
     }
 
     @Override
-    public String convertToResXmlFormat(ResScalarValue value)
-            throws AndrolibException {
-        if(value instanceof ResReferenceValue) {
+    public String convertToResXmlFormat(ResScalarValue value) throws AndrolibException {
+        if (value instanceof ResReferenceValue) {
             return value.encodeAsResXml();
         }
         if (!(value instanceof ResIntValue)) {
@@ -75,8 +78,7 @@ public class ResFlagsAttr extends ResAttr {
         for (FlagItem item : mItems) {
             serializer.startTag(null, "flag");
             serializer.attribute(null, "name", item.getValue());
-            serializer.attribute(null, "value",
-                String.format("0x%08x", item.flag));
+            serializer.attribute(null, "value", String.format("0x%08x", item.flag));
             serializer.endTag(null, "flag");
         }
     }
@@ -122,7 +124,9 @@ public class ResFlagsAttr extends ResAttr {
         mZeroFlags = Arrays.copyOf(zeroFlags, zeroFlagsCount);
         mFlags = Arrays.copyOf(flags, flagsCount);
 
-        Arrays.sort(mFlags, (o1, o2) -> Integer.compare(Integer.bitCount(o2.flag), Integer.bitCount(o1.flag)));
+        Arrays.sort(
+                mFlags,
+                (o1, o2) -> Integer.compare(Integer.bitCount(o2.flag), Integer.bitCount(o1.flag)));
     }
 
     private final FlagItem[] mItems;

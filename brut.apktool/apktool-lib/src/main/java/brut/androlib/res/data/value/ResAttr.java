@@ -21,13 +21,11 @@ import brut.androlib.res.data.ResPackage;
 import brut.androlib.res.data.ResResource;
 import brut.androlib.res.xml.ResValuesXmlSerializable;
 import brut.util.Duo;
+import java.io.IOException;
 import org.xmlpull.v1.XmlSerializer;
 
-import java.io.IOException;
-
 public class ResAttr extends ResBagValue implements ResValuesXmlSerializable {
-    ResAttr(ResReferenceValue parentVal, int type, Integer min, Integer max,
-            Boolean l10n) {
+    ResAttr(ResReferenceValue parentVal, int type, Integer min, Integer max, Boolean l10n) {
         super(parentVal);
         mType = type;
         mMin = min;
@@ -41,7 +39,7 @@ public class ResAttr extends ResBagValue implements ResValuesXmlSerializable {
 
     @Override
     public void serializeToResValuesXml(XmlSerializer serializer, ResResource res)
-        throws IOException, AndrolibException {
+            throws IOException, AndrolibException {
         String type = getTypeAsString();
 
         serializer.startTag(null, "attr");
@@ -62,9 +60,12 @@ public class ResAttr extends ResBagValue implements ResValuesXmlSerializable {
         serializer.endTag(null, "attr");
     }
 
-    public static ResAttr factory(ResReferenceValue parent,
-                                  Duo<Integer, ResScalarValue>[] items, ResValueFactory factory,
-                                  ResPackage pkg) throws AndrolibException {
+    public static ResAttr factory(
+            ResReferenceValue parent,
+            Duo<Integer, ResScalarValue>[] items,
+            ResValueFactory factory,
+            ResPackage pkg)
+            throws AndrolibException {
 
         int type = ((ResIntValue) items[0].m2).getValue();
         int scalarType = type & 0xffff;
@@ -94,7 +95,8 @@ public class ResAttr extends ResBagValue implements ResValuesXmlSerializable {
         for (; i < items.length; i++) {
             int resId = items[i].m1;
             pkg.addSynthesizedRes(resId);
-            attrItems[j++] = new Duo<>(factory.newReference(resId, null), (ResIntValue) items[i].m2);
+            attrItems[j++] =
+                    new Duo<>(factory.newReference(resId, null), (ResIntValue) items[i].m2);
         }
         switch (type & 0xff0000) {
             case TYPE_ENUM:
@@ -106,8 +108,8 @@ public class ResAttr extends ResBagValue implements ResValuesXmlSerializable {
         throw new AndrolibException("Could not decode attr value");
     }
 
-    protected void serializeBody(XmlSerializer serializer, ResResource res) throws AndrolibException, IOException {
-    }
+    protected void serializeBody(XmlSerializer serializer, ResResource res)
+            throws AndrolibException, IOException {}
 
     protected String getTypeAsString() {
         String s = "";
@@ -151,15 +153,15 @@ public class ResAttr extends ResBagValue implements ResValuesXmlSerializable {
     private static final int BAG_KEY_ATTR_MAX = 0x01000002;
     private static final int BAG_KEY_ATTR_L10N = 0x01000003;
 
-    private final static int TYPE_REFERENCE = 0x01;
-    private final static int TYPE_STRING = 0x02;
-    private final static int TYPE_INT = 0x04;
-    private final static int TYPE_BOOL = 0x08;
-    private final static int TYPE_COLOR = 0x10;
-    private final static int TYPE_FLOAT = 0x20;
-    private final static int TYPE_DIMEN = 0x40;
-    private final static int TYPE_FRACTION = 0x80;
-    private final static int TYPE_ANY_STRING = 0xee;
+    private static final int TYPE_REFERENCE = 0x01;
+    private static final int TYPE_STRING = 0x02;
+    private static final int TYPE_INT = 0x04;
+    private static final int TYPE_BOOL = 0x08;
+    private static final int TYPE_COLOR = 0x10;
+    private static final int TYPE_FLOAT = 0x20;
+    private static final int TYPE_DIMEN = 0x40;
+    private static final int TYPE_FRACTION = 0x80;
+    private static final int TYPE_ANY_STRING = 0xee;
 
     private static final int TYPE_ENUM = 0x00010000;
     private static final int TYPE_FLAGS = 0x00020000;

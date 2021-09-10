@@ -19,9 +19,6 @@ package brut.androlib.res.decoder;
 import brut.androlib.AndrolibException;
 import brut.androlib.err.CantFind9PatchChunkException;
 import brut.util.ExtDataInput;
-import org.apache.commons.io.IOUtils;
-
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
@@ -30,6 +27,8 @@ import java.io.DataInput;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import javax.imageio.ImageIO;
+import org.apache.commons.io.IOUtils;
 
 public class Res9patchStreamDecoder implements ResStreamDecoder {
     @Override
@@ -46,7 +45,7 @@ public class Res9patchStreamDecoder implements ResStreamDecoder {
 
             BufferedImage im2 = new BufferedImage(w + 2, h + 2, BufferedImage.TYPE_INT_ARGB);
             if (im.getType() == BufferedImage.TYPE_CUSTOM) {
-                //TODO: Ensure this is gray + alpha case?
+                // TODO: Ensure this is gray + alpha case?
                 Raster srcRaster = im.getRaster();
                 WritableRaster dstRaster = im2.getRaster();
                 int[] gray = null, alpha = null;
@@ -122,22 +121,19 @@ public class Res9patchStreamDecoder implements ResStreamDecoder {
         }
     }
 
-    private NinePatch getNinePatch(byte[] data) throws AndrolibException,
-        IOException {
+    private NinePatch getNinePatch(byte[] data) throws AndrolibException, IOException {
         ExtDataInput di = new ExtDataInput(new ByteArrayInputStream(data));
         find9patchChunk(di, NP_CHUNK_TYPE);
         return NinePatch.decode(di);
     }
 
-    private OpticalInset getOpticalInset(byte[] data) throws AndrolibException,
-        IOException {
+    private OpticalInset getOpticalInset(byte[] data) throws AndrolibException, IOException {
         ExtDataInput di = new ExtDataInput(new ByteArrayInputStream(data));
         find9patchChunk(di, OI_CHUNK_TYPE);
         return OpticalInset.decode(di);
     }
 
-    private void find9patchChunk(DataInput di, int magic) throws AndrolibException,
-        IOException {
+    private void find9patchChunk(DataInput di, int magic) throws AndrolibException, IOException {
         di.skipBytes(8);
         while (true) {
             int size;
@@ -174,8 +170,8 @@ public class Res9patchStreamDecoder implements ResStreamDecoder {
         public final int padLeft, padRight, padTop, padBottom;
         public final int[] xDivs, yDivs;
 
-        public NinePatch(int padLeft, int padRight, int padTop, int padBottom,
-                         int[] xDivs, int[] yDivs) {
+        public NinePatch(
+                int padLeft, int padRight, int padTop, int padBottom, int[] xDivs, int[] yDivs) {
             this.padLeft = padLeft;
             this.padRight = padRight;
             this.padTop = padTop;
@@ -205,8 +201,11 @@ public class Res9patchStreamDecoder implements ResStreamDecoder {
     private static class OpticalInset {
         public final int layoutBoundsLeft, layoutBoundsTop, layoutBoundsRight, layoutBoundsBottom;
 
-        public OpticalInset(int layoutBoundsLeft, int layoutBoundsTop,
-                            int layoutBoundsRight, int layoutBoundsBottom) {
+        public OpticalInset(
+                int layoutBoundsLeft,
+                int layoutBoundsTop,
+                int layoutBoundsRight,
+                int layoutBoundsBottom) {
             this.layoutBoundsLeft = layoutBoundsLeft;
             this.layoutBoundsTop = layoutBoundsTop;
             this.layoutBoundsRight = layoutBoundsRight;
@@ -218,8 +217,8 @@ public class Res9patchStreamDecoder implements ResStreamDecoder {
             int layoutBoundsTop = Integer.reverseBytes(di.readInt());
             int layoutBoundsRight = Integer.reverseBytes(di.readInt());
             int layoutBoundsBottom = Integer.reverseBytes(di.readInt());
-            return new OpticalInset(layoutBoundsLeft, layoutBoundsTop,
-                layoutBoundsRight, layoutBoundsBottom);
+            return new OpticalInset(
+                    layoutBoundsLeft, layoutBoundsTop, layoutBoundsRight, layoutBoundsBottom);
         }
     }
 }

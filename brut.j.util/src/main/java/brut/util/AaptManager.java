@@ -35,7 +35,7 @@ public class AaptManager {
         File aaptBinary;
         String aaptVersion = getAaptBinaryName(version);
 
-        if (! OSDetection.is64Bit() && OSDetection.isMacOSX()) {
+        if (!OSDetection.is64Bit() && OSDetection.isMacOSX()) {
             throw new BrutException("32 bit OS detected. No 32 bit binaries available.");
         }
 
@@ -44,11 +44,15 @@ public class AaptManager {
 
         try {
             if (OSDetection.isMacOSX()) {
-                aaptBinary = Jar.getResourceAsFile("/prebuilt/macosx/" + aaptVersion, AaptManager.class);
+                aaptBinary =
+                        Jar.getResourceAsFile("/prebuilt/macosx/" + aaptVersion, AaptManager.class);
             } else if (OSDetection.isUnix()) {
-                aaptBinary = Jar.getResourceAsFile("/prebuilt/linux/" + aaptVersion, AaptManager.class);
+                aaptBinary =
+                        Jar.getResourceAsFile("/prebuilt/linux/" + aaptVersion, AaptManager.class);
             } else if (OSDetection.isWindows()) {
-                aaptBinary = Jar.getResourceAsFile("/prebuilt/windows/" + aaptVersion + ".exe", AaptManager.class);
+                aaptBinary =
+                        Jar.getResourceAsFile(
+                                "/prebuilt/windows/" + aaptVersion + ".exe", AaptManager.class);
             } else {
                 throw new BrutException("Could not identify platform: " + OSDetection.returnOS());
             }
@@ -64,7 +68,7 @@ public class AaptManager {
     }
 
     public static String getAaptExecutionCommand(String aaptPath, File aapt) throws BrutException {
-        if (! aaptPath.isEmpty()) {
+        if (!aaptPath.isEmpty()) {
             File aaptFile = new File(aaptPath);
             if (aaptFile.canRead() && aaptFile.exists()) {
                 aaptFile.setExecutable(true);
@@ -110,7 +114,8 @@ public class AaptManager {
         String version = OS.execAndReturn(cmd.toArray(new String[0]));
 
         if (version == null) {
-            throw new BrutException("Could not execute aapt binary at location: " + aapt.getAbsolutePath());
+            throw new BrutException(
+                    "Could not execute aapt binary at location: " + aapt.getAbsolutePath());
         }
 
         return getAppVersionFromString(version);

@@ -20,13 +20,11 @@ import brut.androlib.AndrolibException;
 import brut.androlib.res.data.ResResource;
 import brut.androlib.res.xml.ResValuesXmlSerializable;
 import brut.util.Duo;
-import org.xmlpull.v1.XmlSerializer;
-
 import java.io.IOException;
 import java.util.Arrays;
+import org.xmlpull.v1.XmlSerializer;
 
-public class ResArrayValue extends ResBagValue implements
-        ResValuesXmlSerializable {
+public class ResArrayValue extends ResBagValue implements ResValuesXmlSerializable {
 
     ResArrayValue(ResReferenceValue parent, Duo<Integer, ResScalarValue>[] items) {
         super(parent);
@@ -43,8 +41,8 @@ public class ResArrayValue extends ResBagValue implements
     }
 
     @Override
-    public void serializeToResValuesXml(XmlSerializer serializer,
-                                        ResResource res) throws IOException, AndrolibException {
+    public void serializeToResValuesXml(XmlSerializer serializer, ResResource res)
+            throws IOException, AndrolibException {
         String type = getType();
         type = (type == null ? "" : type + "-") + "array";
         serializer.startTag(null, type);

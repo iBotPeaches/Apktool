@@ -16,38 +16,39 @@
  */
 package brut.androlib.decode;
 
+import static org.junit.Assert.*;
+
 import brut.androlib.ApkDecoder;
 import brut.androlib.BaseTest;
 import brut.androlib.TestUtils;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
 import brut.util.OS;
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
-
-import static org.junit.Assert.*;
-
 public class ForceManifestDecodeNoResourcesTest extends BaseTest {
 
-    private final byte[] xmlHeader = new byte[] {
-            0x3C, // <
-            0x3F, // ?
-            0x78, // x
-            0x6D, // m
-            0x6C, // l
-            0x20, // (empty)
-    };
+    private final byte[] xmlHeader =
+            new byte[] {
+                0x3C, // <
+                0x3F, // ?
+                0x78, // x
+                0x6D, // m
+                0x6C, // l
+                0x20, // (empty)
+            };
 
     @BeforeClass
     public static void beforeClass() throws Exception {
         TestUtils.cleanFrameworkFile();
         sTmpDir = new ExtFile(OS.createTempDirectory());
-        TestUtils.copyResourceDir(ForceManifestDecodeNoResourcesTest.class, "decode/issue1680/", sTmpDir);
+        TestUtils.copyResourceDir(
+                ForceManifestDecodeNoResourcesTest.class, "decode/issue1680/", sTmpDir);
     }
 
     @AfterClass
@@ -61,8 +62,11 @@ public class ForceManifestDecodeNoResourcesTest extends BaseTest {
         String output = sTmpDir + File.separator + apk + ".out";
 
         // decode issue1680.apk
-        decodeFile(sTmpDir + File.separator + apk, ApkDecoder.DECODE_RESOURCES_NONE,
-                ApkDecoder.FORCE_DECODE_MANIFEST_FULL, output);
+        decodeFile(
+                sTmpDir + File.separator + apk,
+                ApkDecoder.DECODE_RESOURCES_NONE,
+                ApkDecoder.FORCE_DECODE_MANIFEST_FULL,
+                output);
 
         // lets probe filetype of manifest, we should detect XML
         File manifestFile = new File(output + File.separator + "AndroidManifest.xml");
@@ -75,13 +79,17 @@ public class ForceManifestDecodeNoResourcesTest extends BaseTest {
     }
 
     @Test
-    public void checkIfForceManifestWorksWithNoChangeToResources() throws BrutException, IOException {
+    public void checkIfForceManifestWorksWithNoChangeToResources()
+            throws BrutException, IOException {
         String apk = "issue1680.apk";
         String output = sTmpDir + File.separator + apk + ".out";
 
         // decode issue1680.apk
-        decodeFile(sTmpDir + File.separator + apk, ApkDecoder.DECODE_RESOURCES_FULL,
-                ApkDecoder.FORCE_DECODE_MANIFEST_FULL, output);
+        decodeFile(
+                sTmpDir + File.separator + apk,
+                ApkDecoder.DECODE_RESOURCES_FULL,
+                ApkDecoder.FORCE_DECODE_MANIFEST_FULL,
+                output);
 
         // lets probe filetype of manifest, we should detect XML
         File manifestFile = new File(output + File.separator + "AndroidManifest.xml");
@@ -94,13 +102,17 @@ public class ForceManifestDecodeNoResourcesTest extends BaseTest {
     }
 
     @Test
-    public void checkForceManifestToFalseWithResourcesEnabledIsIgnored() throws BrutException, IOException {
+    public void checkForceManifestToFalseWithResourcesEnabledIsIgnored()
+            throws BrutException, IOException {
         String apk = "issue1680.apk";
         String output = sTmpDir + File.separator + apk + ".out";
 
         // decode issue1680.apk
-        decodeFile(sTmpDir + File.separator + apk, ApkDecoder.DECODE_RESOURCES_FULL,
-                ApkDecoder.FORCE_DECODE_MANIFEST_NONE, output);
+        decodeFile(
+                sTmpDir + File.separator + apk,
+                ApkDecoder.DECODE_RESOURCES_FULL,
+                ApkDecoder.FORCE_DECODE_MANIFEST_NONE,
+                output);
 
         // lets probe filetype of manifest, we should detect XML
         File manifestFile = new File(output + File.separator + "AndroidManifest.xml");
@@ -118,8 +130,11 @@ public class ForceManifestDecodeNoResourcesTest extends BaseTest {
         String output = sTmpDir + File.separator + apk + ".out";
 
         // decode issue1680.apk
-        decodeFile(sTmpDir + File.separator + apk, ApkDecoder.DECODE_RESOURCES_NONE,
-                ApkDecoder.FORCE_DECODE_MANIFEST_NONE, output);
+        decodeFile(
+                sTmpDir + File.separator + apk,
+                ApkDecoder.DECODE_RESOURCES_NONE,
+                ApkDecoder.FORCE_DECODE_MANIFEST_NONE,
+                output);
 
         // lets probe filetype of manifest, we should not detect XML
         File manifestFile = new File(output + File.separator + "AndroidManifest.xml");
