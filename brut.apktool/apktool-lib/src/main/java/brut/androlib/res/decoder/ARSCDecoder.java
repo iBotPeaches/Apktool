@@ -309,12 +309,12 @@ public class ARSCDecoder {
             if (spec.isDummyResSpec()) {
                 removeResSpec(spec);
 
-                spec = new ResResSpec(resId, mSpecNames.getString(specNamesId), mPkg, mTypeSpec);
+                spec = new ResResSpec(resId, mSpecNames.getString(specNamesId), entryData.mFlags, mPkg, mTypeSpec);
                 mPkg.addResSpec(spec);
                 mTypeSpec.addResSpec(spec);
             }
         } else {
-            spec = new ResResSpec(resId, mSpecNames.getString(specNamesId), mPkg, mTypeSpec);
+            spec = new ResResSpec(resId, mSpecNames.getString(specNamesId), entryData.mFlags, mPkg, mTypeSpec);
             mPkg.addResSpec(spec);
             mTypeSpec.addResSpec(spec);
         }
@@ -511,7 +511,7 @@ public class ARSCDecoder {
                 continue;
             }
 
-            ResResSpec spec = new ResResSpec(new ResID(resId | i), "APKTOOL_DUMMY_" + Integer.toHexString(i), mPkg, mTypeSpec);
+            ResResSpec spec = new ResResSpec(new ResID(resId | i), "APKTOOL_DUMMY_" + Integer.toHexString(i), ENTRY_FLAG_PUBLIC, mPkg, mTypeSpec);
 
             // If we already have this resID dont add it again.
             if (! mPkg.hasResSpec(new ResID(resId | i))) {
@@ -575,7 +575,7 @@ public class ARSCDecoder {
     private final HashMap<Integer, ResTypeSpec> mResTypeSpecs = new HashMap<>();
 
     private final static short ENTRY_FLAG_COMPLEX = 0x0001;
-    private final static short ENTRY_FLAG_PUBLIC = 0x0002;
+    public final static short ENTRY_FLAG_PUBLIC = 0x0002;
     private final static short ENTRY_FLAG_WEAK = 0x0004;
 
     public static class Header {
