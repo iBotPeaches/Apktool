@@ -6,6 +6,7 @@ description: Apktool - Changelog / Roadmap
 
 ## v2.6.1
 2021.xx.xx
+ * Add `apktool-cli` to Maven publishing. ([Issue 2686](https://github.com/iBotPeaches/Apktool/issues/2686))
  * Fix `licenseFormat[Test/Main]` to properly inject variables into license preamble.
  * Support automatic workaround for using private resources. ([Issue 2637](https://github.com/iBotPeaches/Apktool/issues/2637)) (Thanks MrIkso)
 
