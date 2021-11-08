@@ -145,7 +145,7 @@ subprojects {
         }
     }
 
-    def mavenProjects = ['apktool-lib', 'brut.j.common', 'brut.j.util', 'brut.j.dir']
+    def mavenProjects = ['apktool-lib', 'apktool-cli', 'brut.j.common', 'brut.j.util', 'brut.j.dir']
 
     if (project.name in mavenProjects) {
         apply plugin: 'maven-publish'
