@@ -23,7 +23,7 @@ Suggestions: [#2237](https://github.com/iBotPeaches/Apktool/issues/2237)
 ## Qualifier Plugin System
 For some OEMs, past and present. They re-use qualifiers that AOSP ends up using. This with CTS is becoming very
 rare and pretty much a problem of the past, but now custom modifications and more "off the cuff" OEMs are doing
-it. 
+it.
 
 Apktool can't do anything because it stays true to AOSP. It would need a plugin system that controls how to
 read the qualifiers. Or even an override file.
@@ -38,3 +38,8 @@ Crawling the filesystem for non-checked files would be slow especially having to
 parsed files.
 
 Suggestions: [#1366](https://github.com/iBotPeaches/Apktool/issues/1366)
+
+## Multi-threaded
+Applications are getting larger as well as frameworks, but Apktool is getting slower.
+
+Suggestions: [#2685](https://github.com/iBotPeaches/Apktool/issues/2685)
