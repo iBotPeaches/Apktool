@@ -237,6 +237,9 @@ public class Androlib {
             if (in.containsFile("AndroidManifest.xml")) {
                 in.copyToDir(originalDir, "AndroidManifest.xml");
             }
+            if (in.containsFile("stamp-cert-sha256")) {
+                in.copyToDir(originalDir, "stamp-cert-sha256");
+            }
             if (in.containsDir("META-INF")) {
                 in.copyToDir(originalDir, "META-INF");
 
@@ -606,6 +609,10 @@ public class Androlib {
                     if (in.containsFile("AndroidManifest.xml")) {
                         LOGGER.info("Copy AndroidManifest.xml...");
                         in.copyToDir(new File(appDir, APK_DIRNAME), "AndroidManifest.xml");
+                    }
+                    if (in.containsFile("stamp-cert-sha256")) {
+                        LOGGER.info("Copy stamp-cert-sha256...");
+                        in.copyToDir(new File(appDir, APK_DIRNAME), "stamp-cert-sha256");
                     }
                     if (in.containsDir("META-INF")) {
                         LOGGER.info("Copy META-INF...");
