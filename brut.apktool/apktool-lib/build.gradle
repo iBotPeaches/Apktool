@@ -45,7 +45,8 @@ dependencies {
                    depends.xmlpull,
                    depends.guava,
                    depends.commons_lang,
-                   depends.commons_io
+                   depends.commons_io,
+                   depends.commons_text
 
     testImplementation depends.xmlunit
 }
