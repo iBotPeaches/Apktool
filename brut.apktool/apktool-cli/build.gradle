@@ -58,6 +58,7 @@ task proguard(type: ProGuardTask, dependsOn: shadowJar) {
         libraryjars "${System.properties['java.home']}/jmods/java.xml.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
         libraryjars "${System.properties['java.home']}/jmods/java.desktop.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
         libraryjars "${System.properties['java.home']}/jmods/java.sql.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
+        libraryjars "${System.properties['java.home']}/jmods/java.scripting.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
 
         libraryjars "${System.properties['java.home']}/jmods/jdk.unsupported.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
     }
