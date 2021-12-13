@@ -8,6 +8,7 @@ description: Apktool - Changelog / Roadmap
 2021.xx.xx
  * Add `apktool-cli` to Maven publishing. ([Issue 2686](https://github.com/iBotPeaches/Apktool/issues/2686))
  * Add support for signature scheme v4 ([Issue 2687](https://github.com/iBotPeaches/Apktool/issues/2687))
+ * Add `commons-lang` project to remove deprecated methods from `commons-io`. ([Issue 2713](https://github.com/iBotPeaches/Apktool/pull/2713/files))
  * Fix `licenseFormat[Test/Main]` to properly inject variables into license preamble.
  * Support automatic workaround for using private resources. ([Issue 2637](https://github.com/iBotPeaches/Apktool/issues/2637)) (Thanks MrIkso)
 
