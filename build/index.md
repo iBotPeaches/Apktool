@@ -24,7 +24,7 @@ The main project can be found below
 ### Build Steps
 We use gradle to build. It's pretty easy. First clone the repository.
 
-  1. `git clone git://github.com/iBotPeaches/Apktool.git`
+  1. `git clone https://github.com/iBotPeaches/Apktool`
   2. `cd Apktool`
   3. For steps 3-5 use `./gradlew` for unix based systems or `gradlew.bat` for windows.
   4. `[./gradlew][gradlew.bat] build shadowJar` - Builds Apktool, including final binary.
