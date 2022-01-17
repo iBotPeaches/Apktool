@@ -13,6 +13,7 @@ description: Apktool - Changelog / Roadmap
  * Upgrade to `guava 31.0.1` (Thanks Goooler)
  * Upgrade to `jengelman.shadow 7.1.0` (Thanks Goooler)
  * Fix `licenseFormat[Test/Main]` to properly inject variables into license preamble.
+ * Fix temp files being written into `/tmp` and not automatically removed. ([Issue 2739](https://github.com/iBotPeaches/Apktool/issues/2739))
  * Support automatic workaround for using private resources. ([Issue 2637](https://github.com/iBotPeaches/Apktool/issues/2637)) (Thanks MrIkso)
 
 ## v2.6.0
