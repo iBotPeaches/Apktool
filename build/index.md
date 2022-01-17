@@ -22,13 +22,13 @@ The main project can be found below
   * git
 
 ### Build Steps
-We use gradle to build. It's pretty easy. First clone the repository.
+We use gradle to build. First clone the repository using either 
+[SSH](git@github.com:iBotPeaches/Apktool.git) or [HTTPS](https://github.com/iBotPeaches/Apktool.git).
 
-  1. `git clone git://github.com/iBotPeaches/Apktool.git`
-  2. `cd Apktool`
-  3. For steps 3-5 use `./gradlew` for unix based systems or `gradlew.bat` for windows.
-  4. `[./gradlew][gradlew.bat] build shadowJar` - Builds Apktool, including final binary.
-  5. Optional (You may build a Proguard jar) `[./gradlew][gradlew.bat] build shadowJar proguard`
+  1. `cd Apktool`
+  2. For remaining steps use `./gradlew` for unix based systems or `gradlew.bat` for windows.
+  3. `[./gradlew][gradlew.bat] build shadowJar` - Builds Apktool, including final binary.
+  4. Optional (You may build a Proguard jar) `[./gradlew][gradlew.bat] build shadowJar proguard`
   
 After build completes you should have a jar file at:
 `./brut.apktool/apktool-cli/build/libs/apktool-xxxxx.jar`
