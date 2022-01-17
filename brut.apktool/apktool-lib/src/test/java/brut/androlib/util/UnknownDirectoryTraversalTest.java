@@ -26,6 +26,7 @@ import brut.directory.ExtFile;
 import brut.util.BrutIO;
 import brut.util.OS;
 import brut.util.OSDetection;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -41,6 +42,11 @@ public class UnknownDirectoryTraversalTest extends BaseTest {
     public static void beforeClass() throws Exception {
         sTmpDir = new ExtFile(OS.createTempDirectory());
         TestUtils.copyResourceDir(UnknownDirectoryTraversalTest.class, "util/traversal", sTmpDir);
+    }
+
+    @AfterClass
+    public static void afterClass() throws BrutException {
+        OS.rmdir(sTmpDir);
     }
 
     @Test
