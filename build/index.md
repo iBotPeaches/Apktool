@@ -23,7 +23,7 @@ The main project can be found below
 
 ### Build Steps
 We use gradle to build. First clone the repository using either 
-[SSH](git@github.com:iBotPeaches/Apktool.git) or [HTTPS](https://github.com/iBotPeaches/Apktool.git).
+[SSH](ssh://git@github.com:iBotPeaches/Apktool.git) or [HTTPS](https://github.com/iBotPeaches/Apktool.git).
 
   1. `cd Apktool`
   2. For remaining steps use `./gradlew` for unix based systems or `gradlew.bat` for windows.
