@@ -562,6 +562,8 @@ public class Androlib {
 
                 Directory tmpDir = new ExtFile(apkFile).getDirectory();
                 tmpDir.copyToDir(apkDir, APK_MANIFEST_FILENAMES);
+
+                apkFile.delete();
             }
             return true;
         } catch (IOException | DirectoryException ex) {
