@@ -498,7 +498,8 @@ public class Androlib {
                                 "AndroidManifest.xml"), new File(appDir, "res"),
                         ninePatch, null, parseUsesFramework(usesFramework));
 
-                Directory tmpDir = new ExtFile(apkFile).getDirectory();
+                ExtFile tmpExtFile = new ExtFile(apkFile);
+                Directory tmpDir = tmpExtFile.getDirectory();
 
                 // Sometimes an application is built with a resources.arsc file with no resources,
                 // Apktool assumes it will have a rebuilt arsc file, when it doesn't. So if we
@@ -509,6 +510,8 @@ public class Androlib {
                                     : APK_RESOURCES_WITHOUT_RES_FILENAMES);
                 } catch (DirectoryException ex) {
                     LOGGER.warning(ex.getMessage());
+                } finally {
+                    tmpExtFile.close();
                 }
 
                 // delete tmpDir
