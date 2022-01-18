@@ -16,7 +16,6 @@
  */
 package brut.androlib.res.data.value;
 
-import brut.androlib.AndrolibException;
 import brut.androlib.res.data.ResResource;
 import brut.androlib.res.xml.ResValuesXmlSerializable;
 import org.xmlpull.v1.XmlSerializer;
@@ -25,11 +24,9 @@ import java.io.IOException;
 
 public class ResIdValue extends ResValue implements ResValuesXmlSerializable {
     @Override
-    public void serializeToResValuesXml(XmlSerializer serializer,
-                                        ResResource res) throws IOException, AndrolibException {
+    public void serializeToResValuesXml(XmlSerializer serializer, ResResource res) throws IOException {
         serializer.startTag(null, "item");
-        serializer
-                .attribute(null, "type", res.getResSpec().getType().getName());
+        serializer.attribute(null, "type", res.getResSpec().getType().getName());
         serializer.attribute(null, "name", res.getResSpec().getName());
         serializer.endTag(null, "item");
     }
