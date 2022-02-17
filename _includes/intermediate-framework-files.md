@@ -1,8 +1,8 @@
 As you probably know, Android apps utilize code and resources that are found on the Android OS itself. These are known as framework resources and Apktool relies on these
-to properly decode and build apks.
+to properly decode and build apks. AOSP defined resources can be found at <a target="_blank" href="https://android.googlesource.com/platform/frameworks/base/+/master/core/res/res/values/public.xml">public.xml</a>.
 <br /><br />
 Every Apktool release contains internally the most up to date AOSP framework at the time of the release. This allows you to decode and build most apks without a problem.
-However, manufacturers add their own framework files in addition to the regular AOSP ones. To use apktool against these manufacturer apks you must first install the 
+However, manufacturers add their own framework files in addition to the regular AOSP ones. To use apktool against these manufacturer apks you must first install the
 manufacturer framework files.
 <h4><strong>Example</strong></h4>
 Lets say you want to decode <code>HtcContacts.apk</code> from an HTC device. If you try you will get an error message.
@@ -24,7 +24,7 @@ I: Framework installed to: 2.apk
 
 Now we will try this decode again.
 {% highlight console %}
-$ apktool d HtcContacts.apk 
+$ apktool d HtcContacts.apk
 I: Loading resource table...
 I: Decoding resources...
 I: Loading resource table from file: /home/brutall/apktool/framework/1.apk
