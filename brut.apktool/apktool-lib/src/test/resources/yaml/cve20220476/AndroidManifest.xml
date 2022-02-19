@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?><manifest xmlns:android="http://schemas.android.com/apk/res/android" android:compileSdkVersion="30" android:compileSdkVersionCodename="11" package="com.ibotpeaches.cve20220476" platformBuildVersionCode="30" platformBuildVersionName="11">
+    <application android:debuggable="true" android:forceQueryable="true">
+    </application>
+</manifest>
