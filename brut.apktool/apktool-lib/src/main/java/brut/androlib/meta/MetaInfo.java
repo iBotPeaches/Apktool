@@ -43,11 +43,11 @@ public class MetaInfo {
         DumperOptions options = new DumperOptions();
         options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
 
-        StringExRepresent representer = new StringExRepresent();
+        EscapedStringRepresenter representer = new EscapedStringRepresenter();
         PropertyUtils propertyUtils = representer.getPropertyUtils();
         propertyUtils.setSkipMissingProperties(true);
 
-        return new Yaml(new StringExConstructor(), representer, options);
+        return new Yaml(new ClassSafeConstructor(), representer, options);
     }
 
     public void save(Writer output) {
