@@ -19,8 +19,8 @@ package brut.androlib.meta;
 import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.representer.Representer;
 
-public class StringExRepresent extends Representer {
-    public StringExRepresent() {
+public class EscapedStringRepresenter extends Representer {
+    public EscapedStringRepresenter() {
         RepresentStringEx representStringEx = new RepresentStringEx();
         multiRepresenters.put(String.class, representStringEx);
         representers.put(String.class, representStringEx);
