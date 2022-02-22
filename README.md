@@ -10,7 +10,7 @@ This repository contains the files used in generating the Github Pages site. It'
 3. Clone repo `git clone git@github.com:iBotPeaches/Apktool.git`
 4. Checkout wiki `git checkout gh-pages`
 5. Install dependencies `bundle install`
-6. Spin up local server `bundle exec jekyll server`
+6. Spin up local server `bundle exec jekyll serve`
 
 ## Known Issues
 
