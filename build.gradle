@@ -45,8 +45,8 @@ buildscript {
 
 apply from: 'gradle/functions.gradle'
 
-version = '2.6.1'
-def suffix = ''
+version = '2.6.2'
+def suffix = 'SNAPSHOT'
 
 defaultTasks 'build', 'shadowJar', 'proguard'
 
