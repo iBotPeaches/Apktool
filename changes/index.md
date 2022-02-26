@@ -5,7 +5,7 @@ description: Apktool - Changelog / Roadmap
 ---
 
 ## v2.6.1
-2021.xx.xx
+2022.02.26
  * Add `apktool-cli` to Maven publishing. ([Issue 2686](https://github.com/iBotPeaches/Apktool/issues/2686))
  * Add support for signature scheme v4 ([Issue 2687](https://github.com/iBotPeaches/Apktool/issues/2687))
  * Add `commons-lang` project to remove deprecated methods from `commons-io`. ([Issue 2713](https://github.com/iBotPeaches/Apktool/pull/2713/files)) (Thanks alsutton)
