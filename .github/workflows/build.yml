@@ -61,7 +61,7 @@ jobs:
       fail-fast: true
       matrix:
         os: [ ubuntu-latest, macOS-latest, windows-latest ]
-        java: [ 8, 9, 10, 11, 12, 13, 14, 15, 16 ]
+        java: [ 8, 9, 10, 11, 12, 13, 14, 15, 16, 17 ]
 
     steps:
       - uses: actions/checkout@v3
