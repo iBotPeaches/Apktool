@@ -17,7 +17,7 @@ jobs:
     runs-on: macos-latest
     strategy:
       matrix:
-        file: [aapt_64, aapt2_64]
+        file: [ aapt_64, aapt2_64 ]
 
     steps:
       - uses: actions/checkout@v2
@@ -32,7 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        file: [aapt, aapt_64, aapt2, aapt2_64]
+        file: [ aapt, aapt_64, aapt2, aapt2_64 ]
 
     steps:
       - uses: actions/checkout@v2
@@ -47,7 +47,7 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        file: [aapt.exe, aapt_64.exe, aapt2.exe, aapt2_64.exe]
+        file: [ aapt.exe, aapt_64.exe, aapt2.exe, aapt2_64.exe ]
 
     steps:
       - uses: actions/checkout@v2
@@ -72,13 +72,6 @@ jobs:
         java: [ 8, 9, 10, 11, 12, 13, 14, 15, 16 ]
 
     steps:
-      - uses: actions/cache@v2
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ matrix.java }}-${{ hashFiles('**/*.gradle*') }}
-          restore-keys: ${{ runner.os }}-${{ matrix.java }}-gradle-
 
       - uses: actions/checkout@v2
 
@@ -90,11 +83,15 @@ jobs:
 
       - name: Build and test
         if: startsWith(matrix.os, 'windows') == true
-        run: ./gradlew.bat build shadowJar proguard
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: build shadowJar proguard
 
       - name: Build and test
         if: startsWith(matrix.os, 'windows') != true
-        run: ./gradlew build shadowJar proguard
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: build shadowJar proguard
 
   upload-artifact:
     runs-on: ubuntu-latest
@@ -104,14 +101,6 @@ jobs:
       - build-and-test-with-Java-8-and-later
 
     steps:
-      - uses: actions/cache@v2
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ matrix.java }}-${{ hashFiles('**/*.gradle*') }}
-          restore-keys: ${{ runner.os }}-${{ matrix.java }}-gradle-
-
       - uses: actions/checkout@v2
 
       - name: Set up JDK 10
@@ -121,7 +110,9 @@ jobs:
           java-version: 10
 
       - name: Build
-        run: ./gradlew build shadowJar proguard
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: build shadowJar proguard
 
       - name: Upload
         uses: actions/upload-artifact@v2
