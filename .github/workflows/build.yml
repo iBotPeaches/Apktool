@@ -1,6 +1,4 @@
 name: CI
-env:
-  BINARY_PATH: brut.apktool/apktool-lib/src/main/resources/prebuilt
 on:
   push:
     branches:
@@ -12,19 +10,19 @@ on:
       - 'brut.apktool/apktool-lib/src/main/resources/**'
       - '.github/workflows/**'
 
+env:
+  BINARY_PATH: brut.apktool/apktool-lib/src/main/resources/prebuilt
+
 jobs:
   analyze-mac-aapt:
     runs-on: macos-latest
     strategy:
       matrix:
         file: [ aapt_64, aapt2_64 ]
-
     steps:
       - uses: actions/checkout@v3
-
       - name: Verify Executable
         run: ${{ env.BINARY_PATH }}/macosx/${{ matrix.file }} version
-
       - name: Output Static
         run: otool -L ${{ env.BINARY_PATH }}/macosx/${{ matrix.file }} || true
 
@@ -33,13 +31,10 @@ jobs:
     strategy:
       matrix:
         file: [ aapt, aapt_64, aapt2, aapt2_64 ]
-
     steps:
       - uses: actions/checkout@v3
-
       - name: Verify Executable
         run: ${{ env.BINARY_PATH }}/linux/${{ matrix.file }} version
-
       - name: Output Static
         run: ldd ${{ env.BINARY_PATH }}/linux/${{ matrix.file }} || true
 
@@ -48,13 +43,10 @@ jobs:
     strategy:
       matrix:
         file: [ aapt.exe, aapt_64.exe, aapt2.exe, aapt2_64.exe ]
-
     steps:
       - uses: actions/checkout@v3
-
       - name: Verify Executable
         run: ${{ env.BINARY_PATH }}/windows/${{ matrix.file }} version
-
       - name: Output Static
         run: ldd ${{ env.BINARY_PATH }}/windows/${{ matrix.file }} || true
 
@@ -72,15 +64,11 @@ jobs:
         java: [ 8, 9, 10, 11, 12, 13, 14, 15, 16 ]
 
     steps:
-
       - uses: actions/checkout@v3
-
-      - name: Set up JDK ${{ matrix.java }}
-        uses: actions/setup-java@v3
+      - uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
           java-version: ${{ matrix.java }}
-
       - name: Build and test
         if: startsWith(matrix.os, 'windows') == true
         uses: gradle/gradle-build-action@v2
@@ -99,21 +87,16 @@ jobs:
     if: github.repository == 'iBotPeaches/Apktool' && github.ref == 'refs/heads/master'
     needs:
       - build-and-test-with-Java-8-and-later
-
     steps:
       - uses: actions/checkout@v3
-
-      - name: Set up JDK 10
-        uses: actions/setup-java@v3
+      - uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
           java-version: 10
-
       - name: Build
         uses: gradle/gradle-build-action@v2
         with:
           arguments: build shadowJar proguard
-
       - name: Upload
         uses: actions/upload-artifact@v2
         with:
@@ -123,23 +106,18 @@ jobs:
   analyze:
     name: Analyze
     runs-on: ubuntu-latest
-
     strategy:
       fail-fast: false
       matrix:
         language: [ 'java' ]
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v1
         with:
           languages: ${{ matrix.language }}
-
       - name: Autobuild
         uses: github/codeql-action/autobuild@v1
-
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v1
