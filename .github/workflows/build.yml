@@ -98,7 +98,7 @@ jobs:
         with:
           arguments: build shadowJar proguard
       - name: Upload
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: apktool.jar
           path: brut.apktool/apktool-cli/build/libs/apktool-*-small.jar
