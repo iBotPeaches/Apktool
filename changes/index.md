@@ -4,6 +4,11 @@ title: Apktool - Changelog
 description: Apktool - Changelog / Roadmap
 ---
 
+## v2.6.2 (Unreleased)
+2022.xx.xx
+ * Add SDK S v2 (API 32) support. ([Issue 2776](https://github.com/iBotPeaches/Apktool/issues/2776))
+ * Upgrade CI Workflow to leverage latest actions. (Thanks Goooler)
+
 ## v2.6.1
 2022.02.26
  * Add `apktool-cli` to Maven publishing. ([Issue 2686](https://github.com/iBotPeaches/Apktool/issues/2686))
