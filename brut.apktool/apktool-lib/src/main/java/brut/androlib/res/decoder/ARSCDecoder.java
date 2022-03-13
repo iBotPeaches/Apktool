@@ -87,7 +87,7 @@ public class ARSCDecoder {
     }
 
     private ResPackage readTablePackage() throws IOException, AndrolibException {
-        checkChunkType(Header.TYPE_PACKAGE);
+        checkChunkType(Header.XML_TYPE_PACKAGE);
         int id = mIn.readInt();
 
         if (id == 0) {
@@ -128,10 +128,10 @@ public class ARSCDecoder {
         boolean flag = true;
         while (flag) {
             switch (mHeader.type) {
-                case Header.TYPE_LIBRARY:
+                case Header.XML_TYPE_LIBRARY:
                     readLibraryType();
                     break;
-                case Header.TYPE_SPEC_TYPE:
+                case Header.XML_TYPE_SPEC_TYPE:
                     readTableTypeSpec();
                     break;
                 default:
@@ -144,7 +144,7 @@ public class ARSCDecoder {
     }
 
     private void readLibraryType() throws AndrolibException, IOException {
-        checkChunkType(Header.TYPE_LIBRARY);
+        checkChunkType(Header.XML_TYPE_LIBRARY);
         int libraryCount = mIn.readInt();
 
         int packageId;
@@ -156,7 +156,7 @@ public class ARSCDecoder {
             LOGGER.info(String.format("Decoding Shared Library (%s), pkgId: %d", packageName, packageId));
         }
 
-        while(nextChunk().type == Header.TYPE_TYPE) {
+        while(nextChunk().type == Header.XML_TYPE_TYPE) {
             readTableTypeSpec();
         }
     }
@@ -168,7 +168,7 @@ public class ARSCDecoder {
         int type = nextChunk().type;
         ResTypeSpec resTypeSpec;
 
-        while (type == Header.TYPE_SPEC_TYPE) {
+        while (type == Header.XML_TYPE_SPEC_TYPE) {
             resTypeSpec = readSingleTableTypeSpec();
             addTypeSpec(resTypeSpec);
             type = nextChunk().type;
@@ -180,7 +180,7 @@ public class ARSCDecoder {
             }
         }
 
-        while (type == Header.TYPE_TYPE) {
+        while (type == Header.XML_TYPE_TYPE) {
             readTableType();
 
             // skip "TYPE 8 chunks" and/or padding data at the end of this chunk
@@ -196,7 +196,7 @@ public class ARSCDecoder {
     }
 
     private ResTypeSpec readSingleTableTypeSpec() throws AndrolibException, IOException {
-        checkChunkType(Header.TYPE_SPEC_TYPE);
+        checkChunkType(Header.XML_TYPE_SPEC_TYPE);
         int id = mIn.readUnsignedByte();
         mIn.skipBytes(3);
         int entryCount = mIn.readInt();
@@ -212,7 +212,7 @@ public class ARSCDecoder {
     }
 
     private ResType readTableType() throws IOException, AndrolibException {
-        checkChunkType(Header.TYPE_TYPE);
+        checkChunkType(Header.XML_TYPE_TYPE);
         int typeId = mIn.readUnsignedByte() - mTypeIdOffset;
         if (mResTypeSpecs.containsKey(typeId)) {
             mResId = (0xff000000 & mResId) | mResTypeSpecs.get(typeId).getId() << 16;
@@ -604,8 +604,18 @@ public class ARSCDecoder {
             return new Header(type, in.readShort(), in.readInt(), start);
         }
 
-        public final static short TYPE_NONE = -1, TYPE_TABLE = 0x0002,
-                TYPE_PACKAGE = 0x0200, TYPE_TYPE = 0x0201, TYPE_SPEC_TYPE = 0x0202, TYPE_LIBRARY = 0x0203;
+        public final static short TYPE_NONE = -1;
+        public final static short TYPE_STRING_POOL = 0x0001;
+        public final static short TYPE_TABLE = 0x0002;
+        public final static short TYPE_XML = 0x0003;
+
+        public final static short XML_TYPE_PACKAGE = 0x0200;
+        public final static short XML_TYPE_TYPE = 0x0201;
+        public final static short XML_TYPE_SPEC_TYPE = 0x0202;
+        public final static short XML_TYPE_LIBRARY = 0x0203;
+        public final static short XML_TYPE_OVERLAY = 0x0204;
+        public final static short XML_TYPE_OVERLAY_POLICY = 0x0205;
+        public final static short XML_TYPE_STAGED_ALIAS = 0x0206;
     }
 
     public static class FlagsOffset {
