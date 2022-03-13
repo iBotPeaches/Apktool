@@ -134,6 +134,9 @@ public class ARSCDecoder {
                 case Header.XML_TYPE_SPEC_TYPE:
                     readTableTypeSpec();
                     break;
+                case Header.XML_TYPE_STAGED_ALIAS:
+                    readStagedAliasSpec();
+                    break;
                 default:
                     flag = false;
                     break;
@@ -159,6 +162,17 @@ public class ARSCDecoder {
         while(nextChunk().type == Header.XML_TYPE_TYPE) {
             readTableTypeSpec();
         }
+    }
+
+    private void readStagedAliasSpec() throws IOException {
+        int count = mIn.readInt();
+
+        for (int i = 0; i < count; i++) {
+            /* stagedResId */mIn.skipInt();
+            /* finalizedResId */mIn.skipInt();
+        }
+
+        nextChunk();
     }
 
     private void readTableTypeSpec() throws AndrolibException, IOException {
