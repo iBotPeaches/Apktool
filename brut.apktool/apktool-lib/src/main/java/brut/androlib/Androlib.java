@@ -705,6 +705,7 @@ public class Androlib {
                 BufferedInputStream unknownFile = new BufferedInputStream(new FileInputStream(inputFile));
                 CRC32 crc = BrutIO.calculateCrc(unknownFile);
                 newEntry.setCrc(crc.getValue());
+                unknownFile.close();
             } else {
                 newEntry.setMethod(ZipEntry.DEFLATED);
             }
