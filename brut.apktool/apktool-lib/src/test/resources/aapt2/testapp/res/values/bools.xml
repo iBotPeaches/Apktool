@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <item type="bool" name="bool_private_reference">@*android:bool/config_enableActivityRecognitionHardwareOverlay</item>
-</resources>

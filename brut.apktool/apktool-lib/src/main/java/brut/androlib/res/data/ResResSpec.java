@@ -18,7 +18,6 @@ package brut.androlib.res.data;
 
 import brut.androlib.AndrolibException;
 import brut.androlib.err.UndefinedResObjectException;
-import brut.androlib.res.decoder.ARSCDecoder;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.LinkedHashMap;
@@ -29,13 +28,11 @@ import java.util.Set;
 public class ResResSpec {
     private final ResID mId;
     private final String mName;
-    private final int mFlags;
     private final ResPackage mPackage;
     private final ResTypeSpec mType;
     private final Map<ResConfigFlags, ResResource> mResources = new LinkedHashMap<>();
 
-    public ResResSpec(ResID id, String name, int flags, ResPackage pkg, ResTypeSpec type) {
-        this.mFlags = flags;
+    public ResResSpec(ResID id, String name, ResPackage pkg, ResTypeSpec type) {
         this.mId = id;
         String cleanName;
 
@@ -75,19 +72,13 @@ public class ResResSpec {
         return mResources.containsKey(new ResConfigFlags());
     }
 
-    public boolean isPublicResource() {
-        return (getFlags() & ARSCDecoder.ENTRY_FLAG_PUBLIC) != 0;
-    }
-
     public String getFullName(ResPackage relativeToPackage, boolean excludeType) {
         return getFullName(getPackage().equals(relativeToPackage), excludeType);
     }
 
     public String getFullName(boolean excludePackage, boolean excludeType) {
-        String privateSuffix = isPublicResource() ? "" : "*";
-        String packageName = excludePackage ? "" : getPackage().getName() + ":";
-        return (packageName.isEmpty() ? "" : privateSuffix + packageName)
-            + (excludeType ? "" : getType().getName() + "/") + getName();
+        return (excludePackage ? "" : getPackage().getName() + ":")
+                + (excludeType ? "" : getType().getName() + "/") + getName();
     }
 
     public ResID getId() {
@@ -104,10 +95,6 @@ public class ResResSpec {
 
     public ResTypeSpec getType() {
         return mType;
-    }
-
-    public int getFlags() {
-        return mFlags;
     }
 
     public boolean isDummyResSpec() {
