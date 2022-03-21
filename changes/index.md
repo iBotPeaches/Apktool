@@ -10,6 +10,7 @@ description: Apktool - Changelog / Roadmap
  * Add support for newest `ResourcesTypes.h` specs (policy, overlay and staged alias). ([Issue 2714](https://github.com/iBotPeaches/Apktool/issues/2714))
  * Fix resource unclosed during unknown file handling. ([Issue 2473](https://github.com/iBotPeaches/Apktool/issues/2473)) / (Thanks 
 auermich93)
+ * Revert automatic workaround for using private resources. ([PR 2785](https://github.com/iBotPeaches/Apktool/pull/2785))
  * Upgrade CI Workflow to leverage latest actions. (Thanks Goooler)
 
 ## v2.6.1
