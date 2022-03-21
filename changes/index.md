@@ -7,6 +7,7 @@ description: Apktool - Changelog / Roadmap
 ## v2.6.2 (Unreleased)
 2022.xx.xx
  * Add SDK S v2 (API 32) support. ([Issue 2776](https://github.com/iBotPeaches/Apktool/issues/2776))
+ * Add support for newest `ResourcesTypes.h` specs (policy, overlay and staged alias). ([Issue 2714](https://github.com/iBotPeaches/Apktool/issues/2714))
  * Fix resource unclosed during unknown file handling. ([Issue 2473](https://github.com/iBotPeaches/Apktool/issues/2473)) / (Thanks 
 auermich93)
  * Upgrade CI Workflow to leverage latest actions. (Thanks Goooler)
