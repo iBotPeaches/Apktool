@@ -128,11 +128,14 @@ public class ARSCDecoder {
         boolean flag = true;
         while (flag) {
             switch (mHeader.type) {
+                case Header.XML_TYPE_SPEC_TYPE:
+                    readTableTypeSpec();
+                    break;
                 case Header.XML_TYPE_LIBRARY:
                     readLibraryType();
                     break;
-                case Header.XML_TYPE_SPEC_TYPE:
-                    readTableTypeSpec();
+                case Header.XML_TYPE_OVERLAY:
+                    readOverlaySpec();
                     break;
                 case Header.XML_TYPE_STAGED_ALIAS:
                     readStagedAliasSpec();
@@ -168,8 +171,18 @@ public class ARSCDecoder {
         int count = mIn.readInt();
 
         for (int i = 0; i < count; i++) {
-            /* stagedResId */mIn.skipInt();
-            /* finalizedResId */mIn.skipInt();
+            LOGGER.info(String.format("Skipping staged alias stagedId (%h) finalId: %h", mIn.readInt(), mIn.readInt()));
+        }
+
+        nextChunk();
+    }
+
+    private void readOverlaySpec() throws IOException {
+        /* policyFlags */mIn.skipInt();
+        int count = mIn.readInt();
+
+        for (int i = 0; i < count; i++) {
+            LOGGER.info(String.format("Skipping overlay (%h)", mIn.readInt()));
         }
 
         nextChunk();
