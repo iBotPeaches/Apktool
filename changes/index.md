@@ -12,6 +12,7 @@ description: Apktool - Changelog / Roadmap
  * Fix resource unclosed during unknown file handling. ([Issue 2473](https://github.com/iBotPeaches/Apktool/issues/2473)) / (Thanks 
 auermich93)
  * Fix support for `uses-native-library` in Manifest. ([Issue 2778](https://github.com/iBotPeaches/Apktool/issues/2778))
+ * Fix support for `usesPermissionFlags` in Manifest. ([Issue 2789](https://github.com/iBotPeaches/Apktool/issues/2789))
  * Revert automatic workaround for using private resources. ([PR 2785](https://github.com/iBotPeaches/Apktool/pull/2785), [Issue 2771](https://github.com/iBotPeaches/Apktool/issues/2771))
  * Upgrade CI Workflow to leverage latest actions. (Thanks Goooler)
 
