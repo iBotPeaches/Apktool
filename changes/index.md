@@ -8,9 +8,11 @@ description: Apktool - Changelog / Roadmap
 2022.xx.xx
  * Add SDK S v2 (API 32) support. ([Issue 2776](https://github.com/iBotPeaches/Apktool/issues/2776))
  * Add support for newest `ResourcesTypes.h` specs (policy, overlay and staged alias). ([Issue 2714](https://github.com/iBotPeaches/Apktool/issues/2714))
+ * Add updated internal aapt2/aapt2 binaries. ([Issue 2787](https://github.com/iBotPeaches/Apktool/pull/2787))
  * Fix resource unclosed during unknown file handling. ([Issue 2473](https://github.com/iBotPeaches/Apktool/issues/2473)) / (Thanks 
 auermich93)
- * Revert automatic workaround for using private resources. ([PR 2785](https://github.com/iBotPeaches/Apktool/pull/2785))
+ * Fix support for `uses-native-library` in Manifest. ([Issue 2778](https://github.com/iBotPeaches/Apktool/issues/2778))
+ * Revert automatic workaround for using private resources. ([PR 2785](https://github.com/iBotPeaches/Apktool/pull/2785), [Issue 2771](https://github.com/iBotPeaches/Apktool/issues/2771))
  * Upgrade CI Workflow to leverage latest actions. (Thanks Goooler)
 
 ## v2.6.1
