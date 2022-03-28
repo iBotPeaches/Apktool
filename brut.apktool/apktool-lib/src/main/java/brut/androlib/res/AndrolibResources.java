@@ -429,6 +429,8 @@ final public class AndrolibResources {
         cmd.add("--no-version-transitions");
         cmd.add("--no-resource-deduping");
 
+        cmd.add("--allow-reserved-package-id");
+
         if (mSparseResources) {
             cmd.add("--enable-sparse-encoding");
         }
