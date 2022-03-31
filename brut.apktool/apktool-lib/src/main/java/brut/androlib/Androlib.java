@@ -36,6 +36,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.jf.dexlib2.iface.DexFile;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 import java.io.*;
 import java.util.*;
 import java.util.logging.Logger;
@@ -486,6 +488,25 @@ public class Androlib {
                     }
                 }
 
+                if (buildOptions.netSecConf) {
+                    MetaInfo meta = readMetaFile(new ExtFile(appDir));
+                    if (meta.sdkInfo != null && meta.sdkInfo.get("targetSdkVersion") != null) {
+                        if (Integer.parseInt(meta.sdkInfo.get("targetSdkVersion")) < 24) {
+                            LOGGER.warning("Target SDK version is lower than 24! Network Security Configuration might be ignored!");
+                        }
+                    }
+                    File netSecConfOrig = new File(appDir, "res/xml/network_security_config.xml");
+                    if (netSecConfOrig.exists()) {
+                        netSecConfOrig.delete();
+                    }
+                    ResXmlPatcher.modNetworkSecurityConfig(netSecConfOrig);
+
+
+                    ResXmlPatcher.setNetworkSecurityConfig(new File(appDir, "AndroidManifest.xml"));
+                    LOGGER.info("Added permissive network security config in manifest");
+                }
+
+
                 File apkFile = File.createTempFile("APKTOOL", null);
                 apkFile.delete();
                 resourceFile.delete();
@@ -518,7 +539,7 @@ public class Androlib {
                 apkFile.delete();
             }
             return true;
-        } catch (IOException | BrutException ex) {
+        } catch (IOException | BrutException | ParserConfigurationException | TransformerException ex) {
             throw new AndrolibException(ex);
         }
     }

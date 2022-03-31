@@ -17,10 +17,7 @@
 package brut.androlib.res.xml;
 
 import brut.androlib.AndrolibException;
-import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -95,6 +92,75 @@ public final class ResXmlPatcher {
             } catch (SAXException | ParserConfigurationException | IOException | TransformerException ignored) {
             }
         }
+    }
+
+    /**
+     * Sets the value of the network security config in the AndroidManifest file
+     *
+     * @param file AndroidManifest file
+     */
+    public static void setNetworkSecurityConfig(File file) {
+        if (file.exists()) {
+            try {
+                Document doc = loadDocument(file);
+                Node application = doc.getElementsByTagName("application").item(0);
+
+                // load attr
+                NamedNodeMap attr = application.getAttributes();
+                Node netSecConfAttr = attr.getNamedItem("android:networkSecurityConfig");
+
+                if (netSecConfAttr == null) {
+                    // there is not an already existing network security configuration
+                    netSecConfAttr = doc.createAttribute("android:networkSecurityConfig");
+                    attr.setNamedItem(netSecConfAttr);
+                }
+
+                // whether it already existed or it was created now set it to the proper value
+                netSecConfAttr.setNodeValue("@xml/network_security_config");
+
+                saveDocument(file, doc);
+
+            } catch (SAXException | ParserConfigurationException | IOException | TransformerException ignored) {
+            }
+        }
+    }
+
+    /**
+     * Creates a modified network security config file that is more permissive
+     *
+     * @param file network security config file
+     */
+    public static void modNetworkSecurityConfig(File file) throws ParserConfigurationException, TransformerException {
+        DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder documentBuilder = documentFactory.newDocumentBuilder();
+        Document document = documentBuilder.newDocument();
+        // root element
+        Element root = document.createElement("network-security-config");
+        document.appendChild(root);
+        Element baseConfig = document.createElement("base-config");
+        root.appendChild(baseConfig);
+        Element trustAnchors = document.createElement("trust-anchors");
+        baseConfig.appendChild(trustAnchors);
+
+        Element certSystem = document.createElement("certificates");
+        Attr attrSystem = document.createAttribute("src");
+        attrSystem.setValue("system");
+        certSystem.setAttributeNode(attrSystem);
+        trustAnchors.appendChild(certSystem);
+
+        Element certUser = document.createElement("certificates");
+        Attr attrUser = document.createAttribute("src");
+        attrUser.setValue("user");
+        certUser.setAttributeNode(attrUser);
+        trustAnchors.appendChild(certUser);
+
+        // create the xml file
+        //transform the DOM Object to an XML File
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        Transformer transformer = transformerFactory.newTransformer();
+        DOMSource domSource = new DOMSource(document);
+        StreamResult streamResult = new StreamResult(file);
+        transformer.transform(domSource, streamResult);
     }
 
     /**
