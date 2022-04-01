@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="test_string1"></string>
+    <string name="test_string2">Lorem ipsum...</string>
+    <string name="test_string3">\@</string>
+    <string name="test_string4">\?</string>
+    <string name="test_string5">\#ff123456</string>
+    <string name="test_string7">&amp;</string>
+    <string name="test_string8">"'"</string>
+    <string name="test_string9">\"</string>
+    <string name="test_string10">\u0005</string>
+    <string name="test_string11">" foo  bar   "</string>
+    <string name="test_string12">"foo
+bar"</string>
+    <string name="test_string13">" foo"<b>bar <i> baz </i></b> <u>foo</u></string>
+    <string name="test_string14">foo<sometag someattr1="someval1" someattr2="someval2">bar</sometag>baz</string>
+    <string name="test_string16">foo<b>bar<i>"b
+        az"</i></b>foo</string>
+    <string name="test_string17" formatted="false">%d of %d</string>
+    <string name="test_string18" formatted="false">foo %d bar %</string>
+    <string name="test_string19">%2$s foo %1$d</string>
+    <string name="test_string20" formatted="false">%-e foo %,d</string>
+    <string name="test_string21">%2$-e foo %1$,d</string>
+    <string name="test_string22" formatted="false">%02d foo %01d</string>
+    <string name="test_string23" formatted="false">%d foo %1</string>
+    <string name="test_string24" formatted="false">%1% foo %2%</string>
+    <string name="test_string25" formatted="false">foo %s bar %2$s baz</string>
+    <string name="test_string26">賞金鬥士14</string>
+    <string name="test_string27">{id:65538,v:2,tid:20003,mst:1,x:-1,y:-1,a:6000,b:3000,lm:{chp:1000,rep:0,bt:0,mp:[[101,0,1,0],[101,0,1,1],[101,0,1,2],[101,0,1,3],[101,0,1,4],[101,0,1,5],[100,0,0,0],[100,0,0,1],[100,0,0,2],[100,0,0,3],[100,0,0,4],[100,0,0,5]]},rm:{chp:1000,rep:0,bt:0,mp:[[100,0,1,0],[100,0,1,1],[100,0,1,2],[100,0,1,3],[100,0,1,4],[100,0,1,5],[101,0,0,0],[101,0,0,1],[101,0,0,2],[101,0,0,3],[101,0,0,4],[101,0,0,5]]}}</string>
+    <string name="test_string28">{al:[[180,0,7,0,0,1000],[109,0,5,0,0],[109,0,5,2,0],[109,0,5,4,0],[100,0,3,0,0],[100,0,3,1,0],[100,0,3,2,0],[100,0,3,3,0],[100,0,3,4,0],[100,0,3,5,0],[103,0,1,0,0],[103,0,1,1,0],[103,0,1,2,0],[103,0,1,3,0],[103,0,1,4,0],[103,0,1,5,0],[106,0,2,0,0],[106,0,2,1,0],[106,0,2,2,0],[106,0,2,3,0],[106,0,2,4,0],[106,0,2,5,0],[800,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[850],[950],[900,0],[1000,0,0]],v:4,s:-1575044211,rl:[[180,0,7,0,0,1000],[103,0,0,0,0],[103,0,0,1,0],[103,0,0,2,0],[103,0,0,3,0],[103,0,0,4,0],[103,0,0,5,0],[111,0,3,0,0],[111,0,3,1,0],[111,0,3,2,0],[111,0,3,3,0],[111,0,3,4,0],[111,0,3,5,0],[102,0,4,0,0],[102,0,4,1,0],[102,0,4,2,0],[102,0,4,3,0],[102,0,4,4,0],[102,0,4,5,0],[107,0,5,0,0],[107,0,5,1,0],[107,0,5,2,0],[107,0,5,3,0],[107,0,5,4,0],[107,0,5,5,0],[106,0,2,0,0],[106,0,2,1,0],[106,0,2,2,0],[106,0,2,3,0],[106,0,2,4,0],[106,0,2,5,0],[900],[1000,0,0]],m:[]}</string>
+    <string name="test_string29" formatted="false">category=temp%temp%foo</string>
+    <string name="test_string30">res/foo/</string>
+    <string name="test_string31">res/foo</string>
+    <string name="test_string32">[<font size="17">TEST STRING</font>]</string>
+    <string name="test_string33"><font size="17">[TEST STRING]</font></string>
+    <string name="test_string34">[<font size="17">TEST STRING]</font></string>
+    <string name="test_string35"><font size="17">[TEST STRING</font>]</string>
+    <string name="test_string36"><font size="17">TEST STRING</font></string>
+    <string name="test_string37">[<font size="17">Ţåþ ţö ţýþé þåššŵöŕð one two three]</font></string>
+    <string name="test_string38">[<font size="17">Ţåþ ţö ţýþé þåššŵöŕð one two three</font>]</string>
+    <string name="test_string39"><font size="17">[Ţåþ ţö ţýþé þåššŵöŕð one two three</font>]</string>
+    <string name="test_string40">[<font size="17">]Ţåþ ţö ţýþé þåššŵöŕð one two three</font></string>
+    <string name="test_string41"><font size="17">[Ţåþ ţö ţýþé þåššŵöŕð one two three]</font></string>
+    <string name="test_string42">🔆</string>
+    <string name="test_string43"><ul> <li><b>aaaaa aa aaaaa</b> – aaaaaaa aaaaaaaaaa aa aaaaaaaa aaaaaa aaaaa (aaaa) aaaa aaaaaaaaa aaaaa aa aaaaaaaaa aaaaaaa aaaa</li> <li><b>aaaaaaaaa aaaaaaaaaaaaaaa aaaaaaaa</b> – aaaaaaa aaaaaaaaaa aaaaaaaaa aaaa aaaaaa aa aaaa aaaa aaaa aaaa aaaaaaa aaaaaaaaaaaaa, aaaaaa aaa aaaaaaaaaa (aaa) aaaaaaaaaaaaaaa</li> <li><b>aaaaaaaaaaa aaaaaa aaaaaaaaaa</b> – aaaaaaaaaa aaaa aaaaaa aa a aaa aa aaaaaa aaa aaaaaaa (aaaaa aaaaaaaa) aaaaaaaa aa aaaaaa aaaaa aaa aaaa</li> </ul></string>
+</resources>

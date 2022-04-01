@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">example.com</domain>
+        <pin-set>
+            <pin digest="SHA-256">OEJax6JVAMiUP7wzOiLPU7KW38Cdx3afNZOYR2iOFZ4=</pin>
+        </pin-set>
+    </domain-config>
+</network-security-config>

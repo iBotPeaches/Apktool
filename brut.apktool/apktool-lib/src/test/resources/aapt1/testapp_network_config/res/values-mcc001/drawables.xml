@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <item name="test_drawable1" type="drawable">@android:drawable/btn_default</item>
+    <item name="test_drawable2" type="drawable">#00000000</item>
+</resources>

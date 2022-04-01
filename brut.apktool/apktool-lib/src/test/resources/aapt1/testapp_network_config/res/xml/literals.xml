@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<View xmlns:android="http://schemas.android.com/apk/res/android"
+    test1=""
+    test2="Lorem ipsum"
+    test3="\@"
+    test4="\?"
+    test5="#ff123456"
+    test6="\#ff123456"
+    test7="&amp;"
+    test8="'"
+    test9="&quot;"
+    test10="\u0005"
+    test11=" foo  bar   "
+    test12="foo \n bar"
+    test15="5"
+/>

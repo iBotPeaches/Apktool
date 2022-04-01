@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="test_array1">
+        <item>TEST1</item>
+        <item>TEST2</item>
+        <item>TEST3</item>
+        <item>%2$s foo %1$d</item>
+        <item>http://google.com&amp;boo=1&amp;foo=2</item>
+        <item>&lt;b>Bolded Text&lt;/b></item>
+        <item>&lt;font size=16 align=middle>Small&lt;/font></item>
+    </string-array>
+    <integer-array name="test_array2">
+        <item>-1</item>
+        <item>0</item>
+        <item>1</item>
+    </integer-array>
+    <array name="test_array3">
+        <item></item>
+        <item>true</item>
+        <item>TEST</item>
+        <item>5</item>
+        <item>5.5</item>
+        <item>10.0sp</item>
+        <item>#ff123456</item>
+    </array>
+    <string-array name="issue_409">
+        <item>@string/test1</item>
+        <item>foo</item>
+        <item>foo2</item>
+    </string-array>
+    <string-array name="issue_677" formatted="false">
+        <item>category=temp%temp%foo</item>
+    </string-array>
+    <string-array name="issue_329">
+        <item>res/</item>
+        <item>view/</item>
+    </string-array>
+</resources>

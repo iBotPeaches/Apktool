@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="test_reference1">@string/test1</string>
+    <string name="test_reference2">@android:string/ok</string>
+    <string name="test_reference3">?android:textStyle</string>
+</resources>

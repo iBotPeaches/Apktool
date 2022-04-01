@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="test_plurals1">
+        <item quantity="other">%1$s, %2$d foo(s)</item>
+        <item quantity="one">%1$s, %2$d foo</item>
+    </plurals>
+    <plurals name="test_plurals2">
+        <item quantity="other">%d foos</item>
+        <item quantity="one">%d foo</item>
+    </plurals>
+    <plurals name="test_plurals3">
+        <item quantity="other">foo %d moos</item>
+        <item quantity="one">foo %d moo</item>
+    </plurals>
+    <plurals name="test_plurals4">
+        <item quantity="other">foo %d</item>
+        <item quantity="one">foo 1</item>
+    </plurals>
+    <plurals name="issue_658">
+        <item quantity="other">&lt;b>%d&lt;/b> guide123</item>
+        <item quantity="one">&lt;b>%d&lt;/b> 1</item>
+    </plurals>
+    <plurals name="issue_1431">
+        <item quantity="other">Vous disposez de &lt;font color=#8c593c>%1$d contenus&lt;/font> sur &lt;font color=#8c593c>%2$d disponibles&lt;/font></item>
+        <item quantity="one">Vous disposez de &lt;font color=#8c593c>%1$d contenu&lt;/font> sur &lt;font color=#8c593c>%2$d disponibles&lt;/font></item>
+    </plurals>
+</resources>

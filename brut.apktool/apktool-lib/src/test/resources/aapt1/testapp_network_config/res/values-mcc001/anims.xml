@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <item name="test_anims1" type="anim">@android:anim/bounce_interpolator</item>
+    <item name="test_anims2" type="anim">@android:anim/cycle_interpolator</item>
+    <item name="test_anims3" type="anim">@android:anim/decelerate_interpolator</item>
+    <item name="test_anims4" type="anim">@android:anim/fade_in</item>
+    <item name="test_anims5" type="anim">@android:anim/fade_out</item>
+    <item name="test_anims6" type="anim">@android:anim/linear_interpolator</item>
+    <item name="test_anims7" type="anim">@android:anim/overshoot_interpolator</item>
+    <item name="test_anims8" type="anim">@android:anim/slide_in_left</item>
+    <item name="test_anims9" type="anim">@android:anim/slide_out_right</item>
+</resources>

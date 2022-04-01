@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="TextAppearance" parent="@android:style/TextAppearance" />
+    <style name="TextAppearance.EditEvent_Label" parent="@style/TextAppearance">
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:popupAnimationStyle">@empty</item>
+    </style>
+    <style name="TextAppearance.EditEvent_Button" parent="@style/TextAppearance.EditEvent_Label">
+        <item name="android:textColor">#ff777777</item>
+        <item name="@string/issue_477">?android:dividerVertical</item>
+    </style>
+    <style name="Foo.Bar" parent=""/>
+    <style name="IssueStyle">
+        <item name="@string/issue_1123">@null</item>
+    </style>
+</resources>

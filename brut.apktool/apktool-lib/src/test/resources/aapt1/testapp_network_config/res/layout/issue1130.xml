@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android">
+    <TableLayout android:shrinkColumns="1" />
+    <TableLayout android:shrinkColumns="\ 2147483647" />
+    <TableLayout android:shrinkColumns="\ 2147483648" />
+    <TableLayout android:shrinkColumns="\ 555555555555555555" />
+</LinearLayout>
