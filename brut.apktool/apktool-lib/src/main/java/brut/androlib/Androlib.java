@@ -20,6 +20,7 @@ import brut.androlib.meta.MetaInfo;
 import brut.androlib.meta.UsesFramework;
 import brut.androlib.options.BuildOptions;
 import brut.androlib.res.AndrolibResources;
+import brut.androlib.res.data.ResConfigFlags;
 import brut.androlib.res.data.ResPackage;
 import brut.androlib.res.data.ResTable;
 import brut.androlib.res.data.ResUnknownFiles;
@@ -35,6 +36,7 @@ import brut.util.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.jf.dexlib2.iface.DexFile;
+import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -491,12 +493,13 @@ public class Androlib {
                 if (buildOptions.netSecConf) {
                     MetaInfo meta = readMetaFile(new ExtFile(appDir));
                     if (meta.sdkInfo != null && meta.sdkInfo.get("targetSdkVersion") != null) {
-                        if (Integer.parseInt(meta.sdkInfo.get("targetSdkVersion")) < 24) {
+                        if (Integer.parseInt(meta.sdkInfo.get("targetSdkVersion")) < ResConfigFlags.SDK_NOUGAT) {
                             LOGGER.warning("Target SDK version is lower than 24! Network Security Configuration might be ignored!");
                         }
                     }
                     File netSecConfOrig = new File(appDir, "res/xml/network_security_config.xml");
                     if (netSecConfOrig.exists()) {
+                        LOGGER.info("Replacing existing network_security_config.xml!");
                         netSecConfOrig.delete();
                     }
                     ResXmlPatcher.modNetworkSecurityConfig(netSecConfOrig);
@@ -539,7 +542,7 @@ public class Androlib {
                 apkFile.delete();
             }
             return true;
-        } catch (IOException | BrutException | ParserConfigurationException | TransformerException ex) {
+        } catch (IOException | BrutException | ParserConfigurationException | TransformerException | SAXException ex) {
             throw new AndrolibException(ex);
         }
     }

@@ -130,7 +130,7 @@ public final class ResXmlPatcher {
      *
      * @param file network security config file
      */
-    public static void modNetworkSecurityConfig(File file) throws ParserConfigurationException, TransformerException {
+    public static void modNetworkSecurityConfig(File file) throws ParserConfigurationException, TransformerException, IOException, SAXException {
         DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder documentBuilder = documentFactory.newDocumentBuilder();
         Document document = documentBuilder.newDocument();
@@ -154,13 +154,7 @@ public final class ResXmlPatcher {
         certUser.setAttributeNode(attrUser);
         trustAnchors.appendChild(certUser);
 
-        // create the xml file
-        //transform the DOM Object to an XML File
-        TransformerFactory transformerFactory = TransformerFactory.newInstance();
-        Transformer transformer = transformerFactory.newTransformer();
-        DOMSource domSource = new DOMSource(document);
-        StreamResult streamResult = new StreamResult(file);
-        transformer.transform(domSource, streamResult);
+        saveDocument(file, document);
     }
 
     /**
