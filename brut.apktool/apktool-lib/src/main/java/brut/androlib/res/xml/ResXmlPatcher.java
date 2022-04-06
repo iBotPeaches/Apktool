@@ -130,11 +130,13 @@ public final class ResXmlPatcher {
      *
      * @param file network security config file
      */
-    public static void modNetworkSecurityConfig(File file) throws ParserConfigurationException, TransformerException, IOException, SAXException {
+    public static void modNetworkSecurityConfig(File file)
+        throws ParserConfigurationException, TransformerException, IOException, SAXException {
+
         DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder documentBuilder = documentFactory.newDocumentBuilder();
         Document document = documentBuilder.newDocument();
-        // root element
+
         Element root = document.createElement("network-security-config");
         document.appendChild(root);
         Element baseConfig = document.createElement("base-config");
