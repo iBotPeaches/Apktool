@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib.aapt1;
+package brut.androlib.aapt2;
 
 import brut.androlib.*;
 import brut.androlib.options.BuildOptions;
@@ -53,7 +53,7 @@ public class NoNetworkConfigTest extends BaseTest {
         sTestOrigDir = new ExtFile(sTmpDir, "testapp-orig");
         sTestNewDir = new ExtFile(sTmpDir, "testapp-new");
         LOGGER.info("Unpacking testapp...");
-        TestUtils.copyResourceDir(NoNetworkConfigTest.class, "aapt1/testapp/", sTestOrigDir);
+        TestUtils.copyResourceDir(NoNetworkConfigTest.class, "aapt2/testapp/", sTestOrigDir);
 
         LOGGER.info("Building testapp.apk...");
         BuildOptions buildOptions = new BuildOptions();
@@ -78,8 +78,8 @@ public class NoNetworkConfigTest extends BaseTest {
     }
 
     @Test
-    public void netSecConfGeneric() throws BrutException, IOException, SAXException {
-        LOGGER.info("Compraring network security configuration file...");
+    public void netSecConfGeneric() throws IOException, SAXException {
+        LOGGER.info("Comparing network security configuration file...");
         String expected = TestUtils.replaceNewlines("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" +
             "<network-security-config><base-config><trust-anchors><certificates src=\"system\"/><certificates src=\"us" +
             "er\"/></trust-anchors></base-config></network-security-config>");
@@ -95,8 +95,7 @@ public class NoNetworkConfigTest extends BaseTest {
     }
 
     @Test
-    public void netSecConfInManifest() throws AndrolibException, IOException, ParserConfigurationException, SAXException {
-
+    public void netSecConfInManifest() throws IOException, ParserConfigurationException, SAXException {
         LOGGER.info("Validating network security config in Manifest...");
         Document doc = loadDocument(new File(sTestNewDir + "/AndroidManifest.xml"));
         Node application = doc.getElementsByTagName("application").item(0);
@@ -131,5 +130,4 @@ public class NoNetworkConfigTest extends BaseTest {
     private static final String ACCESS_EXTERNAL_SCHEMA = "http://javax.xml.XMLConstants/property/accessExternalSchema";
     private static final String FEATURE_LOAD_DTD = "http://apache.org/xml/features/nonvalidating/load-external-dtd";
     private static final String FEATURE_DISABLE_DOCTYPE_DECL = "http://apache.org/xml/features/disallow-doctype-decl";
-
 }

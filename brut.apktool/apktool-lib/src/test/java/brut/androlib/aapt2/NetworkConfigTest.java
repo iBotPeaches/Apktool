@@ -14,16 +14,13 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib.aapt1;
+package brut.androlib.aapt2;
 
 import brut.androlib.*;
-import brut.androlib.meta.MetaInfo;
 import brut.androlib.options.BuildOptions;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
 import brut.util.OS;
-import brut.util.OSDetection;
-import org.custommonkey.xmlunit.ElementNameAndAttributeQualifier;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -33,20 +30,15 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
-import javax.imageio.ImageIO;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Map;
 
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 import static org.junit.Assert.*;
-import static org.junit.Assume.assumeTrue;
 
 public class NetworkConfigTest extends BaseTest {
 
@@ -58,11 +50,12 @@ public class NetworkConfigTest extends BaseTest {
         sTestOrigDir = new ExtFile(sTmpDir, "testapp-orig");
         sTestNewDir = new ExtFile(sTmpDir, "testapp-new");
         LOGGER.info("Unpacking testapp...");
-        TestUtils.copyResourceDir(NetworkConfigTest.class, "aapt1/testapp_network_config/", sTestOrigDir);
+        TestUtils.copyResourceDir(NetworkConfigTest.class, "aapt2/network_config/", sTestOrigDir);
 
         LOGGER.info("Building testapp.apk...");
         BuildOptions buildOptions = new BuildOptions();
         buildOptions.netSecConf = true;
+        buildOptions.useAapt2 = true;
         File testApk = new File(sTmpDir, "testapp.apk");
         new Androlib(buildOptions).build(sTestOrigDir, testApk);
 
@@ -83,8 +76,8 @@ public class NetworkConfigTest extends BaseTest {
     }
 
     @Test
-    public void netSecConfGeneric() throws BrutException, IOException, SAXException {
-        LOGGER.info("Compraring network security configuration file...");
+    public void netSecConfGeneric() throws IOException, SAXException {
+        LOGGER.info("Comparing network security configuration file...");
         String expected = TestUtils.replaceNewlines("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" +
             "<network-security-config><base-config><trust-anchors><certificates src=\"system\"/><certificates src=\"us" +
             "er\"/></trust-anchors></base-config></network-security-config>");
@@ -100,8 +93,7 @@ public class NetworkConfigTest extends BaseTest {
     }
 
     @Test
-    public void netSecConfInManifest() throws AndrolibException, IOException, ParserConfigurationException, SAXException {
-
+    public void netSecConfInManifest() throws IOException, ParserConfigurationException, SAXException {
         LOGGER.info("Validating network security config in Manifest...");
         Document doc = loadDocument(new File(sTestNewDir + "/AndroidManifest.xml"));
         Node application = doc.getElementsByTagName("application").item(0);
@@ -125,8 +117,6 @@ public class NetworkConfigTest extends BaseTest {
         }
 
         DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-        // Not using the parse(File) method on purpose, so that we can control when
-        // to close it. Somehow parse(File) does not seem to close the file in all cases.
         try (FileInputStream inputStream = new FileInputStream(file)) {
             return docBuilder.parse(inputStream);
         }
@@ -136,5 +126,4 @@ public class NetworkConfigTest extends BaseTest {
     private static final String ACCESS_EXTERNAL_SCHEMA = "http://javax.xml.XMLConstants/property/accessExternalSchema";
     private static final String FEATURE_LOAD_DTD = "http://apache.org/xml/features/nonvalidating/load-external-dtd";
     private static final String FEATURE_DISABLE_DOCTYPE_DECL = "http://apache.org/xml/features/disallow-doctype-decl";
-
 }
