@@ -503,12 +503,9 @@ public class Androlib {
                         netSecConfOrig.delete();
                     }
                     ResXmlPatcher.modNetworkSecurityConfig(netSecConfOrig);
-
-
                     ResXmlPatcher.setNetworkSecurityConfig(new File(appDir, "AndroidManifest.xml"));
                     LOGGER.info("Added permissive network security config in manifest");
                 }
-
 
                 File apkFile = File.createTempFile("APKTOOL", null);
                 apkFile.delete();
