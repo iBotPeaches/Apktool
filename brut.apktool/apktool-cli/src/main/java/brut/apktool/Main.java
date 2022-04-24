@@ -250,6 +250,11 @@ public class Main {
             outFile = null;
         }
 
+        if (buildOptions.netSecConf && !buildOptions.useAapt2) {
+            System.err.println("-n / --net-sec-conf is only supported with --use-aapt2.");
+            System.exit(1);
+        }
+
         // try and build apk
         try {
             if (cli.hasOption("a") || cli.hasOption("aapt")) {
