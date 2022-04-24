@@ -58,6 +58,7 @@ public class NoNetworkConfigTest extends BaseTest {
         LOGGER.info("Building testapp.apk...");
         BuildOptions buildOptions = new BuildOptions();
         buildOptions.netSecConf = true;
+        buildOptions.useAapt2 = true;
         File testApk = new File(sTmpDir, "testapp.apk");
         new Androlib(buildOptions).build(sTestOrigDir, testApk);
 
