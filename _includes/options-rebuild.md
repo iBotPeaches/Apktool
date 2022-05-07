@@ -15,6 +15,9 @@ These are all the options when building an apk.
 <strong><kbd>-f, --force-all</kbd></strong>
 <blockquote>Overwrites existing files during build, reassembling the <kbd>resources.arsc</kbd> file and <kbd>dex</kbd> file(s)</blockquote>
 <br />
+<strong><kbd>-n,--net-sec-conf</kbd> - <span class="label label-success">v2.6.2</span></strong>
+<blockquote>Adds a generic Network Security Configuration file in the output APK.</blockquote>
+<br />
 <strong><kbd>-nc,--no-crunch</kbd> - <span class="label label-success">v2.4.0</span></strong>
 <blockquote>Disable crunching of resource files during the build step.</blockquote>
 <br />
