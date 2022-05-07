@@ -216,6 +216,9 @@ public class Main {
         if (cli.hasOption("d") || cli.hasOption("debug")) {
             buildOptions.debugMode = true;
         }
+        if (cli.hasOption("n") || cli.hasOption("net-sec-conf")) {
+            buildOptions.netSecConf = true;
+        }
         if (cli.hasOption("v") || cli.hasOption("verbose")) {
             buildOptions.verbose = true;
         }
@@ -245,6 +248,11 @@ public class Main {
             outFile = new File(cli.getOptionValue("o"));
         } else {
             outFile = null;
+        }
+
+        if (buildOptions.netSecConf && !buildOptions.useAapt2) {
+            System.err.println("-n / --net-sec-conf is only supported with --use-aapt2.");
+            System.exit(1);
         }
 
         // try and build apk
@@ -366,6 +374,11 @@ public class Main {
                 .desc("Sets android:debuggable to \"true\" in the APK's compiled manifest")
                 .build();
 
+        Option netSecConfOption = Option.builder("n")
+            .longOpt("net-sec-conf")
+            .desc("Adds a generic Network Security Configuration file in the output APK")
+            .build();
+
         Option noDbgOption = Option.builder("b")
                 .longOpt("no-debug-info")
                 .desc("don't write out debug info (.local, .param, .line, etc.)")
@@ -473,6 +486,7 @@ public class Main {
 
             buildOptions.addOption(apiLevelOption);
             buildOptions.addOption(debugBuiOption);
+            buildOptions.addOption(netSecConfOption);
             buildOptions.addOption(aaptOption);
             buildOptions.addOption(originalOption);
             buildOptions.addOption(aapt2Option);
@@ -528,6 +542,7 @@ public class Main {
         allOptions.addOption(noAssetOption);
         allOptions.addOption(keepResOption);
         allOptions.addOption(debugBuiOption);
+        allOptions.addOption(netSecConfOption);
         allOptions.addOption(aaptOption);
         allOptions.addOption(originalOption);
         allOptions.addOption(verboseOption);

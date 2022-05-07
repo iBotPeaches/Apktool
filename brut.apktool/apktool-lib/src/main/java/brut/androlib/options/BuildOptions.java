@@ -22,6 +22,7 @@ public class BuildOptions {
     public boolean forceBuildAll = false;
     public boolean forceDeleteFramework = false;
     public boolean debugMode = false;
+    public boolean netSecConf = false;
     public boolean verbose = false;
     public boolean copyOriginalFiles = false;
     public final boolean updateFiles = false;

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:compileSdkVersion="23" android:compileSdkVersionCodename="6.0-2438415" package="brut.apktool.testapp" platformBuildVersionCode="23" platformBuildVersionName="6.0-2438415">
+    <application>
+        android:networkSecurityConfig="@xml/network_security_config"
+    </application>
+</manifest>
