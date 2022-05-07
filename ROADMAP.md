@@ -43,3 +43,9 @@ Suggestions: [#1366](https://github.com/iBotPeaches/Apktool/issues/1366)
 Applications are getting larger as well as frameworks, but Apktool is getting slower.
 
 Suggestions: [#2685](https://github.com/iBotPeaches/Apktool/issues/2685)
+
+## Android Support
+Folks have requested running Apktool on device itself. This has been a challenge due to the arch requirements
+that would be placed on the aapt2/aapt binaries.
+
+Suggestions: [#2811](https://github.com/iBotPeaches/Apktool/issues/2811)
