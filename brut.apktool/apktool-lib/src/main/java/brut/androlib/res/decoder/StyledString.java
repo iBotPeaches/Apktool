@@ -111,9 +111,10 @@ public class StyledString {
 
         private void decodeIterate(PeekingIterator<Span> it) {
             Span span = it.next();
+            String name = span.getName();
+            Map<String, String> attributes = span.getAttributes();
             int spanStart = span.getFirstChar();
             int spanEnd = span.getLastChar() + 1;
-            Map<String, String> attributes = span.getAttributes();
 
             // write encoded raw text preceding the opening tag
             if (spanStart > lastOffset) {
@@ -123,7 +124,7 @@ public class StyledString {
 
             // write opening tag
             xmlValue.append('<');
-            xmlValue.append(span.getName());
+            xmlValue.append(name);
             if (attributes != null) {
                 for (Map.Entry<String, String> attrEntry : attributes.entrySet()) {
                     xmlValue.append(' ');
@@ -153,7 +154,7 @@ public class StyledString {
 
             // write closing tag
             xmlValue.append("</");
-            xmlValue.append(span.getName());
+            xmlValue.append(name);
             xmlValue.append('>');
         }
     }
