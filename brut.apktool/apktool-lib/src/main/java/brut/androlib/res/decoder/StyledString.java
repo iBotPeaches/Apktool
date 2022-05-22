@@ -48,7 +48,7 @@ public class StyledString {
         return new Decoder().decode(this);
     }
 
-    public static class Span {
+    public static class Span implements Comparable<Span> {
         private static final MapSplitter ATTRIBUTES_SPLITTER =
             Splitter.on(';').withKeyValueSeparator(Splitter.on('=').limit(2));
 
@@ -56,33 +56,46 @@ public class StyledString {
         private final int firstChar;
         private final int lastChar;
 
-        Span(String tag, int firstChar, int lastChar) {
+        public Span(String tag, int firstChar, int lastChar) {
             this.tag = tag;
             this.firstChar = firstChar;
             this.lastChar = lastChar;
         }
 
-        String getTag() {
+        public String getTag() {
             return tag;
         }
 
-        int getFirstChar() {
+        public int getFirstChar() {
             return firstChar;
         }
 
-        int getLastChar() {
+        public int getLastChar() {
             return lastChar;
         }
 
-        String getName() {
+        public String getName() {
             int separatorIdx = tag.indexOf(';');
             return separatorIdx == -1 ? tag : tag.substring(0, separatorIdx);
         }
 
-        Map<String, String> getAttributes() {
+        public Map<String, String> getAttributes() {
             int separatorIdx = tag.indexOf(';');
             return separatorIdx == -1 ? null : ATTRIBUTES_SPLITTER.split(
                     tag.substring(separatorIdx + 1, tag.endsWith(";") ? tag.length() - 1 : tag.length()));
+        }
+    
+        @Override
+        public int compareTo(Span o) {
+            int res = Integer.compare(firstChar, o.firstChar);
+            if (res != 0) {
+                return res;
+            }
+            res = Integer.compare(lastChar, o.lastChar);
+            if (res != 0) {
+                return -res;
+            }
+            return -tag.compareTo(o.tag);
         }
     }
 
@@ -123,15 +136,11 @@ public class StyledString {
             lastOffset = spanStart;
 
             // write opening tag
-            xmlValue.append('<');
-            xmlValue.append(name);
+            xmlValue.append('<').append(name);
             if (attributes != null) {
                 for (Map.Entry<String, String> attrEntry : attributes.entrySet()) {
-                    xmlValue.append(' ');
-                    xmlValue.append(attrEntry.getKey());
-                    xmlValue.append("=\"");
-                    xmlValue.append(ResXmlEncoders.escapeXmlChars(attrEntry.getValue()));
-                    xmlValue.append('"');
+                    xmlValue.append(' ').append(attrEntry.getKey()).append("=\"")
+                            .append(ResXmlEncoders.escapeXmlChars(attrEntry.getValue())).append('"');
                 }
             }
             // if an opening tag is followed by a matching closing tag, write as an empty-element tag
@@ -153,9 +162,7 @@ public class StyledString {
             lastOffset = spanEnd;
 
             // write closing tag
-            xmlValue.append("</");
-            xmlValue.append(name);
-            xmlValue.append('>');
+            xmlValue.append("</").append(name).append('>');
         }
     }
 

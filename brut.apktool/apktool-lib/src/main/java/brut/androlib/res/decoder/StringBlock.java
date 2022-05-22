@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -124,6 +125,7 @@ public class StringBlock {
         for (int i = 0; i < style.length; i += 3) {
             spans.add(new StyledString.Span(getString(style[i]), style[i + 1], style[i + 2]));
         }
+        Collections.sort(spans);
 
         StyledString styledString = new StyledString(text, spans);
         return styledString.toString();
