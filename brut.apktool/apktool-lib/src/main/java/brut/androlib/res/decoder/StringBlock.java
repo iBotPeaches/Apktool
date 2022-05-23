@@ -19,22 +19,14 @@ package brut.androlib.res.decoder;
 import brut.androlib.res.xml.ResXmlEncoders;
 import brut.util.ExtDataInput;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Splitter;
-import com.google.common.base.Splitter.MapSplitter;
-import com.google.common.collect.ComparisonChain;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.StringJoiner;
 import java.util.logging.Logger;
-import java.util.stream.Stream;
-
-import static com.google.common.collect.Ordering.explicit;
-import static java.util.Comparator.naturalOrder;
-import static java.util.Comparator.reverseOrder;
 
 public class StringBlock {
 
@@ -109,183 +101,34 @@ public class StringBlock {
         return decodeString(offset, length);
     }
 
-    private static class Tag implements Comparable<Tag> {
-        private static final MapSplitter ATTRIBUTES_SPLITTER =
-            Splitter.on(';').withKeyValueSeparator(Splitter.on('=').limit(2));
-
-        private final String tag;
-        private final Type type;
-        private final int position;
-        private final int matchingTagPosition;
-
-        Tag(String tag, Type type, int position, int matchingTagPosition) {
-            this.tag = ResXmlEncoders.escapeXmlChars(tag);
-            this.type = type;
-            this.position = position;
-            this.matchingTagPosition = matchingTagPosition;
-        }
-
-        /**
-         * compares this tag and another, returning the order that should be between them.
-         * order by:
-         *      position
-         *      closing tag has precedence over openning tag (unless it is the same tag)
-         *      tags that are enclosed in others should appear later if openning tag, or first if closing tag
-         *      lexicographical sort. openning tag and closing tag in reverse so that one tag will be contained in the other and not each contain the other partially
-         * @param o - the other tag object to compare to
-         * @return the order in between this object and the other
-         */
-        @Override
-        public int compareTo(Tag o) {
-            return ComparisonChain.start()
-                .compare(position, o.position)
-                // When one tag closes where another starts, we always close before opening.
-                .compare(type, o.type, this.tag.equals(o.tag) ? explicit(Type.OPEN, Type.CLOSE) : explicit(Type.CLOSE, Type.OPEN))
-                // Open first the tag which closes last, and close first the tag which opened last.
-                .compare(matchingTagPosition, o.matchingTagPosition, reverseOrder())
-                // When two tags open and close together, we order alphabetically. When they close,
-                // we reversed the order. This ensures that the XML tags are properly nested.
-                .compare(tag, o.tag, type.equals(Type.OPEN) ? naturalOrder() : reverseOrder())
-                .result();
-        }
-
-        /**
-         * formats the tag value and attributes according to whether the tag is an openning or closing tag
-         * @return the formatted tag value as a string
-         */
-        @Override
-        public String toString() {
-            // "tag" can either be just the tag or have the form "tag;attr1=value1;attr2=value2;[...]".
-            int separatorIdx = tag.indexOf(';');
-            String actualTag = separatorIdx == -1 ? tag : tag.substring(0, separatorIdx);
-
-            switch (type) {
-                case OPEN:
-                    if (separatorIdx != -1) {
-                        StringJoiner attributes = new StringJoiner(" ");
-                        ATTRIBUTES_SPLITTER
-                            .split(tag.substring(separatorIdx + 1, tag.endsWith(";") ? tag.length() - 1: tag.length()))
-                            .forEach((key, value) -> attributes.add(String.format("%s=\"%s\"", key, value)));
-                        return String.format("<%s %s>", actualTag, attributes);
-                    }
-                    return String.format("<%s>", actualTag);
-                case CLOSE:
-                    return String.format("</%s>", actualTag);
-            }
-            throw new IllegalStateException();
-        }
-
-        private enum Type {
-            OPEN,
-            CLOSE
-        }
-    }
-
-    private static class Span {
-        private String tag;
-        private int firstChar, lastChar;
-
-        Span(String val, int firstIndex, int lastIndex) {
-            this.tag = val;
-            this.firstChar = firstIndex;
-            this.lastChar = lastIndex;
-        }
-
-        String getTag() {
-            return tag;
-        }
-
-        int getFirstChar() {
-            return firstChar;
-        }
-
-        int getLastChar() {
-            return lastChar;
-        }
-    }
-
-    private static class StyledString {
-        String val;
-        int[] styles;
-
-        StyledString(String raw, int[] stylesArr) {
-            this.val = raw;
-            this.styles = stylesArr;
-        }
-
-        String getValue() {
-            return val;
-        }
-
-        List<Span> getSpanList(StringBlock stringBlock) {
-            ArrayList<Span> spanList = new ArrayList<>();
-            for (int i = 0; i != styles.length; i += 3) {
-                spanList.add(new Span(stringBlock.getString(styles[i]), styles[i + 1], styles[i + 2]));
-            }
-            return spanList;
-        }
-    }
-
-    /**
-     *
-     * @param styledString - the raw string with its corresponding styling tags and their locations
-     * @return a formatted styled string that contains the styling tag in the correct locations
-     */
-    String processStyledString(StyledString styledString) {
-
-        ArrayList<Tag> sortedTagsList = new ArrayList<>();
-
-        styledString.getSpanList(this).stream()
-            .flatMap(
-                span ->
-                    Stream.of(
-                        // "+ 1" because the last char is included.
-                        new Tag(
-                            span.getTag(), Tag.Type.OPEN, span.getFirstChar(), span.getLastChar() + 1),
-                        // "+ 1" because the last char is included.
-                        new Tag(
-                            span.getTag(),
-                            Tag.Type.CLOSE,
-                            span.getLastChar() + 1,
-                            span.getFirstChar())))
-            // So we can edit the string in place, we need to start from the end.
-            .sorted(naturalOrder())
-            .forEach(tag -> sortedTagsList.add(tag));
-
-        String raw = styledString.getValue();
-        StringBuilder string = new StringBuilder(raw.length() + 32);
-        int lastIndex = 0;
-        for (Tag tag : sortedTagsList) {
-            string.append(ResXmlEncoders.escapeXmlChars(raw.substring(lastIndex, tag.position)));
-            string.append(tag);
-            lastIndex = tag.position;
-        }
-        string.append(ResXmlEncoders.escapeXmlChars(raw.substring(lastIndex)));
-
-        return string.toString();
-    }
-
     /**
      * @param index Location (index) of string to process to HTML
      * @return String Returns string with style tags (html-like).
      */
     public String getHTML(int index) {
-        String raw = getString(index);
-        if (raw == null) {
+        String text = getString(index);
+        if (text == null) {
             return null;
         }
         int[] style = getStyle(index);
         if (style == null) {
-            return ResXmlEncoders.escapeXmlChars(raw);
+            return ResXmlEncoders.escapeXmlChars(text);
         }
 
         // If the returned style is further in string, than string length. Lets skip it.
-        if (style[1] > raw.length()) {
-            return ResXmlEncoders.escapeXmlChars(raw);
+        if (style[1] > text.length()) {
+            return ResXmlEncoders.escapeXmlChars(text);
         }
 
-        StyledString styledString = new StyledString(raw, style);
-        return processStyledString(styledString);
+        // Convert styles to spans
+        List<StyledString.Span> spans = new ArrayList<>(style.length / 3);
+        for (int i = 0; i < style.length; i += 3) {
+            spans.add(new StyledString.Span(getString(style[i]), style[i + 1], style[i + 2]));
+        }
+        Collections.sort(spans);
+
+        StyledString styledString = new StyledString(text, spans);
+        return styledString.toString();
     }
 
     /**
