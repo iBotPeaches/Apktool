@@ -82,9 +82,10 @@ public class StyledString {
         public Map<String, String> getAttributes() {
             int separatorIdx = tag.indexOf(';');
             return separatorIdx == -1 ? null : ATTRIBUTES_SPLITTER.split(
-                    tag.substring(separatorIdx + 1, tag.endsWith(";") ? tag.length() - 1 : tag.length()));
+                tag.substring(separatorIdx + 1, tag.endsWith(";") ? tag.length() - 1 : tag.length())
+            );
         }
-    
+
         @Override
         public int compareTo(Span o) {
             int res = Integer.compare(firstChar, o.firstChar);
