@@ -16,6 +16,7 @@
 import org.apache.tools.ant.filters.*
 
 apply plugin: 'java-library'
+apply plugin: 'maven-publish'
 
 processResources {
   from('src/main/resources/properties') {
@@ -49,4 +50,22 @@ dependencies {
                    depends.commons_text
 
     testImplementation depends.xmlunit
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/revanced/Apktool")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+    publications {
+        gpr(MavenPublication) {
+            from(components.java)
+        }
+    }
 }
