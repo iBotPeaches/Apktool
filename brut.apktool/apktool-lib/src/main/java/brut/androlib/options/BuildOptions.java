@@ -28,7 +28,7 @@ public class BuildOptions {
     public final boolean updateFiles = false;
     public boolean isFramework = false;
     public boolean resourcesAreCompressed = false;
-    public boolean useAapt2 = false;
+    public boolean useAapt2 = true; // ReVanced - default to v2
     public boolean noCrunch = false;
     public int forceApi = 0;
     public Collection<String> doNotCompress;
@@ -37,9 +37,9 @@ public class BuildOptions {
     public String frameworkTag = null;
     public String aaptPath = "";
 
-    public int aaptVersion = 1; // default to v1
+    public int aaptVersion = 2; // default to v1 // ReVanced - default to v2
 
     public boolean isAapt2() {
-        return this.useAapt2 || this.aaptVersion == 2;
+        return true; // ReVanced - default to v2
     }
 }

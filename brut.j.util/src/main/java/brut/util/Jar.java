@@ -20,6 +20,7 @@ import brut.common.BrutException;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
@@ -51,7 +52,7 @@ public abstract class Jar {
             File fileOut = File.createTempFile(tmpPrefix, suffix + ".tmp");
             fileOut.deleteOnExit();
 
-            OutputStream out = new FileOutputStream(fileOut);
+            OutputStream out = Files.newOutputStream(fileOut.toPath());
             IOUtils.copy(in, out);
             in.close();
             out.close();
