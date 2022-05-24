@@ -4,9 +4,22 @@ on:
   push:
     branches: [master]
 jobs:
+  delete-old-versions:
+    name: Delete old versions
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        pkg: ['brut.j.common', 'brut.j.dir', 'brut.j.util', 'apktool-lib', 'apktool-cli']
+      fail-fast: false
+    steps:
+      - name: Delete package ${{ matrix.pkg }}
+        uses: actions/delete-package-versions@v3
+        with:
+          package-name: 'org.apktool.${{ matrix.pkg }}'
   release:
     name: Release
     runs-on: ubuntu-latest
+    needs: [delete-old-versions]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
