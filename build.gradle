@@ -53,6 +53,7 @@ defaultTasks 'build', 'shadowJar', 'proguard'
 allprojects {
     apply plugin: 'java'
     apply plugin: 'com.github.hierynomus.license'
+    apply plugin: 'maven-publish'
 
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
@@ -80,6 +81,19 @@ allprojects {
             "licenseMain",
             "licenseTest"
     ]
+
+    publishing {
+        repositories {
+            maven {
+                name = "GitHubPackages"
+                url = uri("https://maven.pkg.github.com/revanced/Apktool")
+                credentials {
+                    username = System.getenv("GITHUB_ACTOR")
+                    password = System.getenv("GITHUB_TOKEN")
+                }
+            }
+        }
+    }
 }
 
 tasks.withType(JavaCompile).configureEach {
