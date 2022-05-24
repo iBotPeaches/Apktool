@@ -44,7 +44,19 @@ jobs:
     runs-on: ubuntu-latest
     needs: [ delete-old-versions ]
     steps:
-      - name: Publish to GitHub Packages
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Setup JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: '17'
+          distribution: 'adopt'
+          cache: gradle
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+      - name: Build with Gradle
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./gradlew publish
