@@ -37,6 +37,7 @@ import org.apache.commons.io.IOUtils;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.zip.CRC32;
@@ -617,7 +618,7 @@ final public class AndrolibResources {
         List<String> cmd = new ArrayList<>();
 
         try {
-            String aaptCommand = AaptManager.getAaptExecutionCommand(aaptPath, getAaptBinaryFile());
+            String aaptCommand = AaptManager.getAaptExecutionCommand(aaptPath, getAaptVersion());
             cmd.add(aaptCommand);
         } catch (BrutException ex) {
             LOGGER.warning("aapt: " + ex.getMessage() + " (defaulting to $PATH binary)");
@@ -810,7 +811,7 @@ final public class AndrolibResources {
 
         if (id == 1) {
             try (InputStream in = getAndroidFrameworkResourcesAsStream();
-                 OutputStream out = new FileOutputStream(apk)) {
+                 OutputStream out = Files.newOutputStream(apk.toPath())) {
                 IOUtils.copy(in, out);
                 return apk;
             } catch (IOException ex) {
@@ -1009,17 +1010,6 @@ final public class AndrolibResources {
 
         mFrameworkDirectory = dir;
         return dir;
-    }
-
-    private File getAaptBinaryFile() throws AndrolibException {
-        try {
-            if (getAaptVersion() == 2) {
-                return AaptManager.getAapt2();
-            }
-            return AaptManager.getAapt1();
-        } catch (BrutException ex) {
-            throw new AndrolibException(ex);
-        }
     }
 
     private int getAaptVersion() {

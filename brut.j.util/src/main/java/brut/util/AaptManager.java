@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AaptManager {
-
     private static File getAapt(Integer version) throws BrutException {
         File aaptBinary;
         String aaptVersion = getAaptBinaryName(version);
@@ -56,17 +55,20 @@ public class AaptManager {
         throw new BrutException("Can't set aapt binary as executable");
     }
 
-    public static String getAaptExecutionCommand(String aaptPath, File aapt) throws BrutException {
+    public static String getAaptExecutionCommand(String aaptPath, int aaptVersion) throws BrutException {
         if (!aaptPath.isEmpty()) {
             File aaptFile = new File(aaptPath);
             if (aaptFile.canRead() && aaptFile.exists()) {
-                aaptFile.setExecutable(true);
+                executable(aaptFile);
                 return aaptFile.getPath();
             } else {
                 throw new BrutException("binary could not be read: " + aaptFile.getAbsolutePath());
             }
         } else {
-            return aapt.getAbsolutePath();
+            if (aaptVersion == 2) {
+                return getAapt2().getAbsolutePath();
+            }
+            return getAapt1().getAbsolutePath();
         }
     }
 
@@ -94,7 +96,7 @@ public class AaptManager {
         if (!aapt.isFile()) {
             throw new BrutException("Could not identify aapt binary as executable.");
         }
-        aapt.setExecutable(true);
+        executable(aapt);
 
         List<String> cmd = new ArrayList<>();
         cmd.add(aapt.getAbsolutePath());
@@ -107,6 +109,14 @@ public class AaptManager {
         }
 
         return getAppVersionFromString(version);
+    }
+
+    private static void executable(File aapt) {
+        if (!aapt.canExecute()) {
+            try {
+                aapt.setExecutable(true);
+            } catch (Exception ignored) {}
+        }
     }
 
     public static File getAapt2() throws BrutException {
