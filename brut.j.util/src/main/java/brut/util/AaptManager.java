@@ -21,15 +21,19 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AaptManager implements AaptProvider {
+public class AaptManager {
 
-    public File getAapt2() throws BrutException {
-        return getAapt();
+    public static File getAapt2() throws BrutException {
+        return getAapt(2);
     }
 
-    private static File getAapt() throws BrutException {
+    public static File getAapt1() throws BrutException {
+        return getAapt(1);
+    }
+
+    private static File getAapt(Integer version) throws BrutException {
         File aaptBinary;
-        String aaptVersion = getAaptBinaryName(2);
+        String aaptVersion = getAaptBinaryName(version);
 
         if (! OSDetection.is64Bit() && OSDetection.isMacOSX()) {
             throw new BrutException("32 bit OS detected. No 32 bit binaries available.");

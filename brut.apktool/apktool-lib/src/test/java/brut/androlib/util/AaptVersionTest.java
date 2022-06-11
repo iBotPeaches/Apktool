@@ -23,6 +23,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 public class AaptVersionTest {
+
     @Test
     public void testAapt2Iterations() throws BrutException {
         assertEquals(2, AaptManager.getAppVersionFromString("Android Asset Packaging Tool (aapt) 2:17"));

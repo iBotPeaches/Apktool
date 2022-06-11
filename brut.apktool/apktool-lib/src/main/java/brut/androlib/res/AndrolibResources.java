@@ -45,18 +45,6 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 final public class AndrolibResources {
-    // The aapt2 provider. Default is AaptManager for Mac, Linux & Windows.
-    // May be overridden.
-    private static AaptProvider AAPT_PROVIDER = new AaptManager();
-
-    public static AaptProvider getAaptProvider() {
-        return AAPT_PROVIDER;
-    }
-
-    public static void setAaptProvider(AaptProvider aaptProvider) {
-        AAPT_PROVIDER = aaptProvider;
-    }
-
     public ResTable getResTable(ExtFile apkFile) throws AndrolibException {
         return getResTable(apkFile, true);
     }
@@ -1025,7 +1013,10 @@ final public class AndrolibResources {
 
     private File getAaptBinaryFile() throws AndrolibException {
         try {
-            return getAaptProvider().getAapt2();
+            if (getAaptVersion() == 2) {
+                return AaptManager.getAapt2();
+            }
+            return AaptManager.getAapt1();
         } catch (BrutException ex) {
             throw new AndrolibException(ex);
         }

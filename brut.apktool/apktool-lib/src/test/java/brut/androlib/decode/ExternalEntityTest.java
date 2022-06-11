@@ -56,9 +56,7 @@ public class ExternalEntityTest extends BaseTest {
         OS.rmdir(sTestOrigDir);
     }
 
-    // @Test // ReVanced - disable test.
-    // This test is made for aapt1, which was previously the default.
-    // Now it breaks, and I'm too lazy to fix it :')
+    @Test
     public void doctypeTest() throws IOException {
 
         String expected = TestUtils.replaceNewlines("<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
