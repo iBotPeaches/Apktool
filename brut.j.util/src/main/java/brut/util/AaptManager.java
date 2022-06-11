@@ -17,25 +17,18 @@
 package brut.util;
 
 import brut.common.BrutException;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AaptManager {
-
-    public static File getAapt2() throws BrutException {
-        return getAapt(2);
-    }
-
-    public static File getAapt1() throws BrutException {
-        return getAapt(1);
-    }
+public class AaptManager implements AaptProvider {
 
     private static File getAapt(Integer version) throws BrutException {
         File aaptBinary;
         String aaptVersion = getAaptBinaryName(version);
 
-        if (! OSDetection.is64Bit() && OSDetection.isMacOSX()) {
+        if (!OSDetection.is64Bit() && OSDetection.isMacOSX()) {
             throw new BrutException("32 bit OS detected. No 32 bit binaries available.");
         }
 
@@ -64,7 +57,7 @@ public class AaptManager {
     }
 
     public static String getAaptExecutionCommand(String aaptPath, File aapt) throws BrutException {
-        if (! aaptPath.isEmpty()) {
+        if (!aaptPath.isEmpty()) {
             File aaptFile = new File(aaptPath);
             if (aaptFile.canRead() && aaptFile.exists()) {
                 aaptFile.setExecutable(true);
@@ -114,5 +107,15 @@ public class AaptManager {
         }
 
         return getAppVersionFromString(version);
+    }
+
+    @Override
+    public File getAapt2() throws BrutException {
+        return getAapt(2);
+    }
+
+    @Override
+    public File getAapt1() throws BrutException {
+        return getAapt(1);
     }
 }

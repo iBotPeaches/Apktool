@@ -56,7 +56,7 @@ jobs:
           cache: gradle
       - name: Make gradlew executable
         run: chmod +x gradlew
-      - name: Build with Gradle
+      - name: Publish with Gradle
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./gradlew publish
