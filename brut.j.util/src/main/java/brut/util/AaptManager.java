@@ -22,7 +22,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AaptManager implements AaptProvider {
+public class AaptManager {
 
     private static File getAapt(Integer version) throws BrutException {
         File aaptBinary;
@@ -109,13 +109,11 @@ public class AaptManager implements AaptProvider {
         return getAppVersionFromString(version);
     }
 
-    @Override
-    public File getAapt2() throws BrutException {
+    public static File getAapt2() throws BrutException {
         return getAapt(2);
     }
 
-    @Override
-    public File getAapt1() throws BrutException {
+    public static File getAapt1() throws BrutException {
         return getAapt(1);
     }
 }
