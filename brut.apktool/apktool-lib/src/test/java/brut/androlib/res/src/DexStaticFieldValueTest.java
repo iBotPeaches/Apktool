@@ -42,16 +42,16 @@ public class DexStaticFieldValueTest extends BaseTest {
         sTmpDir = new ExtFile(OS.createTempDirectory());
         sTestOrigDir = new ExtFile(sTmpDir, "issue2543-orig");
         sTestNewDir = new ExtFile(sTmpDir, "issue2543-new");
-        LOGGER.info("Unpacking issue2543...");
+        LOGGER.fine("Unpacking issue2543...");
         TestUtils.copyResourceDir(BuildAndDecodeTest.class, "decode/issue2543/", sTestOrigDir);
 
         BuildOptions buildOptions = new BuildOptions();
 
-        LOGGER.info("Building issue2543.apk...");
+        LOGGER.fine("Building issue2543.apk...");
         File testApk = new File(sTmpDir, "issue2543.apk");
         new Androlib(buildOptions).build(sTestOrigDir, testApk);
 
-        LOGGER.info("Decoding issue2543.apk...");
+        LOGGER.fine("Decoding issue2543.apk...");
         ApkDecoder apkDecoder = new ApkDecoder(testApk);
         apkDecoder.setOutDir(sTestNewDir);
         apkDecoder.setBaksmaliDebugMode(false);

@@ -49,17 +49,17 @@ public class NetworkConfigTest extends BaseTest {
         sTmpDir = new ExtFile(OS.createTempDirectory());
         sTestOrigDir = new ExtFile(sTmpDir, "testapp-orig");
         sTestNewDir = new ExtFile(sTmpDir, "testapp-new");
-        LOGGER.info("Unpacking testapp...");
+        LOGGER.fine("Unpacking testapp...");
         TestUtils.copyResourceDir(NetworkConfigTest.class, "aapt2/network_config/", sTestOrigDir);
 
-        LOGGER.info("Building testapp.apk...");
+        LOGGER.fine("Building testapp.apk...");
         BuildOptions buildOptions = new BuildOptions();
         buildOptions.netSecConf = true;
         buildOptions.useAapt2 = true;
         File testApk = new File(sTmpDir, "testapp.apk");
         new Androlib(buildOptions).build(sTestOrigDir, testApk);
 
-        LOGGER.info("Decoding testapp.apk...");
+        LOGGER.fine("Decoding testapp.apk...");
         ApkDecoder apkDecoder = new ApkDecoder(testApk);
         apkDecoder.setOutDir(sTestNewDir);
         apkDecoder.decode();
@@ -77,7 +77,7 @@ public class NetworkConfigTest extends BaseTest {
 
     @Test
     public void netSecConfGeneric() throws IOException, SAXException {
-        LOGGER.info("Comparing network security configuration file...");
+        LOGGER.fine("Comparing network security configuration file...");
         String expected = TestUtils.replaceNewlines("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" +
             "<network-security-config><base-config><trust-anchors><certificates src=\"system\"/><certificates src=\"us" +
             "er\"/></trust-anchors></base-config></network-security-config>");
@@ -94,7 +94,7 @@ public class NetworkConfigTest extends BaseTest {
 
     @Test
     public void netSecConfInManifest() throws IOException, ParserConfigurationException, SAXException {
-        LOGGER.info("Validating network security config in Manifest...");
+        LOGGER.fine("Validating network security config in Manifest...");
         Document doc = loadDocument(new File(sTestNewDir + "/AndroidManifest.xml"));
         Node application = doc.getElementsByTagName("application").item(0);
         NamedNodeMap attr = application.getAttributes();

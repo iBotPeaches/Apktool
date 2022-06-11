@@ -43,10 +43,10 @@ public class DebuggableTrueRetainedTest extends BaseTest {
         sTmpDir = new ExtFile(OS.createTempDirectory());
         sTestOrigDir = new ExtFile(sTmpDir, "issue2328-debuggable-true-orig");
         sTestNewDir = new ExtFile(sTmpDir, "issue2328-debuggable-true-new");
-        LOGGER.info("Unpacking issue2328-debuggable-true...");
+        LOGGER.fine("Unpacking issue2328-debuggable-true...");
         TestUtils.copyResourceDir(DebuggableTrueRetainedTest.class, "aapt2/issue2328/debuggable-true", sTestOrigDir);
 
-        LOGGER.info("Building issue2328-debuggable-true.apk...");
+        LOGGER.fine("Building issue2328-debuggable-true.apk...");
         BuildOptions buildOptions = new BuildOptions();
         buildOptions.debugMode = true;
         buildOptions.useAapt2 = true;
@@ -55,7 +55,7 @@ public class DebuggableTrueRetainedTest extends BaseTest {
         File testApk = new File(sTmpDir, "issue2328-debuggable-true.apk");
         new Androlib(buildOptions).build(sTestOrigDir, testApk);
 
-        LOGGER.info("Decoding issue2328-debuggable-true.apk...");
+        LOGGER.fine("Decoding issue2328-debuggable-true.apk...");
         ApkDecoder apkDecoder = new ApkDecoder(testApk);
         apkDecoder.setOutDir(sTestNewDir);
         apkDecoder.decode();

@@ -61,7 +61,7 @@ final public class AndrolibResources {
 
     public ResPackage loadMainPkg(ResTable resTable, ExtFile apkFile)
             throws AndrolibException {
-        LOGGER.info("Loading resource table...");
+        LOGGER.fine("Loading resource table...");
         ResPackage[] pkgs = getResPackagesFromApk(apkFile, resTable, sKeepBroken);
         ResPackage pkg;
 
@@ -108,7 +108,7 @@ final public class AndrolibResources {
             throws AndrolibException {
         File apk = getFrameworkApk(id, frameTag);
 
-        LOGGER.info("Loading resource table from file: " + apk);
+        LOGGER.fine("Loading resource table from file: " + apk);
         mFramework = new ExtFile(apk);
         ResPackage[] pkgs = getResPackagesFromApk(mFramework, resTable, true);
 
@@ -147,7 +147,7 @@ final public class AndrolibResources {
             inApk = apkFile.getDirectory();
             out = new FileDirectory(outDir);
 
-            LOGGER.info("Decoding AndroidManifest.xml with only framework resources...");
+            LOGGER.fine("Decoding AndroidManifest.xml with only framework resources...");
             fileDecoder.decodeManifest(inApk, "AndroidManifest.xml", out, "AndroidManifest.xml");
 
         } catch (DirectoryException ex) {
@@ -169,9 +169,9 @@ final public class AndrolibResources {
         // 1) Check if pkgOriginal === mPackageRenamed
         // 2) Check if pkgOriginal is ignored via IGNORED_PACKAGES
         if (pkgOriginal.equalsIgnoreCase(mPackageRenamed) || (Arrays.asList(IGNORED_PACKAGES).contains(pkgOriginal))) {
-            LOGGER.info("Regular manifest package...");
+            LOGGER.fine("Regular manifest package...");
         } else {
-            LOGGER.info("Renamed manifest package found! Replacing " + mPackageRenamed + " with " + pkgOriginal);
+            LOGGER.fine("Renamed manifest package found! Replacing " + mPackageRenamed + " with " + pkgOriginal);
             ResXmlPatcher.renameManifestPackage(new File(filePath), pkgOriginal);
         }
     }
@@ -189,7 +189,7 @@ final public class AndrolibResources {
         try {
             inApk = apkFile.getDirectory();
             out = new FileDirectory(outDir);
-            LOGGER.info("Decoding AndroidManifest.xml with resources...");
+            LOGGER.fine("Decoding AndroidManifest.xml with resources...");
 
             fileDecoder.decodeManifest(inApk, "AndroidManifest.xml", out, "AndroidManifest.xml");
 
@@ -243,12 +243,12 @@ final public class AndrolibResources {
         for (ResPackage pkg : resTable.listMainPackages()) {
             attrDecoder.setCurrentPackage(pkg);
 
-            LOGGER.info("Decoding file-resources...");
+            LOGGER.fine("Decoding file-resources...");
             for (ResResource res : pkg.listFiles()) {
                 fileDecoder.decode(res, in, out);
             }
 
-            LOGGER.info("Decoding values */* XMLs...");
+            LOGGER.fine("Decoding values */* XMLs...");
             for (ResValuesFile valuesFile : pkg.listValuesFiles()) {
                 generateValuesFile(valuesFile, out, xmlSerializer);
             }
@@ -837,7 +837,7 @@ final public class AndrolibResources {
                 } else {
                     for (File file : dir.listFiles()) {
                         if (file.isFile() && file.getName().endsWith(".apk")) {
-                            LOGGER.info("Removing " + file.getName() + " framework file...");
+                            LOGGER.fine("Removing " + file.getName() + " framework file...");
                             file.delete();
                         }
                     }
@@ -857,7 +857,7 @@ final public class AndrolibResources {
 
         for (File file : Objects.requireNonNull(dir.listFiles())) {
             if (file.isFile() && file.getName().endsWith(".apk")) {
-                LOGGER.info(file.getName());
+                LOGGER.fine(file.getName());
             }
         }
     }
@@ -917,7 +917,7 @@ final public class AndrolibResources {
             }
 
             zip.close();
-            LOGGER.info("Framework installed to: " + outFile);
+            LOGGER.fine("Framework installed to: " + outFile);
         } catch (IOException ex) {
             throw new AndrolibException(ex);
         } finally {

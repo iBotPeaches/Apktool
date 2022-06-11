@@ -41,18 +41,18 @@ public class NonStandardPkgIdTest extends BaseTest {
 
         sTestOrigDir = new ExtFile(sTmpDir, "pkgid8-orig");
         sTestNewDir = new ExtFile(sTmpDir, "pkgid8-new");
-        LOGGER.info("Unpacking pkgid8...");
+        LOGGER.fine("Unpacking pkgid8...");
         TestUtils.copyResourceDir(BuildAndDecodeTest.class, "aapt2/pkgid8/", sTestOrigDir);
 
         BuildOptions buildOptions = new BuildOptions();
         buildOptions.useAapt2 = true;
         buildOptions.verbose = true;
 
-        LOGGER.info("Building pkgid8.apk...");
+        LOGGER.fine("Building pkgid8.apk...");
         File testApk = new File(sTmpDir, "pkgid8.apk");
         new Androlib(buildOptions).build(sTestOrigDir, testApk);
 
-        LOGGER.info("Decoding pkgid8.apk...");
+        LOGGER.fine("Decoding pkgid8.apk...");
         ApkDecoder apkDecoder = new ApkDecoder(testApk);
         apkDecoder.setOutDir(sTestNewDir);
         apkDecoder.decode();

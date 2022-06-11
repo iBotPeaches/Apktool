@@ -40,18 +40,18 @@ public class BuildAndDecodeTest extends BaseTest {
         sTmpDir = new ExtFile(OS.createTempDirectory());
         sTestOrigDir = new ExtFile(sTmpDir, "testapp-orig");
         sTestNewDir = new ExtFile(sTmpDir, "testapp-new");
-        LOGGER.info("Unpacking testapp...");
+        LOGGER.fine("Unpacking testapp...");
         TestUtils.copyResourceDir(BuildAndDecodeTest.class, "aapt2/testapp/", sTestOrigDir);
 
         BuildOptions buildOptions = new BuildOptions();
         buildOptions.useAapt2 = true;
         buildOptions.verbose = true;
 
-        LOGGER.info("Building testapp.apk...");
+        LOGGER.fine("Building testapp.apk...");
         File testApk = new File(sTmpDir, "testapp.apk");
         new Androlib(buildOptions).build(sTestOrigDir, testApk);
 
-        LOGGER.info("Decoding testapp.apk...");
+        LOGGER.fine("Decoding testapp.apk...");
         ApkDecoder apkDecoder = new ApkDecoder(testApk);
         apkDecoder.setOutDir(sTestNewDir);
         apkDecoder.decode();

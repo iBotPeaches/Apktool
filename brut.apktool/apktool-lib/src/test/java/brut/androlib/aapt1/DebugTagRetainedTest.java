@@ -43,17 +43,17 @@ public class DebugTagRetainedTest extends BaseTest {
         sTmpDir = new ExtFile(OS.createTempDirectory());
         sTestOrigDir = new ExtFile(sTmpDir, "issue1235-orig");
         sTestNewDir = new ExtFile(sTmpDir, "issue1235-new");
-        LOGGER.info("Unpacking issue1235...");
+        LOGGER.fine("Unpacking issue1235...");
         TestUtils.copyResourceDir(DebugTagRetainedTest.class, "aapt1/issue1235/", sTestOrigDir);
 
-        LOGGER.info("Building issue1235.apk...");
+        LOGGER.fine("Building issue1235.apk...");
         BuildOptions buildOptions = new BuildOptions();
         buildOptions.debugMode = true;
 
         File testApk = new File(sTmpDir, "issue1235.apk");
         new Androlib(buildOptions).build(sTestOrigDir, testApk);
 
-        LOGGER.info("Decoding issue1235.apk...");
+        LOGGER.fine("Decoding issue1235.apk...");
         ApkDecoder apkDecoder = new ApkDecoder(testApk);
         apkDecoder.setOutDir(sTestNewDir);
         apkDecoder.decode();

@@ -158,7 +158,7 @@ public class OS {
                 String line;
                 while ((line = br.readLine()) != null) {
                     if (mType.equals("OUTPUT")) {
-                        LOGGER.info(line);
+                        LOGGER.fine(line);
                     } else {
                         LOGGER.warning(line);
                     }

@@ -43,10 +43,10 @@ public class DebuggableFalseChangeToTrueTest extends BaseTest {
         sTmpDir = new ExtFile(OS.createTempDirectory());
         sTestOrigDir = new ExtFile(sTmpDir, "issue2328-debuggable-false-orig");
         sTestNewDir = new ExtFile(sTmpDir, "issue2328-debuggable-flase-new");
-        LOGGER.info("Unpacking issue2328-debuggable-flase...");
+        LOGGER.fine("Unpacking issue2328-debuggable-flase...");
         TestUtils.copyResourceDir(DebuggableFalseChangeToTrueTest.class, "aapt2/issue2328/debuggable-false", sTestOrigDir);
 
-        LOGGER.info("Building issue2328-debuggable-flase.apk...");
+        LOGGER.fine("Building issue2328-debuggable-flase.apk...");
         BuildOptions buildOptions = new BuildOptions();
         buildOptions.debugMode = true;
         buildOptions.useAapt2 = true;
@@ -55,7 +55,7 @@ public class DebuggableFalseChangeToTrueTest extends BaseTest {
         File testApk = new File(sTmpDir, "issue2328-debuggable-flase.apk");
         new Androlib(buildOptions).build(sTestOrigDir, testApk);
 
-        LOGGER.info("Decoding issue2328-debuggable-flase.apk...");
+        LOGGER.fine("Decoding issue2328-debuggable-flase.apk...");
         ApkDecoder apkDecoder = new ApkDecoder(testApk);
         apkDecoder.setOutDir(sTestNewDir);
         apkDecoder.decode();

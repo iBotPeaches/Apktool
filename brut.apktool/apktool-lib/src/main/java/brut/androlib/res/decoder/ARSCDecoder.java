@@ -159,7 +159,7 @@ public class ARSCDecoder {
         for (int i = 0; i < libraryCount; i++) {
             packageId = mIn.readInt();
             packageName = mIn.readNullEndedString(128, true);
-            LOGGER.info(String.format("Decoding Shared Library (%s), pkgId: %d", packageName, packageId));
+            LOGGER.fine(String.format("Decoding Shared Library (%s), pkgId: %d", packageName, packageId));
         }
 
         while(nextChunk().type == Header.XML_TYPE_TYPE) {
@@ -171,7 +171,7 @@ public class ARSCDecoder {
         int count = mIn.readInt();
 
         for (int i = 0; i < count; i++) {
-            LOGGER.info(String.format("Skipping staged alias stagedId (%h) finalId: %h", mIn.readInt(), mIn.readInt()));
+            LOGGER.fine(String.format("Skipping staged alias stagedId (%h) finalId: %h", mIn.readInt(), mIn.readInt()));
         }
 
         nextChunk();
@@ -182,7 +182,7 @@ public class ARSCDecoder {
         int count = mIn.readInt();
 
         for (int i = 0; i < count; i++) {
-            LOGGER.info(String.format("Skipping overlay (%h)", mIn.readInt()));
+            LOGGER.fine(String.format("Skipping overlay (%h)", mIn.readInt()));
         }
 
         nextChunk();
@@ -264,7 +264,7 @@ public class ARSCDecoder {
         }
 
         if (typeFlags == 1) {
-            LOGGER.info("Sparse type flags detected: " + mTypeSpec.getName());
+            LOGGER.fine("Sparse type flags detected: " + mTypeSpec.getName());
         }
         int[] entryOffsets = mIn.readIntArray(entryCount);
 
@@ -685,7 +685,7 @@ public class ARSCDecoder {
                 throw new AndrolibException("Arsc file contains zero packages");
             } else if (mPackages.length != 1) {
                 int id = findPackageWithMostResSpecs();
-                LOGGER.info("Arsc file contains multiple packages. Using package "
+                LOGGER.fine("Arsc file contains multiple packages. Using package "
                         + mPackages[id].getName() + " as default.");
 
                 return mPackages[id];

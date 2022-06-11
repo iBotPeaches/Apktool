@@ -39,14 +39,14 @@ public class BuildAndDecodeJarTest extends BaseTest {
         sTmpDir = new ExtFile(OS.createTempDirectory());
         sTestOrigDir = new ExtFile(sTmpDir, "testjar-orig");
         sTestNewDir = new ExtFile(sTmpDir, "testjar-new");
-        LOGGER.info("Unpacking testjar...");
+        LOGGER.fine("Unpacking testjar...");
         TestUtils.copyResourceDir(BuildAndDecodeJarTest.class, "aapt1/testjar/", sTestOrigDir);
 
-        LOGGER.info("Building testjar.jar...");
+        LOGGER.fine("Building testjar.jar...");
         File testJar = new File(sTmpDir, "testjar.jar");
         new Androlib().build(sTestOrigDir, testJar);
 
-        LOGGER.info("Decoding testjar.jar...");
+        LOGGER.fine("Decoding testjar.jar...");
         ApkDecoder apkDecoder = new ApkDecoder(testJar);
         apkDecoder.setOutDir(sTestNewDir);
         apkDecoder.decode();

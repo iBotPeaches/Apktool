@@ -41,11 +41,11 @@ public class ExternalEntityTest extends BaseTest {
         sTestOrigDir = new ExtFile(OS.createTempDirectory());
         TestUtils.copyResourceDir(ExternalEntityTest.class, "decode/doctype/", sTestOrigDir);
 
-        LOGGER.info("Building doctype.apk...");
+        LOGGER.fine("Building doctype.apk...");
         File testApk = new File(sTestOrigDir, "doctype.apk");
         new Androlib().build(sTestOrigDir, testApk);
 
-        LOGGER.info("Decoding doctype.apk...");
+        LOGGER.fine("Decoding doctype.apk...");
         ApkDecoder apkDecoder = new ApkDecoder(testApk);
         apkDecoder.setOutDir(new File(sTestOrigDir + File.separator + "output"));
         apkDecoder.decode();

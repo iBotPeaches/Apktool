@@ -35,7 +35,7 @@ public class DuplicateDexTest extends BaseTest {
         sTmpDir = new ExtFile(OS.createTempDirectory());
         sTestOrigDir = new ExtFile(sTmpDir, "duplicatedex-orig");
         sTestNewDir = new ExtFile(sTmpDir, "duplicatedex-new");
-        LOGGER.info("Unpacking duplicatedex.apk...");
+        LOGGER.fine("Unpacking duplicatedex.apk...");
         TestUtils.copyResourceDir(DuplicateDexTest.class, "decode/duplicatedex", sTestOrigDir);
     }
 
@@ -48,12 +48,12 @@ public class DuplicateDexTest extends BaseTest {
     public void decodeAllSourcesShouldThrowException() throws BrutException, IOException {
         File testApk = new File(sTestOrigDir, "duplicatedex.apk");
 
-        LOGGER.info("Decoding duplicatedex.apk...");
+        LOGGER.fine("Decoding duplicatedex.apk...");
         ApkDecoder apkDecoder = new ApkDecoder(testApk);
         apkDecoder.setOutDir(sTestNewDir);
         apkDecoder.decode();
 
-        LOGGER.info("Building duplicatedex.apk...");
+        LOGGER.fine("Building duplicatedex.apk...");
         BuildOptions buildOptions = new BuildOptions();
         new Androlib(buildOptions).build(sTestNewDir, testApk);
     }
@@ -62,13 +62,13 @@ public class DuplicateDexTest extends BaseTest {
     public void decodeUsingOnlyMainClassesMode() throws BrutException, IOException {
         File testApk = new File(sTestOrigDir, "duplicatedex.apk");
 
-        LOGGER.info("Decoding duplicatedex.apk...");
+        LOGGER.fine("Decoding duplicatedex.apk...");
         ApkDecoder apkDecoder = new ApkDecoder(testApk);
         apkDecoder.setDecodeSources(ApkDecoder.DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES);
         apkDecoder.setOutDir(sTestNewDir);
         apkDecoder.decode();
 
-        LOGGER.info("Building duplicatedex.apk...");
+        LOGGER.fine("Building duplicatedex.apk...");
         BuildOptions buildOptions = new BuildOptions();
         new Androlib(buildOptions).build(sTestNewDir, testApk);
     }

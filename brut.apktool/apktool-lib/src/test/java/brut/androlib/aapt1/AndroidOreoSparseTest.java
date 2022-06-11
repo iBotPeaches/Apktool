@@ -36,17 +36,17 @@ public class AndroidOreoSparseTest extends BaseTest {
         sTmpDir = new ExtFile(OS.createTempDirectory());
         sTestOrigDir = new ExtFile(sTmpDir, "issue1594-orig");
         sTestNewDir = new ExtFile(sTmpDir, "issue1594-new");
-        LOGGER.info("Unpacking sparse.apk...");
+        LOGGER.fine("Unpacking sparse.apk...");
         TestUtils.copyResourceDir(AndroidOreoSparseTest.class, "aapt1/issue1594", sTestOrigDir);
 
         File testApk = new File(sTestOrigDir, "sparse.apk");
 
-        LOGGER.info("Decoding sparse.apk...");
+        LOGGER.fine("Decoding sparse.apk...");
         ApkDecoder apkDecoder = new ApkDecoder(testApk);
         apkDecoder.setOutDir(sTestNewDir);
         apkDecoder.decode();
 
-        LOGGER.info("Building sparse.apk...");
+        LOGGER.fine("Building sparse.apk...");
         BuildOptions buildOptions = new BuildOptions();
         new Androlib(buildOptions).build(sTestNewDir, testApk);
     }

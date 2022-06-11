@@ -43,10 +43,10 @@ public class DebuggableTrueAddedTest extends BaseTest {
         sTmpDir = new ExtFile(OS.createTempDirectory());
         sTestOrigDir = new ExtFile(sTmpDir, "issue2328-debuggable-missing-orig");
         sTestNewDir = new ExtFile(sTmpDir, "issue2328-debuggable-missing-new");
-        LOGGER.info("Unpacking issue2328-debuggable-missing...");
+        LOGGER.fine("Unpacking issue2328-debuggable-missing...");
         TestUtils.copyResourceDir(DebuggableTrueAddedTest.class, "aapt2/issue2328/debuggable-missing", sTestOrigDir);
 
-        LOGGER.info("Building issue2328-debuggable-missing.apk...");
+        LOGGER.fine("Building issue2328-debuggable-missing.apk...");
         BuildOptions buildOptions = new BuildOptions();
         buildOptions.debugMode = true;
         buildOptions.useAapt2 = true;
@@ -55,7 +55,7 @@ public class DebuggableTrueAddedTest extends BaseTest {
         File testApk = new File(sTmpDir, "issue2328-debuggable-missing.apk");
         new Androlib(buildOptions).build(sTestOrigDir, testApk);
 
-        LOGGER.info("Decoding issue2328-debuggable-missing.apk...");
+        LOGGER.fine("Decoding issue2328-debuggable-missing.apk...");
         ApkDecoder apkDecoder = new ApkDecoder(testApk);
         apkDecoder.setOutDir(sTestNewDir);
         apkDecoder.decode();

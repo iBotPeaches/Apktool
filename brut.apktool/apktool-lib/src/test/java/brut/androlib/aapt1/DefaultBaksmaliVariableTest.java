@@ -41,14 +41,14 @@ public class DefaultBaksmaliVariableTest extends BaseTest {
         sTmpDir = new ExtFile(OS.createTempDirectory());
         sTestOrigDir = new ExtFile(sTmpDir, "testjar-orig");
         sTestNewDir = new ExtFile(sTmpDir, "testjar-new");
-        LOGGER.info("Unpacking testjar...");
+        LOGGER.fine("Unpacking testjar...");
         TestUtils.copyResourceDir(DefaultBaksmaliVariableTest.class, "aapt1/issue1481/", sTestOrigDir);
 
-        LOGGER.info("Building issue1481.jar...");
+        LOGGER.fine("Building issue1481.jar...");
         File testJar = new File(sTmpDir, "issue1481.jar");
         new Androlib().build(sTestOrigDir, testJar);
 
-        LOGGER.info("Decoding issue1481.jar...");
+        LOGGER.fine("Decoding issue1481.jar...");
         ApkDecoder apkDecoder = new ApkDecoder(testJar);
         apkDecoder.setOutDir(sTestNewDir);
         apkDecoder.decode();

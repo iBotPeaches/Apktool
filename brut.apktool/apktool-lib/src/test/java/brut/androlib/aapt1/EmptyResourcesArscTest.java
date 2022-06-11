@@ -39,17 +39,17 @@ public class EmptyResourcesArscTest {
         sTmpDir = new ExtFile(OS.createTempDirectory());
         sTestOrigDir = new ExtFile(sTmpDir, "issue1730-orig");
         sTestNewDir = new ExtFile(sTmpDir, "issue1730-new");
-        LOGGER.info("Unpacking issue1730.apk...");
+        LOGGER.fine("Unpacking issue1730.apk...");
         TestUtils.copyResourceDir(EmptyResourcesArscTest.class, "aapt1/issue1730", sTestOrigDir);
 
         File testApk = new File(sTestOrigDir, "issue1730.apk");
 
-        LOGGER.info("Decoding issue1730.apk...");
+        LOGGER.fine("Decoding issue1730.apk...");
         ApkDecoder apkDecoder = new ApkDecoder(testApk);
         apkDecoder.setOutDir(sTestNewDir);
         apkDecoder.decode();
 
-        LOGGER.info("Building issue1730.apk...");
+        LOGGER.fine("Building issue1730.apk...");
         BuildOptions buildOptions = new BuildOptions();
         new Androlib(buildOptions).build(sTestNewDir, testApk);
     }

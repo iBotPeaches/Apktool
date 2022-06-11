@@ -37,7 +37,7 @@ public class MaliciousYamlTest extends BaseTest {
 
         sTmpDir = new ExtFile(OS.createTempDirectory());
         sTestNewDir = new ExtFile(sTmpDir, "cve20220476");
-        LOGGER.info("Unpacking cve20220476...");
+        LOGGER.fine("Unpacking cve20220476...");
         TestUtils.copyResourceDir(MaliciousYamlTest.class, "yaml/cve20220476/", sTestNewDir);
     }
 
