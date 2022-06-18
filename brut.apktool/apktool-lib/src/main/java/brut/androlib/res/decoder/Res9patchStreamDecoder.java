@@ -16,9 +16,14 @@
  */
 package brut.androlib.res.decoder;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Matrix;
 import brut.androlib.AndrolibException;
 import brut.androlib.err.CantFind9PatchChunkException;
 import brut.util.ExtDataInput;
+import brut.util.OSDetection;
 import org.apache.commons.io.IOUtils;
 
 import javax.imageio.ImageIO;
@@ -32,89 +37,23 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 public class Res9patchStreamDecoder implements ResStreamDecoder {
+    private static OSDecoder decoder;
+
+    {
+        if (OSDetection.isAndroid()) {
+            decoder = new AndroidImpl();
+        } else {
+            decoder = new OtherImpl();
+        }
+    }
+
     @Override
     public void decode(InputStream in, OutputStream out) throws AndrolibException {
         try {
             byte[] data = IOUtils.toByteArray(in);
-
-            if (data.length == 0) {
-                return;
-            }
-
-            BufferedImage im = ImageIO.read(new ByteArrayInputStream(data));
-            int w = im.getWidth(), h = im.getHeight();
-
-            BufferedImage im2 = new BufferedImage(w + 2, h + 2, BufferedImage.TYPE_INT_ARGB);
-            if (im.getType() == BufferedImage.TYPE_CUSTOM) {
-                //TODO: Ensure this is gray + alpha case?
-                Raster srcRaster = im.getRaster();
-                WritableRaster dstRaster = im2.getRaster();
-                int[] gray = null, alpha = null;
-                for (int y = 0; y < im.getHeight(); y++) {
-                    gray = srcRaster.getSamples(0, y, w, 1, 0, gray);
-                    alpha = srcRaster.getSamples(0, y, w, 1, 1, alpha);
-
-                    dstRaster.setSamples(1, y + 1, w, 1, 0, gray);
-                    dstRaster.setSamples(1, y + 1, w, 1, 1, gray);
-                    dstRaster.setSamples(1, y + 1, w, 1, 2, gray);
-                    dstRaster.setSamples(1, y + 1, w, 1, 3, alpha);
-                }
-            } else {
-                im2.createGraphics().drawImage(im, 1, 1, w, h, null);
-            }
-
-            NinePatch np = getNinePatch(data);
-            drawHLine(im2, h + 1, np.padLeft + 1, w - np.padRight);
-            drawVLine(im2, w + 1, np.padTop + 1, h - np.padBottom);
-
-            int[] xDivs = np.xDivs;
-            if (xDivs.length == 0) {
-                drawHLine(im2, 0, 1, w);
-            } else {
-                for (int i = 0; i < xDivs.length; i += 2) {
-                    drawHLine(im2, 0, xDivs[i] + 1, xDivs[i + 1]);
-                }
-            }
-
-            int[] yDivs = np.yDivs;
-            if (yDivs.length == 0) {
-                drawVLine(im2, 0, 1, h);
-            } else {
-                for (int i = 0; i < yDivs.length; i += 2) {
-                    drawVLine(im2, 0, yDivs[i] + 1, yDivs[i + 1]);
-                }
-            }
-
-            // Some images additionally use Optical Bounds
-            // https://developer.android.com/about/versions/android-4.3.html#OpticalBounds
-            try {
-                OpticalInset oi = getOpticalInset(data);
-
-                for (int i = 0; i < oi.layoutBoundsLeft; i++) {
-                    int x = 1 + i;
-                    im2.setRGB(x, h + 1, OI_COLOR);
-                }
-
-                for (int i = 0; i < oi.layoutBoundsRight; i++) {
-                    int x = w - i;
-                    im2.setRGB(x, h + 1, OI_COLOR);
-                }
-
-                for (int i = 0; i < oi.layoutBoundsTop; i++) {
-                    int y = 1 + i;
-                    im2.setRGB(w + 1, y, OI_COLOR);
-                }
-
-                for (int i = 0; i < oi.layoutBoundsBottom; i++) {
-                    int y = h - i;
-                    im2.setRGB(w + 1, y, OI_COLOR);
-                }
-            } catch (CantFind9PatchChunkException t) {
-                // This chunk might not exist
-            }
-
-            ImageIO.write(im2, "png", out);
-        } catch (IOException | NullPointerException ex) {
+            if (data.length == 0) return;
+            decoder.decode(data, out);
+        } catch (Exception ex) {
             // In my case this was triggered because a .png file was
             // containing a html document instead of an image.
             // This could be more verbose and try to MIME ?
@@ -153,15 +92,27 @@ public class Res9patchStreamDecoder implements ResStreamDecoder {
         }
     }
 
-    private void drawHLine(BufferedImage im, int y, int x1, int x2) {
+    private void drawHLineJ(BufferedImage im, int y, int x1, int x2) {
         for (int x = x1; x <= x2; x++) {
             im.setRGB(x, y, NP_COLOR);
         }
     }
 
-    private void drawVLine(BufferedImage im, int x, int y1, int y2) {
+    private void drawVLineJ(BufferedImage im, int x, int y1, int y2) {
         for (int y = y1; y <= y2; y++) {
             im.setRGB(x, y, NP_COLOR);
+        }
+    }
+
+    private void drawHLineA(Bitmap bm, int y, int x1, int x2) {
+        for (int x = x1; x <= x2; x++) {
+            bm.setPixel(x, y, NP_COLOR);
+        }
+    }
+
+    private void drawVLineA(Bitmap bm, int x, int y1, int y2) {
+        for (int y = y1; y <= y2; y++) {
+            bm.setPixel(x, y, NP_COLOR);
         }
     }
 
@@ -220,6 +171,159 @@ public class Res9patchStreamDecoder implements ResStreamDecoder {
             int layoutBoundsBottom = Integer.reverseBytes(di.readInt());
             return new OpticalInset(layoutBoundsLeft, layoutBoundsTop,
                 layoutBoundsRight, layoutBoundsBottom);
+        }
+    }
+
+    // OS implementations
+    private interface OSDecoder {
+        void decode(byte[] data, OutputStream out) throws Exception;
+    }
+
+    private class OtherImpl implements OSDecoder {
+        public void decode(byte[] data, OutputStream out) throws Exception {
+            BufferedImage im = ImageIO.read(new ByteArrayInputStream(data));
+            int w = im.getWidth(), h = im.getHeight();
+
+            BufferedImage im2 = new BufferedImage(w + 2, h + 2, BufferedImage.TYPE_INT_ARGB);
+            if (im.getType() == BufferedImage.TYPE_CUSTOM) {
+                // TODO: Ensure this is gray + alpha case?
+                Raster srcRaster = im.getRaster();
+                WritableRaster dstRaster = im2.getRaster();
+                int[] gray = null, alpha = null;
+                for (int y = 0; y < im.getHeight(); y++) {
+                    gray = srcRaster.getSamples(0, y, w, 1, 0, gray);
+                    alpha = srcRaster.getSamples(0, y, w, 1, 1, alpha);
+
+                    dstRaster.setSamples(1, y + 1, w, 1, 0, gray);
+                    dstRaster.setSamples(1, y + 1, w, 1, 1, gray);
+                    dstRaster.setSamples(1, y + 1, w, 1, 2, gray);
+                    dstRaster.setSamples(1, y + 1, w, 1, 3, alpha);
+                }
+            } else {
+                im2.createGraphics().drawImage(im, 1, 1, w, h, null);
+            }
+
+            Res9patchStreamDecoder.NinePatch np = getNinePatch(data);
+            drawHLineJ(im2, h + 1, np.padLeft + 1, w - np.padRight);
+            drawVLineJ(im2, w + 1, np.padTop + 1, h - np.padBottom);
+
+            int[] xDivs = np.xDivs;
+            if (xDivs.length == 0) {
+                drawHLineJ(im2, 0, 1, w);
+            } else {
+                for (int i = 0; i < xDivs.length; i += 2) {
+                    drawHLineJ(im2, 0, xDivs[i] + 1, xDivs[i + 1]);
+                }
+            }
+
+            int[] yDivs = np.yDivs;
+            if (yDivs.length == 0) {
+                drawVLineJ(im2, 0, 1, h);
+            } else {
+                for (int i = 0; i < yDivs.length; i += 2) {
+                    drawVLineJ(im2, 0, yDivs[i] + 1, yDivs[i + 1]);
+                }
+            }
+
+            // Some images additionally use Optical Bounds
+            // https://developer.android.com/about/versions/android-4.3.html#OpticalBounds
+            try {
+                OpticalInset oi = getOpticalInset(data);
+
+                for (int i = 0; i < oi.layoutBoundsLeft; i++) {
+                    int x = 1 + i;
+                    im2.setRGB(x, h + 1, OI_COLOR);
+                }
+
+                for (int i = 0; i < oi.layoutBoundsRight; i++) {
+                    int x = w - i;
+                    im2.setRGB(x, h + 1, OI_COLOR);
+                }
+
+                for (int i = 0; i < oi.layoutBoundsTop; i++) {
+                    int y = 1 + i;
+                    im2.setRGB(w + 1, y, OI_COLOR);
+                }
+
+                for (int i = 0; i < oi.layoutBoundsBottom; i++) {
+                    int y = h - i;
+                    im2.setRGB(w + 1, y, OI_COLOR);
+                }
+            } catch (CantFind9PatchChunkException t) {
+                // This chunk might not exist
+            }
+
+            ImageIO.write(im2, "png", out);
+        }
+    }
+
+    private class AndroidImpl implements OSDecoder {
+        @Override
+        public void decode(byte[] data, OutputStream output) throws Exception {
+            Bitmap bm = BitmapFactory.decodeByteArray(data, 0, data.length);
+            int width = bm.getWidth(), height = bm.getHeight();
+
+            Bitmap outImg = Bitmap.createBitmap(width + 2, height + 2, Bitmap.Config.ARGB_8888);
+            drawImage(outImg, bm);
+
+            NinePatch np = getNinePatch(data);
+            drawHLineA(outImg, height + 1, np.padLeft + 1, width - np.padRight);
+            drawVLineA(outImg, width + 1, np.padTop + 1, height - np.padBottom);
+
+            int[] xDivs = np.xDivs;
+            if (xDivs.length == 0) {
+                drawHLineA(outImg, 0, 1, width);
+            } else {
+                for (int i = 0; i < xDivs.length; i += 2) {
+                    drawHLineA(outImg, 0, xDivs[i] + 1, xDivs[i + 1]);
+                }
+            }
+
+            int[] yDivs = np.yDivs;
+            if (yDivs.length == 0) {
+                drawVLineA(outImg, 0, 1, height);
+            } else {
+                for (int i = 0; i < yDivs.length; i += 2) {
+                    drawVLineA(outImg, 0, yDivs[i] + 1, yDivs[i + 1]);
+                }
+            }
+
+            // Some images additionally use Optical Bounds
+            // https://developer.android.com/about/versions/android-4.3.html#OpticalBounds
+            try {
+                OpticalInset oi = getOpticalInset(data);
+
+                for (int i = 0; i < oi.layoutBoundsLeft; i++) {
+                    int x = 1 + i;
+                    outImg.setPixel(x, height + 1, OI_COLOR);
+                }
+
+                for (int i = 0; i < oi.layoutBoundsRight; i++) {
+                    int x = width - i;
+                    outImg.setPixel(x, height + 1, OI_COLOR);
+                }
+
+                for (int i = 0; i < oi.layoutBoundsTop; i++) {
+                    int y = 1 + i;
+                    outImg.setPixel(width + 1, y, OI_COLOR);
+                }
+
+                for (int i = 0; i < oi.layoutBoundsBottom; i++) {
+                    int y = height - i;
+                    outImg.setPixel(width + 1, y, OI_COLOR);
+                }
+            } catch (CantFind9PatchChunkException t) {
+                // This chunk might not exist
+            }
+
+            outImg.compress(Bitmap.CompressFormat.PNG, 100, output);
+        }
+
+        private void drawImage(Bitmap self, Bitmap toDraw) {
+            Canvas canvas = new Canvas(self);
+            Matrix matrix = new Matrix();
+            matrix.mapPoints(new float[] { 1f, 1f, toDraw.getWidth(), toDraw.getHeight() });
+            canvas.drawBitmap(toDraw, matrix, null);
         }
     }
 }

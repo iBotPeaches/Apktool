@@ -13,23 +13,24 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-import org.apache.tools.ant.filters.*
+
+import org.apache.tools.ant.filters.ReplaceTokens
 
 apply plugin: 'java-library'
 
 processResources {
-  from('src/main/resources/properties') {
-    include '**/*.properties'
-    into 'properties'
-    filter(ReplaceTokens, tokens: [version: project.apktool_version, gitrev: project.hash] )
-    duplicatesStrategy = DuplicatesStrategy.INCLUDE
-  }
-  from('src/main/resources/') {
-    include '**/*.jar'
-    duplicatesStrategy = DuplicatesStrategy.INCLUDE
-  }
+    from('src/main/resources/properties') {
+        include '**/*.properties'
+        into 'properties'
+        filter(ReplaceTokens, tokens: [version: project.apktool_version, gitrev: project.hash])
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    }
+    from('src/main/resources/') {
+        include '**/*.jar'
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    }
 
-  includeEmptyDirs = false
+    includeEmptyDirs = false
 }
 
 dependencies {
@@ -39,14 +40,26 @@ dependencies {
         project(':brut.j.util'),
         project(':brut.j.common')
 
+    def androidJar
+    def root = System.getenv('ANDROID_SDK_ROOT')
+    if (root == null) {
+        new GradleException("Missing ANDROID_SDK_ROOT").printStackTrace()
+        androidJar = 'com.google.android:android:4.1.1.4'
+    } else {
+        def androidVersion = 30
+        androidJar = files("$root/platforms/android-$androidVersion/android.jar")
+    }
+
+    compileOnly androidJar
+
     implementation depends.baksmali,
-                   depends.smali,
-                   depends.snakeyaml,
-                   depends.xmlpull,
-                   depends.guava,
-                   depends.commons_lang,
-                   depends.commons_io,
-                   depends.commons_text
+        depends.smali,
+        depends.snakeyaml,
+        depends.xmlpull,
+        depends.guava,
+        depends.commons_lang,
+        depends.commons_io,
+        depends.commons_text
 
     testImplementation depends.xmlunit
 }
