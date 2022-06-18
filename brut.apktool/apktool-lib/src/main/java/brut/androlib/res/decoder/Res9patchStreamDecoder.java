@@ -322,7 +322,7 @@ public class Res9patchStreamDecoder implements ResStreamDecoder {
         private void drawImage(Bitmap self, Bitmap toDraw) {
             Canvas canvas = new Canvas(self);
             Matrix matrix = new Matrix();
-            matrix.mapPoints(new float[] { 1f, 1f, toDraw.getWidth(), toDraw.getHeight() });
+            matrix.mapPoints(new float[] { 1f, 1f, self.getWidth(), self.getHeight() });
             canvas.drawBitmap(toDraw, matrix, null);
         }
     }
