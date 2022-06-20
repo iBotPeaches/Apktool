@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" android:appCategory="game" android:compileSdkVersion="23" android:compileSdkVersionCodename="6.0-2438415" package="brut.apktool.aapt1.testapp" platformBuildVersionCode="23" platformBuildVersionName="6.0-2438415">
-    <application android:label="Issue2799 &amp; B">
+    <application android:label="Issue2799 &amp; B" android:dataExtractionRules="backup_rules.xml">
         <meta-data name="test_int_as_string" value="\ 12345" />
         <meta-data name="test_int" value="12345" />
     </application>
