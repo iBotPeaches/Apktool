@@ -38,6 +38,7 @@ import org.xmlpull.v1.XmlSerializer;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.zip.CRC32;
@@ -331,19 +332,18 @@ final public class AndrolibResources {
     }
 
     private void aapt2Package(File apkFile, File manifest, File resDir, File rawDir, File assetDir, File[] include,
-                              List<String> cmd, boolean customAapt)
-            throws AndrolibException {
-
+                              List<String> cmd, boolean customAapt) throws AndrolibException {
         List<String> compileCommand = new ArrayList<>(cmd);
         File resourcesZip = null;
 
         if (resDir != null) {
             File buildDir = new File(resDir.getParent(), "build");
+            //noinspection ResultOfMethodCallIgnored
+            buildDir.mkdirs();
             resourcesZip = new File(buildDir, "resources.zip");
         }
 
         if (resDir != null && !resourcesZip.exists()) {
-
             // Compile the files into flat arsc files
             cmd.add("compile");
 
@@ -352,9 +352,6 @@ final public class AndrolibResources {
 
             // Treats error that used to be valid in aapt1 as warnings in aapt2
             cmd.add("--legacy");
-
-            File buildDir = new File(resDir.getParent(), "build");
-            resourcesZip = new File(buildDir, "resources.zip");
 
             cmd.add("-o");
             cmd.add(resourcesZip.getAbsolutePath());
@@ -614,7 +611,7 @@ final public class AndrolibResources {
             throws AndrolibException {
 
         String aaptPath = buildOptions.aaptPath;
-        boolean customAapt = !aaptPath.isEmpty();
+        boolean customAapt = false; // ReVanced - we always use a custom aapt binary.
         List<String> cmd = new ArrayList<>();
 
         try {
@@ -889,10 +886,10 @@ final public class AndrolibResources {
                     + (tag == null ? "" : '-' + tag)
                     + ".apk");
 
-            out = new ZipOutputStream(new FileOutputStream(outFile));
+            out = new ZipOutputStream(Files.newOutputStream(outFile.toPath()));
             out.setMethod(ZipOutputStream.STORED);
             CRC32 crc = new CRC32();
-            crc.update(data);
+            crc.update(data, 0, data.length);
             entry = new ZipEntry("resources.arsc");
             entry.setSize(data.length);
             entry.setMethod(ZipOutputStream.STORED);
@@ -907,7 +904,7 @@ final public class AndrolibResources {
                 in = zip.getInputStream(entry);
                 byte[] manifest = IOUtils.toByteArray(in);
                 CRC32 manifestCrc = new CRC32();
-                manifestCrc.update(manifest);
+                manifestCrc.update(manifest, 0, manifest.length);
                 entry.setSize(manifest.length);
                 entry.setCompressedSize(-1);
                 entry.setCrc(manifestCrc.getValue());
@@ -929,8 +926,10 @@ final public class AndrolibResources {
     public void publicizeResources(File arscFile) throws AndrolibException {
         byte[] data = new byte[(int) arscFile.length()];
 
-        try(InputStream in = new FileInputStream(arscFile);
-            OutputStream out = new FileOutputStream(arscFile)) {
+        Path path = arscFile.toPath();
+        try(InputStream in = Files.newInputStream(path);
+            OutputStream out = Files.newOutputStream(path)) {
+            //noinspection ResultOfMethodCallIgnored
             in.read(data);
             publicizeResources(data);
             out.write(data);
