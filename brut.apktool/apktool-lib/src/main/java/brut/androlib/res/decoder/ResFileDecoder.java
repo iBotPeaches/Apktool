@@ -25,6 +25,7 @@ import brut.androlib.res.data.value.ResFileValue;
 import brut.directory.DirUtil;
 import brut.directory.Directory;
 import brut.directory.DirectoryException;
+import brut.util.OSDetection;
 
 import java.io.*;
 import java.util.logging.Level;
@@ -88,7 +89,12 @@ public class ResFileDecoder {
                     }
 
                     try {
-                        decode(inDir, inFileName, outDir, outFileName, "9patch");
+                        // ReVanced - decode raw on Android
+                        if (OSDetection.isAndroid()) {
+                            decode(inDir, inFileName, outDir, outFileName, "9patch");
+                        } else {
+                            decode(inDir, inFileName, outDir, outFileName, "raw");
+                        }
                         return;
                     } catch (CantFind9PatchChunkException ex) {
                         LOGGER.log(
