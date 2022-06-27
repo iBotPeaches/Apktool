@@ -91,9 +91,9 @@ public class ResFileDecoder {
                     try {
                         // ReVanced - decode raw on Android
                         if (OSDetection.isAndroid()) {
-                            decode(inDir, inFileName, outDir, outFileName, "9patch");
-                        } else {
                             decode(inDir, inFileName, outDir, outFileName, "raw");
+                        } else {
+                            decode(inDir, inFileName, outDir, outFileName, "9patch");
                         }
                         return;
                     } catch (CantFind9PatchChunkException ex) {
