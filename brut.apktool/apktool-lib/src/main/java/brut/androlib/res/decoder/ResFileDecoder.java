@@ -89,9 +89,9 @@ public class ResFileDecoder {
                     }
 
                     try {
-                        // ReVanced - decode raw on Android
+                        // ReVanced - copy raw on Android
                         if (OSDetection.isAndroid()) {
-                            decode(inDir, inFileName, outDir, outFileName, "raw");
+                            copyRaw(inDir, outDir, inFileName, outFileName);
                         } else {
                             decode(inDir, inFileName, outDir, outFileName, "9patch");
                         }
