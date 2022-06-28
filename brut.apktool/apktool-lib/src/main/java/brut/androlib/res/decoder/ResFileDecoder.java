@@ -89,12 +89,7 @@ public class ResFileDecoder {
                     }
 
                     try {
-                        // ReVanced - copy raw on Android
-                        if (OSDetection.isAndroid()) {
-                            copyRaw(inDir, outDir, inFileName, outFileName);
-                        } else {
-                            decode(inDir, inFileName, outDir, outFileName, "9patch");
-                        }
+                        decode(inDir, inFileName, outDir, outFileName, "9patch");
                         return;
                     } catch (CantFind9PatchChunkException ex) {
                         LOGGER.log(
