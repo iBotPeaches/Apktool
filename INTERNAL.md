@@ -253,6 +253,11 @@ original as they were.
 As cheesy as it is, just follow this [downloading](https://source.android.com/source/downloading.html) link in order
 to get the source downloaded. This is no small download, expect to use 150-250GB.
 
+Some optimization techniques for a smaller clone:
+
+ * `~/bin/repo init -u https://android.googlesource.com/platform/manifest -b master --partial-clone` - Partial clone
+ * `repo sync -c` - Only current branch
+
 After that, you need to build AOSP via this [documentation](https://source.android.com/source/building.html) guide. Now
 we aren't building the entire AOSP package, the initial build is to just see if you are capable of building it.
 
