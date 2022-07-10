@@ -12,6 +12,7 @@ description: Apktool - Changelog / Roadmap
  * Add support for newest `ResourcesTypes.h` specs (policy, overlay and staged alias). ([Issue 2809](https://github.com/iBotPeaches/Apktool/issues/2809), [Issue 2714](https://github.com/iBotPeaches/Apktool/issues/2714))
  * Add updated internal aapt2/aapt2 binaries. ([Issue 2787](https://github.com/iBotPeaches/Apktool/pull/2787))
  * Add ability to generate generic network security config (`-n` / `--net-sec-conf`). ([Issue 1622](https://github.com/iBotPeaches/Apktool/issues/1622))
+ * Add helpful message during built apk message to identify location of apk. ([Issue 2843](https://github.com/iBotPeaches/Apktool/issues/2843))
  * Fix resource unclosed during unknown file handling. ([Issue 2473](https://github.com/iBotPeaches/Apktool/issues/2473)) / (Thanks 
 auermich93)
  * Fix style strings regression between aapt1/aapt2 builds. ([Issue 2815](https://github.com/iBotPeaches/Apktool/issues/2815)) / (Thanks IgorEisberg)
