@@ -129,6 +129,10 @@ public final class ResXmlPatcher {
      * Creates a modified network security config file that is more permissive
      *
      * @param file network security config file
+     * @throws TransformerException XML file could not be edited
+     * @throws IOException XML file could not be located
+     * @throws SAXException XML file could not be read
+     * @throws ParserConfigurationException XML nodes could be written
      */
     public static void modNetworkSecurityConfig(File file)
         throws ParserConfigurationException, TransformerException, IOException, SAXException {
@@ -184,13 +188,10 @@ public final class ResXmlPatcher {
                 for (int i = 0; i < nodes.getLength(); i++) {
                     Node node = nodes.item(i);
                     NamedNodeMap attrs = node.getAttributes();
+                    Node provider = attrs.getNamedItem("android:authorities");
 
-                    if (attrs != null) {
-                        Node provider = attrs.getNamedItem("android:authorities");
-
-                        if (provider != null) {
-                            saved = isSaved(file, saved, provider);
-                        }
+                    if (provider != null) {
+                        saved = isSaved(file, saved, provider);
                     }
                 }
 
@@ -204,13 +205,10 @@ public final class ResXmlPatcher {
                 for (int i = 0; i < nodes.getLength(); i++) {
                     Node node = nodes.item(i);
                     NamedNodeMap attrs = node.getAttributes();
+                    Node provider = attrs.getNamedItem("android:scheme");
 
-                    if (attrs != null) {
-                        Node provider = attrs.getNamedItem("android:scheme");
-
-                        if (provider != null) {
-                            saved = isSaved(file, saved, provider);
-                        }
+                    if (provider != null) {
+                        saved = isSaved(file, saved, provider);
                     }
                 }
 
