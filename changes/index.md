@@ -8,6 +8,7 @@ description: Apktool - Changelog / Roadmap
 2022.xx.xx
  * Add SDK T (API 33) support. ([Issue 2845](https://github.com/iBotPeaches/Apktool/pull/2845))
  * Add SDK S v2 (API 32) support. ([Issue 2776](https://github.com/iBotPeaches/Apktool/issues/2776))
+ * Updated internal aapt/aapt2 to ([91492d8 of frameworks_base](https://github.com/iBotPeaches/platform_frameworks_base/commit/91492d85dcaefe1999ae98d0d2b39258be2252a9))
  * Add support for newest `ResourcesTypes.h` specs (policy, overlay and staged alias). ([Issue 2809](https://github.com/iBotPeaches/Apktool/issues/2809), [Issue 2714](https://github.com/iBotPeaches/Apktool/issues/2714))
  * Add updated internal aapt2/aapt2 binaries. ([Issue 2787](https://github.com/iBotPeaches/Apktool/pull/2787))
  * Add ability to generate generic network security config (`-n` / `--net-sec-conf`). ([Issue 1622](https://github.com/iBotPeaches/Apktool/issues/1622))
