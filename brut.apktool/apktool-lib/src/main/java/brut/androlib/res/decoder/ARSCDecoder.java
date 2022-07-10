@@ -171,7 +171,7 @@ public class ARSCDecoder {
         int count = mIn.readInt();
 
         for (int i = 0; i < count; i++) {
-            LOGGER.info(String.format("Skipping staged alias stagedId (%h) finalId: %h", mIn.readInt(), mIn.readInt()));
+            LOGGER.fine(String.format("Skipping staged alias stagedId (%h) finalId: %h", mIn.readInt(), mIn.readInt()));
         }
 
         nextChunk();
@@ -182,7 +182,7 @@ public class ARSCDecoder {
         int count = mIn.readInt();
 
         for (int i = 0; i < count; i++) {
-            LOGGER.info(String.format("Skipping overlay (%h)", mIn.readInt()));
+            LOGGER.fine(String.format("Skipping overlay (%h)", mIn.readInt()));
         }
 
         nextChunk();
