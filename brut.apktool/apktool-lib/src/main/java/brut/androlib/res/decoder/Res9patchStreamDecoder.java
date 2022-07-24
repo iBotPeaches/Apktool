@@ -263,8 +263,12 @@ public class Res9patchStreamDecoder implements ResStreamDecoder {
             Bitmap bm = BitmapFactory.decodeByteArray(data, 0, data.length);
             int width = bm.getWidth(), height = bm.getHeight();
 
-            Bitmap outImg = Bitmap.createBitmap(width + 2, height + 2, Bitmap.Config.ARGB_8888);
-            drawImage(outImg, bm);
+            Bitmap outImg = Bitmap.createBitmap(width + 2, height + 2, bm.getConfig());
+            for (int x = 0; x < width; x++) {
+                for (int y = 0; y < height; y++) {
+                    outImg.setPixel(x + 1, y + 1, bm.getPixel(x, y));
+                }
+            }
 
             NinePatch np = getNinePatch(data);
             drawHLineA(outImg, height + 1, np.padLeft + 1, width - np.padRight);
@@ -317,13 +321,8 @@ public class Res9patchStreamDecoder implements ResStreamDecoder {
             }
 
             outImg.compress(Bitmap.CompressFormat.PNG, 100, output);
-        }
-
-        private void drawImage(Bitmap self, Bitmap toDraw) {
-            Canvas canvas = new Canvas(self);
-            Matrix matrix = new Matrix();
-            matrix.mapPoints(new float[] { 1f, 1f, self.getWidth(), self.getHeight() });
-            canvas.drawBitmap(toDraw, matrix, null);
+            bm.recycle();
+            outImg.recycle();
         }
     }
 }
