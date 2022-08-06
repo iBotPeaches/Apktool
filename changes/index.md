@@ -18,6 +18,7 @@ auermich93)
  * Fix style strings regression between aapt1/aapt2 builds. ([Issue 2815](https://github.com/iBotPeaches/Apktool/issues/2815)) / (Thanks IgorEisberg)
  * Fix support for `uses-native-library` in Manifest. ([Issue 2778](https://github.com/iBotPeaches/Apktool/issues/2778))
  * Fix support for `usesPermissionFlags` in Manifest. ([Issue 2789](https://github.com/iBotPeaches/Apktool/issues/2789))
+ * Fix windows helper script to allow spaces in path name. ([Issue 2855](https://github.com/iBotPeaches/Apktool/issues/2855))
  * Revert automatic workaround for using private resources. ([PR 2785](https://github.com/iBotPeaches/Apktool/pull/2785), [Issue 2771](https://github.com/iBotPeaches/Apktool/issues/2771))
  * Upgrade CI Workflow to leverage latest actions. (Thanks Goooler)
 
