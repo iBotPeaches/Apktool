@@ -6,7 +6,7 @@ chcp 65001 2>nul >nul
 set java_exe=java.exe
 
 if defined JAVA_HOME (
-set java_exe="%JAVA_HOME%\bin\java.exe"
+set "java_exe=%JAVA_HOME%\bin\java.exe"
 )
 
 rem Find the highest version .jar available in the same directory as the script
