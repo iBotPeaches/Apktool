@@ -336,16 +336,26 @@ public class AXmlResourceParser implements XmlResourceParser {
         }
 
         String value = m_strings.getString(name);
+        String namespace = getAttributeNamespace(index);
 
-        // some attributes will return "", we must rely on the resource_id and refer to the frameworks
-        // to match the resource id to the name. ex: 0x101021C = versionName
-        if (value.length() == 0 || android_ns.equals(getAttributeNamespace(index))) {
+        // If attribute name is lacking or a private namespace emerges,
+        // retrieve the exact attribute name by its id.
+        if (value == null || value.length() == 0) {
             try {
-                int resourceId = getAttributeNameResource(index);
-                if (resourceId != 0) {
-                    value = mAttrDecoder.decodeManifestAttr(getAttributeNameResource(index));
+                value = mAttrDecoder.decodeManifestAttr(getAttributeNameResource(index));
+                if (value == null) {
+                    value = "";
                 }
-            } catch (AndrolibException | NullPointerException ignored) {}
+            } catch (AndrolibException e) {
+                value = "";
+            }
+        } else if (! namespace.equals(android_ns)) {
+            try {
+                String obfuscatedName = mAttrDecoder.decodeManifestAttr(getAttributeNameResource(index));
+                if (! (obfuscatedName == null || obfuscatedName.equals(value))) {
+                    value = obfuscatedName;
+                }
+            } catch (AndrolibException ignored) {}
         }
         return value;
     }
@@ -381,11 +391,27 @@ public class AXmlResourceParser implements XmlResourceParser {
 
         if (mAttrDecoder != null) {
             try {
+                String value = valueRaw == -1 ? null : ResXmlEncoders.escapeXmlChars(m_strings.getString(valueRaw));
+                String obfuscatedValue = mAttrDecoder.decodeManifestAttr(valueData);
+
+                if (! (value == null || obfuscatedValue == null)) {
+                    int slashPos = value.lastIndexOf("/");
+
+                    if (slashPos != -1) {
+                        // Handle a value with a format of "@yyy/xxx"
+                        String dir = value.substring(0, slashPos);
+                        value = dir + "/"+ obfuscatedValue;
+                    } else if (! value.equals(obfuscatedValue)) {
+                        value = obfuscatedValue;
+                    }
+                }
+
                 return mAttrDecoder.decode(
-                        valueType,
-                        valueData,
-                        valueRaw == -1 ? null : ResXmlEncoders.escapeXmlChars(m_strings.getString(valueRaw)),
-                        getAttributeNameResource(index));
+                    valueType,
+                    valueData,
+                    value,
+                    getAttributeNameResource(index)
+                );
             } catch (AndrolibException ex) {
                 setFirstError(ex);
                 LOGGER.log(Level.WARNING, String.format("Could not decode attr value, using undecoded value "
@@ -807,9 +833,9 @@ public class AXmlResourceParser implements XmlResourceParser {
         if (m_strings == null) {
             m_reader.skipCheckInt(CHUNK_AXML_FILE, CHUNK_AXML_FILE_BROKEN);
 
-			/*
-			 * chunkSize
-			 */
+            /*
+             * chunkSize
+             */
             m_reader.skipInt();
             m_strings = StringBlock.read(m_reader);
             m_namespaces.increaseDepth();
@@ -863,9 +889,9 @@ public class AXmlResourceParser implements XmlResourceParser {
             }
 
             // Common header.
-			/* chunkSize */m_reader.skipInt();
+            /* chunkSize */m_reader.skipInt();
             int lineNumber = m_reader.readInt();
-			/* 0xFFFFFFFF */m_reader.skipInt();
+            /* 0xFFFFFFFF */m_reader.skipInt();
 
             if (chunkType == CHUNK_XML_START_NAMESPACE || chunkType == CHUNK_XML_END_NAMESPACE) {
                 if (chunkType == CHUNK_XML_START_NAMESPACE) {
@@ -873,8 +899,8 @@ public class AXmlResourceParser implements XmlResourceParser {
                     int uri = m_reader.readInt();
                     m_namespaces.push(prefix, uri);
                 } else {
-					/* prefix */m_reader.skipInt();
-					/* uri */m_reader.skipInt();
+                    /* prefix */m_reader.skipInt();
+                    /* uri */m_reader.skipInt();
                     m_namespaces.pop();
                 }
                 continue;
@@ -885,7 +911,7 @@ public class AXmlResourceParser implements XmlResourceParser {
             if (chunkType == CHUNK_XML_START_TAG) {
                 m_namespaceUri = m_reader.readInt();
                 m_name = m_reader.readInt();
-				/* flags? */m_reader.skipInt();
+                /* flags? */m_reader.skipInt();
                 int attributeCount = m_reader.readInt();
                 m_idAttribute = (attributeCount >>> 16) - 1;
                 attributeCount &= 0xFFFF;
@@ -912,8 +938,8 @@ public class AXmlResourceParser implements XmlResourceParser {
 
             if (chunkType == CHUNK_XML_TEXT) {
                 m_name = m_reader.readInt();
-				/* ? */m_reader.skipInt();
-				/* ? */m_reader.skipInt();
+                /* ? */m_reader.skipInt();
+                /* ? */m_reader.skipInt();
                 m_event = TEXT;
                 break;
             }
@@ -927,10 +953,10 @@ public class AXmlResourceParser implements XmlResourceParser {
     }
 
     // ///////////////////////////////// data
-	/*
-	 * All values are essentially indices, e.g. m_name is an index of name in
-	 * m_strings.
-	 */
+    /*
+     * All values are essentially indices, e.g. m_name is an index of name in
+     * m_strings.
+     */
     private ExtDataInput m_reader;
     private ResAttrDecoder mAttrDecoder;
     private AndrolibException mFirstError;
