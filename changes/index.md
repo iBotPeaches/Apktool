@@ -20,6 +20,8 @@ auermich93)
  * Fix support for `usesPermissionFlags` in Manifest. ([Issue 2789](https://github.com/iBotPeaches/Apktool/issues/2789))
  * Fix windows helper script to allow spaces in path name. ([Issue 2855](https://github.com/iBotPeaches/Apktool/issues/2855))
  * Fix decoding application if using multiple style res types. ([Issue 1719](https://github.com/iBotPeaches/Apktool/issues/1719)) / (Thanks tvildo)
+ * Fix handling with malformed namespaces. ([Issue 2615](https://github.com/iBotPeaches/Apktool/issues/2615)) / (Thanks ljysdfz & MyAnoneNeko)
+ * Fix handling of sparse flags during resource parsing. ([Issue 2887](https://github.com/iBotPeaches/Apktool/pull/2887)) / (Thanks iamr0s)
  * Revert automatic workaround for using private resources. ([PR 2785](https://github.com/iBotPeaches/Apktool/pull/2785), [Issue 2771](https://github.com/iBotPeaches/Apktool/issues/2771))
  * Upgrade CI Workflow to leverage latest actions. (Thanks Goooler)
 
