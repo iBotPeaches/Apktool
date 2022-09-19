@@ -265,15 +265,13 @@ public class ARSCDecoder {
 
         if ((typeFlags & 0x01) != 0) {
             LOGGER.info("Sparse type flags detected: " + mTypeSpec.getName());
-        }else{
-            // LOGGER.info("Not sparse type flags detected: " + mTypeSpec.getName());
         }
 
         HashMap<Integer, Integer> entryOffsetMap = new LinkedHashMap();
-        for (int i = 0; i < entryCount; i++){
+        for (int i = 0; i < entryCount; i++) {
             if ((typeFlags & 0x01) != 0) {
                 entryOffsetMap.put(mIn.readUnsignedShort(), mIn.readUnsignedShort());
-            }else{
+            } else {
                 entryOffsetMap.put(i, mIn.readInt());
             }
         }
@@ -289,9 +287,11 @@ public class ARSCDecoder {
 
         mType = flags.isInvalid && !mKeepBroken ? null : mPkg.getOrCreateConfig(flags);
 
-        for (int i : entryOffsetMap.keySet()){
+        for (int i : entryOffsetMap.keySet()) {
             int offset = entryOffsetMap.get(i);
-            if (offset == -1) continue;
+            if (offset == -1) {
+                continue;
+            }
             mMissingResSpecMap.put(i, false);
             mResId = (mResId & 0xffff0000) | i;
             readEntry(readEntryData());
@@ -533,12 +533,12 @@ public class ARSCDecoder {
     private void addMissingResSpecs() throws AndrolibException {
         int resId = mResId & 0xffff0000;
 
-        for (int i : mMissingResSpecMap.keySet()){
+        for (int i : mMissingResSpecMap.keySet()) {
             if (mMissingResSpecMap.get(i)) continue;
 
             ResResSpec spec = new ResResSpec(new ResID(resId | i), "APKTOOL_DUMMY_" + Integer.toHexString(i), mPkg, mTypeSpec);
 
-            // If we already have this resID dont add it again.
+            // If we already have this resID don't add it again.
             if (! mPkg.hasResSpec(new ResID(resId | i))) {
                 mPkg.addResSpec(spec);
                 mTypeSpec.addResSpec(spec);
