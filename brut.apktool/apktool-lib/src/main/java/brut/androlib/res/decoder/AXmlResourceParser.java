@@ -28,6 +28,7 @@ import java.io.DataInput;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -343,15 +344,19 @@ public class AXmlResourceParser implements XmlResourceParser {
         if (value == null || value.length() == 0) {
             try {
                 value = mAttrDecoder.decodeManifestAttr(getAttributeNameResource(index));
-                if (value == null) value = "";
-            } catch (AndrolibException e) {value = "";}
+                if (value == null) {
+                    value = "";
+                }
+            } catch (AndrolibException e) {
+                value = "";
+            }
         } else if (! namespace.equals(android_ns)) {
             try {
                 String obfuscatedName = mAttrDecoder.decodeManifestAttr(getAttributeNameResource(index));
                 if (! (obfuscatedName == null || obfuscatedName.equals(value))) {
                     value = obfuscatedName;
                 }
-            } catch (AndrolibException e) {}
+            } catch (AndrolibException ignored) {}
         }
         return value;
     }
@@ -387,10 +392,9 @@ public class AXmlResourceParser implements XmlResourceParser {
 
         if (mAttrDecoder != null) {
             try {
-                String value = valueRaw == -1 ? null : ResXmlEncoders
-                        .escapeXmlChars(m_strings.getString(valueRaw));
-                String obfuscatedValue = mAttrDecoder
-                        .decodeManifestAttr(valueData);
+                String value = valueRaw == -1 ? null : ResXmlEncoders.escapeXmlChars(m_strings.getString(valueRaw));
+                String obfuscatedValue = mAttrDecoder.decodeManifestAttr(valueData);
+
                 if (! (value == null || obfuscatedValue == null)) {
                     int slashPos = value.lastIndexOf("/");
 
@@ -404,10 +408,11 @@ public class AXmlResourceParser implements XmlResourceParser {
                 }
 
                 return mAttrDecoder.decode(
-                        valueType,
-                        valueData,
-                        value,
-                        getAttributeNameResource(index));
+                    valueType,
+                    valueData,
+                    value,
+                    getAttributeNameResource(index)
+                );
             } catch (AndrolibException ex) {
                 setFirstError(ex);
                 LOGGER.log(Level.WARNING, String.format("Could not decode attr value, using undecoded value "
