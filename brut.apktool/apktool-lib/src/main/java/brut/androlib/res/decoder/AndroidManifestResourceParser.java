@@ -37,6 +37,9 @@ public class AndroidManifestResourceParser extends AXmlResourceParser {
     @Override
     public String getAttributeValue(int index) {
         String value = super.getAttributeValue(index);
+        if (value == null) {
+            return "";
+        }
 
         if (!isNumericStringMetadataAttributeValue(index, value)) {
             return value;
@@ -46,7 +49,7 @@ public class AndroidManifestResourceParser extends AXmlResourceParser {
         // Otherwise, when the decoded app is rebuilt, aapt will incorrectly encode
         // the value as an int or float (depending on aapt version), breaking the original
         // app functionality.
-        return "\\ " + super.getAttributeValue(index).trim();
+        return "\\ " + value.trim();
     }
 
     private boolean isNumericStringMetadataAttributeValue(int index, String value) {
