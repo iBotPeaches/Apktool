@@ -49,3 +49,8 @@ Folks have requested running Apktool on device itself. This has been a challenge
 that would be placed on the aapt2/aapt binaries.
 
 Suggestions: [#2811](https://github.com/iBotPeaches/Apktool/issues/2811)
+
+## Split APK Support
+Applications are further getting split on qualifiers. Apktool has been built on the assumption of one apk.
+
+Suggestions: [#2283](https://github.com/iBotPeaches/Apktool/issues/2283), [#2218](https://github.com/iBotPeaches/Apktool/issues/2218), [#2880](https://github.com/iBotPeaches/Apktool/issues/2880)
