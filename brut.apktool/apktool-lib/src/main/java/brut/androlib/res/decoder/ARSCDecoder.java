@@ -33,6 +33,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -159,7 +160,7 @@ public class ARSCDecoder {
         for (int i = 0; i < libraryCount; i++) {
             packageId = mIn.readInt();
             packageName = mIn.readNullEndedString(128, true);
-            LOGGER.fine(String.format("Decoding Shared Library (%s), pkgId: %d", packageName, packageId));
+           LOGGER.fine(String.format("Decoding Shared Library (%s), pkgId: %d", packageName, packageId));
         }
 
         while(nextChunk().type == Header.XML_TYPE_TYPE) {
@@ -232,7 +233,7 @@ public class ARSCDecoder {
             mFlagsOffsets.add(new FlagsOffset(mCountIn.getCount(), entryCount));
         }
 
-		/* flags */mIn.skipBytes(entryCount * 4);
+        /* flags */mIn.skipBytes(entryCount * 4);
         mTypeSpec = new ResTypeSpec(mTypeNames.getString(id - 1), mResTable, mPkg, id, entryCount);
         mPkg.addType(mTypeSpec);
         return mTypeSpec;
@@ -250,8 +251,7 @@ public class ARSCDecoder {
         /* reserved */mIn.skipBytes(2);
         int entryCount = mIn.readInt();
         int entriesStart = mIn.readInt();
-        mMissingResSpecs = new boolean[entryCount];
-        Arrays.fill(mMissingResSpecs, true);
+        mMissingResSpecMap = new LinkedHashMap();
 
         ResConfigFlags flags = readConfigFlags();
         int position = (mHeader.startPosition + entriesStart) - (entryCount * 4);
@@ -263,10 +263,18 @@ public class ARSCDecoder {
             mIn.skipBytes(position - mCountIn.getCount());
         }
 
-        if (typeFlags == 1) {
-            LOGGER.fine("Sparse type flags detected: " + mTypeSpec.getName());
+        if ((typeFlags & 0x01) != 0) {
+           LOGGER.fine("Sparse type flags detected: " + mTypeSpec.getName());
         }
-        int[] entryOffsets = mIn.readIntArray(entryCount);
+
+        HashMap<Integer, Integer> entryOffsetMap = new LinkedHashMap();
+        for (int i = 0; i < entryCount; i++) {
+            if ((typeFlags & 0x01) != 0) {
+                entryOffsetMap.put(mIn.readUnsignedShort(), mIn.readUnsignedShort());
+            } else {
+                entryOffsetMap.put(i, mIn.readInt());
+            }
+        }
 
         if (flags.isInvalid) {
             String resName = mTypeSpec.getName() + flags.getQualifiers();
@@ -278,23 +286,15 @@ public class ARSCDecoder {
         }
 
         mType = flags.isInvalid && !mKeepBroken ? null : mPkg.getOrCreateConfig(flags);
-        HashMap<Integer, EntryData> offsetsToEntryData = new HashMap<>();
 
-        for (int offset : entryOffsets) {
-            if (offset == -1 || offsetsToEntryData.containsKey(offset)) {
+        for (int i : entryOffsetMap.keySet()) {
+            int offset = entryOffsetMap.get(i);
+            if (offset == -1) {
                 continue;
             }
-
-            offsetsToEntryData.put(offset, readEntryData());
-        }
-
-        for (int i = 0; i < entryOffsets.length; i++) {
-            if (entryOffsets[i] != -1) {
-                mMissingResSpecs[i] = false;
-                mResId = (mResId & 0xffff0000) | i;
-                EntryData entryData = offsetsToEntryData.get(entryOffsets[i]);
-                readEntry(entryData);
-            }
+            mMissingResSpecMap.put(i, false);
+            mResId = (mResId & 0xffff0000) | i;
+            readEntry(readEntryData());
         }
 
         return mType;
@@ -384,8 +384,8 @@ public class ARSCDecoder {
     }
 
     private ResIntBasedValue readValue() throws IOException, AndrolibException {
-		/* size */mIn.skipCheckShort((short) 8);
-		/* zero */mIn.skipCheckByte((byte) 0);
+        /* size */mIn.skipCheckShort((short) 8);
+        /* zero */mIn.skipCheckByte((byte) 0);
         byte type = mIn.readByte();
         int data = mIn.readInt();
 
@@ -418,13 +418,13 @@ public class ARSCDecoder {
         byte keyboard = mIn.readByte();
         byte navigation = mIn.readByte();
         byte inputFlags = mIn.readByte();
-		/* inputPad0 */mIn.skipBytes(1);
+        /* inputPad0 */mIn.skipBytes(1);
 
         short screenWidth = mIn.readShort();
         short screenHeight = mIn.readShort();
 
         short sdkVersion = mIn.readShort();
-		/* minorVersion, now must always be 0 */mIn.skipBytes(2);
+        /* minorVersion, now must always be 0 */mIn.skipBytes(2);
 
         byte screenLayout = 0;
         byte uiMode = 0;
@@ -533,14 +533,12 @@ public class ARSCDecoder {
     private void addMissingResSpecs() throws AndrolibException {
         int resId = mResId & 0xffff0000;
 
-        for (int i = 0; i < mMissingResSpecs.length; i++) {
-            if (!mMissingResSpecs[i]) {
-                continue;
-            }
+        for (int i : mMissingResSpecMap.keySet()) {
+            if (mMissingResSpecMap.get(i)) continue;
 
             ResResSpec spec = new ResResSpec(new ResID(resId | i), "APKTOOL_DUMMY_" + Integer.toHexString(i), mPkg, mTypeSpec);
 
-            // If we already have this resID dont add it again.
+            // If we already have this resID don't add it again.
             if (! mPkg.hasResSpec(new ResID(resId | i))) {
                 mPkg.addResSpec(spec);
                 mTypeSpec.addResSpec(spec);
@@ -598,7 +596,7 @@ public class ARSCDecoder {
     private ResType mType;
     private int mResId;
     private int mTypeIdOffset = 0;
-    private boolean[] mMissingResSpecs;
+    private HashMap<Integer, Boolean> mMissingResSpecMap;
     private final HashMap<Integer, ResTypeSpec> mResTypeSpecs = new HashMap<>();
 
     private final static short ENTRY_FLAG_COMPLEX = 0x0001;
@@ -685,7 +683,7 @@ public class ARSCDecoder {
                 throw new AndrolibException("Arsc file contains zero packages");
             } else if (mPackages.length != 1) {
                 int id = findPackageWithMostResSpecs();
-                LOGGER.fine("Arsc file contains multiple packages. Using package "
+               LOGGER.fine("Arsc file contains multiple packages. Using package "
                         + mPackages[id].getName() + " as default.");
 
                 return mPackages[id];

@@ -337,7 +337,7 @@ public class Androlib {
                 throw new AndrolibException(ex.getMessage());
             }
         }
-        LOGGER.fine("Built apk...");
+        LOGGER.fine("Built apk into: " + outFile.getPath());
     }
 
     private void buildManifestFile(File appDir, File manifest, File manifestOriginal)

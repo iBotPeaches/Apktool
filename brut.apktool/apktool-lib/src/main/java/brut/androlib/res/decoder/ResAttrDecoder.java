@@ -18,6 +18,7 @@ package brut.androlib.res.decoder;
 
 import brut.androlib.AndrolibException;
 import brut.androlib.err.UndefinedResObjectException;
+import brut.androlib.res.data.ResID;
 import brut.androlib.res.data.ResPackage;
 import brut.androlib.res.data.ResResSpec;
 import brut.androlib.res.data.value.ResAttr;
@@ -48,10 +49,24 @@ public class ResAttrDecoder {
         throws AndrolibException {
 
         if (attrResId != 0) {
-            ResResSpec resResSpec = getCurrentPackage().getResTable().getResSpec(attrResId);
+            int attrId = attrResId;
 
-            if (resResSpec != null) {
-                return resResSpec.getName();
+            // See also: brut.androlib.res.data.ResTable.getResSpec
+            if (attrId >> 24 == 0) {
+                ResPackage pkg = getCurrentPackage();
+                int packageId = pkg.getId();
+                int pkgId = (packageId == 0 ? 2 : packageId);
+                attrId = (0xFF000000 & (pkgId << 24)) | attrId;
+            }
+
+            // Retrieve the ResSpec in a package by id
+            ResID resId = new ResID(attrId);
+            ResPackage pkg = getCurrentPackage();
+            if (pkg.hasResSpec(resId)) {
+                ResResSpec resResSpec = pkg.getResSpec(resId);
+                if (resResSpec != null) {
+                    return resResSpec.getName();
+                }
             }
         }
 

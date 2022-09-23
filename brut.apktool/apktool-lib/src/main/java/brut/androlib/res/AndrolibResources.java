@@ -67,6 +67,9 @@ final public class AndrolibResources {
         ResPackage pkg;
 
         switch (pkgs.length) {
+            case 0:
+                pkg = null;
+                break;
             case 1:
                 pkg = pkgs[0];
                 break;
