@@ -53,7 +53,7 @@ public class Res9patchStreamDecoder implements ResStreamDecoder {
             byte[] data = IOUtils.toByteArray(in);
             if (data.length == 0) return;
             decoder.decode(data, out);
-        } catch (Exception ex) {
+        } catch (IOException | NullPointerException ex) {
             // In my case this was triggered because a .png file was
             // containing a html document instead of an image.
             // This could be more verbose and try to MIME ?
@@ -176,11 +176,11 @@ public class Res9patchStreamDecoder implements ResStreamDecoder {
 
     // OS implementations
     private interface OSDecoder {
-        void decode(byte[] data, OutputStream out) throws Exception;
+        void decode(byte[] data, OutputStream out) throws IOException, AndrolibException;
     }
 
     private class OtherImpl implements OSDecoder {
-        public void decode(byte[] data, OutputStream out) throws Exception {
+        public void decode(byte[] data, OutputStream out) throws IOException, AndrolibException {
             BufferedImage im = ImageIO.read(new ByteArrayInputStream(data));
             int w = im.getWidth(), h = im.getHeight();
 
@@ -259,7 +259,7 @@ public class Res9patchStreamDecoder implements ResStreamDecoder {
 
     private class AndroidImpl implements OSDecoder {
         @Override
-        public void decode(byte[] data, OutputStream output) throws Exception {
+        public void decode(byte[] data, OutputStream output) throws IOException, AndrolibException {
             Bitmap bm = BitmapFactory.decodeByteArray(data, 0, data.length);
             int width = bm.getWidth(), height = bm.getHeight();
 
