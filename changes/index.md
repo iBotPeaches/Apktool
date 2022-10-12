@@ -23,6 +23,7 @@ auermich93)
  * Fix handling with malformed namespaces. ([Issue 2615](https://github.com/iBotPeaches/Apktool/issues/2615)) / (Thanks ljysdfz & MyAnoneNeko)
  * Fix handling of sparse flags during resource parsing. ([Issue 2887](https://github.com/iBotPeaches/Apktool/pull/2887)) / (Thanks iamr0s)
  * Fix crash when parsing a manifest numeric that resolves as null. ([Issue 2878](https://github.com/iBotPeaches/Apktool/issues/2878))
+ * Fix crash when parsing HTML string with empty tag leading to invalid entry. [Issue 2900](https://github.com/iBotPeaches/Apktool/issues/2900)) / (Thanks MaSven)
  * Revert automatic workaround for using private resources. ([PR 2785](https://github.com/iBotPeaches/Apktool/pull/2785), [Issue 2771](https://github.com/iBotPeaches/Apktool/issues/2771))
  * Upgrade CI Workflow to leverage latest actions. (Thanks Goooler)
 
