@@ -50,7 +50,7 @@ public class StyledString {
 
     public static class Span implements Comparable<Span> {
         private static final MapSplitter ATTRIBUTES_SPLITTER =
-            Splitter.on(';').withKeyValueSeparator(Splitter.on('=').limit(2));
+            Splitter.on(';').omitEmptyStrings().withKeyValueSeparator(Splitter.on('=').limit(2));
 
         private final String tag;
         private final int firstChar;
