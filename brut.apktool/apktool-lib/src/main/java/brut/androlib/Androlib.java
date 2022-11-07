@@ -184,6 +184,9 @@ public class Androlib {
 
                     if (ext.isEmpty() || !NO_COMPRESS_PATTERN.matcher(ext).find()) {
                         ext = file;
+                        if (mAndRes.ObfFiles.containsKey(ext)) {
+                            ext = mAndRes.ObfFiles.get(ext);
+                        }
                     }
                     if (!uncompressedFilesOrExts.contains(ext)) {
                         uncompressedFilesOrExts.add(ext);

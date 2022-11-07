@@ -27,6 +27,7 @@ import brut.directory.Directory;
 import brut.directory.DirectoryException;
 
 import java.io.*;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,10 +38,11 @@ public class ResFileDecoder {
         this.mDecoders = decoders;
     }
 
-    public void decode(ResResource res, Directory inDir, Directory outDir)
+    public void decode(ResResource res, Directory inDir, Directory outDir, Map<String, String> obfFiles)
             throws AndrolibException {
 
         ResFileValue fileValue = (ResFileValue) res.getValue();
+        String inFileFullName = fileValue.toString();
         String inFileName = fileValue.getStrippedPath();
         String outResName = res.getFilePath();
         String typeName = res.getResSpec().getType().getName();
@@ -53,6 +55,11 @@ public class ResFileDecoder {
         } else {
             ext = inFileName.substring(extPos).toLowerCase();
             outFileName = outResName + ext;
+        }
+
+        String outFileFullName = "res/"+outFileName;
+        if (!inFileFullName.equals(outFileFullName)) {
+            obfFiles.put(inFileFullName, outFileFullName);
         }
 
         try {
