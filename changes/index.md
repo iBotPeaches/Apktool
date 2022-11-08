@@ -25,6 +25,7 @@ auermich93)
  * Fix crash when parsing a manifest numeric that resolves as null. ([Issue 2878](https://github.com/iBotPeaches/Apktool/issues/2878))
  * Fix crash when parsing HTML string with empty tag leading to invalid entry. [Issue 2900](https://github.com/iBotPeaches/Apktool/issues/2900)) / (Thanks MaSven)
  * Fix crash when wrongly decoding overlay policies. ([Issue 2805](https://github.com/iBotPeaches/Apktool/issues/2805)) / (Thanks gramound)
+ * Fix respecting of `$XDG_DATA_HOME` on Linux for framework files location. ([Issue 2924](https://github.com/iBotPeaches/Apktool/pull/2924)) / (Thanks Miepee)
  * Revert automatic workaround for using private resources. ([PR 2785](https://github.com/iBotPeaches/Apktool/pull/2785), [Issue 2771](https://github.com/iBotPeaches/Apktool/issues/2771))
  * Upgrade CI Workflow to leverage latest actions. (Thanks Goooler)
 
