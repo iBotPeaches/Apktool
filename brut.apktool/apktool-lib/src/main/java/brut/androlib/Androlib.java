@@ -177,16 +177,19 @@ public class Androlib {
 
             for (String file : files) {
                 if (isAPKFileNames(file) && unk.getCompressionLevel(file) == 0) {
-                    String ext = "";
+                    String extOrFile = "";
                     if (unk.getSize(file) != 0) {
-                        ext = FilenameUtils.getExtension(file);
+                        extOrFile = FilenameUtils.getExtension(file);
                     }
 
-                    if (ext.isEmpty() || !NO_COMPRESS_PATTERN.matcher(ext).find()) {
-                        ext = file;
+                    if (extOrFile.isEmpty() || !NO_COMPRESS_PATTERN.matcher(extOrFile).find()) {
+                        extOrFile = file;
+                        if (mAndRes.mResFileMapping.containsKey(extOrFile)) {
+                            extOrFile = mAndRes.mResFileMapping.get(extOrFile);
+                        }
                     }
-                    if (!uncompressedFilesOrExts.contains(ext)) {
-                        uncompressedFilesOrExts.add(ext);
+                    if (!uncompressedFilesOrExts.contains(extOrFile)) {
+                        uncompressedFilesOrExts.add(extOrFile);
                     }
                 }
             }
