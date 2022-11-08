@@ -27,6 +27,7 @@ auermich93)
  * Fix crash when wrongly decoding overlay policies. ([Issue 2805](https://github.com/iBotPeaches/Apktool/issues/2805)) / (Thanks gramound)
  * Fix respecting of `$XDG_DATA_HOME` on Linux for framework files location. ([Issue 2924](https://github.com/iBotPeaches/Apktool/pull/2924)) / (Thanks Miepee)
  * Fix storing of obfuscated resource files for properly applying proper compression on build. ([Issue 2925](https://github.com/iBotPeaches/Apktool/pull/2925)) / (Thanks Kirlif)
+ * Fix issue parsing an obfuscated resource with a improperly referenced parent resource. ([Issue 2908](https://github.com/iBotPeaches/Apktool/issues/2908))
  * Revert automatic workaround for using private resources. ([PR 2785](https://github.com/iBotPeaches/Apktool/pull/2785), [Issue 2771](https://github.com/iBotPeaches/Apktool/issues/2771))
  * Upgrade CI Workflow to leverage latest actions. (Thanks Goooler)
 
