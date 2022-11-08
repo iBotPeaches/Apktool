@@ -247,7 +247,7 @@ final public class AndrolibResources {
 
             LOGGER.info("Decoding file-resources...");
             for (ResResource res : pkg.listFiles()) {
-                fileDecoder.decode(res, in, out, ObfFiles);
+                fileDecoder.decode(res, in, out, mResFileMapping);
             }
 
             LOGGER.info("Decoding values */* XMLs...");
@@ -1041,7 +1041,7 @@ final public class AndrolibResources {
 
     public BuildOptions buildOptions;
 
-    public Map<String, String> ObfFiles = new HashMap();
+    public Map<String, String> mResFileMapping = new HashMap();
 
     // TODO: dirty static hack. I have to refactor decoding mechanisms.
     public static boolean sKeepBroken = false;

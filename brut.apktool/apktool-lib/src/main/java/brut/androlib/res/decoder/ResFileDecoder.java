@@ -38,11 +38,11 @@ public class ResFileDecoder {
         this.mDecoders = decoders;
     }
 
-    public void decode(ResResource res, Directory inDir, Directory outDir, Map<String, String> obfFiles)
+    public void decode(ResResource res, Directory inDir, Directory outDir, Map<String, String> resFileMapping)
             throws AndrolibException {
 
         ResFileValue fileValue = (ResFileValue) res.getValue();
-        String inFileFullName = fileValue.toString();
+        String inFilePath = fileValue.toString();
         String inFileName = fileValue.getStrippedPath();
         String outResName = res.getFilePath();
         String typeName = res.getResSpec().getType().getName();
@@ -57,9 +57,9 @@ public class ResFileDecoder {
             outFileName = outResName + ext;
         }
 
-        String outFileFullName = "res/"+outFileName;
-        if (!inFileFullName.equals(outFileFullName)) {
-            obfFiles.put(inFileFullName, outFileFullName);
+        String outFilePath = "res/" + outFileName;
+        if (!inFilePath.equals(outFilePath)) {
+            resFileMapping.put(inFilePath, outFilePath);
         }
 
         try {
