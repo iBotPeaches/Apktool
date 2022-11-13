@@ -29,6 +29,7 @@ auermich93)
  * Fix storing of obfuscated resource files for properly applying proper compression on build. ([Issue 2925](https://github.com/iBotPeaches/Apktool/pull/2925)) / (Thanks Kirlif)
  * Fix issue parsing an obfuscated resource with a improperly referenced parent resource. ([Issue 2908](https://github.com/iBotPeaches/Apktool/issues/2908))
  * Fix `--only-main-classes` winning over `--no-src`. ([Issue 2927](https://github.com/iBotPeaches/Apktool/pull/2927)) / (Thanks Surendrajat)
+ * Fix disassembly of files mixed between `r`, `R` and `res` folders. ([Issue 2933](https://github.com/iBotPeaches/Apktool/issues/2933))
  * Revert automatic workaround for using private resources. ([PR 2785](https://github.com/iBotPeaches/Apktool/pull/2785), [Issue 2771](https://github.com/iBotPeaches/Apktool/issues/2771))
  * Upgrade CI Workflow to leverage latest actions. (Thanks Goooler)
 
