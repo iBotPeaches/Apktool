@@ -221,22 +221,12 @@ final public class AndrolibResources {
         ResAttrDecoder attrDecoder = duo.m2.getAttrDecoder();
 
         attrDecoder.setCurrentPackage(resTable.listMainPackages().iterator().next());
-        Directory inApk, in = null, out;
+        Directory in, out;
 
         try {
             out = new FileDirectory(outDir);
-
-            inApk = apkFile.getDirectory();
+            in = apkFile.getDirectory();
             out = out.createDir("res");
-            if (inApk.containsDir("res")) {
-                in = inApk.getDir("res");
-            }
-            if (in == null && inApk.containsDir("r")) {
-                in = inApk.getDir("r");
-            }
-            if (in == null && inApk.containsDir("R")) {
-                in = inApk.getDir("R");
-            }
         } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
         }
