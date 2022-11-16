@@ -36,11 +36,14 @@ public class ResResSpec {
         this.mId = id;
         String cleanName;
 
+        if (name == null || name.isEmpty() || name.equals("(name removed)"))
+            name = "APKTOOL_DUMMYVAL_" + id.toString();
+
         ResResSpec resResSpec = type.getResSpecUnsafe(name);
         if (resResSpec != null) {
             cleanName = String.format("APKTOOL_DUPLICATE_%s_%s", type, id.toString());
         } else {
-            cleanName = ((name == null || name.isEmpty()) ? ("APKTOOL_DUMMYVAL_" + id.toString()) : name);
+            cleanName = name;
         }
 
         this.mName = cleanName;
