@@ -15,7 +15,6 @@
  */
 
 dependencies {
-  implementation project(':brut.j.common'),
-                 depends.commons_io
-  testImplementation depends.junit
+  implementation project(':brut.j.common')
+  implementation depends.commons_io
 }

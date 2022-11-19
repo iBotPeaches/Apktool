@@ -79,6 +79,14 @@ allprojects {
             "licenseMain",
             "licenseTest"
     ]
+
+    repositories {
+        mavenCentral()
+
+        // Obtain baksmali/smali from source builds - https://github.com/iBotPeaches/smali
+        // Remove when official smali releases come out again.
+        maven { url 'https://jitpack.io' }
+    }
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -134,10 +142,6 @@ task snapshot {
 
 subprojects {
     apply plugin: 'java'
-
-    repositories {
-        mavenCentral()
-    }
 
     test {
         testLogging {

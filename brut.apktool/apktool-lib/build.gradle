@@ -33,28 +33,19 @@ processResources {
 }
 
 dependencies {
+    api project(':brut.j.dir')
+    api project(':brut.j.util')
+    api project(':brut.j.common')
+
+    implementation depends.baksmali
+    implementation depends.smali
+    implementation depends.snakeyaml
+    implementation depends.xmlpull
+    implementation depends.guava
+    implementation depends.commons_lang
+    implementation depends.commons_io
+    implementation depends.commons_text
+
     testImplementation depends.junit
-
-    api project(':brut.j.dir'),
-        project(':brut.j.util'),
-        project(':brut.j.common')
-
-    implementation depends.baksmali,
-                   depends.smali,
-                   depends.snakeyaml,
-                   depends.xmlpull,
-                   depends.guava,
-                   depends.commons_lang,
-                   depends.commons_io,
-                   depends.commons_text
-
     testImplementation depends.xmlunit
-
-    repositories {
-        mavenCentral()
-
-        // Obtain baksmali/smali from source builds - https://github.com/iBotPeaches/smali
-        // Remove when official smali releases come out again.
-        maven { url 'https://jitpack.io' }
-    }
 }
