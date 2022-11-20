@@ -56,4 +56,18 @@ public class AndResGuardTest extends BaseTest {
         File aPng =  new File(sTestOrigDir,"res/mipmap-hdpi-v4/a.png");
         assertTrue(aPng.isFile());
     }
+
+    @Test
+    public void checkifAndResDecodeRemapsRFolderInRawMode() throws BrutException, IOException {
+        String apk = "issue1170.apk";
+        ApkDecoder apkDecoder = new ApkDecoder(new File(sTmpDir + File.separator + apk));
+        sTestOrigDir = new ExtFile(sTmpDir + File.separator + apk + ".raw.out");
+
+        apkDecoder.setOutDir(new File(sTmpDir + File.separator + apk + ".raw.out"));
+        apkDecoder.setDecodeResources(ApkDecoder.DECODE_RESOURCES_NONE);
+        apkDecoder.decode();
+
+        File aPng =  new File(sTestOrigDir,"r/a/a.png");
+        assertTrue(aPng.isFile());
+    }
 }
