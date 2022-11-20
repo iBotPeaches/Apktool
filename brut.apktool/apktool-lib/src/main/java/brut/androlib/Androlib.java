@@ -842,7 +842,7 @@ public class Androlib {
     private final static String APK_DIRNAME = "build/apk";
     private final static String UNK_DIRNAME = "unknown";
     private final static String[] APK_RESOURCES_FILENAMES = new String[] {
-            "resources.arsc", "AndroidManifest.xml", "res" };
+            "resources.arsc", "AndroidManifest.xml", "res", "r", "R" };
     private final static String[] APK_RESOURCES_WITHOUT_RES_FILENAMES = new String[] {
             "resources.arsc", "AndroidManifest.xml" };
     private final static String[] APP_RESOURCES_FILENAMES = new String[] {
