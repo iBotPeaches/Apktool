@@ -35,6 +35,8 @@ auermich93)
  * Fix disassembly of raw resources for AndResGuard. ([Issue 2943](https://github.com/iBotPeaches/Apktool/pull/2944))
  * Revert automatic workaround for using private resources. ([PR 2785](https://github.com/iBotPeaches/Apktool/pull/2785), [Issue 2771](https://github.com/iBotPeaches/Apktool/issues/2771))
  * Upgrade CI Workflow to leverage latest actions. (Thanks Goooler)
+ * Upgrade `org.apache.commons:commons-text` to `1.10.0` (from `1.9`)
+ * Upgrade `org.yaml:snakeyaml` to `1.32` (from `1.29`)
 
 ## v2.6.1
 2022.02.26
