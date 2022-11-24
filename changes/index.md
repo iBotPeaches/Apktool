@@ -4,8 +4,8 @@ title: Apktool - Changelog
 description: Apktool - Changelog / Roadmap
 ---
 
-## v2.6.2 (Unreleased)
-2022.xx.xx
+## v2.70
+2022.11.24
  * Add SDK T (API 33) support. ([Issue 2845](https://github.com/iBotPeaches/Apktool/pull/2845))
  * Add SDK S v2 (API 32) support. ([Issue 2776](https://github.com/iBotPeaches/Apktool/issues/2776))
  * Updated internal aapt/aapt2 to ([91492d8 of frameworks_base](https://github.com/iBotPeaches/platform_frameworks_base/commit/91492d85dcaefe1999ae98d0d2b39258be2252a9))
