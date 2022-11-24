@@ -18,7 +18,7 @@ The main project can be found below
 [https://github.com/iBotPeaches/Apktool](https://github.com/iBotPeaches/Apktool)
 
 ### Requirements
-  * JDK8 (Oracle or OpenJDK)
+  * JDK > 8 <= 17
   * git
 
 ### Build Steps
@@ -33,7 +33,7 @@ We use gradle to build. First clone the repository using either
 After build completes you should have a jar file at:
 `./brut.apktool/apktool-cli/build/libs/apktool-xxxxx.jar`
 
-### Windows Requirements
+#### Windows Requirements
 Windows has some limitations regarding max filepath. At one location in Apktool, we have a 218 character directory path
 which means due to the limitation of max 255 characters on Windows we need to enforce some requirements.
 
