@@ -23,11 +23,12 @@ dependencies {
 }
 
 buildscript {
-    repositories {
-        mavenCentral()
-    }
-
     dependencies {
+        repositories {
+            mavenCentral()
+            gradlePluginPortal()
+        }
+
         classpath(depends.proguard_gradle) {
             exclude group: 'com.android.tools.build'
         }

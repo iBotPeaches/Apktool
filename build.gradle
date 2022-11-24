@@ -18,7 +18,7 @@ import java.nio.charset.StandardCharsets
 buildscript {
     ext {
         depends = [
-                baksmali       : 'org.smali:baksmali:2.5.2',
+                baksmali       : 'com.github.iBotPeaches.smali:baksmali:403e90375e',
                 commons_cli    : 'commons-cli:commons-cli:1.5.0',
                 commons_io     : 'commons-io:commons-io:2.11.0',
                 commons_lang   : 'org.apache.commons:commons-lang3:3.12.0',
@@ -27,14 +27,13 @@ buildscript {
                 junit          : 'junit:junit:4.13.2',
                 proguard_gradle: 'com.guardsquare:proguard-gradle:7.1.1',
                 snakeyaml      : 'org.yaml:snakeyaml:1.32:android',
-                smali          : 'org.smali:smali:2.5.2',
+                smali          : 'com.github.iBotPeaches.smali:smali:403e90375e',
                 xmlpull        : 'xpp3:xpp3:1.1.4c',
                 xmlunit        : 'xmlunit:xmlunit:1.6',
         ]
     }
 
     repositories {
-        mavenCentral()
         gradlePluginPortal()
     }
     dependencies {
@@ -80,6 +79,14 @@ allprojects {
             "licenseMain",
             "licenseTest"
     ]
+
+    repositories {
+        mavenCentral()
+
+        // Obtain baksmali/smali from source builds - https://github.com/iBotPeaches/smali
+        // Remove when official smali releases come out again.
+        maven { url 'https://jitpack.io' }
+    }
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -135,10 +142,6 @@ task snapshot {
 
 subprojects {
     apply plugin: 'java'
-
-    repositories {
-        mavenCentral()
-    }
 
     test {
         testLogging {
