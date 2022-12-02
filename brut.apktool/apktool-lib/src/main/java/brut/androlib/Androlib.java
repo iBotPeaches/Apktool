@@ -374,15 +374,17 @@ public class Androlib {
             throws AndrolibException {
         try {
             // loop through any smali_ directories for multi-dex apks
-            Map<String, Directory> dirs = appDir.getDirectory().getDirs();
-            for (Map.Entry<String, Directory> directory : dirs.entrySet()) {
-                String name = directory.getKey();
-                if (name.startsWith("smali_")) {
-                    String filename = name.substring(name.indexOf("_") + 1) + ".dex";
-
-                    if (!buildSourcesRaw(appDir, filename) && !buildSourcesSmali(appDir, name, filename)) {
-                        LOGGER.warning("Could not find sources");
-                    }
+            List<String> srcDirs = new ArrayList<>();
+            for (String dir : appDir.getDirectory().getDirs().keySet()) {
+                if (dir.startsWith("smali_")) {
+                    srcDirs.add(dir);
+                }
+            }
+            srcDirs.sort(new NaturalOrderComparator());
+            for (String srcDir : srcDirs) {
+                String filename = srcDir.substring(srcDir.indexOf("_") + 1) + ".dex";
+                if (!buildSourcesRaw(appDir, filename) && !buildSourcesSmali(appDir, srcDir, filename)) {
+                    LOGGER.warning("Could not find sources");
                 }
             }
 
@@ -390,14 +392,13 @@ public class Androlib {
             File[] dexFiles = appDir.listFiles();
             if (dexFiles != null) {
                 for (File dex : dexFiles) {
-
                     // skip classes.dex because we have handled it in buildSources()
                     if (dex.getName().endsWith(".dex") && ! dex.getName().equalsIgnoreCase("classes.dex")) {
                         buildSourcesRaw(appDir, dex.getName());
                     }
                 }
             }
-        } catch(DirectoryException ex) {
+        } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
         }
     }

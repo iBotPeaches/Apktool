@@ -29,9 +29,10 @@ import brut.androlib.res.data.ResTable;
 import brut.directory.ExtFile;
 import brut.androlib.res.xml.ResXmlPatcher;
 import brut.common.BrutException;
-import brut.directory.DirectoryException;
-import brut.util.OS;
+import brut.directory.*;
+import brut.util.*;
 import com.google.common.base.Strings;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -139,26 +140,44 @@ public class ApkDecoder {
 
             if (hasMultipleSources()) {
                 // foreach unknown dex file in root, lets disassemble it
-                Set<String> files = mApkFile.getDirectory().getFiles(true);
-                for (String file : files) {
-                    if (file.endsWith(".dex")) {
-                        if (! file.equalsIgnoreCase("classes.dex")) {
-                            switch(mDecodeSources) {
-                                case DECODE_SOURCES_NONE:
-                                    mAndrolib.decodeSourcesRaw(mApkFile, outDir, file);
-                                    break;
-                                case DECODE_SOURCES_SMALI:
-                                    mAndrolib.decodeSourcesSmali(mApkFile, outDir, file, mBakDeb, mApiLevel);
-                                    break;
-                                case DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES:
-                                    if (file.startsWith("classes") && file.endsWith(".dex")) {
-                                        mAndrolib.decodeSourcesSmali(mApkFile, outDir, file, mBakDeb, mApiLevel);
-                                    } else {
-                                        mAndrolib.decodeSourcesRaw(mApkFile, outDir, file);
-                                    }
-                                    break;
-                            }
+                List<String> dexFiles = new ArrayList<>();
+                for (String file : mApkFile.getDirectory().getFiles(true)) {
+                    if (file.endsWith(".dex") && ! file.equalsIgnoreCase("classes.dex")) {
+                        dexFiles.add(file);
+                    }
+                }
+                dexFiles.sort(new NaturalOrderComparator() {
+                    @Override
+                    public int compare(String a, String b) {
+                        int result = Integer.compare(
+                            StringUtils.countMatches(a, File.separatorChar),
+                            StringUtils.countMatches(b, File.separatorChar)
+                        );
+                        if (result != 0) {
+                            return result;
                         }
+                        result = Boolean.compare(b.startsWith("classes"), a.startsWith("classes"));
+                        if (result != 0) {
+                            return result;
+                        }
+                        return super.compare(a, b);
+                    }
+                });
+                for (String file : dexFiles) {
+                    switch (mDecodeSources) {
+                        case DECODE_SOURCES_NONE:
+                            mAndrolib.decodeSourcesRaw(mApkFile, outDir, file);
+                            break;
+                        case DECODE_SOURCES_SMALI:
+                            mAndrolib.decodeSourcesSmali(mApkFile, outDir, file, mBakDeb, mApiLevel);
+                            break;
+                        case DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES:
+                            if (file.startsWith("classes")) {
+                                mAndrolib.decodeSourcesSmali(mApkFile, outDir, file, mBakDeb, mApiLevel);
+                            } else {
+                                mAndrolib.decodeSourcesRaw(mApkFile, outDir, file);
+                            }
+                            break;
                     }
                 }
             }
