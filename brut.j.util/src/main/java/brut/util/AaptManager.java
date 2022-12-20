@@ -56,7 +56,7 @@ public class AaptManager {
     }
 
     public static String getAaptExecutionCommand(String aaptPath, int aaptVersion) throws BrutException {
-        if (!aaptPath.isEmpty()) {
+        if (aaptPath != null && !aaptPath.isEmpty()) {
             File aaptFile = new File(aaptPath);
             if (aaptFile.canRead() && aaptFile.exists()) {
                 executable(aaptFile);

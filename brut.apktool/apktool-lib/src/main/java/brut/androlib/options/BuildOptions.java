@@ -35,7 +35,7 @@ public class BuildOptions {
 
     public String frameworkFolderLocation = null;
     public String frameworkTag = null;
-    public String aaptPath = "";
+    public String aaptPath = null;
 
     public int aaptVersion = 1; // default to v1
 
