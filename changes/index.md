@@ -4,6 +4,11 @@ title: Apktool - Changelog
 description: Apktool - Changelog / Roadmap
 ---
 
+## v2.7.1
+xxxx.xx.xx
+ * Remove CI testing for Java versions: 9, 10, 12, 13, 14, 15 and 17.
+ * Add CI testing for Java versions: 18 and 19. ([Issue 2976](https://github.com/iBotPeaches/Apktool/issues/2976))
+
 ## v2.7.0
 2022.11.24
  * Add SDK T (API 33) support. ([Issue 2845](https://github.com/iBotPeaches/Apktool/pull/2845))
