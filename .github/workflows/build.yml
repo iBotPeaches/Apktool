@@ -88,7 +88,7 @@ jobs:
       - uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
-          java-version: 10
+          java-version: 17
       - name: Build
         uses: gradle/gradle-build-action@v2
         with:
