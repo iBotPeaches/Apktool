@@ -43,6 +43,9 @@ buildscript {
     }
 }
 
+def ghUsername = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
+def ghPassword = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
+
 apply from: 'gradle/functions.gradle'
 
 version = '2.7.0'
@@ -57,6 +60,18 @@ allprojects {
 
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
+
+    dependencies {
+        repositories {
+            maven {
+                url = uri("https://maven.pkg.github.com/revanced/smali")
+                credentials {
+                    username = ghUsername
+                    password = ghPassword
+                }
+            }
+        }
+    }
 
     license {
         header rootProject.file("brut.j.common/src/templates/apache2.0-header.txt")
@@ -88,8 +103,8 @@ allprojects {
                 name = "GitHubPackages"
                 url = uri("https://maven.pkg.github.com/revanced/Apktool")
                 credentials {
-                    username = System.getenv("GITHUB_ACTOR")
-                    password = System.getenv("GITHUB_TOKEN")
+                    username = ghUsername
+                    password = ghPassword
                 }
             }
         }
