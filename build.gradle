@@ -186,7 +186,7 @@ subprojects {
                 maven(MavenPublication) {
                     from project.components.java
 
-                    groupId = 'org.apktool'
+                    groupId = project.name == 'apktool-lib' ? 'app.revanced' : 'org.apktool'
                     artifactId = project.name
                     version = mavenVersion
 
