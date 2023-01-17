@@ -36,6 +36,8 @@ public class ResResSpec {
         this.mId = id;
         String cleanName;
 
+        name = (("(name removed)".equals(name)) ? null : name);
+
         ResResSpec resResSpec = type.getResSpecUnsafe(name);
         if (resResSpec != null) {
             cleanName = String.format("APKTOOL_DUPLICATE_%s_%s", type, id.toString());

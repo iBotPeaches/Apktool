@@ -223,22 +223,12 @@ final public class AndrolibResources {
         ResAttrDecoder attrDecoder = duo.m2.getAttrDecoder();
 
         attrDecoder.setCurrentPackage(resTable.listMainPackages().iterator().next());
-        Directory inApk, in = null, out;
+        Directory in, out;
 
         try {
             out = new FileDirectory(outDir);
-
-            inApk = apkFile.getDirectory();
+            in = apkFile.getDirectory();
             out = out.createDir("res");
-            if (inApk.containsDir("res")) {
-                in = inApk.getDir("res");
-            }
-            if (in == null && inApk.containsDir("r")) {
-                in = inApk.getDir("r");
-            }
-            if (in == null && inApk.containsDir("R")) {
-                in = inApk.getDir("R");
-            }
         } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
         }
@@ -249,7 +239,7 @@ final public class AndrolibResources {
 
             LOGGER.fine("Decoding file-resources...");
             for (ResResource res : pkg.listFiles()) {
-                fileDecoder.decode(res, in, out);
+                fileDecoder.decode(res, in, out, mResFileMapping);
             }
 
             LOGGER.fine("Decoding values */* XMLs...");
@@ -974,7 +964,12 @@ final public class AndrolibResources {
             } else if (OSDetection.isWindows()) {
                 path = parentPath.getAbsolutePath() + String.format("%1$sAppData%1$sLocal%1$sapktool%1$sframework", File.separatorChar);
             } else {
-                path = parentPath.getAbsolutePath() + String.format("%1$s.local%1$sshare%1$sapktool%1$sframework", File.separatorChar);
+                String xdgDataFolder = System.getenv("XDG_DATA_HOME");
+                if (xdgDataFolder != null) {
+                    path = xdgDataFolder + String.format("%1$sapktool%1$sframework", File.separatorChar);
+                } else {
+                    path = parentPath.getAbsolutePath() + String.format("%1$s.local%1$sshare%1$sapktool%1$sframework", File.separatorChar);
+                }
             }
         }
 
@@ -1029,6 +1024,8 @@ final public class AndrolibResources {
     }
 
     public BuildOptions buildOptions;
+
+    public Map<String, String> mResFileMapping = new HashMap();
 
     // TODO: dirty static hack. I have to refactor decoding mechanisms.
     public static boolean sKeepBroken = false;

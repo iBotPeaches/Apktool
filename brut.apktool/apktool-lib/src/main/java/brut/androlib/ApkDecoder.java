@@ -180,6 +180,10 @@ public class ApkDecoder {
         if (mode != DECODE_SOURCES_NONE && mode != DECODE_SOURCES_SMALI && mode != DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES) {
             throw new AndrolibException("Invalid decode sources mode: " + mode);
         }
+        if (mDecodeSources == DECODE_SOURCES_NONE && mode == DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES) {
+            LOGGER.info("--only-main-classes cannot be paired with -s/--no-src. Ignoring.");
+            return;
+        }
         mDecodeSources = mode;
     }
 

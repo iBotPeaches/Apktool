@@ -71,7 +71,7 @@ public class ResEnumAttr extends ResAttr {
                     break;
                 }
             }
-            if (ref != null) {
+            if (ref != null && !ref.referentIsNull()) {
                 value2 = ref.getReferent().getName();
                 mItemsCache.put(value, value2);
             }
