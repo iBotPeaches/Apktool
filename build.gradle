@@ -18,7 +18,7 @@ import java.nio.charset.StandardCharsets
 buildscript {
     ext {
         depends = [
-            baksmali       : 'com.github.iBotPeaches.smali:baksmali:403e90375e',
+            baksmali       : 'app.revanced:baksmali:2.5.3-a3836654',
             commons_cli    : 'commons-cli:commons-cli:1.5.0',
             commons_io     : 'commons-io:commons-io:2.11.0',
             commons_lang   : 'org.apache.commons:commons-lang3:3.12.0',
@@ -27,7 +27,7 @@ buildscript {
             junit          : 'junit:junit:4.13.2',
             proguard_gradle: 'com.guardsquare:proguard-gradle:7.3.0',
             snakeyaml      : 'org.yaml:snakeyaml:1.32:android',
-            smali          : 'com.github.iBotPeaches.smali:smali:403e90375e',
+            smali          : 'app.revanced:smali:2.5.3-a3836654',
             xmlpull        : 'xpp3:xpp3:1.1.4c',
             xmlunit        : 'xmlunit:xmlunit:1.6',
         ]
