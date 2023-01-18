@@ -47,7 +47,7 @@ dependencies {
 
     api project(':brut.j.dir')
     api project(':brut.j.util')
-    api project(':brut.j.common')
+    api depends.brut_j_common
 
     implementation depends.baksmali
     implementation depends.smali

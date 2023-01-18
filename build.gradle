@@ -30,6 +30,7 @@ buildscript {
             smali          : 'app.revanced:smali:2.5.3-a3836654',
             xmlpull        : 'xpp3:xpp3:1.1.4c',
             xmlunit        : 'xmlunit:xmlunit:1.6',
+            brut_j_common  : 'org.apktool:brut.j.common:2.7.0'
         ]
     }
 
