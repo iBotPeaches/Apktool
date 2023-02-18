@@ -66,7 +66,7 @@ final public class AndrolibResources {
 
         switch (pkgs.length) {
             case 0:
-                pkg = null;
+                pkg = new ResPackage(resTable, 0, null);
                 break;
             case 1:
                 pkg = pkgs[0];
@@ -78,10 +78,6 @@ final public class AndrolibResources {
             default:
                 pkg = selectPkgWithMostResSpecs(pkgs);
                 break;
-        }
-
-        if (pkg == null) {
-            throw new AndrolibException("arsc files with zero packages or no arsc file found.");
         }
 
         resTable.addPackage(pkg, true);
@@ -168,9 +164,11 @@ final public class AndrolibResources {
         resTable.setPackageId(resPackage.getId());
         resTable.setPackageOriginal(pkgOriginal);
 
-        // 1) Check if pkgOriginal === mPackageRenamed
-        // 2) Check if pkgOriginal is ignored via IGNORED_PACKAGES
-        if (pkgOriginal.equalsIgnoreCase(mPackageRenamed) || (Arrays.asList(IGNORED_PACKAGES).contains(pkgOriginal))) {
+        // 1) Check if pkgOriginal is null (empty resources.arsc)
+        // 2) Check if pkgOriginal === mPackageRenamed
+        // 3) Check if pkgOriginal is ignored via IGNORED_PACKAGES
+        if (pkgOriginal == null || pkgOriginal.equalsIgnoreCase(mPackageRenamed)
+                || (Arrays.asList(IGNORED_PACKAGES).contains(pkgOriginal))) {
             LOGGER.info("Regular manifest package...");
         } else {
             LOGGER.info("Renamed manifest package found! Replacing " + mPackageRenamed + " with " + pkgOriginal);
@@ -708,7 +706,7 @@ final public class AndrolibResources {
         if (withResources) {
             axmlParser.setAttrDecoder(new ResAttrDecoder());
         }
-        decoders.setDecoder("xml", new XmlPullStreamDecoder(axmlParser,getResXmlSerializer()));
+        decoders.setDecoder("xml", new XmlPullStreamDecoder(axmlParser, getResXmlSerializer()));
 
         return new Duo<>(new ResFileDecoder(decoders), axmlParser);
     }
@@ -772,7 +770,7 @@ final public class AndrolibResources {
         }
     }
 
-    private ResPackage[] getResPackagesFromApk(ExtFile apkFile,ResTable resTable, boolean keepBroken)
+    private ResPackage[] getResPackagesFromApk(ExtFile apkFile, ResTable resTable, boolean keepBroken)
             throws AndrolibException {
         try {
             Directory dir = apkFile.getDirectory();
