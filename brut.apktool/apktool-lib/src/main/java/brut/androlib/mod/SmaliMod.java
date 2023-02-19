@@ -30,7 +30,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 
 public class SmaliMod {
-    public static boolean assembleSmaliFile(File smaliFile,DexBuilder dexBuilder, int apiLevel, boolean verboseErrors,
+    public static boolean assembleSmaliFile(File smaliFile, DexBuilder dexBuilder, int apiLevel, boolean verboseErrors,
                                             boolean printTokens) throws IOException, RecognitionException {
 
         CommonTokenStream tokens;

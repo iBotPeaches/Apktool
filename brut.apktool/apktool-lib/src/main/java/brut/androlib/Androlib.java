@@ -776,7 +776,7 @@ public class Androlib {
 
     public boolean isFrameworkApk(ResTable resTable) {
         for (ResPackage pkg : resTable.listMainPackages()) {
-            if (pkg.getId() < 64) {
+            if (pkg.getId() > 0 && pkg.getId() < 64) {
                 return true;
             }
         }
