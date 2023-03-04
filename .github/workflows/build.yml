@@ -75,6 +75,7 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: ${{ matrix.java }}
+      - uses: gradle/wrapper-validation-action@v1
       - name: Build and test
         uses: gradle/gradle-build-action@v2
         with:
