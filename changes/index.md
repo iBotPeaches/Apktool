@@ -10,6 +10,7 @@ xxxx.xx.xx
  * Add CI testing for Java versions: 18 and 19. ([Issue 2976](https://github.com/iBotPeaches/Apktool/issues/2976))
  * Add support for parsing applications with config flag size > 8 (from 28). ([Issue 2978](https://github.com/iBotPeaches/Apktool/issues/2978))
  * Fix issue parsing empty `resources.asrc`. ([Issue 2998](https://github.com/iBotPeaches/Apktool/pull/2998)) / (Thanks IgorEisberg) 
+ * Fix issue with larger `apktool.yml` files. ([Issue 3008](https://github.com/iBotPeaches/Apktool/issues/3008))
 
 ## v2.7.0
 2022.11.24
