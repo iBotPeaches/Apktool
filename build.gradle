@@ -23,9 +23,9 @@ buildscript {
                 commons_io     : 'commons-io:commons-io:2.11.0',
                 commons_lang   : 'org.apache.commons:commons-lang3:3.12.0',
                 commons_text   : 'org.apache.commons:commons-text:1.10.0',
-                guava          : 'com.google.guava:guava:31.0.1-jre',
+                guava          : 'com.google.guava:guava:31.1-jre',
                 junit          : 'junit:junit:4.13.2',
-                proguard_gradle: 'com.guardsquare:proguard-gradle:7.3.0',
+                proguard_gradle: 'com.guardsquare:proguard-gradle:7.3.1',
                 snakeyaml      : 'org.yaml:snakeyaml:1.32:android',
                 smali          : 'com.github.iBotPeaches.smali:smali:403e90375e',
                 xmlpull        : 'xpp3:xpp3:1.1.4c',
@@ -37,7 +37,7 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
-        classpath "gradle.plugin.com.github.johnrengelman:shadow:7.1.0"
+        classpath "gradle.plugin.com.github.johnrengelman:shadow:8.0.0"
         classpath "gradle.plugin.com.hierynomus.gradle.plugins:license-gradle-plugin:0.16.1"
     }
 }
