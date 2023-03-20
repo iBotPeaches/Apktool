@@ -25,7 +25,7 @@ buildscript {
                 commons_text   : 'org.apache.commons:commons-text:1.10.0',
                 guava          : 'com.google.guava:guava:31.1-jre',
                 junit          : 'junit:junit:4.13.2',
-                proguard_gradle: 'com.guardsquare:proguard-gradle:7.3.1',
+                proguard_gradle: 'com.guardsquare:proguard-gradle:7.3.2',
                 snakeyaml      : 'org.yaml:snakeyaml:1.32:android',
                 smali          : 'com.github.iBotPeaches.smali:smali:403e90375e',
                 xmlpull        : 'xpp3:xpp3:1.1.4c',
