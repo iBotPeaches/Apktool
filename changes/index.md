@@ -11,9 +11,10 @@ xxxx.xx.xx
  * Add support for parsing applications with config flag size > 8 (from 28). ([Issue 2978](https://github.com/iBotPeaches/Apktool/issues/2978))
  * Fix issue parsing empty `resources.asrc`. ([Issue 2998](https://github.com/iBotPeaches/Apktool/pull/2998)) / (Thanks IgorEisberg) 
  * Fix issue with larger `apktool.yml` files. ([Issue 3008](https://github.com/iBotPeaches/Apktool/issues/3008))
+ * Fix issue with parsing `XML_TYPE_OVERLAY`. ([Issue 3030](https://github.com/iBotPeaches/Apktool/issues/3030))
  * Upgrade to Gradle 8.0.2 (Thanks ArjunaKumarMohanta)
  * Upgrade `guava` to `31.1-jre` from `31.0.1-jre`
- * Upgrade `proguard_gradle` to `7.3.1` from `7.3.0`
+ * Upgrade `proguard_gradle` to `7.3.2` from `7.3.0`
  * Upgrade `shadow` to `8.0.0` from `7.1.0`
 
 ## v2.7.0
