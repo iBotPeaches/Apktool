@@ -56,9 +56,10 @@ public class ZipUtils {
 
     private static void processFolder(final File folder, final ZipOutputStream zipOutputStream, final int prefixLength)
             throws BrutException, IOException {
+        final File baseFolder = new File(folder.getPath().substring(0, prefixLength - 1));
         for (final File file : folder.listFiles()) {
             if (file.isFile()) {
-                final String cleanedPath = BrutIO.sanitizeUnknownFile(folder, file.getPath().substring(prefixLength));
+                final String cleanedPath = BrutIO.sanitizeUnknownFile(baseFolder, file.getPath().substring(prefixLength));
                 final ZipEntry zipEntry = new ZipEntry(BrutIO.normalizePath(cleanedPath));
 
                 // aapt binary by default takes in parameters via -0 arsc to list extensions that shouldn't be
