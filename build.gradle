@@ -53,8 +53,8 @@ allprojects {
     apply plugin: 'java'
     apply plugin: 'com.github.hierynomus.license'
 
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
 
     license {
         header rootProject.file("brut.j.common/src/templates/apache2.0-header.txt")
