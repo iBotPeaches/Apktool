@@ -45,7 +45,7 @@ public class ApktoolProperties {
 
         InputStream templateStream = null;
         try {
-            templateStream = org.jf.baksmali.Main.class.getClassLoader().getResourceAsStream("baksmali.properties");
+            templateStream = com.android.tools.smali.baksmali.Main.class.getClassLoader().getResourceAsStream("baksmali.properties");
         } catch(NoClassDefFoundError ex) {
             LOGGER.warning("Can't load baksmali properties.");
         }
@@ -63,7 +63,7 @@ public class ApktoolProperties {
 
         templateStream = null;
         try {
-            templateStream = org.jf.smali.Main.class.getClassLoader().getResourceAsStream("smali.properties");
+            templateStream = com.android.tools.smali.smali.Main.class.getClassLoader().getResourceAsStream("smali.properties");
         } catch(NoClassDefFoundError ex) {
             LOGGER.warning("Can't load smali properties.");
         }

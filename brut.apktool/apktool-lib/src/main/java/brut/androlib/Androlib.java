@@ -35,7 +35,7 @@ import brut.directory.*;
 import brut.util.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.jf.dexlib2.iface.DexFile;
+import com.android.tools.smali.dexlib2.iface.DexFile;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;

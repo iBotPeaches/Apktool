@@ -12,7 +12,7 @@ A couple of quick tips to ease the submission process.
 
  * [IntelliJ IDEA](http://www.jetbrains.com/idea/) is our IDE of choice. It has built in debugger support along with Gradle integration.
 
- * For changes to smali/baksmali please see their [page](https://github.com/JesusFreke/smali) for more information.
+ * For changes to smali/baksmali please see their [page](https://github.com/google/smali) for more information.
 
 
 ## Code Styles
