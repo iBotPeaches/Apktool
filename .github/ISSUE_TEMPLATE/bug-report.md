@@ -11,6 +11,7 @@ assignees: ''
 1. **Apktool Version (`apktool -version`)** -
 2. **Operating System (Mac, Linux, Windows)** -
 3. **APK From? (Playstore, ROM, Other)** -
+4. **Java Version (`java --version`)** -
 
 ### Stacktrace/Logcat
 
