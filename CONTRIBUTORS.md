@@ -1,12 +1,12 @@
 # Apktool Contributors
-Copyright 2014 Ryszard Wiśniewski <brut.alll@gmail.com>
 
 This product includes software developed by:
 
-  * Ryszard Wiśniewski (brut.alll@gmail.com)
-  * JesusFreke (https://github.com/JesusFreke/smali)
-  * Dmitry Skiba (http://code.google.com/p/android4me/)
-  * Tahseen Ur Rehman (http://code.google.com/p/radixtree/)
   * Connor Tumbleson (connor.tumbleson@gmail.com)
-  * Android Open Source Project (http://source.android.com/)
+  * Ryszard Wiśniewski (brut.alll@gmail.com)
+  * Google (https://github.com/google/smali)
+  * JesusFreke (https://github.com/JesusFreke/smali)
+  * Dmitry Skiba (https://code.google.com/p/android4me/)
+  * Tahseen Ur Rehman (https://code.google.com/p/radixtree/)
+  * Android Open Source Project (https://source.android.com/)
   * The Apache Software Foundation (https://www.apache.org/)
