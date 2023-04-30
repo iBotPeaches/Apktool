@@ -67,6 +67,7 @@ public class AaptManager {
         if (! aaptPath.isEmpty()) {
             File aaptFile = new File(aaptPath);
             if (aaptFile.canRead() && aaptFile.exists()) {
+                //noinspection ResultOfMethodCallIgnored
                 aaptFile.setExecutable(true);
                 return aaptFile.getPath();
             } else {
@@ -101,6 +102,7 @@ public class AaptManager {
         if (!aapt.isFile()) {
             throw new BrutException("Could not identify aapt binary as executable.");
         }
+        //noinspection ResultOfMethodCallIgnored
         aapt.setExecutable(true);
 
         List<String> cmd = new ArrayList<>();

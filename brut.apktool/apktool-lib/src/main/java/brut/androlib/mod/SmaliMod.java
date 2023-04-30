@@ -28,6 +28,7 @@ import com.android.tools.smali.smali.smaliTreeWalker;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 
 public class SmaliMod {
     public static boolean assembleSmaliFile(File smaliFile, DexBuilder dexBuilder, int apiLevel, boolean verboseErrors,
@@ -36,7 +37,7 @@ public class SmaliMod {
         CommonTokenStream tokens;
         smaliFlexLexer lexer;
 
-        InputStream is = new FileInputStream(smaliFile);
+        InputStream is = Files.newInputStream(smaliFile.toPath());
         InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8);
 
         lexer = new smaliFlexLexer(reader, apiLevel);

@@ -80,7 +80,7 @@ public class SmaliDecoder {
                 dexEntry = container.getEntry(mDexFile);
             }
 
-            // Double check the passed param exists
+            // Double-check the passed param exists
             if (dexEntry == null) {
                 dexEntry = container.getEntry(container.getDexEntryNames().get(0));
             }

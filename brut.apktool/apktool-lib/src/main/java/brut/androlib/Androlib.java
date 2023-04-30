@@ -41,6 +41,7 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import java.io.*;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -98,6 +99,7 @@ public class Androlib {
                 smaliDir = new File(outDir, SMALI_DIRNAME + "_" + filename.substring(0, filename.indexOf(".")));
             }
             OS.rmdir(smaliDir);
+            //noinspection ResultOfMethodCallIgnored
             smaliDir.mkdirs();
             LOGGER.info("Baksmaling " + filename + "...");
             DexFile dexFile = SmaliDecoder.decode(apkFile, smaliDir, filename, bakDeb, apiLevel);
@@ -236,6 +238,7 @@ public class Androlib {
         LOGGER.info("Copying original files...");
         File originalDir = new File(outDir, "original");
         if (!originalDir.exists()) {
+            //noinspection ResultOfMethodCallIgnored
             originalDir.mkdirs();
         }
 
@@ -313,6 +316,7 @@ public class Androlib {
             outFile = new File(appDir, "dist" + File.separator + (outFileName == null ? "out.apk" : outFileName));
         }
 
+        //noinspection ResultOfMethodCallIgnored
         new File(appDir, APK_DIRNAME).mkdirs();
         File manifest = new File(appDir, "AndroidManifest.xml");
         File manifestOriginal = new File(appDir, "AndroidManifest.xml.orig");
@@ -353,6 +357,7 @@ public class Androlib {
         if (manifest.isFile() && manifest.exists()) {
             try {
                 if (manifestOriginal.exists()) {
+                    //noinspection ResultOfMethodCallIgnored
                     manifestOriginal.delete();
                 }
                 FileUtils.copyFile(manifest, manifestOriginal);
@@ -412,7 +417,7 @@ public class Androlib {
         if (buildOptions.forceBuildAll || isModified(working, stored)) {
             LOGGER.info("Copying " + appDir.toString() + " " + filename + " file...");
             try {
-                BrutIO.copyAndClose(new FileInputStream(working), new FileOutputStream(stored));
+                BrutIO.copyAndClose(Files.newInputStream(working.toPath()), Files.newOutputStream(stored.toPath()));
                 return true;
             } catch (IOException ex) {
                 throw new AndrolibException(ex);
@@ -433,6 +438,7 @@ public class Androlib {
         }
         if (buildOptions.forceBuildAll || isModified(smaliDir, dex)) {
             LOGGER.info("Smaling " + folder + " folder into " + filename + "...");
+            //noinspection ResultOfMethodCallIgnored
             dex.delete();
             SmaliBuilder.build(smaliDir, dex, buildOptions.forceApi > 0 ? buildOptions.forceApi : mMinSdkVersion);
         }
@@ -503,6 +509,7 @@ public class Androlib {
                     File netSecConfOrig = new File(appDir, "res/xml/network_security_config.xml");
                     if (netSecConfOrig.exists()) {
                         LOGGER.info("Replacing existing network_security_config.xml!");
+                        //noinspection ResultOfMethodCallIgnored
                         netSecConfOrig.delete();
                     }
                     ResXmlPatcher.modNetworkSecurityConfig(netSecConfOrig);
@@ -511,7 +518,9 @@ public class Androlib {
                 }
 
                 File apkFile = File.createTempFile("APKTOOL", null);
+                //noinspection ResultOfMethodCallIgnored
                 apkFile.delete();
+                //noinspection ResultOfMethodCallIgnored
                 resourceFile.delete();
 
                 File ninePatch = new File(appDir, "9patch");
@@ -539,6 +548,7 @@ public class Androlib {
                 }
 
                 // delete tmpDir
+                //noinspection ResultOfMethodCallIgnored
                 apkFile.delete();
             }
             return true;
@@ -576,6 +586,7 @@ public class Androlib {
                 LOGGER.info("Building AndroidManifest.xml...");
 
                 File apkFile = File.createTempFile("APKTOOL", null);
+                //noinspection ResultOfMethodCallIgnored
                 apkFile.delete();
 
                 File ninePatch = new File(appDir, "9patch");
@@ -590,6 +601,7 @@ public class Androlib {
                 Directory tmpDir = new ExtFile(apkFile).getDirectory();
                 tmpDir.copyToDir(apkDir, APK_MANIFEST_FILENAMES);
 
+                //noinspection ResultOfMethodCallIgnored
                 apkFile.delete();
             }
             return true;
@@ -668,7 +680,7 @@ public class Androlib {
 
             try (
                     ZipFile inputFile = new ZipFile(tempFile);
-                    ZipOutputStream actualOutput = new ZipOutputStream(new FileOutputStream(outFile))
+                    ZipOutputStream actualOutput = new ZipOutputStream(Files.newOutputStream(outFile.toPath()))
             ) {
                 copyExistingFiles(inputFile, actualOutput);
                 copyUnknownFiles(appDir, actualOutput, files);
@@ -677,6 +689,7 @@ public class Androlib {
             }
 
             // Remove our temporary file.
+            //noinspection ResultOfMethodCallIgnored
             tempFile.delete();
         }
     }
@@ -726,7 +739,7 @@ public class Androlib {
                 newEntry.setMethod(ZipEntry.STORED);
                 newEntry.setSize(inputFile.length());
                 newEntry.setCompressedSize(-1);
-                BufferedInputStream unknownFile = new BufferedInputStream(new FileInputStream(inputFile));
+                BufferedInputStream unknownFile = new BufferedInputStream(Files.newInputStream(inputFile.toPath()));
                 CRC32 crc = BrutIO.calculateCrc(unknownFile);
                 newEntry.setCrc(crc.getValue());
                 unknownFile.close();
@@ -743,10 +756,12 @@ public class Androlib {
     public void buildApk(File appDir, File outApk) throws AndrolibException {
         LOGGER.info("Building apk file...");
         if (outApk.exists()) {
+            //noinspection ResultOfMethodCallIgnored
             outApk.delete();
         } else {
             File outDir = outApk.getParentFile();
             if (outDir != null && !outDir.exists()) {
+                //noinspection ResultOfMethodCallIgnored
                 outDir.mkdirs();
             }
         }

@@ -22,6 +22,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.util.Collection;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
@@ -39,7 +40,7 @@ public class ZipUtils {
             throws BrutException, IOException {
 
         mDoNotCompress = doNotCompress;
-        ZipOutputStream zipOutputStream = new ZipOutputStream(new FileOutputStream(zip));
+        ZipOutputStream zipOutputStream = new ZipOutputStream(Files.newOutputStream(zip.toPath()));
         zipFolders(folder, zipOutputStream);
 
         // We manually set the assets because we need to retain the folder structure
@@ -67,7 +68,7 @@ public class ZipUtils {
                 if (mDoNotCompress != null && (mDoNotCompress.contains(extension) || mDoNotCompress.contains(zipEntry.getName()))) {
                     zipEntry.setMethod(ZipEntry.STORED);
                     zipEntry.setSize(file.length());
-                    BufferedInputStream unknownFile = new BufferedInputStream(new FileInputStream(file));
+                    BufferedInputStream unknownFile = new BufferedInputStream(Files.newInputStream(file.toPath()));
                     CRC32 crc = BrutIO.calculateCrc(unknownFile);
                     zipEntry.setCrc(crc.getValue());
                     unknownFile.close();

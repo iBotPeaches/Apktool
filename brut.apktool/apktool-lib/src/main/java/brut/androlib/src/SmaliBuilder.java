@@ -25,9 +25,9 @@ import com.android.tools.smali.dexlib2.Opcodes;
 import com.android.tools.smali.dexlib2.writer.builder.DexBuilder;
 import com.android.tools.smali.dexlib2.writer.io.FileDataStore;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.logging.Logger;
 
 public class SmaliBuilder {
@@ -63,7 +63,7 @@ public class SmaliBuilder {
     private void buildFile(String fileName, DexBuilder dexBuilder)
             throws AndrolibException, IOException {
         File inFile = new File(mSmaliDir, fileName);
-        InputStream inStream = new FileInputStream(inFile);
+        InputStream inStream = Files.newInputStream(inFile.toPath());
 
         if (fileName.endsWith(".smali")) {
             try {

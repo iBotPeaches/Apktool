@@ -20,6 +20,7 @@ import brut.common.BrutException;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -43,15 +44,18 @@ public class OS {
             if (file.isDirectory()) {
                 rmdir(file);
             } else {
+                //noinspection ResultOfMethodCallIgnored
                 file.delete();
             }
         }
+        //noinspection ResultOfMethodCallIgnored
         dir.delete();
     }
 
     public static void rmfile(String file) {
     	File del = new File(file);
-    	del.delete();
+        //noinspection ResultOfMethodCallIgnored
+        del.delete();
     }
 
     public static void rmdir(String dir) throws BrutException {
@@ -59,6 +63,7 @@ public class OS {
     }
 
     public static void cpdir(File src, File dest) throws BrutException {
+        //noinspection ResultOfMethodCallIgnored
         dest.mkdirs();
         File[] files = src.listFiles();
         if (files == null) {
@@ -72,8 +77,8 @@ public class OS {
                 continue;
             }
             try {
-                try (InputStream in = new FileInputStream(file)) {
-                    try (OutputStream out = new FileOutputStream(destFile)) {
+                try (InputStream in = Files.newInputStream(file.toPath())) {
+                    try (OutputStream out = Files.newOutputStream(destFile.toPath())) {
                         IOUtils.copy(in, out);
                     }
                 }

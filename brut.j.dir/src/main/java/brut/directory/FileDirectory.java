@@ -59,6 +59,7 @@ public class FileDirectory extends AbstractDirectory {
     @Override
     protected AbstractDirectory createDirLocal(String name) throws DirectoryException {
         File dir = new File(generatePath(name));
+        //noinspection ResultOfMethodCallIgnored
         dir.mkdir();
         return new FileDirectory(dir);
     }
@@ -93,6 +94,7 @@ public class FileDirectory extends AbstractDirectory {
 
     @Override
     protected void removeFileLocal(String name) {
+        //noinspection ResultOfMethodCallIgnored
         new File(generatePath(name)).delete();
     }
 
