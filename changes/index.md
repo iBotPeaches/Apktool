@@ -13,7 +13,7 @@ xxxx.xx.xx
  * Fix issue with larger `apktool.yml` files. ([Issue 3008](https://github.com/iBotPeaches/Apktool/issues/3008))
  * Fix issue with parsing `XML_TYPE_OVERLAY`. ([Issue 3030](https://github.com/iBotPeaches/Apktool/issues/3030))
  * Upgrade to smali/baksmali 3.0.3 and move to Google fork of it. ([Issue 3050](https://github.com/iBotPeaches/Apktool/issues/3050))
- * Upgrade to Gradle 8.1.0 (Thanks ArjunaKumarMohanta)
+ * Upgrade to Gradle 8.1.1 (Thanks ArjunaKumarMohanta)
  * Upgrade `guava` to `31.1-jre` from `31.0.1-jre`
  * Upgrade `proguard_gradle` to `7.3.2` from `7.3.0`
  * Upgrade `shadow` to `8.0.0` from `7.1.0`
