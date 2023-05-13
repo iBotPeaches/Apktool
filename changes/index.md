@@ -6,6 +6,7 @@ description: Apktool - Changelog / Roadmap
 
 ## v2.7.1
 xxxx.xx.xx
+ * Add SDK U (API 34) Preview support. ([Issue 3041](https://github.com/iBotPeaches/Apktool/issues/3041))
  * Remove CI testing for Java versions: 9, 10, 12, 13, 14, 15 and 17.
  * Add CI testing for Java versions: 18 and 19. ([Issue 2976](https://github.com/iBotPeaches/Apktool/issues/2976))
  * Add support for parsing applications with config flag size > 8 (from 28). ([Issue 2978](https://github.com/iBotPeaches/Apktool/issues/2978))
