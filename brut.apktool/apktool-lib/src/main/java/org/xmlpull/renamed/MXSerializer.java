@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.Objects;
 
 /**
  * Implementation of XmlSerializer interface from XmlPull V1 API. This
@@ -106,7 +107,7 @@ public class MXSerializer implements XmlSerializer {
 	private final boolean checkNamesInterned = false;
 
 	private void checkInterning(String name) {
-		if (namesInterned && name != name.intern()) {
+		if (namesInterned && !Objects.equals(name, name.intern())) {
 			throw new IllegalArgumentException("all names passed as arguments must be interned"
 					+ "when NAMES INTERNED feature is enabled");
 		}

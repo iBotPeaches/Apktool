@@ -90,6 +90,7 @@ public class DirUtil {
             } else {
                 String cleanedFilename = BrutIO.sanitizeUnknownFile(out, fileName);
                 File outFile = new File(out, cleanedFilename);
+                //noinspection ResultOfMethodCallIgnored
                 outFile.getParentFile().mkdirs();
                 BrutIO.copyAndClose(in.getFileInput(fileName), Files.newOutputStream(outFile.toPath()));
             }

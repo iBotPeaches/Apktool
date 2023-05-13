@@ -37,6 +37,7 @@ import org.apache.commons.io.IOUtils;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.zip.CRC32;
@@ -185,7 +186,7 @@ final public class AndrolibResources {
 
         attrDecoder.setCurrentPackage(resTable.listMainPackages().iterator().next());
 
-        Directory inApk, in = null, out;
+        Directory inApk, out;
         try {
             inApk = apkFile.getDirectory();
             out = new FileDirectory(outDir);
@@ -433,7 +434,8 @@ final public class AndrolibResources {
         if (buildOptions.doNotCompress != null && !customAapt) {
             // Use custom -e option to avoid limits on commandline length.
             // Can only be used when custom aapt binary is not used.
-            String extensionsFilePath = createDoNotCompressExtensionsFile(buildOptions).getAbsolutePath();
+            String extensionsFilePath =
+                Objects.requireNonNull(createDoNotCompressExtensionsFile(buildOptions)).getAbsolutePath();
             cmd.add("-e");
             cmd.add(extensionsFilePath);
         } else if (buildOptions.doNotCompress != null) {
@@ -555,7 +557,8 @@ final public class AndrolibResources {
         if (buildOptions.doNotCompress != null && !customAapt) {
             // Use custom -e option to avoid limits on commandline length.
             // Can only be used when custom aapt binary is not used.
-            String extensionsFilePath = createDoNotCompressExtensionsFile(buildOptions).getAbsolutePath();
+            String extensionsFilePath =
+                Objects.requireNonNull(createDoNotCompressExtensionsFile(buildOptions)).getAbsolutePath();
             cmd.add("-e");
             cmd.add(extensionsFilePath);
         } else if (buildOptions.doNotCompress != null) {
@@ -801,7 +804,7 @@ final public class AndrolibResources {
 
         if (id == 1) {
             try (InputStream in = getAndroidFrameworkResourcesAsStream();
-                 OutputStream out = new FileOutputStream(apk)) {
+                 OutputStream out = Files.newOutputStream(apk.toPath())) {
                 IOUtils.copy(in, out);
                 return apk;
             } catch (IOException ex) {
@@ -822,12 +825,13 @@ final public class AndrolibResources {
             LOGGER.warning("Can't empty framework directory, no file found at: " + apk.getAbsolutePath());
         } else {
             try {
-                if (apk.exists() && dir.listFiles().length > 1 && ! buildOptions.forceDeleteFramework) {
+                if (apk.exists() && Objects.requireNonNull(dir.listFiles()).length > 1 && ! buildOptions.forceDeleteFramework) {
                     LOGGER.warning("More than default framework detected. Please run command with `--force` parameter to wipe framework directory.");
                 } else {
-                    for (File file : dir.listFiles()) {
+                    for (File file : Objects.requireNonNull(dir.listFiles())) {
                         if (file.isFile() && file.getName().endsWith(".apk")) {
                             LOGGER.info("Removing " + file.getName() + " framework file...");
+                            //noinspection ResultOfMethodCallIgnored
                             file.delete();
                         }
                     }
@@ -879,7 +883,7 @@ final public class AndrolibResources {
                     + (tag == null ? "" : '-' + tag)
                     + ".apk");
 
-            out = new ZipOutputStream(new FileOutputStream(outFile));
+            out = new ZipOutputStream(Files.newOutputStream(outFile.toPath()));
             out.setMethod(ZipOutputStream.STORED);
             CRC32 crc = new CRC32();
             crc.update(data);
@@ -919,8 +923,9 @@ final public class AndrolibResources {
     public void publicizeResources(File arscFile) throws AndrolibException {
         byte[] data = new byte[(int) arscFile.length()];
 
-        try(InputStream in = new FileInputStream(arscFile);
-            OutputStream out = new FileOutputStream(arscFile)) {
+        try(InputStream in = Files.newInputStream(arscFile.toPath());
+            OutputStream out = Files.newOutputStream(arscFile.toPath())) {
+            //noinspection ResultOfMethodCallIgnored
             in.read(data);
             publicizeResources(data);
             out.write(data);
@@ -1034,7 +1039,7 @@ final public class AndrolibResources {
 
     public BuildOptions buildOptions;
 
-    public Map<String, String> mResFileMapping = new HashMap();
+    public Map<String, String> mResFileMapping = new HashMap<>();
 
     // TODO: dirty static hack. I have to refactor decoding mechanisms.
     public static boolean sKeepBroken = false;

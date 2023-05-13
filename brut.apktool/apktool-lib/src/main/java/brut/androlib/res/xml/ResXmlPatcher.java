@@ -168,7 +168,7 @@ public final class ResXmlPatcher {
      * build, thus preventing the application from installing. This is from a bug/error
      * in AOSP where public resources cannot be part of an authorities attribute within
      * a provider tag.
-     *
+     * <p>
      * This finds any reference and replaces it with the literal value found in the
      * res/values/strings.xml file.
      *
