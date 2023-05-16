@@ -31,12 +31,15 @@ public class ResResSpec {
     private final ResPackage mPackage;
     private final ResTypeSpec mType;
     private final Map<ResConfigFlags, ResResource> mResources = new LinkedHashMap<>();
+    private static final Set<String> EMPTY_RESOURCE_NAMES = Set.of(
+        "0_resource_name_obfuscated",
+        "(name removed)"
+    );
 
     public ResResSpec(ResID id, String name, ResPackage pkg, ResTypeSpec type) {
         this.mId = id;
         String cleanName;
-
-        name = (("(name removed)".equals(name)) ? null : name);
+        name = EMPTY_RESOURCE_NAMES.contains(name) ? null : name;
 
         ResResSpec resResSpec = type.getResSpecUnsafe(name);
         if (resResSpec != null) {
