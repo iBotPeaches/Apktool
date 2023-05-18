@@ -312,6 +312,25 @@ public class Main {
 
     private static void _version() {
         System.out.println(Androlib.getVersion());
+        try {
+            System.out.print("Embedded aapt: ");
+            System.out.print(AaptManager.getAaptVersionString(AaptManager.getAapt1()));
+            System.out.print("Embedded aapt2: ");
+            System.out.print(AaptManager.getAaptVersionString(AaptManager.getAapt2()));
+            File aapt1 = AaptManager.findAaptInPath(1);
+            if (aapt1 != null) {
+                System.out.print(aapt1.getPath() + ": ");
+                System.out.print(AaptManager.getAaptVersionString(aapt1));
+            }
+            File aapt2 = AaptManager.findAaptInPath(2);
+            if (aapt2 != null) {
+                System.out.print(aapt2.getPath() + ": ");
+                System.out.print(AaptManager.getAaptVersionString(aapt2));
+            }
+        } catch (BrutException e) {
+            System.err.println(e.getMessage());
+            System.exit(1);
+        }
     }
 
     private static void _Options() {

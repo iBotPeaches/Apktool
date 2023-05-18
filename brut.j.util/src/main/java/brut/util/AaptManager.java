@@ -18,8 +18,13 @@ package brut.util;
 
 import brut.common.BrutException;
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 public class AaptManager {
 
@@ -83,7 +88,8 @@ public class AaptManager {
     }
 
     public static String getAaptBinaryName(Integer version) {
-        return "aapt" + (version == 2 ? "2" : "");
+        String aaptVersion = "aapt" + (version == 2 ? "2" : "");
+        return aaptVersion;
     }
 
     public static int getAppVersionFromString(String version) throws BrutException {
@@ -99,6 +105,11 @@ public class AaptManager {
     }
 
     public static int getAaptVersion(File aapt) throws BrutException {
+        String version = getAaptVersionString(aapt);
+        return getAppVersionFromString(version);
+    }
+
+    public static String getAaptVersionString(File aapt) throws BrutException {
         if (!aapt.isFile()) {
             throw new BrutException("Could not identify aapt binary as executable.");
         }
@@ -115,6 +126,21 @@ public class AaptManager {
             throw new BrutException("Could not execute aapt binary at location: " + aapt.getAbsolutePath());
         }
 
-        return getAppVersionFromString(version);
+        return version;
+    }
+
+    public static File findAaptInPath(Integer version) throws BrutException {
+        String aaptVersion = getAaptBinaryName(version);
+        if (OSDetection.isWindows()) {
+            aaptVersion += ".exe";
+        }
+
+        final String aapt = aaptVersion;
+        final String[] paths = System.getenv("PATH").split(File.pathSeparator);
+        Optional<Path> res = Stream.of(paths).map(Paths::get).filter(
+            path -> Files.exists(path.resolve(aapt))
+        ).findFirst();
+
+        return res.isPresent() ? Paths.get(res.get().toString(), aaptVersion).toFile() : null;
     }
 }
