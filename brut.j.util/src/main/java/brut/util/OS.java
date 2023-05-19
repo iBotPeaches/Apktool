@@ -120,12 +120,10 @@ public class OS {
             StreamCollector collector = new StreamCollector(process.getInputStream());
             executor.execute(collector);
 
-            process.waitFor();
-            if (! executor.awaitTermination(15, TimeUnit.SECONDS)) {
-                executor.shutdownNow();
-                if (! executor.awaitTermination(5, TimeUnit.SECONDS)) {
-                    System.err.println("Stream collector did not terminate.");
-                }
+            process.waitFor(15, TimeUnit.SECONDS);
+            executor.shutdownNow();
+            if (! executor.awaitTermination(5, TimeUnit.SECONDS)) {
+                System.err.println("Stream collector did not terminate.");
             }
             return collector.get();
         } catch (IOException | InterruptedException e) {
