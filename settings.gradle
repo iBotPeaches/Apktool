@@ -1,3 +1,4 @@
+rootProject.name = 'apktool-cli'
 include 'brut.j.common',
         'brut.j.util',
         'brut.j.dir',
