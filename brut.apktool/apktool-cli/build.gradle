@@ -15,13 +15,6 @@
  */
 import proguard.gradle.ProGuardTask
 
-apply plugin: 'com.github.johnrengelman.shadow'
-
-dependencies {
-    implementation depends.commons_cli
-    implementation project(':brut.apktool:apktool-lib')
-}
-
 buildscript {
     dependencies {
         repositories {
@@ -33,6 +26,20 @@ buildscript {
             exclude group: 'com.android.tools.build'
         }
     }
+}
+
+plugins {
+    id 'com.github.johnrengelman.shadow'
+    id 'application'
+}
+
+dependencies {
+    implementation depends.commons_cli
+    implementation project(':brut.apktool:apktool-lib')
+}
+
+application {
+    mainClass = 'brut.apktool.Main'
 }
 
 jar {
