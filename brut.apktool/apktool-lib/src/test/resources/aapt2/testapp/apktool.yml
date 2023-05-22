@@ -13,3 +13,6 @@ compressionType: false
 doNotCompress:
 - assets/0byte_file.jpg
 sparseResources: false
+unknownFiles:
+  AssetBundle/assets/a.txt: '8'
+  AssetBundle/b.txt: '8'

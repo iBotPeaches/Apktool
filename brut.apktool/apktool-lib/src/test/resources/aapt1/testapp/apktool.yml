@@ -16,6 +16,8 @@ doNotCompress:
 - png
 - mp3
 unknownFiles:
+  AssetBundle/assets/a.txt: '8'
+  AssetBundle/b.txt: '8'
   hidden.file: '8'
   non\u007Fprintable.file: '8'
   stored.file: '0'
