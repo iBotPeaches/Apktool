@@ -75,9 +75,9 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: ${{ matrix.java }}
-      - uses: gradle/wrapper-validation-action@v1
+      - uses: gradle/wrapper-validation-action@v1.0.6
       - name: Build and test
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v2.4.2
         with:
           arguments: build shadowJar proguard
 
@@ -94,7 +94,7 @@ jobs:
           distribution: 'zulu'
           java-version: 17
       - name: Build
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v2.4.2
         with:
           arguments: build shadowJar proguard
       - name: Upload
