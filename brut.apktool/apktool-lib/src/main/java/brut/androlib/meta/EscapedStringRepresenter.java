@@ -16,11 +16,13 @@
  */
 package brut.androlib.meta;
 
+import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.representer.Representer;
 
 public class EscapedStringRepresenter extends Representer {
     public EscapedStringRepresenter() {
+        super(new DumperOptions());
         RepresentStringEx representStringEx = new RepresentStringEx();
         multiRepresenters.put(String.class, representStringEx);
         representers.put(String.class, representStringEx);
