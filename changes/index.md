@@ -21,7 +21,7 @@ xxxx.xx.xx
  * Upgrade to smali/baksmali 3.0.3 and move to Google fork of it. ([Issue 3050](https://github.com/iBotPeaches/Apktool/issues/3050))
  * Upgrade to Gradle 8.1.1 (Thanks ArjunaKumarMohanta)
  * Upgrade `commons-io` to `2.12.0` from `2.11.0`
- * Upgrade `guava` to `31.1-jre` from `31.0.1-jre`
+ * Upgrade `guava` to `32.0.0-jre` from `31.0.1-jre`
  * Upgrade `proguard_gradle` to `7.3.2` from `7.3.0`
  * Upgrade `shadow` to `8.0.0` from `7.1.0`
 
