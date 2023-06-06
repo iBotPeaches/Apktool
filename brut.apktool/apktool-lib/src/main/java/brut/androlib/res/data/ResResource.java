@@ -16,7 +16,7 @@
  */
 package brut.androlib.res.data;
 
-import brut.androlib.AndrolibException;
+import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.data.value.ResValue;
 
 public class ResResource {

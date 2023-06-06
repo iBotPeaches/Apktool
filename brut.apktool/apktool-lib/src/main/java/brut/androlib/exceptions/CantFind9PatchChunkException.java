@@ -14,23 +14,10 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib.err;
+package brut.androlib.exceptions;
 
-import brut.androlib.AndrolibException;
-
-public class CantFindFrameworkResException extends AndrolibException {
-	public CantFindFrameworkResException(int id) {
-		mPkgId = id;
+public class CantFind9PatchChunkException extends AndrolibException {
+	public CantFind9PatchChunkException(String message, Throwable cause) {
+		super(message, cause);
 	}
-
-	public int getPkgId() {
-		return mPkgId;
-	}
-
-	@Override
-	public String getMessage() {
-		return String.format("Can't find framework resources for package of id: %d", this.getPkgId());
-	}
-
-	private final int mPkgId;
 }

@@ -14,11 +14,10 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib.err;
+package brut.androlib.exceptions;
 
-import brut.androlib.AndrolibException;
-
-public class InFileNotFoundException extends AndrolibException {
-	public InFileNotFoundException() {
-	}
+public class RawXmlEncounteredException extends AndrolibException {
+    public RawXmlEncounteredException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

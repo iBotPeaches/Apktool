@@ -16,9 +16,9 @@
  */
 package brut.androlib.res.decoder;
 
-import brut.androlib.AndrolibException;
-import brut.androlib.err.AXmlDecodingException;
-import brut.androlib.err.RawXmlEncounteredException;
+import brut.androlib.exceptions.AndrolibException;
+import brut.androlib.exceptions.AXmlDecodingException;
+import brut.androlib.exceptions.RawXmlEncounteredException;
 import brut.androlib.res.data.ResTable;
 import brut.androlib.res.util.ExtXmlSerializer;
 import org.xmlpull.v1.XmlPullParser;

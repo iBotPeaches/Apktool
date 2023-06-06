@@ -16,7 +16,7 @@
  */
 package brut.androlib.res.decoder;
 
-import brut.androlib.AndrolibException;
+import brut.androlib.exceptions.AndrolibException;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;

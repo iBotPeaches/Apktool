@@ -14,12 +14,9 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib.err;
+package brut.androlib.exceptions;
 
-import brut.androlib.AndrolibException;
-
-public class UndefinedResObjectException extends AndrolibException {
-	public UndefinedResObjectException(String message) {
-		super(message);
+public class InFileNotFoundException extends AndrolibException {
+	public InFileNotFoundException() {
 	}
 }

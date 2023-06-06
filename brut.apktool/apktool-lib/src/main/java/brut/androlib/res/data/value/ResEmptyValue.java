@@ -16,7 +16,7 @@
  */
 package brut.androlib.res.data.value;
 
-import brut.androlib.AndrolibException;
+import brut.androlib.exceptions.AndrolibException;
 
 public class ResEmptyValue extends ResScalarValue {
     protected final int mValue;

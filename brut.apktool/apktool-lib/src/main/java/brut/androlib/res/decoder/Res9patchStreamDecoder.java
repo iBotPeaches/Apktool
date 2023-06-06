@@ -16,8 +16,8 @@
  */
 package brut.androlib.res.decoder;
 
-import brut.androlib.AndrolibException;
-import brut.androlib.err.CantFind9PatchChunkException;
+import brut.androlib.exceptions.AndrolibException;
+import brut.androlib.exceptions.CantFind9PatchChunkException;
 import brut.util.ExtDataInput;
 import org.apache.commons.io.IOUtils;
 

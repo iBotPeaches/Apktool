@@ -14,9 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib.err;
-
-import brut.androlib.AndrolibException;
+package brut.androlib.exceptions;
 
 public class AXmlDecodingException extends AndrolibException {
     public AXmlDecodingException(String message, Throwable cause) {

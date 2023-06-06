@@ -16,9 +16,10 @@
  */
 package brut.androlib;
 
-import brut.androlib.err.InFileNotFoundException;
-import brut.androlib.err.OutDirExistsException;
-import brut.androlib.err.UndefinedResObjectException;
+import brut.androlib.exceptions.AndrolibException;
+import brut.androlib.exceptions.InFileNotFoundException;
+import brut.androlib.exceptions.OutDirExistsException;
+import brut.androlib.exceptions.UndefinedResObjectException;
 import brut.androlib.meta.MetaInfo;
 import brut.androlib.meta.PackageInfo;
 import brut.androlib.meta.UsesFramework;

@@ -16,7 +16,7 @@
  */
 package brut.androlib.src;
 
-import brut.androlib.AndrolibException;
+import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.mod.SmaliMod;
 import brut.directory.DirectoryException;
 import brut.directory.ExtFile;
