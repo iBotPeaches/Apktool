@@ -78,7 +78,7 @@ public class ResTable {
             return pkg;
         }
         if (mAndRes != null) {
-            return mAndRes.loadFrameworkPkg(this, id, mAndRes.buildOptions.frameworkTag);
+            return mAndRes.loadFrameworkPkg(this, id);
         }
         throw new UndefinedResObjectException(String.format("package: id=%d", id));
     }

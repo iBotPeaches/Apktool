@@ -18,7 +18,7 @@ package brut.androlib.aapt1;
 
 import brut.androlib.Androlib;
 import brut.androlib.ApkDecoder;
-import brut.androlib.options.BuildOptions;
+import brut.androlib.Config;
 import brut.androlib.TestUtils;
 import brut.directory.ExtFile;
 import brut.common.BrutException;
@@ -50,8 +50,8 @@ public class EmptyResourcesArscTest {
         apkDecoder.decode();
 
         LOGGER.info("Building issue1730.apk...");
-        BuildOptions buildOptions = new BuildOptions();
-        new Androlib(buildOptions).build(sTestNewDir, testApk);
+        Config config = Config.getDefaultConfig();
+        new Androlib(config).build(sTestNewDir, testApk);
     }
 
     @AfterClass

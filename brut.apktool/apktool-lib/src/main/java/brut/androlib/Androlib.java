@@ -19,7 +19,6 @@ package brut.androlib;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.meta.MetaInfo;
 import brut.androlib.meta.UsesFramework;
-import brut.androlib.options.BuildOptions;
 import brut.androlib.res.AndrolibResources;
 import brut.androlib.res.data.ResConfigFlags;
 import brut.androlib.res.data.ResPackage;
@@ -52,18 +51,18 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 public class Androlib {
-    private final AndrolibResources mAndRes = new AndrolibResources();
+    private final AndrolibResources mAndRes;
     protected final ResUnknownFiles mResUnknownFiles = new ResUnknownFiles();
-    public final BuildOptions buildOptions;
+    private final Config config;
     private int mMinSdkVersion = 0;
 
     public Androlib() {
-        this(new BuildOptions());
+        this(Config.getDefaultConfig());
     }
 
-    public Androlib(BuildOptions buildOptions) {
-        this.buildOptions = buildOptions;
-        mAndRes.buildOptions = buildOptions;
+    public Androlib(Config config) {
+        this.config = config;
+        mAndRes = new AndrolibResources(config);
     }
 
     public ResTable getResTable(ExtFile apkFile)
@@ -90,7 +89,7 @@ public class Androlib {
         }
     }
 
-    public void decodeSourcesSmali(File apkFile, File outDir, String filename, boolean bakDeb, int apiLevel)
+    public void decodeSourcesSmali(File apkFile, File outDir, String filename)
             throws AndrolibException {
         try {
             File smaliDir;
@@ -103,7 +102,8 @@ public class Androlib {
             //noinspection ResultOfMethodCallIgnored
             smaliDir.mkdirs();
             LOGGER.info("Baksmaling " + filename + "...");
-            DexFile dexFile = SmaliDecoder.decode(apkFile, smaliDir, filename, bakDeb, apiLevel);
+            DexFile dexFile = SmaliDecoder.decode(apkFile, smaliDir, filename,
+                config.baksmaliDebugMode, config.apiLevel);
             int minSdkVersion = dexFile.getOpcodes().api;
             if (mMinSdkVersion == 0 || mMinSdkVersion > minSdkVersion) {
                 mMinSdkVersion = minSdkVersion;
@@ -148,13 +148,13 @@ public class Androlib {
         mAndRes.decodeManifestWithResources(resTable, apkFile, outDir);
     }
 
-    public void decodeRawFiles(ExtFile apkFile, File outDir, short decodeAssetMode)
+    public void decodeRawFiles(ExtFile apkFile, File outDir)
             throws AndrolibException {
         LOGGER.info("Copying assets and libs...");
         try {
             Directory in = apkFile.getDirectory();
 
-            if (decodeAssetMode == ApkDecoder.DECODE_ASSETS_FULL) {
+            if (config.decodeAssets == Config.DECODE_ASSETS_FULL) {
                 if (in.containsDir("assets")) {
                     in.copyToDir(outDir, "assets");
                 }
@@ -296,9 +296,9 @@ public class Androlib {
         LOGGER.info("Using Apktool " + Androlib.getVersion());
 
         MetaInfo meta = readMetaFile(appDir);
-        buildOptions.isFramework = meta.isFrameworkApk;
-        buildOptions.resourcesAreCompressed = meta.compressionType;
-        buildOptions.doNotCompress = meta.doNotCompress;
+        config.isFramework = meta.isFrameworkApk;
+        config.resourcesAreCompressed = meta.compressionType;
+        config.doNotCompress = meta.doNotCompress;
 
         mAndRes.setSdkInfo(meta.sdkInfo);
         mAndRes.setPackageId(meta.packageInfo);
@@ -415,7 +415,7 @@ public class Androlib {
             return false;
         }
         File stored = new File(appDir, APK_DIRNAME + "/" + filename);
-        if (buildOptions.forceBuildAll || isModified(working, stored)) {
+        if (config.forceBuildAll || isModified(working, stored)) {
             LOGGER.info("Copying " + appDir.toString() + " " + filename + " file...");
             try {
                 BrutIO.copyAndClose(Files.newInputStream(working.toPath()), Files.newOutputStream(stored.toPath()));
@@ -434,14 +434,14 @@ public class Androlib {
             return false;
         }
         File dex = new File(appDir, APK_DIRNAME + "/" + filename);
-        if (! buildOptions.forceBuildAll) {
+        if (! config.forceBuildAll) {
             LOGGER.info("Checking whether sources has changed...");
         }
-        if (buildOptions.forceBuildAll || isModified(smaliDir, dex)) {
+        if (config.forceBuildAll || isModified(smaliDir, dex)) {
             LOGGER.info("Smaling " + folder + " folder into " + filename + "...");
             //noinspection ResultOfMethodCallIgnored
             dex.delete();
-            SmaliBuilder.build(smaliDir, dex, buildOptions.forceApi > 0 ? buildOptions.forceApi : mMinSdkVersion);
+            SmaliBuilder.build(smaliDir, dex, config.forceApi > 0 ? config.forceApi : mMinSdkVersion);
         }
         return true;
     }
@@ -461,10 +461,10 @@ public class Androlib {
                 return false;
             }
             File apkDir = new File(appDir, APK_DIRNAME);
-            if (! buildOptions.forceBuildAll) {
+            if (! config.forceBuildAll) {
                 LOGGER.info("Checking whether resources has changed...");
             }
-            if (buildOptions.forceBuildAll || isModified(newFiles(APK_RESOURCES_FILENAMES, appDir),
+            if (config.forceBuildAll || isModified(newFiles(APK_RESOURCES_FILENAMES, appDir),
                     newFiles(APK_RESOURCES_FILENAMES, apkDir))) {
                 LOGGER.info("Copying raw resources...");
                 appDir.getDirectory().copyToDir(apkDir, APK_RESOURCES_FILENAMES);
@@ -481,18 +481,18 @@ public class Androlib {
             if (!new File(appDir, "res").exists()) {
                 return false;
             }
-            if (! buildOptions.forceBuildAll) {
+            if (! config.forceBuildAll) {
                 LOGGER.info("Checking whether resources has changed...");
             }
             File apkDir = new File(appDir, APK_DIRNAME);
             File resourceFile = new File(apkDir.getParent(), "resources.zip");
 
-            if (buildOptions.forceBuildAll || isModified(newFiles(APP_RESOURCES_FILENAMES, appDir),
-                    newFiles(APK_RESOURCES_FILENAMES, apkDir)) || (buildOptions.isAapt2() && !isFile(resourceFile))) {
+            if (config.forceBuildAll || isModified(newFiles(APP_RESOURCES_FILENAMES, appDir),
+                    newFiles(APK_RESOURCES_FILENAMES, apkDir)) || (config.isAapt2() && !isFile(resourceFile))) {
                 LOGGER.info("Building resources...");
 
-                if (buildOptions.debugMode) {
-                    if (buildOptions.isAapt2()) {
+                if (config.debugMode) {
+                    if (config.isAapt2()) {
                         LOGGER.info("Using aapt2 - setting 'debuggable' attribute to 'true' in AndroidManifest.xml");
                         ResXmlPatcher.setApplicationDebugTagTrue(new File(appDir, "AndroidManifest.xml"));
                     } else {
@@ -500,7 +500,7 @@ public class Androlib {
                     }
                 }
 
-                if (buildOptions.netSecConf) {
+                if (config.netSecConf) {
                     MetaInfo meta = readMetaFile(new ExtFile(appDir));
                     if (meta.sdkInfo != null && meta.sdkInfo.get("targetSdkVersion") != null) {
                         if (Integer.parseInt(meta.sdkInfo.get("targetSdkVersion")) < ResConfigFlags.SDK_NOUGAT) {
@@ -576,13 +576,13 @@ public class Androlib {
             if (!new File(appDir, "AndroidManifest.xml").exists()) {
                 return false;
             }
-            if (! buildOptions.forceBuildAll) {
+            if (! config.forceBuildAll) {
                 LOGGER.info("Checking whether resources has changed...");
             }
 
             File apkDir = new File(appDir, APK_DIRNAME);
 
-            if (buildOptions.forceBuildAll || isModified(newFiles(APK_MANIFEST_FILENAMES, appDir),
+            if (config.forceBuildAll || isModified(newFiles(APK_MANIFEST_FILENAMES, appDir),
                     newFiles(APK_MANIFEST_FILENAMES, apkDir))) {
                 LOGGER.info("Building AndroidManifest.xml...");
 
@@ -629,7 +629,7 @@ public class Androlib {
         }
 
         File stored = new File(appDir, APK_DIRNAME + "/" + folder);
-        if (buildOptions.forceBuildAll || isModified(working, stored)) {
+        if (config.forceBuildAll || isModified(working, stored)) {
             LOGGER.info("Copying libs... (/" + folder + ")");
             try {
                 OS.rmdir(stored);
@@ -642,7 +642,7 @@ public class Androlib {
 
     public void buildCopyOriginalFiles(File appDir)
             throws AndrolibException {
-        if (buildOptions.copyOriginalFiles) {
+        if (config.copyOriginalFiles) {
             File originalDir = new File(appDir, "original");
             if (originalDir.exists()) {
                 try {
