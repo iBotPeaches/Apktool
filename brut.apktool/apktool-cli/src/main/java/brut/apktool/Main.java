@@ -130,10 +130,10 @@ public class Main {
 
         // check decode options
         if (cli.hasOption("s") || cli.hasOption("no-src")) {
-            config.decodeSources = Config.DECODE_SOURCES_NONE;
+            config.setDecodeSources(Config.DECODE_SOURCES_NONE);
         }
         if (cli.hasOption("only-main-classes")) {
-            config.decodeSources = Config.DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES;
+            config.setDecodeSources(Config.DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES);
         }
         if (cli.hasOption("d") || cli.hasOption("debug")) {
             System.err.println("SmaliDebugging has been removed in 2.1.0 onward. Please see: https://github.com/iBotPeaches/Apktool/issues/1061");

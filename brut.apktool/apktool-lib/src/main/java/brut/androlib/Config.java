@@ -66,27 +66,15 @@ public class Config {
     public final static short DECODE_ASSETS_FULL = 0x0001;
 
     public short decodeAssets = DECODE_ASSETS_FULL;
-
     public boolean analysisMode = false;
-
     public int apiLevel = 0;
-
     public boolean forceDelete = false;
-
     public boolean keepBrokenResources = false;
-
     public boolean baksmaliDebugMode = true;
 
     // common options
 
-    /**
-     * Frameworks path
-     */
     public String frameworkDirectory = null;
-
-    /**
-     * Framework tag
-     */
     public String frameworkTag = null;
     public String aaptPath = "";
     public int aaptVersion = 1; // default to v1
