@@ -17,6 +17,7 @@
 package brut.androlib.decode;
 
 import brut.androlib.*;
+import brut.androlib.exceptions.AndrolibException;
 import brut.common.BrutException;
 import brut.directory.DirectoryException;
 import brut.directory.ExtFile;

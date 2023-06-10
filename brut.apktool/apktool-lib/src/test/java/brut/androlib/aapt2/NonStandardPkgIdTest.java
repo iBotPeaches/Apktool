@@ -17,6 +17,7 @@
 package brut.androlib.aapt2;
 
 import brut.androlib.*;
+import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.options.BuildOptions;
 import brut.androlib.res.data.ResTable;
 import brut.common.BrutException;

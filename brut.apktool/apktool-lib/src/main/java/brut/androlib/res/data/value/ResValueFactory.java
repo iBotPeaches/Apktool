@@ -17,7 +17,7 @@
 package brut.androlib.res.data.value;
 
 import android.util.TypedValue;
-import brut.androlib.AndrolibException;
+import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.data.ResPackage;
 import brut.androlib.res.data.ResTypeSpec;
 import brut.util.Duo;
@@ -107,7 +107,7 @@ public class ResValueFactory {
         if (ResTypeSpec.RES_TYPE_NAME_ATTR.equals(resTypeName)) {
             return new ResAttr(parentVal, 0, null, null, null);
         }
-        
+
         if (resTypeName.startsWith(ResTypeSpec.RES_TYPE_NAME_STYLES)) {
             return new ResStyleValue(parentVal, items, this);
         }

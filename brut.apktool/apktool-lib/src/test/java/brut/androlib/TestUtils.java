@@ -16,6 +16,7 @@
  */
 package brut.androlib;
 
+import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.options.BuildOptions;
 import brut.androlib.res.AndrolibResources;
 import brut.common.BrutException;

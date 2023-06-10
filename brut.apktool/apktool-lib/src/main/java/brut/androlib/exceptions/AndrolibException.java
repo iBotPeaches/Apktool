@@ -14,12 +14,23 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib.err;
+package brut.androlib.exceptions;
 
-import brut.androlib.AndrolibException;
+import brut.common.BrutException;
 
-public class CantFind9PatchChunkException extends AndrolibException {
-	public CantFind9PatchChunkException(String message, Throwable cause) {
-		super(message, cause);
-	}
+public class AndrolibException extends BrutException {
+    public AndrolibException() {
+    }
+
+    public AndrolibException(String message) {
+        super(message);
+    }
+
+    public AndrolibException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public AndrolibException(Throwable cause) {
+        super(cause);
+    }
 }

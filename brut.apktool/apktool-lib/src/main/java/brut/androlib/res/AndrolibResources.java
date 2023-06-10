@@ -16,9 +16,9 @@
  */
 package brut.androlib.res;
 
-import brut.androlib.AndrolibException;
+import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.options.BuildOptions;
-import brut.androlib.err.CantFindFrameworkResException;
+import brut.androlib.exceptions.CantFindFrameworkResException;
 import brut.androlib.meta.MetaInfo;
 import brut.androlib.meta.PackageInfo;
 import brut.androlib.meta.VersionInfo;

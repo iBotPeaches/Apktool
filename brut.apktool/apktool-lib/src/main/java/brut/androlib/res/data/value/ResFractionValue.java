@@ -17,7 +17,7 @@
 package brut.androlib.res.data.value;
 
 import android.util.TypedValue;
-import brut.androlib.AndrolibException;
+import brut.androlib.exceptions.AndrolibException;
 
 public class ResFractionValue extends ResIntValue {
     public ResFractionValue(int value, String rawValue) {

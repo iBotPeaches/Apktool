@@ -16,7 +16,7 @@
  */
 package brut.androlib.res.xml;
 
-import brut.androlib.AndrolibException;
+import brut.androlib.exceptions.AndrolibException;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
