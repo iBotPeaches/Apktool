@@ -16,7 +16,7 @@
  */
 package brut.androlib.decode;
 
-import brut.androlib.Androlib;
+import brut.androlib.ApkBuilder;
 import brut.androlib.ApkDecoder;
 import brut.androlib.BaseTest;
 import brut.androlib.TestUtils;
@@ -55,10 +55,10 @@ public class DoubleExtensionUnknownFileTest extends BaseTest {
         // decode issue1244.apk
         ApkDecoder apkDecoder = new ApkDecoder(new File(sTmpDir + File.separator + apk));
         ExtFile decodedApk = new ExtFile(sTmpDir + File.separator + apk + ".out");
-        apkDecoder.setOutDir(new File(sTmpDir + File.separator + apk + ".out"));
-        apkDecoder.decode();
+        File outDir = new File(sTmpDir + File.separator + apk + ".out");
+        apkDecoder.decode(outDir);
 
-        MetaInfo metaInfo = new Androlib().readMetaFile(decodedApk);
+        MetaInfo metaInfo = MetaInfo.readMetaFile(decodedApk);
         for (String string : metaInfo.doNotCompress) {
             if (StringUtils.countMatches(string, ".") > 1) {
                 assertTrue(string.equalsIgnoreCase("assets/bin/Data/sharedassets1.assets.split0"));

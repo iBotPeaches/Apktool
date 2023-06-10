@@ -18,6 +18,7 @@ package brut.androlib.aapt1;
 
 import brut.androlib.*;
 import brut.androlib.exceptions.AndrolibException;
+import brut.androlib.res.AndrolibResources;
 import brut.directory.ExtFile;
 import brut.common.BrutException;
 import brut.util.OS;
@@ -54,7 +55,7 @@ public class SharedLibraryTest extends BaseTest {
         config.frameworkDirectory = sTmpDir.getAbsolutePath();
         config.frameworkTag = "building";
 
-        new Androlib(config).installFramework(new File(sTmpDir + File.separator + apkName));
+        new AndrolibResources(config).installFramework(new File(sTmpDir + File.separator + apkName));
 
         assertTrue(fileExists("2-building.apk"));
     }
@@ -66,7 +67,7 @@ public class SharedLibraryTest extends BaseTest {
         Config config = Config.getDefaultConfig();
         config.frameworkDirectory = sTmpDir.getAbsolutePath();
 
-        new Androlib(config).installFramework(new File(sTmpDir + File.separator + apkName));
+        new AndrolibResources(config).installFramework(new File(sTmpDir + File.separator + apkName));
 
         assertTrue(fileExists("2.apk"));
     }
@@ -82,27 +83,27 @@ public class SharedLibraryTest extends BaseTest {
         config.frameworkTag = "shared";
 
         // install library/framework
-        new Androlib(config).installFramework(new File(sTmpDir + File.separator + library));
+        new AndrolibResources(config).installFramework(new File(sTmpDir + File.separator + library));
         assertTrue(fileExists("2-shared.apk"));
 
         // decode client.apk
         ApkDecoder apkDecoder = new ApkDecoder(config, new ExtFile(sTmpDir + File.separator + client));
-        apkDecoder.setOutDir(new File(sTmpDir + File.separator + client + ".out"));
-        apkDecoder.decode();
+        File outDir = new File(sTmpDir + File.separator + client + ".out");
+        apkDecoder.decode(outDir);
 
         // decode library.apk
         ApkDecoder libraryDecoder = new ApkDecoder(config, new ExtFile(sTmpDir + File.separator + library));
-        libraryDecoder.setOutDir(new File(sTmpDir + File.separator + library + ".out"));
-        libraryDecoder.decode();
+        outDir = new File(sTmpDir + File.separator + library + ".out");
+        libraryDecoder.decode(outDir);
 
         // build client.apk
         ExtFile clientApk = new ExtFile(sTmpDir, client + ".out");
-        new Androlib(config).build(clientApk, null);
+        new ApkBuilder(config, clientApk).build(null);
         assertTrue(fileExists(client + ".out" + File.separator + "dist" + File.separator + client));
 
         // build library.apk (shared library)
         ExtFile libraryApk = new ExtFile(sTmpDir, library + ".out");
-        new Androlib(config).build(libraryApk, null);
+        new ApkBuilder(config, libraryApk).build(null);
         assertTrue(fileExists(library + ".out" + File.separator + "dist" + File.separator + library));
     }
 

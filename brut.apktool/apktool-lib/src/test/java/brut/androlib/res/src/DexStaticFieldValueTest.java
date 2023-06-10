@@ -49,13 +49,12 @@ public class DexStaticFieldValueTest extends BaseTest {
 
         LOGGER.info("Building issue2543.apk...");
         File testApk = new File(sTmpDir, "issue2543.apk");
-        new Androlib(config).build(sTestOrigDir, testApk);
+        new ApkBuilder(config, sTestOrigDir).build(testApk);
 
         LOGGER.info("Decoding issue2543.apk...");
         config.baksmaliDebugMode = false;
         ApkDecoder apkDecoder = new ApkDecoder(config, new ExtFile(testApk));
-        apkDecoder.setOutDir(sTestNewDir);
-        apkDecoder.decode();
+        apkDecoder.decode(sTestNewDir);
     }
 
     @AfterClass

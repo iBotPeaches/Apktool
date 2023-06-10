@@ -16,7 +16,7 @@
  */
 package brut.androlib.yaml;
 
-import brut.androlib.Androlib;
+import brut.androlib.ApkBuilder;
 import brut.androlib.BaseTest;
 import brut.androlib.TestUtils;
 import brut.androlib.Config;
@@ -45,6 +45,6 @@ public class MaliciousYamlTest extends BaseTest {
     public void testMaliciousYamlNotLoaded() throws BrutException {
         Config config = Config.getDefaultConfig();
         File testApk = new File(sTmpDir, "cve20220476.apk");
-        new Androlib(config).build(sTestNewDir, testApk);
+        new ApkBuilder(config, sTestNewDir).build(testApk);
     }
 }

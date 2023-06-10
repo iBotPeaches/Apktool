@@ -48,12 +48,12 @@ public class UnknownCompressionTest extends BaseTest {
         // decode deflated_unknowns.apk
         // need new ExtFile because closed in decode()
         ApkDecoder apkDecoder = new ApkDecoder(new ExtFile(sTestOrigDir));
-        apkDecoder.setOutDir(new File(sTestOrigDir.getAbsolutePath() + ".out"));
-        apkDecoder.decode();
+        File outDir = new File(sTestOrigDir.getAbsolutePath() + ".out");
+        apkDecoder.decode(outDir);
 
         // build deflated_unknowns
         ExtFile clientApkFolder = new ExtFile(sTestOrigDir.getAbsolutePath() + ".out");
-        new Androlib(config).build(clientApkFolder, null);
+        new ApkBuilder(config, clientApkFolder).build(null);
         sTestNewDir = new ExtFile(clientApkFolder, "dist" + File.separator + apk);
     }
 

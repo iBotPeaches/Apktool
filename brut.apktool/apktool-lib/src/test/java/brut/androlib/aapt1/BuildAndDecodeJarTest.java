@@ -16,7 +16,7 @@
  */
 package brut.androlib.aapt1;
 
-import brut.androlib.Androlib;
+import brut.androlib.ApkBuilder;
 import brut.androlib.ApkDecoder;
 import brut.androlib.BaseTest;
 import brut.androlib.TestUtils;
@@ -44,12 +44,11 @@ public class BuildAndDecodeJarTest extends BaseTest {
 
         LOGGER.info("Building testjar.jar...");
         File testJar = new File(sTmpDir, "testjar.jar");
-        new Androlib().build(sTestOrigDir, testJar);
+        new ApkBuilder(sTestOrigDir).build(testJar);
 
         LOGGER.info("Decoding testjar.jar...");
         ApkDecoder apkDecoder = new ApkDecoder(testJar);
-        apkDecoder.setOutDir(sTestNewDir);
-        apkDecoder.decode();
+        apkDecoder.decode(sTestNewDir);
     }
 
     @AfterClass

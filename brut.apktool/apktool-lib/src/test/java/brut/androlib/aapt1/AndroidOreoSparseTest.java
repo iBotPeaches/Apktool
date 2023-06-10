@@ -43,12 +43,11 @@ public class AndroidOreoSparseTest extends BaseTest {
 
         LOGGER.info("Decoding sparse.apk...");
         ApkDecoder apkDecoder = new ApkDecoder(testApk);
-        apkDecoder.setOutDir(sTestNewDir);
-        apkDecoder.decode();
+        apkDecoder.decode(sTestNewDir);
 
         LOGGER.info("Building sparse.apk...");
         Config config = Config.getDefaultConfig();
-        new Androlib(config).build(sTestNewDir, testApk);
+        new ApkBuilder(config, sTestNewDir).build(testApk);
     }
 
     @AfterClass

@@ -37,8 +37,8 @@ import static org.junit.Assert.*;
 public class BaseTest {
 
     protected void compareUnknownFiles() throws BrutException {
-        MetaInfo control = new Androlib().readMetaFile(sTestOrigDir);
-        MetaInfo test = new Androlib().readMetaFile(sTestNewDir);
+        MetaInfo control = MetaInfo.readMetaFile(sTestOrigDir);
+        MetaInfo test = MetaInfo.readMetaFile(sTestNewDir);
         assertNotNull(control.unknownFiles);
         assertNotNull(test.unknownFiles);
 

@@ -211,4 +211,13 @@ public class ResTable {
     public boolean getSparseResources() {
         return mSparseResources;
     }
+
+    public boolean isFrameworkApk() {
+        for (ResPackage pkg : listMainPackages()) {
+            if (pkg.getId() > 0 && pkg.getId() < 64) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

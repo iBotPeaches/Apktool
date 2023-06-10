@@ -27,27 +27,48 @@ import brut.androlib.meta.VersionInfo;
 import brut.androlib.res.AndrolibResources;
 import brut.androlib.res.data.ResPackage;
 import brut.androlib.res.data.ResTable;
+import brut.androlib.res.data.ResUnknownFiles;
+import brut.androlib.src.SmaliDecoder;
+import brut.directory.Directory;
 import brut.directory.ExtFile;
 import brut.androlib.res.xml.ResXmlPatcher;
 import brut.common.BrutException;
 import brut.directory.DirectoryException;
 import brut.util.OS;
+import com.android.tools.smali.dexlib2.iface.DexFile;
 import com.google.common.base.Strings;
+import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 public class ApkDecoder {
 
     private final static Logger LOGGER = Logger.getLogger(ApkDecoder.class.getName());
+
     private final Config config;
-    private final Androlib mAndrolib;
+    private final AndrolibResources mAndRes;
     private final ExtFile mApkFile;
-    private File mOutDir;
     private ResTable mResTable;
+    protected final ResUnknownFiles mResUnknownFiles;
     private Collection<String> mUncompressedFiles;
+    private int mMinSdkVersion = 0;
+
+    private final static String SMALI_DIRNAME = "smali";
+    private final static String UNK_DIRNAME = "unknown";
+    private final static String[] APK_RESOURCES_FILENAMES = new String[] {
+        "resources.arsc", "AndroidManifest.xml", "res", "r", "R" };
+    private final static String[] APK_MANIFEST_FILENAMES = new String[] {
+        "AndroidManifest.xml" };
+    private final static String[] APK_STANDARD_ALL_FILENAMES = new String[] {
+        "classes.dex", "AndroidManifest.xml", "resources.arsc", "res", "r", "R",
+        "lib", "libs", "assets", "META-INF", "kotlin" };
+    private final static Pattern NO_COMPRESS_PATTERN = Pattern.compile("(" +
+        "jpg|jpeg|png|gif|wav|mp2|mp3|ogg|aac|mpg|mpeg|mid|midi|smf|jet|rtttl|imy|xmf|mp4|" +
+        "m4a|m4v|3gp|3gpp|3g2|3gpp2|amr|awb|wma|wmv|webm|webp|mkv)$");
 
     public ApkDecoder(ExtFile apkFile) {
         this(Config.getDefaultConfig(), apkFile);
@@ -55,7 +76,8 @@ public class ApkDecoder {
 
     public ApkDecoder(Config config, ExtFile apkFile) {
         this.config = config;
-        mAndrolib = new Androlib(config);
+        mAndRes = new AndrolibResources(config);
+        mResUnknownFiles = new ResUnknownFiles();
         mApkFile = apkFile;
     }
 
@@ -67,14 +89,8 @@ public class ApkDecoder {
         this(config, new ExtFile(apkFile));
     }
 
-    public void setOutDir(File outDir) {
-        mOutDir = outDir;
-    }
-
-    public void decode() throws AndrolibException, IOException, DirectoryException {
+    public void decode(File outDir) throws AndrolibException, IOException, DirectoryException {
         try {
-            File outDir = getOutDir();
-
             if (!config.forceDelete && outDir.exists()) {
                 throw new OutDirExistsException();
             }
@@ -90,24 +106,24 @@ public class ApkDecoder {
             }
             outDir.mkdirs();
 
-            LOGGER.info("Using Apktool " + Androlib.getVersion() + " on " + mApkFile.getName());
+            LOGGER.info("Using Apktool " + ApktoolProperties.getVersion() + " on " + mApkFile.getName());
 
             if (hasResources()) {
                 switch (config.decodeResources) {
                     case Config.DECODE_RESOURCES_NONE:
-                        mAndrolib.decodeResourcesRaw(mApkFile, outDir);
+                        decodeResourcesRaw(mApkFile, outDir);
                         if (config.forceDecodeManifest == Config.FORCE_DECODE_MANIFEST_FULL) {
                             // done after raw decoding of resources because copyToDir overwrites dest files
                             if (hasManifest()) {
-                                mAndrolib.decodeManifestWithResources(mApkFile, outDir, getResTable());
+                                decodeManifestWithResources(mApkFile, outDir, getResTable());
                             }
                         }
                         break;
                     case Config.DECODE_RESOURCES_FULL:
                         if (hasManifest()) {
-                            mAndrolib.decodeManifestWithResources(mApkFile, outDir, getResTable());
+                            decodeManifestWithResources(mApkFile, outDir, getResTable());
                         }
-                        mAndrolib.decodeResourcesFull(mApkFile, outDir, getResTable());
+                        decodeResourcesFull(mApkFile, outDir, getResTable());
                         break;
                 }
             } else {
@@ -116,10 +132,10 @@ public class ApkDecoder {
                 if (hasManifest()) {
                     if (config.decodeResources == Config.DECODE_RESOURCES_FULL
                             || config.forceDecodeManifest == Config.FORCE_DECODE_MANIFEST_FULL) {
-                        mAndrolib.decodeManifestFull(mApkFile, outDir, getResTable());
+                        decodeManifestFull(mApkFile, outDir, getResTable());
                     }
                     else {
-                        mAndrolib.decodeManifestRaw(mApkFile, outDir);
+                        decodeManifestRaw(mApkFile, outDir);
                     }
                 }
             }
@@ -127,11 +143,11 @@ public class ApkDecoder {
             if (hasSources()) {
                 switch (config.decodeSources) {
                     case Config.DECODE_SOURCES_NONE:
-                        mAndrolib.decodeSourcesRaw(mApkFile, outDir, "classes.dex");
+                        decodeSourcesRaw(mApkFile, outDir, "classes.dex");
                         break;
                     case Config.DECODE_SOURCES_SMALI:
                     case Config.DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES:
-                        mAndrolib.decodeSourcesSmali(mApkFile, outDir, "classes.dex");
+                        decodeSourcesSmali(mApkFile, outDir, "classes.dex");
                         break;
                 }
             }
@@ -144,16 +160,16 @@ public class ApkDecoder {
                         if (! file.equalsIgnoreCase("classes.dex")) {
                             switch(config.decodeSources) {
                                 case Config.DECODE_SOURCES_NONE:
-                                    mAndrolib.decodeSourcesRaw(mApkFile, outDir, file);
+                                    decodeSourcesRaw(mApkFile, outDir, file);
                                     break;
                                 case Config.DECODE_SOURCES_SMALI:
-                                    mAndrolib.decodeSourcesSmali(mApkFile, outDir, file);
+                                    decodeSourcesSmali(mApkFile, outDir, file);
                                     break;
                                 case Config.DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES:
                                     if (file.startsWith("classes") && file.endsWith(".dex")) {
-                                        mAndrolib.decodeSourcesSmali(mApkFile, outDir, file);
+                                        decodeSourcesSmali(mApkFile, outDir, file);
                                     } else {
-                                        mAndrolib.decodeSourcesRaw(mApkFile, outDir, file);
+                                        decodeSourcesRaw(mApkFile, outDir, file);
                                     }
                                     break;
                             }
@@ -162,12 +178,12 @@ public class ApkDecoder {
                 }
             }
 
-            mAndrolib.decodeRawFiles(mApkFile, outDir);
-            mAndrolib.decodeUnknownFiles(mApkFile, outDir);
+            decodeRawFiles(mApkFile, outDir);
+            decodeUnknownFiles(mApkFile, outDir);
             mUncompressedFiles = new ArrayList<>();
-            mAndrolib.recordUncompressedFiles(mApkFile, mUncompressedFiles);
-            mAndrolib.writeOriginalFiles(mApkFile, outDir);
-            writeMetaFile();
+            recordUncompressedFiles(mApkFile, mUncompressedFiles);
+            writeOriginalFiles(mApkFile, outDir);
+            writeMetaFile(outDir);
         } finally {
             try {
                 mApkFile.close();
@@ -183,7 +199,7 @@ public class ApkDecoder {
                 throw new AndrolibException(
                         "Apk doesn't contain either AndroidManifest.xml file or resources.arsc file");
             }
-            mResTable = mAndrolib.getResTable(mApkFile, hasResources);
+            mResTable = mAndRes.getResTable(mApkFile, hasResources);
             mResTable.setAnalysisMode(config.analysisMode);
         }
         return mResTable;
@@ -231,29 +247,21 @@ public class ApkDecoder {
     }
 
     public void close() throws IOException {
-        if (mAndrolib != null) {
-            mAndrolib.close();
-        }
+        mAndRes.close();
     }
 
-    private File getOutDir() throws AndrolibException {
-        if (mOutDir == null) {
-            throw new AndrolibException("Out dir not set");
-        }
-        return mOutDir;
-    }
-
-    private void writeMetaFile() throws AndrolibException {
+    public void writeMetaFile(File outDir)
+        throws AndrolibException {
         MetaInfo meta = new MetaInfo();
-        meta.version = Androlib.getVersion();
+        meta.version = ApktoolProperties.getVersion();
         meta.apkFileName = mApkFile.getName();
 
         if (mResTable != null) {
-            meta.isFrameworkApk = mAndrolib.isFrameworkApk(mResTable);
+            meta.isFrameworkApk = mResTable.isFrameworkApk();
             putUsesFramework(meta);
-            putSdkInfo(meta);
+            putSdkInfo(outDir, meta);
             putPackageInfo(meta);
-            putVersionInfo(meta);
+            putVersionInfo(outDir, meta);
             putSharedLibraryInfo(meta);
             putSparseResourcesInfo(meta);
         } else {
@@ -262,7 +270,11 @@ public class ApkDecoder {
         putUnknownInfo(meta);
         putFileCompressionInfo(meta);
 
-        mAndrolib.writeMetaFile(mOutDir, meta);
+        try {
+            meta.save(new File(outDir, "apktool.yml"));
+        } catch (IOException ex) {
+            throw new AndrolibException(ex);
+        }
     }
 
     private void putUsesFramework(MetaInfo meta) {
@@ -286,24 +298,24 @@ public class ApkDecoder {
         }
     }
 
-    private void putSdkInfo(MetaInfo meta) {
+    private void putSdkInfo(File outDir, MetaInfo meta) {
         Map<String, String> info = mResTable.getSdkInfo();
         if (info.size() > 0) {
             String refValue;
             if (info.get("minSdkVersion") != null) {
-                refValue = ResXmlPatcher.pullValueFromIntegers(mOutDir, info.get("minSdkVersion"));
+                refValue = ResXmlPatcher.pullValueFromIntegers(outDir, info.get("minSdkVersion"));
                 if (refValue != null) {
                     info.put("minSdkVersion", refValue);
                 }
             }
             if (info.get("targetSdkVersion") != null) {
-                refValue = ResXmlPatcher.pullValueFromIntegers(mOutDir, info.get("targetSdkVersion"));
+                refValue = ResXmlPatcher.pullValueFromIntegers(outDir, info.get("targetSdkVersion"));
                 if (refValue != null) {
                     info.put("targetSdkVersion", refValue);
                 }
             }
             if (info.get("maxSdkVersion") != null) {
-                refValue = ResXmlPatcher.pullValueFromIntegers(mOutDir, info.get("maxSdkVersion"));
+                refValue = ResXmlPatcher.pullValueFromIntegers(outDir, info.get("maxSdkVersion"));
                 if (refValue != null) {
                     info.put("maxSdkVersion", refValue);
                 }
@@ -313,10 +325,9 @@ public class ApkDecoder {
     }
 
     private void putMinSdkInfo(MetaInfo meta) {
-        int minSdkVersion = mAndrolib.getMinSdkVersion();
-        if (minSdkVersion > 0) {
+        if (mMinSdkVersion > 0) {
             Map<String, String> sdkInfo = new LinkedHashMap<>();
-            sdkInfo.put("minSdkVersion", Integer.toString(minSdkVersion));
+            sdkInfo.put("minSdkVersion", Integer.toString(mMinSdkVersion));
             meta.sdkInfo = sdkInfo;
         }
     }
@@ -343,9 +354,9 @@ public class ApkDecoder {
         meta.packageInfo.forcedPackageId = String.valueOf(id);
     }
 
-    private void putVersionInfo(MetaInfo meta) {
+    private void putVersionInfo(File outDir, MetaInfo meta) {
         VersionInfo info = mResTable.getVersionInfo();
-        String refValue = ResXmlPatcher.pullValueFromStrings(mOutDir, info.versionName);
+        String refValue = ResXmlPatcher.pullValueFromStrings(outDir, info.versionName);
         if (refValue != null) {
             info.versionName = refValue;
         }
@@ -361,12 +372,200 @@ public class ApkDecoder {
     }
 
     private void putUnknownInfo(MetaInfo meta) {
-        meta.unknownFiles = mAndrolib.mResUnknownFiles.getUnknownFiles();
+        meta.unknownFiles = mResUnknownFiles.getUnknownFiles();
     }
 
     private void putFileCompressionInfo(MetaInfo meta) {
         if (mUncompressedFiles != null && !mUncompressedFiles.isEmpty()) {
             meta.doNotCompress = mUncompressedFiles;
+        }
+    }
+
+    public void decodeSourcesRaw(ExtFile apkFile, File outDir, String filename)
+        throws AndrolibException {
+        try {
+            LOGGER.info("Copying raw " + filename + " file...");
+            apkFile.getDirectory().copyToDir(outDir, filename);
+        } catch (DirectoryException ex) {
+            throw new AndrolibException(ex);
+        }
+    }
+
+    public void decodeSourcesSmali(File apkFile, File outDir, String filename)
+        throws AndrolibException {
+        try {
+            File smaliDir;
+            if (filename.equalsIgnoreCase("classes.dex")) {
+                smaliDir = new File(outDir, SMALI_DIRNAME);
+            } else {
+                smaliDir = new File(outDir, SMALI_DIRNAME + "_" + filename.substring(0, filename.indexOf(".")));
+            }
+            OS.rmdir(smaliDir);
+            //noinspection ResultOfMethodCallIgnored
+            smaliDir.mkdirs();
+            LOGGER.info("Baksmaling " + filename + "...");
+            DexFile dexFile = SmaliDecoder.decode(apkFile, smaliDir, filename,
+                config.baksmaliDebugMode, config.apiLevel);
+            int minSdkVersion = dexFile.getOpcodes().api;
+            if (mMinSdkVersion == 0 || mMinSdkVersion > minSdkVersion) {
+                mMinSdkVersion = minSdkVersion;
+            }
+        } catch (BrutException ex) {
+            throw new AndrolibException(ex);
+        }
+    }
+
+    public void decodeManifestRaw(ExtFile apkFile, File outDir)
+        throws AndrolibException {
+        try {
+            LOGGER.info("Copying raw manifest...");
+            apkFile.getDirectory().copyToDir(outDir, APK_MANIFEST_FILENAMES);
+        } catch (DirectoryException ex) {
+            throw new AndrolibException(ex);
+        }
+    }
+
+    public void decodeManifestFull(ExtFile apkFile, File outDir, ResTable resTable)
+        throws AndrolibException {
+        mAndRes.decodeManifest(resTable, apkFile, outDir);
+    }
+
+    public void decodeResourcesRaw(ExtFile apkFile, File outDir)
+        throws AndrolibException {
+        try {
+            LOGGER.info("Copying raw resources...");
+            apkFile.getDirectory().copyToDir(outDir, APK_RESOURCES_FILENAMES);
+        } catch (DirectoryException ex) {
+            throw new AndrolibException(ex);
+        }
+    }
+
+    public void decodeResourcesFull(ExtFile apkFile, File outDir, ResTable resTable)
+        throws AndrolibException {
+        mAndRes.decode(resTable, apkFile, outDir);
+    }
+
+    public void decodeManifestWithResources(ExtFile apkFile, File outDir, ResTable resTable)
+        throws AndrolibException {
+        mAndRes.decodeManifestWithResources(resTable, apkFile, outDir);
+    }
+
+    public void decodeRawFiles(ExtFile apkFile, File outDir)
+        throws AndrolibException {
+        LOGGER.info("Copying assets and libs...");
+        try {
+            Directory in = apkFile.getDirectory();
+
+            if (config.decodeAssets == Config.DECODE_ASSETS_FULL) {
+                if (in.containsDir("assets")) {
+                    in.copyToDir(outDir, "assets");
+                }
+            }
+            if (in.containsDir("lib")) {
+                in.copyToDir(outDir, "lib");
+            }
+            if (in.containsDir("libs")) {
+                in.copyToDir(outDir, "libs");
+            }
+            if (in.containsDir("kotlin")) {
+                in.copyToDir(outDir, "kotlin");
+            }
+        } catch (DirectoryException ex) {
+            throw new AndrolibException(ex);
+        }
+    }
+
+    private boolean isAPKFileNames(String file) {
+        for (String apkFile : APK_STANDARD_ALL_FILENAMES) {
+            if (apkFile.equals(file) || file.startsWith(apkFile + "/")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void decodeUnknownFiles(ExtFile apkFile, File outDir)
+        throws AndrolibException {
+        LOGGER.info("Copying unknown files...");
+        File unknownOut = new File(outDir, UNK_DIRNAME);
+        try {
+            Directory unk = apkFile.getDirectory();
+
+            // loop all items in container recursively, ignoring any that are pre-defined by aapt
+            Set<String> files = unk.getFiles(true);
+            for (String file : files) {
+                if (!isAPKFileNames(file) && !file.endsWith(".dex")) {
+
+                    // copy file out of archive into special "unknown" folder
+                    unk.copyToDir(unknownOut, file);
+                    // let's record the name of the file, and its compression type
+                    // so that we may re-include it the same way
+                    mResUnknownFiles.addUnknownFileInfo(file, String.valueOf(unk.getCompressionLevel(file)));
+                }
+            }
+        } catch (DirectoryException ex) {
+            throw new AndrolibException(ex);
+        }
+    }
+
+    public void writeOriginalFiles(ExtFile apkFile, File outDir)
+        throws AndrolibException {
+        LOGGER.info("Copying original files...");
+        File originalDir = new File(outDir, "original");
+        if (!originalDir.exists()) {
+            //noinspection ResultOfMethodCallIgnored
+            originalDir.mkdirs();
+        }
+
+        try {
+            Directory in = apkFile.getDirectory();
+            if (in.containsFile("AndroidManifest.xml")) {
+                in.copyToDir(originalDir, "AndroidManifest.xml");
+            }
+            if (in.containsFile("stamp-cert-sha256")) {
+                in.copyToDir(originalDir, "stamp-cert-sha256");
+            }
+            if (in.containsDir("META-INF")) {
+                in.copyToDir(originalDir, "META-INF");
+
+                if (in.containsDir("META-INF/services")) {
+                    // If the original APK contains the folder META-INF/services folder
+                    // that is used for service locators (like coroutines on android),
+                    // copy it to the destination folder so it does not get dropped.
+                    LOGGER.info("Copying META-INF/services directory");
+                    in.copyToDir(outDir, "META-INF/services");
+                }
+            }
+        } catch (DirectoryException ex) {
+            throw new AndrolibException(ex);
+        }
+    }
+
+    public void recordUncompressedFiles(ExtFile apkFile, Collection<String> uncompressedFilesOrExts) throws AndrolibException {
+        try {
+            Directory unk = apkFile.getDirectory();
+            Set<String> files = unk.getFiles(true);
+
+            for (String file : files) {
+                if (isAPKFileNames(file) && unk.getCompressionLevel(file) == 0) {
+                    String extOrFile = "";
+                    if (unk.getSize(file) != 0) {
+                        extOrFile = FilenameUtils.getExtension(file);
+                    }
+
+                    if (extOrFile.isEmpty() || !NO_COMPRESS_PATTERN.matcher(extOrFile).find()) {
+                        extOrFile = file;
+                        if (mAndRes.mResFileMapping.containsKey(extOrFile)) {
+                            extOrFile = mAndRes.mResFileMapping.get(extOrFile);
+                        }
+                    }
+                    if (!uncompressedFilesOrExts.contains(extOrFile)) {
+                        uncompressedFilesOrExts.add(extOrFile);
+                    }
+                }
+            }
+        } catch (DirectoryException ex) {
+            throw new AndrolibException(ex);
         }
     }
 }

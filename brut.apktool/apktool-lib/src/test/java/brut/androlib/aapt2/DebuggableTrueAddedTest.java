@@ -53,12 +53,11 @@ public class DebuggableTrueAddedTest extends BaseTest {
         config.verbose = true;
 
         File testApk = new File(sTmpDir, "issue2328-debuggable-missing.apk");
-        new Androlib(config).build(sTestOrigDir, testApk);
+        new ApkBuilder(config, sTestOrigDir).build(testApk);
 
         LOGGER.info("Decoding issue2328-debuggable-missing.apk...");
         ApkDecoder apkDecoder = new ApkDecoder(testApk);
-        apkDecoder.setOutDir(sTestNewDir);
-        apkDecoder.decode();
+        apkDecoder.decode(sTestNewDir);
     }
 
     @AfterClass

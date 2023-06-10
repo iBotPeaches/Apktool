@@ -33,6 +33,10 @@ public class ApktoolProperties {
         return sProps;
     }
 
+    public static String getVersion() {
+        return get("application.version");
+    }
+
     private static void loadProps() {
         InputStream in = ApktoolProperties.class.getResourceAsStream("/properties/apktool.properties");
         sProps = new Properties();

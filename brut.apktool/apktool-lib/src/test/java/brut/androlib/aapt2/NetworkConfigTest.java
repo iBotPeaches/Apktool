@@ -57,12 +57,11 @@ public class NetworkConfigTest extends BaseTest {
         config.netSecConf = true;
         config.useAapt2 = true;
         File testApk = new File(sTmpDir, "testapp.apk");
-        new Androlib(config).build(sTestOrigDir, testApk);
+        new ApkBuilder(config, sTestOrigDir).build(testApk);
 
         LOGGER.info("Decoding testapp.apk...");
         ApkDecoder apkDecoder = new ApkDecoder(testApk);
-        apkDecoder.setOutDir(sTestNewDir);
-        apkDecoder.decode();
+        apkDecoder.decode(sTestNewDir);
     }
 
     @AfterClass
