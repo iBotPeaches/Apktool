@@ -111,9 +111,7 @@ public class Main {
         }
     }
 
-    private static void initConfig(CommandLine cli, Config config) throws AndrolibException {
-        // init common config options from command line flags
-
+    private static void initConfig(CommandLine cli, Config config) {
         if (cli.hasOption("p") || cli.hasOption("frame-path")) {
             config.frameworkDirectory = cli.getOptionValue("p");
         }

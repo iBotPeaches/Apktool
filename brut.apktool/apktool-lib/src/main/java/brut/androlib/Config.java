@@ -23,12 +23,22 @@ import java.io.File;
 import java.util.Collection;
 import java.util.logging.Logger;
 
-/**
- * Option storage.
- */
 public class Config {
 
     private final static Logger LOGGER = Logger.getLogger(Config.class.getName());
+
+    public final static short DECODE_SOURCES_NONE = 0x0000;
+    public final static short DECODE_SOURCES_SMALI = 0x0001;
+    public final static short DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES = 0x0010;
+
+    public final static short DECODE_RESOURCES_NONE = 0x0100;
+    public final static short DECODE_RESOURCES_FULL = 0x0101;
+
+    public final static short FORCE_DECODE_MANIFEST_NONE = 0x0000;
+    public final static short FORCE_DECODE_MANIFEST_FULL = 0x0001;
+
+    public final static short DECODE_ASSETS_NONE = 0x0000;
+    public final static short DECODE_ASSETS_FULL = 0x0001;
 
     // Build options
     public boolean forceBuildAll = false;
@@ -45,41 +55,24 @@ public class Config {
     public int forceApi = 0;
     public Collection<String> doNotCompress;
 
-    // decode options
-
-    public final static short DECODE_SOURCES_NONE = 0x0000;
-    public final static short DECODE_SOURCES_SMALI = 0x0001;
-    public final static short DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES = 0x0010;
-
+    // Decode options
     public short decodeSources = DECODE_SOURCES_SMALI;
-
-    public final static short DECODE_RESOURCES_NONE = 0x0100;
-    public final static short DECODE_RESOURCES_FULL = 0x0101;
-
     public short decodeResources = DECODE_RESOURCES_FULL;
-    public final static short FORCE_DECODE_MANIFEST_NONE = 0x0000;
-    public final static short FORCE_DECODE_MANIFEST_FULL = 0x0001;
-
     public short forceDecodeManifest = FORCE_DECODE_MANIFEST_NONE;
-
-    public final static short DECODE_ASSETS_NONE = 0x0000;
-    public final static short DECODE_ASSETS_FULL = 0x0001;
-
     public short decodeAssets = DECODE_ASSETS_FULL;
-    public boolean analysisMode = false;
     public int apiLevel = 0;
+    public boolean analysisMode = false;
     public boolean forceDelete = false;
     public boolean keepBrokenResources = false;
     public boolean baksmaliDebugMode = true;
 
-    // common options
-
+    // Common options
     public String frameworkDirectory = null;
     public String frameworkTag = null;
     public String aaptPath = "";
     public int aaptVersion = 1; // default to v1
 
-    // utility functions
+    // Utility functions
     public boolean isAapt2() {
         return this.useAapt2 || this.aaptVersion == 2;
     }
