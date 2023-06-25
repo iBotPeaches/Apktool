@@ -18,6 +18,7 @@ package brut.androlib.decode;
 
 import brut.androlib.ApkDecoder;
 import brut.androlib.BaseTest;
+import brut.androlib.Config;
 import brut.androlib.TestUtils;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
@@ -47,10 +48,11 @@ public class ParentDirectoryTraversalTest extends BaseTest {
     public void checkIfDrawableFileDecodesProperly() throws BrutException, IOException {
         String apk = "issue1498.apk";
 
+        Config config = Config.getDefaultConfig();
+        config.forceDelete = true;
+        config.decodeResources = Config.DECODE_RESOURCES_NONE;
         // decode issue1498.apk
-        ApkDecoder apkDecoder = new ApkDecoder(new File(sTmpDir + File.separator + apk));
-        apkDecoder.setDecodeResources(ApkDecoder.DECODE_RESOURCES_NONE);
-
+        ApkDecoder apkDecoder = new ApkDecoder(config, new File(sTmpDir + File.separator + apk));
         apkDecoder.setOutDir(new File(sTmpDir + File.separator + apk + ".out"));
 
         // this should not raise an exception:

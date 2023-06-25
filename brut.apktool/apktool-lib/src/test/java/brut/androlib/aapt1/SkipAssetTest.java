@@ -18,6 +18,7 @@ package brut.androlib.aapt1;
 
 import brut.androlib.ApkDecoder;
 import brut.androlib.BaseTest;
+import brut.androlib.Config;
 import brut.androlib.TestUtils;
 import brut.directory.ExtFile;
 import brut.common.BrutException;
@@ -46,13 +47,15 @@ public class SkipAssetTest extends BaseTest {
     public void checkIfEnablingSkipAssetWorks() throws BrutException, IOException {
         String apk = "issue1605.apk";
 
+        Config config = Config.getDefaultConfig();
+        config.decodeAssets = Config.DECODE_ASSETS_NONE;
+        config.forceDelete = true;
+
         // decode issue1605.apk
-        ApkDecoder apkDecoder = new ApkDecoder(new File(sTmpDir + File.separator + apk));
+        ApkDecoder apkDecoder = new ApkDecoder(config, new ExtFile(sTmpDir + File.separator + apk));
         sTestOrigDir = new ExtFile(sTmpDir + File.separator + apk + ".out");
 
         apkDecoder.setOutDir(sTestOrigDir);
-        apkDecoder.setDecodeAssets(ApkDecoder.DECODE_ASSETS_NONE);
-        apkDecoder.setForceDelete(true);
         apkDecoder.decode();
 
         checkFileDoesNotExist("assets" + File.separator + "kotlin.kotlin_builtins");
@@ -63,13 +66,15 @@ public class SkipAssetTest extends BaseTest {
     public void checkControl() throws BrutException, IOException {
         String apk = "issue1605.apk";
 
+        Config config = Config.getDefaultConfig();
+        config.decodeAssets = Config.DECODE_ASSETS_FULL;
+        config.forceDelete = true;
+
         // decode issue1605.apk
-        ApkDecoder apkDecoder = new ApkDecoder(new File(sTmpDir + File.separator + apk));
+        ApkDecoder apkDecoder = new ApkDecoder(config, new ExtFile(sTmpDir + File.separator + apk));
         sTestOrigDir = new ExtFile(sTmpDir + File.separator + apk + ".out");
 
         apkDecoder.setOutDir(sTestOrigDir);
-        apkDecoder.setDecodeAssets(ApkDecoder.DECODE_ASSETS_FULL);
-        apkDecoder.setForceDelete(true);
         apkDecoder.decode();
 
         checkFileDoesExist("assets" + File.separator + "kotlin.kotlin_builtins");

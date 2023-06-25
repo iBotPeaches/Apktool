@@ -17,7 +17,7 @@
 package brut.androlib.aapt1;
 
 import brut.androlib.*;
-import brut.androlib.options.BuildOptions;
+import brut.androlib.Config;
 import brut.directory.ExtFile;
 import brut.common.BrutException;
 import brut.util.OS;
@@ -40,19 +40,20 @@ public class UnknownCompressionTest extends BaseTest {
         TestUtils.copyResourceDir(UnknownCompressionTest.class, "aapt1/unknown_compression/", sTmpDir);
 
         String apk = "deflated_unknowns.apk";
-        BuildOptions buildOptions = new BuildOptions();
-        buildOptions.frameworkFolderLocation = sTmpDir.getAbsolutePath();
+        Config config = Config.getDefaultConfig();
+        config.frameworkDirectory = sTmpDir.getAbsolutePath();
 
         sTestOrigDir = new ExtFile(sTmpDir, apk);
 
         // decode deflated_unknowns.apk
-        ApkDecoder apkDecoder = new ApkDecoder(sTestOrigDir);
+        // need new ExtFile because closed in decode()
+        ApkDecoder apkDecoder = new ApkDecoder(new ExtFile(sTestOrigDir));
         apkDecoder.setOutDir(new File(sTestOrigDir.getAbsolutePath() + ".out"));
         apkDecoder.decode();
 
         // build deflated_unknowns
         ExtFile clientApkFolder = new ExtFile(sTestOrigDir.getAbsolutePath() + ".out");
-        new Androlib(buildOptions).build(clientApkFolder, null);
+        new Androlib(config).build(clientApkFolder, null);
         sTestNewDir = new ExtFile(clientApkFolder, "dist" + File.separator + apk);
     }
 

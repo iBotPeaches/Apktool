@@ -18,7 +18,7 @@ package brut.androlib.res.src;
 
 import brut.androlib.*;
 import brut.androlib.aapt2.BuildAndDecodeTest;
-import brut.androlib.options.BuildOptions;
+import brut.androlib.Config;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
 import brut.util.OS;
@@ -45,16 +45,16 @@ public class DexStaticFieldValueTest extends BaseTest {
         LOGGER.info("Unpacking issue2543...");
         TestUtils.copyResourceDir(BuildAndDecodeTest.class, "decode/issue2543/", sTestOrigDir);
 
-        BuildOptions buildOptions = new BuildOptions();
+        Config config = Config.getDefaultConfig();
 
         LOGGER.info("Building issue2543.apk...");
         File testApk = new File(sTmpDir, "issue2543.apk");
-        new Androlib(buildOptions).build(sTestOrigDir, testApk);
+        new Androlib(config).build(sTestOrigDir, testApk);
 
         LOGGER.info("Decoding issue2543.apk...");
-        ApkDecoder apkDecoder = new ApkDecoder(testApk);
+        config.baksmaliDebugMode = false;
+        ApkDecoder apkDecoder = new ApkDecoder(config, new ExtFile(testApk));
         apkDecoder.setOutDir(sTestNewDir);
-        apkDecoder.setBaksmaliDebugMode(false);
         apkDecoder.decode();
     }
 

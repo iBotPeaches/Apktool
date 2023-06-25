@@ -18,6 +18,7 @@ package brut.androlib.decode;
 
 import brut.androlib.ApkDecoder;
 import brut.androlib.BaseTest;
+import brut.androlib.Config;
 import brut.androlib.TestUtils;
 import brut.directory.ExtFile;
 import brut.common.BrutException;
@@ -44,9 +45,10 @@ public class MinifiedArscTest extends BaseTest {
         String apk = "issue1157.apk";
         sTestNewDir = new ExtFile(sTmpDir, "issue1157");
 
+        Config config = Config.getDefaultConfig();
+        config.forceDelete = true;
         // decode issue1157.apk
-        ApkDecoder apkDecoder = new ApkDecoder(new ExtFile(sTmpDir, apk));
-        apkDecoder.setForceDelete(true);
+        ApkDecoder apkDecoder = new ApkDecoder(config, new ExtFile(sTmpDir, apk));
         apkDecoder.setOutDir(sTestNewDir);
 
         // this should not raise an exception:

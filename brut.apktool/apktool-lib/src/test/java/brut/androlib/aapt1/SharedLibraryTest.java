@@ -18,7 +18,6 @@ package brut.androlib.aapt1;
 
 import brut.androlib.*;
 import brut.androlib.exceptions.AndrolibException;
-import brut.androlib.options.BuildOptions;
 import brut.directory.ExtFile;
 import brut.common.BrutException;
 import brut.util.OS;
@@ -51,11 +50,11 @@ public class SharedLibraryTest extends BaseTest {
     public void isFrameworkTaggingWorking() throws AndrolibException {
         String apkName = "library.apk";
 
-        BuildOptions buildOptions = new BuildOptions();
-        buildOptions.frameworkFolderLocation = sTmpDir.getAbsolutePath();
-        buildOptions.frameworkTag = "building";
+        Config config = Config.getDefaultConfig();
+        config.frameworkDirectory = sTmpDir.getAbsolutePath();
+        config.frameworkTag = "building";
 
-        new Androlib(buildOptions).installFramework(new File(sTmpDir + File.separator + apkName));
+        new Androlib(config).installFramework(new File(sTmpDir + File.separator + apkName));
 
         assertTrue(fileExists("2-building.apk"));
     }
@@ -64,10 +63,10 @@ public class SharedLibraryTest extends BaseTest {
     public void isFrameworkInstallingWorking() throws AndrolibException {
         String apkName = "library.apk";
 
-        BuildOptions buildOptions = new BuildOptions();
-        buildOptions.frameworkFolderLocation = sTmpDir.getAbsolutePath();
+        Config config = Config.getDefaultConfig();
+        config.frameworkDirectory = sTmpDir.getAbsolutePath();
 
-        new Androlib(buildOptions).installFramework(new File(sTmpDir + File.separator + apkName));
+        new Androlib(config).installFramework(new File(sTmpDir + File.separator + apkName));
 
         assertTrue(fileExists("2.apk"));
     }
@@ -78,36 +77,32 @@ public class SharedLibraryTest extends BaseTest {
         String client = "client.apk";
 
         // setup apkOptions
-        BuildOptions buildOptions = new BuildOptions();
-        buildOptions.frameworkFolderLocation = sTmpDir.getAbsolutePath();
-        buildOptions.frameworkTag = "shared";
+        Config config = Config.getDefaultConfig();
+        config.frameworkDirectory = sTmpDir.getAbsolutePath();
+        config.frameworkTag = "shared";
 
         // install library/framework
-        new Androlib(buildOptions).installFramework(new File(sTmpDir + File.separator + library));
+        new Androlib(config).installFramework(new File(sTmpDir + File.separator + library));
         assertTrue(fileExists("2-shared.apk"));
 
         // decode client.apk
-        ApkDecoder apkDecoder = new ApkDecoder(new File(sTmpDir + File.separator + client));
+        ApkDecoder apkDecoder = new ApkDecoder(config, new ExtFile(sTmpDir + File.separator + client));
         apkDecoder.setOutDir(new File(sTmpDir + File.separator + client + ".out"));
-        apkDecoder.setFrameworkDir(buildOptions.frameworkFolderLocation);
-        apkDecoder.setFrameworkTag(buildOptions.frameworkTag);
         apkDecoder.decode();
 
         // decode library.apk
-        ApkDecoder libraryDecoder = new ApkDecoder(new File(sTmpDir + File.separator + library));
+        ApkDecoder libraryDecoder = new ApkDecoder(config, new ExtFile(sTmpDir + File.separator + library));
         libraryDecoder.setOutDir(new File(sTmpDir + File.separator + library + ".out"));
-        libraryDecoder.setFrameworkDir(buildOptions.frameworkFolderLocation);
-        libraryDecoder.setFrameworkTag(buildOptions.frameworkTag);
         libraryDecoder.decode();
 
         // build client.apk
         ExtFile clientApk = new ExtFile(sTmpDir, client + ".out");
-        new Androlib(buildOptions).build(clientApk, null);
+        new Androlib(config).build(clientApk, null);
         assertTrue(fileExists(client + ".out" + File.separator + "dist" + File.separator + client));
 
         // build library.apk (shared library)
         ExtFile libraryApk = new ExtFile(sTmpDir, library + ".out");
-        new Androlib(buildOptions).build(libraryApk, null);
+        new Androlib(config).build(libraryApk, null);
         assertTrue(fileExists(library + ".out" + File.separator + "dist" + File.separator + library));
     }
 

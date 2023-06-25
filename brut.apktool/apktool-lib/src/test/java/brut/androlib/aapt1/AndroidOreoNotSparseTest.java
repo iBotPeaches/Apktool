@@ -17,7 +17,7 @@
 package brut.androlib.aapt1;
 
 import brut.androlib.*;
-import brut.androlib.options.BuildOptions;
+import brut.androlib.Config;
 import brut.directory.ExtFile;
 import brut.common.BrutException;
 import brut.util.OS;
@@ -47,8 +47,8 @@ public class AndroidOreoNotSparseTest extends BaseTest {
         apkDecoder.decode();
 
         LOGGER.info("Building not_sparse.apk...");
-        BuildOptions buildOptions = new BuildOptions();
-        new Androlib(buildOptions).build(sTestNewDir, testApk);
+        Config config = Config.getDefaultConfig();
+        new Androlib(config).build(sTestNewDir, testApk);
     }
 
     @AfterClass

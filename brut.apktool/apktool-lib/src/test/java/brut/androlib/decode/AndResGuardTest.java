@@ -18,6 +18,7 @@ package brut.androlib.decode;
 
 import brut.androlib.ApkDecoder;
 import brut.androlib.BaseTest;
+import brut.androlib.Config;
 import brut.androlib.TestUtils;
 import brut.directory.ExtFile;
 import brut.common.BrutException;
@@ -59,12 +60,14 @@ public class AndResGuardTest extends BaseTest {
 
     @Test
     public void checkifAndResDecodeRemapsRFolderInRawMode() throws BrutException, IOException {
-        String apk = "issue1170.apk";
-        ApkDecoder apkDecoder = new ApkDecoder(new File(sTmpDir + File.separator + apk));
-        sTestOrigDir = new ExtFile(sTmpDir + File.separator + apk + ".raw.out");
 
+        Config config = Config.getDefaultConfig();
+        config.forceDelete = true;
+        config.decodeResources = Config.DECODE_RESOURCES_NONE;
+        String apk = "issue1170.apk";
+        ApkDecoder apkDecoder = new ApkDecoder(config, new File(sTmpDir + File.separator + apk));
+        sTestOrigDir = new ExtFile(sTmpDir + File.separator + apk + ".raw.out");
         apkDecoder.setOutDir(new File(sTmpDir + File.separator + apk + ".raw.out"));
-        apkDecoder.setDecodeResources(ApkDecoder.DECODE_RESOURCES_NONE);
         apkDecoder.decode();
 
         File aPng =  new File(sTestOrigDir,"r/a/a.png");

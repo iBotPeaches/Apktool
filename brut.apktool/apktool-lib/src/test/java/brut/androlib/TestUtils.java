@@ -17,7 +17,6 @@
 package brut.androlib;
 
 import brut.androlib.exceptions.AndrolibException;
-import brut.androlib.options.BuildOptions;
 import brut.androlib.res.AndrolibResources;
 import brut.common.BrutException;
 import brut.directory.DirUtil;
@@ -119,7 +118,7 @@ public abstract class TestUtils {
     }
 
     public static void cleanFrameworkFile() throws BrutException {
-        File framework = new File(getFrameworkDir(), "1.apk");
+        File framework = new File(getFrameworkDirectory(), "1.apk");
 
         if (Files.exists(framework.toPath())) {
             OS.rmfile(framework.getAbsolutePath());
@@ -137,10 +136,10 @@ public abstract class TestUtils {
         return buffer;
     }
 
-    static File getFrameworkDir() throws AndrolibException {
-        AndrolibResources androlibResources = new AndrolibResources();
-        androlibResources.buildOptions = new BuildOptions();
-        return androlibResources.getFrameworkDir();
+    static File getFrameworkDirectory() throws AndrolibException {
+        Config config = Config.getDefaultConfig();
+        AndrolibResources androlibResources = new AndrolibResources(config);
+        return androlibResources.getFrameworkDirectory();
     }
 
     public static class ResValueElementQualifier implements ElementQualifier {

@@ -21,9 +21,9 @@ import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.exceptions.CantFindFrameworkResException;
 import brut.androlib.exceptions.InFileNotFoundException;
 import brut.androlib.exceptions.OutDirExistsException;
-import brut.androlib.options.BuildOptions;
 import brut.common.BrutException;
 import brut.directory.DirectoryException;
+import brut.directory.ExtFile;
 import brut.util.AaptManager;
 import brut.util.OSDetection;
 import org.apache.commons.cli.*;
@@ -74,25 +74,28 @@ public class Main {
             setAdvanceMode();
         }
 
+        Config config = Config.getDefaultConfig();
+        initConfig(commandLine, config);
+
         boolean cmdFound = false;
         for (String opt : commandLine.getArgs()) {
             if (opt.equalsIgnoreCase("d") || opt.equalsIgnoreCase("decode")) {
-                cmdDecode(commandLine);
+                cmdDecode(commandLine, config);
                 cmdFound = true;
             } else if (opt.equalsIgnoreCase("b") || opt.equalsIgnoreCase("build")) {
-                cmdBuild(commandLine);
+                cmdBuild(commandLine, config);
                 cmdFound = true;
             } else if (opt.equalsIgnoreCase("if") || opt.equalsIgnoreCase("install-framework")) {
-                cmdInstallFramework(commandLine);
+                cmdInstallFramework(commandLine, config);
                 cmdFound = true;
             } else if (opt.equalsIgnoreCase("empty-framework-dir")) {
-                cmdEmptyFrameworkDirectory(commandLine);
+                cmdEmptyFrameworkDirectory(commandLine, config);
                 cmdFound = true;
             } else if (opt.equalsIgnoreCase("list-frameworks")) {
-                cmdListFrameworks(commandLine);
+                cmdListFrameworks(commandLine, config);
                 cmdFound = true;
             } else if (opt.equalsIgnoreCase("publicize-resources")) {
-                cmdPublicizeResources(commandLine);
+                cmdPublicizeResources(commandLine, config);
                 cmdFound = true;
             }
         }
@@ -108,54 +111,55 @@ public class Main {
         }
     }
 
-    private static void cmdDecode(CommandLine cli) throws AndrolibException {
-        ApkDecoder decoder = new ApkDecoder();
+    private static void initConfig(CommandLine cli, Config config) {
+        if (cli.hasOption("p") || cli.hasOption("frame-path")) {
+            config.frameworkDirectory = cli.getOptionValue("p");
+        }
+        if (cli.hasOption("t") || cli.hasOption("tag")) {
+            config.frameworkTag = cli.getOptionValue("t");
+        }
+        if (cli.hasOption("api") || cli.hasOption("api-level")) {
+            config.apiLevel = Integer.parseInt(cli.getOptionValue("api"));
+        }
+    }
 
-        int paraCount = cli.getArgList().size();
-        String apkName = cli.getArgList().get(paraCount - 1);
-        File outDir;
+    private static void cmdDecode(CommandLine cli, Config config) throws AndrolibException {
+        String apkName = getLastArg(cli);
 
-        // check for options
+        // check decode options
         if (cli.hasOption("s") || cli.hasOption("no-src")) {
-            decoder.setDecodeSources(ApkDecoder.DECODE_SOURCES_NONE);
+            config.setDecodeSources(Config.DECODE_SOURCES_NONE);
         }
         if (cli.hasOption("only-main-classes")) {
-            decoder.setDecodeSources(ApkDecoder.DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES);
+            config.setDecodeSources(Config.DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES);
         }
         if (cli.hasOption("d") || cli.hasOption("debug")) {
             System.err.println("SmaliDebugging has been removed in 2.1.0 onward. Please see: https://github.com/iBotPeaches/Apktool/issues/1061");
             System.exit(1);
         }
         if (cli.hasOption("b") || cli.hasOption("no-debug-info")) {
-            decoder.setBaksmaliDebugMode(false);
-        }
-        if (cli.hasOption("t") || cli.hasOption("frame-tag")) {
-            decoder.setFrameworkTag(cli.getOptionValue("t"));
+            config.baksmaliDebugMode = false;
         }
         if (cli.hasOption("f") || cli.hasOption("force")) {
-            decoder.setForceDelete(true);
+            config.forceDelete = true;
         }
         if (cli.hasOption("r") || cli.hasOption("no-res")) {
-            decoder.setDecodeResources(ApkDecoder.DECODE_RESOURCES_NONE);
+            config.setDecodeResources(Config.DECODE_RESOURCES_NONE);
         }
         if (cli.hasOption("force-manifest")) {
-            decoder.setForceDecodeManifest(ApkDecoder.FORCE_DECODE_MANIFEST_FULL);
+            config.setForceDecodeManifest(Config.FORCE_DECODE_MANIFEST_FULL);
         }
         if (cli.hasOption("no-assets")) {
-            decoder.setDecodeAssets(ApkDecoder.DECODE_ASSETS_NONE);
+            config.setDecodeAssets(Config.DECODE_ASSETS_NONE);
         }
         if (cli.hasOption("k") || cli.hasOption("keep-broken-res")) {
-            decoder.setKeepBrokenResources(true);
-        }
-        if (cli.hasOption("p") || cli.hasOption("frame-path")) {
-            decoder.setFrameworkDir(cli.getOptionValue("p"));
+            config.keepBrokenResources = true;
         }
         if (cli.hasOption("m") || cli.hasOption("match-original")) {
-            decoder.setAnalysisMode(true);
+            config.analysisMode = true;
         }
-        if (cli.hasOption("api") || cli.hasOption("api-level")) {
-            decoder.setApiLevel(Integer.parseInt(cli.getOptionValue("api")));
-        }
+
+        File outDir;
         if (cli.hasOption("o") || cli.hasOption("output")) {
             outDir = new File(cli.getOptionValue("o"));
         } else {
@@ -169,8 +173,8 @@ public class Main {
             outDir = new File(outName);
         }
 
+        ApkDecoder decoder = new ApkDecoder(config, new ExtFile(apkName));
         decoder.setOutDir(outDir);
-        decoder.setApkFile(new File(apkName));
 
         try {
             decoder.decode();
@@ -204,54 +208,48 @@ public class Main {
         }
     }
 
-    private static void cmdBuild(CommandLine cli) {
+    private static void cmdBuild(CommandLine cli, Config config) {
         String[] args = cli.getArgs();
         String appDirName = args.length < 2 ? "." : args[1];
-        File outFile;
-        BuildOptions buildOptions = new BuildOptions();
 
         // check for build options
         if (cli.hasOption("f") || cli.hasOption("force-all")) {
-            buildOptions.forceBuildAll = true;
+            config.forceBuildAll = true;
         }
         if (cli.hasOption("d") || cli.hasOption("debug")) {
-            buildOptions.debugMode = true;
+            config.debugMode = true;
         }
         if (cli.hasOption("n") || cli.hasOption("net-sec-conf")) {
-            buildOptions.netSecConf = true;
+            config.netSecConf = true;
         }
         if (cli.hasOption("v") || cli.hasOption("verbose")) {
-            buildOptions.verbose = true;
+            config.verbose = true;
         }
         if (cli.hasOption("a") || cli.hasOption("aapt")) {
-            buildOptions.aaptPath = cli.getOptionValue("a");
+            config.aaptPath = cli.getOptionValue("a");
         }
         if (cli.hasOption("c") || cli.hasOption("copy-original")) {
             System.err.println("-c/--copy-original has been deprecated. Removal planned for v3.0.0 (#2129)");
-            buildOptions.copyOriginalFiles = true;
-        }
-        if (cli.hasOption("p") || cli.hasOption("frame-path")) {
-            buildOptions.frameworkFolderLocation = cli.getOptionValue("p");
+            config.copyOriginalFiles = true;
         }
         if (cli.hasOption("nc") || cli.hasOption("no-crunch")) {
-            buildOptions.noCrunch = true;
+            config.noCrunch = true;
         }
 
         // Temporary flag to enable the use of aapt2. This will transform in time to a use-aapt1 flag, which will be
         // legacy and eventually removed.
         if (cli.hasOption("use-aapt2")) {
-            buildOptions.useAapt2 = true;
+            config.useAapt2 = true;
         }
-        if (cli.hasOption("api") || cli.hasOption("api-level")) {
-            buildOptions.forceApi = Integer.parseInt(cli.getOptionValue("api"));
-        }
+
+        File outFile;
         if (cli.hasOption("o") || cli.hasOption("output")) {
             outFile = new File(cli.getOptionValue("o"));
         } else {
             outFile = null;
         }
 
-        if (buildOptions.netSecConf && !buildOptions.useAapt2) {
+        if (config.netSecConf && !config.useAapt2) {
             System.err.println("-n / --net-sec-conf is only supported with --use-aapt2.");
             System.exit(1);
         }
@@ -259,56 +257,39 @@ public class Main {
         // try and build apk
         try {
             if (cli.hasOption("a") || cli.hasOption("aapt")) {
-                buildOptions.aaptVersion = AaptManager.getAaptVersion(cli.getOptionValue("a"));
+                config.aaptVersion = AaptManager.getAaptVersion(cli.getOptionValue("a"));
             }
-            new Androlib(buildOptions).build(new File(appDirName), outFile);
+            new Androlib(config).build(new File(appDirName), outFile);
         } catch (BrutException ex) {
             System.err.println(ex.getMessage());
             System.exit(1);
         }
     }
 
-    private static void cmdInstallFramework(CommandLine cli) throws AndrolibException {
-        int paraCount = cli.getArgList().size();
-        String apkName = cli.getArgList().get(paraCount - 1);
-
-        brut.androlib.options.BuildOptions buildOptions = new BuildOptions();
-        if (cli.hasOption("p") || cli.hasOption("frame-path")) {
-            buildOptions.frameworkFolderLocation = cli.getOptionValue("p");
-        }
-        if (cli.hasOption("t") || cli.hasOption("tag")) {
-            buildOptions.frameworkTag = cli.getOptionValue("t");
-        }
-        new Androlib(buildOptions).installFramework(new File(apkName));
+    private static void cmdInstallFramework(CommandLine cli, Config config) throws AndrolibException {
+        String apkName = getLastArg(cli);
+        new Androlib(config).installFramework(new File(apkName));
     }
 
-    private static void cmdListFrameworks(CommandLine cli) throws AndrolibException {
-        brut.androlib.options.BuildOptions buildOptions = new BuildOptions();
-        if (cli.hasOption("p") || cli.hasOption("frame-path")) {
-            buildOptions.frameworkFolderLocation = cli.getOptionValue("p");
-        }
-
-        new Androlib(buildOptions).listFrameworks();
+    private static void cmdListFrameworks(CommandLine cli, Config config) throws AndrolibException {
+        new Androlib(config).listFrameworks();
     }
 
-    private static void cmdPublicizeResources(CommandLine cli) throws AndrolibException {
-        int paraCount = cli.getArgList().size();
-        String apkName = cli.getArgList().get(paraCount - 1);
-
-        new Androlib().publicizeResources(new File(apkName));
+    private static void cmdPublicizeResources(CommandLine cli, Config config) throws AndrolibException {
+        String apkName = getLastArg(cli);
+        new Androlib(config).publicizeResources(new File(apkName));
     }
 
-    private static void cmdEmptyFrameworkDirectory(CommandLine cli) throws AndrolibException {
-        brut.androlib.options.BuildOptions buildOptions = new BuildOptions();
-
+    private static void cmdEmptyFrameworkDirectory(CommandLine cli, Config config) throws AndrolibException {
         if (cli.hasOption("f") || cli.hasOption("force")) {
-            buildOptions.forceDeleteFramework = true;
+            config.forceDeleteFramework = true;
         }
-        if (cli.hasOption("p") || cli.hasOption("frame-path")) {
-            buildOptions.frameworkFolderLocation = cli.getOptionValue("p");
-        }
+        new Androlib(config).emptyFrameworkDirectory();
+    }
 
-        new Androlib(buildOptions).emptyFrameworkDirectory();
+    private static String getLastArg(CommandLine cli) {
+        int paraCount = cli.getArgList().size();
+        return cli.getArgList().get(paraCount - 1);
     }
 
     private static void _version() {

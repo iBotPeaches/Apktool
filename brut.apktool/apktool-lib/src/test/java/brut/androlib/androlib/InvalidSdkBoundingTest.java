@@ -17,6 +17,7 @@
 package brut.androlib.androlib;
 
 import brut.androlib.BaseTest;
+import brut.androlib.Config;
 import brut.androlib.res.AndrolibResources;
 import org.junit.Test;
 import java.util.LinkedHashMap;

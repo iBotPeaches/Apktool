@@ -17,7 +17,7 @@
 package brut.androlib.aapt2;
 
 import brut.androlib.*;
-import brut.androlib.options.BuildOptions;
+import brut.androlib.Config;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
 import brut.util.OS;
@@ -56,11 +56,11 @@ public class NoNetworkConfigTest extends BaseTest {
         TestUtils.copyResourceDir(NoNetworkConfigTest.class, "aapt2/testapp/", sTestOrigDir);
 
         LOGGER.info("Building testapp.apk...");
-        BuildOptions buildOptions = new BuildOptions();
-        buildOptions.netSecConf = true;
-        buildOptions.useAapt2 = true;
+        Config config = Config.getDefaultConfig();
+        config.netSecConf = true;
+        config.useAapt2 = true;
         File testApk = new File(sTmpDir, "testapp.apk");
-        new Androlib(buildOptions).build(sTestOrigDir, testApk);
+        new Androlib(config).build(sTestOrigDir, testApk);
 
         LOGGER.info("Decoding testapp.apk...");
         ApkDecoder apkDecoder = new ApkDecoder(testApk);
