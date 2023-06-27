@@ -22,6 +22,7 @@ import brut.androlib.exceptions.CantFindFrameworkResException;
 import brut.androlib.exceptions.InFileNotFoundException;
 import brut.androlib.exceptions.OutDirExistsException;
 import brut.androlib.res.AndrolibResources;
+import brut.androlib.res.Framework;
 import brut.common.BrutException;
 import brut.directory.DirectoryException;
 import brut.directory.ExtFile;
@@ -271,23 +272,23 @@ public class Main {
 
     private static void cmdInstallFramework(CommandLine cli, Config config) throws AndrolibException {
         String apkName = getLastArg(cli);
-        new AndrolibResources(config).installFramework(new File(apkName));
+        new Framework(config).installFramework(new File(apkName));
     }
 
     private static void cmdListFrameworks(CommandLine cli, Config config) throws AndrolibException {
-        new AndrolibResources(config).listFrameworkDirectory();
+        new Framework(config).listFrameworkDirectory();
     }
 
     private static void cmdPublicizeResources(CommandLine cli, Config config) throws AndrolibException {
         String apkName = getLastArg(cli);
-        new AndrolibResources(config).publicizeResources(new File(apkName));
+        new Framework(config).publicizeResources(new File(apkName));
     }
 
     private static void cmdEmptyFrameworkDirectory(CommandLine cli, Config config) throws AndrolibException {
         if (cli.hasOption("f") || cli.hasOption("force")) {
             config.forceDeleteFramework = true;
         }
-        new AndrolibResources(config).emptyFrameworkDirectory();
+        new Framework(config).emptyFrameworkDirectory();
     }
 
     private static String getLastArg(CommandLine cli) {
