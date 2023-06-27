@@ -18,6 +18,7 @@ package brut.androlib;
 
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.AndrolibResources;
+import brut.androlib.res.Framework;
 import brut.common.BrutException;
 import brut.directory.DirUtil;
 import brut.directory.Directory;
@@ -138,8 +139,8 @@ public abstract class TestUtils {
 
     static File getFrameworkDirectory() throws AndrolibException {
         Config config = Config.getDefaultConfig();
-        AndrolibResources androlibResources = new AndrolibResources(config);
-        return androlibResources.getFrameworkDirectory();
+        Framework framework = new Framework(config);
+        return framework.getFrameworkDirectory();
     }
 
     public static class ResValueElementQualifier implements ElementQualifier {

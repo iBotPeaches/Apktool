@@ -20,6 +20,7 @@ import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.meta.MetaInfo;
 import brut.androlib.meta.UsesFramework;
 import brut.androlib.res.AndrolibResources;
+import brut.androlib.res.Framework;
 import brut.androlib.res.data.ResConfigFlags;
 import brut.androlib.res.xml.ResXmlPatcher;
 import brut.androlib.src.SmaliBuilder;
@@ -570,11 +571,12 @@ public class ApkBuilder {
             return null;
         }
 
+        Framework framework = new Framework(config);
         String tag = usesFramework.tag;
         File[] files = new File[ids.size()];
         int i = 0;
         for (int id : ids) {
-            files[i++] = mAndRes.getFrameworkApk(id, tag);
+            files[i++] = framework.getFrameworkApk(id, tag);
         }
         return files;
     }

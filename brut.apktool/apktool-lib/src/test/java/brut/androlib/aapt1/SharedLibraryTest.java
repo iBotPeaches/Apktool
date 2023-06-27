@@ -19,6 +19,7 @@ package brut.androlib.aapt1;
 import brut.androlib.*;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.AndrolibResources;
+import brut.androlib.res.Framework;
 import brut.directory.ExtFile;
 import brut.common.BrutException;
 import brut.util.OS;
@@ -55,7 +56,7 @@ public class SharedLibraryTest extends BaseTest {
         config.frameworkDirectory = sTmpDir.getAbsolutePath();
         config.frameworkTag = "building";
 
-        new AndrolibResources(config).installFramework(new File(sTmpDir + File.separator + apkName));
+        new Framework(config).installFramework(new File(sTmpDir + File.separator + apkName));
 
         assertTrue(fileExists("2-building.apk"));
     }
@@ -67,7 +68,7 @@ public class SharedLibraryTest extends BaseTest {
         Config config = Config.getDefaultConfig();
         config.frameworkDirectory = sTmpDir.getAbsolutePath();
 
-        new AndrolibResources(config).installFramework(new File(sTmpDir + File.separator + apkName));
+        new Framework(config).installFramework(new File(sTmpDir + File.separator + apkName));
 
         assertTrue(fileExists("2.apk"));
     }
@@ -83,7 +84,7 @@ public class SharedLibraryTest extends BaseTest {
         config.frameworkTag = "shared";
 
         // install library/framework
-        new AndrolibResources(config).installFramework(new File(sTmpDir + File.separator + library));
+        new Framework(config).installFramework(new File(sTmpDir + File.separator + library));
         assertTrue(fileExists("2-shared.apk"));
 
         // decode client.apk
