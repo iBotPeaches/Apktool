@@ -18,6 +18,7 @@ xxxx.xx.xx
  * Fix issue with aapt/aapt2 in edge cases waiting 15 seconds for output. ([Issue 3071](https://github.com/iBotPeaches/Apktool/pull/3071)) / (Thanks sv99)
  * Refactor `brut.androlib.err` to `brut.androlib.exceptions` for standard naming convention of Exceptions. ([Issue 3088](https://github.com/iBotPeaches/Apktool/pull/3088)) / (Thanks sv99)
  * Refactor Build/Decode to work from common Config object. ([Issue 3091](https://github.com/iBotPeaches/Apktool/pull/3091)) / (Thanks sv99)
+ * Refactor into `ApkBuilder` and `ApkDecoder` instead of generic `Androlib`. ([Issue 3103](https://github.com/iBotPeaches/Apktool/pull/3103)) / (Thanks sv99)
  * Upgrade away from deprecated SnakeYAML constructors ([Issue 3079](https://github.com/iBotPeaches/Apktool/pull/3079)) / (Thanks MarcMil)
  * Upgrade codebase to use Java7 NIO library for IO. ([Issue 3055](https://github.com/iBotPeaches/Apktool/pull/3055)) / (Thanks sv99)
  * Upgrade to smali/baksmali 3.0.3 and move to Google fork of it. ([Issue 3050](https://github.com/iBotPeaches/Apktool/issues/3050))
