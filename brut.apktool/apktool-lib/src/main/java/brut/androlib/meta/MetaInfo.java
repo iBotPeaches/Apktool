@@ -16,6 +16,9 @@
  */
 package brut.androlib.meta;
 
+import brut.androlib.exceptions.AndrolibException;
+import brut.directory.DirectoryException;
+import brut.directory.ExtFile;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
@@ -72,5 +75,16 @@ public class MetaInfo {
 
     public static MetaInfo load(InputStream is) {
         return getYaml().loadAs(is, MetaInfo.class);
+    }
+
+    public static MetaInfo readMetaFile(ExtFile appDir)
+        throws AndrolibException {
+        try(
+            InputStream in = appDir.getDirectory().getFileInput("apktool.yml")
+        ) {
+            return MetaInfo.load(in);
+        } catch (DirectoryException | IOException ex) {
+            throw new AndrolibException(ex);
+        }
     }
 }

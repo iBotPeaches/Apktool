@@ -118,7 +118,7 @@ public final class ResXmlEncoders {
                     default:
                         if (!isPrintableChar(c)) {
 
-                            // lets not write trailing \u0000 if we are at end of string
+                            // let's not write trailing \u0000 if we are at end of string
                             if ((out.length() + 1) == str.length() && c == '\u0000') {
                                 continue;
                             }
@@ -162,7 +162,7 @@ public final class ResXmlEncoders {
 
     /**
      * It returns a tuple of:
-     *   - a list of offsets of non positional substitutions. non-pos is defined as any "%" which isn't "%%" nor "%\d+\$"
+     *   - a list of offsets of non-positional substitutions. non-pos is defined as any "%" which isn't "%%" nor "%\d+\$"
      *   - a list of offsets of positional substitutions
      */
     private static Duo<List<Integer>, List<Integer>> findSubstitutions(String str, int nonPosMax) {

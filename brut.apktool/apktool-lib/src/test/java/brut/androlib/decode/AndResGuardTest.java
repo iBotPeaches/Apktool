@@ -51,8 +51,8 @@ public class AndResGuardTest extends BaseTest {
         ApkDecoder apkDecoder = new ApkDecoder(new File(sTmpDir + File.separator + apk));
         sTestOrigDir = new ExtFile(sTmpDir + File.separator + apk + ".out");
 
-        apkDecoder.setOutDir(new File(sTmpDir + File.separator + apk + ".out"));
-        apkDecoder.decode();
+        File outDir = new File(sTmpDir + File.separator + apk + ".out");
+        apkDecoder.decode(outDir);
 
         File aPng =  new File(sTestOrigDir,"res/mipmap-hdpi-v4/a.png");
         assertTrue(aPng.isFile());
@@ -67,8 +67,8 @@ public class AndResGuardTest extends BaseTest {
         String apk = "issue1170.apk";
         ApkDecoder apkDecoder = new ApkDecoder(config, new File(sTmpDir + File.separator + apk));
         sTestOrigDir = new ExtFile(sTmpDir + File.separator + apk + ".raw.out");
-        apkDecoder.setOutDir(new File(sTmpDir + File.separator + apk + ".raw.out"));
-        apkDecoder.decode();
+        File outDir = new File(sTmpDir + File.separator + apk + ".raw.out");
+        apkDecoder.decode(outDir);
 
         File aPng =  new File(sTestOrigDir,"r/a/a.png");
         assertTrue(aPng.isFile());

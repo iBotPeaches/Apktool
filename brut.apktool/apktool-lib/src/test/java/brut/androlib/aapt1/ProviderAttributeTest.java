@@ -16,7 +16,7 @@
  */
 package brut.androlib.aapt1;
 
-import brut.androlib.Androlib;
+import brut.androlib.ApkBuilder;
 import brut.androlib.ApkDecoder;
 import brut.androlib.BaseTest;
 import brut.androlib.TestUtils;
@@ -57,19 +57,19 @@ public class ProviderAttributeTest extends BaseTest {
 
         // decode issue636.apk
         ApkDecoder apkDecoder = new ApkDecoder(new File(sTmpDir + File.separator + apk));
-        apkDecoder.setOutDir(new File(sTmpDir + File.separator + apk + ".out"));
-        apkDecoder.decode();
+        File outDir = new File(sTmpDir + File.separator + apk + ".out");
+        apkDecoder.decode(outDir);
 
         // build issue636
         ExtFile testApk = new ExtFile(sTmpDir, apk + ".out");
-        new Androlib().build(testApk, null);
+        new ApkBuilder(testApk).build(null);
         String newApk = apk + ".out" + File.separator + "dist" + File.separator + apk;
         assertTrue(fileExists(newApk));
 
         // decode issues636 again
         apkDecoder = new ApkDecoder(new File(sTmpDir + File.separator + newApk));
-        apkDecoder.setOutDir(new File(sTmpDir + File.separator + apk + ".out.two"));
-        apkDecoder.decode();
+        outDir = new File(sTmpDir + File.separator + apk + ".out.two");
+        apkDecoder.decode(outDir);
 
         String expected = TestUtils.replaceNewlines("<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"no\"?>\n" +
                 "<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\" android:compileSdkVersion=\"23\" android:compileSdkVersionCodename=\"6.0-2438415\" package=\"com.ibotpeaches.issue636\" platformBuildVersionCode=\"22\" platformBuildVersionName=\"5.1-1756733\">\n" +

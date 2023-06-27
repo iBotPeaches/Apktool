@@ -16,7 +16,7 @@
  */
 package brut.androlib.aapt1;
 
-import brut.androlib.Androlib;
+import brut.androlib.ApkBuilder;
 import brut.androlib.ApkDecoder;
 import brut.androlib.Config;
 import brut.androlib.TestUtils;
@@ -46,12 +46,11 @@ public class EmptyResourcesArscTest {
 
         LOGGER.info("Decoding issue1730.apk...");
         ApkDecoder apkDecoder = new ApkDecoder(testApk);
-        apkDecoder.setOutDir(sTestNewDir);
-        apkDecoder.decode();
+        apkDecoder.decode(sTestNewDir);
 
         LOGGER.info("Building issue1730.apk...");
         Config config = Config.getDefaultConfig();
-        new Androlib(config).build(sTestNewDir, testApk);
+        new ApkBuilder(config, sTestNewDir).build(testApk);
     }
 
     @AfterClass

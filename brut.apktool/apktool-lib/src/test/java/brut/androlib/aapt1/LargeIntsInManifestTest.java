@@ -16,7 +16,7 @@
  */
 package brut.androlib.aapt1;
 
-import brut.androlib.Androlib;
+import brut.androlib.ApkBuilder;
 import brut.androlib.ApkDecoder;
 import brut.androlib.BaseTest;
 import brut.androlib.TestUtils;
@@ -50,20 +50,20 @@ public class LargeIntsInManifestTest extends BaseTest {
         ApkDecoder apkDecoder = new ApkDecoder(new File(sTmpDir + File.separator + apk));
         sTestOrigDir = new ExtFile(sTmpDir + File.separator + apk + ".out");
 
-        apkDecoder.setOutDir(new File(sTmpDir + File.separator + apk + ".out"));
-        apkDecoder.decode();
+        File outDir = new File(sTmpDir + File.separator + apk + ".out");
+        apkDecoder.decode(outDir);
 
         // build issue767
         ExtFile testApk = new ExtFile(sTmpDir, apk + ".out");
-        new Androlib().build(testApk, null);
+        new ApkBuilder(testApk).build(null);
         String newApk = apk + ".out" + File.separator + "dist" + File.separator + apk;
 
         // decode issue767 again
         apkDecoder = new ApkDecoder(new File(sTmpDir + File.separator + newApk));
         sTestNewDir = new ExtFile(sTmpDir + File.separator + apk + ".out.two");
 
-        apkDecoder.setOutDir(new File(sTmpDir + File.separator + apk + ".out.two"));
-        apkDecoder.decode();
+        outDir = new File(sTmpDir + File.separator + apk + ".out.two");
+        apkDecoder.decode(outDir);
 
         compareXmlFiles("AndroidManifest.xml");
     }

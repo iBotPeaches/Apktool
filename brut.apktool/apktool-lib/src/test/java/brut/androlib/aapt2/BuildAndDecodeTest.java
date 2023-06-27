@@ -19,6 +19,7 @@ package brut.androlib.aapt2;
 import brut.androlib.*;
 import brut.androlib.meta.MetaInfo;
 import brut.androlib.Config;
+import brut.androlib.res.AndrolibResources;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
 import brut.util.OS;
@@ -49,12 +50,11 @@ public class BuildAndDecodeTest extends BaseTest {
 
         LOGGER.info("Building testapp.apk...");
         File testApk = new File(sTmpDir, "testapp.apk");
-        new Androlib(config).build(sTestOrigDir, testApk);
+        new ApkBuilder(config, sTestOrigDir).build(testApk);
 
         LOGGER.info("Decoding testapp.apk...");
         ApkDecoder apkDecoder = new ApkDecoder(testApk);
-        apkDecoder.setOutDir(sTestNewDir);
-        apkDecoder.decode();
+        apkDecoder.decode(sTestNewDir);
     }
 
     @AfterClass
@@ -79,13 +79,13 @@ public class BuildAndDecodeTest extends BaseTest {
 
     @Test
     public void confirmZeroByteFileExtensionIsNotStored() throws BrutException {
-        MetaInfo metaInfo = new Androlib().readMetaFile(sTestNewDir);
+        MetaInfo metaInfo = MetaInfo.readMetaFile(sTestNewDir);
         assertFalse(metaInfo.doNotCompress.contains("jpg"));
     }
 
     @Test
     public void confirmZeroByteFileIsStored() throws BrutException {
-        MetaInfo metaInfo = new Androlib().readMetaFile(sTestNewDir);
+        MetaInfo metaInfo = MetaInfo.readMetaFile(sTestNewDir);
         assertTrue(metaInfo.doNotCompress.contains("assets/0byte_file.jpg"));
     }
 

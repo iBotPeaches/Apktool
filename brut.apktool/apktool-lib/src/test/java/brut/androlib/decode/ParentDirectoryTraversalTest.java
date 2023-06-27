@@ -53,9 +53,8 @@ public class ParentDirectoryTraversalTest extends BaseTest {
         config.decodeResources = Config.DECODE_RESOURCES_NONE;
         // decode issue1498.apk
         ApkDecoder apkDecoder = new ApkDecoder(config, new File(sTmpDir + File.separator + apk));
-        apkDecoder.setOutDir(new File(sTmpDir + File.separator + apk + ".out"));
-
+        File outDir = new File(sTmpDir + File.separator + apk + ".out");
         // this should not raise an exception:
-        apkDecoder.decode();
+        apkDecoder.decode(outDir);
     }
 }

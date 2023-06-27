@@ -16,7 +16,7 @@
  */
 package brut.androlib.aapt1;
 
-import brut.androlib.Androlib;
+import brut.androlib.ApkBuilder;
 import brut.androlib.ApkDecoder;
 import brut.androlib.BaseTest;
 import brut.androlib.TestUtils;
@@ -54,10 +54,10 @@ public class ReferenceVersionCodeTest extends BaseTest {
         // decode issue1234.apk
         ApkDecoder apkDecoder = new ApkDecoder(new ExtFile(sTmpDir + File.separator + apk));
         ExtFile decodedApk = new ExtFile(sTmpDir + File.separator + apk + ".out");
-        apkDecoder.setOutDir(new File(sTmpDir + File.separator + apk + ".out"));
-        apkDecoder.decode();
+        File outDir = new File(sTmpDir + File.separator + apk + ".out");
+        apkDecoder.decode(outDir);
 
-        MetaInfo metaInfo = new Androlib().readMetaFile(decodedApk);
+        MetaInfo metaInfo = MetaInfo.readMetaFile(decodedApk);
         assertEquals("v1.0.0", metaInfo.versionInfo.versionName);
     }
 }

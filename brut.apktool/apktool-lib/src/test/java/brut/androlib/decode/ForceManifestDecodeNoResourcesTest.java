@@ -140,7 +140,6 @@ public class ForceManifestDecodeNoResourcesTest extends BaseTest {
         config.decodeResources = decodeResources;
         config.forceDecodeManifest = decodeManifest;
         ApkDecoder apkDecoder = new ApkDecoder(config, new File(apk));
-        apkDecoder.setOutDir(new File(output));
-        apkDecoder.decode();
+        apkDecoder.decode(new File(output));
     }
 }

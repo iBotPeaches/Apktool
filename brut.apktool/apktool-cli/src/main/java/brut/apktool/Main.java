@@ -21,6 +21,7 @@ import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.exceptions.CantFindFrameworkResException;
 import brut.androlib.exceptions.InFileNotFoundException;
 import brut.androlib.exceptions.OutDirExistsException;
+import brut.androlib.res.AndrolibResources;
 import brut.common.BrutException;
 import brut.directory.DirectoryException;
 import brut.directory.ExtFile;
@@ -32,6 +33,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.logging.*;
 
+/**
+ * Main entry point of the apktool.
+ */
 public class Main {
     public static void main(String[] args) throws BrutException {
 
@@ -174,10 +178,9 @@ public class Main {
         }
 
         ApkDecoder decoder = new ApkDecoder(config, new ExtFile(apkName));
-        decoder.setOutDir(outDir);
 
         try {
-            decoder.decode();
+            decoder.decode(outDir);
         } catch (OutDirExistsException ex) {
             System.err
                     .println("Destination directory ("
@@ -259,7 +262,7 @@ public class Main {
             if (cli.hasOption("a") || cli.hasOption("aapt")) {
                 config.aaptVersion = AaptManager.getAaptVersion(cli.getOptionValue("a"));
             }
-            new Androlib(config).build(new File(appDirName), outFile);
+            new ApkBuilder(config, new ExtFile(appDirName)).build(outFile);
         } catch (BrutException ex) {
             System.err.println(ex.getMessage());
             System.exit(1);
@@ -268,23 +271,23 @@ public class Main {
 
     private static void cmdInstallFramework(CommandLine cli, Config config) throws AndrolibException {
         String apkName = getLastArg(cli);
-        new Androlib(config).installFramework(new File(apkName));
+        new AndrolibResources(config).installFramework(new File(apkName));
     }
 
     private static void cmdListFrameworks(CommandLine cli, Config config) throws AndrolibException {
-        new Androlib(config).listFrameworks();
+        new AndrolibResources(config).listFrameworkDirectory();
     }
 
     private static void cmdPublicizeResources(CommandLine cli, Config config) throws AndrolibException {
         String apkName = getLastArg(cli);
-        new Androlib(config).publicizeResources(new File(apkName));
+        new AndrolibResources(config).publicizeResources(new File(apkName));
     }
 
     private static void cmdEmptyFrameworkDirectory(CommandLine cli, Config config) throws AndrolibException {
         if (cli.hasOption("f") || cli.hasOption("force")) {
             config.forceDeleteFramework = true;
         }
-        new Androlib(config).emptyFrameworkDirectory();
+        new AndrolibResources(config).emptyFrameworkDirectory();
     }
 
     private static String getLastArg(CommandLine cli) {
@@ -293,7 +296,7 @@ public class Main {
     }
 
     private static void _version() {
-        System.out.println(Androlib.getVersion());
+        System.out.println(ApktoolProperties.getVersion());
     }
 
     private static void _Options() {
@@ -549,7 +552,7 @@ public class Main {
 
         // print out license info prior to formatter.
         System.out.println(
-                "Apktool v" + Androlib.getVersion() + " - a tool for reengineering Android apk files\n" +
+                "Apktool v" + ApktoolProperties.getVersion() + " - a tool for reengineering Android apk files\n" +
                         "with smali v" + ApktoolProperties.get("smaliVersion") +
                         " and baksmali v" + ApktoolProperties.get("baksmaliVersion") + "\n" +
                         "Copyright 2010 Ryszard Wiśniewski <brut.alll@gmail.com>\n" +

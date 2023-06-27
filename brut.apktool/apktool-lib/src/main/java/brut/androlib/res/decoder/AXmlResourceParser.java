@@ -34,13 +34,13 @@ import java.util.logging.Logger;
 /**
  * Binary xml files parser.
  *
- * Parser has only two states: (1) Operational state, which parser
+ * <p>Parser has only two states: (1) Operational state, which parser
  * obtains after first successful call to next() and retains until
  * open(), close(), or failed call to next(). (2) Closed state, which
  * parser obtains after open(), close(), or failed call to next(). In
  * this state methods return invalid values or throw exceptions.
  *
- * TODO: * check all methods in closed state
+ * <p>TODO: * check all methods in closed state
  */
 public class AXmlResourceParser implements XmlResourceParser {
 

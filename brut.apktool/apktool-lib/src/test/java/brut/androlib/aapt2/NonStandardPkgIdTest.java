@@ -50,12 +50,11 @@ public class NonStandardPkgIdTest extends BaseTest {
 
         LOGGER.info("Building pkgid8.apk...");
         File testApk = new File(sTmpDir, "pkgid8.apk");
-        new Androlib(config).build(sTestOrigDir, testApk);
+        new ApkBuilder(config, sTestOrigDir).build(testApk);
 
         LOGGER.info("Decoding pkgid8.apk...");
         ApkDecoder apkDecoder = new ApkDecoder(testApk);
-        apkDecoder.setOutDir(sTestNewDir);
-        apkDecoder.decode();
+        apkDecoder.decode(sTestNewDir);
         mResTable = apkDecoder.getResTable();
     }
 
