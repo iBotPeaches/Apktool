@@ -289,7 +289,7 @@ public class AXmlResourceParser implements XmlResourceParser {
         // unless the pkgId of the resource is private. We will grab the non-standard one.
         String value = m_strings.getString(namespace);
 
-        if (value.length() == 0) {
+        if (value == null || value.length() == 0) {
             ResID resourceId = new ResID(getAttributeNameResource(index));
             if (resourceId.package_ == PRIVATE_PKG_ID) {
                 value = getNonDefaultNamespaceUri(offset);
