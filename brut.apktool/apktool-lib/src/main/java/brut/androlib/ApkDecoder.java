@@ -53,7 +53,7 @@ public class ApkDecoder {
     private final static String SMALI_DIRNAME = "smali";
     private final static String UNK_DIRNAME = "unknown";
     private final static String[] APK_RESOURCES_FILENAMES = new String[] {
-        "resources.arsc", "AndroidManifest.xml", "res", "r", "R" };
+        "resources.arsc", "res", "r", "R" };
     private final static String[] APK_MANIFEST_FILENAMES = new String[] {
         "AndroidManifest.xml" };
     private final static String[] APK_STANDARD_ALL_FILENAMES = new String[] {
@@ -101,46 +101,17 @@ public class ApkDecoder {
 
             LOGGER.info("Using Apktool " + ApktoolProperties.getVersion() + " on " + mApkFile.getName());
 
-            if (hasResources()) {
-                switch (config.decodeResources) {
-                    case Config.DECODE_RESOURCES_NONE:
-                        copyResourcesRaw(mApkFile, outDir);
-                        if (config.forceDecodeManifest == Config.FORCE_DECODE_MANIFEST_FULL) {
-                            // done after raw decoding of resources because copyToDir overwrites dest files
-                            if (hasManifest()) {
-                                decodeManifestWithResources(mApkFile, outDir, getResTable());
-                            }
-                        }
-                        break;
-                    case Config.DECODE_RESOURCES_FULL:
-                        if (hasManifest()) {
-                            decodeManifestWithResources(mApkFile, outDir, getResTable());
-                        }
-                        decodeResourcesFull(mApkFile, outDir, getResTable());
-                        break;
-                }
-            } else {
-                // if there's no resources.arsc, decode the manifest without looking
-                // up attribute references
-                if (hasManifest()) {
-                    if (config.decodeResources == Config.DECODE_RESOURCES_FULL
-                            || config.forceDecodeManifest == Config.FORCE_DECODE_MANIFEST_FULL) {
-                        decodeManifestFull(mApkFile, outDir, getResTable());
-                    }
-                    else {
-                        copyManifestRaw(mApkFile, outDir);
-                    }
-                }
-            }
+            decodeManifest(outDir);
+            decodeResources(outDir);
 
             if (hasSources()) {
                 switch (config.decodeSources) {
                     case Config.DECODE_SOURCES_NONE:
-                        copySourcesRaw(mApkFile, outDir, "classes.dex");
+                        copySourcesRaw(outDir, "classes.dex");
                         break;
                     case Config.DECODE_SOURCES_SMALI:
                     case Config.DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES:
-                        decodeSourcesSmali(mApkFile, outDir, "classes.dex");
+                        decodeSourcesSmali(outDir, "classes.dex");
                         break;
                 }
             }
@@ -153,16 +124,16 @@ public class ApkDecoder {
                         if (! file.equalsIgnoreCase("classes.dex")) {
                             switch(config.decodeSources) {
                                 case Config.DECODE_SOURCES_NONE:
-                                    copySourcesRaw(mApkFile, outDir, file);
+                                    copySourcesRaw(outDir, file);
                                     break;
                                 case Config.DECODE_SOURCES_SMALI:
-                                    decodeSourcesSmali(mApkFile, outDir, file);
+                                    decodeSourcesSmali(outDir, file);
                                     break;
                                 case Config.DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES:
                                     if (file.startsWith("classes") && file.endsWith(".dex")) {
-                                        decodeSourcesSmali(mApkFile, outDir, file);
+                                        decodeSourcesSmali(outDir, file);
                                     } else {
-                                        copySourcesRaw(mApkFile, outDir, file);
+                                        copySourcesRaw(outDir, file);
                                     }
                                     break;
                             }
@@ -171,11 +142,11 @@ public class ApkDecoder {
                 }
             }
 
-            copyRawFiles(mApkFile, outDir);
-            copyUnknownFiles(mApkFile, outDir);
+            copyRawFiles(outDir);
+            copyUnknownFiles(outDir);
             mUncompressedFiles = new ArrayList<>();
-            recordUncompressedFiles(mApkFile, mUncompressedFiles);
-            copyOriginalFiles(mApkFile, outDir);
+            recordUncompressedFiles(mUncompressedFiles);
+            copyOriginalFiles(outDir);
             writeMetaFile(outDir);
         } finally {
             try {
@@ -276,17 +247,17 @@ public class ApkDecoder {
         return sdkInfo;
     }
 
-    private void copySourcesRaw(ExtFile apkFile, File outDir, String filename)
+    private void copySourcesRaw(File outDir, String filename)
         throws AndrolibException {
         try {
             LOGGER.info("Copying raw " + filename + " file...");
-            apkFile.getDirectory().copyToDir(outDir, filename);
+            mApkFile.getDirectory().copyToDir(outDir, filename);
         } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
         }
     }
 
-    private void decodeSourcesSmali(File apkFile, File outDir, String filename)
+    private void decodeSourcesSmali(File outDir, String filename)
         throws AndrolibException {
         try {
             File smaliDir;
@@ -299,7 +270,7 @@ public class ApkDecoder {
             //noinspection ResultOfMethodCallIgnored
             smaliDir.mkdirs();
             LOGGER.info("Baksmaling " + filename + "...");
-            DexFile dexFile = SmaliDecoder.decode(apkFile, smaliDir, filename,
+            DexFile dexFile = SmaliDecoder.decode(mApkFile, smaliDir, filename,
                 config.baksmaliDebugMode, config.apiLevel);
             int minSdkVersion = dexFile.getOpcodes().api;
             if (mMinSdkVersion == 0 || mMinSdkVersion > minSdkVersion) {
@@ -310,46 +281,52 @@ public class ApkDecoder {
         }
     }
 
-    private void copyManifestRaw(ExtFile apkFile, File outDir)
-        throws AndrolibException {
-        try {
-            LOGGER.info("Copying raw manifest...");
-            apkFile.getDirectory().copyToDir(outDir, APK_MANIFEST_FILENAMES);
-        } catch (DirectoryException ex) {
-            throw new AndrolibException(ex);
+    private void decodeManifest(File outDir) throws AndrolibException {
+        if (hasManifest()) {
+            if (config.decodeResources == Config.DECODE_RESOURCES_FULL ||
+                config.forceDecodeManifest == Config.FORCE_DECODE_MANIFEST_FULL) {
+                if (hasResources()) {
+                    mAndRes.decodeManifestWithResources(getResTable(), mApkFile, outDir);
+                } else {
+                    // if there's no resources.arsc, decode the manifest without looking
+                    // up attribute references
+                    mAndRes.decodeManifest(getResTable(), mApkFile, outDir);
+                }
+            }
+            else {
+                try {
+                    LOGGER.info("Copying raw manifest...");
+                    mApkFile.getDirectory().copyToDir(outDir, APK_MANIFEST_FILENAMES);
+                } catch (DirectoryException ex) {
+                    throw new AndrolibException(ex);
+                }
+            }
         }
     }
 
-    private void decodeManifestFull(ExtFile apkFile, File outDir, ResTable resTable)
-        throws AndrolibException {
-        mAndRes.decodeManifest(resTable, apkFile, outDir);
-    }
-
-    private void copyResourcesRaw(ExtFile apkFile, File outDir)
-        throws AndrolibException {
-        try {
-            LOGGER.info("Copying raw resources...");
-            apkFile.getDirectory().copyToDir(outDir, APK_RESOURCES_FILENAMES);
-        } catch (DirectoryException ex) {
-            throw new AndrolibException(ex);
+    private void decodeResources(File outDir) throws AndrolibException {
+        if (hasResources()) {
+            switch (config.decodeResources) {
+                case Config.DECODE_RESOURCES_NONE:
+                    try {
+                        LOGGER.info("Copying raw resources...");
+                        mApkFile.getDirectory().copyToDir(outDir, APK_RESOURCES_FILENAMES);
+                    } catch (DirectoryException ex) {
+                        throw new AndrolibException(ex);
+                    }
+                    break;
+                case Config.DECODE_RESOURCES_FULL:
+                    mAndRes.decode(getResTable(), mApkFile, outDir);
+                    break;
+            }
         }
     }
 
-    private void decodeResourcesFull(ExtFile apkFile, File outDir, ResTable resTable)
-        throws AndrolibException {
-        mAndRes.decode(resTable, apkFile, outDir);
-    }
-
-    private void decodeManifestWithResources(ExtFile apkFile, File outDir, ResTable resTable)
-        throws AndrolibException {
-        mAndRes.decodeManifestWithResources(resTable, apkFile, outDir);
-    }
-
-    private void copyRawFiles(ExtFile apkFile, File outDir)
+    private void copyRawFiles(File outDir)
         throws AndrolibException {
         LOGGER.info("Copying assets and libs...");
         try {
-            Directory in = apkFile.getDirectory();
+            Directory in = mApkFile.getDirectory();
 
             if (config.decodeAssets == Config.DECODE_ASSETS_FULL) {
                 if (in.containsDir("assets")) {
@@ -379,12 +356,12 @@ public class ApkDecoder {
         return false;
     }
 
-    private void copyUnknownFiles(ExtFile apkFile, File outDir)
+    private void copyUnknownFiles(File outDir)
         throws AndrolibException {
         LOGGER.info("Copying unknown files...");
         File unknownOut = new File(outDir, UNK_DIRNAME);
         try {
-            Directory unk = apkFile.getDirectory();
+            Directory unk = mApkFile.getDirectory();
 
             // loop all items in container recursively, ignoring any that are pre-defined by aapt
             Set<String> files = unk.getFiles(true);
@@ -403,7 +380,7 @@ public class ApkDecoder {
         }
     }
 
-    private void copyOriginalFiles(ExtFile apkFile, File outDir)
+    private void copyOriginalFiles(File outDir)
         throws AndrolibException {
         LOGGER.info("Copying original files...");
         File originalDir = new File(outDir, "original");
@@ -413,7 +390,7 @@ public class ApkDecoder {
         }
 
         try {
-            Directory in = apkFile.getDirectory();
+            Directory in = mApkFile.getDirectory();
             if (in.containsFile("AndroidManifest.xml")) {
                 in.copyToDir(originalDir, "AndroidManifest.xml");
             }
@@ -436,9 +413,9 @@ public class ApkDecoder {
         }
     }
 
-    private void recordUncompressedFiles(ExtFile apkFile, Collection<String> uncompressedFilesOrExts) throws AndrolibException {
+    private void recordUncompressedFiles(Collection<String> uncompressedFilesOrExts) throws AndrolibException {
         try {
-            Directory unk = apkFile.getDirectory();
+            Directory unk = mApkFile.getDirectory();
             Set<String> files = unk.getFiles(true);
 
             for (String file : files) {
