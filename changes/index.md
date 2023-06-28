@@ -4,7 +4,7 @@ title: Apktool - Changelog
 description: Apktool - Changelog / Roadmap
 ---
 
-## v2.7.1
+## v2.7.1 (?) / v3.0.0 (?)
 xxxx.xx.xx
  * Add SDK U (API 34) Preview support. ([Issue 3041](https://github.com/iBotPeaches/Apktool/issues/3041))
  * Remove CI testing for Java versions: 9, 10, 12, 13, 14, 15 and 17.
