@@ -16,6 +16,7 @@ xxxx.xx.xx
  * Fix issue with larger `apktool.yml` files. ([Issue 3008](https://github.com/iBotPeaches/Apktool/issues/3008))
  * Fix issue with parsing `XML_TYPE_OVERLAY`. ([Issue 3030](https://github.com/iBotPeaches/Apktool/issues/3030))
  * Fix issue with aapt/aapt2 in edge cases waiting 15 seconds for output. ([Issue 3071](https://github.com/iBotPeaches/Apktool/pull/3071)) / (Thanks sv99)
+ * Fix NPE when decoding namespace missing from string pool. ([Issue 3104](https://github.com/iBotPeaches/Apktool/issues/3104))
  * Refactor `brut.androlib.err` to `brut.androlib.exceptions` for standard naming convention of Exceptions. ([Issue 3088](https://github.com/iBotPeaches/Apktool/pull/3088)) / (Thanks sv99)
  * Refactor Build/Decode to work from common Config object. ([Issue 3091](https://github.com/iBotPeaches/Apktool/pull/3091)) / (Thanks sv99)
  * Refactor into `ApkBuilder` and `ApkDecoder` instead of generic `Androlib`. ([Issue 3103](https://github.com/iBotPeaches/Apktool/pull/3103)) / (Thanks sv99)
