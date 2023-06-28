@@ -20,6 +20,7 @@ xxxx.xx.xx
  * Refactor Build/Decode to work from common Config object. ([Issue 3091](https://github.com/iBotPeaches/Apktool/pull/3091)) / (Thanks sv99)
  * Refactor into `ApkBuilder` and `ApkDecoder` instead of generic `Androlib`. ([Issue 3103](https://github.com/iBotPeaches/Apktool/pull/3103)) / (Thanks sv99)
  * Refactor new class `Framework` to lessen responsibility of `AndrolibResources`. ([Issue 3105](https://github.com/iBotPeaches/Apktool/pull/3105)) / (Thanks sv99)
+ * Refactor `ApkDecoder` to split methods for `MetaInfo` towards `ResTable`. ([Issue 3106](https://github.com/iBotPeaches/Apktool/pull/3106)) / (Thanks sv99)
  * Upgrade away from deprecated SnakeYAML constructors ([Issue 3079](https://github.com/iBotPeaches/Apktool/pull/3079)) / (Thanks MarcMil)
  * Upgrade codebase to use Java7 NIO library for IO. ([Issue 3055](https://github.com/iBotPeaches/Apktool/pull/3055)) / (Thanks sv99)
  * Upgrade to smali/baksmali 3.0.3 and move to Google fork of it. ([Issue 3050](https://github.com/iBotPeaches/Apktool/issues/3050))
