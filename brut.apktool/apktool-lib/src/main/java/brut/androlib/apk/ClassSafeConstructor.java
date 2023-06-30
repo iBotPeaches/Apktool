@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib.meta;
+package brut.androlib.apk;
 
 import org.yaml.snakeyaml.constructor.AbstractConstruct;
 import org.yaml.snakeyaml.constructor.Constructor;
@@ -33,7 +33,7 @@ public class ClassSafeConstructor extends Constructor {
         super(new LoaderOptions());
         this.yamlConstructors.put(Tag.STR, new ConstructStringEx());
 
-        this.allowableClasses.add(MetaInfo.class);
+        this.allowableClasses.add(ApkInfo.class);
         this.allowableClasses.add(PackageInfo.class);
         this.allowableClasses.add(UsesFramework.class);
         this.allowableClasses.add(VersionInfo.class);

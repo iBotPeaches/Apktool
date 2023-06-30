@@ -136,11 +136,11 @@ public class Framework {
         }
     }
 
-    public void publicizeResources(byte[] arsc) throws AndrolibException {
+    private void publicizeResources(byte[] arsc) throws AndrolibException {
         publicizeResources(arsc, ARSCDecoder.decode(new ByteArrayInputStream(arsc), true, true).getFlagsOffsets());
     }
 
-    public void publicizeResources(byte[] arsc, ARSCDecoder.FlagsOffset[] flagsOffsets) {
+    private void publicizeResources(byte[] arsc, ARSCDecoder.FlagsOffset[] flagsOffsets) {
         for (ARSCDecoder.FlagsOffset flags : flagsOffsets) {
             int offset = flags.offset + 3;
             int end = offset + 4 * flags.count;

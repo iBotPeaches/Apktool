@@ -14,9 +14,11 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib.meta;
+package brut.androlib.apk;
 
-public class PackageInfo {
-    public String forcedPackageId;
-    public String renameManifestPackage;
+import java.util.List;
+
+public class UsesFramework {
+    public List<Integer> ids;
+    public String tag;
 }

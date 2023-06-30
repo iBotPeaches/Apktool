@@ -20,7 +20,7 @@ import brut.androlib.ApkBuilder;
 import brut.androlib.ApkDecoder;
 import brut.androlib.BaseTest;
 import brut.androlib.TestUtils;
-import brut.androlib.meta.MetaInfo;
+import brut.androlib.apk.ApkInfo;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
 import brut.util.OS;
@@ -491,17 +491,17 @@ public class BuildAndDecodeTest extends BaseTest {
 
     @Test
     public void confirmZeroByteFileExtensionIsNotStored() throws BrutException {
-        MetaInfo metaInfo = MetaInfo.readMetaFile(sTestNewDir);
+        ApkInfo apkInfo = ApkInfo.load(sTestNewDir);
 
-        for (String item : metaInfo.doNotCompress) {
+        for (String item : apkInfo.doNotCompress) {
             assertNotEquals("jpg", item);
         }
     }
 
     @Test
     public void confirmZeroByteFileIsStored() throws BrutException {
-        MetaInfo metaInfo = MetaInfo.readMetaFile(sTestNewDir);
-        assertTrue(metaInfo.doNotCompress.contains("assets/0byte_file.jpg"));
+        ApkInfo apkInfo = ApkInfo.load(sTestNewDir);
+        assertTrue(apkInfo.doNotCompress.contains("assets/0byte_file.jpg"));
     }
 
     @Test

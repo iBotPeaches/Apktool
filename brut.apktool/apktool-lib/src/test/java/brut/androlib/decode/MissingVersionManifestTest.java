@@ -16,11 +16,10 @@
  */
 package brut.androlib.decode;
 
-import brut.androlib.ApkBuilder;
 import brut.androlib.ApkDecoder;
 import brut.androlib.BaseTest;
 import brut.androlib.TestUtils;
-import brut.androlib.meta.MetaInfo;
+import brut.androlib.apk.ApkInfo;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
 import brut.util.OS;
@@ -57,7 +56,7 @@ public class MissingVersionManifestTest extends BaseTest {
         File outDir = new File(sTmpDir + File.separator + apk + ".out");
         apkDecoder.decode(outDir);
 
-        MetaInfo metaInfo = MetaInfo.readMetaFile(decodedApk);
-        assertNull(metaInfo.versionInfo.versionName);
+        ApkInfo apkInfo = ApkInfo.load(decodedApk);
+        assertNull(apkInfo.versionInfo.versionName);
     }
 }
