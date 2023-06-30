@@ -21,7 +21,6 @@ import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.exceptions.CantFindFrameworkResException;
 import brut.androlib.exceptions.InFileNotFoundException;
 import brut.androlib.exceptions.OutDirExistsException;
-import brut.androlib.res.AndrolibResources;
 import brut.androlib.res.Framework;
 import brut.common.BrutException;
 import brut.directory.DirectoryException;

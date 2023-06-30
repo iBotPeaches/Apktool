@@ -17,9 +17,9 @@
 package brut.androlib.androlib;
 
 import brut.androlib.BaseTest;
-import brut.androlib.Config;
-import brut.androlib.res.AndrolibResources;
+import brut.androlib.apk.ApkInfo;
 import org.junit.Test;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 import static org.junit.Assert.assertEquals;
@@ -28,82 +28,82 @@ public class InvalidSdkBoundingTest extends BaseTest {
 
     @Test
     public void checkIfInvalidValuesPass() {
-        AndrolibResources androlibResources = new AndrolibResources();
+        ApkInfo apkInfo = new ApkInfo();
 
         Map<String, String> sdkInfo = new LinkedHashMap<>();
         sdkInfo.put("minSdkVersion", "15");
         sdkInfo.put("targetSdkVersion", "25");
         sdkInfo.put("maxSdkVersion", "19");
 
-        androlibResources.setSdkInfo(sdkInfo);
-        assertEquals("19", androlibResources.checkTargetSdkVersionBounds());
+        apkInfo.setSdkInfo(sdkInfo);
+        assertEquals("19", apkInfo.checkTargetSdkVersionBounds());
     }
 
     @Test
     public void checkIfMissingMinPasses() {
-        AndrolibResources androlibResources = new AndrolibResources();
+        ApkInfo apkInfo = new ApkInfo();
 
         Map<String, String> sdkInfo = new LinkedHashMap<>();
         sdkInfo.put("targetSdkVersion", "25");
         sdkInfo.put("maxSdkVersion", "19");
 
-        androlibResources.setSdkInfo(sdkInfo);
-        assertEquals("19", androlibResources.checkTargetSdkVersionBounds());
+        apkInfo.setSdkInfo(sdkInfo);
+        assertEquals("19", apkInfo.checkTargetSdkVersionBounds());
     }
 
     @Test
     public void checkIfMissingMaxPasses() {
-        AndrolibResources androlibResources = new AndrolibResources();
+        ApkInfo apkInfo = new ApkInfo();
 
         Map<String, String> sdkInfo = new LinkedHashMap<>();
         sdkInfo.put("minSdkVersion", "15");
         sdkInfo.put("targetSdkVersion", "25");
 
-        androlibResources.setSdkInfo(sdkInfo);
-        assertEquals("25", androlibResources.checkTargetSdkVersionBounds());
+        apkInfo.setSdkInfo(sdkInfo);
+        assertEquals("25", apkInfo.checkTargetSdkVersionBounds());
     }
 
     @Test
     public void checkIfMissingBothPasses() {
-        AndrolibResources androlibResources = new AndrolibResources();
+        ApkInfo apkInfo = new ApkInfo();
 
         Map<String, String> sdkInfo = new LinkedHashMap<>();
         sdkInfo.put("targetSdkVersion", "25");
 
-        androlibResources.setSdkInfo(sdkInfo);
-        assertEquals("25", androlibResources.checkTargetSdkVersionBounds());
+        apkInfo.setSdkInfo(sdkInfo);
+        assertEquals("25", apkInfo.checkTargetSdkVersionBounds());
     }
 
     @Test
     public void checkForShortHandSTag() {
-        AndrolibResources androlibResources = new AndrolibResources();
+        ApkInfo apkInfo = new ApkInfo();
 
         Map<String, String> sdkInfo = new LinkedHashMap<>();
         sdkInfo.put("targetSdkVersion", "S");
 
-        androlibResources.setSdkInfo(sdkInfo);
-        assertEquals("31", androlibResources.checkTargetSdkVersionBounds());
+        apkInfo.setSdkInfo(sdkInfo);
+        assertEquals("31", apkInfo.checkTargetSdkVersionBounds());
     }
 
     @Test
     public void checkForShortHandSdkTag() {
-        AndrolibResources androlibResources = new AndrolibResources();
+        ApkInfo apkInfo = new ApkInfo();
 
         Map<String, String> sdkInfo = new LinkedHashMap<>();
         sdkInfo.put("targetSdkVersion", "O");
 
-        androlibResources.setSdkInfo(sdkInfo);
-        assertEquals("26", androlibResources.checkTargetSdkVersionBounds());
+        apkInfo.setSdkInfo(sdkInfo);
+        assertEquals("26", apkInfo.checkTargetSdkVersionBounds());
     }
 
     @Test
     public void checkForSdkDevelopmentInsaneTestValue() {
-        AndrolibResources androlibResources = new AndrolibResources();
+        ApkInfo apkInfo = new ApkInfo();
 
         Map<String, String> sdkInfo = new LinkedHashMap<>();
         sdkInfo.put("targetSdkVersion", "VANILLAICECREAM");
 
-        androlibResources.setSdkInfo(sdkInfo);
-        assertEquals("10000", androlibResources.checkTargetSdkVersionBounds());
+        apkInfo.setSdkInfo(sdkInfo);
+        assertEquals("10000", apkInfo.checkTargetSdkVersionBounds());
     }
 }

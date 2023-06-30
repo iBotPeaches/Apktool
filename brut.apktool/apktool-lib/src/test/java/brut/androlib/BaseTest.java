@@ -16,7 +16,7 @@
  */
 package brut.androlib;
 
-import brut.androlib.meta.MetaInfo;
+import brut.androlib.apk.ApkInfo;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
 import brut.directory.FileDirectory;
@@ -37,8 +37,8 @@ import static org.junit.Assert.*;
 public class BaseTest {
 
     protected void compareUnknownFiles() throws BrutException {
-        MetaInfo control = MetaInfo.readMetaFile(sTestOrigDir);
-        MetaInfo test = MetaInfo.readMetaFile(sTestNewDir);
+        ApkInfo control = ApkInfo.load(sTestOrigDir);
+        ApkInfo test = ApkInfo.load(sTestNewDir);
         assertNotNull(control.unknownFiles);
         assertNotNull(test.unknownFiles);
 

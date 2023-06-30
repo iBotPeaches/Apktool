@@ -137,7 +137,7 @@ public class Framework {
         }
     }
 
-    public void publicizeResources(byte[] arsc) throws AndrolibException {
+    private void publicizeResources(byte[] arsc) throws AndrolibException {
         publicizeResources(arsc, ARSCDecoder.decode(new ByteArrayInputStream(arsc), true, true).getFlagsOffsets());
     }
 
