@@ -1,0 +1,22 @@
+name: Gradle Validate
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    paths:
+      - 'gradle/wrapper/**'
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-gradle-wrapper:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: 17
+      - uses: gradle/wrapper-validation-action@v1.0.6
