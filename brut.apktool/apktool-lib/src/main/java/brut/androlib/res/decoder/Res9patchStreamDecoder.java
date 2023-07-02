@@ -18,6 +18,8 @@ package brut.androlib.res.decoder;
 
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.exceptions.CantFind9PatchChunkException;
+import brut.androlib.res.decoder.ninepatch.NinePatchData;
+import brut.androlib.res.decoder.ninepatch.OpticalInset;
 import brut.util.ExtDataInput;
 import org.apache.commons.io.IOUtils;
 
@@ -63,7 +65,7 @@ public class Res9patchStreamDecoder implements ResStreamDecoder {
                 im2.createGraphics().drawImage(im, 1, 1, w, h, null);
             }
 
-            NinePatch np = getNinePatch(data);
+            NinePatchData np = getNinePatch(data);
             drawHLine(im2, h + 1, np.padLeft + 1, w - np.padRight);
             drawVLine(im2, w + 1, np.padTop + 1, h - np.padBottom);
 
@@ -122,11 +124,11 @@ public class Res9patchStreamDecoder implements ResStreamDecoder {
         }
     }
 
-    private NinePatch getNinePatch(byte[] data) throws AndrolibException,
+    private NinePatchData getNinePatch(byte[] data) throws AndrolibException,
         IOException {
         ExtDataInput di = new ExtDataInput(new ByteArrayInputStream(data));
         find9patchChunk(di, NP_CHUNK_TYPE);
-        return NinePatch.decode(di);
+        return NinePatchData.decode(di);
     }
 
     private OpticalInset getOpticalInset(byte[] data) throws AndrolibException,
@@ -169,57 +171,4 @@ public class Res9patchStreamDecoder implements ResStreamDecoder {
     private static final int OI_CHUNK_TYPE = 0x6e704c62; // npLb
     private static final int NP_COLOR = 0xff000000;
     private static final int OI_COLOR = 0xffff0000;
-
-    private static class NinePatch {
-        public final int padLeft, padRight, padTop, padBottom;
-        public final int[] xDivs, yDivs;
-
-        public NinePatch(int padLeft, int padRight, int padTop, int padBottom,
-                         int[] xDivs, int[] yDivs) {
-            this.padLeft = padLeft;
-            this.padRight = padRight;
-            this.padTop = padTop;
-            this.padBottom = padBottom;
-            this.xDivs = xDivs;
-            this.yDivs = yDivs;
-        }
-
-        public static NinePatch decode(ExtDataInput di) throws IOException {
-            di.skipBytes(1); // wasDeserialized
-            byte numXDivs = di.readByte();
-            byte numYDivs = di.readByte();
-            di.skipBytes(1); // numColors
-            di.skipBytes(8); // xDivs/yDivs offset
-            int padLeft = di.readInt();
-            int padRight = di.readInt();
-            int padTop = di.readInt();
-            int padBottom = di.readInt();
-            di.skipBytes(4); // colorsOffset
-            int[] xDivs = di.readIntArray(numXDivs);
-            int[] yDivs = di.readIntArray(numYDivs);
-
-            return new NinePatch(padLeft, padRight, padTop, padBottom, xDivs, yDivs);
-        }
-    }
-
-    private static class OpticalInset {
-        public final int layoutBoundsLeft, layoutBoundsTop, layoutBoundsRight, layoutBoundsBottom;
-
-        public OpticalInset(int layoutBoundsLeft, int layoutBoundsTop,
-                            int layoutBoundsRight, int layoutBoundsBottom) {
-            this.layoutBoundsLeft = layoutBoundsLeft;
-            this.layoutBoundsTop = layoutBoundsTop;
-            this.layoutBoundsRight = layoutBoundsRight;
-            this.layoutBoundsBottom = layoutBoundsBottom;
-        }
-
-        public static OpticalInset decode(ExtDataInput di) throws IOException {
-            int layoutBoundsLeft = Integer.reverseBytes(di.readInt());
-            int layoutBoundsTop = Integer.reverseBytes(di.readInt());
-            int layoutBoundsRight = Integer.reverseBytes(di.readInt());
-            int layoutBoundsBottom = Integer.reverseBytes(di.readInt());
-            return new OpticalInset(layoutBoundsLeft, layoutBoundsTop,
-                layoutBoundsRight, layoutBoundsBottom);
-        }
-    }
 }

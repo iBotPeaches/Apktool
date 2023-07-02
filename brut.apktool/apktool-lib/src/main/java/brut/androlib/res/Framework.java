@@ -20,6 +20,8 @@ import brut.androlib.Config;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.exceptions.CantFindFrameworkResException;
 import brut.androlib.res.decoder.ARSCDecoder;
+import brut.androlib.res.decoder.arsc.ARSCData;
+import brut.androlib.res.decoder.arsc.FlagsOffset;
 import brut.util.Jar;
 import org.apache.commons.io.IOUtils;
 
@@ -33,7 +35,6 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 public class Framework {
-
     private final Config config;
 
     private File mFrameworkDirectory = null;
@@ -63,7 +64,7 @@ public class Framework {
             in = zip.getInputStream(entry);
             byte[] data = IOUtils.toByteArray(in);
 
-            ARSCDecoder.ARSCData arsc = ARSCDecoder.decode(new ByteArrayInputStream(data), true, true);
+            ARSCData arsc = ARSCDecoder.decode(new ByteArrayInputStream(data), true, true);
             publicizeResources(data, arsc.getFlagsOffsets());
 
             File outFile = new File(getFrameworkDirectory(), arsc
@@ -140,8 +141,8 @@ public class Framework {
         publicizeResources(arsc, ARSCDecoder.decode(new ByteArrayInputStream(arsc), true, true).getFlagsOffsets());
     }
 
-    public void publicizeResources(byte[] arsc, ARSCDecoder.FlagsOffset[] flagsOffsets) {
-        for (ARSCDecoder.FlagsOffset flags : flagsOffsets) {
+    public void publicizeResources(byte[] arsc, FlagsOffset[] flagsOffsets) {
+        for (FlagsOffset flags : flagsOffsets) {
             int offset = flags.offset + 3;
             int end = offset + 4 * flags.count;
             while (offset < end) {
