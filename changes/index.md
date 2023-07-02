@@ -26,6 +26,7 @@ xxxx.xx.xx
  * Refactor `ApkDecoder` to split methods for `MetaInfo` towards `ResTable`. ([Issue 3106](https://github.com/iBotPeaches/Apktool/pull/3106)) / (Thanks sv99)
  * Refactor `ApkDecoder` to introduce common methods for manifest and resource operations. ([Issue 3109](https://github.com/iBotPeaches/Apktool/pull/3109)) / (Thanks sv99)
  * Refactor Gradle workflow into its own to cut down on unrelated CI failures. ([Issue 3114](https://github.com/iBotPeaches/Apktool/pull/3114))
+ * Refactor `*Decoders` to split child classes into own class files. [(Issue 3116](https://github.com/iBotPeaches/Apktool/pull/3116))
  * Upgrade away from deprecated SnakeYAML constructors ([Issue 3079](https://github.com/iBotPeaches/Apktool/pull/3079)) / (Thanks MarcMil)
  * Upgrade codebase to use Java7 NIO library for IO. ([Issue 3055](https://github.com/iBotPeaches/Apktool/pull/3055)) / (Thanks sv99)
  * Upgrade to smali/baksmali 3.0.3 and move to Google fork of it. ([Issue 3050](https://github.com/iBotPeaches/Apktool/issues/3050))
