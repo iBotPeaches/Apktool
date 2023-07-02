@@ -342,7 +342,7 @@ public class AXmlResourceParser implements XmlResourceParser {
         // retrieve the exact attribute name by its id.
         if (value == null || value.length() == 0) {
             try {
-                value = mAttrDecoder.decodeManifestAttr(getAttributeNameResource(index));
+                value = mAttrDecoder.decodeManifestAttrLegacy(getAttributeNameResource(index));
                 if (value == null) {
                     value = "";
                 }

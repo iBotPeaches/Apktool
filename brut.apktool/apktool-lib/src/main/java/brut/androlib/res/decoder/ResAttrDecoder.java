@@ -73,6 +73,20 @@ public class ResAttrDecoder {
         return null;
     }
 
+    public String decodeManifestAttrLegacy(int attrResId)
+        throws AndrolibException {
+
+        if (attrResId != 0) {
+            ResResSpec resResSpec = getCurrentPackage().getResTable().getResSpec(attrResId);
+
+            if (resResSpec != null) {
+                return resResSpec.getName();
+            }
+        }
+
+        return null;
+    }
+
     public ResPackage getCurrentPackage() throws AndrolibException {
         if (mCurrentPackage == null) {
             throw new AndrolibException("Current package not set");
