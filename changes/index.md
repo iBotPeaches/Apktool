@@ -7,11 +7,13 @@ description: Apktool - Changelog / Roadmap
 ## v2.7.1 (?) / v3.0.0 (?)
 xxxx.xx.xx
  * Add SDK U (API 34) Preview support. ([Issue 3041](https://github.com/iBotPeaches/Apktool/issues/3041))
- * Remove CI testing for Java versions: 9, 10, 12, 13, 14, 15 and 17.
+ * Add SDK V (API ?) Preview support. ([Issue 3115](https://github.com/iBotPeaches/Apktool/pull/3115))
  * Add CI testing for Java versions: 18 and 19. ([Issue 2976](https://github.com/iBotPeaches/Apktool/issues/2976))
  * Add support for parsing applications with config flag size > 8 (from 28). ([Issue 2978](https://github.com/iBotPeaches/Apktool/issues/2978))
  * Add support for running apktool via gradle. ([Issue 3070](https://github.com/iBotPeaches/Apktool/pull/3070)) / (Thanks sv99)
  * Add support for `0_resource_name_obfuscated` ([Issue 2980](https://github.com/iBotPeaches/Apktool/issues/2980))
+ * Add support for Upside Down Cake & Vanilla Ice Cream SDK Shorthand. ([Issue 3113](https://github.com/iBotPeaches/Apktool/pull/3113))
+ * Remove CI testing for Java versions: 9, 10, 12, 13, 14, 15 and 17.
  * Fix issue parsing empty `resources.asrc`. ([Issue 2998](https://github.com/iBotPeaches/Apktool/pull/2998)) / (Thanks IgorEisberg) 
  * Fix issue with larger `apktool.yml` files. ([Issue 3008](https://github.com/iBotPeaches/Apktool/issues/3008))
  * Fix issue with parsing `XML_TYPE_OVERLAY`. ([Issue 3030](https://github.com/iBotPeaches/Apktool/issues/3030))
@@ -23,6 +25,7 @@ xxxx.xx.xx
  * Refactor new class `Framework` to lessen responsibility of `AndrolibResources`. ([Issue 3105](https://github.com/iBotPeaches/Apktool/pull/3105)) / (Thanks sv99)
  * Refactor `ApkDecoder` to split methods for `MetaInfo` towards `ResTable`. ([Issue 3106](https://github.com/iBotPeaches/Apktool/pull/3106)) / (Thanks sv99)
  * Refactor `ApkDecoder` to introduce common methods for manifest and resource operations. ([Issue 3109](https://github.com/iBotPeaches/Apktool/pull/3109)) / (Thanks sv99)
+ * Refactor Gradle workflow into its own to cut down on unrelated CI failures. ([Issue 3114](https://github.com/iBotPeaches/Apktool/pull/3114))
  * Upgrade away from deprecated SnakeYAML constructors ([Issue 3079](https://github.com/iBotPeaches/Apktool/pull/3079)) / (Thanks MarcMil)
  * Upgrade codebase to use Java7 NIO library for IO. ([Issue 3055](https://github.com/iBotPeaches/Apktool/pull/3055)) / (Thanks sv99)
  * Upgrade to smali/baksmali 3.0.3 and move to Google fork of it. ([Issue 3050](https://github.com/iBotPeaches/Apktool/issues/3050))
