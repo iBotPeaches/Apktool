@@ -17,15 +17,12 @@
 package brut.androlib.res;
 
 import brut.androlib.exceptions.AndrolibException;
-import brut.androlib.exceptions.CantFindFrameworkResException;
 import brut.androlib.Config;
 import brut.androlib.meta.MetaInfo;
 import brut.androlib.meta.PackageInfo;
 import brut.androlib.meta.VersionInfo;
 import brut.androlib.res.data.*;
 import brut.androlib.res.decoder.*;
-import brut.androlib.res.decoder.ARSCDecoder.ARSCData;
-import brut.androlib.res.decoder.ARSCDecoder.FlagsOffset;
 import brut.androlib.res.util.ExtMXSerializer;
 import brut.androlib.res.util.ExtXmlSerializer;
 import brut.androlib.res.xml.ResValuesXmlSerializable;
@@ -37,13 +34,8 @@ import org.apache.commons.io.IOUtils;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.*;
-import java.nio.file.Files;
 import java.util.*;
 import java.util.logging.Logger;
-import java.util.zip.CRC32;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipOutputStream;
 
 final public class AndrolibResources {
 
@@ -52,8 +44,6 @@ final public class AndrolibResources {
     public Map<String, String> mResFileMapping = new HashMap<>();
 
     private final static Logger LOGGER = Logger.getLogger(AndrolibResources.class.getName());
-
-    private File mFrameworkDirectory = null;
 
     private ExtFile mFramework = null;
 
@@ -78,10 +68,6 @@ final public class AndrolibResources {
 
     public AndrolibResources() {
         this.config = Config.getDefaultConfig();
-    }
-
-    public ResTable getResTable(ExtFile apkFile) throws AndrolibException {
-        return getResTable(apkFile, true);
     }
 
     public ResTable getResTable(ExtFile apkFile, boolean loadMainPkg)
