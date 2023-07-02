@@ -276,7 +276,7 @@ public class ARSCDecoder {
         }
 
         if ((typeFlags & 0x01) != 0) {
-            LOGGER.info("Sparse type flags detected: " + mTypeSpec.getName());
+            LOGGER.fine("Sparse type flags detected: " + mTypeSpec.getName());
         }
 
         HashMap<Integer, Integer> entryOffsetMap = new LinkedHashMap();
