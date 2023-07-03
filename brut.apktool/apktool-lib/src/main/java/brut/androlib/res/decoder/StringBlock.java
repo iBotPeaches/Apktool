@@ -43,11 +43,11 @@ public class StringBlock {
         int chunkSize = reader.readInt();
 
         // ResStringPool_header
-        int stringCount = reader.readInt();
-        int styleCount = reader.readInt();
-        int flags = reader.readInt();
-        int stringsOffset = reader.readInt();
-        int stylesOffset = reader.readInt();
+        int stringCount = reader.readInt(); // stringCount (uint32_t)
+        int styleCount = reader.readInt(); // styleCount (uint32_t)
+        int flags = reader.readInt(); // flags (uint32_t)
+        int stringsOffset = reader.readInt(); // stringsStart (uint32_t)
+        int stylesOffset = reader.readInt(); // stylesOffset (uint32_t)
 
         StringBlock block = new StringBlock();
         block.m_isUTF8 = (flags & UTF8_FLAG) != 0;

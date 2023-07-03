@@ -38,14 +38,18 @@ public class ARSCHeader {
     }
 
     public static ARSCHeader read(ExtDataInput in, CountingInputStream countIn) throws IOException {
+        // ResChunk_header
         short type;
         int start = countIn.getCount();
         try {
-            type = in.readShort();
+            type = in.readShort(); // type (uint16_t)
         } catch (EOFException ex) {
             return new ARSCHeader(TYPE_NONE, 0, 0, countIn.getCount());
         }
-        return new ARSCHeader(type, in.readShort(), in.readInt(), start);
+
+        int headerSize = in.readShort(); // headerSize (uint16_t)
+        int chunkSize = in.readInt(); // chunkSize (uint32_t)
+        return new ARSCHeader(type, headerSize, chunkSize, start);
     }
 
     public final static short TYPE_NONE = -1;
