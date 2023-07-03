@@ -334,7 +334,7 @@ public class AXmlResourceParser implements XmlResourceParser {
         // retrieve the exact attribute name by its id.
         if (value == null || value.length() == 0) {
             try {
-                value = mAttrDecoder.decodeManifestAttr(getAttributeNameResource(index));
+                value = mAttrDecoder.decodeFromResourceId(getAttributeNameResource(index));
                 if (value == null) {
                     value = "";
                 }
@@ -343,7 +343,7 @@ public class AXmlResourceParser implements XmlResourceParser {
             }
         } else if (! namespace.equals(android_ns)) {
             try {
-                String obfuscatedName = mAttrDecoder.decodeManifestAttr(getAttributeNameResource(index));
+                String obfuscatedName = mAttrDecoder.decodeFromResourceId(getAttributeNameResource(index));
                 if (! (obfuscatedName == null || obfuscatedName.equals(value))) {
                     value = obfuscatedName;
                 }
@@ -384,7 +384,7 @@ public class AXmlResourceParser implements XmlResourceParser {
         if (mAttrDecoder != null) {
             try {
                 String value = valueRaw == -1 ? null : ResXmlEncoders.escapeXmlChars(m_strings.getString(valueRaw));
-                String obfuscatedValue = mAttrDecoder.decodeManifestAttr(valueData);
+                String obfuscatedValue = mAttrDecoder.decodeFromResourceId(valueData);
 
                 if (! (value == null || obfuscatedValue == null)) {
                     int slashPos = value.lastIndexOf("/");
