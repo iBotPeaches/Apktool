@@ -27,6 +27,7 @@ xxxx.xx.xx
  * Refactor `ApkDecoder` to introduce common methods for manifest and resource operations. ([Issue 3109](https://github.com/iBotPeaches/Apktool/pull/3109)) / (Thanks sv99)
  * Refactor Gradle workflow into its own to cut down on unrelated CI failures. ([Issue 3114](https://github.com/iBotPeaches/Apktool/pull/3114))
  * Refactor `*Decoders` to split child classes into own class files. [(Issue 3116](https://github.com/iBotPeaches/Apktool/pull/3116))
+ * Refactor classes to support new `ApkInvoker` class. ([Issue 3124](https://github.com/iBotPeaches/Apktool/pull/3124)) / (Thanks sv99)
  * Upgrade `gradle/gradle-build-action` to `2.5.1`. [(Issue 3119](https://github.com/iBotPeaches/Apktool/pull/3119))
  * Upgrade away from deprecated SnakeYAML constructors ([Issue 3079](https://github.com/iBotPeaches/Apktool/pull/3079)) / (Thanks MarcMil)
  * Upgrade codebase to use Java7 NIO library for IO. ([Issue 3055](https://github.com/iBotPeaches/Apktool/pull/3055)) / (Thanks sv99)
