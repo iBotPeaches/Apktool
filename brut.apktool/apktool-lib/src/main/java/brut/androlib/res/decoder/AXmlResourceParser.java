@@ -283,7 +283,7 @@ public class AXmlResourceParser implements XmlResourceParser {
 
         if (value == null || value.length() == 0) {
             ResID resourceId = new ResID(getAttributeNameResource(index));
-            if (resourceId.package_ == PRIVATE_PKG_ID) {
+            if (resourceId.pkgId == PRIVATE_PKG_ID) {
                 value = getNonDefaultNamespaceUri(offset);
             } else {
                 value = android_ns;
