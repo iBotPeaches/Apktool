@@ -20,7 +20,7 @@ import android.content.res.XmlResourceParser;
 import android.util.TypedValue;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.data.ResID;
-import brut.androlib.res.decoder.axml.NamespaceStack;
+import brut.androlib.res.data.axml.NamespaceStack;
 import brut.androlib.res.xml.ResXmlEncoders;
 import brut.util.ExtDataInput;
 import com.google.common.io.LittleEndianDataInputStream;

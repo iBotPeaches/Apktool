@@ -18,8 +18,8 @@ package brut.androlib.res.decoder;
 
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.exceptions.CantFind9PatchChunkException;
-import brut.androlib.res.decoder.ninepatch.NinePatchData;
-import brut.androlib.res.decoder.ninepatch.OpticalInset;
+import brut.androlib.res.data.ninepatch.NinePatchData;
+import brut.androlib.res.data.ninepatch.OpticalInset;
 import brut.util.ExtDataInput;
 import org.apache.commons.io.IOUtils;
 
