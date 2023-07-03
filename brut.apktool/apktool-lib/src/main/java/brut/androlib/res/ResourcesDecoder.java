@@ -16,13 +16,8 @@
  */
 package brut.androlib.res;
 
-import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.Config;
-import brut.directory.*;
-import org.apache.commons.io.IOUtils;
 
-import java.io.*;
-import java.util.*;
 import java.util.logging.Logger;
 
 final public class ResourcesDecoder {
