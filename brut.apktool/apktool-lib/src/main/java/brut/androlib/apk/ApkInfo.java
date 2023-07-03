@@ -38,7 +38,7 @@ public class ApkInfo {
     private String mApkFileName;
     public boolean isFrameworkApk;
     public UsesFramework usesFramework;
-    private  Map<String, String> mSdkInfo = new LinkedHashMap<>();
+    private Map<String, String> mSdkInfo = new LinkedHashMap<>();
     public PackageInfo packageInfo = new PackageInfo();
     public VersionInfo versionInfo = new VersionInfo();
     public boolean resourcesAreCompressed;

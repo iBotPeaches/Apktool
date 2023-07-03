@@ -62,7 +62,6 @@ public class ApkDecoder {
 
     public ApkDecoder(Config config, ExtFile apkFile) {
         mConfig = config;
-        //mAndRes = new AndrolibResources(config);
         mResUnknownFiles = new ResUnknownFiles();
         mApkFile = apkFile;
     }
@@ -176,10 +175,6 @@ public class ApkDecoder {
         } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
         }
-    }
-
-    public void close() throws IOException {
-        //mAndRes.close();
     }
 
     private void writeApkInfo(ApkInfo apkInfo, File outDir) throws AndrolibException {

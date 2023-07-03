@@ -40,7 +40,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-final public class ResourcesDecoder {
+public class ResourcesDecoder {
 
     private final static Logger LOGGER = Logger.getLogger(ResourcesDecoder.class.getName());
 
@@ -57,7 +57,6 @@ final public class ResourcesDecoder {
     private final static String[] IGNORED_PACKAGES = new String[] {
         "android", "com.htc", "com.lge", "com.lge.internal", "yi", "flyme", "air.com.adobe.appentry",
         "FFFFFFFFFFFFFFFFFFFFFF" };
-
 
     public ResourcesDecoder(Config config, ExtFile apkFile) {
         mConfig = config;
