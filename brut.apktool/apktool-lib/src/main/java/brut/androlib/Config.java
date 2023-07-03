@@ -20,7 +20,6 @@ import brut.androlib.exceptions.AndrolibException;
 import brut.util.OSDetection;
 
 import java.io.File;
-import java.util.Collection;
 import java.util.logging.Logger;
 
 public class Config {

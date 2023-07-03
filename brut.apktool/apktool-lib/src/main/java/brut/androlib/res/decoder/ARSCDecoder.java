@@ -681,17 +681,7 @@ public class ARSCDecoder {
         public final static short XML_TYPE_STAGED_ALIAS = 0x0206;
     }
 
-    public static class FlagsOffset {
-        public final int offset;
-        public final int count;
-
-        public FlagsOffset(int offset, int count) {
-            this.offset = offset;
-            this.count = count;
-        }
-    }
-
-    private class EntryData {
+    private static class EntryData {
         public short mFlags;
         public int mSpecNamesId;
         public ResValue mValue;
@@ -700,54 +690,4 @@ public class ARSCDecoder {
     private static final Logger LOGGER = Logger.getLogger(ARSCDecoder.class.getName());
     private static final int KNOWN_CONFIG_BYTES = 56;
 
-    public static class ARSCData {
-
-        public ARSCData(ResPackage[] packages, FlagsOffset[] flagsOffsets, ResTable resTable) {
-            mPackages = packages;
-            mFlagsOffsets = flagsOffsets;
-            mResTable = resTable;
-        }
-
-        public FlagsOffset[] getFlagsOffsets() {
-            return mFlagsOffsets;
-        }
-
-        public ResPackage[] getPackages() {
-            return mPackages;
-        }
-
-        public ResPackage getOnePackage() throws AndrolibException {
-            if (mPackages.length <= 0) {
-                throw new AndrolibException("Arsc file contains zero packages");
-            } else if (mPackages.length != 1) {
-                int id = findPackageWithMostResSpecs();
-                LOGGER.info("Arsc file contains multiple packages. Using package "
-                        + mPackages[id].getName() + " as default.");
-
-                return mPackages[id];
-            }
-            return mPackages[0];
-        }
-
-        public int findPackageWithMostResSpecs() {
-            int count = mPackages[0].getResSpecCount();
-            int id = 0;
-
-            for (int i = 0; i < mPackages.length; i++) {
-                if (mPackages[i].getResSpecCount() >= count) {
-                    count = mPackages[i].getResSpecCount();
-                    id = i;
-                }
-            }
-            return id;
-        }
-
-        public ResTable getResTable() {
-            return mResTable;
-        }
-
-        private final ResPackage[] mPackages;
-        private final FlagsOffset[] mFlagsOffsets;
-        private final ResTable mResTable;
-    }
 }

@@ -14,21 +14,14 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib.res;
+package brut.androlib.res.data;
 
-import brut.androlib.Config;
+public class FlagsOffset {
+    public final int offset;
+    public final int count;
 
-import java.util.logging.Logger;
-
-final public class ResourcesDecoder {
-
-    private final static Logger LOGGER = Logger.getLogger(ResourcesDecoder.class.getName());
-
-    private final Config mConfig;
-
-    public ResourcesDecoder(Config config) {
-        mConfig = config;
+    public FlagsOffset(int offset, int count) {
+        this.offset = offset;
+        this.count = count;
     }
-
-
 }
