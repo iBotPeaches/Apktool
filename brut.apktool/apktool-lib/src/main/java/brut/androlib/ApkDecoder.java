@@ -38,14 +38,12 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 public class ApkDecoder {
-
     private final static Logger LOGGER = Logger.getLogger(ApkDecoder.class.getName());
 
     private final Config mConfig;
     private final ExtFile mApkFile;
     protected final ResUnknownFiles mResUnknownFiles;
     private int mMinSdkVersion = 0;
-
 
     private final static String SMALI_DIRNAME = "smali";
     private final static String UNK_DIRNAME = "unknown";

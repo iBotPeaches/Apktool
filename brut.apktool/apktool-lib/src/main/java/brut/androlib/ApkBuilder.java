@@ -177,7 +177,7 @@ public class ApkBuilder {
                     }
                 }
             }
-        } catch(DirectoryException ex) {
+        } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
         }
     }
@@ -302,7 +302,7 @@ public class ApkBuilder {
                 if (!ninePatch.exists()) {
                     ninePatch = null;
                 }
-                AaptInvoker invoker = new AaptInvoker(mConfig, mApkInfo, apkDir);
+                AaptInvoker invoker = new AaptInvoker(mConfig, mApkInfo);
                 invoker.invokeAapt(apkFile, new File(appDir,
                                 "AndroidManifest.xml"), new File(appDir, "res"),
                         ninePatch, null, parseUsesFramework(usesFramework));
@@ -370,7 +370,7 @@ public class ApkBuilder {
                     ninePatch = null;
                 }
 
-                AaptInvoker invoker = new AaptInvoker(mConfig, mApkInfo, apkDir);
+                AaptInvoker invoker = new AaptInvoker(mConfig, mApkInfo);
                 invoker.invokeAapt(apkFile, new File(appDir,
                                 "AndroidManifest.xml"), null, ninePatch, null,
                         parseUsesFramework(usesFramework));

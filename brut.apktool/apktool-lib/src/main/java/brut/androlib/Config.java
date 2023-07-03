@@ -23,7 +23,6 @@ import java.io.File;
 import java.util.logging.Logger;
 
 public class Config {
-
     private final static Logger LOGGER = Logger.getLogger(Config.class.getName());
 
     public final static short DECODE_SOURCES_NONE = 0x0000;

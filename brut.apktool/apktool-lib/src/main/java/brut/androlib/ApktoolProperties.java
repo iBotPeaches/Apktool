@@ -22,6 +22,10 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 public class ApktoolProperties {
+    private static final Logger LOGGER = Logger.getLogger(ApktoolProperties.class.getName());
+
+    private static Properties sProps;
+
     public static String get(String key) {
         return get().getProperty(key);
     }
@@ -83,8 +87,4 @@ public class ApktoolProperties {
         }
         sProps.put("smaliVersion", version);
     }
-
-    private static Properties sProps;
-
-    private static final Logger LOGGER = Logger.getLogger(ApktoolProperties.class.getName());
 }

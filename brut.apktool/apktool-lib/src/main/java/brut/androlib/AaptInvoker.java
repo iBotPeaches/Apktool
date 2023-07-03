@@ -32,17 +32,14 @@ import java.util.Objects;
 import java.util.logging.Logger;
 
 public class AaptInvoker {
-
     private final Config mConfig;
     private final ApkInfo mApkInfo;
-    private final File mApkDir;
 
     private final static Logger LOGGER = Logger.getLogger(AaptInvoker.class.getName());
 
-    public AaptInvoker(Config config, ApkInfo apkInfo, File apkDir) {
+    public AaptInvoker(Config config, ApkInfo apkInfo) {
         mConfig = config;
         mApkInfo = apkInfo;
-        mApkDir = apkDir;
     }
 
     private File getAaptBinaryFile() throws AndrolibException {
@@ -386,5 +383,4 @@ public class AaptInvoker {
         }
         invokeAapt1(apkFile, manifest, resDir, rawDir, assetDir, include, cmd, customAapt);
     }
-
 }

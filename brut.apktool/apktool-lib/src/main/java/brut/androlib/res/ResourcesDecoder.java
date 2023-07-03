@@ -41,7 +41,6 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 public class ResourcesDecoder {
-
     private final static Logger LOGGER = Logger.getLogger(ResourcesDecoder.class.getName());
 
     private final Config mConfig;
@@ -355,5 +354,4 @@ public class ResourcesDecoder {
             throw new AndrolibException("Could not generate public.xml file", ex);
         }
     }
-
 }
