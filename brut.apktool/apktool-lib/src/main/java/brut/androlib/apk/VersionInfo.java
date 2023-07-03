@@ -14,12 +14,9 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib.res.decoder.arsc;
+package brut.androlib.apk;
 
-import brut.androlib.res.data.value.ResValue;
-
-public class EntryData {
-    public short mFlags;
-    public int mSpecNamesId;
-    public ResValue mValue;
+public class VersionInfo {
+    public String versionCode;
+    public String versionName;
 }

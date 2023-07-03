@@ -18,6 +18,7 @@ package brut.androlib.aapt2;
 
 import brut.androlib.*;
 import brut.androlib.exceptions.AndrolibException;
+import brut.androlib.res.ResourcesDecoder;
 import brut.androlib.res.data.ResTable;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
@@ -53,9 +54,12 @@ public class NonStandardPkgIdTest extends BaseTest {
         new ApkBuilder(config, sTestOrigDir).build(testApk);
 
         LOGGER.info("Decoding pkgid8.apk...");
-        ApkDecoder apkDecoder = new ApkDecoder(testApk);
-        apkDecoder.decode(sTestNewDir);
-        mResTable = apkDecoder.getResTable();
+        ResourcesDecoder resourcesDecoder = new ResourcesDecoder(
+            Config.getDefaultConfig(), new ExtFile(testApk));
+
+        sTestNewDir.mkdirs();
+        resourcesDecoder.decodeManifest(sTestNewDir);
+        mResTable = resourcesDecoder.decodeResources(sTestNewDir);
     }
 
     @AfterClass

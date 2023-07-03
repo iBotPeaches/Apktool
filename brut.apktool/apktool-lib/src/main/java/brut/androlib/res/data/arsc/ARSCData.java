@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib.res.decoder.arsc;
+package brut.androlib.res.data.arsc;
 
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.data.ResPackage;

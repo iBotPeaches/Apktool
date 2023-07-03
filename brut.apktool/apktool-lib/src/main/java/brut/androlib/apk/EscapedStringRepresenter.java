@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib.meta;
+package brut.androlib.apk;
 
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.nodes.Node;

@@ -14,14 +14,9 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib.res.decoder.arsc;
+package brut.androlib.apk;
 
-public class FlagsOffset {
-    public final int offset;
-    public final int count;
-
-    public FlagsOffset(int offset, int count) {
-        this.offset = offset;
-        this.count = count;
-    }
+public class PackageInfo {
+    public String forcedPackageId;
+    public String renameManifestPackage;
 }

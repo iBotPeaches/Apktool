@@ -14,9 +14,12 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib.meta;
+package brut.androlib.res.data.arsc;
 
-public class VersionInfo {
-    public String versionCode;
-    public String versionName;
+import brut.androlib.res.data.value.ResValue;
+
+public class EntryData {
+    public short mFlags;
+    public int mSpecNamesId;
+    public ResValue mValue;
 }

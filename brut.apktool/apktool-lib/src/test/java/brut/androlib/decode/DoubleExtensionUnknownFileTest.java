@@ -16,11 +16,10 @@
  */
 package brut.androlib.decode;
 
-import brut.androlib.ApkBuilder;
 import brut.androlib.ApkDecoder;
 import brut.androlib.BaseTest;
 import brut.androlib.TestUtils;
-import brut.androlib.meta.MetaInfo;
+import brut.androlib.apk.ApkInfo;
 import brut.directory.ExtFile;
 import brut.common.BrutException;
 import brut.util.OS;
@@ -58,8 +57,8 @@ public class DoubleExtensionUnknownFileTest extends BaseTest {
         File outDir = new File(sTmpDir + File.separator + apk + ".out");
         apkDecoder.decode(outDir);
 
-        MetaInfo metaInfo = MetaInfo.readMetaFile(decodedApk);
-        for (String string : metaInfo.doNotCompress) {
+        ApkInfo apkInfo = ApkInfo.load(decodedApk);
+        for (String string : apkInfo.doNotCompress) {
             if (StringUtils.countMatches(string, ".") > 1) {
                 assertTrue(string.equalsIgnoreCase("assets/bin/Data/sharedassets1.assets.split0"));
             }

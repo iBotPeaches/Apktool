@@ -20,8 +20,8 @@ import brut.androlib.Config;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.exceptions.CantFindFrameworkResException;
 import brut.androlib.res.decoder.ARSCDecoder;
-import brut.androlib.res.decoder.arsc.ARSCData;
-import brut.androlib.res.decoder.arsc.FlagsOffset;
+import brut.androlib.res.data.arsc.ARSCData;
+import brut.androlib.res.data.arsc.FlagsOffset;
 import brut.util.Jar;
 import org.apache.commons.io.IOUtils;
 
@@ -137,7 +137,7 @@ public class Framework {
         }
     }
 
-    public void publicizeResources(byte[] arsc) throws AndrolibException {
+    private void publicizeResources(byte[] arsc) throws AndrolibException {
         publicizeResources(arsc, ARSCDecoder.decode(new ByteArrayInputStream(arsc), true, true).getFlagsOffsets());
     }
 

@@ -14,11 +14,14 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib.meta;
+package brut.androlib.res.data.arsc;
 
-import java.util.List;
+public class FlagsOffset {
+    public final int offset;
+    public final int count;
 
-public class UsesFramework {
-    public List<Integer> ids;
-    public String tag;
+    public FlagsOffset(int offset, int count) {
+        this.offset = offset;
+        this.count = count;
+    }
 }

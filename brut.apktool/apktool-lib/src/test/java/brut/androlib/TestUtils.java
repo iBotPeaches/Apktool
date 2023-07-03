@@ -17,7 +17,6 @@
 package brut.androlib;
 
 import brut.androlib.exceptions.AndrolibException;
-import brut.androlib.res.AndrolibResources;
 import brut.androlib.res.Framework;
 import brut.common.BrutException;
 import brut.directory.DirUtil;

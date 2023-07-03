@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib.res.decoder.axml;
+package brut.androlib.res.data.axml;
 
 /**
  * Namespace stack, holds prefix+uri pairs, as well as depth information.

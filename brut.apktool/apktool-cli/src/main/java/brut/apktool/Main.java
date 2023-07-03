@@ -21,7 +21,6 @@ import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.exceptions.CantFindFrameworkResException;
 import brut.androlib.exceptions.InFileNotFoundException;
 import brut.androlib.exceptions.OutDirExistsException;
-import brut.androlib.res.AndrolibResources;
 import brut.androlib.res.Framework;
 import brut.common.BrutException;
 import brut.directory.DirectoryException;
@@ -205,10 +204,6 @@ public class Main {
         } catch (DirectoryException ex) {
             System.err.println("Could not modify internal dex files. Please ensure you have permission.");
             System.exit(1);
-        } finally {
-            try {
-                decoder.close();
-            } catch (IOException ignored) {}
         }
     }
 
