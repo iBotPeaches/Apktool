@@ -18,7 +18,9 @@ package brut.androlib.decode;
 
 import brut.androlib.ApkDecoder;
 import brut.androlib.BaseTest;
+import brut.androlib.Config;
 import brut.androlib.TestUtils;
+import brut.androlib.res.ResourcesDecoder;
 import brut.androlib.res.data.ResTable;
 import brut.androlib.res.data.value.ResArrayValue;
 import brut.androlib.res.data.value.ResValue;
@@ -50,9 +52,12 @@ public class DecodeArrayTest extends BaseTest {
     @Test
     public void decodeStringArray() throws BrutException {
         String apk = "issue1994.apk";
-        ApkDecoder apkDecoder = new ApkDecoder(new File(sTmpDir + File.separator + apk));
+        //ApkDecoder apkDecoder = new ApkDecoder(new File(sTmpDir + File.separator + apk));
+        ResourcesDecoder resourcesDecoder = new ResourcesDecoder(
+            Config.getDefaultConfig(),
+            new ExtFile(sTmpDir + File.separator + apk));
 
-        ResTable resTable = apkDecoder.getResTable();
+        ResTable resTable = resourcesDecoder.getResTable();
         ResValue value = resTable.getResSpec(0x7f020001).getDefaultResource().getValue();
 
         assertTrue("Not a ResArrayValue. Found: " + value.getClass(), value instanceof ResArrayValue);
@@ -61,9 +66,11 @@ public class DecodeArrayTest extends BaseTest {
     @Test
     public void decodeArray() throws BrutException {
         String apk = "issue1994.apk";
-        ApkDecoder apkDecoder = new ApkDecoder(new File(sTmpDir + File.separator + apk));
+        ResourcesDecoder resourcesDecoder = new ResourcesDecoder(
+            Config.getDefaultConfig(),
+            new ExtFile(sTmpDir + File.separator + apk));
 
-        ResTable resTable = apkDecoder.getResTable();
+        ResTable resTable = resourcesDecoder.getResTable();
         ResValue value = resTable.getResSpec(0x7f020000).getDefaultResource().getValue();
 
         assertTrue("Not a ResArrayValue. Found: " + value.getClass(), value instanceof ResArrayValue);
