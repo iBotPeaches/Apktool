@@ -136,9 +136,7 @@ public class ResourcesDecoder {
         // Set ResAttrDecoder
         duo.m2.setAttrDecoder(new ResAttrDecoder());
         ResAttrDecoder attrDecoder = duo.m2.getAttrDecoder();
-
-        // Fake ResPackage
-        attrDecoder.setCurrentPackage(new ResPackage(resTable, 0, null));
+        attrDecoder.setResTable(resTable);
 
         Directory inApk, out;
         try {
@@ -159,8 +157,7 @@ public class ResourcesDecoder {
         Duo<ResFileDecoder, AXmlResourceParser> duo = getManifestFileDecoder(true);
         ResFileDecoder fileDecoder = duo.m1;
         ResAttrDecoder attrDecoder = duo.m2.getAttrDecoder();
-
-        attrDecoder.setCurrentPackage(resTable.listMainPackages().iterator().next());
+        attrDecoder.setResTable(resTable);
 
         Directory inApk, out;
         try {
@@ -259,8 +256,7 @@ public class ResourcesDecoder {
         Duo<ResFileDecoder, AXmlResourceParser> duo = getResFileDecoder();
         ResFileDecoder fileDecoder = duo.m1;
         ResAttrDecoder attrDecoder = duo.m2.getAttrDecoder();
-
-        attrDecoder.setCurrentPackage(resTable.listMainPackages().iterator().next());
+        attrDecoder.setResTable(resTable);
         Directory in, out;
 
         try {
@@ -273,7 +269,6 @@ public class ResourcesDecoder {
 
         ExtMXSerializer xmlSerializer = getResXmlSerializer();
         for (ResPackage pkg : resTable.listMainPackages()) {
-            attrDecoder.setCurrentPackage(pkg);
 
             LOGGER.info("Decoding file-resources...");
             for (ResResource res : pkg.listFiles()) {

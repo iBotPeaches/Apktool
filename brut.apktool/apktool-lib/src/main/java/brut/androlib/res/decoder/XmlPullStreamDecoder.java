@@ -45,7 +45,7 @@ public class XmlPullStreamDecoder implements ResStreamDecoder {
         try {
             XmlPullWrapperFactory factory = XmlPullWrapperFactory.newInstance();
             XmlPullParserWrapper par = factory.newPullParserWrapper(mParser);
-            final ResTable resTable = ((AXmlResourceParser) mParser).getAttrDecoder().getCurrentPackage().getResTable();
+            final ResTable resTable = ((AXmlResourceParser) mParser).getAttrDecoder().getResTable();
 
             XmlSerializerWrapper ser = new StaticXmlSerializerWrapper(mSerial, factory) {
                 boolean hideSdkInfo = false;

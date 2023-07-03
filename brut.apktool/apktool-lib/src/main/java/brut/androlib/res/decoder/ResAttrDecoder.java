@@ -17,24 +17,24 @@
 package brut.androlib.res.decoder;
 
 import brut.androlib.exceptions.AndrolibException;
+import brut.androlib.exceptions.CantFindFrameworkResException;
 import brut.androlib.exceptions.UndefinedResObjectException;
 import brut.androlib.res.data.ResID;
 import brut.androlib.res.data.ResPackage;
 import brut.androlib.res.data.ResResSpec;
+import brut.androlib.res.data.ResTable;
 import brut.androlib.res.data.value.ResAttr;
 import brut.androlib.res.data.value.ResScalarValue;
 
 public class ResAttrDecoder {
     public String decode(int type, int value, String rawValue, int attrResId)
-            throws AndrolibException {
-        ResScalarValue resValue = mCurrentPackage.getValueFactory().factory(
-                type, value, rawValue);
+        throws AndrolibException {
+        ResScalarValue resValue = mResTable.getCurrentResPackage().getValueFactory().factory(type, value, rawValue);
 
         String decoded = null;
         if (attrResId > 0) {
             try {
-                ResAttr attr = (ResAttr) getCurrentPackage().getResTable()
-                        .getResSpec(attrResId).getDefaultResource().getValue();
+                ResAttr attr = (ResAttr) mResTable.getResSpec(attrResId).getDefaultResource().getValue();
 
                 decoded = attr.convertToResXmlFormat(resValue);
             } catch (UndefinedResObjectException | ClassCastException ex) {
@@ -73,16 +73,16 @@ public class ResAttrDecoder {
         return null;
     }
 
-    public ResPackage getCurrentPackage() throws AndrolibException {
-        if (mCurrentPackage == null) {
-            throw new AndrolibException("Current package not set");
+    public ResTable getResTable() throws AndrolibException {
+        if (mResTable == null) {
+            throw new AndrolibException("Res Table not set");
         }
-        return mCurrentPackage;
+        return mResTable;
     }
 
-    public void setCurrentPackage(ResPackage currentPackage) {
-        mCurrentPackage = currentPackage;
+    public void setResTable(ResTable resTable) {
+        mResTable = resTable;
     }
 
-    private ResPackage mCurrentPackage;
+    private ResTable mResTable;
 }
