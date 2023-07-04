@@ -141,4 +141,9 @@ public class BuildAndDecodeTest extends BaseTest {
         File classesDex = new File(sTestOrigDir, "build/apk/classes.dex");
         assertTrue(classesDex.isFile());
     }
+
+    @Test
+    public void unknownFolderTest() throws BrutException {
+        compareUnknownFiles();
+    }
 }
