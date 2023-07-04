@@ -20,7 +20,6 @@ import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.exceptions.CantFindFrameworkResException;
 import brut.androlib.exceptions.UndefinedResObjectException;
 import brut.androlib.res.data.ResID;
-import brut.androlib.res.data.ResPackage;
 import brut.androlib.res.data.ResResSpec;
 import brut.androlib.res.data.ResTable;
 import brut.androlib.res.data.value.ResAttr;
@@ -37,9 +36,7 @@ public class ResAttrDecoder {
                 ResAttr attr = (ResAttr) mResTable.getResSpec(attrResId).getDefaultResource().getValue();
 
                 decoded = attr.convertToResXmlFormat(resValue);
-            } catch (UndefinedResObjectException | ClassCastException ex) {
-                // ignored
-            }
+            } catch (UndefinedResObjectException | ClassCastException ignored) {}
         }
 
         return decoded != null ? decoded : resValue.encodeAsResXmlAttr();
@@ -54,20 +51,9 @@ public class ResAttrDecoder {
             try {
                 ResResSpec resResSpec = mResTable.getResSpec(resId);
                 if (resResSpec != null) {
-                    return resResSpec.getFullName(resId.pkgId != 1, true);
+                    return resResSpec.getName();
                 }
-            } catch (UndefinedResObjectException | CantFindFrameworkResException ex) {
-                // If we can't find the package associated with the resource, it may fall back to the private package
-                // Think split-apks, etc.
-                ResPackage resPackage = mResTable.getCurrentResPackage();
-
-                if (resPackage.hasResSpec(resId)) {
-                    ResResSpec resResSpec = resPackage.getResSpec(resId);
-                    if (resResSpec != null) {
-                        return resResSpec.getName();
-                    }
-                }
-            }
+            } catch (UndefinedResObjectException | CantFindFrameworkResException ignored) {}
         }
 
         return null;

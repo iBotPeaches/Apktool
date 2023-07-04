@@ -282,8 +282,8 @@ public class AXmlResourceParser implements XmlResourceParser {
         String value = m_strings.getString(namespace);
 
         if (value == null || value.length() == 0) {
-            ResID resourceId = new ResID(getAttributeNameResource(index));
-            if (resourceId.pkgId == PRIVATE_PKG_ID) {
+            ResID resId = new ResID(getAttributeNameResource(index));
+            if (resId.pkgId == PRIVATE_PKG_ID) {
                 value = getNonDefaultNamespaceUri(offset);
             } else {
                 value = android_ns;
@@ -327,29 +327,32 @@ public class AXmlResourceParser implements XmlResourceParser {
             return "";
         }
 
-        String value = m_strings.getString(name);
-        String namespace = getAttributeNamespace(index);
+        String resourceMapValue;
+        String stringBlockValue = m_strings.getString(name);
+        int resourceId = getAttributeNameResource(index);
 
-        // If attribute name is lacking or a private namespace emerges,
-        // retrieve the exact attribute name by its id.
-        if (value == null || value.length() == 0) {
-            try {
-                value = mAttrDecoder.decodeFromResourceId(getAttributeNameResource(index));
-                if (value == null) {
-                    value = "";
-                }
-            } catch (AndrolibException e) {
-                value = "";
-            }
-        } else if (! namespace.equals(android_ns)) {
-            try {
-                String obfuscatedName = mAttrDecoder.decodeFromResourceId(getAttributeNameResource(index));
-                if (! (obfuscatedName == null || obfuscatedName.equals(value))) {
-                    value = obfuscatedName;
-                }
-            } catch (AndrolibException ignored) {}
+        try {
+            resourceMapValue = mAttrDecoder.decodeFromResourceId(resourceId);
+        } catch (AndrolibException ignored) {
+            resourceMapValue = null;
         }
-        return value;
+
+        // Android prefers the resource map value over what the String block has.
+        // This can be seen quite often in obfuscated apps where values such as:
+        // <item android:state_enabled="true" app:state_collapsed="false" app:state_collapsible="true">
+        // Are improperly decoded when trusting the String block.
+        // Leveraging the resource map allows us to get the proper value.
+        // <item android:state_enabled="true" app:d2="false" app:d3="true">
+        if (resourceMapValue != null) {
+            return resourceMapValue;
+        }
+
+        if (stringBlockValue != null) {
+            return stringBlockValue;
+        }
+
+        // In this case we have a bogus resource. If it was not found in either.
+        return "";
     }
 
     @Override
@@ -383,18 +386,22 @@ public class AXmlResourceParser implements XmlResourceParser {
 
         if (mAttrDecoder != null) {
             try {
-                String value = valueRaw == -1 ? null : ResXmlEncoders.escapeXmlChars(m_strings.getString(valueRaw));
-                String obfuscatedValue = mAttrDecoder.decodeFromResourceId(valueData);
+                String stringBlockValue = valueRaw == -1 ? null : ResXmlEncoders.escapeXmlChars(m_strings.getString(valueRaw));
+                String resourceMapValue = mAttrDecoder.decodeFromResourceId(valueData);
+                String value = stringBlockValue;
 
-                if (! (value == null || obfuscatedValue == null)) {
-                    int slashPos = value.lastIndexOf("/");
+                if (stringBlockValue != null && resourceMapValue != null) {
+                    int slashPos = stringBlockValue.lastIndexOf("/");
+                    int colonPos = stringBlockValue.lastIndexOf(":");
 
+                    // Handle a value with a format of "@yyy/xxx", but avoid "@yyy/zzz:xxx"
                     if (slashPos != -1) {
-                        // Handle a value with a format of "@yyy/xxx"
-                        String dir = value.substring(0, slashPos);
-                        value = dir + "/"+ obfuscatedValue;
-                    } else if (! value.equals(obfuscatedValue)) {
-                        value = obfuscatedValue;
+                        if (colonPos == -1) {
+                            String type = stringBlockValue.substring(0, slashPos);
+                            value = type + "/" + resourceMapValue;
+                        }
+                    } else if (! stringBlockValue.equals(resourceMapValue)) {
+                        value = resourceMapValue;
                     }
                 }
 
