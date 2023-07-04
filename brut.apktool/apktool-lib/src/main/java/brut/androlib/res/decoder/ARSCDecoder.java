@@ -128,9 +128,11 @@ public class ARSCDecoder {
         mPkg = new ResPackage(mResTable, id, name);
 
         nextChunk();
-        boolean flag = true;
-        while (flag) {
+
+        chunkLoop:
+        for (;;) {
             switch (mHeader.type) {
+                case ARSCHeader.XML_TYPE_TYPE:
                 case ARSCHeader.XML_TYPE_SPEC_TYPE:
                     readTableTypeSpec();
                     break;
@@ -147,8 +149,7 @@ public class ARSCDecoder {
                     readStagedAliasSpec();
                     break;
                 default:
-                    flag = false;
-                    break;
+                    break chunkLoop;
             }
         }
 
@@ -168,9 +169,7 @@ public class ARSCDecoder {
             LOGGER.info(String.format("Decoding Shared Library (%s), pkgId: %d", packageName, packageId));
         }
 
-        while(nextChunk().type == ARSCHeader.XML_TYPE_TYPE) {
-            readTableTypeSpec();
-        }
+        nextChunk();
     }
 
     private void readStagedAliasSpec() throws IOException {
