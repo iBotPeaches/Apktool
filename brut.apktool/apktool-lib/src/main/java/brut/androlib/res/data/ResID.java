@@ -17,22 +17,21 @@
 package brut.androlib.res.data;
 
 public class ResID {
-    public final int package_;
+    public final int pkgId;
     public final int type;
     public final int entry;
-
     public final int id;
 
-    public ResID(int package_, int type, int entry) {
-        this(package_, type, entry, (package_ << 24) + (type << 16) + entry);
+    public ResID(int pkgId, int type, int entry) {
+        this(pkgId, type, entry, (pkgId << 24) + (type << 16) + entry);
     }
 
     public ResID(int id) {
         this((id >> 24) & 0xff, (id >> 16) & 0x000000ff, id & 0x0000ffff, id);
     }
 
-    public ResID(int package_, int type, int entry, int id) {
-        this.package_ = (package_ == 0) ? 2 : package_;
+    public ResID(int pkgId, int type, int entry, int id) {
+        this.pkgId = (pkgId == 0) ? 2 : pkgId;
         this.type = type;
         this.entry = entry;
         this.id = id;

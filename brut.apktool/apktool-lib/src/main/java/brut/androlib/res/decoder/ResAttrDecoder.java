@@ -17,72 +17,58 @@
 package brut.androlib.res.decoder;
 
 import brut.androlib.exceptions.AndrolibException;
+import brut.androlib.exceptions.CantFindFrameworkResException;
 import brut.androlib.exceptions.UndefinedResObjectException;
 import brut.androlib.res.data.ResID;
-import brut.androlib.res.data.ResPackage;
 import brut.androlib.res.data.ResResSpec;
+import brut.androlib.res.data.ResTable;
 import brut.androlib.res.data.value.ResAttr;
 import brut.androlib.res.data.value.ResScalarValue;
 
 public class ResAttrDecoder {
     public String decode(int type, int value, String rawValue, int attrResId)
-            throws AndrolibException {
-        ResScalarValue resValue = mCurrentPackage.getValueFactory().factory(
-                type, value, rawValue);
+        throws AndrolibException {
+        ResScalarValue resValue = mResTable.getCurrentResPackage().getValueFactory().factory(type, value, rawValue);
 
         String decoded = null;
         if (attrResId > 0) {
             try {
-                ResAttr attr = (ResAttr) getCurrentPackage().getResTable()
-                        .getResSpec(attrResId).getDefaultResource().getValue();
+                ResAttr attr = (ResAttr) mResTable.getResSpec(attrResId).getDefaultResource().getValue();
 
                 decoded = attr.convertToResXmlFormat(resValue);
-            } catch (UndefinedResObjectException | ClassCastException ex) {
-                // ignored
-            }
+            } catch (UndefinedResObjectException | ClassCastException ignored) {}
         }
 
         return decoded != null ? decoded : resValue.encodeAsResXmlAttr();
     }
 
-    public String decodeManifestAttr(int attrResId)
+    public String decodeFromResourceId(int attrResId)
         throws AndrolibException {
 
         if (attrResId != 0) {
-            int attrId = attrResId;
+            ResID resId = new ResID(attrResId);
 
-            // See also: brut.androlib.res.data.ResTable.getResSpec
-            if (attrId >> 24 == 0) {
-                ResPackage pkg = getCurrentPackage();
-                int packageId = pkg.getId();
-                int pkgId = (packageId == 0 ? 2 : packageId);
-                attrId = (0xFF000000 & (pkgId << 24)) | attrId;
-            }
-
-            // Retrieve the ResSpec in a package by id
-            ResID resId = new ResID(attrId);
-            ResPackage pkg = getCurrentPackage();
-            if (pkg.hasResSpec(resId)) {
-                ResResSpec resResSpec = pkg.getResSpec(resId);
+            try {
+                ResResSpec resResSpec = mResTable.getResSpec(resId);
                 if (resResSpec != null) {
                     return resResSpec.getName();
                 }
-            }
+            } catch (UndefinedResObjectException | CantFindFrameworkResException ignored) {}
         }
 
         return null;
     }
 
-    public ResPackage getCurrentPackage() throws AndrolibException {
-        if (mCurrentPackage == null) {
-            throw new AndrolibException("Current package not set");
+    public ResTable getResTable() throws AndrolibException {
+        if (mResTable == null) {
+            throw new AndrolibException("Res Table not set");
         }
-        return mCurrentPackage;
+        return mResTable;
     }
 
-    public void setCurrentPackage(ResPackage currentPackage) {
-        mCurrentPackage = currentPackage;
+    public void setResTable(ResTable resTable) {
+        mResTable = resTable;
     }
 
-    private ResPackage mCurrentPackage;
+    private ResTable mResTable;
 }

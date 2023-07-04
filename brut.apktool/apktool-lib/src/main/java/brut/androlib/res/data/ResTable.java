@@ -82,7 +82,7 @@ public class ResTable {
     }
 
     public ResResSpec getResSpec(ResID resID) throws AndrolibException {
-        return getPackage(resID.package_).getResSpec(resID);
+        return getPackage(resID.pkgId).getResSpec(resID);
     }
 
     public Set<ResPackage> listMainPackages() {
