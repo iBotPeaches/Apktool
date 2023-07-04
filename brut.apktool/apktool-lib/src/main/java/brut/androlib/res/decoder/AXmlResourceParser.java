@@ -352,7 +352,7 @@ public class AXmlResourceParser implements XmlResourceParser {
         }
 
         // In this case we have a bogus resource. If it was not found in either.
-        return "";
+        return "APKTOOL_MISSING_" + Integer.toHexString(resourceId);
     }
 
     @Override
