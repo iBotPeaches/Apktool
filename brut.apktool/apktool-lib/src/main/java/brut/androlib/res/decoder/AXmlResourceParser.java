@@ -648,9 +648,9 @@ public class AXmlResourceParser implements XmlResourceParser {
         if (m_strings == null) {
             m_reader.skipCheckInt(CHUNK_AXML_FILE, CHUNK_AXML_FILE_BROKEN);
 
-            // chunkSize
+            // headerSize
             m_reader.skipInt();
-            m_strings = StringBlock.read(m_reader);
+            m_strings = StringBlock.read(m_reader, m_reader.readInt());
             m_namespaces.increaseDepth();
             m_operational = true;
         }

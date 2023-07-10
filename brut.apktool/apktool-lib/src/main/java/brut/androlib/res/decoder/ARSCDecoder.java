@@ -33,10 +33,7 @@ import java.io.DataInput;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Logger;
 
 public class ARSCDecoder {
@@ -50,7 +47,7 @@ public class ARSCDecoder {
             throws AndrolibException {
         try {
             ARSCDecoder decoder = new ARSCDecoder(arscStream, resTable, findFlagsOffsets, keepBroken);
-            ResPackage[] pkgs = decoder.readTableHeader();
+            ResPackage[] pkgs = decoder.readResourceTable();
             return new ARSCData(pkgs, decoder.mFlagsOffsets == null
                     ? null
                     : decoder.mFlagsOffsets.toArray(new FlagsOffset[0]));
@@ -74,19 +71,78 @@ public class ARSCDecoder {
         mKeepBroken = keepBroken;
     }
 
-    private ResPackage[] readTableHeader() throws IOException, AndrolibException {
-        nextChunkCheckType(ARSCHeader.TYPE_TABLE);
-        int packageCount = mIn.readInt();
+    private ResPackage[] readResourceTable() throws IOException, AndrolibException {
+        nextChunk();
 
-        mTableStrings = StringBlock.read(mIn);
-        ResPackage[] packages = new ResPackage[packageCount];
+        return parseChunks();
+    }
+
+    private ResPackage[] parseChunks() throws IOException, AndrolibException {
+        Set<ResPackage> pkgs = new LinkedHashSet<>();
+
+        chunkLoop:
+        for (;;) {
+            switch (mHeader.type) {
+                case ARSCHeader.RES_NULL_TYPE:
+                    readUnknownChunk();
+                    break;
+                case ARSCHeader.RES_STRING_POOL_TYPE:
+                    readStringPoolChunk();
+                    break;
+                case ARSCHeader.RES_TABLE_TYPE:
+                    readTableChunk();
+                    break;
+
+                // Chunk types in RES_TABLE_TYPE
+                case ARSCHeader.XML_TYPE_PACKAGE:
+                    mTypeIdOffset = 0;
+                    pkgs.add(readTablePackage());
+                    break;
+                case ARSCHeader.XML_TYPE_TYPE:
+                case ARSCHeader.XML_TYPE_SPEC_TYPE:
+                    readTableTypeSpec();
+                    break;
+                case ARSCHeader.XML_TYPE_LIBRARY:
+                    readLibraryType();
+                    break;
+                case ARSCHeader.XML_TYPE_OVERLAY:
+                    readOverlaySpec();
+                    break;
+                case ARSCHeader.XML_TYPE_OVERLAY_POLICY:
+                    readOverlayPolicySpec();
+                    break;
+                case ARSCHeader.XML_TYPE_STAGED_ALIAS:
+                    readStagedAliasSpec();
+                    break;
+                default:
+                    break chunkLoop;
+            }
+        }
+
+        return (ResPackage[]) pkgs.toArray();
+    }
+
+    private void readStringPoolChunk() throws IOException, AndrolibException {
+        checkChunkType(ARSCHeader.RES_STRING_POOL_TYPE);
+        mTableStrings = StringBlock.read(mIn, mHeader.chunkSize);
 
         nextChunk();
-        for (int i = 0; i < packageCount; i++) {
-            mTypeIdOffset = 0;
-            packages[i] = readTablePackage();
-        }
-        return packages;
+    }
+
+    private void readTableChunk() throws IOException, AndrolibException {
+        checkChunkType(ARSCHeader.RES_TABLE_TYPE);
+        mIn.skipInt(); // packageCount
+
+        nextChunk();
+    }
+
+    private void readUnknownChunk() throws IOException, AndrolibException {
+        checkChunkType(ARSCHeader.RES_NULL_TYPE);
+
+        LOGGER.warning("Skipping unknown chunk data of size " + mHeader.chunkSize);
+        mHeader.skipChunk(mIn);
+
+        nextChunk();
     }
 
     private ResPackage readTablePackage() throws IOException, AndrolibException {
@@ -121,37 +177,13 @@ public class ARSCDecoder {
             LOGGER.warning("Please report this application to Apktool for a fix: https://github.com/iBotPeaches/Apktool/issues/1728");
         }
 
-        mTypeNames = StringBlock.read(mIn);
-        mSpecNames = StringBlock.read(mIn);
+        mTypeNames = StringBlock.read(mIn, mHeader.chunkSize);
+        mSpecNames = StringBlock.read(mIn, mHeader.chunkSize);
 
         mResId = id << 24;
         mPkg = new ResPackage(mResTable, id, name);
 
         nextChunk();
-
-        chunkLoop:
-        for (;;) {
-            switch (mHeader.type) {
-                case ARSCHeader.XML_TYPE_TYPE:
-                case ARSCHeader.XML_TYPE_SPEC_TYPE:
-                    readTableTypeSpec();
-                    break;
-                case ARSCHeader.XML_TYPE_LIBRARY:
-                    readLibraryType();
-                    break;
-                case ARSCHeader.XML_TYPE_OVERLAY:
-                    readOverlaySpec();
-                    break;
-                case ARSCHeader.XML_TYPE_OVERLAY_POLICY:
-                    readOverlayPolicySpec();
-                    break;
-                case ARSCHeader.XML_TYPE_STAGED_ALIAS:
-                    readStagedAliasSpec();
-                    break;
-                default:
-                    break chunkLoop;
-            }
-        }
 
         return mPkg;
     }
@@ -614,11 +646,6 @@ public class ARSCDecoder {
             throw new AndrolibException(String.format("Invalid chunk type: expected=0x%08x, got=0x%08x",
                     expectedType, mHeader.type));
         }
-    }
-
-    private void nextChunkCheckType(int expectedType) throws IOException, AndrolibException {
-        nextChunk();
-        checkChunkType(expectedType);
     }
 
     private final ExtDataInput mIn;
