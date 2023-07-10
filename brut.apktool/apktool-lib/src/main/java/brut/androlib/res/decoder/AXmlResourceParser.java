@@ -286,7 +286,7 @@ public class AXmlResourceParser implements XmlResourceParser {
             if (resId.pkgId == PRIVATE_PKG_ID) {
                 value = getNonDefaultNamespaceUri(offset);
             } else {
-                value = android_ns;
+                value = "http://schemas.android.com/apk/res/android";
             }
         }
 
@@ -646,11 +646,11 @@ public class AXmlResourceParser implements XmlResourceParser {
     private void doNext() throws IOException {
         // Delayed initialization.
         if (m_strings == null) {
-            m_reader.skipCheckInt(CHUNK_AXML_FILE, CHUNK_AXML_FILE_BROKEN);
+            m_reader.skipCheckInt(CHUNK_AXML_FILE, CHUNK_AXML_FILE_BROKEN); // type
+            m_reader.skipInt(); // headerSize
+            int chunkSize = m_reader.readInt(); // chunkSize
 
-            // headerSize
-            m_reader.skipInt();
-            m_strings = StringBlock.read(m_reader, m_reader.readInt());
+            m_strings = StringBlock.read(m_reader, chunkSize);
             m_namespaces.increaseDepth();
             m_operational = true;
         }
@@ -773,7 +773,6 @@ public class AXmlResourceParser implements XmlResourceParser {
     private StringBlock m_strings;
     private int[] m_resourceIDs;
     private final NamespaceStack m_namespaces = new NamespaceStack();
-    private final String android_ns = "http://schemas.android.com/apk/res/android";
     private boolean m_decreaseDepth;
 
     // All values are essentially indices, e.g. m_name is an index of name in m_strings.

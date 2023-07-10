@@ -115,11 +115,14 @@ public class ARSCDecoder {
                     readStagedAliasSpec();
                     break;
                 default:
+                    if (mHeader.type != ARSCHeader.RES_NONE_TYPE) {
+                        LOGGER.severe(String.format("Unknown chunk type: %04x", mHeader.type));
+                    }
                     break chunkLoop;
             }
         }
 
-        return (ResPackage[]) pkgs.toArray();
+        return pkgs.toArray(new ResPackage[0]);
     }
 
     private void readStringPoolChunk() throws IOException, AndrolibException {
@@ -177,7 +180,9 @@ public class ARSCDecoder {
             LOGGER.warning("Please report this application to Apktool for a fix: https://github.com/iBotPeaches/Apktool/issues/1728");
         }
 
+        nextChunk();
         mTypeNames = StringBlock.read(mIn, mHeader.chunkSize);
+        nextChunk();
         mSpecNames = StringBlock.read(mIn, mHeader.chunkSize);
 
         mResId = id << 24;
@@ -272,7 +277,8 @@ public class ARSCDecoder {
     private ResTypeSpec readSingleTableTypeSpec() throws AndrolibException, IOException {
         checkChunkType(ARSCHeader.XML_TYPE_SPEC_TYPE);
         int id = mIn.readUnsignedByte();
-        mIn.skipBytes(3);
+        mIn.skipBytes(1); // reserved0
+        mIn.skipBytes(2); // reserved1
         int entryCount = mIn.readInt();
 
         if (mFlagsOffsets != null) {
