@@ -275,6 +275,14 @@ There is probably a more automated way to do this, but for now:
 3. `git fetch origin -v`
 4. `git checkout origin/master`
 
+#### Mac Patch
+
+Normally you'll be building this on a recent Mac OS that isn't supported. You'll want to follow these steps:
+
+1. `vim build/soong/cc/config/darwin_host.go`
+2. Find `darwinSupportedSdkVersions` array.
+3. Add number that corresponds to output of: `find /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs -iname "*.sdk"`
+
 ### Building the aapt1 (Legacy) binary.
 
 The steps below are different per flavor and operating system.
