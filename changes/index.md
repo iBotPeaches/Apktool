@@ -20,6 +20,7 @@ xxxx.xx.xx
  * Fix issue with aapt/aapt2 in edge cases waiting 15 seconds for output. ([Issue 3071](https://github.com/iBotPeaches/Apktool/pull/3071)) / (Thanks sv99)
  * Fix NPE when decoding namespace missing from string pool. ([Issue 3104](https://github.com/iBotPeaches/Apktool/issues/3104))
  * Fix preference order when bogus values fill spring pool instead preferring res table. ([Issue 2981](https://github.com/iBotPeaches/Apktool/issues/2981))
+ * Fix assembly with aapt1 when duplicate bag items are detected. ([Issue 1927](https://github.com/iBotPeaches/Apktool/issues/1927))
  * Refactor `brut.androlib.err` to `brut.androlib.exceptions` for standard naming convention of Exceptions. ([Issue 3088](https://github.com/iBotPeaches/Apktool/pull/3088)) / (Thanks sv99)
  * Refactor Build/Decode to work from common Config object. ([Issue 3091](https://github.com/iBotPeaches/Apktool/pull/3091)) / (Thanks sv99)
  * Refactor into `ApkBuilder` and `ApkDecoder` instead of generic `Androlib`. ([Issue 3103](https://github.com/iBotPeaches/Apktool/pull/3103)) / (Thanks sv99)
