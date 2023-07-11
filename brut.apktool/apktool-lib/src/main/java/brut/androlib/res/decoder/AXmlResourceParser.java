@@ -20,6 +20,7 @@ import android.content.res.XmlResourceParser;
 import android.util.TypedValue;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.data.ResID;
+import brut.androlib.res.data.arsc.ARSCHeader;
 import brut.androlib.res.data.axml.NamespaceStack;
 import brut.androlib.res.xml.ResXmlEncoders;
 import brut.util.ExtDataInput;
@@ -690,6 +691,12 @@ public class AXmlResourceParser implements XmlResourceParser {
                 continue;
             }
 
+            if (chunkType == ARSCHeader.RES_NULL_TYPE) {
+                // TODO - Skip unknown chunk.
+                LOGGER.warning("Skipping null chunk data.");
+                break;
+            }
+
             if (chunkType < CHUNK_XML_FIRST || chunkType > CHUNK_XML_LAST) {
                 throw new IOException("Invalid chunk type (" + chunkType + ").");
             }
@@ -701,9 +708,9 @@ public class AXmlResourceParser implements XmlResourceParser {
             }
 
             // Common header.
-            /* chunkSize */m_reader.skipInt();
+            m_reader.skipInt(); // chunkSize
             int lineNumber = m_reader.readInt();
-            /* 0xFFFFFFFF */m_reader.skipInt();
+            m_reader.skipInt(); // 0xFFFFFFFF
 
             if (chunkType == CHUNK_XML_START_NAMESPACE || chunkType == CHUNK_XML_END_NAMESPACE) {
                 if (chunkType == CHUNK_XML_START_NAMESPACE) {
@@ -711,8 +718,8 @@ public class AXmlResourceParser implements XmlResourceParser {
                     int uri = m_reader.readInt();
                     m_namespaces.push(prefix, uri);
                 } else {
-                    /* prefix */m_reader.skipInt();
-                    /* uri */m_reader.skipInt();
+                    m_reader.skipInt(); // prefix
+                    m_reader.skipInt(); // uri
                     m_namespaces.pop();
                 }
                 continue;
@@ -723,7 +730,7 @@ public class AXmlResourceParser implements XmlResourceParser {
             if (chunkType == CHUNK_XML_START_TAG) {
                 m_namespaceUri = m_reader.readInt();
                 m_name = m_reader.readInt();
-                /* flags? */m_reader.skipInt();
+                m_reader.skipInt(); // flags
                 int attributeCount = m_reader.readInt();
                 m_idAttribute = (attributeCount >>> 16) - 1;
                 attributeCount &= 0xFFFF;
@@ -750,8 +757,8 @@ public class AXmlResourceParser implements XmlResourceParser {
 
             if (chunkType == CHUNK_XML_TEXT) {
                 m_name = m_reader.readInt();
-                /* ? */m_reader.skipInt();
-                /* ? */m_reader.skipInt();
+                m_reader.skipInt();
+                m_reader.skipInt();
                 m_event = TEXT;
                 break;
             }
