@@ -72,16 +72,13 @@ public class ARSCDecoder {
     }
 
     private ResPackage[] readResourceTable() throws IOException, AndrolibException {
-        nextChunk();
-
-        return parseChunks();
-    }
-
-    private ResPackage[] parseChunks() throws IOException, AndrolibException {
         Set<ResPackage> pkgs = new LinkedHashSet<>();
+        ResTypeSpec typeSpec;
 
         chunkLoop:
         for (;;) {
+            nextChunk();
+
             switch (mHeader.type) {
                 case ARSCHeader.RES_NULL_TYPE:
                     readUnknownChunk();
@@ -99,8 +96,11 @@ public class ARSCDecoder {
                     pkgs.add(readTablePackage());
                     break;
                 case ARSCHeader.XML_TYPE_TYPE:
+                    readTableType();
+                    break;
                 case ARSCHeader.XML_TYPE_SPEC_TYPE:
-                    readTableTypeSpec();
+                    typeSpec = readTableSpecType();
+                    addTypeSpec(typeSpec);
                     break;
                 case ARSCHeader.XML_TYPE_LIBRARY:
                     readLibraryType();
@@ -122,21 +122,27 @@ public class ARSCDecoder {
             }
         }
 
+        if (mPkg.getResSpecCount() > 0) {
+            addMissingResSpecs();
+        }
+
+        // We've detected sparse resources, lets record this so we can rebuild in that same format (sparse/not)
+        // with aapt2. aapt1 will ignore this.
+        if (! mResTable.getSparseResources()) {
+            mResTable.setSparseResources(true);
+        }
+
         return pkgs.toArray(new ResPackage[0]);
     }
 
     private void readStringPoolChunk() throws IOException, AndrolibException {
         checkChunkType(ARSCHeader.RES_STRING_POOL_TYPE);
         mTableStrings = StringBlock.readWithoutChunk(mIn, mHeader.chunkSize);
-
-        nextChunk();
     }
 
     private void readTableChunk() throws IOException, AndrolibException {
         checkChunkType(ARSCHeader.RES_TABLE_TYPE);
         mIn.skipInt(); // packageCount
-
-        nextChunk();
     }
 
     private void readUnknownChunk() throws IOException, AndrolibException {
@@ -144,8 +150,6 @@ public class ARSCDecoder {
 
         LOGGER.warning("Skipping unknown chunk data of size " + mHeader.chunkSize);
         mHeader.skipChunk(mIn);
-
-        nextChunk();
     }
 
     private ResPackage readTablePackage() throws IOException, AndrolibException {
@@ -186,8 +190,6 @@ public class ARSCDecoder {
         mResId = id << 24;
         mPkg = new ResPackage(mResTable, id, name);
 
-        nextChunk();
-
         return mPkg;
     }
 
@@ -203,8 +205,6 @@ public class ARSCDecoder {
             packageName = mIn.readNullEndedString(128, true);
             LOGGER.info(String.format("Decoding Shared Library (%s), pkgId: %d", packageName, packageId));
         }
-
-        nextChunk();
     }
 
     private void readStagedAliasSpec() throws IOException {
@@ -213,8 +213,6 @@ public class ARSCDecoder {
         for (int i = 0; i < count; i++) {
             LOGGER.fine(String.format("Skipping staged alias stagedId (%h) finalId: %h", mIn.readInt(), mIn.readInt()));
         }
-
-        nextChunk();
     }
 
     private void readOverlaySpec() throws AndrolibException, IOException {
@@ -222,8 +220,6 @@ public class ARSCDecoder {
         String name = mIn.readNullEndedString(256, true);
         String actor = mIn.readNullEndedString(256, true);
         LOGGER.fine(String.format("Overlay name: \"%s\", actor: \"%s\")", name, actor));
-
-        nextChunk();
     }
 
     private void readOverlayPolicySpec() throws AndrolibException, IOException {
@@ -234,45 +230,9 @@ public class ARSCDecoder {
         for (int i = 0; i < count; i++) {
             LOGGER.fine(String.format("Skipping overlay (%h)", mIn.readInt()));
         }
-
-        nextChunk();
     }
 
-    private void readTableTypeSpec() throws AndrolibException, IOException {
-        mTypeSpec = readSingleTableTypeSpec();
-        addTypeSpec(mTypeSpec);
-
-        int type = nextChunk().type;
-        ResTypeSpec resTypeSpec;
-
-        while (type == ARSCHeader.XML_TYPE_SPEC_TYPE) {
-            resTypeSpec = readSingleTableTypeSpec();
-            addTypeSpec(resTypeSpec);
-            type = nextChunk().type;
-
-            // We've detected sparse resources, lets record this so we can rebuild in that same format (sparse/not)
-            // with aapt2. aapt1 will ignore this.
-            if (! mResTable.getSparseResources()) {
-                mResTable.setSparseResources(true);
-            }
-        }
-
-        while (type == ARSCHeader.XML_TYPE_TYPE) {
-            readTableType();
-
-            // skip "TYPE 8 chunks" and/or padding data at the end of this chunk
-            if (mCountIn.getCount() < mHeader.endPosition) {
-                LOGGER.warning("Unknown data detected. Skipping: " + (mHeader.endPosition - mCountIn.getCount()) + " byte(s)");
-                mCountIn.skip(mHeader.endPosition - mCountIn.getCount());
-            }
-
-            type = nextChunk().type;
-
-            addMissingResSpecs();
-        }
-    }
-
-    private ResTypeSpec readSingleTableTypeSpec() throws AndrolibException, IOException {
+    private ResTypeSpec readTableSpecType() throws AndrolibException, IOException {
         checkChunkType(ARSCHeader.XML_TYPE_SPEC_TYPE);
         int id = mIn.readUnsignedByte();
         mIn.skipBytes(1); // reserved0
@@ -286,6 +246,7 @@ public class ARSCDecoder {
 		mIn.skipBytes(entryCount * 4); // flags
         mTypeSpec = new ResTypeSpec(mTypeNames.getString(id - 1), mResTable, mPkg, id, entryCount);
         mPkg.addType(mTypeSpec);
+
         return mTypeSpec;
     }
 
@@ -345,6 +306,12 @@ public class ARSCDecoder {
             mMissingResSpecMap.put(i, false);
             mResId = (mResId & 0xffff0000) | i;
             readEntry(readEntryData());
+        }
+
+        // skip "TYPE 8 chunks" and/or padding data at the end of this chunk
+        if (mCountIn.getCount() < mHeader.endPosition) {
+            long bytesSkipped = mCountIn.skip(mHeader.endPosition - mCountIn.getCount());
+            LOGGER.warning("Unknown data detected. Skipping: " + bytesSkipped + " byte(s)");
         }
 
         return mType;
