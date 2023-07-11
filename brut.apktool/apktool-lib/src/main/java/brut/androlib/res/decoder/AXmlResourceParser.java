@@ -646,11 +646,7 @@ public class AXmlResourceParser implements XmlResourceParser {
     private void doNext() throws IOException {
         // Delayed initialization.
         if (m_strings == null) {
-            m_reader.skipCheckInt(CHUNK_AXML_FILE, CHUNK_AXML_FILE_BROKEN); // type
-            m_reader.skipInt(); // headerSize
-            int chunkSize = m_reader.readInt(); // chunkSize
-
-            m_strings = StringBlock.read(m_reader, chunkSize);
+            m_strings = StringBlock.readWithChunk(m_reader);
             m_namespaces.increaseDepth();
             m_operational = true;
         }
@@ -792,8 +788,7 @@ public class AXmlResourceParser implements XmlResourceParser {
             ATTRIBUTE_IX_VALUE_TYPE = 3, ATTRIBUTE_IX_VALUE_DATA = 4,
             ATTRIBUTE_LENGTH = 5;
 
-    private static final int CHUNK_AXML_FILE = 0x00080003, CHUNK_AXML_FILE_BROKEN = 0x00080001,
-            CHUNK_RESOURCEIDS = 0x00080180, CHUNK_XML_FIRST = 0x00100100,
+    private static final int CHUNK_RESOURCEIDS = 0x00080180, CHUNK_XML_FIRST = 0x00100100,
             CHUNK_XML_START_NAMESPACE = 0x00100100,
             CHUNK_XML_END_NAMESPACE = 0x00100101,
             CHUNK_XML_START_TAG = 0x00100102, CHUNK_XML_END_TAG = 0x00100103,
