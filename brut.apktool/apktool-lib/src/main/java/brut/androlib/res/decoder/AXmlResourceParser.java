@@ -646,6 +646,9 @@ public class AXmlResourceParser implements XmlResourceParser {
     private void doNext() throws IOException {
         // Delayed initialization.
         if (m_strings == null) {
+            m_reader.skipInt(); // XML Chunk AXML Type
+            m_reader.skipInt(); // Chunk Size
+
             m_strings = StringBlock.readWithChunk(m_reader);
             m_namespaces.increaseDepth();
             m_operational = true;

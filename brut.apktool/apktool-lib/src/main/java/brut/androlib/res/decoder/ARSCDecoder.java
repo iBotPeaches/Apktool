@@ -180,10 +180,8 @@ public class ARSCDecoder {
             LOGGER.warning("Please report this application to Apktool for a fix: https://github.com/iBotPeaches/Apktool/issues/1728");
         }
 
-        nextChunk();
-        mTypeNames = StringBlock.readWithoutChunk(mIn, mHeader.chunkSize);
-        nextChunk();
-        mSpecNames = StringBlock.readWithoutChunk(mIn, mHeader.chunkSize);
+        mTypeNames = StringBlock.readWithChunk(mIn);
+        mSpecNames = StringBlock.readWithChunk(mIn);
 
         mResId = id << 24;
         mPkg = new ResPackage(mResTable, id, name);

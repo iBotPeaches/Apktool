@@ -32,7 +32,7 @@ import java.util.logging.Logger;
 public class StringBlock {
     public static StringBlock readWithChunk(ExtDataInput reader) throws IOException {
         reader.skipCheckShort(ARSCHeader.RES_STRING_POOL_TYPE);
-        reader.skipInt(); // headerSize
+        reader.skipShort(); // headerSize
         int chunkSize = reader.readInt();
 
         return readWithoutChunk(reader, chunkSize);
