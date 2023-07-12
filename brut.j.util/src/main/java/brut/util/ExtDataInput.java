@@ -29,7 +29,7 @@ public class ExtDataInput extends DataInputDelegate {
 
     public int[] readIntArray(int length) throws IOException {
         int[] array = new int[length];
-        for(int i = 0; i < length; i++) {
+        for (int i = 0; i < length; i++) {
             array[i] = readInt();
         }
         return array;
@@ -39,36 +39,20 @@ public class ExtDataInput extends DataInputDelegate {
         skipBytes(4);
     }
 
-    public void skipCheckInt(int expected1, int expected2) throws IOException {
-        int got = readInt();
-        if (got != expected1 && got != expected2) {
-            throw new IOException(String.format(
-                "Expected: 0x%08x or 0x%08x, got: 0x%08x", expected1, expected2, got));
-        }
+    public void skipShort() throws IOException {
+        skipBytes(2);
     }
 
     public void skipCheckShort(short expected) throws IOException {
         short got = readShort();
         if (got != expected) {
-            throw new IOException(String.format(
-                "Expected: 0x%08x, got: 0x%08x", expected, got));
+            throw new IOException(String.format("Expected: 0x%08x, got: 0x%08x", expected, got));
         }
     }
 
     public void skipCheckByte(byte expected) throws IOException {
         byte got = readByte();
         if (got != expected) {
-            throw new IOException(String.format(
-                    "Expected: 0x%08x, got: 0x%08x", expected, got));
-        }
-    }
-
-    public void skipCheckChunkTypeInt(int expected, int possible) throws IOException {
-        int got = readInt();
-
-        if (got == possible || got < expected) {
-            skipCheckChunkTypeInt(expected, -1);
-        } else if (got != expected) {
             throw new IOException(String.format("Expected: 0x%08x, got: 0x%08x", expected, got));
         }
     }
@@ -89,10 +73,9 @@ public class ExtDataInput extends DataInputDelegate {
         return total;
     }
 
-    public String readNullEndedString(int length, boolean fixed)
-            throws IOException {
+    public String readNullEndedString(int length, boolean fixed) throws IOException {
         StringBuilder string = new StringBuilder(16);
-        while(length-- != 0) {
+        while (length-- != 0) {
             short ch = readShort();
             if (ch == 0) {
                 break;

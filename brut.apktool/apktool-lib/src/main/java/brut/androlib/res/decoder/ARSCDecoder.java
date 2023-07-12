@@ -33,10 +33,7 @@ import java.io.DataInput;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Logger;
 
 public class ARSCDecoder {
@@ -50,7 +47,7 @@ public class ARSCDecoder {
             throws AndrolibException {
         try {
             ARSCDecoder decoder = new ARSCDecoder(arscStream, resTable, findFlagsOffsets, keepBroken);
-            ResPackage[] pkgs = decoder.readTableHeader();
+            ResPackage[] pkgs = decoder.readResourceTable();
             return new ARSCData(pkgs, decoder.mFlagsOffsets == null
                     ? null
                     : decoder.mFlagsOffsets.toArray(new FlagsOffset[0]));
@@ -74,19 +71,85 @@ public class ARSCDecoder {
         mKeepBroken = keepBroken;
     }
 
-    private ResPackage[] readTableHeader() throws IOException, AndrolibException {
-        nextChunkCheckType(ARSCHeader.TYPE_TABLE);
-        int packageCount = mIn.readInt();
+    private ResPackage[] readResourceTable() throws IOException, AndrolibException {
+        Set<ResPackage> pkgs = new LinkedHashSet<>();
+        ResTypeSpec typeSpec;
 
-        mTableStrings = StringBlock.read(mIn);
-        ResPackage[] packages = new ResPackage[packageCount];
+        chunkLoop:
+        for (;;) {
+            nextChunk();
 
-        nextChunk();
-        for (int i = 0; i < packageCount; i++) {
-            mTypeIdOffset = 0;
-            packages[i] = readTablePackage();
+            switch (mHeader.type) {
+                case ARSCHeader.RES_NULL_TYPE:
+                    readUnknownChunk();
+                    break;
+                case ARSCHeader.RES_STRING_POOL_TYPE:
+                    readStringPoolChunk();
+                    break;
+                case ARSCHeader.RES_TABLE_TYPE:
+                    readTableChunk();
+                    break;
+
+                // Chunk types in RES_TABLE_TYPE
+                case ARSCHeader.XML_TYPE_PACKAGE:
+                    mTypeIdOffset = 0;
+                    pkgs.add(readTablePackage());
+                    break;
+                case ARSCHeader.XML_TYPE_TYPE:
+                    readTableType();
+                    break;
+                case ARSCHeader.XML_TYPE_SPEC_TYPE:
+                    typeSpec = readTableSpecType();
+                    addTypeSpec(typeSpec);
+                    break;
+                case ARSCHeader.XML_TYPE_LIBRARY:
+                    readLibraryType();
+                    break;
+                case ARSCHeader.XML_TYPE_OVERLAY:
+                    readOverlaySpec();
+                    break;
+                case ARSCHeader.XML_TYPE_OVERLAY_POLICY:
+                    readOverlayPolicySpec();
+                    break;
+                case ARSCHeader.XML_TYPE_STAGED_ALIAS:
+                    readStagedAliasSpec();
+                    break;
+                default:
+                    if (mHeader.type != ARSCHeader.RES_NONE_TYPE) {
+                        LOGGER.severe(String.format("Unknown chunk type: %04x", mHeader.type));
+                    }
+                    break chunkLoop;
+            }
         }
-        return packages;
+
+        if (mPkg.getResSpecCount() > 0) {
+            addMissingResSpecs();
+        }
+
+        // We've detected sparse resources, lets record this so we can rebuild in that same format (sparse/not)
+        // with aapt2. aapt1 will ignore this.
+        if (! mResTable.getSparseResources()) {
+            mResTable.setSparseResources(true);
+        }
+
+        return pkgs.toArray(new ResPackage[0]);
+    }
+
+    private void readStringPoolChunk() throws IOException, AndrolibException {
+        checkChunkType(ARSCHeader.RES_STRING_POOL_TYPE);
+        mTableStrings = StringBlock.readWithoutChunk(mIn, mHeader.chunkSize);
+    }
+
+    private void readTableChunk() throws IOException, AndrolibException {
+        checkChunkType(ARSCHeader.RES_TABLE_TYPE);
+        mIn.skipInt(); // packageCount
+    }
+
+    private void readUnknownChunk() throws IOException, AndrolibException {
+        checkChunkType(ARSCHeader.RES_NULL_TYPE);
+
+        LOGGER.warning("Skipping unknown chunk data of size " + mHeader.chunkSize);
+        mHeader.skipChunk(mIn);
     }
 
     private ResPackage readTablePackage() throws IOException, AndrolibException {
@@ -121,37 +184,11 @@ public class ARSCDecoder {
             LOGGER.warning("Please report this application to Apktool for a fix: https://github.com/iBotPeaches/Apktool/issues/1728");
         }
 
-        mTypeNames = StringBlock.read(mIn);
-        mSpecNames = StringBlock.read(mIn);
+        mTypeNames = StringBlock.readWithChunk(mIn);
+        mSpecNames = StringBlock.readWithChunk(mIn);
 
         mResId = id << 24;
         mPkg = new ResPackage(mResTable, id, name);
-
-        nextChunk();
-
-        chunkLoop:
-        for (;;) {
-            switch (mHeader.type) {
-                case ARSCHeader.XML_TYPE_TYPE:
-                case ARSCHeader.XML_TYPE_SPEC_TYPE:
-                    readTableTypeSpec();
-                    break;
-                case ARSCHeader.XML_TYPE_LIBRARY:
-                    readLibraryType();
-                    break;
-                case ARSCHeader.XML_TYPE_OVERLAY:
-                    readOverlaySpec();
-                    break;
-                case ARSCHeader.XML_TYPE_OVERLAY_POLICY:
-                    readOverlayPolicySpec();
-                    break;
-                case ARSCHeader.XML_TYPE_STAGED_ALIAS:
-                    readStagedAliasSpec();
-                    break;
-                default:
-                    break chunkLoop;
-            }
-        }
 
         return mPkg;
     }
@@ -168,8 +205,6 @@ public class ARSCDecoder {
             packageName = mIn.readNullEndedString(128, true);
             LOGGER.info(String.format("Decoding Shared Library (%s), pkgId: %d", packageName, packageId));
         }
-
-        nextChunk();
     }
 
     private void readStagedAliasSpec() throws IOException {
@@ -178,8 +213,6 @@ public class ARSCDecoder {
         for (int i = 0; i < count; i++) {
             LOGGER.fine(String.format("Skipping staged alias stagedId (%h) finalId: %h", mIn.readInt(), mIn.readInt()));
         }
-
-        nextChunk();
     }
 
     private void readOverlaySpec() throws AndrolibException, IOException {
@@ -187,8 +220,6 @@ public class ARSCDecoder {
         String name = mIn.readNullEndedString(256, true);
         String actor = mIn.readNullEndedString(256, true);
         LOGGER.fine(String.format("Overlay name: \"%s\", actor: \"%s\")", name, actor));
-
-        nextChunk();
     }
 
     private void readOverlayPolicySpec() throws AndrolibException, IOException {
@@ -199,48 +230,13 @@ public class ARSCDecoder {
         for (int i = 0; i < count; i++) {
             LOGGER.fine(String.format("Skipping overlay (%h)", mIn.readInt()));
         }
-
-        nextChunk();
     }
 
-    private void readTableTypeSpec() throws AndrolibException, IOException {
-        mTypeSpec = readSingleTableTypeSpec();
-        addTypeSpec(mTypeSpec);
-
-        int type = nextChunk().type;
-        ResTypeSpec resTypeSpec;
-
-        while (type == ARSCHeader.XML_TYPE_SPEC_TYPE) {
-            resTypeSpec = readSingleTableTypeSpec();
-            addTypeSpec(resTypeSpec);
-            type = nextChunk().type;
-
-            // We've detected sparse resources, lets record this so we can rebuild in that same format (sparse/not)
-            // with aapt2. aapt1 will ignore this.
-            if (! mResTable.getSparseResources()) {
-                mResTable.setSparseResources(true);
-            }
-        }
-
-        while (type == ARSCHeader.XML_TYPE_TYPE) {
-            readTableType();
-
-            // skip "TYPE 8 chunks" and/or padding data at the end of this chunk
-            if (mCountIn.getCount() < mHeader.endPosition) {
-                LOGGER.warning("Unknown data detected. Skipping: " + (mHeader.endPosition - mCountIn.getCount()) + " byte(s)");
-                mCountIn.skip(mHeader.endPosition - mCountIn.getCount());
-            }
-
-            type = nextChunk().type;
-
-            addMissingResSpecs();
-        }
-    }
-
-    private ResTypeSpec readSingleTableTypeSpec() throws AndrolibException, IOException {
+    private ResTypeSpec readTableSpecType() throws AndrolibException, IOException {
         checkChunkType(ARSCHeader.XML_TYPE_SPEC_TYPE);
         int id = mIn.readUnsignedByte();
-        mIn.skipBytes(3);
+        mIn.skipBytes(1); // reserved0
+        mIn.skipBytes(2); // reserved1
         int entryCount = mIn.readInt();
 
         if (mFlagsOffsets != null) {
@@ -250,6 +246,7 @@ public class ARSCDecoder {
 		mIn.skipBytes(entryCount * 4); // flags
         mTypeSpec = new ResTypeSpec(mTypeNames.getString(id - 1), mResTable, mPkg, id, entryCount);
         mPkg.addType(mTypeSpec);
+
         return mTypeSpec;
     }
 
@@ -309,6 +306,12 @@ public class ARSCDecoder {
             mMissingResSpecMap.put(i, false);
             mResId = (mResId & 0xffff0000) | i;
             readEntry(readEntryData());
+        }
+
+        // skip "TYPE 8 chunks" and/or padding data at the end of this chunk
+        if (mCountIn.getCount() < mHeader.endPosition) {
+            long bytesSkipped = mCountIn.skip(mHeader.endPosition - mCountIn.getCount());
+            LOGGER.warning("Unknown data detected. Skipping: " + bytesSkipped + " byte(s)");
         }
 
         return mType;
@@ -614,11 +617,6 @@ public class ARSCDecoder {
             throw new AndrolibException(String.format("Invalid chunk type: expected=0x%08x, got=0x%08x",
                     expectedType, mHeader.type));
         }
-    }
-
-    private void nextChunkCheckType(int expectedType) throws IOException, AndrolibException {
-        nextChunk();
-        checkChunkType(expectedType);
     }
 
     private final ExtDataInput mIn;

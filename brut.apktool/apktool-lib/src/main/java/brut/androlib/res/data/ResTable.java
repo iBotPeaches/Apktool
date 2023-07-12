@@ -364,7 +364,7 @@ public class ResTable {
         }
 
         // only put rename-manifest-package into apktool.yml, if the change will be required
-        if (!renamed.equalsIgnoreCase(original)) {
+        if (renamed != null && !renamed.equalsIgnoreCase(original)) {
             mApkInfo.packageInfo.renameManifestPackage = renamed;
         }
         mApkInfo.packageInfo.forcedPackageId = String.valueOf(id);

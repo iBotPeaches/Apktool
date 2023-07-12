@@ -16,6 +16,7 @@
  */
 package brut.androlib.res.decoder;
 
+import brut.androlib.res.data.arsc.ARSCHeader;
 import brut.androlib.res.xml.ResXmlEncoders;
 import brut.util.ExtDataInput;
 import com.google.common.annotations.VisibleForTesting;
@@ -29,19 +30,15 @@ import java.util.List;
 import java.util.logging.Logger;
 
 public class StringBlock {
-
-    /**
-     * Reads whole (including chunk type) string block from stream. Stream must
-     * be at the chunk type.
-     * @param reader ExtDataInput
-     * @return StringBlock
-     *
-     * @throws IOException Parsing resources.arsc error
-     */
-    public static StringBlock read(ExtDataInput reader) throws IOException {
-        reader.skipCheckChunkTypeInt(CHUNK_STRINGPOOL_TYPE, CHUNK_NULL_TYPE);
+    public static StringBlock readWithChunk(ExtDataInput reader) throws IOException {
+        reader.skipCheckShort(ARSCHeader.RES_STRING_POOL_TYPE);
+        reader.skipShort(); // headerSize
         int chunkSize = reader.readInt();
 
+        return readWithoutChunk(reader, chunkSize);
+    }
+
+    public static StringBlock readWithoutChunk(ExtDataInput reader, int chunkSize) throws IOException {
         // ResStringPool_header
         int stringCount = reader.readInt();
         int styleCount = reader.readInt();
@@ -277,8 +274,5 @@ public class StringBlock {
     private final CharsetDecoder CESU8_DECODER = Charset.forName("CESU8").newDecoder();
     private static final Logger LOGGER = Logger.getLogger(StringBlock.class.getName());
 
-    // ResChunk_header = header.type (0x0001) + header.headerSize (0x001C)
-    private static final int CHUNK_STRINGPOOL_TYPE = 0x001C0001;
-    private static final int CHUNK_NULL_TYPE = 0x00000000;
     private static final int UTF8_FLAG = 0x00000100;
 }

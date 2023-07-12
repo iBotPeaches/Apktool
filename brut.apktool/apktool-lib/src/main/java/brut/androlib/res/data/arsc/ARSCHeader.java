@@ -43,16 +43,22 @@ public class ARSCHeader {
         try {
             type = in.readShort();
         } catch (EOFException ex) {
-            return new ARSCHeader(TYPE_NONE, 0, 0, countIn.getCount());
+            return new ARSCHeader(RES_NONE_TYPE, 0, 0, countIn.getCount());
         }
         return new ARSCHeader(type, in.readShort(), in.readInt(), start);
     }
 
-    public final static short TYPE_NONE = -1;
-    public final static short TYPE_STRING_POOL = 0x0001;
-    public final static short TYPE_TABLE = 0x0002;
-    public final static short TYPE_XML = 0x0003;
+    public void skipChunk(ExtDataInput in) throws IOException {
+        in.skipBytes(chunkSize - headerSize);
+    }
 
+    public final static short RES_NONE_TYPE = -1;
+    public final static short RES_NULL_TYPE = 0x0000;
+    public final static short RES_STRING_POOL_TYPE = 0x0001;
+    public final static short RES_TABLE_TYPE = 0x0002;
+    public final static short RES_XML_TYPE = 0x0003;
+
+    // RES_TABLE_TYPE Chunks
     public final static short XML_TYPE_PACKAGE = 0x0200;
     public final static short XML_TYPE_TYPE = 0x0201;
     public final static short XML_TYPE_SPEC_TYPE = 0x0202;
@@ -60,4 +66,14 @@ public class ARSCHeader {
     public final static short XML_TYPE_OVERLAY = 0x0204;
     public final static short XML_TYPE_OVERLAY_POLICY = 0x0205;
     public final static short XML_TYPE_STAGED_ALIAS = 0x0206;
+
+    // RES_XML_TYPE Chunks
+    public final static short RES_XML_FIRST_CHUNK_TYPE = 0x0100;
+    public final static short RES_XML_START_NAMESPACE_TYPE = 0x0100;
+    public final static short RES_XML_END_NAMESPACE_TYPE = 0x0101;
+    public final static short RES_XML_START_ELEMENT_TYPE = 0x0102;
+    public final static short RES_XML_END_ELEMENT_TYPE = 0x0103;
+    public final static short RES_XML_CDATA_TYPE = 0x0104;
+    public final static short RES_XML_LAST_CHUNK_TYPE = 0x017f;
+    public final static short RES_XML_RESOURCE_MAP_TYPE = 0x0180;
 }
