@@ -686,12 +686,6 @@ public class AXmlResourceParser implements XmlResourceParser {
                 continue;
             }
 
-            if (chunkType == ARSCHeader.RES_NULL_TYPE) {
-                // TODO - Skip unknown chunk.
-                LOGGER.warning("Skipping null chunk data.");
-                break;
-            }
-
             if (chunkType < ARSCHeader.RES_XML_FIRST_CHUNK_TYPE || chunkType > ARSCHeader.RES_XML_LAST_CHUNK_TYPE) {
                 throw new IOException("Invalid chunk type (" + chunkType + ").");
             }
