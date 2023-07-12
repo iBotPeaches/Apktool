@@ -190,19 +190,20 @@ public class ResourcesDecoder {
         // compare resources.arsc package name to the one present in AndroidManifest
         ResPackage resPackage = resTable.getCurrentResPackage();
         String pkgOriginal = resPackage.getName();
-        String packageRenamed = resTable.getPackageRenamed();
+        String pkgRenamed = resTable.getPackageRenamed();
 
         resTable.setPackageId(resPackage.getId());
         resTable.setPackageOriginal(pkgOriginal);
 
         // 1) Check if pkgOriginal is null (empty resources.arsc)
-        // 2) Check if pkgOriginal === mPackageRenamed
-        // 3) Check if pkgOriginal is ignored via IGNORED_PACKAGES
-        if (pkgOriginal == null || pkgOriginal.equalsIgnoreCase(packageRenamed)
+        // 2) Check if pkgRenamed is null
+        // 3) Check if pkgOriginal === mPackageRenamed
+        // 4) Check if pkgOriginal is ignored via IGNORED_PACKAGES
+        if (pkgOriginal == null || pkgRenamed == null || pkgOriginal.equalsIgnoreCase(pkgRenamed)
             || (Arrays.asList(IGNORED_PACKAGES).contains(pkgOriginal))) {
             LOGGER.info("Regular manifest package...");
         } else {
-            LOGGER.info("Renamed manifest package found! Replacing " + packageRenamed + " with " + pkgOriginal);
+            LOGGER.info("Renamed manifest package found! Replacing " + pkgRenamed + " with " + pkgOriginal);
             ResXmlPatcher.renameManifestPackage(new File(filePath), pkgOriginal);
         }
     }
