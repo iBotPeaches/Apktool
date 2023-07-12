@@ -135,8 +135,7 @@ public class AXmlResourceParser implements XmlResourceParser {
     }
 
     @Override
-    public void require(int type, String namespace, String name)
-            throws XmlPullParserException, IOException {
+    public void require(int type, String namespace, String name) throws XmlPullParserException {
         if (type != getEventType() || (namespace != null && !namespace.equals(getNamespace()))
                 || (name != null && !name.equals(getName()))) {
             throw new XmlPullParserException(TYPES[type] + " is expected.", this, null);
@@ -521,13 +520,11 @@ public class AXmlResourceParser implements XmlResourceParser {
 
     @Override
     public int getAttributeListValue(int index, String[] options, int defaultValue) {
-        // TODO implement
         return 0;
     }
 
     @Override
     public int getAttributeListValue(String namespace, String attribute, String[] options, int defaultValue) {
-        // TODO implement
         return 0;
     }
 
@@ -588,8 +585,7 @@ public class AXmlResourceParser implements XmlResourceParser {
     }
 
     @Override
-    public void setProperty(String name, Object value)
-            throws XmlPullParserException {
+    public void setProperty(String name, Object value) throws XmlPullParserException {
         throw new XmlPullParserException(E_NOT_SUPPORTED);
     }
 
@@ -599,8 +595,7 @@ public class AXmlResourceParser implements XmlResourceParser {
     }
 
     @Override
-    public void setFeature(String name, boolean value)
-            throws XmlPullParserException {
+    public void setFeature(String name, boolean value) throws XmlPullParserException {
         throw new XmlPullParserException(E_NOT_SUPPORTED);
     }
 
@@ -645,7 +640,6 @@ public class AXmlResourceParser implements XmlResourceParser {
     }
 
     private void doNext() throws IOException {
-        // Delayed initialization.
         if (mStringBlock == null) {
             mIn.skipInt(); // XML Chunk AXML Type
             mIn.skipInt(); // Chunk Size
@@ -731,7 +725,7 @@ public class AXmlResourceParser implements XmlResourceParser {
                 mNamespaceIndex = mIn.readInt();
                 mNameIndex = mIn.readInt();
                 mIn.skipShort(); // attributeStart
-                mIn.skipShort(); // attributeSize
+                int attributeSize = mIn.readShort();
                 int attributeCount = mIn.readShort();
                 mIdIndex = mIn.readShort();
                 mClassIndex = mIn.readShort();
@@ -741,6 +735,17 @@ public class AXmlResourceParser implements XmlResourceParser {
                     mAttributes[i] = (mAttributes[i] >>> 24);
                     i += ATTRIBUTE_LENGTH;
                 }
+
+                int byteAttrSizeRead = (attributeCount * ATTRIBUTE_LENGTH) * 4;
+                int byteAttrSizeReported = (attributeSize * attributeCount);
+
+                // Check for misleading chunk sizes
+                if (byteAttrSizeRead < byteAttrSizeReported) {
+                    int bytesToSkip = byteAttrSizeReported - byteAttrSizeRead;
+                    mIn.skipBytes(bytesToSkip);
+                    LOGGER.fine("Skipping " + bytesToSkip + " unknown bytes in attributes area.");
+                }
+
                 mNamespaces.increaseDepth();
                 mEvent = START_TAG;
                 break;
@@ -780,7 +785,7 @@ public class AXmlResourceParser implements XmlResourceParser {
     private final NamespaceStack mNamespaces = new NamespaceStack();
     private boolean m_decreaseDepth;
 
-    // All values are essentially indices, e.g. m_name is an index of name in m_strings.
+    // All values are essentially indices, e.g. mNameIndex is an index of name in mStringBlock.
     private int mEvent;
     private int mLineNumber;
     private int mNameIndex;
@@ -792,10 +797,14 @@ public class AXmlResourceParser implements XmlResourceParser {
 
     private final static Logger LOGGER = Logger.getLogger(AXmlResourceParser.class.getName());
     private static final String E_NOT_SUPPORTED = "Method is not supported.";
-    private static final int ATTRIBUTE_IX_NAMESPACE_URI = 0,
-            ATTRIBUTE_IX_NAME = 1, ATTRIBUTE_IX_VALUE_STRING = 2,
-            ATTRIBUTE_IX_VALUE_TYPE = 3, ATTRIBUTE_IX_VALUE_DATA = 4,
-            ATTRIBUTE_LENGTH = 5;
+
+    // ResXMLTree_attribute
+    private static final int ATTRIBUTE_IX_NAMESPACE_URI = 0; // ns
+    private static final int ATTRIBUTE_IX_NAME = 1; // name
+    private static final int ATTRIBUTE_IX_VALUE_STRING = 2; // rawValue
+    private static final int ATTRIBUTE_IX_VALUE_TYPE = 3; // (size/res0/dataType)
+    private static final int ATTRIBUTE_IX_VALUE_DATA = 4; // data
+    private static final int ATTRIBUTE_LENGTH = 5;
 
     private static final int PRIVATE_PKG_ID = 0x7F;
 }
