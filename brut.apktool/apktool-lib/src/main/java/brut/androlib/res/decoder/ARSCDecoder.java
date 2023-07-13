@@ -500,13 +500,14 @@ public class ARSCDecoder {
         if (size >= 52) {
             screenLayout2 = mIn.readByte();
             colorMode = mIn.readByte();
-            mIn.skipBytes(2); // reserved padding
+            mIn.skipBytes(2); // screenConfigPad2
             read = 52;
         }
 
-        if (size >= 56) {
-            mIn.skipBytes(4);
-            read = 56;
+        if (size > 52) {
+            int length = size - read;
+            mIn.skipBytes(length); // localeNumberingSystem
+            read += length;
         }
 
         int exceedingSize = size - KNOWN_CONFIG_BYTES;
@@ -557,7 +558,7 @@ public class ARSCDecoder {
     private String readScriptOrVariantChar(int length) throws IOException {
         StringBuilder string = new StringBuilder(16);
 
-        while(length-- != 0) {
+        while (length-- != 0) {
             short ch = mIn.readByte();
             if (ch == 0) {
                 break;
@@ -641,7 +642,7 @@ public class ARSCDecoder {
     private final static short ENTRY_FLAG_PUBLIC = 0x0002;
     private final static short ENTRY_FLAG_WEAK = 0x0004;
 
-    private static final int KNOWN_CONFIG_BYTES = 56;
+    private static final int KNOWN_CONFIG_BYTES = 64;
 
     private static final Logger LOGGER = Logger.getLogger(ARSCDecoder.class.getName());
 }
