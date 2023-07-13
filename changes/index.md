@@ -22,6 +22,7 @@ xxxx.xx.xx
  * Fix preference order when bogus values fill spring pool instead preferring res table. ([Issue 2981](https://github.com/iBotPeaches/Apktool/issues/2981))
  * Fix assembly with aapt1 when duplicate bag items are detected. ([Issue 1927](https://github.com/iBotPeaches/Apktool/issues/1927), [Issue 2484](https://github.com/iBotPeaches/Apktool/issues/2484))
  * Fix config flag support for 64 byte header, adding `localeNumberingSystem`. ([Issue 3133](https://github.com/iBotPeaches/Apktool/pull/3133))
+ * Fix issue crashing out when reading entries past chunk end. ([Issue 3036](https://github.com/iBotPeaches/Apktool/issues/3036))
  * Refactor `brut.androlib.err` to `brut.androlib.exceptions` for standard naming convention of Exceptions. ([Issue 3088](https://github.com/iBotPeaches/Apktool/pull/3088)) / (Thanks sv99)
  * Refactor Build/Decode to work from common Config object. ([Issue 3091](https://github.com/iBotPeaches/Apktool/pull/3091)) / (Thanks sv99)
  * Refactor into `ApkBuilder` and `ApkDecoder` instead of generic `Androlib`. ([Issue 3103](https://github.com/iBotPeaches/Apktool/pull/3103)) / (Thanks sv99)
