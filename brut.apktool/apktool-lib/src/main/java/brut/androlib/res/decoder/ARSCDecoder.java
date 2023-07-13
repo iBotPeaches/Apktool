@@ -305,6 +305,16 @@ public class ARSCDecoder {
             }
             mMissingResSpecMap.put(i, false);
             mResId = (mResId & 0xffff0000) | i;
+
+            // As seen in some recent APKs - there are more entries reported than can fit in the chunk.
+            if (mCountIn.getCount() == mHeader.endPosition) {
+                int remainingEntries = entryCount - i;
+                LOGGER.warning(String.format("End of chunk hit. Skipping remaining entries (%d) in type: %s",
+                    remainingEntries, mTypeSpec.getName())
+                );
+                break;
+            }
+
             readEntry(readEntryData());
         }
 
