@@ -1,0 +1,23 @@
+---
+slug: apktool-1.3.2
+title: Apktool 1.3.2
+authors: broo2s
+tags: [release]
+---
+
+- Contains critical bug: [#211](https://github.com/iBotPeaches/Apktool/issues/211)
+- updated smali to `v1.2.4`
+- added support for API Level 8 resource qualifiers: night, car, etc. [#176](https://github.com/iBotPeaches/Apktool/issues/176)
+- added support for broken file-resources [#202](https://github.com/iBotPeaches/Apktool/issues/202)
+- don’t generate sdkVersion (`-v`) resource qualifiers if they're "natural" [#196](https://github.com/iBotPeaches/Apktool/issues/196)
+- always compress resources.arsc file [#178](https://github.com/iBotPeaches/Apktool/issues/178)
+- throw warnings instead of exceptions on unknown files inside smali dir [#188](https://github.com/iBotPeaches/Apktool/issues/188)
+- added support for resources using invalid/unknown config flags, e.g. from future APIs or added by manufacturer [#176](https://github.com/iBotPeaches/Apktool/issues/176)
+- added an option to keep broken resources to fix them manually [#176](https://github.com/iBotPeaches/Apktool/issues/176)
+- fixed case-sensitivity problems [#197](https://github.com/iBotPeaches/Apktool/issues/197)
+- fixed an issue when `*.9.png` doesn't have 9patch chunk in it [#170](https://github.com/iBotPeaches/Apktool/issues/170)
+- fixed NPE when there is a file without extension in drawable dir [#173](https://github.com/iBotPeaches/Apktool/issues/173)
+- fixed escaping of chars in XML style tags [#175](https://github.com/iBotPeaches/Apktool/issues/175)
+- fixed an error, when there are missing resources in a type, which does not have default config [XDA Thread](https://forum.xda-developers.com/showthread.php?p=7949440#post7949440)
+- try to use original value of XML attribute - instead of parsed one. Fixes an issue when apktool was decoding e.g. "01" as "1" [#187](https://github.com/iBotPeaches/Apktool/issues/187)
+- added more debugging info when omitting unknown config flags ("Config size > 32" message)
