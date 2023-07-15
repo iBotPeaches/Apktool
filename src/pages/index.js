@@ -16,7 +16,8 @@ function HomepageHeader() {
           <h1 className="hero__title">{siteConfig.title}</h1>
           <p className="hero__subtitle">{siteConfig.tagline}</p>
         </span>
-        <CodeBlock language="text">{`$ apktool d test.apk
+        <CodeBlock language="text">
+          {`$ apktool d test.apk
 I: Using Apktool 2.7.0 on test.apk
 I: Loading resource table...
 I: Decoding AndroidManifest.xml with resources...
