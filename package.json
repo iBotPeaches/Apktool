@@ -11,7 +11,9 @@
     "clear": "docusaurus clear",
     "serve": "docusaurus serve",
     "write-translations": "docusaurus write-translations",
-    "write-heading-ids": "docusaurus write-heading-ids"
+    "write-heading-ids": "docusaurus write-heading-ids",
+    "lint": "eslint ./docs/** ./blog/** ./src/**/*.js ./*.js",
+    "lint:fix": "eslint --fix ./docs/** ./blog/** ./src/**/*.js ./*.js"
   },
   "dependencies": {
     "@docusaurus/core": "2.4.1",
@@ -23,7 +25,13 @@
     "react-dom": "^17.0.2"
   },
   "devDependencies": {
-    "@docusaurus/module-type-aliases": "2.4.1"
+    "@docusaurus/eslint-plugin": "^2.4.1",
+    "@docusaurus/module-type-aliases": "2.4.1",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-mdx": "^2.1.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "eslint-plugin-yml": "^1.8.0",
+    "prettier": "^3.0.0"
   },
   "browserslist": {
     "production": [
