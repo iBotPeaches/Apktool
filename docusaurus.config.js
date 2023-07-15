@@ -25,17 +25,11 @@ const config = {
       ({
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
-          editUrl:
-            'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+          editUrl: 'https://github.com/iBotPeaches/Apktool/tree/',
         },
         blog: {
           showReadingTime: true,
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
-          editUrl:
-            'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+          editUrl: 'https://github.com/iBotPeaches/Apktool/tree/',
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
@@ -61,6 +55,7 @@ const config = {
             position: 'left',
             label: 'Docs',
           },
+          {to: '/docs/install', label: 'Install', position: 'left'},
           {to: '/blog', label: 'Releases', position: 'left'},
           {
             href: 'https://github.com/iBotPeaches/Apktool',
@@ -85,13 +80,18 @@ const config = {
             title: 'Community',
             items: [
               {
+                label: 'GitHub Discussions',
+                href: 'https://github.com/iBotPeaches/Apktool/discussions',
+              },
+              {
                 label: 'Stack Overflow',
                 href: 'https://stackoverflow.com/questions/tagged/apktool',
               },
-              {
-                label: 'Gitter',
-                href: 'https://app.gitter.im/#/room/#iBotPeaches_Apktool:gitter.im',
-              },
+            ],
+          },
+          {
+            title: 'Maintainer',
+            items: [
               {
                 label: 'Twitter',
                 href: 'https://twitter.com/iBotPeaches',
@@ -100,18 +100,9 @@ const config = {
                 label: 'Mastodon',
                 href: 'https://infosec.exchange/@iBotPeaches',
               },
-            ],
-          },
-          {
-            title: 'More',
-            items: [
               {
                 label: 'Blog',
-                to: '/blog',
-              },
-              {
-                label: 'GitHub',
-                href: 'https://github.com/iBotPeaches/Apktool',
+                href: 'https://connortumbleson.com/tag/apktool/',
               },
             ],
           },
