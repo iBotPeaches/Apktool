@@ -1,0 +1,153 @@
+---
+slug: apktool-2.0.0
+title: Apktool 2.0.0
+authors: [ibotpeaches, broo2s]
+tags: [release]
+---
+
+:::caution
+Major release. Breaking changes!
+
+- **Java 1.7 is required**
+- Update apktool to v2.0.0
+- aapt is now included inside the apktool binary. It's not required to maintain your own aapt install under $PATH. (However, features like `-a / --aapt` are still used and can override the internal aapt)
+- The addition of aapt replaces the need for separate aapt download packages. Helper Scripts may be found [here](https://github.com/iBotPeaches/Apktool/tree/master/scripts)
+- Remove framework `$HOME/apktool/framework/1.apk`
+- Eagle-eyed users will notice resources are now decoded before sources now. This is because we need to know the API version via the manifest for decoding the sources
+
+:::
+
+> This post was originally released at: https://connortumbleson.com/2015/04/20/apktool-v2-0-0-released and duplicated in part here for historical reasons.
+
+## Changes
+
+- **Android 5.1 support**
+- Updated smali/baksmali to `v2.0.5`
+- Updated gradle to `v2.1`
+- Fixed using `-c` to retain original manifest and META-INF folder. ([#118](https://github.com/iBotPeaches/Apktool/issues/118))
+- Fixed handling apks that have unknown files outside of standard aapt allowed resources. ([#174](https://github.com/iBotPeaches/Apktool/issues/174))
+- Fixed aapt incorrectly setting `pkgId`. ([#313](https://github.com/iBotPeaches/Apktool/issues/313)) / (Thanks M1cha)
+- Added new usage output to organize features / parameters. ([#514](https://github.com/iBotPeaches/Apktool/issues/514))
+- Fixed NPE from malformed 9patch images. ([#470](https://github.com/iBotPeaches/Apktool/issues/470)) / (Thanks Felipe Richards)
+- Fixed aapt requiring `versionName` and `versionCode` via parameter passing. ([#512](https://github.com/iBotPeaches/Apktool/issues/512))
+- Fixed common `aapt` problems by including an internal mac, win and linux aapt. ([#551](https://github.com/iBotPeaches/Apktool/issues/551))
+- Fixed decoding apks that had general access bit thrown. ([#550](https://github.com/iBotPeaches/Apktool/issues/550))
+- Fixed debug mode (`-d`) to fix smali debugging. ([#450](https://github.com/iBotPeaches/Apktool/issues/450)) / (Thanks Ryszard)
+- Adapted smali debugging output to make breakpoint setting easier across IDEs. ([#228](https://github.com/iBotPeaches/Apktool/issues/288)) / (Thanks Ryszard)
+- Fixed characters (`&` & `<`) from being double escaped in `<item>`'s of `arrays.xml`. ([#502](https://github.com/iBotPeaches/Apktool/issues/502))
+- Fixed "multiple substitution" errors with positional and exactly 1 non-positional argument. ([#371](https://github.com/iBotPeaches/Apktool/issues/371))
+- Fixed ignoring `--frame-path` on `[b]uild`. ([#538](https://github.com/iBotPeaches/Apktool/issues/538))
+- Fixed setting `android:debuggable` on debug apks. ([#507](https://github.com/iBotPeaches/Apktool/issues/507))
+- Fixed common "superclass" errors on debug mode. ([#451](https://github.com/iBotPeaches/Apktool/issues/451))
+- Fixed `pkgId` not being set in framework files. ([#569](https://github.com/iBotPeaches/Apktool/issues/569))
+- Added `-m` / `--match-original` feature to allow apks to match original. ([#580](https://github.com/iBotPeaches/Apktool/issues/580))
+- Fixed apks PNGs gaining brightness on rebuild. ([#437](https://github.com/iBotPeaches/Apktool/issues/437))
+- Added dexlib2 (smali2) into Apktool. ([#559](https://github.com/iBotPeaches/Apktool/issues/559))
+- Fixed windows builds caused by `java.nio`. ([#606](https://github.com/iBotPeaches/Apktool/issues/606))
+- Fixed error output being written to `stdout` instead of `stderr`. ([#620](https://github.com/iBotPeaches/Apktool/issues/620))
+- Fixed issue with smali filenames from being too long. ([#537](https://github.com/iBotPeaches/Apktool/issues/537)) / (Thanks JesusFreke)
+- Fixed issue with `INSTALL_FAILED_DEXOPT`. ([#634](https://github.com/iBotPeaches/Apktool/issues/634)) / (Thanks JesusFreke)
+- Fixed issue with apks with multiple packages. ([#583](https://github.com/iBotPeaches/Apktool/issues/583))
+- Fixed issue with decoding `.jar` files. ([#641](https://github.com/iBotPeaches/Apktool/issues/641))
+- Fixed issue with improperly labeling type of `<array>`'s. ([#660](https://github.com/iBotPeaches/Apktool/issues/660))
+- Fixed issue with truncated strings. ([#681](https://github.com/iBotPeaches/Apktool/issues/681)) / (Thanks jtmuhone)
+- Fixed issue with apks with multiple empty types via ignoring them. ([#688](https://github.com/iBotPeaches/Apktool/issues/688))
+- Fixed issue with apks with one package named `android` from decoding. ([#699](https://github.com/iBotPeaches/Apktool/issues/699))
+- Fixed StringBlock by making it thread safe. ([#711](https://github.com/iBotPeaches/Apktool/issues/711)) / (Thanks aluedeke)
+- Fixed truncated `UTF-16` strings. ([#349](https://github.com/iBotPeaches/Apktool/issues/349))
+- Spacing cleanup of 2014. ([#694](https://github.com/iBotPeaches/Apktool/issues/694))
+- Fixed style crash due to malformed styles. ([#307](https://github.com/iBotPeaches/Apktool/issues/307))
+- Fixed issue with unknown files being ignored that start with an accepted file name. ([#713](https://github.com/iBotPeaches/Apktool/issues/713))
+- Fixed issue with unknown files being ignored when `-r` was used. ([#716](https://github.com/iBotPeaches/Apktool/issues/716))
+- Fixed issue with renamed manifests such as (`android`, `com.htc` and `miui`). ([#719](https://github.com/iBotPeaches/Apktool/issues/719))
+- Fixed path issues with `UTF8` chars and unknown files. ([#736](https://github.com/iBotPeaches/Apktool/issues/736))
+- Fixed issue with renamed manifest (`com.lge`). ([#740](https://github.com/iBotPeaches/Apktool/issues/740))
+- Fixed incorrect typing of `<array>` items due to incorrect loop index. ([#520](https://github.com/iBotPeaches/Apktool/issues/520))
+- Fixed issue with `AndroidManifest.xml` missing attributes. ([#623](https://github.com/iBotPeaches/Apktool/issues/623))
+- Fixed issue with ignoring `formatted="false"` attribute in `<string-array>`'s. ([#786](https://github.com/iBotPeaches/Apktool/issues/786))
+- Fixed issue with multiple overlapping try catches. ([#748](https://github.com/iBotPeaches/Apktool/issues/784))
+- Fixed issue with apks with multiple `ResPackages` where default is not `pkgId` 0. ([#793](https://github.com/iBotPeaches/Apktool/issues/793))
+- Fixed issue with renamed manifest (`yi`). ([#791](https://github.com/iBotPeaches/Apktool/issues/791))
+- Fixed issue with apks with large StringPools failing to decode. ([#773](https://github.com/iBotPeaches/Apktool/issues/773))
+- Fixed issue with bad casting of `ResStringValue` to `ResAttr`. ([#587](https://github.com/iBotPeaches/Apktool/issues/587)) / (Thanks whydoubt)
+- Fixed issue with hardcoding 9 patches as `.png` when there are `.qmg`, `.spi`. ([#798](https://github.com/iBotPeaches/Apktool/issues/798))
+- Added support for Android 5.0 (Lollipop). ([#763](https://github.com/iBotPeaches/Apktool/issues/763))
+- Added support for `TYPE_DYNAMIC_REFERENCE`. ([#815](https://github.com/iBotPeaches/Apktool/issues/815))
+- Fixed issue with implicitly added version qualifiers. ([#823](https://github.com/iBotPeaches/Apktool/issues/823))
+- Added support for shared library apks. ([#822](https://github.com/iBotPeaches/Apktool/issues/822))
+- Fixed issue improperly casting strings that resembled filepaths to `ResFileValues`. ([#440](https://github.com/iBotPeaches/Apktool/issues/440))
+- Fixed issue with segfaulting `aapt`. ([#700](https://github.com/iBotPeaches/Apktool/issues/700))
+- Fixed issue with undefined attributes. ([#655](https://github.com/iBotPeaches/Apktool/issues/655))
+- Fixed issue with improper handling of `MNC_ZERO` which caused duplicated resources. ([#811](https://github.com/iBotPeaches/Apktool/issues/811))
+- Fixed warnings of "Cleaning up unclosed ZipFile...". ([#853](https://github.com/iBotPeaches/Apktool/issues/853))
+- Added support for downloading gradle binaries over `https`. ([#866](https://github.com/iBotPeaches/Apktool/issues/866))
+- Fixed issue when user has no access to `$HOME`. ([#513](https://github.com/iBotPeaches/Apktool/issues/513))
+- Added support for `BCP-47` localization tags. ([#870](https://github.com/iBotPeaches/Apktool/issues/870))
+- Fixed issue with double escaping of ampersands in `<`. ([#658](https://github.com/iBotPeaches/Apktool/pull/105)) / (Thanks jhornber)
+- Fixed issue with not respecting compression type of unknown files. ([#878](https://github.com/iBotPeaches/Apktool/issues/878)) / (Thanks simtel12)
+- Fixed issue with apktool branding apks via `platformBuildVersion[Code/Name]`. ([#890](https://github.com/iBotPeaches/Apktool/issues/890))
+- Fixed issue when multiple dex files were ignored using `-s`. ([#904](https://github.com/iBotPeaches/Apktool/issues/904))
+- Fixed issue with `@string` references in `<provider>` attributes from preventing apk install. ([#636](https://github.com/iBotPeaches/Apktool/issues/636))
+- Fixed issue with decoding `.spi` files as 9 patch images. (Thanks Furniel)
+- Fixed issue with APKs with multiple dex files.
+- Fixed issue using Apktool without smali/baksmali.
+- Fixed issue using non URI standard characters in apk name. (Thanks rover12421)
+- Added version output during decode/build operations to quickly identify apktool version.
+- Fixed NPE error when using `.odex` files with `--no-src` specified. (Thanks Rodrigo Chiossi)
+- Fixed locale problems when locale changes meaning of windows `.bat` script. (Thanks Adem666)
+- Fixed issue when `-r` was used with no `/res` folder present. (Thanks chrisch1974)
+
+## Parameter Changes
+
+- Smali/baksmali 2.0 are included. This is a big change from 1.4.2. Please read the smali updates [here](https://github.com/JesusFreke/smali/wiki/SmaliBaksmali20) for more information
+- `-o / --output` is now used for the output of apk/directory
+- `-t / --tag` is required for tagging framework files
+- `-advance / --advanced` will launch advanced parameters and information on the usage output
+- `-m / --match-original` is a new feature for apk analysis. This retains the apk in nearly the original format, but will likely make the rebuild not work due to ignoring the changes that newer aapt requires
+- After `[d]ecode`, there will be new folders (original / unknown) in the decoded apk folder
+- **original** = `META-INF folder` / `AndroidManifest.xml`, which are needed to retain the signature of apks to prevent needing to resign. Used with `-c / --copy-original` on `[b]uild`
+- **unknown** = Files/folders that are not part of the standard AOSP build procedure. These files will be injected back into the rebuilt APK.
+- `apktool.yml` collects more information than the last version
+- `SdkInfo` - Used to repopulate the SDK information in `AndroidManifest.xml` since newer aapt requires version information to be passed via a parameter
+- `packageInfo` - Used to help support Android 4.2 renamed manifest feature. Automatically detects differences between resources and the manifest and performs automatic `--rename-manifest-package` on `[b]uild`
+- `versionInfo` - Used to repopulate the version information in `AndroidManifest.xml` since newer aapt requires version information to be passed via a parameter
+- `compressionType` - Used to determine the compression that `resources.arsc` had on the original APK in order to replicate during `[b]uild`
+- `unknownFiles` - Used to record the name/location of non-standard files in an APK in order to place them correctly on the rebuilt APK
+- `sharedLibrary` - Used to help support Android 5 shared library feature by automatically detecting shared libraries and using `--shared-lib` on `[b]uild`
+
+### Parameter Comparison
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>Old (Apktool 1.5.x)</th>
+      <th>New (Apktool 2.0.x)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <kbd>apktool if framework-res.apk tag</kbd>
+      </td>
+      <td>
+        <kbd>apktool if framework-res.apk -t tag</kbd>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <kbd>apktool d framework-res.apk output</kbd>
+      </td>
+      <td>
+        <kbd>apktool d framework.res.apk -o output</kbd>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <kbd>apktool b output new.apk</kbd>
+      </td>
+      <td>
+        <kbd>apktool b output -o new.apk</kbd>
+      </td>
+    </tr>
+  </tbody>
+</table>
