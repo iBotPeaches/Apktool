@@ -95,7 +95,7 @@ const config = {
               {
                 label: 'IRC (Libera)',
                 href: 'https://web.libera.chat/#apktool',
-              }
+              },
             ],
           },
           {
