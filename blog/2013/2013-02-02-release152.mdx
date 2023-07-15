@@ -1,0 +1,18 @@
+---
+slug: apktool-1.5.2
+title: Apktool 1.5.2
+authors: ibotpeaches
+tags: [release]
+---
+
+- Output smali files to a folder named "smali" instead of "out". [#410](https://github.com/iBotPeaches/Apktool/issues/410)
+- Only show the `--aapt / -a` info in verbose mode.
+- Don't crash out if .git folder isn't present. Use SNAPSHOT-DEV instead. [#503](https://github.com/iBotPeaches/Apktool/issues/503)
+- Only store compressed resources.arsc if the original was compressed, otherwise STORE. [#178](https://github.com/iBotPeaches/Apktool/issues/178)
+- Moved build.gradle files to each subproject for more organization.
+- Prevented duplicated files in the final jar, saving around 1.2mb. [#505](https://github.com/iBotPeaches/Apktool/issues/505)
+- Added Proguard to reduce the final jar size from 6.2mb to 2.6mb.
+- Added a check for "aapt" in unit tests. [#506](https://github.com/iBotPeaches/Apktool/issues/506)
+- Added the ability to use `--frame-path` on `if|install-framework`.
+- Fixed the renaming of incorrectly named `.r.9.png` images to `.9.png`.
+- Added the ability to use `--version` to print out the Apktool version.
