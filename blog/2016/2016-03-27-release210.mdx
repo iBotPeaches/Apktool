@@ -1,0 +1,28 @@
+---
+slug: apktool-2.1.0
+title: Apktool 2.1.0
+authors: ibotpeaches
+tags: [release]
+---
+
+:::danger
+This release removes Smali Debugging as it was no longer functioning and full of issues.
+
+:::
+
+- **Breaking** - Removes SmaliDebugging feature. ([#1061](https://github.com/iBotPeaches/Apktool/issues/1061))
+- Fixed issue with non-printable chars in unknown files. / Thanks ihanson
+- Fixed issue when a non-compressed file has no extension. ([#1122](https://github.com/iBotPeaches/Apktool/issues/1122)) / Thanks BurgerZ
+- Added ability for launched executables (`aapt`) to differentiate between output and error streams. Thanks BurgerZ
+- Revamped internal storage of `apktool.yml` to be serialized objects vs entries in HashMap. ([#1128](https://github.com/iBotPeaches/Apktool/pull/1128)) / Thanks rover
+- Closes streams that were not properly closed. ([#1143](https://github.com/iBotPeaches/Apktool/issues/1143))
+- Fixes issue when `@null` was improperly decoded. ([#1123](https://github.com/iBotPeaches/Apktool/issues/1123))
+- Fixes issue when apk filename has trailing space. ([#1145](https://github.com/iBotPeaches/Apktool/issues/1145)) / Thanks BurgerZ
+- Fixes issue that all digits were treated as string using `\ ###` trick. ([#1130](https://github.com/iBotPeaches/Apktool/issues/1130))
+- Added additional feature to `--keep-broken-res` to ignore resource duplicates. ([#1164](https://github.com/iBotPeaches/Apktool/pull/1164)) / Thanks crpalmer
+- Performance enhancement - Stops using String.format() for `MISSING_RES_SPECS`. ([#1186](https://github.com/iBotPeaches/Apktool/issues/1186)) / Thanks dnault
+- Added support for decoding `AndResGuard` apps. ([#1170](https://github.com/iBotPeaches/Apktool/issues/1170))
+- Removed LittleEndianReader in favor for a public domain one. ([#1166](https://github.com/iBotPeaches/Apktool/issues/1166)) / Thanks chirayudesai
+- Adapt 9patch decoder to handle any format (Color Table, RGB, RGBA, Gray, GrayAlpha). ([#1180](https://github.com/iBotPeaches/Apktool/issues/1180)) / Thanks mattsarett
+
+> This post was originally released at: https://connortumbleson.com/2016/03/27/apktool-v2-1-0-released and duplicated in part here for historical reasons.

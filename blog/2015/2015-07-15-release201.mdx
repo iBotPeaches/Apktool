@@ -1,0 +1,17 @@
+---
+slug: apktool-2.0.1
+title: Apktool 2.0.1
+authors: ibotpeaches
+tags: [release]
+---
+
+- Fixed version qualifier like `v4` from being ignored during decode. ([#928](https://github.com/iBotPeaches/Apktool/issues/928))
+- Fixed windows helper script from appending current directory into `$PATH`. ([#927](https://github.com/iBotPeaches/Apktool/issues/927)) / (Thanks Tercete)
+- Fixed frameworks that were SharedLibraries from affecting the `apktool.yml` file. ([#936](https://github.com/iBotPeaches/Apktool/issues/936))
+- Fixed apks that were crashing on internal attributes. ([#913](https://github.com/iBotPeaches/Apktool/issues/913))
+- Fixed `ResFileValue(s)` being casted to `ResScalarValues`. ([#921](https://github.com/iBotPeaches/Apktool/issues/921))
+- Fixed reading `ResConfigFlags` twice. ([#924](https://github.com/iBotPeaches/Apktool/issues/924))
+- Expose raw index used for resource lookups. ([#990](https://github.com/iBotPeaches/Apktool/issues/990)) / (Thanks mmastrac)
+- Correctly add `libs` and `lib` folders on `[b]uild`
+
+> This post was originally released at: https://connortumbleson.com/2015/07/15/apktool-2-0-1-released and duplicated in part here for historical reasons.

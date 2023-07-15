@@ -1,0 +1,22 @@
+---
+slug: apktool-2.2.1
+title: Apktool 2.2.1
+authors: ibotpeaches
+tags: [release]
+---
+
+:::caution
+
+This release contains an updated internal framework file.
+
+:::
+
+- **Android Nougat Support.** ([Issue 1223](https://github.com/iBotPeaches/Apktool/issues/1223))
+- Fixed issue with missing attributes (using Android N Final Preview Sdk). ([Issue 1243](https://github.com/iBotPeaches/Apktool/issues/1243))
+- Fixed issue with new value type 8 - `TYPE_DYNAMIC_ATTRIBUTE`. ([Issue 1317](https://github.com/iBotPeaches/Apktool/issues/1317))
+- Gracefully handle APKs with additional data after `TYPE` chunks. ([Issue 1324](https://github.com/iBotPeaches/Apktool/pull/1324)) / Thanks jamestut
+- Pass `minSdkVersion` to smali to correctly trigger edge cases where proper API needs to set. ([Issue 1313](https://github.com/iBotPeaches/Apktool/pull/1313)) / Thanks benjamin-promon
+- Added `empty-framework-dir` command to clean up framework directory to ease upgrades. ([Issue 901](https://github.com/iBotPeaches/Apktool/issues/901))
+- Handle applications that trick apktool with unknown header type. ([Issue 1332](https://github.com/iBotPeaches/Apktool/issues/1332)) / Thanks xpirt
+
+> This post was originally released at: https://connortumbleson.com/2016/10/18/apktool-v2-2-1-released and duplicated in part here for historical reasons.

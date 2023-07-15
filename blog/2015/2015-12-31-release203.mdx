@@ -1,0 +1,25 @@
+---
+slug: apktool-2.0.3
+title: Apktool 2.0.3
+authors: ibotpeaches
+tags: [release]
+---
+
+- **For developers** - Run `git submodule update --init --recursive` to setup submodules.
+- Fixed issue with too long command due to large amount of uncompressed files. ([#1053](https://github.com/iBotPeaches/Apktool/issues/1053))
+- Fixed bad casting issue between `ResStringValue` and `ResAttr`. ([#1060](https://github.com/iBotPeaches/Apktool/issues/1060))
+- Fixed bad casting issue between `ResStyleValue` and `ResAttr`. ([#957](https://github.com/iBotPeaches/Apktool/issues/957), [#1063](https://github.com/iBotPeaches/Apktool/issues/1063))
+- Prevent greedy additional `.dex` finder from pulling `.dex` files outside of apk root.
+- Move smali to git submodule for easier updates, update to `2.1.0` in process.
+- Fixed issue with echo in helper scripts. ([#1056](https://github.com/iBotPeaches/Apktool/issues/1056))
+- Fixed issue with `mnc1` qualifier. ([#1072](https://github.com/iBotPeaches/Apktool/issues/1072))
+- Fixed issue with apks that have a 28 byte `ResConfig` size. ([#1084](https://github.com/iBotPeaches/Apktool/pull/1084)) / Thanks rover
+- Cleaned up code base to match AOSP naming. ([#1099](https://github.com/iBotPeaches/Apktool/issues/1099))
+- Fixed issue with APKs that had sparse ResourceTable. ([#964](https://github.com/iBotPeaches/Apktool/issues/964), [#1031](https://github.com/iBotPeaches/Apktool/issues/1031))
+- Added support for `DATA_NULL_EMPTY`
+- Added support for API23 mnc values. They are no longer zero padded.
+- Fixed issue where large int values in `AndroidManifest.xml` were truncated due to overflow. ([#767](https://github.com/iBotPeaches/Apktool/issues/767)) / Thanks gio73 and MarcMil
+- Added decode support for Dexguard Enterprise applications. ([#1014](https://github.com/iBotPeaches/Apktool/issues/1014))
+- Simply creates dummy key value names to prevent duplicate resource error.
+
+> This post was originally released at: https://connortumbleson.com/2015/12/31/apktool-v2-0-3-released and duplicated in part here for historical reasons.

@@ -1,0 +1,15 @@
+---
+slug: apktool-2.1.1
+title: Apktool 2.1.1
+authors: ibotpeaches
+tags: [release]
+---
+
+- Fixed issue where APK would identify as wrong `packageId` ([#1220](https://github.com/iBotPeaches/Apktool/issues/1220))
+- Include the `AndroidManifest.xml` file from the framework being installed to satisfy default aapt. ([#1224](https://github.com/iBotPeaches/Apktool/issues/1224)) / Thanks BurgerZ
+- Restore `-d / --debug-mode` to simply change `android:debuggable` in `AndroidManifest.xml`. ([#1235](https://github.com/iBotPeaches/Apktool/issues/1235)) / Thanks Benjamin-Dobell
+- Insert literal `versionName` if it is a reference to satisfy `aapt`. ([#1234](https://github.com/iBotPeaches/Apktool/issues/1234)) / Thanks padlar
+- Fix Samsung apks that have an unknown 4 bytes. ([#1131](https://github.com/iBotPeaches/Apktool/issues/1131))
+- Prevent manifest rename for Adobe AIR applications. ([#1240](https://github.com/iBotPeaches/Apktool/issues/1240))
+
+> This post was originally released at: https://connortumbleson.com/2016/05/07/apktool-v2-1-1-released and duplicated in part here for historical reasons.

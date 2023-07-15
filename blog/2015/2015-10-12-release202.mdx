@@ -1,0 +1,26 @@
+---
+slug: apktool-2.0.2
+title: Apktool 2.0.2
+authors: ibotpeaches
+tags: [release]
+---
+
+:::caution
+
+This release contains an updated internal framework file.
+
+:::
+
+- Fixed issues with apks that use `.9.xml` files, which improperly triggered 9patch decoder. ([#1005](https://github.com/iBotPeaches/Apktool/issues/1005))
+- Prevent compressing resources that should not be. ([Pull 1020](https://github.com/iBotPeaches/Apktool/pull/1020))
+- `aapt` changes
+  - [5cded813](https://github.com/iBotPeaches/platform_frameworks_base/commit/5cded8132294c860a374409b7e0c94167ab91e06) - skip compat functions.
+  - [eb06229e](https://github.com/iBotPeaches/platform_frameworks_base/commit/eb06229e29362dded12f67cf0962f604e8214815) - add miui support for `godzillaui`.
+  - [d3c5cc64](https://github.com/iBotPeaches/platform_frameworks_base/commit/d3c5cc64d686a95e40cd87682cef346a5b9eb352) - add miui support for 4 digit `mnc`/`mcc` fields.
+  - [ef9e8d09](https://github.com/iBotPeaches/platform_frameworks_base/commit/ef9e8d86d0941cb80097f05274ec76fbdef2fbe7) - build `libc++` statically.
+- Updated smali/baksmali to `v2.0.8`
+- Fixed issues with reference attributes being decoded improperly. ([#1023](https://github.com/iBotPeaches/Apktool/issues/1023)) / (Thanks phhusson)
+- Fixed issue with version qualifiers being improperly added during build. ([#928](https://github.com/iBotPeaches/Apktool/issues/928))
+- Added Support for Android Marshmallow (API 23). ([#999](https://github.com/iBotPeaches/Apktool/issues/999))
+
+> This post was originally released at: https://connortumbleson.com/2015/10/12/apktool-v2-0-2-released and duplicated in part here for historical reasons.
