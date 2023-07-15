@@ -29,7 +29,7 @@ const config = {
         },
         blog: {
           showReadingTime: false,
-          postsPerPage: 5,
+          postsPerPage: 2,
           blogSidebarCount: 'ALL',
           editUrl: 'https://github.com/iBotPeaches/Apktool/tree/docs/',
         },
