@@ -25,11 +25,11 @@ const config = {
       ({
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
-          editUrl: 'https://github.com/iBotPeaches/Apktool/tree/',
+          editUrl: 'https://github.com/iBotPeaches/Apktool/tree/docs/',
         },
         blog: {
           showReadingTime: true,
-          editUrl: 'https://github.com/iBotPeaches/Apktool/tree/',
+          editUrl: 'https://github.com/iBotPeaches/Apktool/tree/docs/',
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
