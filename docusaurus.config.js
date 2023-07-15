@@ -28,7 +28,9 @@ const config = {
           editUrl: 'https://github.com/iBotPeaches/Apktool/tree/docs/',
         },
         blog: {
-          showReadingTime: true,
+          showReadingTime: false,
+          postsPerPage: 5,
+          blogSidebarCount: 'ALL',
           editUrl: 'https://github.com/iBotPeaches/Apktool/tree/docs/',
         },
         theme: {
