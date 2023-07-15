@@ -58,6 +58,11 @@ const config = {
           {to: '/docs/install', label: 'Install', position: 'left'},
           {to: '/blog', label: 'Releases', position: 'left'},
           {
+            href: 'https://bitbucket.org/iBotPeaches/apktool/downloads/apktool_2.7.0.jar',
+            label: 'Download 2.7.0',
+            position: 'right',
+          },
+          {
             href: 'https://github.com/iBotPeaches/Apktool',
             label: 'GitHub',
             position: 'right',
@@ -87,6 +92,10 @@ const config = {
                 label: 'Stack Overflow',
                 href: 'https://stackoverflow.com/questions/tagged/apktool',
               },
+              {
+                label: 'IRC (Libera)',
+                href: 'https://web.libera.chat/#apktool',
+              }
             ],
           },
           {
