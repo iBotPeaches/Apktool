@@ -1,0 +1,23 @@
+---
+title: Decoding
+sidebar_position: 2
+---
+
+The decode option can be invoked either from `d` or `decode` like shown below.
+
+```bash
+$ apktool d foo.jar
+# decodes foo.jar to foo.jar.out folder
+
+$ apktool decode foo.jar
+# decodes foo.jar to foo.jar.out folder
+
+$ apktool d bar.apk
+# decodes bar.apk to bar folder
+
+$ apktool decode bar.apk
+# decodes bar.apk to bar folder
+
+$ apktool d bar.apk -o baz
+# decodes bar.apk to baz folder
+```
