@@ -1,0 +1,16 @@
+---
+slug: apktool-1.2.0
+title: Apktool 1.2.0
+authors: broo2s
+tags: [release]
+---
+
+- Added feature for installing and using custom framework files - pulled from a device. See FrameworkFiles [#137](https://github.com/iBotPeaches/Apktool/issues/137)
+- Froyo support [#147](https://github.com/iBotPeaches/Apktool/issues/147)
+- updated Android framework to `2.2r1`
+- removed HTC framework
+- no need to use `-s`/`-r` switch, when apk doesn't contain sources/resources
+- added protection against accidental remove of important files when decoding [#146](https://github.com/iBotPeaches/Apktool/issues/146)
+- made outdir argument optional when decoding
+- fix: adding dummy resources if some of them are missing [#150](https://github.com/iBotPeaches/Apktool/issues/150)
+- fix: better recognition of AXML files [#151](https://github.com/iBotPeaches/Apktool/issues/151)
