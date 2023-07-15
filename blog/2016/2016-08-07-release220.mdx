@@ -7,23 +7,25 @@ tags: [release]
 
 :::caution
 
-This release contains an updated internal framework file.
+This release changes the default location for framework files on Linux and Windows. You may migrate with the following commands:
 
+- Windows - `move %USERPROFILE%\apktool %USERPROFILE%\AppData\Local`
+- Linux - `mkdir -p ~/.local/share; mv ~/apktool ~/.local/share`
 :::
 
-- Updated smali/baksmali to `v2.1.3`
+* Updated smali/baksmali to `v2.1.3`
   - Fixed upstream issue where debug comment indexes can cause out of bounds exception. ([#1269](https://github.com/iBotPeaches/Apktool/issues/1269))
-- Default framework changed on Windows & Unix to prevent visible top level home directories. ([#1277](https://github.com/iBotPeaches/Apktool/issues/1277))
-- Fixed issue where extensions would be different cases. ([#1258](https://github.com/iBotPeaches/Apktool/issues/1258))
-- Fixed issue with APKs that had no `versionCode` / `versionName` properties. ([#1264](https://github.com/iBotPeaches/Apktool/issues/1264))
-- Fixed issue with improper decoding of `@empty` value. ([#1270](https://github.com/iBotPeaches/Apktool/issues/1270)) / Thanks phhusson
-- Fixed issue with improper compression with files with multiple extensions. ([#1244](https://github.com/iBotPeaches/Apktool/issues/1244))
-- Fixed issue with overflow for applications that have absurdly large TypeSpec indexes. ([#1185](https://github.com/iBotPeaches/Apktool/issues/1185))
-- Fixed issue with hex values being truncated in `AndroidManifest.xml`. ([#972](https://github.com/iBotPeaches/Apktool/issues/972))
-- Replaced public domain LittleEndianReader for Google's Guava LittleEndianDataInputStream (Apache2). ([#1166](https://github.com/iBotPeaches/Apktool/issues/1166)) / Thanks amorris
-- Fixed issue with APKs that have duplicate value names by creating dummy names. ([#894](https://github.com/iBotPeaches/Apktool/issues/894))
-- Adjust mac and unix scripts to force UTF8 file encoding.
-- Fixed public resource reference error when using references in `android:scheme` in `AndroidManifest.xml`. ([#1097](https://github.com/iBotPeaches/Apktool/issues/1097))
-- Fixed issue with APKs where parent reference in `styles.xml` is not found. ([#745](https://github.com/iBotPeaches/Apktool/issues/745))
+* Default framework changed on Windows & Unix to prevent visible top level home directories. ([#1277](https://github.com/iBotPeaches/Apktool/issues/1277))
+* Fixed issue where extensions would be different cases. ([#1258](https://github.com/iBotPeaches/Apktool/issues/1258))
+* Fixed issue with APKs that had no `versionCode` / `versionName` properties. ([#1264](https://github.com/iBotPeaches/Apktool/issues/1264))
+* Fixed issue with improper decoding of `@empty` value. ([#1270](https://github.com/iBotPeaches/Apktool/issues/1270)) / Thanks phhusson
+* Fixed issue with improper compression with files with multiple extensions. ([#1244](https://github.com/iBotPeaches/Apktool/issues/1244))
+* Fixed issue with overflow for applications that have absurdly large TypeSpec indexes. ([#1185](https://github.com/iBotPeaches/Apktool/issues/1185))
+* Fixed issue with hex values being truncated in `AndroidManifest.xml`. ([#972](https://github.com/iBotPeaches/Apktool/issues/972))
+* Replaced public domain LittleEndianReader for Google's Guava LittleEndianDataInputStream (Apache2). ([#1166](https://github.com/iBotPeaches/Apktool/issues/1166)) / Thanks amorris
+* Fixed issue with APKs that have duplicate value names by creating dummy names. ([#894](https://github.com/iBotPeaches/Apktool/issues/894))
+* Adjust mac and unix scripts to force UTF8 file encoding.
+* Fixed public resource reference error when using references in `android:scheme` in `AndroidManifest.xml`. ([#1097](https://github.com/iBotPeaches/Apktool/issues/1097))
+* Fixed issue with APKs where parent reference in `styles.xml` is not found. ([#745](https://github.com/iBotPeaches/Apktool/issues/745))
 
 > This post was originally released at: https://connortumbleson.com/2016/08/07/apktool-v2-2-0-released and duplicated in part here for historical reasons.

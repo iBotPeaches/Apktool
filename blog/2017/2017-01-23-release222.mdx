@@ -9,19 +9,20 @@ tags: [release]
 
 This release contains an updated internal framework file.
 
+- `apktool empty-framework-dir --force` to remove the old file.
 :::
 
-- Added Android 7.1 Resources ([#1349](https://github.com/iBotPeaches/Apktool/issues/1349))
-- Update `aapt` to `android-7.1.1_r4`.
-- Upgrade to `gradle 3.3`
-- Fixed NPE with styles that had a parent that didn't exist. ([#1370](https://github.com/iBotPeaches/Apktool/issues/1370))
-- Fixed issue with `TYPE_DYNAMIC_ATTRIBUTE` treating improperly which affected Nougat based applications. ([#1382](https://github.com/iBotPeaches/Apktool/issues/1382)) / Thanks xpirt
-- Fixed issue with APKs that have invalid characters. ([#885](https://github.com/iBotPeaches/Apktool/issues/885)), ([#1389](https://github.com/iBotPeaches/Apktool/issues/1389))
-- Fixed issue with versioning vector images during build. ([#1384](https://github.com/iBotPeaches/Apktool/issues/1384))
-- Fixed issue with APKs that have invalid characters in filename. ([#1369](https://github.com/iBotPeaches/Apktool/issues/1369))
-- Fixed build issue where space was in build path. ([#1394](https://github.com/iBotPeaches/Apktool/issues/1394))
-- Fixed issue with APKs that have 3 non-positional attributes. ([#1360](https://github.com/iBotPeaches/Apktool/issues/1360))
-- Fixed issue with APKs that require non-standard `pkgId`. ([#1119](https://github.com/iBotPeaches/Apktool/issues/1119)), ([#989](https://github.com/iBotPeaches/Apktool/issues/989)), ([#1278](https://github.com/iBotPeaches/Apktool/issues/1278)), ([#1377](https://github.com/iBotPeaches/Apktool/issues/1377)), ([#1091](https://github.com/iBotPeaches/Apktool/issues/1091)) / Thanks peter23
-- Fixed issue with APKs that used reserved words `do` and `if`. ([#1404](https://github.com/iBotPeaches/Apktool/issues/1404))
+* Added Android 7.1 Resources ([#1349](https://github.com/iBotPeaches/Apktool/issues/1349))
+* Update `aapt` to `android-7.1.1_r4`.
+* Upgrade to `gradle 3.3`
+* Fixed NPE with styles that had a parent that didn't exist. ([#1370](https://github.com/iBotPeaches/Apktool/issues/1370))
+* Fixed issue with `TYPE_DYNAMIC_ATTRIBUTE` treating improperly which affected Nougat based applications. ([#1382](https://github.com/iBotPeaches/Apktool/issues/1382)) / Thanks xpirt
+* Fixed issue with APKs that have invalid characters. ([#885](https://github.com/iBotPeaches/Apktool/issues/885)), ([#1389](https://github.com/iBotPeaches/Apktool/issues/1389))
+* Fixed issue with versioning vector images during build. ([#1384](https://github.com/iBotPeaches/Apktool/issues/1384))
+* Fixed issue with APKs that have invalid characters in filename. ([#1369](https://github.com/iBotPeaches/Apktool/issues/1369))
+* Fixed build issue where space was in build path. ([#1394](https://github.com/iBotPeaches/Apktool/issues/1394))
+* Fixed issue with APKs that have 3 non-positional attributes. ([#1360](https://github.com/iBotPeaches/Apktool/issues/1360))
+* Fixed issue with APKs that require non-standard `pkgId`. ([#1119](https://github.com/iBotPeaches/Apktool/issues/1119)), ([#989](https://github.com/iBotPeaches/Apktool/issues/989)), ([#1278](https://github.com/iBotPeaches/Apktool/issues/1278)), ([#1377](https://github.com/iBotPeaches/Apktool/issues/1377)), ([#1091](https://github.com/iBotPeaches/Apktool/issues/1091)) / Thanks peter23
+* Fixed issue with APKs that used reserved words `do` and `if`. ([#1404](https://github.com/iBotPeaches/Apktool/issues/1404))
 
 > This post was originally released at: https://connortumbleson.com/2017/01/23/apktool-v2-2-2-released and duplicated in part here for historical reasons.
