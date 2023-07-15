@@ -78,8 +78,12 @@ const config = {
             title: 'Docs',
             items: [
               {
-                label: 'Install Guide',
+                label: 'How to Install',
                 to: '/docs/install',
+              },
+              {
+                label: 'How to Build',
+                to: 'docs/build',
               },
             ],
           },
