@@ -1,0 +1,40 @@
+---
+slug: apktool-1.4.0
+title: Apktool 1.4.0
+authors: broo2s
+tags: [release]
+---
+
+### Prerequisites
+
+- Upgrade Apktool to v1.4.0
+- update install package to `r04-brut1` or update your aapt manually
+  - then remove `$HOME/apktool/framework/1.apk` or install your own framework from Honeycomb/Gingerbread
+
+### Changes
+
+- Added Honeycomb support (3.1, API 12).
+  - support for mipmaps and xlarge, xhdpi resource qualifiers
+  - updated builtin framework to 3.1 (API 12)
+- completely rewritten mechanism of enclosing/escaping strings in XML files:
+  - fixed legendary [#211](https://github.com/iBotPeaches/Apktool/issues/211) bug
+  - fixed a lot of other bugs discovered when writing integration tests
+  - string format is simpler and more compact now: `&#x20;` instead of `\u0020`, `&quot;` instead of `\"`, etc.
+- fixed incompatibilities between newer aapt and apks built by older one.
+  - New aapt is more restrictive, some apps can't be built using it, even if you would have sources.
+  - Apktool tries to convert/fix these incompatibilities: it adds `formatted="false"` for `<string />` tags and enumerates substitutions for plurals.
+- updated smali to `v1.2.6`
+- added automatic integration tests for resource decoding and building
+- first official release of apktool built using Maven from open source
+- sort framework ids before storing them in apktool.yml.
+  - aapt command requires you to include frameworks in order.
+- zero-padding of MCC resource qualifier
+- prefer to use raw values when decoding XML attrs.
+  - This could make decoded XMLs a little more similar to original ones.
+- close apktool.yml file handler after generating it
+- added error message about missing input file when decoding
+- added more info messages during decoding.
+- do not decode res-references as `<item />`.
+  - Now they're decoded as e.g. `<string name="test">@android:string/ok</string>` instead of `<item type="string" name="test">@android:string/ok</item>`.
+- changed encoding of generated XML files from UTF-8 to utf-8 - it's more consistent with Android SDK
+- add new line at the end of generated XML files.
