@@ -1,0 +1,29 @@
+---
+slug: apktool-2.4.0
+title: Apktool 2.4.0
+authors: ibotpeaches
+tags: [release]
+---
+
+:::danger
+Java 8 (1.8) is now required.
+:::
+
+- Java 8 (1.8) is now required.
+- Updated baksmali/smali to version 2.2.6 ([#1893](https://github.com/iBotPeaches/Apktool/issues/1893))
+- Fixed issue with new restriction with non-empty `ids.xml` values. ([#1918](https://github.com/iBotPeaches/Apktool/issues/1918)) / Thanks gino247
+- Fixed issue with `PlatformBuildVersion` properties changing to unexpected values. ([#1909](https://github.com/iBotPeaches/Apktool/issues/1909)) / Thanks gino247
+- Fixed issue with pending v5 Gradle upgrade, by upgrading to gradle v4.10.2. ([#1943](https://github.com/iBotPeaches/Apktool/pull/1943)) / Thanks friederbluemle
+- Added `no-crunch` support (optional) via new parameter of `nc | --no-crunch`. ([#1849](https://github.com/iBotPeaches/Apktool/pull/1849)) / Thanks Novex
+- Fixed issue with `xsd` files decoding/building improperly between aapt1/aapt2. ([#1952](https://github.com/iBotPeaches/Apktool/issues/1952))
+- Fixed issue with malformed chunk header when decoding "special" apks. ([#1976](https://github.com/iBotPeaches/Apktool/issues/1976)) / Thanks sebras
+- Fixed issue with Apktool stealing focus on Mac environments. ([#1996](https://github.com/iBotPeaches/Apktool/issues/1996))
+- Fixed issue with `array` resources having wrong types. ([#1994](https://github.com/iBotPeaches/Apktool/issues/1994)), ([#1922](https://github.com/iBotPeaches/Apktool/issues/1922)) / Thanks vbarthel-fr
+- Fixed issue with 9patch images missing vertical or horizontal divs, by automatically creating them. ([#1522](https://github.com/iBotPeaches/Apktool/issues/1522)) / Thanks IgorEisberg
+- Fixed issue with resolving references to non-standard framework files. / Thanks IgorEisberg
+- Fixed issue with resolving SDK version codes were not explicit values. / Thanks IgorEisberg
+- Added 32bit binaries for unix & windows for `aapt` and `aapt2`.
+- Added automated tests on Windows. ([#1975](https://github.com/iBotPeaches/Apktool/issues/1975))
+- Added ability for `api-level` to be passed to baksmali & smali. / Thanks IgorEisberg
+
+> This post was originally released at: https://connortumbleson.com/2019/03/03/apktool-v2-4-0-released and duplicated in part here for historical reasons.

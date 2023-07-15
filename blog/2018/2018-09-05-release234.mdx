@@ -1,0 +1,22 @@
+---
+slug: apktool-2.3.4
+title: Apktool 2.3.4
+authors: ibotpeaches
+tags: [release]
+---
+
+:::caution
+
+This release contains an updated internal framework file.
+
+:::
+
+- **Android Pie Final Support** ([#1864](https://github.com/iBotPeaches/Apktool/issues/1864))
+- Fixed issue with rebuilding applications with `$` or `_` characters (aapt2 only). ([#1776](https://github.com/iBotPeaches/Apktool/issues/1776))
+- Fixed process executor to wait for response (15 seconds) in the case of identifying aapt version. ([#1809](https://github.com/iBotPeaches/Apktool/issues/1809)) / Thanks sunshouxiang
+- Fixed issue with 0 size file being marked as doNotCompress. ([#1843](https://github.com/iBotPeaches/Apktool/issues/1843)) / Thanks alexeikh
+- Updated aapt2 to latest version to handle various edge cases. ([#1817](https://github.com/iBotPeaches/Apktool/issues/1817))
+- Align the `frameworks/base` project for both `aapt1/aapt2` builds. ([#1889](https://github.com/iBotPeaches/Apktool/issues/1889))
+- Update to Gradle 4.10 and fix warnings with upgrade. ([#1884](https://github.com/iBotPeaches/Apktool/issues/1884))
+
+> This post was originally released at: https://connortumbleson.com/2018/09/05/apktool-v2-3-4-released and duplicated in part here for historical reasons.

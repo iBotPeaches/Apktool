@@ -1,0 +1,29 @@
+---
+slug: apktool-2.2.4
+title: Apktool 2.2.4
+authors: ibotpeaches
+tags: [release]
+---
+
+:::caution
+
+This release contains an updated internal framework file.
+
+:::
+
+- **Android O Final Dev Preview Support** ([#1520](https://github.com/iBotPeaches/Apktool/issues/1520))
+- Update SnakeYAML to 1.1.8 (Android). ([#591](https://github.com/iBotPeaches/Apktool/issues/591))
+- Upgrade to `gradle 4.0`
+- Fixed issue with APKs taking longer than usual to parse resources. ([#1489](https://github.com/iBotPeaches/Apktool/issues/1489)) / Thanks MarcMil
+- Fixed issue with internal binaries not accessible in a Spring boot environment. ([#1543](https://github.com/iBotPeaches/Apktool/issues/1543)) / Thanks bingqiao
+- Add preliminary support for rebuilding applications built in `aapt2` ([#1520](https://github.com/iBotPeaches/Apktool/issues/1520))
+- Add support for resource filenames to contain `$` symbols. ([#1532](https://github.com/iBotPeaches/Apktool/issues/1532))
+- Fixed issue with apktool not closing file resources, creating locks. ([#1561](https://github.com/iBotPeaches/Apktool/pull/1561)) / Thanks MarcMil
+- Fixed issue with APKs that have `INVALID TYPE CONFIG` resources. ([#1534](https://github.com/iBotPeaches/Apktool/issues/1534))
+- Fixed decoding issue with APKs with intentionally invalid characters. ([#1564](https://github.com/iBotPeaches/Apktool/issues/1564))
+- Only exit with a 0 status code during `version` commands.
+- Enforce proper Apache licenses on all Java files.
+- Prevent malicious directory traversal with unknown files.
+- Prevent XML-XXE processing to prevent unintended leaking of information in a malicious setting.
+
+> This post was originally released at: https://connortumbleson.com/2017/07/29/apktool-v2-2-4-released and duplicated in part here for historical reasons.

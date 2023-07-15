@@ -1,0 +1,37 @@
+---
+slug: apktool-2.5.0
+title: Apktool 2.5.0
+authors: ibotpeaches
+tags: [release]
+---
+
+:::caution
+
+This release contains an updated internal framework file.
+
+:::
+
+- **Android 11 Support** ([#2399](https://github.com/iBotPeaches/Apktool/issues/2399), [#2397](https://github.com/iBotPeaches/Apktool/issues/2397), [#2369](https://github.com/iBotPeaches/Apktool/issues/2369), [#2167](https://github.com/iBotPeaches/Apktool/issues/2167))
+- Updated baksmali/smali to version 2.4.0 ([#2006](https://github.com/iBotPeaches/Apktool/issues/2006), [#1718](https://github.com/iBotPeaches/Apktool/issues/1718))
+- Upgrade to `gradle 6.4.1`
+- Replaced TravisCI with GitHub Actions
+- Deprecate 32bit ([#2110](https://github.com/iBotPeaches/Apktool/issues/2210), [#2053](https://github.com/iBotPeaches/Apktool/issues/2053))
+- Added support for SDK Codename "S" (Android 12?)
+- Added support for `JAVA_HOME` environmental on Windows if defined. (Thanks vldmrrr)
+- Update license headers to reflect start copyright date & remove javadoc style. (Thanks friederbluemle)
+- Fixed issue with binary name clash in multi-threaded environments. ([#2251](https://github.com/iBotPeaches/Apktool/issues/2251)) Thanks chris-sharl
+- Fixed issue with `resources.arsc` file being compressed in framework files. ([#2323](https://github.com/iBotPeaches/Apktool/issues/2323))
+- Fixed issue with empty files being compressed breaking applications. ([#2333](https://github.com/iBotPeaches/Apktool/issues/2333)) / (Thanks peret)
+- Fixed handling with debug mode while using aapt2. ([#2328](https://github.com/iBotPeaches/Apktool/issues/2328), [#2364](https://github.com/iBotPeaches/Apktool/issues/2364)) / Thanks Comnir)
+- Fixed issue with handling of XML files using `$` in resource name. ([#2386](https://github.com/iBotPeaches/Apktool/issues/2386), [#2217](https://github.com/iBotPeaches/Apktool/issues/2271), [#2119](https://github.com/iBotPeaches/Apktool/issues/2119))
+- Fixed issue with NPE disassembling manifest with attributes with no resourceId. ([#2300](https://github.com/iBotPeaches/Apktool/issues/2300))
+- Fixed issue with aapt2 and strict dummy properties, changing bool(false) to ref(null). ([#2438](https://github.com/iBotPeaches/Apktool/issues/2438), [#1903](https://github.com/iBotPeaches/Apktool/issues/1903))
+- Fixed issue with non-standard namespaces in obfuscated application. ([#2317](https://github.com/iBotPeaches/Apktool/issues/2317), [#2188](https://github.com/iBotPeaches/Apktool/issues/2188), [#1859](https://github.com/iBotPeaches/Apktool/issues/1859))
+- Fixed NPE when trying to find a referent of a missing resource. ([#1945](https://github.com/iBotPeaches/Apktool/issues/1945), [#2146](https://github.com/iBotPeaches/Apktool/issues/2146))
+- Properly return non-zero error if invalid parameters. (Thanks Giszmo)
+- Added helpful error message when framework directory cannot be written. ([#2343](https://github.com/iBotPeaches/Apktool/issues/2343))
+- Added testcases for `classes#.dex` disassembling on aapt1/aapt2. ([#2411](https://github.com/iBotPeaches/Apktool/issues/2411))
+- Added `apktool list-frameworks`. ([#1913](https://github.com/iBotPeaches/Apktool/issues/1913))
+- Support for new `compileSdkVersion` property for `SdkInfo`. ([#2368](https://github.com/iBotPeaches/Apktool/issues/2368))
+
+> This post was originally released at: https://connortumbleson.com/2020/12/02/apktool-v2-5-0-released and duplicated in part here for historical reasons.
