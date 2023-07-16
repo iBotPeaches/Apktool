@@ -18,6 +18,35 @@ const config = {
     defaultLocale: 'en',
     locales: ['en'],
   },
+  plugins: [
+    [
+      '@docusaurus/plugin-client-redirects',
+      {
+        redirects: [
+          {
+            to: '/docs/install',
+            from: '/Apktool/install',
+          },
+          {
+            to: '/docs/build',
+            from: '/Apktool/build',
+          },
+          {
+            to: '/docs/the-basics/intro',
+            from: '/Apktool/documentation',
+          },
+          {
+            to: '/blog/googlecode-shutdown',
+            from: '/Apktool/googlecode',
+          },
+          {
+            to: '/blog',
+            from: '/Apktool/changes',
+          },
+        ],
+      },
+    ],
+  ],
   presets: [
     [
       'classic',
@@ -39,7 +68,6 @@ const config = {
       }),
     ],
   ],
-
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
