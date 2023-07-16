@@ -1,7 +1,6 @@
 ### Apktool
-**This is the repository for Apktool. If you are looking for the Apktool website. Click [here](https://github.com/iBotPeaches/Apktool/tree/gh-pages).**
+**This is the repository for Apktool. If you are looking for the Apktool website. Click [here](https://github.com/iBotPeaches/Apktool/tree/docs).**
 
-[![Join the chat at https://gitter.im/iBotPeaches/Apktool](https://badges.gitter.im/iBotPeaches/Apktool.svg)](https://gitter.im/iBotPeaches/Apktool?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![CI](https://github.com/iBotPeaches/Apktool/actions/workflows/build.yml/badge.svg)](https://github.com/iBotPeaches/Apktool/actions/workflows/test.yml)
 [![Software License](https://img.shields.io/badge/license-Apache%202.0-brightgreen.svg)](https://github.com/iBotPeaches/Apktool/blob/master/LICENSE)
 
@@ -31,7 +30,6 @@ If you discover a security vulnerability within Apktool, please send an e-mail t
 - [How to Build](https://ibotpeaches.github.io/Apktool/build/)
 - [Documentation](https://ibotpeaches.github.io/Apktool/documentation/)
 - [Bug Reports](https://github.com/iBotPeaches/Apktool/issues)
-- [Chat on Gitter](https://gitter.im/iBotPeaches/Apktool)
 - [Changelog/Information](https://ibotpeaches.github.io/Apktool/changes/)
 - [XDA Post](https://forum.xda-developers.com/t/util-dec-2-2020-apktool-tool-for-reverse-engineering-apk-files.1755243/)
 - [Source (Github)](https://github.com/iBotPeaches/Apktool)
