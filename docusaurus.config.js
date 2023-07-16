@@ -25,23 +25,23 @@ const config = {
         redirects: [
           {
             to: '/docs/install',
-            from: '/Apktool/install',
+            from: '/install/',
           },
           {
             to: '/docs/build',
-            from: '/Apktool/build',
+            from: '/build/',
           },
           {
             to: '/docs/the-basics/intro',
-            from: '/Apktool/documentation',
+            from: '/documentation/',
           },
           {
             to: '/blog/googlecode-shutdown',
-            from: '/Apktool/googlecode',
+            from: '/googlecode/',
           },
           {
             to: '/blog',
-            from: '/Apktool/changes',
+            from: '/changes/',
           },
         ],
       },
