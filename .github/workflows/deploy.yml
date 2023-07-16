@@ -1,7 +1,7 @@
 name: Deploy Docs
 on:
   push:
-    branches: ['master']
+    branches: ['docs']
   workflow_dispatch:
 permissions:
   contents: read
