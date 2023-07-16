@@ -154,7 +154,7 @@ The hashes match so we are good with the backup server.
 
 #### Sonatype
 
-You'll want to log in and view the Staging repostories and confirm you see the recently made build. You'll want to:
+You'll want to log in and view the Staging repositories and confirm you see the recently made build. You'll want to:
 
  * Close it (Wait for audit report email)
  * Release it (Drop the staging repository)
