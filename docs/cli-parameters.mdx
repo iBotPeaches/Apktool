@@ -4,7 +4,7 @@ title: CLI Parameters
 
 ### Utility Options
 
-_Options used for utility commands_
+_Options used for utility commands (`apktool {options}`)_
 
 ```
 -advance, --advanced
@@ -94,6 +94,96 @@ _Options used for decoding commands (`apktool d file.apk {options}`)_
 ```
 
 - Uses framework files tagged by `TAG`.
+
+### Building Options
+
+_Options used for building commands (`apktool b folder {options}`)_
+
+```
+-a, --aapt <FILE>
+```
+
+- Loads aapt/aapt2 binary from the specified location, instead of relying on internal version.
+
+```
+-api, --api-level <API>
+```
+
+- The numeric api-level of the smali files to build against (defaults to `minSdkVersion`)
+
+```
+-c, --copy-original
+```
+
+- Copies original `AndroidManifest.xml` and `META-INF`.
+
+```
+-d, --debug
+```
+
+- Adds `debuggable="true"` to `AndroidManifest.xml`.
+
+```
+-f, --force-all
+```
+
+- Overwrites existing files during build, including resources and sources.
+
+```
+-n, --net-sec-conf
+```
+
+- Adds a generic Network Security Configuration file in the apk.
+
+```
+-nc, --no-crunch
+```
+
+- Disables crunching of resource files during the build.
+
+```
+-o, --output <FILE>
+```
+
+- The name of apk that gets written. Default is `dist/{apkname}.apk`.
+
+```
+-p, --frame-path <DIR>
+```
+
+- The location where framework files are stored/read from.
+
+```
+--use-aapt2
+```
+
+- Use aapt2 instead of aapt.
+
+### Empty Framework Directory Options
+
+_Options used for empty-framework-dir commands (`apktool empty-framework-dir {options}`)_
+
+```
+-f, --force
+```
+
+- Force delete destination directory.
+
+```
+-p, --frame-path <DIR>
+```
+
+- The folder location where framework files should be stored/read from.
+
+### List Framework Directory Options
+
+_Options used for list-frameworks commands (`apktool list-frameworks {options}`)_
+
+```
+-p, --frame-path <DIR>
+```
+
+- The folder location where framework files should be stored/read from.
 
 ### Common Options
 
