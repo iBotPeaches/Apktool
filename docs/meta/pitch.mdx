@@ -1,0 +1,33 @@
+---
+title: Pitch & anti-pitch
+sidebar_position: 6
+---
+
+Often times a question is asked - how is this different from tool xxx? This is a valid question, and one that should be asked.
+However, it is also a question that is often asked in bad faith. This is a place to address both.
+
+So this post will give you a "pitch" (why you should use Apktool) and an "anti-pitch" (why you shouldn't use Apktool).
+
+## Pitch
+
+- Apktool has been around for 13+ years. It has been used by hundreds of thousands of people judging from the
+  historical downloads - so you'll find support nearly anywhere.
+- Apktool is open source. This means you can see what it does, and how it does it. You can even contribute to it.
+- Apktool is free. It is licensed under the Apache 2.0 license, which gives great flexibility in usage.
+  - Plenty of tools have been built on top of Apktool, and you can do the same.
+  - Apktool was even started from the research and work of others.
+- Apktool is cross-platform. It runs on Windows, Linux, and macOS.
+- Apktool is one fat jar. You don't need to install anything else to get it working.
+- Apktool is 1 easy command for disassembly and 1 easy command for reassembly.
+
+## Anti-pitch
+
+- Apktool doesn't really work well on Android devices, because it uses the same native tools that Android Studio uses when compiling an application
+  - This means that in order to build an application on device - you'd need to cross compile aapt/aapt2 for the respective architecture.
+  - This is not impossible, but it is not easy nor something Apktool officially wants to spend time on.
+  - Libraries such as [ARSCLib](https://github.com/REAndroid/ARSCLib) were invented to replace the need for aapt/aapt2 on device.
+- Apktool works slowly in fixing issues and adding features.
+  - Apktool is a side project for the only current maintainer. I've got a full time job and other responsibilities.
+  - Paid alternatives like [JEB from PNF Software](https://www.pnfsoftware.com/jeb/android) have an expensive option that might surpass Apktool's offering
+- Apktool works with sources to return smali format instead of reconstructed Java which is often a barrier to entry for new users.
+  - [JADX](https://github.com/skylot/jadx) is a great alternative that will return Java code instead of smali and has a growing robust resource parser.
