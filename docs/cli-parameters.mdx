@@ -1,0 +1,112 @@
+---
+title: CLI Parameters
+---
+
+### Utility Options
+
+_Options used for utility commands_
+
+```
+-advance, --advanced
+```
+
+- Dumps out advanced usage output.
+
+```
+-version, --version
+```
+
+- Outputs current version. (Ex: 1.5.2
+
+### Decoding Options
+
+_Options used for decoding commands (`apktool d file.apk {options}`)_
+
+```
+-api, --api-level <API>
+```
+
+- The numeric api-level of the smali files to generate (defaults to targetSdkVersion)
+
+```
+-b, --no-debug-info
+```
+
+- Prevents baksmali from writing out debug info (.local, .param, .line, etc).
+
+```
+-f, --force
+```
+
+- Force delete destination directory.
+
+```
+--force-manifest
+```
+
+- Forces decode of `AndroidManifest.xml` regardless of decoding of resources parameter.
+
+```
+--keep-broken-res
+```
+
+- Use if there was an error and some resources were dropped, e.g. "Invalid config flags detected. Dropping resources", but you want to decode them anyway, even with errors.
+- You will have to fix them manually before building.
+
+```
+-m, --match-original
+```
+
+- Matches files closest as possible to original at cost of preventing rebuild.
+
+```
+--no-assets
+```
+
+- Prevents decoding/copying of unknown asset files.
+
+```
+--only-main-classes
+```
+
+- Only disassemble dex classes in root of application.
+
+```
+-p, --frame-path <DIR>
+```
+
+- The folder location where framework files should be stored/read from.
+
+```
+-r, --no-res
+```
+
+- This will prevent the decompile of resources. This keeps the `resources.arsc`
+
+```
+-s, --no-src
+```
+
+- This will prevent the disassembly of the dex file(s). This keeps the apk dex file(s) and simply moves it during build.
+
+```
+-t, --frame-tag <TAG>
+```
+
+- Uses framework files tagged by `TAG`.
+
+### Common Options
+
+_Options that can be used with any command_
+
+```
+-v, --verbose
+```
+
+- Verbose output. Includes any message tagged `FINE` in the logger.
+
+```
+-q, --quiet
+```
+
+- Quiet output.
