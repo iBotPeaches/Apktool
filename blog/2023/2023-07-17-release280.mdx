@@ -1,0 +1,52 @@
+---
+slug: apktool-2.8.0
+title: Apktool 2.8.0
+authors: ibotpeaches
+tags: [release]
+---
+
+:::caution
+
+This release contains an updated internal framework file.
+
+- `apktool empty-framework-dir --force` to remove the old file.
+
+:::
+
+- Add SDK U (API 34) Preview support. ([Issue 3041](https://github.com/iBotPeaches/Apktool/issues/3041))
+- Add SDK V (API ?) Preview support. ([Issue 3115](https://github.com/iBotPeaches/Apktool/pull/3115))
+- Add CI testing for Java versions: 18 and 19. ([Issue 2976](https://github.com/iBotPeaches/Apktool/issues/2976))
+- Add support for parsing applications with config flag size > 8 (from 28). ([Issue 2978](https://github.com/iBotPeaches/Apktool/issues/2978))
+- Add support for running apktool via gradle. ([Issue 3070](https://github.com/iBotPeaches/Apktool/pull/3070)) / (Thanks sv99)
+- Add support for `0_resource_name_obfuscated` ([Issue 2980](https://github.com/iBotPeaches/Apktool/issues/2980))
+- Add support for Upside Down Cake & Vanilla Ice Cream SDK Shorthand. ([Issue 3113](https://github.com/iBotPeaches/Apktool/pull/3113))
+- Remove CI testing for Java versions: 9, 10, 12, 13, 14, 15 and 17.
+- Fix issue parsing empty `resources.asrc`. ([Issue 2998](https://github.com/iBotPeaches/Apktool/pull/2998)) / (Thanks IgorEisberg)
+- Fix issue with larger `apktool.yml` files. ([Issue 3008](https://github.com/iBotPeaches/Apktool/issues/3008))
+- Fix issue with parsing `XML_TYPE_OVERLAY`. ([Issue 3030](https://github.com/iBotPeaches/Apktool/issues/3030))
+- Fix issue with aapt/aapt2 in edge cases waiting 15 seconds for output. ([Issue 3071](https://github.com/iBotPeaches/Apktool/pull/3071)) / (Thanks sv99)
+- Fix NPE when decoding namespace missing from string pool. ([Issue 3104](https://github.com/iBotPeaches/Apktool/issues/3104))
+- Fix preference order when bogus values fill spring pool instead preferring res table. ([Issue 2981](https://github.com/iBotPeaches/Apktool/issues/2981))
+- Fix assembly with aapt1 when duplicate bag items are detected. ([Issue 1927](https://github.com/iBotPeaches/Apktool/issues/1927), [Issue 2484](https://github.com/iBotPeaches/Apktool/issues/2484))
+- Fix config flag support for 64 byte header, adding `localeNumberingSystem`. ([Issue 3133](https://github.com/iBotPeaches/Apktool/pull/3133))
+- Fix issue crashing out when reading entries past chunk end. ([Issue 3036](https://github.com/iBotPeaches/Apktool/issues/3036))
+- Refactor `brut.androlib.err` to `brut.androlib.exceptions` for standard naming convention of Exceptions. ([Issue 3088](https://github.com/iBotPeaches/Apktool/pull/3088)) / (Thanks sv99)
+- Refactor Build/Decode to work from common Config object. ([Issue 3091](https://github.com/iBotPeaches/Apktool/pull/3091)) / (Thanks sv99)
+- Refactor into `ApkBuilder` and `ApkDecoder` instead of generic `Androlib`. ([Issue 3103](https://github.com/iBotPeaches/Apktool/pull/3103)) / (Thanks sv99)
+- Refactor new class `Framework` to lessen responsibility of `AndrolibResources`. ([Issue 3105](https://github.com/iBotPeaches/Apktool/pull/3105)) / (Thanks sv99)
+- Refactor `ApkDecoder` to split methods for `MetaInfo` towards `ResTable`. ([Issue 3106](https://github.com/iBotPeaches/Apktool/pull/3106)) / (Thanks sv99)
+- Refactor `ApkDecoder` to introduce common methods for manifest and resource operations. ([Issue 3109](https://github.com/iBotPeaches/Apktool/pull/3109)) / (Thanks sv99)
+- Refactor Gradle workflow into its own to cut down on unrelated CI failures. ([Issue 3114](https://github.com/iBotPeaches/Apktool/pull/3114))
+- Refactor `*Decoders` to split child classes into own class files. [(Issue 3116](https://github.com/iBotPeaches/Apktool/pull/3116))
+- Refactor classes to support new `ApkInvoker` class. ([Issue 3124](https://github.com/iBotPeaches/Apktool/pull/3124)) / (Thanks sv99)
+- Upgrade `gradle/gradle-build-action` to `2.5.1`. [(Issue 3119](https://github.com/iBotPeaches/Apktool/pull/3119))
+- Upgrade away from deprecated SnakeYAML constructors ([Issue 3079](https://github.com/iBotPeaches/Apktool/pull/3079)) / (Thanks MarcMil)
+- Upgrade codebase to use Java7 NIO library for IO. ([Issue 3055](https://github.com/iBotPeaches/Apktool/pull/3055)) / (Thanks sv99)
+- Upgrade to smali/baksmali 3.0.3 and move to Google fork of it. ([Issue 3050](https://github.com/iBotPeaches/Apktool/issues/3050))
+- Upgrade to Gradle 8.2 (Thanks ArjunaKumarMohanta)
+- Upgrade `commons-io` to `2.13.0` from `2.11.0`
+- Upgrade `guava` to `32.0.1-jre` from `31.0.1-jre`
+- Upgrade `proguard_gradle` to `7.3.2` from `7.3.0`
+- Upgrade `shadow` to `8.0.0` from `7.1.0`
+
+> This post was released in pair with https://connortumbleson.com/2023/07/17/apktool-v2-8-0-released and duplicated in part here for historical reasons.
