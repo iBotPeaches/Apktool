@@ -43,6 +43,10 @@ const config = {
             to: '/blog',
             from: '/changes/',
           },
+          {
+            to: '/docs/meta/contributing',
+            from: '/contribute/',
+          },
         ],
       },
     ],
