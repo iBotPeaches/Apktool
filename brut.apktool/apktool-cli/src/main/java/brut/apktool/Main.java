@@ -573,8 +573,8 @@ public class Main {
 
         // print out more information
         System.out.println(
-                "For additional info, see: https://ibotpeaches.github.io/Apktool/ \n"
-                        + "For smali/baksmali info, see: https://github.com/JesusFreke/smali");
+                "For additional info, see: https://apktool.org/ \n"
+                        + "For smali/baksmali info, see: https://github.com/google/smali");
     }
 
     private static void setupLogging(final Verbosity verbosity) {
