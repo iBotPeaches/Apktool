@@ -1,0 +1,52 @@
+---
+sidebar_label: resources.arsc
+title: The resources.arsc file
+sidebar_position: 1
+---
+
+Within an Android application lies a `resources.arsc`, which is a binary file containing resources of the application.
+The `.arsc` extension hints at Android Resource Storage Container which is a massive collection of chunks.
+
+If we dumped the first line of the file, we would see the following:
+
+```
+0200 0c00 f00b 0000 0100 0000 0100 1c00  ................
+```
+
+The `.arsc` file uses what is described as a `ResChunk_header` to describe the chunks within the file. This header is
+what starts of the file off and is as follows:
+
+#### ResChunk_header
+
+| Name        | Size    | Description            |
+|-------------|---------|------------------------|
+| Type        | 2 bytes | The type of the chunk  |
+| Header Size | 2 bytes | The size of the header |
+| Size        | 4 bytes | The size of the chunk  |
+
+So knowing we have a little endian structure we can parse out this header. We get:
+
+ * Type - `0x0002`
+ * Header Size - `0x000c`
+ * Size - `0x00000bf0`
+
+So we can leverage the [ResourceTypes.h](https://github.com/iBotPeaches/platform_frameworks_base/blob/master/libs/androidfw/include/androidfw/ResourceTypes.h)
+file in order to understand what this chunk is.
+
+```cpp
+enum {
+    RES_NULL_TYPE                     = 0x0000,
+    RES_STRING_POOL_TYPE              = 0x0001,
+    RES_TABLE_TYPE                    = 0x0002,
+    RES_XML_TYPE                      = 0x0003,
+};
+```
+
+So we start the file with a `RES_TABLE_TYPE` chunk. This chunk is described as:
+
+#### ResTable_header
+| Name          | Size    | Description            |
+|---------------|---------|------------------------|
+| Header        | 8 bytes | The type of the chunk  |
+| Package Count | 4 bytes | The number of packages |
+
