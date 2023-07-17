@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Feature request
+    url: https://github.com/iBotPeaches/Apktool/discussions/categories/ideas
+    about: 'For ideas or feature requests, start a new discussion'
