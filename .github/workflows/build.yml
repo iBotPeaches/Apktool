@@ -65,7 +65,7 @@ jobs:
       - analyze-windows-aapt
     name: Build/Test (JDK ${{ matrix.java }}, ${{ matrix.os }})
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         os: [ ubuntu-latest, macOS-latest, windows-latest ]
         java: [ 8, 11, 17, 18, 19 ]
