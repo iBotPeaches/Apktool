@@ -89,12 +89,10 @@ public class DirUtil {
                 // Skip copies of directories/files not found.
             } else {
                 String cleanedFilename = BrutIO.sanitizeUnknownFile(out, fileName);
-                if (! cleanedFilename.isEmpty()) {
-                    File outFile = new File(out, cleanedFilename);
-                    //noinspection ResultOfMethodCallIgnored
-                    outFile.getParentFile().mkdirs();
-                    BrutIO.copyAndClose(in.getFileInput(fileName), Files.newOutputStream(outFile.toPath()));
-                }
+                File outFile = new File(out, cleanedFilename);
+                //noinspection ResultOfMethodCallIgnored
+                outFile.getParentFile().mkdirs();
+                BrutIO.copyAndClose(in.getFileInput(fileName), Files.newOutputStream(outFile.toPath()));
             }
         } catch (RootUnknownFileException | InvalidUnknownFileException | TraversalUnknownFileException exception) {
             LOGGER.warning(String.format("Skipping file %s (%s)", fileName, exception.getMessage()));
