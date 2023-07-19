@@ -47,6 +47,9 @@ public class ApkInfo {
     public Map<String, String> unknownFiles;
     public Collection<String> doNotCompress;
 
+    /** @deprecated use {@link #resourcesAreCompressed} */
+    public boolean compressionType;
+
     public ApkInfo() {
         this.version = ApktoolProperties.getVersion();
     }
