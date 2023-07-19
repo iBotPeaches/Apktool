@@ -134,7 +134,7 @@ public class ApkDecoder {
             }
             ApkInfo apkInfo = resourcesDecoder.getApkInfo();
             if (mMinSdkVersion > 0) {
-                apkInfo.setSdkInfo(getMinSdkInfo());
+                apkInfo.setSdkInfoField("minSdkVersion", Integer.toString(mMinSdkVersion));
             }
 
             copyRawFiles(outDir);
@@ -181,12 +181,6 @@ public class ApkDecoder {
         } catch (IOException ex) {
             throw new AndrolibException(ex);
         }
-    }
-
-    private Map<String, String> getMinSdkInfo() {
-        Map<String, String> sdkInfo = new LinkedHashMap<>();
-        sdkInfo.put("minSdkVersion", Integer.toString(mMinSdkVersion));
-        return sdkInfo;
     }
 
     private void copySourcesRaw(File outDir, String filename)

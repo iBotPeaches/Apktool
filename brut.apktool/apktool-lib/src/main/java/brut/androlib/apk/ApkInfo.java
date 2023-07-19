@@ -98,6 +98,10 @@ public class ApkInfo {
         mSdkInfo = sdkInfo;
     }
 
+    public void setSdkInfoField(String key, String value) {
+        mSdkInfo.put(key, value);
+    }
+
     public String getMinSdkVersion() {
         return mSdkInfo.get("minSdkVersion");
     }
