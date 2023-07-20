@@ -46,10 +46,8 @@ public class ResAttrDecoder {
         throws AndrolibException {
 
         if (attrResId != 0) {
-            ResID resId = new ResID(attrResId);
-
             try {
-                ResResSpec resResSpec = mResTable.getResSpec(resId);
+                ResResSpec resResSpec = mResTable.getResSpec(attrResId);
                 if (resResSpec != null) {
                     return resResSpec.getName();
                 }
