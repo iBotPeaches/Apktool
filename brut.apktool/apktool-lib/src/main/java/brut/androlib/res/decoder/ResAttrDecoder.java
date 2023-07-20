@@ -20,6 +20,7 @@ import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.exceptions.CantFindFrameworkResException;
 import brut.androlib.exceptions.UndefinedResObjectException;
 import brut.androlib.res.data.ResID;
+import brut.androlib.res.data.ResPackage;
 import brut.androlib.res.data.ResResSpec;
 import brut.androlib.res.data.ResTable;
 import brut.androlib.res.data.value.ResAttr;
@@ -28,7 +29,8 @@ import brut.androlib.res.data.value.ResScalarValue;
 public class ResAttrDecoder {
     public String decode(int type, int value, String rawValue, int attrResId)
         throws AndrolibException {
-        ResScalarValue resValue = mResTable.getCurrentResPackage().getValueFactory().factory(type, value, rawValue);
+        ResPackage pkg = mResTable.getCurrentResPackage();
+        ResScalarValue resValue = pkg.getValueFactory().factory(type, value, rawValue);
 
         String decoded = null;
         if (attrResId > 0) {
@@ -46,14 +48,24 @@ public class ResAttrDecoder {
         throws AndrolibException {
 
         if (attrResId != 0) {
-            ResID resId = new ResID(attrResId);
+            ResPackage pkg = mResTable.getCurrentResPackage();
+            int attrId = attrResId;
 
-            try {
-                ResResSpec resResSpec = mResTable.getResSpec(resId);
+            // See also: brut.androlib.res.data.ResTable.getResSpec
+            if (attrId >> 24 == 0) {
+                int packageId = pkg.getId();
+                int pkgId = (packageId == 0 ? 2 : packageId);
+                attrId = (0xFF000000 & (pkgId << 24)) | attrId;
+            }
+
+            // Retrieve the ResSpec in a package by id
+            ResID resId = new ResID(attrId);
+            if (pkg.hasResSpec(resId)) {
+                ResResSpec resResSpec = pkg.getResSpec(resId);
                 if (resResSpec != null) {
                     return resResSpec.getName();
                 }
-            } catch (UndefinedResObjectException | CantFindFrameworkResException ignored) {}
+            }
         }
 
         return null;

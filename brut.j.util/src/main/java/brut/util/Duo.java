@@ -27,6 +27,7 @@ public class Duo<T1, T2> {
         this.m2 = t2;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
