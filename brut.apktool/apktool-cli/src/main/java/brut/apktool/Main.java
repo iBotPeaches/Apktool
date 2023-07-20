@@ -183,7 +183,8 @@ public class Main {
             outDir = new File(outName);
         }
 
-        ApkDecoder decoder = new ApkDecoder(config, new ExtFile(apkName));
+        ExtFile apkFile = new ExtFile(apkName);
+        ApkDecoder decoder = new ApkDecoder(config, apkFile);
 
         try {
             decoder.decode(outDir);
@@ -195,7 +196,7 @@ public class Main {
                             + "already exists. Use -f switch if you want to overwrite it.");
             System.exit(1);
         } catch (InFileNotFoundException ex) {
-            System.err.println("Input file (" + apkName + ") " + "was not found or was not readable.");
+            System.err.println("Input file (" + apkFile.getAbsolutePath() + ") " + "was not found or was not readable.");
             System.exit(1);
         } catch (CantFindFrameworkResException ex) {
             System.err

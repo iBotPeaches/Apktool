@@ -42,17 +42,24 @@ application {
     mainClass = 'brut.apktool.Main'
 }
 
+tasks.named('run') {
+    // run from root directory
+    // otherwise run from brut.apktool/apktool-cli
+    workingDir = file(System.getProperty('user.dir'))
+}
+
 jar {
     manifest {
         attributes 'Main-Class': 'brut.apktool.Main'
     }
 }
 
-task cleanOutputDirectory(type: Delete) {
+tasks.register('cleanOutputDirectory', Delete) {
     delete fileTree(dir: jar.getDestinationDirectory().getAsFile(), exclude: "apktool-cli-all.jar")
 }
 
-task proguard(type: ProGuardTask, dependsOn: shadowJar) {
+tasks.register('proguard', ProGuardTask) {
+    dependsOn shadowJar
     injars shadowJar.getArchiveFile()
 
     // Java 9 and prior uses merged package for runtime, later uses split jmod files.
