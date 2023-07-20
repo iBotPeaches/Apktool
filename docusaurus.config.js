@@ -161,6 +161,15 @@ const config = {
         darkTheme: darkCodeTheme,
         additionalLanguages: ['java', 'smali', 'bash'],
       },
+      algolia: {
+        appId: 'P3KZHU1SCW',
+        apiKey: '10bf8c8c0768d8404b2bc87d75ec8c1b',
+        indexName: 'apktool',
+        contextualSearch: true,
+        externalUrlRegex: 'apktool\\.org',
+        searchParameters: {},
+        searchPagePath: 'search',
+      },
     }),
 };
 
