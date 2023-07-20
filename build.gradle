@@ -142,6 +142,10 @@ subprojects {
     apply plugin: 'java'
 
     test {
+        // https://github.com/iBotPeaches/Apktool/issues/3174
+        systemProperty 'jdk.nio.zipfs.allowDotZipEntry', 'true'
+        systemProperty 'jdk.util.zip.disableZip64ExtraFieldValidation', 'true'
+
         testLogging {
             exceptionFormat = 'full'
         }
