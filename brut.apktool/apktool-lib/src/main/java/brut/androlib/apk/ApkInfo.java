@@ -35,10 +35,10 @@ import java.util.Map;
 public class ApkInfo {
     public String version;
 
-    private String mApkFileName;
+    private String apkFileName;
     public boolean isFrameworkApk;
     public UsesFramework usesFramework;
-    private Map<String, String> mSdkInfo = new LinkedHashMap<>();
+    private Map<String, String> sdkInfo = new LinkedHashMap<>();
     public PackageInfo packageInfo = new PackageInfo();
     public VersionInfo versionInfo = new VersionInfo();
     public boolean resourcesAreCompressed;
@@ -46,6 +46,9 @@ public class ApkInfo {
     public boolean sparseResources;
     public Map<String, String> unknownFiles;
     public Collection<String> doNotCompress;
+
+    /** @deprecated use {@link #resourcesAreCompressed} */
+    public boolean compressionType;
 
     public ApkInfo() {
         this.version = ApktoolProperties.getVersion();
@@ -83,38 +86,42 @@ public class ApkInfo {
     }
 
     public String getApkFileName() {
-        return mApkFileName;
+        return apkFileName;
     }
 
     public void setApkFileName(String apkFileName) {
-        mApkFileName = apkFileName;
+        this.apkFileName = apkFileName;
     }
 
     public Map<String, String> getSdkInfo() {
-        return mSdkInfo;
+        return sdkInfo;
     }
 
     public void setSdkInfo(Map<String, String> sdkInfo) {
-        mSdkInfo = sdkInfo;
+        this.sdkInfo = sdkInfo;
+    }
+
+    public void setSdkInfoField(String key, String value) {
+        sdkInfo.put(key, value);
     }
 
     public String getMinSdkVersion() {
-        return mSdkInfo.get("minSdkVersion");
+        return sdkInfo.get("minSdkVersion");
     }
 
     public String getMaxSdkVersion() {
-        return mSdkInfo.get("maxSdkVersion");
+        return sdkInfo.get("maxSdkVersion");
     }
 
     public String getTargetSdkVersion() {
-        return mSdkInfo.get("targetSdkVersion");
+        return sdkInfo.get("targetSdkVersion");
     }
 
     public int getMinSdkVersionFromAndroidCodename(String sdkVersion) {
         int sdkNumber = mapSdkShorthandToVersion(sdkVersion);
 
         if (sdkNumber == ResConfigFlags.SDK_BASE) {
-            return Integer.parseInt(mSdkInfo.get("minSdkVersion"));
+            return Integer.parseInt(sdkInfo.get("minSdkVersion"));
         }
         return sdkNumber;
     }
