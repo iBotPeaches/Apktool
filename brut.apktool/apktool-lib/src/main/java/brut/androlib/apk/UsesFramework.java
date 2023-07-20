@@ -16,9 +16,32 @@
  */
 package brut.androlib.apk;
 
+import brut.androlib.exceptions.AndrolibException;
+
 import java.util.List;
 
-public class UsesFramework {
+public class UsesFramework implements YamlSerializable {
     public List<Integer> ids;
     public String tag;
+
+    @Override
+    public void readItem(YamlReader reader) throws AndrolibException {
+        YamlLine line = reader.getLine();
+        switch (line.key) {
+            case "ids": {
+                ids = reader.readIntList();
+                break;
+            }
+            case "tag": {
+                tag = line.getValueString();
+                break;
+            }
+        }
+    }
+
+    @Override
+    public void write(YamlWriter writer) {
+        writer.writeList("ids", ids);
+        writer.writeString("tag", tag);
+    }
 }

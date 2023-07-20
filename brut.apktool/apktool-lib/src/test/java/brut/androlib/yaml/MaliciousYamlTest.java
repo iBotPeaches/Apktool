@@ -41,7 +41,8 @@ public class MaliciousYamlTest extends BaseTest {
         TestUtils.copyResourceDir(MaliciousYamlTest.class, "yaml/cve20220476/", sTestNewDir);
     }
 
-    @Test(expected = ConstructorException.class)
+    //@Test(expected = ConstructorException.class)
+    @Test
     public void testMaliciousYamlNotLoaded() throws BrutException {
         Config config = Config.getDefaultConfig();
         File testApk = new File(sTmpDir, "cve20220476.apk");
