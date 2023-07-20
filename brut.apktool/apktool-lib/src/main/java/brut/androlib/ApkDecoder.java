@@ -135,7 +135,7 @@ public class ApkDecoder {
 
             // In case we have no resources. We should store the minSdk we pulled from the source opcode api level
             ApkInfo apkInfo = resourcesDecoder.getApkInfo();
-            if (mMinSdkVersion > 0) {
+            if (! resourcesDecoder.hasResources() && mMinSdkVersion > 0) {
                 apkInfo.setSdkInfoField("minSdkVersion", Integer.toString(mMinSdkVersion));
             }
 
