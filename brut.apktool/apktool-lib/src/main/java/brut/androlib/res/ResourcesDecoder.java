@@ -65,7 +65,7 @@ public class ResourcesDecoder {
         mResTable = new ResTable(mConfig, mApkInfo);
     }
 
-    private boolean hasManifest() throws AndrolibException {
+    public boolean hasManifest() throws AndrolibException {
         try {
             return mApkFile.getDirectory().containsFile("AndroidManifest.xml");
         } catch (DirectoryException ex) {
@@ -73,7 +73,7 @@ public class ResourcesDecoder {
         }
     }
 
-    private boolean hasResources() throws AndrolibException {
+    public boolean hasResources() throws AndrolibException {
         try {
             return mApkFile.getDirectory().containsFile("resources.arsc");
         } catch (DirectoryException ex) {
