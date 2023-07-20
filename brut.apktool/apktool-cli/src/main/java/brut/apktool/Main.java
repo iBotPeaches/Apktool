@@ -42,6 +42,12 @@ public class Main {
         // headless
         System.setProperty("java.awt.headless", "true");
 
+        // Ignore stricter validation on zip files from java 11 onwards as this is a protection technique
+        // that applications use to thwart disassembly tools. We have protections in place for directory traversal
+        // and handling of bogus data in the zip header, so we can ignore this.
+        System.setProperty("jdk.nio.zipfs.allowDotZipEntry", "true");
+        System.setProperty("jdk.util.zip.disableZip64ExtraFieldValidation", "true");
+
         // set verbosity default
         Verbosity verbosity = Verbosity.NORMAL;
 
