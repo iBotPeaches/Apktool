@@ -10,7 +10,7 @@ The `.arsc` extension hints at Android Resource Storage Container which is a mas
 If we dumped the first line of the file, we would see the following:
 
 ```
-0200 0c00 f00b 0000 0100 0000 0100 1c00  ................
+00000000: 0200 0c00 f00b 0000 0100 0000 0100 1c00  ................
 ```
 
 The `.arsc` file uses what is described as a `ResChunk_header` to describe the chunks within the file. This header is
@@ -50,3 +50,62 @@ So we start the file with a `RES_TABLE_TYPE` chunk. This chunk is described as:
 | ------------- | ------- | ---------------------- |
 | Header        | 8 bytes | The type of the chunk  |
 | Package Count | 4 bytes | The number of packages |
+
+A pretty simple chunk that just helps understand how many `ResTable_package` chunks are within the file. So now that
+we understand that each chunk begins with a `ResChunk_header` we can safely read the next chunk to see what it is.
+
+So now let's bring up the line again and mark what we've already read.
+
+```
+00000000: [0200 0c00 f00b 0000] 0100 0000 0100 1c00  ................
+```
+
+So we can see that the next chunk is a `RES_STRING_POOL_TYPE` (`0x0001`) chunk after reading the `type` of the `ResChunk_header`.
+This string pool chunk is described as:
+
+| Name          | Size    | Description                                            |
+| ------------- | ------- | ------------------------------------------------------ |
+| String Count  | 4 bytes | Number of strings in the pool                          |
+| Style Count   | 4 bytes | Number of style span arrays in pool                    |
+| Flags         | 4 bytes | Whether the strings are UTF-8 or UTF-16, sorted or not |
+| String Offset | 4 bytes | The offset in bytes from header to the string data     |
+| Style Offset  | 4 bytes | The offset in bytes from header to the style data      |
+
+This chunk is a bit more complex than the previous chunk, but we can still parse it out. We learn how many strings and
+styles we have and where they start in the file. So Apktool works in this situation by reading those pools of data and
+storing them in memory. This allows us to reference them later on when we need to via the indicies.
+
+The String Pool in itself has so many quirks and oddities that we will not be covering them in this document. If you
+want a deep dive on how the string pool works. This String Pool (TODO) document can help. For now just assume you can
+reference an index in the string pool and get a string back.
+
+The String Pool is important to read first because it contains all the string values of the entire resource table.
+However, except not the names of entries or type identifiers are contained within that pool.
+
+So now assuming we properly read the pool and/or skipped it from the information contained in the `ResChunk_header` we
+end up at another new chunk. Below is the relevant segment after the String Pool.
+
+```
+00000340: 0000 0000] 0002 2001 ac08 0000 7f00 0000  ...... .........
+00000350: 6300 6f00 6d00 2e00 6900 6200 6f00 7400  c.o.m...i.b.o.t.
+00000360: 7000 6500 6100 6300 6800 6500 7300 2e00  p.e.a.c.h.e.s...
+00000370: 6100 7200 7300 6300 7400 6500 7300 7400  a.r.s.c.t.e.s.t.
+```
+
+- `]` - end of string pool.
+
+So if we read another `ResChunk_header` we get a new type of chunk. This chunk is a `RES_TABLE_TYPE` (`0x0200`) chunk
+which is described as:
+
+| Name                           | Size     | Description                                                                     |
+| ------------------------------ | -------- | ------------------------------------------------------------------------------- |
+| Package Id                     | 4 bytes  | Package Id                                                                      |
+| Package Name                   | Variable | Package Name, null terminated                                                   |
+| Type String Offset             | 4 bytes  | Offset to the type symbol table, may be zero if inheriting from another package |
+| Last Public Type String Offset | 4 bytes  | Last index in the above table of public types                                   |
+| Key Symbol Offset              | 4 bytes  | Offset to the key symbol table, may be zero if inheriting from another package  |
+| Last Public Key Symbol Offset  | 4 bytes  | Last index in the above table of key symbols                                    |
+| Type Id Offset                 | 4 bytes  | Offset to the specific type ids for split apks                                  |
+
+This chunk suggests from the properties and explanation that this chunk will kick off the child `ResTable_type` and
+`ResTable_typeSpec` chunks.
