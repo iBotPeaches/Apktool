@@ -120,6 +120,9 @@ public class ARSCDecoder {
                     }
                     break chunkLoop;
             }
+
+            // Check for chunks that are lying about their header size
+            mHeader.skipRemainingHeader(mIn, mCountIn);
         }
 
         if (mPkg.getResSpecCount() > 0) {
