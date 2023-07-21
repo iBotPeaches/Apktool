@@ -170,7 +170,6 @@ public class ApkBuilder {
             File[] dexFiles = appDir.listFiles();
             if (dexFiles != null) {
                 for (File dex : dexFiles) {
-
                     // skip classes.dex because we have handled it in buildSources()
                     if (dex.getName().endsWith(".dex") && ! dex.getName().equalsIgnoreCase("classes.dex")) {
                         buildSourcesRaw(appDir, dex.getName());
