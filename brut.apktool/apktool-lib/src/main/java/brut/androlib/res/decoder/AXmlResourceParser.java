@@ -387,7 +387,14 @@ public class AXmlResourceParser implements XmlResourceParser {
         if (mAttrDecoder != null) {
             try {
                 String stringBlockValue = valueRaw == -1 ? null : ResXmlEncoders.escapeXmlChars(mStringBlock.getString(valueRaw));
-                String resourceMapValue = mAttrDecoder.decodeFromResourceId(valueData);
+                String resourceMapValue = null;
+
+                // Ensure we only track down obfuscated values for reference/attribute type values. Otherwise we might
+                // spam lookups against resource table for invalid ids.
+                if (valueType == TypedValue.TYPE_REFERENCE || valueType == TypedValue.TYPE_DYNAMIC_REFERENCE ||
+                    valueType == TypedValue.TYPE_ATTRIBUTE || valueType == TypedValue.TYPE_DYNAMIC_ATTRIBUTE) {
+                    resourceMapValue = mAttrDecoder.decodeFromResourceId(valueData);
+                }
                 String value = stringBlockValue;
 
                 if (stringBlockValue != null && resourceMapValue != null) {
