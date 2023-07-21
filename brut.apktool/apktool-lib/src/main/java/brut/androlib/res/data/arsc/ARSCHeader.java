@@ -50,9 +50,11 @@ public class ARSCHeader {
         return new ARSCHeader(type, in.readShort(), in.readInt(), start);
     }
 
-    public void skipRemainingHeader(ExtDataInput in, CountingInputStream countIn) throws IOException {
+    public void checkForUnreadChunk(ExtDataInput in, CountingInputStream countIn) throws IOException {
         // Some applications lie about the reported size of their chunk header. Trusting the chunkSize is misleading
         // So compare to what we actually read in the header vs reported and skip the rest.
+        // However, this runs after each chunk and not every chunk reading has a specific distinction between the
+        // header and the body.
         int actualHeaderSize = countIn.getCount() - this.startPosition;
         int exceedingSize = this.headerSize - actualHeaderSize;
         if (exceedingSize > 0) {
