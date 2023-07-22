@@ -243,9 +243,6 @@ public class ResourcesDecoder {
                     break;
             }
             mResTable.initApkInfo(mApkInfo, outDir);
-            if (mConfig.frameworkTag != null) {
-                mApkInfo.usesFramework.tag = mConfig.frameworkTag;
-            }
         }
         return mResTable;
     }
