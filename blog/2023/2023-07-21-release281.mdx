@@ -1,0 +1,29 @@
+---
+slug: apktool-2.8.1
+title: Apktool 2.8.1
+authors: ibotpeaches
+tags: [release]
+---
+
+- Add JDK 20 to test suite. [#3177](https://github.com/iBotPeaches/Apktool/pull/3177)
+- Add `run` command for Gradle inline execution. [#3179](https://github.com/iBotPeaches/Apktool/pull/3179)
+- Fix links on usage output for new smali & apktool links.
+- Fix Windows issue copying files that resolved to an empty filename. [#3165](https://github.com/iBotPeaches/Apktool/issues/3165)
+- Fix Java restriction with ZIP64 extra field validation. [#3174](https://github.com/iBotPeaches/Apktool/issues/3174), [#3170](https://github.com/iBotPeaches/Apktool/issues/3170)
+- Fix regression on `apktool.yml` property names. [#3169](https://github.com/iBotPeaches/Apktool/issues/3169)
+- Fix regression on `minSdkVersion` value being blown out before setting into `apktool.yml`. [#3182](https://github.com/iBotPeaches/Apktool/pull/3182) / (Thanks IgorEisberg)
+- Fix regression on inefficient reading of framework files during attribute parsing. [#3181](https://github.com/iBotPeaches/Apktool/issues/31810
+- Refactor descriptions on commands. [#3188](https://github.com/iBotPeaches/Apktool/pull/3188) / (Thanks IgorEisberg)
+- Upgrade `gradle/gradle-build-action` to `2.6.0` [#3151](https://github.com/iBotPeaches/Apktool/pull/3151)
+- Upgrade to Gradle 8.2.1 [#3141](https://github.com/iBotPeaches/Apktool/pull/3141) / (Thanks ArjunaKumarMohanta)
+
+:::success
+
+[Download now at Bitbucket](https://bitbucket.org/iBotPeaches/apktool/downloads/apktool_2.8.1.jar)
+
+- md5 - `b23b9f062e2bc68d7b26f41ad8847a5f`
+- sha256 - `d8df4042183ceba0d2326896b22eca609b6dd1253ee3ef5e30ca30122a409458`
+
+:::
+
+> This post was released in pair with https://connortumbleson.com/2023/07/22/apktool-v2-8-1-released and duplicated in part here for historical reasons.
