@@ -26,7 +26,6 @@ buildscript {
                 guava          : 'com.google.guava:guava:32.0.1-jre',
                 junit          : 'junit:junit:4.13.2',
                 proguard_gradle: 'com.guardsquare:proguard-gradle:7.3.2',
-                snakeyaml      : 'org.yaml:snakeyaml:1.32:android',
                 smali          : 'com.android.tools.smali:smali:3.0.3',
                 xmlpull        : 'xpp3:xpp3:1.1.4c',
                 xmlunit        : 'xmlunit:xmlunit:1.6',

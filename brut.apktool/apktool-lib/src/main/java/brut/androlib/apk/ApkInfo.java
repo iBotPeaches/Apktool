@@ -21,10 +21,6 @@ import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.data.ResConfigFlags;
 import brut.directory.DirectoryException;
 import brut.directory.FileDirectory;
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.LoaderOptions;
-import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.introspector.PropertyUtils;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -52,26 +48,6 @@ public class ApkInfo implements YamlSerializable {
 
     public ApkInfo() {
         this.version = ApktoolProperties.getVersion();
-    }
-
-    private static Yaml getYaml() {
-        DumperOptions dumpOptions = new DumperOptions();
-        dumpOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-
-        EscapedStringRepresenter representer = new EscapedStringRepresenter();
-        PropertyUtils propertyUtils = representer.getPropertyUtils();
-        propertyUtils.setSkipMissingProperties(true);
-
-        LoaderOptions loaderOptions = new LoaderOptions();
-        loaderOptions.setCodePointLimit(10 * 1024 * 1024); // 10mb
-
-        return new Yaml(new ClassSafeConstructor(), representer, dumpOptions, loaderOptions);
-    }
-
-    public void save(Writer output) {
-        DumperOptions options = new DumperOptions();
-        options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-        getYaml().dump(this, output);
     }
 
     public String checkTargetSdkVersionBounds() {
@@ -157,16 +133,6 @@ public class ApkInfo implements YamlSerializable {
         }
     }
 
-//    public void save(File file) throws IOException {
-//        try(
-//                FileOutputStream fos = new FileOutputStream(file);
-//                OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
-//                Writer writer = new BufferedWriter(outputStreamWriter)
-//        ) {
-//            save(writer);
-//        }
-//    }
-
     public void save(File file) throws AndrolibException {
         try (
             YamlWriter writer = new YamlWriter(new FileOutputStream(file));
@@ -186,17 +152,6 @@ public class ApkInfo implements YamlSerializable {
         reader.readRoot(apkInfo);
         return apkInfo;
     }
-
-//    public static ApkInfo load(File appDir)
-//        throws AndrolibException {
-//        try(
-//            InputStream in = new FileDirectory(appDir).getFileInput("apktool.yml")
-//        ) {
-//            return ApkInfo.load(in);
-//        } catch (DirectoryException | IOException ex) {
-//            throw new AndrolibException(ex);
-//        }
-//    }
 
     public static ApkInfo load(File appDir)
         throws AndrolibException {
