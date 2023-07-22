@@ -17,30 +17,16 @@
 package brut.androlib.apk;
 
 import brut.androlib.exceptions.AndrolibException;
+import org.junit.Test;
 
-public class PackageInfo implements YamlSerializable {
-    public String forcedPackageId;
-    public String renameManifestPackage;
+import static org.junit.Assert.assertEquals;
 
-    @Override
-    public void readItem(YamlReader reader) throws AndrolibException {
-        YamlLine line = reader.getLine();
-        switch (line.getKey()) {
-            case "forcedPackageId": {
-                forcedPackageId = line.getValue();
-                break;
-            }
-            case "renameManifestPackage": {
-                renameManifestPackage = line.getValue();
-                break;
-            }
-        }
+public class MaliciousYamlTest {
+
+    @Test
+    public void testMaliciousYaml() throws AndrolibException {
+        ApkInfo apkInfo = ApkInfo.load(
+            this.getClass().getResourceAsStream("/apk/cve20220476.yml"));
+        assertEquals("2.6.1-ddc4bb-SNAPSHOT", apkInfo.version);
     }
-
-    @Override
-    public void write(YamlWriter writer) {
-        writer.writeString("forcedPackageId", forcedPackageId);
-        writer.writeString("renameManifestPackage", renameManifestPackage);
-    }
-
 }

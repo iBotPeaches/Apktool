@@ -27,6 +27,7 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.introspector.PropertyUtils;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -182,7 +183,8 @@ public class ApkInfo implements YamlSerializable {
         // return getYaml().loadAs(is, ApkInfo.class);
         YamlReader reader = new YamlReader(is);
         ApkInfo apkInfo = new ApkInfo();
-        return reader.readRoot(apkInfo);
+        reader.readRoot(apkInfo);
+        return apkInfo;
     }
 
 //    public static ApkInfo load(File appDir)
@@ -210,13 +212,13 @@ public class ApkInfo implements YamlSerializable {
     @Override
     public void readItem(YamlReader reader) throws AndrolibException {
         YamlLine line = reader.getLine();
-        switch (line.key) {
+        switch (line.getKey()) {
             case "version": {
-                this.version = line.getValueString();
+                this.version = line.getValue();
                 break;
             }
             case "apkFileName": {
-                this.apkFileName = line.getValueString();
+                this.apkFileName = line.getValue();
                 break;
             }
             case "isFrameworkApk": {
@@ -229,7 +231,7 @@ public class ApkInfo implements YamlSerializable {
                 break;
             }
             case "sdkInfo": {
-                this.sdkInfo = reader.readMap();
+                reader.readMap(sdkInfo);
                 break;
             }
             case "packageInfo": {
@@ -256,11 +258,13 @@ public class ApkInfo implements YamlSerializable {
                 break;
             }
             case "unknownFiles": {
-                this.unknownFiles = reader.readMap();
+                this.unknownFiles = new LinkedHashMap<>();
+                reader.readMap(unknownFiles);
                 break;
             }
             case "doNotCompress": {
-                this.doNotCompress = reader.readStringList();
+                this.doNotCompress = new ArrayList<>();
+                reader.readStringList(doNotCompress);
                 break;
             }
         }

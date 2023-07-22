@@ -5,8 +5,8 @@ import java.util.Objects;
 public class YamlLine {
 
     public int indent = 0;
-    public String key = "";
-    public String value = "";
+    private String key = "";
+    private String value = "";
     public boolean isComment;
     public boolean isEmpty;
     public boolean hasColon;
@@ -59,7 +59,11 @@ public class YamlLine {
         }
     }
 
-    public String getValueString() {
+    public static String unescape(String value) {
+        return YamlStringEscapeUtils.unescapeString(value);
+    }
+
+    public String getValue() {
         if (value.equals("null"))
             return null;
         String res = YamlStringEscapeUtils.unescapeString(value);
@@ -69,7 +73,7 @@ public class YamlLine {
         return res;
     }
 
-    public String getKeyString() {
+    public String getKey() {
         String res = YamlStringEscapeUtils.unescapeString(key);
         // remove quotation marks
         res = res.replaceAll("^\"|\"$", "");

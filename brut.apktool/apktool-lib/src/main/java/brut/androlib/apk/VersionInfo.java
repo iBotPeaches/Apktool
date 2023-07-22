@@ -25,13 +25,13 @@ public class VersionInfo implements YamlSerializable {
     @Override
     public void readItem(YamlReader reader) throws AndrolibException {
         YamlLine line = reader.getLine();
-        switch (line.key) {
+        switch (line.getKey()) {
             case "versionCode": {
-                versionCode = line.getValueString();
+                versionCode = line.getValue();
                 break;
             }
             case "versionName": {
-                versionName = line.getValueString();
+                versionName = line.getValue();
                 break;
             }
         }

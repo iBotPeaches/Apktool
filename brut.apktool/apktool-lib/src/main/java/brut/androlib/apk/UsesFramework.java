@@ -18,6 +18,7 @@ package brut.androlib.apk;
 
 import brut.androlib.exceptions.AndrolibException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class UsesFramework implements YamlSerializable {
@@ -27,13 +28,14 @@ public class UsesFramework implements YamlSerializable {
     @Override
     public void readItem(YamlReader reader) throws AndrolibException {
         YamlLine line = reader.getLine();
-        switch (line.key) {
+        switch (line.getKey()) {
             case "ids": {
-                ids = reader.readIntList();
+                ids = new ArrayList<>();
+                reader.readIntList(ids);
                 break;
             }
             case "tag": {
-                tag = line.getValueString();
+                tag = line.getValue();
                 break;
             }
         }

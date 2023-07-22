@@ -4,7 +4,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-public class YamlWriter implements AutoCloseable {
+public class YamlWriter implements Closeable {
 
     private int mIndent = 0;
     private final PrintWriter mWriter;
@@ -16,7 +16,7 @@ public class YamlWriter implements AutoCloseable {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() throws IOException {
         mWriter.close();
     }
 
@@ -29,6 +29,10 @@ public class YamlWriter implements AutoCloseable {
         // return " ".repeat(mIndent);
         // for java 8
         return String.join("", Collections.nCopies(mIndent, " "));
+    }
+
+    public static String escape(String value) {
+        return YamlStringEscapeUtils.escapeString(value);
     }
 
     public void nextIndent() {
@@ -46,24 +50,23 @@ public class YamlWriter implements AutoCloseable {
 
     public void writeInt(String key, int value) {
         writeIndent();
-        mWriter.println(key + ": " + value);
+        mWriter.println(escape(key) + ": " + value);
     }
 
     public void writeBool(String key, boolean value) {
         writeIndent();
         String val = value ? "true": "false";
-        mWriter.println(key + ": " + val);
+        mWriter.println(escape(key) + ": " + val);
     }
 
     public void writeString(String key, String value, boolean quoted) {
         writeIndent();
         if (Objects.isNull(value)) {
-            mWriter.println(key + ": null");
+            mWriter.println(escape(key) + ": null");
         } else {
-            value = YamlStringEscapeUtils.escapeString(value);
             if (quoted)
                 value = QUOTE + value + QUOTE;
-            mWriter.println(YamlStringEscapeUtils.escapeString(key) + ": " + value);
+            mWriter.println(escape(key) + ": " + escape(value));
         }
     }
 
@@ -75,7 +78,7 @@ public class YamlWriter implements AutoCloseable {
         if (Objects.isNull(list))
             return;
         writeIndent();
-        mWriter.println(key + ":");
+        mWriter.println(escape(key) + ":");
         for (T item: list) {
             writeIndent();
             mWriter.println("- " +  item);
@@ -86,7 +89,7 @@ public class YamlWriter implements AutoCloseable {
         if (Objects.isNull(map))
             return;
         writeIndent();
-        mWriter.println(key + ":");
+        mWriter.println(escape(key) + ":");
         nextIndent();
         for (K mapKey: map.keySet()) {
             writeIndent();
@@ -99,15 +102,10 @@ public class YamlWriter implements AutoCloseable {
         if (Objects.isNull(map))
             return;
         writeIndent();
-        mWriter.println(key + ":");
+        mWriter.println(escape(key) + ":");
         nextIndent();
         for (String mapKey: map.keySet()) {
             writeString(mapKey, map.get(mapKey));
-//            writeIndent();
-//            String val = map.get(mapKey);
-//            mapKey = YamlStringEscapeUtils.escapeString(mapKey);
-//            val = YamlStringEscapeUtils.escapeString(val);
-//            mWriter.println(mapKey + ": " +  val);
         }
         prevIndent();
     }
@@ -116,7 +114,7 @@ public class YamlWriter implements AutoCloseable {
         if (Objects.isNull(obj))
             return;
         writeIndent();
-        mWriter.println(key + ":");
+        mWriter.println(escape(key) + ":");
         nextIndent();
         obj.write(this);
         prevIndent();

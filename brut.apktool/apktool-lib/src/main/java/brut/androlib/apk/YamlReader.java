@@ -84,14 +84,14 @@ public class YamlReader {
     /**
     * Read root object from start to end
     */
-    public <T extends YamlSerializable> T readRoot(T obj) throws AndrolibException {
+    public <T extends YamlSerializable> void readRoot(T obj) throws AndrolibException {
         if (isEnd())
-            return obj;
+            return;
         int objIndent = 0;
         skipInsignificant();
         while (true) {
             if (isEnd())
-                return obj;
+                return;
             YamlLine line = getLine();
             // skip don't checked line or lines with other indent
             if (objIndent != line.indent || !line.hasColon) {
@@ -108,11 +108,11 @@ public class YamlReader {
      * The object data should be placed on the next line
      * and have indent.
      */
-    public <T> T readObject(T obj,
+    public <T> void readObject(T obj,
                             Checker check,
                             Updater<T> updater) throws AndrolibException {
         if (isEnd())
-            return obj;
+            return;
         int prevIndent = getIndent();
         // detect indent for the object data
         nextLine();
@@ -122,24 +122,23 @@ public class YamlReader {
         // otherwise stop reading
         if (objIndent <= prevIndent || !check.check(line)) {
             pushLine();
-            return obj;
+            return;
         }
         updater.update(obj, this);
         while (nextLine()) {
             if (isEnd())
-                return obj;
+                return;
             line = getLine();
             if (objIndent != line.indent || !check.check(line)) {
                 pushLine();
-                return obj;
+                return;
             }
             updater.update(obj, this);
         }
-        return obj;
     }
 
-    <T extends YamlSerializable> T readObject(T obj) throws AndrolibException {
-        return readObject(obj,
+    <T extends YamlSerializable> void readObject(T obj) throws AndrolibException {
+        readObject(obj,
             line -> line.hasColon,
             YamlSerializable::readItem);
     }
@@ -149,54 +148,51 @@ public class YamlReader {
      * The list data should be placed on the next line.
      * Data should have same indent. May by same with name.
      */
-    public <T> List<T> readList(List<T> list,
+    public <T> void readList(List<T> list,
                                 Updater<List<T>> updater) throws AndrolibException {
         if (isEnd())
-            return list;
+            return;
         int listIndent = getIndent();
         nextLine();
         int dataIndent = getIndent();
         while (true) {
             if (isEnd())
-                return list;
+                return;
             // check incorrect data indent
             if (dataIndent < listIndent) {
                 pushLine();
-                return list;
+                return;
             }
             YamlLine line = getLine();
             if (dataIndent != line.indent || !line.isItem) {
                 pushLine();
-                return list;
+                return;
             }
             updater.update(list, this);
             nextLine();
         }
     }
 
-    public List<String> readStringList() throws AndrolibException {
-        List<String> list = new ArrayList<>();
-        return readList(list,
+    public void readStringList(List<String> list) throws AndrolibException {
+        readList(list,
             (items, reader) -> {
-                items.add(reader.getLine().getValueString());
+                items.add(reader.getLine().getValue());
             });
     };
 
-    public List<Integer> readIntList() throws AndrolibException {
-        List<Integer> list = new ArrayList<>();
-        return readList(list,
+    public void readIntList(List<Integer> list) throws AndrolibException {
+        readList(list,
             (items, reader) -> {
                 items.add(reader.getLine().getValueInt());
             });
     };
 
-    public Map<String, String> readMap() throws AndrolibException {
-        Map<String, String> map = new LinkedHashMap<>();
-        return readObject(map,
+    public void readMap(Map<String, String> map) throws AndrolibException {
+        readObject(map,
             line -> line.hasColon,
             (items, reader) -> {
                 YamlLine line = reader.getLine();
-                items.put(line.getKeyString(), line.getValueString());
+                items.put(line.getKey(), line.getValue());
             });
     };
 }
