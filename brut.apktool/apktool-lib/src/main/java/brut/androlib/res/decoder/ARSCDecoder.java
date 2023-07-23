@@ -126,12 +126,6 @@ public class ARSCDecoder {
             addMissingResSpecs();
         }
 
-        // We've detected sparse resources, lets record this so we can rebuild in that same format (sparse/not)
-        // with aapt2. aapt1 will ignore this.
-        if (! mResTable.getSparseResources()) {
-            mResTable.setSparseResources(true);
-        }
-
         return pkgs.toArray(new ResPackage[0]);
     }
 
@@ -276,6 +270,9 @@ public class ARSCDecoder {
 
         if ((typeFlags & 0x01) != 0) {
             LOGGER.fine("Sparse type flags detected: " + mTypeSpec.getName());
+
+            // We've detected sparse resources, lets record this so we can rebuild in that same format
+            mResTable.setSparseResources(true);
         }
 
         HashMap<Integer, Integer> entryOffsetMap = new LinkedHashMap<>();
