@@ -252,11 +252,11 @@ public class ARSCDecoder {
             mFlagsOffsets.add(new FlagsOffset(mCountIn.getCount(), entryCount));
         }
 
-		mIn.skipBytes(entryCount * 4); // flags
+        mHeader.checkForUnreadHeader(mIn, mCountIn);
+
+        mIn.skipBytes(entryCount * 4); // flags
         mTypeSpec = new ResTypeSpec(mTypeNames.getString(id - 1), mResTable, mPkg, id, entryCount);
         mPkg.addType(mTypeSpec);
-
-        mHeader.checkForUnreadHeader(mIn, mCountIn);
 
         return mTypeSpec;
     }
