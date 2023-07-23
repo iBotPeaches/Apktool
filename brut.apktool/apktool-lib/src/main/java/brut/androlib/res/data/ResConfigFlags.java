@@ -472,7 +472,7 @@ public class ResConfigFlags {
                 sb.append("+").append(toUpper(localeVariant));
             }
             if (localeNumberingSystem != null && localeNumberingSystem.length > 0) {
-                sb.append("-n-nu-").append(localeNumberingSystem);
+                sb.append("+n+nu+").append(localeNumberingSystem);
             }
         }
         return sb.toString();
