@@ -50,7 +50,7 @@ public class ARSCHeader {
         return new ARSCHeader(type, in.readShort(), in.readInt(), start);
     }
 
-    public void checkForUnreadChunk(ExtDataInput in, CountingInputStream countIn) throws IOException {
+    public void checkForUnreadHeader(ExtDataInput in, CountingInputStream countIn) throws IOException {
         // Some applications lie about the reported size of their chunk header. Trusting the chunkSize is misleading
         // So compare to what we actually read in the header vs reported and skip the rest.
         // However, this runs after each chunk and not every chunk reading has a specific distinction between the
