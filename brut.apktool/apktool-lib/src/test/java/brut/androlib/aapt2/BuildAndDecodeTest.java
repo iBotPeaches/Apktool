@@ -82,6 +82,11 @@ public class BuildAndDecodeTest extends BaseTest {
     }
 
     @Test
+    public void valuesBcp47NumberingTest() throws BrutException {
+        compareValuesFiles("values-b+ast+Latn+IT+AREVELA/strings.xml");
+    }
+
+    @Test
     public void confirmZeroByteFileExtensionIsNotStored() throws BrutException {
         ApkInfo apkInfo = ApkInfo.load(sTestNewDir);
         assertFalse(apkInfo.doNotCompress.contains("jpg"));
