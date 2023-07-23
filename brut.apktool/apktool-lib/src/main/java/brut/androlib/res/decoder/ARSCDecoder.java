@@ -456,11 +456,12 @@ public class ARSCDecoder {
         byte keyboard = 0;
         byte navigation = 0;
         byte inputFlags = 0;
+        byte grammaticalInflection = 0;
         if (size >= 20) {
             keyboard = mIn.readByte();
             navigation = mIn.readByte();
             inputFlags = mIn.readByte();
-            mIn.skipBytes(1); // inputPad0
+            grammaticalInflection = mIn.readByte();
             read = 20;
         }
 
@@ -542,7 +543,7 @@ public class ARSCDecoder {
 
         return new ResConfigFlags(mcc, mnc, language, country,
                 orientation, touchscreen, density, keyboard, navigation,
-                inputFlags, screenWidth, screenHeight, sdkVersion,
+                inputFlags, grammaticalInflection, screenWidth, screenHeight, sdkVersion,
                 screenLayout, uiMode, smallestScreenWidthDp, screenWidthDp,
                 screenHeightDp, localeScript, localeVariant, screenLayout2,
                 colorMode, isInvalid, size);
