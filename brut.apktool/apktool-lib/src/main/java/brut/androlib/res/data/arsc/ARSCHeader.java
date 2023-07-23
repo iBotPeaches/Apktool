@@ -21,6 +21,8 @@ import org.apache.commons.io.input.CountingInputStream;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.math.BigInteger;
+import java.util.logging.Logger;
 
 public class ARSCHeader {
     public final short type;
@@ -46,6 +48,30 @@ public class ARSCHeader {
             return new ARSCHeader(RES_NONE_TYPE, 0, 0, countIn.getCount());
         }
         return new ARSCHeader(type, in.readShort(), in.readInt(), start);
+    }
+
+    public void checkForUnreadHeader(ExtDataInput in, CountingInputStream countIn) throws IOException {
+        // Some applications lie about the reported size of their chunk header. Trusting the chunkSize is misleading
+        // So compare to what we actually read in the header vs reported and skip the rest.
+        // However, this runs after each chunk and not every chunk reading has a specific distinction between the
+        // header and the body.
+        int actualHeaderSize = countIn.getCount() - this.startPosition;
+        int exceedingSize = this.headerSize - actualHeaderSize;
+        if (exceedingSize > 0) {
+            byte[] buf = new byte[exceedingSize];
+            in.readFully(buf);
+            BigInteger exceedingBI = new BigInteger(1, buf);
+
+            if (exceedingBI.equals(BigInteger.ZERO)) {
+                LOGGER.fine(String.format("Chunk header size (%d), read (%d), but exceeding bytes are all zero.",
+                    this.headerSize, actualHeaderSize
+                ));
+            } else {
+                LOGGER.warning(String.format("Chunk header size (%d), read (%d). Exceeding bytes: 0x%X.",
+                    this.headerSize, actualHeaderSize, exceedingBI
+                ));
+            }
+        }
     }
 
     public void skipChunk(ExtDataInput in) throws IOException {
@@ -76,4 +102,6 @@ public class ARSCHeader {
     public final static short RES_XML_CDATA_TYPE = 0x0104;
     public final static short RES_XML_LAST_CHUNK_TYPE = 0x017f;
     public final static short RES_XML_RESOURCE_MAP_TYPE = 0x0180;
+
+    private static final Logger LOGGER = Logger.getLogger(ARSCHeader.class.getName());
 }
