@@ -514,7 +514,7 @@ public class ARSCDecoder {
         char[] localeNumberingSystem = null;
         if (size >= 60) {
             localeNumberingSystem = readVariantLengthString(8).toCharArray();
-            read = 60;
+            read = 68;
         }
 
         int exceedingKnownSize = size - KNOWN_CONFIG_BYTES;
