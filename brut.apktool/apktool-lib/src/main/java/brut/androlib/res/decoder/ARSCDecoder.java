@@ -520,10 +520,10 @@ public class ARSCDecoder {
             read += length;
         }
 
-        int exceedingSize = size - KNOWN_CONFIG_BYTES;
-        if (exceedingSize > 0) {
-            byte[] buf = new byte[exceedingSize];
-            read += exceedingSize;
+        int exceedingKnownSize = size - KNOWN_CONFIG_BYTES;
+        if (exceedingKnownSize > 0 && read < size) {
+            byte[] buf = new byte[exceedingKnownSize];
+            read += exceedingKnownSize;
             mIn.readFully(buf);
             BigInteger exceedingBI = new BigInteger(1, buf);
 
