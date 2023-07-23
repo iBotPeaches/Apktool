@@ -84,6 +84,7 @@ public class BuildAndDecodeTest extends BaseTest {
     @Test
     public void valuesBcp47NumberingTest() throws BrutException {
         compareValuesFiles("values-b+ast+Latn+IT+AREVELA/strings.xml");
+        compareValuesFiles("values-b+ast+Hant+IT+ARABEXT/strings.xml");
     }
 
     @Test
