@@ -1,5 +1,5 @@
 !!brut.androlib.meta.MetaInfo
-  version: 2.8.1
+  version: 2.0.0
 apkFileName: standard.apk
 compressionType: false
 doNotCompress:

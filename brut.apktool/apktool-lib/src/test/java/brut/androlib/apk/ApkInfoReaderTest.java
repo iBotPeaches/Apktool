@@ -53,7 +53,7 @@ public class ApkInfoReaderTest {
         ApkInfo apkInfo = ApkInfo.load(
             this.getClass().getResourceAsStream("/apk/skip_incorrect_indent.yml"));
         checkStandard(apkInfo);
-        assertNotEquals("2.8.1", apkInfo.version);
+        assertNotEquals("2.0.0", apkInfo.version);
     }
 
     @Test
@@ -61,7 +61,7 @@ public class ApkInfoReaderTest {
         ApkInfo apkInfo = ApkInfo.load(
             this.getClass().getResourceAsStream("/apk/first_incorrect_indent.yml"));
         checkStandard(apkInfo);
-        assertNotEquals("2.8.1", apkInfo.version);
+        assertNotEquals("2.0.0", apkInfo.version);
     }
 
     @Test

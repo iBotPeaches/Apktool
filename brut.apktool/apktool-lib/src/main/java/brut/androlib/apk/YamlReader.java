@@ -62,7 +62,6 @@ public class YamlReader {
             return false;
         while (true) {
             mCurrent++;
-            // skip comments
             if (isCommentOrEmpty())
                 continue;
             return !isEnd();
