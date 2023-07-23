@@ -66,7 +66,7 @@ public class YamlLine {
     public String getValue() {
         if (value.equals("null"))
             return null;
-        String res = YamlStringEscapeUtils.unescapeString(value);
+        String res = unescape(value);
         // remove quotation marks
         res = res.replaceAll("^\"|\"$", "");
         res = res.replaceAll("^'|'$", "");
@@ -74,7 +74,7 @@ public class YamlLine {
     }
 
     public String getKey() {
-        String res = YamlStringEscapeUtils.unescapeString(key);
+        String res = unescape(key);
         // remove quotation marks
         res = res.replaceAll("^\"|\"$", "");
         res = res.replaceAll("^'|'$", "");

@@ -16,10 +16,6 @@ public class YamlReader {
         read(in);
     }
 
-    public int getLineNo() {
-        return mCurrent + 1;
-    }
-
     public void pushLine() {
         if (mCurrent > 0)
             mCurrent--;

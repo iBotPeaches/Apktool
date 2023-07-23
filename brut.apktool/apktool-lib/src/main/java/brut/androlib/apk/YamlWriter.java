@@ -20,10 +20,6 @@ public class YamlWriter implements Closeable {
         mWriter.close();
     }
 
-    public int getIndent() {
-        return mIndent;
-    }
-
     public String getIndentString() {
         // for java 11
         // return " ".repeat(mIndent);
@@ -46,11 +42,6 @@ public class YamlWriter implements Closeable {
 
     public void writeIndent() {
         mWriter.print(getIndentString());
-    }
-
-    public void writeInt(String key, int value) {
-        writeIndent();
-        mWriter.println(escape(key) + ": " + value);
     }
 
     public void writeBool(String key, boolean value) {
@@ -83,19 +74,6 @@ public class YamlWriter implements Closeable {
             writeIndent();
             mWriter.println("- " +  item);
         }
-    }
-
-    public <K, V> void writeCommonMap(String key, Map<K, V> map) {
-        if (Objects.isNull(map))
-            return;
-        writeIndent();
-        mWriter.println(escape(key) + ":");
-        nextIndent();
-        for (K mapKey: map.keySet()) {
-            writeIndent();
-            mWriter.println(mapKey + ": " +  map.get(mapKey));
-        }
-        prevIndent();
     }
 
     public void writeStringMap(String key, Map<String, String> map) {
