@@ -51,6 +51,8 @@ public class ResConfigFlags {
     private final byte screenLayout2;
     private final byte colorMode;
 
+    private final char[] localeNumberingSystem;
+
     public final boolean isInvalid;
 
     private final String mQualifiers;
@@ -80,6 +82,7 @@ public class ResConfigFlags {
         localeVariant = null;
         screenLayout2 = 0;
         colorMode = COLOR_WIDE_UNDEFINED;
+        localeNumberingSystem = null;
         isInvalid = false;
         mQualifiers = "";
         size = 0;
@@ -92,7 +95,8 @@ public class ResConfigFlags {
                           short sdkVersion, byte screenLayout, byte uiMode,
                           short smallestScreenWidthDp, short screenWidthDp,
                           short screenHeightDp, char[] localeScript, char[] localeVariant,
-                          byte screenLayout2, byte colorMode, boolean isInvalid, int size) {
+                          byte screenLayout2, byte colorMode, char[] localeNumberingSystem,
+                          boolean isInvalid, int size) {
         if (orientation < 0 || orientation > 3) {
             LOGGER.warning("Invalid orientation value: " + orientation);
             orientation = 0;
@@ -157,6 +161,7 @@ public class ResConfigFlags {
         this.localeVariant = localeVariant;
         this.screenLayout2 = screenLayout2;
         this.colorMode = colorMode;
+        this.localeNumberingSystem = localeNumberingSystem;
         this.isInvalid = isInvalid;
         this.size = size;
         mQualifiers = generateQualifiers();
@@ -465,6 +470,12 @@ public class ResConfigFlags {
             }
             if (localeVariant != null && localeVariant.length >= 5) {
                 sb.append("+").append(toUpper(localeVariant));
+            }
+
+            // If we have a numbering system - it isn't used in qualifiers for build tools, but AOSP understands it
+            // So chances are - this may be valid, but aapt 1/2 will not like it.
+            if (localeNumberingSystem != null && localeNumberingSystem.length > 0) {
+                sb.append("+u+nu+").append(localeNumberingSystem);
             }
         }
         return sb.toString();

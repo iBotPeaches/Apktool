@@ -497,8 +497,8 @@ public class ARSCDecoder {
         char[] localeScript = null;
         char[] localeVariant = null;
         if (size >= 48) {
-            localeScript = readScriptOrVariantChar(4).toCharArray();
-            localeVariant = readScriptOrVariantChar(8).toCharArray();
+            localeScript = readVariantLengthString(4).toCharArray();
+            localeVariant = readVariantLengthString(8).toCharArray();
             read = 48;
         }
 
@@ -511,16 +511,16 @@ public class ARSCDecoder {
             read = 52;
         }
 
-        if (size > 52) {
-            int length = size - read;
-            mIn.skipBytes(length); // localeNumberingSystem
-            read += length;
+        char[] localeNumberingSystem = null;
+        if (size >= 60) {
+            localeNumberingSystem = readVariantLengthString(8).toCharArray();
+            read = 60;
         }
 
-        int exceedingSize = size - KNOWN_CONFIG_BYTES;
-        if (exceedingSize > 0) {
-            byte[] buf = new byte[exceedingSize];
-            read += exceedingSize;
+        int exceedingKnownSize = size - KNOWN_CONFIG_BYTES;
+        if (exceedingKnownSize > 0) {
+            byte[] buf = new byte[exceedingKnownSize];
+            read += exceedingKnownSize;
             mIn.readFully(buf);
             BigInteger exceedingBI = new BigInteger(1, buf);
 
@@ -545,7 +545,7 @@ public class ARSCDecoder {
                 inputFlags, screenWidth, screenHeight, sdkVersion,
                 screenLayout, uiMode, smallestScreenWidthDp, screenWidthDp,
                 screenHeightDp, localeScript, localeVariant, screenLayout2,
-                colorMode, isInvalid, size);
+                colorMode, localeNumberingSystem, isInvalid, size);
     }
 
     private char[] unpackLanguageOrRegion(byte in0, byte in1, char base) {
@@ -562,17 +562,17 @@ public class ARSCDecoder {
         return new char[] { (char) in0, (char) in1 };
     }
 
-    private String readScriptOrVariantChar(int length) throws IOException {
+    private String readVariantLengthString(int maxLength) throws IOException {
         StringBuilder string = new StringBuilder(16);
 
-        while (length-- != 0) {
+        while (maxLength-- != 0) {
             short ch = mIn.readByte();
             if (ch == 0) {
                 break;
             }
             string.append((char) ch);
         }
-        mIn.skipBytes(length);
+        mIn.skipBytes(maxLength);
 
         return string.toString();
     }
