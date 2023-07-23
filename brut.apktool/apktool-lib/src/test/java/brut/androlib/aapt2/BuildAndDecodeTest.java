@@ -77,6 +77,11 @@ public class BuildAndDecodeTest extends BaseTest {
     }
 
     @Test
+    public void valuesBcp47NumericTest() throws BrutException {
+        compareValuesFiles("values-b+iw+660/strings.xml");
+    }
+
+    @Test
     public void confirmZeroByteFileExtensionIsNotStored() throws BrutException {
         ApkInfo apkInfo = ApkInfo.load(sTestNewDir);
         assertFalse(apkInfo.doNotCompress.contains("jpg"));
