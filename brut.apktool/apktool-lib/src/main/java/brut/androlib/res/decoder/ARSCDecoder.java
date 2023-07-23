@@ -272,9 +272,7 @@ public class ARSCDecoder {
             LOGGER.fine("Sparse type flags detected: " + mTypeSpec.getName());
 
             // We've detected sparse resources, lets record this so we can rebuild in that same format
-            if (! mResTable.getSparseResources()) {
-                mResTable.setSparseResources(true);
-            }
+            mResTable.setSparseResources(true);
         }
 
         HashMap<Integer, Integer> entryOffsetMap = new LinkedHashMap<>();
