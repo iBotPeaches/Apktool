@@ -471,8 +471,11 @@ public class ResConfigFlags {
             if (localeVariant != null && localeVariant.length >= 5) {
                 sb.append("+").append(toUpper(localeVariant));
             }
+
+            // If we have a numbering system - it isn't used in qualifiers for build tools, but AOSP understands it
+            // So chances are - this may be valid, but aapt 1/2 will not like it.
             if (localeNumberingSystem != null && localeNumberingSystem.length > 0) {
-                sb.append("+n+nu+").append(localeNumberingSystem);
+                sb.append("+u+nu+").append(localeNumberingSystem);
             }
         }
         return sb.toString();
