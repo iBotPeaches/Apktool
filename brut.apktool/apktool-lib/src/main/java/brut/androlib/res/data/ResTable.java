@@ -291,7 +291,7 @@ public class ResTable {
     }
 
     private boolean isFrameworkApk() {
-        for (ResPackage pkg : listMainPackages()) {
+        for (ResPackage pkg : mMainPackages) {
             if (pkg.getId() > 0 && pkg.getId() < 64) {
                 return true;
             }
@@ -301,9 +301,7 @@ public class ResTable {
 
     public void initApkInfo(ApkInfo apkInfo, File outDir) throws AndrolibException {
         apkInfo.isFrameworkApk = isFrameworkApk();
-        if (!listFramePackages().isEmpty()) {
-            apkInfo.usesFramework = getUsesFramework();
-        }
+        apkInfo.usesFramework = getUsesFramework();
         if (!mApkInfo.getSdkInfo().isEmpty()) {
             updateSdkInfoFromResources(outDir);
         }
@@ -312,18 +310,15 @@ public class ResTable {
     }
 
     private UsesFramework getUsesFramework() {
-        Set<ResPackage> pkgs = listFramePackages();
-
-        Integer[] ids = new Integer[pkgs.size()];
+        UsesFramework info = new UsesFramework();
+        Integer[] ids = new Integer[mFramePackages.size()];
         int i = 0;
-        for (ResPackage pkg : pkgs) {
+        for (ResPackage pkg : mFramePackages) {
             ids[i++] = pkg.getId();
         }
         Arrays.sort(ids);
-
-        UsesFramework info = new UsesFramework();
         info.ids = Arrays.asList(ids);
-
+        info.tag = mConfig.frameworkTag;
         return info;
     }
 

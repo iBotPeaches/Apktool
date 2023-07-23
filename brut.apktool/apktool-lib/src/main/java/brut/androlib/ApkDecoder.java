@@ -72,7 +72,7 @@ public class ApkDecoder {
         this(config, new ExtFile(apkFile));
     }
 
-    public void decode(File outDir) throws AndrolibException, IOException, DirectoryException {
+    public ApkInfo decode(File outDir) throws AndrolibException, IOException, DirectoryException {
         try {
             if (!mConfig.forceDelete && outDir.exists()) {
                 throw new OutDirExistsException();
@@ -145,6 +145,8 @@ public class ApkDecoder {
             recordUncompressedFiles(apkInfo, resourcesDecoder.getResFileMapping(), mUncompressedFiles);
             copyOriginalFiles(outDir);
             writeApkInfo(apkInfo, outDir);
+
+            return apkInfo;
         } finally {
             try {
                 mApkFile.close();

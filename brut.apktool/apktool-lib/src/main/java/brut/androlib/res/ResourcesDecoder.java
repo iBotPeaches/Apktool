@@ -34,10 +34,9 @@ import org.xmlpull.v1.XmlSerializer;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Logger;
 
 public class ResourcesDecoder {
@@ -104,16 +103,23 @@ public class ResourcesDecoder {
         if (hasManifest()) {
             if (mConfig.decodeResources == Config.DECODE_RESOURCES_FULL ||
                 mConfig.forceDecodeManifest == Config.FORCE_DECODE_MANIFEST_FULL) {
+                decodeManifest(getResTable(), mApkFile, outDir);
                 if (hasResources()) {
-                    decodeManifestWithResources(getResTable(), mApkFile, outDir);
                     if (!mConfig.analysisMode) {
+                        // Remove versionName / versionCode (aapt API 16)
+                        //
+                        // check for a mismatch between resources.arsc package and the package listed in AndroidManifest
+                        // also remove the android::versionCode / versionName from manifest for rebuild
+                        // this is a required change to prevent aapt warning about conflicting versions
+                        // it will be passed as a parameter to aapt like "--min-sdk-version" via apktool.yml
+                        adjustPackageManifest(getResTable(), outDir.getAbsolutePath() + File.separator + "AndroidManifest.xml");
+
+                        ResXmlPatcher.removeManifestVersions(new File(
+                            outDir.getAbsolutePath() + File.separator + "AndroidManifest.xml"));
+
                         // update apk info
                         mApkInfo.packageInfo.forcedPackageId = String.valueOf(mResTable.getPackageId());
                     }
-                } else {
-                    // if there's no resources.arsc, decode the manifest without looking
-                    // up attribute references
-                    decodeManifest(getResTable(), mApkFile, outDir);
                 }
             }
             else {
@@ -130,55 +136,26 @@ public class ResourcesDecoder {
     private void decodeManifest(ResTable resTable, ExtFile apkFile, File outDir)
         throws AndrolibException {
 
-        Duo<ResFileDecoder, AXmlResourceParser> duo = getManifestFileDecoder(false);
-        ResFileDecoder fileDecoder = duo.m1;
-
-        // Set ResAttrDecoder
-        duo.m2.setAttrDecoder(new ResAttrDecoder());
-        ResAttrDecoder attrDecoder = duo.m2.getAttrDecoder();
+        AXmlResourceParser axmlParser = new AndroidManifestResourceParser();
+        ResAttrDecoder attrDecoder = new ResAttrDecoder();
         attrDecoder.setResTable(resTable);
+        axmlParser.setAttrDecoder(attrDecoder);
 
+        XmlPullStreamDecoder fileDecoder = new XmlPullStreamDecoder(axmlParser, getResXmlSerializer());
         Directory inApk, out;
         try {
             inApk = apkFile.getDirectory();
             out = new FileDirectory(outDir);
 
-            LOGGER.info("Decoding AndroidManifest.xml with only framework resources...");
-            fileDecoder.decodeManifest(inApk, "AndroidManifest.xml", out, "AndroidManifest.xml");
-
-        } catch (DirectoryException ex) {
-            throw new AndrolibException(ex);
-        }
-    }
-
-    private void decodeManifestWithResources(ResTable resTable, ExtFile apkFile, File outDir)
-        throws AndrolibException {
-
-        Duo<ResFileDecoder, AXmlResourceParser> duo = getManifestFileDecoder(true);
-        ResFileDecoder fileDecoder = duo.m1;
-        ResAttrDecoder attrDecoder = duo.m2.getAttrDecoder();
-        attrDecoder.setResTable(resTable);
-
-        Directory inApk, out;
-        try {
-            inApk = apkFile.getDirectory();
-            out = new FileDirectory(outDir);
-            LOGGER.info("Decoding AndroidManifest.xml with resources...");
-
-            fileDecoder.decodeManifest(inApk, "AndroidManifest.xml", out, "AndroidManifest.xml");
-
-            // Remove versionName / versionCode (aapt API 16)
-            if (!mConfig.analysisMode) {
-
-                // check for a mismatch between resources.arsc package and the package listed in AndroidManifest
-                // also remove the android::versionCode / versionName from manifest for rebuild
-                // this is a required change to prevent aapt warning about conflicting versions
-                // it will be passed as a parameter to aapt like "--min-sdk-version" via apktool.yml
-                adjustPackageManifest(resTable, outDir.getAbsolutePath() + File.separator + "AndroidManifest.xml");
-
-                ResXmlPatcher.removeManifestVersions(new File(
-                    outDir.getAbsolutePath() + File.separator + "AndroidManifest.xml"));
+            if (hasResources()) {
+                LOGGER.info("Decoding AndroidManifest.xml with resources...");
+            } else {
+                LOGGER.info("Decoding AndroidManifest.xml with only framework resources...");
             }
+            InputStream inputStream = inApk.getFileInput("AndroidManifest.xml");
+            OutputStream outputStream = out.getFileOutput("AndroidManifest.xml");
+            fileDecoder.decodeManifest(inputStream, outputStream);
+
         } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
         }
@@ -208,18 +185,6 @@ public class ResourcesDecoder {
         }
     }
 
-    private Duo<ResFileDecoder, AXmlResourceParser> getManifestFileDecoder(boolean withResources) {
-        ResStreamDecoderContainer decoders = new ResStreamDecoderContainer();
-
-        AXmlResourceParser axmlParser = new AndroidManifestResourceParser();
-        if (withResources) {
-            axmlParser.setAttrDecoder(new ResAttrDecoder());
-        }
-        decoders.setDecoder("xml", new XmlPullStreamDecoder(axmlParser, getResXmlSerializer()));
-
-        return new Duo<>(new ResFileDecoder(decoders), axmlParser);
-    }
-
     private ExtMXSerializer getResXmlSerializer() {
         ExtMXSerializer serial = new ExtMXSerializer();
         serial.setProperty(ExtXmlSerializer.PROPERTY_SERIALIZER_INDENTATION, "    ");
@@ -245,9 +210,6 @@ public class ResourcesDecoder {
                     break;
             }
             mResTable.initApkInfo(mApkInfo, outDir);
-            if (mConfig.frameworkTag != null) {
-                mApkInfo.usesFramework.tag = mConfig.frameworkTag;
-            }
         }
         return mResTable;
     }

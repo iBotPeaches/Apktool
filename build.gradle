@@ -45,7 +45,7 @@ buildscript {
 
 apply from: 'gradle/functions.gradle'
 
-version = '2.8.1'
+version = '2.8.2'
 def suffix = 'SNAPSHOT'
 
 defaultTasks 'build', 'shadowJar', 'proguard'
