@@ -147,10 +147,11 @@ public class ResourcesDecoder {
             inApk = apkFile.getDirectory();
             out = new FileDirectory(outDir);
 
-            if (hasResources())
-                LOGGER.info("Decoding AndroidManifest.xml framework resources...");
-            else
+            if (hasResources()) {
+                LOGGER.info("Decoding AndroidManifest.xml with resources...");
+            } else {
                 LOGGER.info("Decoding AndroidManifest.xml with only framework resources...");
+            }
             InputStream inputStream = inApk.getFileInput("AndroidManifest.xml");
             OutputStream outputStream = out.getFileOutput("AndroidManifest.xml");
             fileDecoder.decodeManifest(inputStream, outputStream);
