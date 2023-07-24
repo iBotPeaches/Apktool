@@ -17,8 +17,9 @@ public class YamlReader {
     }
 
     public void pushLine() {
-        if (mCurrent > 0)
+        if (mCurrent > 0) {
             mCurrent--;
+        }
     }
 
     public void read(InputStream in) {
@@ -48,22 +49,26 @@ public class YamlReader {
     }
 
     public void skipInsignificant() {
-        if (isEnd())
+        if (isEnd()) {
             return;
+        }
         while (isCommentOrEmpty()) {
             mCurrent++;
-            if (isEnd())
+            if (isEnd()) {
                 break;
+            }
         }
     }
 
     public boolean nextLine() {
-        if (isEnd())
+        if (isEnd()) {
             return false;
+        }
         while (true) {
             mCurrent++;
-            if (isCommentOrEmpty())
+            if (isCommentOrEmpty()) {
                 continue;
+            }
             return !isEnd();
         }
     }
@@ -80,13 +85,15 @@ public class YamlReader {
     * Read root object from start to end
     */
     public <T extends YamlSerializable> void readRoot(T obj) throws AndrolibException {
-        if (isEnd())
+        if (isEnd()) {
             return;
+        }
         int objIndent = 0;
         skipInsignificant();
         while (true) {
-            if (isEnd())
+            if (isEnd()) {
                 return;
+            }
             YamlLine line = getLine();
             // skip don't checked line or lines with other indent
             if (objIndent != line.indent || !line.hasColon) {
@@ -106,8 +113,9 @@ public class YamlReader {
     public <T> void readObject(T obj,
                             Checker check,
                             Updater<T> updater) throws AndrolibException {
-        if (isEnd())
+        if (isEnd()) {
             return;
+        }
         int prevIndent = getIndent();
         // detect indent for the object data
         nextLine();
@@ -121,8 +129,9 @@ public class YamlReader {
         }
         updater.update(obj, this);
         while (nextLine()) {
-            if (isEnd())
+            if (isEnd()) {
                 return;
+            }
             line = getLine();
             if (objIndent != line.indent || !check.check(line)) {
                 pushLine();
@@ -145,14 +154,16 @@ public class YamlReader {
      */
     public <T> void readList(List<T> list,
                                 Updater<List<T>> updater) throws AndrolibException {
-        if (isEnd())
+        if (isEnd()) {
             return;
+        }
         int listIndent = getIndent();
         nextLine();
         int dataIndent = getIndent();
         while (true) {
-            if (isEnd())
+            if (isEnd()) {
                 return;
+            }
             // check incorrect data indent
             if (dataIndent < listIndent) {
                 pushLine();

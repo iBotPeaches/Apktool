@@ -36,8 +36,9 @@ public class YamlWriter implements Closeable {
     }
 
     public void prevIndent() {
-        if (mIndent != 0)
+        if (mIndent != 0) {
             mIndent -= 2;
+        }
     }
 
     public void writeIndent() {
@@ -55,8 +56,9 @@ public class YamlWriter implements Closeable {
         if (Objects.isNull(value)) {
             mWriter.println(escape(key) + ": null");
         } else {
-            if (quoted)
+            if (quoted) {
                 value = QUOTE + value + QUOTE;
+            }
             mWriter.println(escape(key) + ": " + escape(value));
         }
     }
@@ -66,8 +68,9 @@ public class YamlWriter implements Closeable {
     }
 
     public <T> void writeList(String key, List<T> list) {
-        if (Objects.isNull(list))
+        if (Objects.isNull(list)) {
             return;
+        }
         writeIndent();
         mWriter.println(escape(key) + ":");
         for (T item: list) {
@@ -77,8 +80,9 @@ public class YamlWriter implements Closeable {
     }
 
     public void writeStringMap(String key, Map<String, String> map) {
-        if (Objects.isNull(map))
+        if (Objects.isNull(map)) {
             return;
+        }
         writeIndent();
         mWriter.println(escape(key) + ":");
         nextIndent();
@@ -89,8 +93,9 @@ public class YamlWriter implements Closeable {
     }
 
     public <T extends YamlSerializable> void writeObject(String key, T obj) {
-        if (Objects.isNull(obj))
+        if (Objects.isNull(obj)) {
             return;
+        }
         writeIndent();
         mWriter.println(escape(key) + ":");
         nextIndent();

@@ -64,8 +64,9 @@ public class YamlLine {
     }
 
     public String getValue() {
-        if (value.equals("null"))
+        if (value.equals("null")) {
             return null;
+        }
         String res = unescape(value);
         // remove quotation marks
         res = res.replaceAll("^\"|\"$", "");
