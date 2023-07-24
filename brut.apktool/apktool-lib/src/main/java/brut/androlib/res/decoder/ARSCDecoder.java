@@ -308,7 +308,7 @@ public class ARSCDecoder {
 
         for (int i : entryOffsetMap.keySet()) {
             int offset = entryOffsetMap.get(i);
-            if (offset == -1) {
+            if (offset == NO_ENTRY) {
                 continue;
             }
             mMissingResSpecMap.put(i, false);
@@ -318,12 +318,15 @@ public class ARSCDecoder {
             if (mCountIn.getCount() == mHeader.endPosition) {
                 int remainingEntries = entryCount - i;
                 LOGGER.warning(String.format("End of chunk hit. Skipping remaining entries (%d) in type: %s",
-                    remainingEntries, mTypeSpec.getName())
-                );
+                    remainingEntries, mTypeSpec.getName()
+                ));
                 break;
             }
 
-            readEntry(readEntryData());
+            EntryData entryData = readEntryData();
+            if (entryData != null) {
+                readEntry(entryData);
+            }
         }
 
         // skip "TYPE 8 chunks" and/or padding data at the end of this chunk
@@ -344,6 +347,10 @@ public class ARSCDecoder {
 
         short flags = mIn.readShort();
         int specNamesId = mIn.readInt();
+        if (specNamesId == NO_ENTRY) {
+            return null;
+        }
+
         ResValue value = (flags & ENTRY_FLAG_COMPLEX) == 0 ? readValue() : readComplexEntry();
         EntryData entryData = new EntryData();
         entryData.mFlags = flags;
@@ -661,6 +668,8 @@ public class ARSCDecoder {
     private final static short ENTRY_FLAG_WEAK = 0x0004;
 
     private static final int KNOWN_CONFIG_BYTES = 64;
+
+    private static final int NO_ENTRY = 0xFFFFFFFF;
 
     private static final Logger LOGGER = Logger.getLogger(ARSCDecoder.class.getName());
 }
