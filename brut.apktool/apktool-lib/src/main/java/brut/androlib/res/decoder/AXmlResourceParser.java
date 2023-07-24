@@ -20,6 +20,7 @@ import android.content.res.XmlResourceParser;
 import android.util.TypedValue;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.data.ResID;
+import brut.androlib.res.data.ResTable;
 import brut.androlib.res.data.arsc.ARSCHeader;
 import brut.androlib.res.data.axml.NamespaceStack;
 import brut.androlib.res.xml.ResXmlEncoders;
@@ -44,8 +45,9 @@ import java.util.logging.Logger;
  */
 public class AXmlResourceParser implements XmlResourceParser {
 
-    public AXmlResourceParser() {
+    public AXmlResourceParser(ResTable resTable) {
         resetEventInfo();
+        setAttrDecoder(new ResAttrDecoder(resTable));
     }
 
     public AndrolibException getFirstError() {

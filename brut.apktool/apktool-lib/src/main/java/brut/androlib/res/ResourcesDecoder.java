@@ -136,12 +136,9 @@ public class ResourcesDecoder {
     private void decodeManifest(ResTable resTable, ExtFile apkFile, File outDir)
         throws AndrolibException {
 
-        AXmlResourceParser axmlParser = new AndroidManifestResourceParser();
-        ResAttrDecoder attrDecoder = new ResAttrDecoder();
-        attrDecoder.setResTable(resTable);
-        axmlParser.setAttrDecoder(attrDecoder);
-
+        AXmlResourceParser axmlParser = new AndroidManifestResourceParser(resTable);
         XmlPullStreamDecoder fileDecoder = new XmlPullStreamDecoder(axmlParser, getResXmlSerializer());
+
         Directory inApk, out;
         try {
             inApk = apkFile.getDirectory();
@@ -216,10 +213,15 @@ public class ResourcesDecoder {
 
     private void decodeResources(ResTable resTable, ExtFile apkFile, File outDir)
         throws AndrolibException {
-        Duo<ResFileDecoder, AXmlResourceParser> duo = getResFileDecoder();
-        ResFileDecoder fileDecoder = duo.m1;
-        ResAttrDecoder attrDecoder = duo.m2.getAttrDecoder();
-        attrDecoder.setResTable(resTable);
+
+        ResStreamDecoderContainer decoders = new ResStreamDecoderContainer();
+        decoders.setDecoder("raw", new ResRawStreamDecoder());
+        decoders.setDecoder("9patch", new Res9patchStreamDecoder());
+
+        AXmlResourceParser axmlParser = new AXmlResourceParser(resTable);
+        decoders.setDecoder("xml", new XmlPullStreamDecoder(axmlParser, getResXmlSerializer()));
+
+        ResFileDecoder fileDecoder = new ResFileDecoder(decoders);
         Directory in, out;
 
         try {
@@ -245,22 +247,10 @@ public class ResourcesDecoder {
             generatePublicXml(pkg, out, xmlSerializer);
         }
 
-        AndrolibException decodeError = duo.m2.getFirstError();
+        AndrolibException decodeError = axmlParser.getFirstError();
         if (decodeError != null) {
             throw decodeError;
         }
-    }
-
-    private Duo<ResFileDecoder, AXmlResourceParser> getResFileDecoder() {
-        ResStreamDecoderContainer decoders = new ResStreamDecoderContainer();
-        decoders.setDecoder("raw", new ResRawStreamDecoder());
-        decoders.setDecoder("9patch", new Res9patchStreamDecoder());
-
-        AXmlResourceParser axmlParser = new AXmlResourceParser();
-        axmlParser.setAttrDecoder(new ResAttrDecoder());
-        decoders.setDecoder("xml", new XmlPullStreamDecoder(axmlParser, getResXmlSerializer()));
-
-        return new Duo<>(new ResFileDecoder(decoders), axmlParser);
     }
 
     private void generateValuesFile(ResValuesFile valuesFile, Directory out,
