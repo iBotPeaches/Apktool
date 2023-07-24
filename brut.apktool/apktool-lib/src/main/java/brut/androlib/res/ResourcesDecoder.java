@@ -29,7 +29,6 @@ import brut.directory.Directory;
 import brut.directory.DirectoryException;
 import brut.directory.ExtFile;
 import brut.directory.FileDirectory;
-import brut.util.Duo;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.File;
@@ -48,10 +47,6 @@ public class ResourcesDecoder {
     private final ApkInfo mApkInfo;
     private final Map<String, String> mResFileMapping = new HashMap<>();
 
-    private final static String[] APK_RESOURCES_FILENAMES = new String[] {
-        "resources.arsc", "res", "r", "R" };
-    private final static String[] APK_MANIFEST_FILENAMES = new String[] {
-        "AndroidManifest.xml" };
     private final static String[] IGNORED_PACKAGES = new String[] {
         "android", "com.htc", "com.lge", "com.lge.internal", "yi", "flyme", "air.com.adobe.appentry",
         "FFFFFFFFFFFFFFFFFFFFFF" };
@@ -85,9 +80,6 @@ public class ResourcesDecoder {
             throw new AndrolibException(
                 "Apk doesn't contain either AndroidManifest.xml file or resources.arsc file");
         }
-        if (hasResources() && !mResTable.isMainPkgLoaded()) {
-            mResTable.loadMainPkg(mApkFile);
-        }
         return mResTable;
     }
 
@@ -101,36 +93,29 @@ public class ResourcesDecoder {
 
     public void decodeManifest(File outDir) throws AndrolibException {
         if (hasManifest()) {
-            if (mConfig.decodeResources == Config.DECODE_RESOURCES_FULL ||
-                mConfig.forceDecodeManifest == Config.FORCE_DECODE_MANIFEST_FULL) {
-                decodeManifest(getResTable(), mApkFile, outDir);
-                if (hasResources()) {
-                    if (!mConfig.analysisMode) {
-                        // Remove versionName / versionCode (aapt API 16)
-                        //
-                        // check for a mismatch between resources.arsc package and the package listed in AndroidManifest
-                        // also remove the android::versionCode / versionName from manifest for rebuild
-                        // this is a required change to prevent aapt warning about conflicting versions
-                        // it will be passed as a parameter to aapt like "--min-sdk-version" via apktool.yml
-                        adjustPackageManifest(getResTable(), outDir.getAbsolutePath() + File.separator + "AndroidManifest.xml");
+            decodeManifest(getResTable(), mApkFile, outDir);
+            if (hasResources()) {
+                if (!mConfig.analysisMode) {
+                    // Remove versionName / versionCode (aapt API 16)
+                    //
+                    // check for a mismatch between resources.arsc package and the package listed in AndroidManifest
+                    // also remove the android::versionCode / versionName from manifest for rebuild
+                    // this is a required change to prevent aapt warning about conflicting versions
+                    // it will be passed as a parameter to aapt like "--min-sdk-version" via apktool.yml
+                    adjustPackageManifest(getResTable(), outDir.getAbsolutePath() + File.separator + "AndroidManifest.xml");
 
-                        ResXmlPatcher.removeManifestVersions(new File(
-                            outDir.getAbsolutePath() + File.separator + "AndroidManifest.xml"));
+                    ResXmlPatcher.removeManifestVersions(new File(
+                        outDir.getAbsolutePath() + File.separator + "AndroidManifest.xml"));
 
-                        // update apk info
-                        mApkInfo.packageInfo.forcedPackageId = String.valueOf(mResTable.getPackageId());
-                    }
-                }
-            }
-            else {
-                try {
-                    LOGGER.info("Copying raw manifest...");
-                    mApkFile.getDirectory().copyToDir(outDir, APK_MANIFEST_FILENAMES);
-                } catch (DirectoryException ex) {
-                    throw new AndrolibException(ex);
+                    // update apk info
+                    mApkInfo.packageInfo.forcedPackageId = String.valueOf(mResTable.getPackageId());
                 }
             }
         }
+    }
+
+    public void updateApkInfo(File outDir) throws AndrolibException {
+        mResTable.initApkInfo(mApkInfo, outDir);
     }
 
     private void decodeManifest(ResTable resTable, ExtFile apkFile, File outDir)
@@ -191,22 +176,14 @@ public class ResourcesDecoder {
         return serial;
     }
 
+    public void loadMainPkg() throws AndrolibException {
+        mResTable.loadMainPkg(mApkFile);
+    }
+
     public ResTable decodeResources(File outDir) throws AndrolibException {
         if (hasResources()) {
-            switch (mConfig.decodeResources) {
-                case Config.DECODE_RESOURCES_NONE:
-                    try {
-                        LOGGER.info("Copying raw resources...");
-                        mApkFile.getDirectory().copyToDir(outDir, APK_RESOURCES_FILENAMES);
-                    } catch (DirectoryException ex) {
-                        throw new AndrolibException(ex);
-                    }
-                    break;
-                case Config.DECODE_RESOURCES_FULL:
-                    decodeResources(getResTable(), mApkFile, outDir);
-                    break;
-            }
-            mResTable.initApkInfo(mApkInfo, outDir);
+            loadMainPkg();
+            decodeResources(getResTable(), mApkFile, outDir);
         }
         return mResTable;
     }
