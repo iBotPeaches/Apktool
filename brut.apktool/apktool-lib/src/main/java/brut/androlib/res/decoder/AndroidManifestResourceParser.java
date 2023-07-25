@@ -17,6 +17,7 @@
 package brut.androlib.res.decoder;
 
 import android.util.TypedValue;
+import brut.androlib.res.data.ResTable;
 
 import java.util.regex.Pattern;
 
@@ -24,6 +25,10 @@ import java.util.regex.Pattern;
  * AXmlResourceParser specifically for parsing encoded AndroidManifest.xml.
  */
 public class AndroidManifestResourceParser extends AXmlResourceParser {
+
+    public AndroidManifestResourceParser(ResTable resTable) {
+        super(resTable);
+    }
 
     /**
      * Pattern for matching numeric string meta-data values. aapt automatically infers the

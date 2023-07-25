@@ -137,10 +137,14 @@ public class ARSCDecoder {
     private void readTableChunk() throws IOException, AndrolibException {
         checkChunkType(ARSCHeader.RES_TABLE_TYPE);
         mIn.skipInt(); // packageCount
+
+        mHeader.checkForUnreadHeader(mIn, mCountIn);
     }
 
     private void readUnknownChunk() throws IOException, AndrolibException {
         checkChunkType(ARSCHeader.RES_NULL_TYPE);
+
+        mHeader.checkForUnreadHeader(mIn, mCountIn);
 
         LOGGER.warning("Skipping unknown chunk data of size " + mHeader.chunkSize);
         mHeader.skipChunk(mIn);
@@ -178,6 +182,8 @@ public class ARSCDecoder {
             LOGGER.warning("Please report this application to Apktool for a fix: https://github.com/iBotPeaches/Apktool/issues/1728");
         }
 
+        mHeader.checkForUnreadHeader(mIn, mCountIn);
+
         mTypeNames = StringBlock.readWithChunk(mIn);
         mSpecNames = StringBlock.readWithChunk(mIn);
 
@@ -194,6 +200,8 @@ public class ARSCDecoder {
         int packageId;
         String packageName;
 
+        mHeader.checkForUnreadHeader(mIn, mCountIn);
+
         for (int i = 0; i < libraryCount; i++) {
             packageId = mIn.readInt();
             packageName = mIn.readNullEndedString(128, true);
@@ -204,6 +212,8 @@ public class ARSCDecoder {
     private void readStagedAliasSpec() throws IOException {
         int count = mIn.readInt();
 
+        mHeader.checkForUnreadHeader(mIn, mCountIn);
+
         for (int i = 0; i < count; i++) {
             LOGGER.fine(String.format("Skipping staged alias stagedId (%h) finalId: %h", mIn.readInt(), mIn.readInt()));
         }
@@ -213,6 +223,9 @@ public class ARSCDecoder {
         checkChunkType(ARSCHeader.XML_TYPE_OVERLAY);
         String name = mIn.readNullEndedString(256, true);
         String actor = mIn.readNullEndedString(256, true);
+
+        mHeader.checkForUnreadHeader(mIn, mCountIn);
+
         LOGGER.fine(String.format("Overlay name: \"%s\", actor: \"%s\")", name, actor));
     }
 
@@ -220,6 +233,8 @@ public class ARSCDecoder {
         checkChunkType(ARSCHeader.XML_TYPE_OVERLAY_POLICY);
         mIn.skipInt(); // policyFlags
         int count = mIn.readInt();
+
+        mHeader.checkForUnreadHeader(mIn, mCountIn);
 
         for (int i = 0; i < count; i++) {
             LOGGER.fine(String.format("Skipping overlay (%h)", mIn.readInt()));
@@ -237,7 +252,9 @@ public class ARSCDecoder {
             mFlagsOffsets.add(new FlagsOffset(mCountIn.getCount(), entryCount));
         }
 
-		mIn.skipBytes(entryCount * 4); // flags
+        mHeader.checkForUnreadHeader(mIn, mCountIn);
+
+        mIn.skipBytes(entryCount * 4); // flags
         mTypeSpec = new ResTypeSpec(mTypeNames.getString(id - 1), mResTable, mPkg, id, entryCount);
         mPkg.addType(mTypeSpec);
 
@@ -255,18 +272,12 @@ public class ARSCDecoder {
         int typeFlags = mIn.readByte();
         mIn.skipBytes(2); // reserved
         int entryCount = mIn.readInt();
-        int entriesStart = mIn.readInt();
+        mIn.skipInt(); // entriesStart
+
         mMissingResSpecMap = new LinkedHashMap<>();
-
         ResConfigFlags flags = readConfigFlags();
-        int position = (mHeader.startPosition + entriesStart) - (entryCount * 4);
 
-        // For some APKs there is a disconnect between the reported size of Configs
-        // If we find a mismatch skip those bytes.
-        if (position != mCountIn.getCount()) {
-            LOGGER.warning("Invalid data detected. Skipping: " + (position - mCountIn.getCount()) + " byte(s)");
-            mIn.skipBytes(position - mCountIn.getCount());
-        }
+        mHeader.checkForUnreadHeader(mIn, mCountIn);
 
         if ((typeFlags & 0x01) != 0) {
             LOGGER.fine("Sparse type flags detected: " + mTypeSpec.getName());
@@ -297,7 +308,7 @@ public class ARSCDecoder {
 
         for (int i : entryOffsetMap.keySet()) {
             int offset = entryOffsetMap.get(i);
-            if (offset == -1) {
+            if (offset == NO_ENTRY) {
                 continue;
             }
             mMissingResSpecMap.put(i, false);
@@ -307,12 +318,15 @@ public class ARSCDecoder {
             if (mCountIn.getCount() == mHeader.endPosition) {
                 int remainingEntries = entryCount - i;
                 LOGGER.warning(String.format("End of chunk hit. Skipping remaining entries (%d) in type: %s",
-                    remainingEntries, mTypeSpec.getName())
-                );
+                    remainingEntries, mTypeSpec.getName()
+                ));
                 break;
             }
 
-            readEntry(readEntryData());
+            EntryData entryData = readEntryData();
+            if (entryData != null) {
+                readEntry(entryData);
+            }
         }
 
         // skip "TYPE 8 chunks" and/or padding data at the end of this chunk
@@ -333,6 +347,10 @@ public class ARSCDecoder {
 
         short flags = mIn.readShort();
         int specNamesId = mIn.readInt();
+        if (specNamesId == NO_ENTRY) {
+            return null;
+        }
+
         ResValue value = (flags & ENTRY_FLAG_COMPLEX) == 0 ? readValue() : readComplexEntry();
         EntryData entryData = new EntryData();
         entryData.mFlags = flags;
@@ -498,8 +516,8 @@ public class ARSCDecoder {
         char[] localeScript = null;
         char[] localeVariant = null;
         if (size >= 48) {
-            localeScript = readScriptOrVariantChar(4).toCharArray();
-            localeVariant = readScriptOrVariantChar(8).toCharArray();
+            localeScript = readVariantLengthString(4).toCharArray();
+            localeVariant = readVariantLengthString(8).toCharArray();
             read = 48;
         }
 
@@ -512,14 +530,15 @@ public class ARSCDecoder {
             read = 52;
         }
 
-        if (size > 52) {
-            int length = size - read;
-            mIn.skipBytes(length); // localeNumberingSystem
-            read += length;
+        char[] localeNumberingSystem = null;
+        if (size >= 60) {
+            localeNumberingSystem = readVariantLengthString(8).toCharArray();
+            read = 60;
         }
 
         int exceedingKnownSize = size - KNOWN_CONFIG_BYTES;
-        if (exceedingKnownSize > 0 && read < size) {
+
+        if (exceedingKnownSize > 0) {
             byte[] buf = new byte[exceedingKnownSize];
             read += exceedingKnownSize;
             mIn.readFully(buf);
@@ -546,7 +565,7 @@ public class ARSCDecoder {
                 inputFlags, grammaticalInflection, screenWidth, screenHeight, sdkVersion,
                 screenLayout, uiMode, smallestScreenWidthDp, screenWidthDp,
                 screenHeightDp, localeScript, localeVariant, screenLayout2,
-                colorMode, isInvalid, size);
+                colorMode, localeNumberingSystem, isInvalid, size);
     }
 
     private char[] unpackLanguageOrRegion(byte in0, byte in1, char base) {
@@ -563,17 +582,17 @@ public class ARSCDecoder {
         return new char[] { (char) in0, (char) in1 };
     }
 
-    private String readScriptOrVariantChar(int length) throws IOException {
+    private String readVariantLengthString(int maxLength) throws IOException {
         StringBuilder string = new StringBuilder(16);
 
-        while (length-- != 0) {
+        while (maxLength-- != 0) {
             short ch = mIn.readByte();
             if (ch == 0) {
                 break;
             }
             string.append((char) ch);
         }
-        mIn.skipBytes(length);
+        mIn.skipBytes(maxLength);
 
         return string.toString();
     }
@@ -651,6 +670,8 @@ public class ARSCDecoder {
     private final static short ENTRY_FLAG_WEAK = 0x0004;
 
     private static final int KNOWN_CONFIG_BYTES = 64;
+
+    private static final int NO_ENTRY = 0xFFFFFFFF;
 
     private static final Logger LOGGER = Logger.getLogger(ARSCDecoder.class.getName());
 }

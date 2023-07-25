@@ -58,8 +58,8 @@ public class NonStandardPkgIdTest extends BaseTest {
             Config.getDefaultConfig(), new ExtFile(testApk));
 
         sTestNewDir.mkdirs();
-        resourcesDecoder.decodeManifest(sTestNewDir);
         mResTable = resourcesDecoder.decodeResources(sTestNewDir);
+        resourcesDecoder.decodeManifest(sTestNewDir);
     }
 
     @AfterClass

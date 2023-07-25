@@ -22,13 +22,22 @@ import brut.androlib.Config;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
 import brut.util.OS;
+import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
+import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 import static org.junit.Assert.*;
 
 public class BuildAndDecodeTest extends BaseTest {
@@ -74,6 +83,17 @@ public class BuildAndDecodeTest extends BaseTest {
     @Test
     public void valuesMaxLengthTest() throws BrutException {
         compareValuesFiles("values-es/strings.xml");
+    }
+
+    @Test
+    public void valuesBcp47LanguageVariantTest() throws BrutException {
+        compareValuesFiles("values-b+iw+660/strings.xml");
+    }
+
+    @Test
+    public void valuesBcp47LanguageScriptRegionVariantTest() throws BrutException {
+        compareValuesFiles("values-b+ast+Latn+IT+AREVELA/strings.xml");
+        compareValuesFiles("values-b+ast+Hant+IT+ARABEXT/strings.xml");
     }
 
     @Test
@@ -145,5 +165,24 @@ public class BuildAndDecodeTest extends BaseTest {
     @Test
     public void unknownFolderTest() throws BrutException {
         compareUnknownFiles();
+    }
+
+    @Test
+    public void confirmPlatformManifestValuesTest() throws IOException, SAXException, ParserConfigurationException {
+        Document doc = loadDocument(new File(sTestNewDir + "/AndroidManifest.xml"));
+        Node application = doc.getElementsByTagName("manifest").item(0);
+        NamedNodeMap attr = application.getAttributes();
+
+        Node platformBuildVersionNameAttr = attr.getNamedItem("platformBuildVersionName");
+        assertEquals("6.0-2438415", platformBuildVersionNameAttr.getNodeValue());
+
+        Node platformBuildVersionCodeAttr = attr.getNamedItem("platformBuildVersionCode");
+        assertEquals("23", platformBuildVersionCodeAttr.getNodeValue());
+
+        Node compileSdkVersionAttr = attr.getNamedItem("compileSdkVersion");
+        assertNull("compileSdkVersion should be stripped via aapt2", compileSdkVersionAttr);
+
+        Node compileSdkVersionCodenameAttr = attr.getNamedItem("compileSdkVersionCodename");
+        assertNull("compileSdkVersionCodename should be stripped via aapt2", compileSdkVersionCodenameAttr);
     }
 }

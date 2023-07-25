@@ -20,6 +20,7 @@ import android.content.res.XmlResourceParser;
 import android.util.TypedValue;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.data.ResID;
+import brut.androlib.res.data.ResTable;
 import brut.androlib.res.data.arsc.ARSCHeader;
 import brut.androlib.res.data.axml.NamespaceStack;
 import brut.androlib.res.xml.ResXmlEncoders;
@@ -44,8 +45,9 @@ import java.util.logging.Logger;
  */
 public class AXmlResourceParser implements XmlResourceParser {
 
-    public AXmlResourceParser() {
+    public AXmlResourceParser(ResTable resTable) {
         resetEventInfo();
+        setAttrDecoder(new ResAttrDecoder(resTable));
     }
 
     public AndrolibException getFirstError() {
@@ -676,12 +678,13 @@ public class AXmlResourceParser implements XmlResourceParser {
             }
 
             int chunkType;
+            int headerSize = 0;
             if (event == START_DOCUMENT) {
                 // Fake event, see CHUNK_XML_START_TAG handler.
                 chunkType = ARSCHeader.RES_XML_START_ELEMENT_TYPE;
             } else {
                 chunkType = mIn.readShort();
-                mIn.skipShort(); // headerSize
+                headerSize = mIn.readShort();
             }
 
             if (chunkType == ARSCHeader.RES_XML_RESOURCE_MAP_TYPE) {
@@ -717,6 +720,14 @@ public class AXmlResourceParser implements XmlResourceParser {
                     mIn.skipInt(); // prefix
                     mIn.skipInt(); // uri
                     mNamespaces.pop();
+                }
+
+                // Check for larger header than we read. We know the current header is 0x10 bytes, but some apps
+                // are packed with a larger header of unknown data.
+                if (headerSize > 0x10) {
+                    int bytesToSkip = headerSize - 0x10;
+                    LOGGER.warning(String.format("AXML header larger than 0x10 bytes, skipping %d bytes.", bytesToSkip));
+                    mIn.skipBytes(bytesToSkip);
                 }
                 continue;
             }

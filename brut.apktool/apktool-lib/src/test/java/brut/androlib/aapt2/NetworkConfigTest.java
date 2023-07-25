@@ -30,8 +30,6 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
 import java.nio.file.Files;
@@ -100,29 +98,4 @@ public class NetworkConfigTest extends BaseTest {
         Node debugAttr = attr.getNamedItem("android:networkSecurityConfig");
         assertEquals("@xml/network_security_config", debugAttr.getNodeValue());
     }
-
-    private static Document loadDocument(File file)
-        throws IOException, SAXException, ParserConfigurationException {
-
-        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-        docFactory.setFeature(FEATURE_DISABLE_DOCTYPE_DECL, true);
-        docFactory.setFeature(FEATURE_LOAD_DTD, false);
-
-        try {
-            docFactory.setAttribute(ACCESS_EXTERNAL_DTD, " ");
-            docFactory.setAttribute(ACCESS_EXTERNAL_SCHEMA, " ");
-        } catch (IllegalArgumentException ex) {
-            LOGGER.warning("JAXP 1.5 Support is required to validate XML");
-        }
-
-        DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-        try (FileInputStream inputStream = new FileInputStream(file)) {
-            return docBuilder.parse(inputStream);
-        }
-    }
-
-    private static final String ACCESS_EXTERNAL_DTD = "http://javax.xml.XMLConstants/property/accessExternalDTD";
-    private static final String ACCESS_EXTERNAL_SCHEMA = "http://javax.xml.XMLConstants/property/accessExternalSchema";
-    private static final String FEATURE_LOAD_DTD = "http://apache.org/xml/features/nonvalidating/load-external-dtd";
-    private static final String FEATURE_DISABLE_DOCTYPE_DECL = "http://apache.org/xml/features/disallow-doctype-decl";
 }

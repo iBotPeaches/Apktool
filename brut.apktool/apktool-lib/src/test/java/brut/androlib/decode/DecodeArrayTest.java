@@ -57,6 +57,7 @@ public class DecodeArrayTest extends BaseTest {
             Config.getDefaultConfig(),
             new ExtFile(sTmpDir + File.separator + apk));
 
+        resourcesDecoder.loadMainPkg();
         ResTable resTable = resourcesDecoder.getResTable();
         ResValue value = resTable.getResSpec(0x7f020001).getDefaultResource().getValue();
 
@@ -70,6 +71,7 @@ public class DecodeArrayTest extends BaseTest {
             Config.getDefaultConfig(),
             new ExtFile(sTmpDir + File.separator + apk));
 
+        resourcesDecoder.loadMainPkg();
         ResTable resTable = resourcesDecoder.getResTable();
         ResValue value = resTable.getResSpec(0x7f020000).getDefaultResource().getValue();
 
