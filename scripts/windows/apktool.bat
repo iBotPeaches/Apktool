@@ -36,7 +36,7 @@ if "%ATTR:~0,1%"=="-" if "%~x1"==".apk" (
 )
 
 :load
-"%java_exe%" -jar -Duser.language=en -Dfile.encoding=UTF8 "%~dp0%BASENAME%%max%.jar" %fastCommand% %*
+"%java_exe%" -jar -Duser.language=en -Dfile.encoding=UTF8 -Djdk.util.zip.disableZip64ExtraFieldValidation=true -Djdk.nio.zipfs.allowDotZipEntry=true "%~dp0%BASENAME%%max%.jar" %fastCommand% %*
 
 rem Pause when ran non interactively
 for /f "tokens=2" %%# in ("%cmdcmdline%") do if /i "%%#" equ "/c" pause
