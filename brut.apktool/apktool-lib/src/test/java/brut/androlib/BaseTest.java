@@ -21,12 +21,13 @@ import brut.common.BrutException;
 import brut.directory.ExtFile;
 import brut.directory.FileDirectory;
 import org.custommonkey.xmlunit.*;
+import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Reader;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.*;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -131,9 +132,35 @@ public class BaseTest {
         assertTrue(path + ": " + diff.getAllDifferences().toString(), diff.similar());
     }
 
+    protected static Document loadDocument(File file) throws IOException, SAXException, ParserConfigurationException {
+
+        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+        docFactory.setFeature(FEATURE_DISABLE_DOCTYPE_DECL, true);
+        docFactory.setFeature(FEATURE_LOAD_DTD, false);
+
+        try {
+            docFactory.setAttribute(ACCESS_EXTERNAL_DTD, " ");
+            docFactory.setAttribute(ACCESS_EXTERNAL_SCHEMA, " ");
+        } catch (IllegalArgumentException ex) {
+            LOGGER.warning("JAXP 1.5 Support is required to validate XML");
+        }
+
+        DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+        // Not using the parse(File) method on purpose, so that we can control when
+        // to close it. Somehow parse(File) does not seem to close the file in all cases.
+        try (FileInputStream inputStream = new FileInputStream(file)) {
+            return docBuilder.parse(inputStream);
+        }
+    }
+
     protected static ExtFile sTmpDir;
     protected static ExtFile sTestOrigDir;
     protected static ExtFile sTestNewDir;
 
     protected final static Logger LOGGER = Logger.getLogger(BaseTest.class.getName());
+
+    private static final String ACCESS_EXTERNAL_DTD = "http://javax.xml.XMLConstants/property/accessExternalDTD";
+    private static final String ACCESS_EXTERNAL_SCHEMA = "http://javax.xml.XMLConstants/property/accessExternalSchema";
+    private static final String FEATURE_LOAD_DTD = "http://apache.org/xml/features/nonvalidating/load-external-dtd";
+    private static final String FEATURE_DISABLE_DOCTYPE_DECL = "http://apache.org/xml/features/disallow-doctype-decl";
 }
