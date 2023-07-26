@@ -25,6 +25,7 @@ import brut.androlib.res.data.arsc.ARSCHeader;
 import brut.androlib.res.data.axml.NamespaceStack;
 import brut.androlib.res.xml.ResXmlEncoders;
 import brut.util.ExtDataInput;
+import org.apache.commons.io.input.CountingInputStream;
 import com.google.common.io.LittleEndianDataInputStream;
 import org.xmlpull.v1.XmlPullParserException;
 import java.io.DataInput;
@@ -65,6 +66,7 @@ public class AXmlResourceParser implements XmlResourceParser {
     public void open(InputStream stream) {
         close();
         if (stream != null) {
+            stream = mCountIn = new CountingInputStream(stream);
             // We need to explicitly cast to DataInput as otherwise the constructor is ambiguous.
             // We choose DataInput instead of InputStream as ExtDataInput wraps an InputStream in
             // a DataInputStream which is big-endian and ignores the little-endian behavior.
@@ -79,6 +81,7 @@ public class AXmlResourceParser implements XmlResourceParser {
         }
         isOperational = false;
         mIn = null;
+        mCountIn = null;
         mStringBlock = null;
         mResourceIds = null;
         mNamespaces.reset();
@@ -677,6 +680,13 @@ public class AXmlResourceParser implements XmlResourceParser {
                 break;
             }
 
+            // #2070 - Some applications have 2 start namespaces, but only 1 end namespace.
+            if (mCountIn.available() == 0) {
+                LOGGER.warning(String.format("AXML hit unexpected end of file at byte: 0x%X", mCountIn.getCount()));
+                mEvent = END_DOCUMENT;
+                break;
+            }
+
             int chunkType;
             int headerSize = 0;
             if (event == START_DOCUMENT) {
@@ -788,6 +798,7 @@ public class AXmlResourceParser implements XmlResourceParser {
     }
 
     private ExtDataInput mIn;
+    private CountingInputStream mCountIn;
     private ResAttrDecoder mAttrDecoder;
     private AndrolibException mFirstError;
 
