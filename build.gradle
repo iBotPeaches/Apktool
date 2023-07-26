@@ -226,5 +226,11 @@ subprojects {
 
         tasks.getByPath(':release').dependsOn(publish)
         tasks.getByPath(':snapshot').dependsOn(publish)
+
+        tasks.withType(Javadoc).tap {
+            configureEach {
+                options.addStringOption('Xdoclint:none', '-quiet')
+            }
+        }
     }
 }
