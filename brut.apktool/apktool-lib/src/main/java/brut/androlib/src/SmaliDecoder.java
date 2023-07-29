@@ -27,8 +27,7 @@ import com.android.tools.smali.dexlib2.analysis.InlineMethodResolver;
 import com.android.tools.smali.dexlib2.iface.DexFile;
 import com.android.tools.smali.dexlib2.iface.MultiDexContainer;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 
 public class SmaliDecoder {
 

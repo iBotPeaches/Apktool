@@ -29,8 +29,7 @@ import brut.util.AaptManager;
 import brut.util.OSDetection;
 import org.apache.commons.cli.*;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.logging.*;
 
 /**

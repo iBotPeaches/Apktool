@@ -20,6 +20,7 @@ import brut.androlib.ApkDecoder;
 import brut.androlib.BaseTest;
 import brut.androlib.Config;
 import brut.androlib.TestUtils;
+import brut.androlib.apk.ApkInfo;
 import brut.androlib.res.ResourcesDecoder;
 import brut.androlib.res.data.ResTable;
 import brut.androlib.res.data.value.ResArrayValue;
@@ -51,11 +52,10 @@ public class DecodeArrayTest extends BaseTest {
 
     @Test
     public void decodeStringArray() throws BrutException {
-        String apk = "issue1994.apk";
-        //ApkDecoder apkDecoder = new ApkDecoder(new File(sTmpDir + File.separator + apk));
-        ResourcesDecoder resourcesDecoder = new ResourcesDecoder(
-            Config.getDefaultConfig(),
-            new ExtFile(sTmpDir + File.separator + apk));
+        ExtFile apkFile = new ExtFile(sTmpDir, "issue1994.apk");
+        ApkInfo apkInfo = new ApkInfo(apkFile);
+        //ApkDecoder apkDecoder = new ApkDecoder(apkFile);
+        ResourcesDecoder resourcesDecoder = new ResourcesDecoder(Config.getDefaultConfig(), apkFile, apkInfo);
 
         resourcesDecoder.loadMainPkg();
         ResTable resTable = resourcesDecoder.getResTable();
@@ -66,10 +66,9 @@ public class DecodeArrayTest extends BaseTest {
 
     @Test
     public void decodeArray() throws BrutException {
-        String apk = "issue1994.apk";
-        ResourcesDecoder resourcesDecoder = new ResourcesDecoder(
-            Config.getDefaultConfig(),
-            new ExtFile(sTmpDir + File.separator + apk));
+        ExtFile apkFile = new ExtFile(sTmpDir, "issue1994.apk");
+        ApkInfo apkInfo = new ApkInfo(apkFile);
+        ResourcesDecoder resourcesDecoder = new ResourcesDecoder(Config.getDefaultConfig(), apkFile, apkInfo);
 
         resourcesDecoder.loadMainPkg();
         ResTable resTable = resourcesDecoder.getResTable();

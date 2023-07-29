@@ -39,9 +39,7 @@ public class ApkInfoSerializationTest {
 
         File savedApkInfo = folder.newFile( "saved.yml" );
         control.save(savedApkInfo);
-        try (
-            FileInputStream fis = new FileInputStream(savedApkInfo);
-        ) {
+        try (FileInputStream fis = new FileInputStream(savedApkInfo)) {
             ApkInfo saved = ApkInfo.load(fis);
             check(saved);
         }
@@ -49,7 +47,7 @@ public class ApkInfoSerializationTest {
 
     private void check(ApkInfo apkInfo) {
         assertEquals("2.0.0", apkInfo.version);
-        assertEquals("testapp.apk", apkInfo.getApkFileName());
+        assertEquals("testapp.apk", apkInfo.apkFileName);
         assertFalse(apkInfo.isFrameworkApk);
         assertNotNull(apkInfo.usesFramework);
         assertEquals(1, apkInfo.usesFramework.ids.size());

@@ -139,8 +139,8 @@ public class ResFileDecoder {
     public void decode(Directory inDir, String inFileName, Directory outDir,
                        String outFileName, String decoder) throws AndrolibException {
         try (
-                InputStream in = inDir.getFileInput(inFileName);
-                OutputStream out = outDir.getFileOutput(outFileName)
+            InputStream in = inDir.getFileInput(inFileName);
+            OutputStream out = outDir.getFileOutput(outFileName)
         ) {
             mDecoders.decode(in, out, decoder);
         } catch (DirectoryException | IOException ex) {
@@ -160,8 +160,8 @@ public class ResFileDecoder {
     public void decodeManifest(Directory inDir, String inFileName,
                                Directory outDir, String outFileName) throws AndrolibException {
         try (
-                InputStream in = inDir.getFileInput(inFileName);
-                OutputStream out = outDir.getFileOutput(outFileName)
+            InputStream in = inDir.getFileInput(inFileName);
+            OutputStream out = outDir.getFileOutput(outFileName)
         ) {
             ((XmlPullStreamDecoder) mDecoders.getDecoder("xml")).decodeManifest(in, out);
         } catch (DirectoryException | IOException ex) {

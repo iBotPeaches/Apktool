@@ -105,17 +105,13 @@ public class BrutIO {
     }
 
     public static void copy(File inputFile, ZipOutputStream outputFile) throws IOException {
-        try (
-                FileInputStream fis = new FileInputStream(inputFile)
-        ) {
+        try (FileInputStream fis = new FileInputStream(inputFile)) {
             IOUtils.copy(fis, outputFile);
         }
     }
 
     public static void copy(ZipFile inputFile, ZipOutputStream outputFile, ZipEntry entry) throws IOException {
-        try (
-                InputStream is = inputFile.getInputStream(entry)
-        ) {
+        try (InputStream is = inputFile.getInputStream(entry)) {
             IOUtils.copy(is, outputFile);
         }
     }

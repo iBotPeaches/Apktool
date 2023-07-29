@@ -18,10 +18,7 @@ package org.xmlpull.renamed;
 
 import org.xmlpull.v1.XmlSerializer;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
+import java.io.*;
 import java.util.Objects;
 
 /**

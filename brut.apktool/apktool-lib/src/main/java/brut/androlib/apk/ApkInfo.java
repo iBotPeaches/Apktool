@@ -20,18 +20,17 @@ import brut.androlib.ApktoolProperties;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.data.ResConfigFlags;
 import brut.directory.DirectoryException;
+import brut.directory.ExtFile;
 import brut.directory.FileDirectory;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ApkInfo implements YamlSerializable {
-    public String version;
+    private transient ExtFile mApkFile;
 
-    private String apkFileName;
+    public String version;
+    public String apkFileName;
     public boolean isFrameworkApk;
     public UsesFramework usesFramework;
     private Map<String, String> sdkInfo = new LinkedHashMap<>();
@@ -47,7 +46,78 @@ public class ApkInfo implements YamlSerializable {
     public boolean compressionType;
 
     public ApkInfo() {
+        this(null);
+    }
+
+    public ApkInfo(ExtFile apkFile) {
         this.version = ApktoolProperties.getVersion();
+        if (apkFile != null) {
+            setApkFile(apkFile);
+        }
+    }
+
+    public ExtFile getApkFile() {
+        return mApkFile;
+    }
+
+    public void setApkFile(ExtFile apkFile) {
+        mApkFile = apkFile;
+        if (this.apkFileName == null) {
+            this.apkFileName = apkFile.getName();
+        }
+    }
+
+    public boolean hasManifest() throws AndrolibException {
+        if (mApkFile == null) {
+            return false;
+        }
+        try {
+            return mApkFile.getDirectory().containsFile("AndroidManifest.xml");
+        } catch (DirectoryException ex) {
+            throw new AndrolibException(ex);
+        }
+    }
+
+    public boolean hasResources() throws AndrolibException {
+        if (mApkFile == null) {
+            return false;
+        }
+        try {
+            return mApkFile.getDirectory().containsFile("resources.arsc");
+        } catch (DirectoryException ex) {
+            throw new AndrolibException(ex);
+        }
+    }
+
+    public boolean hasSources() throws AndrolibException {
+        if (mApkFile == null) {
+            return false;
+        }
+        try {
+            return mApkFile.getDirectory().containsFile("classes.dex");
+        } catch (DirectoryException ex) {
+            throw new AndrolibException(ex);
+        }
+    }
+
+    public boolean hasMultipleSources() throws AndrolibException {
+        if (mApkFile == null) {
+            return false;
+        }
+        try {
+            Set<String> files = mApkFile.getDirectory().getFiles(false);
+            for (String file : files) {
+                if (file.endsWith(".dex")) {
+                    if (!file.equalsIgnoreCase("classes.dex")) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        } catch (DirectoryException ex) {
+            throw new AndrolibException(ex);
+        }
     }
 
     public String checkTargetSdkVersionBounds() {
@@ -59,14 +129,6 @@ public class ApkInfo implements YamlSerializable {
         target = Math.min(max, target);
         target = Math.max(min, target);
         return Integer.toString(target);
-    }
-
-    public String getApkFileName() {
-        return apkFileName;
-    }
-
-    public void setApkFileName(String apkFileName) {
-        this.apkFileName = apkFileName;
     }
 
     public Map<String, String> getSdkInfo() {
@@ -134,9 +196,7 @@ public class ApkInfo implements YamlSerializable {
     }
 
     public void save(File file) throws AndrolibException {
-        try (
-            YamlWriter writer = new YamlWriter(new FileOutputStream(file));
-        ) {
+        try (YamlWriter writer = new YamlWriter(new FileOutputStream(file))) {
             write(writer);
         } catch (FileNotFoundException e) {
             throw new AndrolibException("File not found");
@@ -153,10 +213,10 @@ public class ApkInfo implements YamlSerializable {
     }
 
     public static ApkInfo load(File appDir) throws AndrolibException {
-        try(
-            InputStream in = new FileDirectory(appDir).getFileInput("apktool.yml");
-        ) {
-            return ApkInfo.load(in);
+        try (InputStream in = new FileDirectory(appDir).getFileInput("apktool.yml")) {
+            ApkInfo apkInfo = ApkInfo.load(in);
+            apkInfo.setApkFile(new ExtFile(appDir));
+            return apkInfo;
         } catch (DirectoryException | IOException ex) {
             throw new AndrolibException(ex);
         }

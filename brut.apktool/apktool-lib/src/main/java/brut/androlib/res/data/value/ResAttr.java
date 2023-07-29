@@ -40,8 +40,7 @@ public class ResAttr extends ResBagValue implements ResValuesXmlSerializable {
     }
 
     @Override
-    public void serializeToResValuesXml(XmlSerializer serializer, ResResource res)
-        throws IOException, AndrolibException {
+    public void serializeToResValuesXml(XmlSerializer serializer, ResResource res) throws IOException, AndrolibException {
         String type = getTypeAsString();
 
         serializer.startTag(null, "attr");
@@ -106,7 +105,7 @@ public class ResAttr extends ResBagValue implements ResValuesXmlSerializable {
         throw new AndrolibException("Could not decode attr value");
     }
 
-    protected void serializeBody(XmlSerializer serializer, ResResource res) throws AndrolibException, IOException {
+    protected void serializeBody(XmlSerializer serializer, ResResource res) throws IOException, AndrolibException {
     }
 
     protected String getTypeAsString() {

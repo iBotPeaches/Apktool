@@ -29,7 +29,7 @@ public class ConsistentPropertyTest {
             this.getClass().getResourceAsStream("/apk/basic.yml"));
 
         assertEquals("2.8.0", apkInfo.version);
-        assertEquals("basic.apk", apkInfo.getApkFileName());
+        assertEquals("basic.apk", apkInfo.apkFileName);
         assertFalse(apkInfo.isFrameworkApk);
         assertEquals(1, apkInfo.usesFramework.ids.size());
         assertEquals("tag", apkInfo.usesFramework.tag);

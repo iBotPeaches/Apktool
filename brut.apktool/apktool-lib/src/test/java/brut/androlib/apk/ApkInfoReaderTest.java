@@ -24,7 +24,7 @@ import static org.junit.Assert.*;
 public class ApkInfoReaderTest {
 
     private void checkStandard(ApkInfo apkInfo) {
-        assertEquals("standard.apk", apkInfo.getApkFileName());
+        assertEquals("standard.apk", apkInfo.apkFileName);
         assertFalse(apkInfo.resourcesAreCompressed);
         assertEquals(1, apkInfo.doNotCompress.size());
         assertEquals("resources.arsc", apkInfo.doNotCompress.iterator().next());
@@ -85,7 +85,7 @@ public class ApkInfoReaderTest {
         ApkInfo apkInfo = ApkInfo.load(
             this.getClass().getResourceAsStream("/apk/unknown_files.yml"));
         assertEquals("2.0.0", apkInfo.version);
-        assertEquals("testapp.apk", apkInfo.getApkFileName());
+        assertEquals("testapp.apk", apkInfo.apkFileName);
         assertFalse(apkInfo.isFrameworkApk);
         assertNotNull(apkInfo.usesFramework);
         assertEquals(1, apkInfo.usesFramework.ids.size());
@@ -118,7 +118,7 @@ public class ApkInfoReaderTest {
         ApkInfo apkInfo = ApkInfo.load(
             this.getClass().getResourceAsStream("/apk/list_with_indent.yml"));
         assertEquals("2.8.0", apkInfo.version);
-        assertEquals("basic.apk", apkInfo.getApkFileName());
+        assertEquals("basic.apk", apkInfo.apkFileName);
         assertFalse(apkInfo.isFrameworkApk);
         assertNotNull(apkInfo.usesFramework);
         assertEquals(1, apkInfo.usesFramework.ids.size());
