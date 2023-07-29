@@ -146,15 +146,13 @@ public class ApkInfo implements YamlSerializable {
     }
 
     public static ApkInfo load(InputStream is) throws AndrolibException {
-        // return getYaml().loadAs(is, ApkInfo.class);
         YamlReader reader = new YamlReader(is);
         ApkInfo apkInfo = new ApkInfo();
         reader.readRoot(apkInfo);
         return apkInfo;
     }
 
-    public static ApkInfo load(File appDir)
-        throws AndrolibException {
+    public static ApkInfo load(File appDir) throws AndrolibException {
         try(
             InputStream in = new FileDirectory(appDir).getFileInput("apktool.yml");
         ) {

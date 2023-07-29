@@ -16,14 +16,12 @@
  */
 package brut.androlib.apk;
 
-import brut.androlib.exceptions.AndrolibException;
-
 public class VersionInfo implements YamlSerializable {
     public String versionCode;
     public String versionName;
 
     @Override
-    public void readItem(YamlReader reader) throws AndrolibException {
+    public void readItem(YamlReader reader) {
         YamlLine line = reader.getLine();
         switch (line.getKey()) {
             case "versionCode": {
