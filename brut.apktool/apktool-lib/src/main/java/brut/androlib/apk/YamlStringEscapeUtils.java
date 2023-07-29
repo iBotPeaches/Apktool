@@ -26,22 +26,20 @@ import java.io.Writer;
 public class YamlStringEscapeUtils {
 
     public static String escapeString(String str) {
-        return escapeJavaStyleString(str, false, false);
+        return escapeJavaStyleString(str);
     }
 
     /**
      * @param str String to escape values in, may be null
-     * @param escapeSingleQuotes escapes single quotes if <code>true</code>
-     * @param escapeForwardSlash TODO
      * @return the escaped string
      */
-    private static String escapeJavaStyleString(String str, boolean escapeSingleQuotes, boolean escapeForwardSlash) {
+    private static String escapeJavaStyleString(String str) {
         if (str == null) {
             return null;
         }
         try {
             StringWriter writer = new StringWriter(str.length() * 2);
-            escapeJavaStyleString(writer, str, escapeSingleQuotes, escapeForwardSlash);
+            escapeJavaStyleString(writer, str);
             return writer.toString();
         } catch (IOException ioe) {
             // this should never ever happen while writing to a StringWriter
@@ -50,14 +48,11 @@ public class YamlStringEscapeUtils {
     }
 
     /**
-     * @param out write to receieve the escaped string
+     * @param out write to receive the escaped string
      * @param str String to escape values in, may be null
-     * @param escapeSingleQuote escapes single quotes if <code>true</code>
-     * @param escapeForwardSlash TODO
      * @throws IOException if an IOException occurs
      */
-    private static void escapeJavaStyleString(Writer out, String str, boolean escapeSingleQuote,
-                                              boolean escapeForwardSlash) throws IOException {
+    private static void escapeJavaStyleString(Writer out, String str) throws IOException {
         if (out == null) {
             throw new IllegalArgumentException("The Writer must not be null");
         }
@@ -101,7 +96,7 @@ public class YamlStringEscapeUtils {
             } else {
                 switch (ch) {
                     case '\'' :
-                        if (escapeSingleQuote) {
+                        if (false) {
                             out.write('\\');
                         }
                         out.write('\'');
@@ -115,7 +110,7 @@ public class YamlStringEscapeUtils {
                         out.write('\\');
                         break;
                     case '/' :
-                        if (escapeForwardSlash) {
+                        if (false) {
                             out.write('\\');
                         }
                         out.write('/');
