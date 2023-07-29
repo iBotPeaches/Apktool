@@ -3,9 +3,11 @@ on:
   push:
     branches:
       - master
+    paths:
+      - 'gradle/wrapper/gradle-wrapper.jar'
   pull_request:
     paths:
-      - 'gradle/wrapper/**'
+      - 'gradle/wrapper/gradle-wrapper.jar'
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
