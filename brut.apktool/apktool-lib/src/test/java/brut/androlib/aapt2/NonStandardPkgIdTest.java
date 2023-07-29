@@ -50,11 +50,10 @@ public class NonStandardPkgIdTest extends BaseTest {
 
         LOGGER.info("Building pkgid8.apk...");
         ExtFile testApk = new ExtFile(sTmpDir, "pkgid8.apk");
-        ApkInfo testInfo = new ApkInfo(testApk);
-        testInfo.setApkFileName(testApk.getName());
         new ApkBuilder(config, sTestOrigDir).build(testApk);
 
         LOGGER.info("Decoding pkgid8.apk...");
+        ApkInfo testInfo = new ApkInfo(testApk);
         ResourcesDecoder resourcesDecoder = new ResourcesDecoder(Config.getDefaultConfig(), testApk, testInfo);
 
         sTestNewDir.mkdirs();

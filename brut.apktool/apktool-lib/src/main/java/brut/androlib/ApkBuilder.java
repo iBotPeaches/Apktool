@@ -87,7 +87,7 @@ public class ApkBuilder {
         }
 
         if (outFile == null) {
-            String outFileName = mApkInfo.getApkFileName();
+            String outFileName = mApkInfo.apkFileName;
             outFile = new File(mApkDir, "dist" + File.separator + (outFileName == null ? "out.apk" : outFileName));
         }
 

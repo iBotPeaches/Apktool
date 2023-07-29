@@ -47,7 +47,7 @@ public class ApkInfoSerializationTest {
 
     private void check(ApkInfo apkInfo) {
         assertEquals("2.0.0", apkInfo.version);
-        assertEquals("testapp.apk", apkInfo.getApkFileName());
+        assertEquals("testapp.apk", apkInfo.apkFileName);
         assertFalse(apkInfo.isFrameworkApk);
         assertNotNull(apkInfo.usesFramework);
         assertEquals(1, apkInfo.usesFramework.ids.size());

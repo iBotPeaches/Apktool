@@ -97,7 +97,6 @@ public class ApkDecoder {
             LOGGER.info("Using Apktool " + ApktoolProperties.getVersion() + " on " + mApkFile.getName());
 
             mApkInfo = new ApkInfo(mApkFile);
-            mApkInfo.setApkFileName(mApkFile.getName());
 
             ResourcesDecoder resourcesDecoder = new ResourcesDecoder(mConfig, mApkFile, mApkInfo);
 

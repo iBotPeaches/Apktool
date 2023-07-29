@@ -30,8 +30,7 @@ public class ApkInfo implements YamlSerializable {
     private transient ExtFile mApkFile;
 
     public String version;
-
-    private String apkFileName;
+    public String apkFileName;
     public boolean isFrameworkApk;
     public UsesFramework usesFramework;
     private Map<String, String> sdkInfo = new LinkedHashMap<>();
@@ -51,8 +50,10 @@ public class ApkInfo implements YamlSerializable {
     }
 
     public ApkInfo(ExtFile apkFile) {
-        mApkFile = apkFile;
         this.version = ApktoolProperties.getVersion();
+        if (apkFile != null) {
+            setApkFile(apkFile);
+        }
     }
 
     public ExtFile getApkFile() {
@@ -61,6 +62,9 @@ public class ApkInfo implements YamlSerializable {
 
     public void setApkFile(ExtFile apkFile) {
         mApkFile = apkFile;
+        if (this.apkFileName == null) {
+            this.apkFileName = apkFile.getName();
+        }
     }
 
     public boolean hasManifest() throws AndrolibException {
@@ -125,14 +129,6 @@ public class ApkInfo implements YamlSerializable {
         target = Math.min(max, target);
         target = Math.max(min, target);
         return Integer.toString(target);
-    }
-
-    public String getApkFileName() {
-        return apkFileName;
-    }
-
-    public void setApkFileName(String apkFileName) {
-        this.apkFileName = apkFileName;
     }
 
     public Map<String, String> getSdkInfo() {
