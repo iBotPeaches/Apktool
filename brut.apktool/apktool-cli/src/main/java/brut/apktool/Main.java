@@ -235,7 +235,6 @@ public class Main {
             config.aaptPath = cli.getOptionValue("a");
         }
         if (cli.hasOption("c") || cli.hasOption("copy-original")) {
-            System.err.println("-c/--copy-original has been deprecated. Removal planned for v3.0.0 (#2129)");
             config.copyOriginalFiles = true;
         }
         if (cli.hasOption("nc") || cli.hasOption("no-crunch")) {
