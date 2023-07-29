@@ -122,7 +122,7 @@ public class ARSCDecoder {
             }
         }
 
-        if (mPkg.getResSpecCount() > 0) {
+        if (mPkg != null && mPkg.getResSpecCount() > 0) {
             addMissingResSpecs();
         }
 
