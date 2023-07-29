@@ -16,14 +16,12 @@
  */
 package brut.androlib.apk;
 
-import brut.androlib.exceptions.AndrolibException;
-
 public class PackageInfo implements YamlSerializable {
     public String forcedPackageId;
     public String renameManifestPackage;
 
     @Override
-    public void readItem(YamlReader reader) throws AndrolibException {
+    public void readItem(YamlReader reader) {
         YamlLine line = reader.getLine();
         switch (line.getKey()) {
             case "forcedPackageId": {
@@ -42,5 +40,4 @@ public class PackageInfo implements YamlSerializable {
         writer.writeString("forcedPackageId", forcedPackageId);
         writer.writeString("renameManifestPackage", renameManifestPackage);
     }
-
 }
