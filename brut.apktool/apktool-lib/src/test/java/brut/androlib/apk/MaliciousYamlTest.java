@@ -16,23 +16,17 @@
  */
 package brut.androlib.apk;
 
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.nodes.Node;
-import org.yaml.snakeyaml.representer.Representer;
+import brut.androlib.exceptions.AndrolibException;
+import org.junit.Test;
 
-public class EscapedStringRepresenter extends Representer {
-    public EscapedStringRepresenter() {
-        super(new DumperOptions());
-        RepresentStringEx representStringEx = new RepresentStringEx();
-        multiRepresenters.put(String.class, representStringEx);
-        representers.put(String.class, representStringEx);
-    }
+import static org.junit.Assert.assertEquals;
 
-    private class RepresentStringEx extends RepresentString {
+public class MaliciousYamlTest {
 
-        @Override
-        public Node representData(Object data) {
-            return super.representData(YamlStringEscapeUtils.escapeString(data.toString()));
-        }
+    @Test
+    public void testMaliciousYaml() throws AndrolibException {
+        ApkInfo apkInfo = ApkInfo.load(
+            this.getClass().getResourceAsStream("/apk/cve20220476.yml"));
+        assertEquals("2.6.1-ddc4bb-SNAPSHOT", apkInfo.version);
     }
 }

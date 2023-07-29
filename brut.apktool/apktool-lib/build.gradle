@@ -39,7 +39,6 @@ dependencies {
 
     implementation depends.baksmali
     implementation depends.smali
-    implementation depends.snakeyaml
     implementation depends.xmlpull
     implementation depends.guava
     implementation depends.commons_lang

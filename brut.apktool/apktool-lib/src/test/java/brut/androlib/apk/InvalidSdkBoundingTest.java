@@ -14,17 +14,16 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib.androlib;
+package brut.androlib.apk;
 
-import brut.androlib.BaseTest;
-import brut.androlib.apk.ApkInfo;
 import org.junit.Test;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+
 import static org.junit.Assert.assertEquals;
 
-public class InvalidSdkBoundingTest extends BaseTest {
+public class InvalidSdkBoundingTest {
 
     @Test
     public void checkIfInvalidValuesPass() {

@@ -89,7 +89,6 @@ tasks.register('proguard', ProGuardTask) {
     dontwarn 'javax.xml.xpath.**'
     dontnote '**'
     // between Java 1.8 and 1.9, the signature of `flip()` changed, which trips up proguard.
-    dontwarn 'org.yaml.snakeyaml.scanner.ScannerImpl'
 
     def outPath = jar.getDestinationDirectory().getAsFile().get().toString()
     def extension = jar.archiveExtension.get().toString()

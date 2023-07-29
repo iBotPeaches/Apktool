@@ -165,7 +165,7 @@ public class ApkDecoder {
 
             copyRawFiles(outDir);
             copyUnknownFiles(apkInfo, outDir);
-            Collection<String> mUncompressedFiles = new ArrayList<>();
+            List<String> mUncompressedFiles = new ArrayList<>();
             recordUncompressedFiles(apkInfo, resourcesDecoder.getResFileMapping(), mUncompressedFiles);
             copyOriginalFiles(outDir);
             writeApkInfo(apkInfo, outDir);
@@ -220,11 +220,7 @@ public class ApkDecoder {
     }
 
     private void writeApkInfo(ApkInfo apkInfo, File outDir) throws AndrolibException {
-        try {
-            apkInfo.save(new File(outDir, "apktool.yml"));
-        } catch (IOException ex) {
-            throw new AndrolibException(ex);
-        }
+        apkInfo.save(new File(outDir, "apktool.yml"));
     }
 
     private void copyManifestRaw(File outDir)
@@ -376,7 +372,7 @@ public class ApkDecoder {
 
     private void recordUncompressedFiles(ApkInfo apkInfo,
                                          Map<String, String> resFileMapping,
-                                         Collection<String> uncompressedFilesOrExts)
+                                         List<String> uncompressedFilesOrExts)
         throws AndrolibException {
         try {
             Directory unk = mApkFile.getDirectory();
