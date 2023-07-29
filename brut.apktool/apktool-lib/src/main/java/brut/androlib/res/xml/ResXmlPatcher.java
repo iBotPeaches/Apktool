@@ -29,9 +29,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.*;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.logging.Logger;
 
 public final class ResXmlPatcher {
@@ -135,7 +133,7 @@ public final class ResXmlPatcher {
      * @throws ParserConfigurationException XML nodes could be written
      */
     public static void modNetworkSecurityConfig(File file)
-        throws ParserConfigurationException, TransformerException, IOException, SAXException {
+            throws ParserConfigurationException, TransformerException, IOException, SAXException {
 
         DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder documentBuilder = documentFactory.newDocumentBuilder();

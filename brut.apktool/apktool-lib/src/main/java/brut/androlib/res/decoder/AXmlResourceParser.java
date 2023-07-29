@@ -25,13 +25,11 @@ import brut.androlib.res.data.arsc.ARSCHeader;
 import brut.androlib.res.data.axml.NamespaceStack;
 import brut.androlib.res.xml.ResXmlEncoders;
 import brut.util.ExtDataInput;
-import org.apache.commons.io.input.CountingInputStream;
 import com.google.common.io.LittleEndianDataInputStream;
+import org.apache.commons.io.input.CountingInputStream;
 import org.xmlpull.v1.XmlPullParserException;
-import java.io.DataInput;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
+
+import java.io.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

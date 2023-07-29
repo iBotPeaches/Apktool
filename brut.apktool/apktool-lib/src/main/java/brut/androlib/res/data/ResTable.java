@@ -57,6 +57,10 @@ public class ResTable {
         this(Config.getDefaultConfig(), new ApkInfo());
     }
 
+    public ResTable(ExtFile apkFile) {
+        this(Config.getDefaultConfig(), new ApkInfo(apkFile));
+    }
+
     public ResTable(Config config, ApkInfo apkInfo) {
         mConfig = config;
         mApkInfo = apkInfo;
@@ -145,8 +149,7 @@ public class ResTable {
         mMainPkgLoaded = true;
     }
 
-    private ResPackage loadFrameworkPkg(int id)
-        throws AndrolibException {
+    private ResPackage loadFrameworkPkg(int id) throws AndrolibException {
         Framework framework = new Framework(mConfig);
         File frameworkApk = framework.getFrameworkApk(id, mConfig.frameworkTag);
 
@@ -168,8 +171,7 @@ public class ResTable {
         return pkg;
     }
 
-    private ResPackage[] loadResPackagesFromApk(ExtFile apkFile, boolean keepBrokenResources)
-        throws AndrolibException {
+    private ResPackage[] loadResPackagesFromApk(ExtFile apkFile, boolean keepBrokenResources) throws AndrolibException {
         try {
             Directory dir = apkFile.getDirectory();
             try (BufferedInputStream bfi = new BufferedInputStream(dir.getFileInput("resources.arsc"))) {

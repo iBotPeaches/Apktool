@@ -28,9 +28,7 @@ import org.xmlpull.v1.wrapper.XmlPullWrapperFactory;
 import org.xmlpull.v1.wrapper.XmlSerializerWrapper;
 import org.xmlpull.v1.wrapper.classic.StaticXmlSerializerWrapper;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 
 public class XmlPullStreamDecoder implements ResStreamDecoder {
     public XmlPullStreamDecoder(XmlPullParser parser,

@@ -31,8 +31,7 @@ public class ResAttrDecoder {
         mResTable = resTable;
     }
 
-    public String decode(int type, int value, String rawValue, int attrResId)
-        throws AndrolibException {
+    public String decode(int type, int value, String rawValue, int attrResId) throws AndrolibException {
         ResScalarValue resValue = mResTable.getCurrentResPackage().getValueFactory().factory(type, value, rawValue);
 
         String decoded = null;
@@ -47,9 +46,7 @@ public class ResAttrDecoder {
         return decoded != null ? decoded : resValue.encodeAsResXmlAttr();
     }
 
-    public String decodeFromResourceId(int attrResId)
-        throws AndrolibException {
-
+    public String decodeFromResourceId(int attrResId) throws AndrolibException {
         if (attrResId != 0) {
             try {
                 ResResSpec resResSpec = mResTable.getResSpec(attrResId);

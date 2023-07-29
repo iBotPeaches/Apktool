@@ -49,8 +49,7 @@ public class Framework {
         installFramework(frameFile, config.frameworkTag);
     }
 
-    public void installFramework(File frameFile, String tag)
-        throws AndrolibException {
+    public void installFramework(File frameFile, String tag) throws AndrolibException {
         InputStream in = null;
         ZipOutputStream out = null;
         try {
@@ -198,8 +197,7 @@ public class Framework {
         return dir;
     }
 
-    public File getFrameworkApk(int id, String frameTag)
-        throws AndrolibException {
+    public File getFrameworkApk(int id, String frameTag) throws AndrolibException {
         File dir = getFrameworkDirectory();
         File apk;
 
@@ -216,8 +214,10 @@ public class Framework {
         }
 
         if (id == 1) {
-            try (InputStream in = getAndroidFrameworkResourcesAsStream();
-                 OutputStream out = Files.newOutputStream(apk.toPath())) {
+            try (
+                InputStream in = getAndroidFrameworkResourcesAsStream();
+                OutputStream out = Files.newOutputStream(apk.toPath())
+            ) {
                 IOUtils.copy(in, out);
                 return apk;
             } catch (IOException ex) {

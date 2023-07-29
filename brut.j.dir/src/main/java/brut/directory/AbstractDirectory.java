@@ -262,12 +262,9 @@ public abstract class AbstractDirectory implements Directory {
 
     protected abstract void loadFiles();
     protected abstract void loadDirs();
-    protected abstract InputStream getFileInputLocal(String name)
-        throws DirectoryException;
-    protected abstract OutputStream getFileOutputLocal(String name)
-        throws DirectoryException;
-    protected abstract AbstractDirectory createDirLocal(String name)
-        throws DirectoryException;
+    protected abstract InputStream getFileInputLocal(String name) throws DirectoryException;
+    protected abstract OutputStream getFileOutputLocal(String name) throws DirectoryException;
+    protected abstract AbstractDirectory createDirLocal(String name) throws DirectoryException;
     protected abstract void removeFileLocal(String name);
 
 

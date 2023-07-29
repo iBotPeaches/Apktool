@@ -39,9 +39,7 @@ public class ApkInfoSerializationTest {
 
         File savedApkInfo = folder.newFile( "saved.yml" );
         control.save(savedApkInfo);
-        try (
-            FileInputStream fis = new FileInputStream(savedApkInfo);
-        ) {
+        try (FileInputStream fis = new FileInputStream(savedApkInfo)) {
             ApkInfo saved = ApkInfo.load(fis);
             check(saved);
         }

@@ -22,13 +22,8 @@ import brut.common.BrutException;
 import brut.util.AaptManager;
 import brut.util.OS;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.io.*;
+import java.util.*;
 import java.util.logging.Logger;
 
 public class AaptInvoker {
@@ -81,8 +76,7 @@ public class AaptInvoker {
     }
 
     private void invokeAapt2(File apkFile, File manifest, File resDir, File rawDir, File assetDir, File[] include,
-                             List<String> cmd, boolean customAapt)
-        throws AndrolibException {
+                             List<String> cmd, boolean customAapt) throws AndrolibException {
 
         List<String> compileCommand = new ArrayList<>(cmd);
         File resourcesZip = null;
@@ -249,8 +243,7 @@ public class AaptInvoker {
     }
 
     private void invokeAapt1(File apkFile, File manifest, File resDir, File rawDir, File assetDir, File[] include,
-                             List<String> cmd, boolean customAapt)
-        throws AndrolibException {
+                             List<String> cmd, boolean customAapt) throws AndrolibException {
 
         cmd.add("p");
 
@@ -365,7 +358,7 @@ public class AaptInvoker {
     }
 
     public void invokeAapt(File apkFile, File manifest, File resDir, File rawDir, File assetDir, File[] include)
-        throws AndrolibException {
+            throws AndrolibException {
 
         String aaptPath = mConfig.aaptPath;
         boolean customAapt = !aaptPath.isEmpty();
