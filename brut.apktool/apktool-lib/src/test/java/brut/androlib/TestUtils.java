@@ -23,8 +23,6 @@ import brut.directory.DirUtil;
 import brut.directory.Directory;
 import brut.directory.FileDirectory;
 import brut.util.OS;
-import org.custommonkey.xmlunit.ElementQualifier;
-import org.w3c.dom.Element;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
@@ -140,24 +138,6 @@ public abstract class TestUtils {
         Config config = Config.getDefaultConfig();
         Framework framework = new Framework(config);
         return framework.getFrameworkDirectory();
-    }
-
-    public static class ResValueElementQualifier implements ElementQualifier {
-
-        @Override
-        public boolean qualifyForComparison(Element control, Element test) {
-            String controlType = control.getTagName();
-            if ("item".equals(controlType)) {
-                controlType = control.getAttribute("type");
-            }
-
-            String testType = test.getTagName();
-            if ("item".equals(testType)) {
-                testType = test.getAttribute("type");
-            }
-
-            return controlType.equals(testType) && control.getAttribute("name").equals(test.getAttribute("name"));
-        }
     }
 
     public static String replaceNewlines(String value) {
