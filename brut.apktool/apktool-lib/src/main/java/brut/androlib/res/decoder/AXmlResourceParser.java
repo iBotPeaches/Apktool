@@ -281,7 +281,7 @@ public class AXmlResourceParser implements XmlResourceParser {
         // we can resolve it to the default namespace. This may prove to be too aggressive as we scope the entire
         // system namespace, but it is better than not resolving it at all.
         ResID resId = new ResID(getAttributeNameResource(index));
-        if (resId.pkgId == 1 && namespace == -1) {
+        if (namespace == -1 && resId.pkgId == 1) {
             return ANDROID_RES_NS;
         }
 
