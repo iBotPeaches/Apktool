@@ -713,7 +713,10 @@ public class AXmlResourceParser implements XmlResourceParser {
             }
 
             if (chunkType < ARSCHeader.RES_XML_FIRST_CHUNK_TYPE || chunkType > ARSCHeader.RES_XML_LAST_CHUNK_TYPE) {
-                throw new IOException("Invalid chunk type (" + chunkType + ").");
+                int chunkSize = mIn.readInt();
+                mIn.skipBytes(chunkSize - 8);
+                LOGGER.warning(String.format("Unknown chunk type at: (0x%08x) skipping...", mCountIn.getCount()));
+                break;
             }
 
             // Fake START_DOCUMENT event.
