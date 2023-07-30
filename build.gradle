@@ -28,7 +28,7 @@ buildscript {
                 proguard_gradle: 'com.guardsquare:proguard-gradle:7.3.2',
                 smali          : 'com.android.tools.smali:smali:3.0.3',
                 xmlpull        : 'xpp3:xpp3:1.1.4c',
-                xmlunit        : 'xmlunit:xmlunit:1.6',
+                xmlunit        : 'org.xmlunit:xmlunit-legacy:2.9.1',
         ]
     }
 
