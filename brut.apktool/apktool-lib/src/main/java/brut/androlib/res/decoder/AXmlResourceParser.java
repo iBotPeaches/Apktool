@@ -276,6 +276,15 @@ public class AXmlResourceParser implements XmlResourceParser {
     public String getAttributeNamespace(int index) {
         int offset = getAttributeOffset(index);
         int namespace = mAttributes[offset + ATTRIBUTE_IX_NAMESPACE_URI];
+
+        // #2972 - If the namespace index is -1, the attribute is not present, but if the attribute is from system
+        // we can resolve it to the default namespace. This may prove to be too aggressive as we scope the entire
+        // system namespace, but it is better than not resolving it at all.
+        ResID resId = new ResID(getAttributeNameResource(index));
+        if (namespace == -1 && resId.pkgId == 1) {
+            return ANDROID_RES_NS;
+        }
+
         if (namespace == -1) {
             return "";
         }
@@ -284,12 +293,11 @@ public class AXmlResourceParser implements XmlResourceParser {
         // unless the pkgId of the resource is private. We will grab the non-standard one.
         String value = mStringBlock.getString(namespace);
 
-        if (value == null || value.length() == 0) {
-            ResID resId = new ResID(getAttributeNameResource(index));
+        if (value == null || value.isEmpty()) {
             if (resId.pkgId == PRIVATE_PKG_ID) {
-                value = getNonDefaultNamespaceUri(offset);
+                return getNonDefaultNamespaceUri(offset);
             } else {
-                value = "http://schemas.android.com/apk/res/android";
+                return ANDROID_RES_NS;
             }
         }
 
@@ -308,7 +316,7 @@ public class AXmlResourceParser implements XmlResourceParser {
         // We have the namespaces that can't be touched in the opening tag.
         // Though no known way to correlate them at this time.
         // So return the res-auto namespace.
-        return "http://schemas.android.com/apk/res-auto";
+        return ANDROID_RES_NS_AUTO;
     }
 
     @Override
@@ -828,4 +836,7 @@ public class AXmlResourceParser implements XmlResourceParser {
     private static final int ATTRIBUTE_LENGTH = 5;
 
     private static final int PRIVATE_PKG_ID = 0x7F;
+
+    private static final String ANDROID_RES_NS_AUTO = "http://schemas.android.com/apk/res-auto";
+    private static final String ANDROID_RES_NS = "http://schemas.android.com/apk/res/android";
 }
