@@ -115,6 +115,8 @@ public class BaseTest {
             Reader control = new FileReader(new File(sTestOrigDir, path));
             Reader test = new FileReader(new File(sTestNewDir, path));
 
+            XMLUnit.setEnableXXEProtection(true);
+
             if (qualifier == null) {
                 XMLUnit.setIgnoreWhitespace(true);
                 XMLUnit.setIgnoreAttributeOrder(true);
