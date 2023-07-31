@@ -24,9 +24,8 @@ import brut.androlib.res.data.ResTable;
 import brut.androlib.res.data.arsc.ARSCHeader;
 import brut.androlib.res.data.axml.NamespaceStack;
 import brut.androlib.res.xml.ResXmlEncoders;
-import brut.util.ExtDataInput;
+import brut.util.ExtCountingDataInput;
 import com.google.common.io.LittleEndianDataInputStream;
-import org.apache.commons.io.input.CountingInputStream;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.*;
@@ -64,11 +63,7 @@ public class AXmlResourceParser implements XmlResourceParser {
     public void open(InputStream stream) {
         close();
         if (stream != null) {
-            stream = mCountIn = new CountingInputStream(stream);
-            // We need to explicitly cast to DataInput as otherwise the constructor is ambiguous.
-            // We choose DataInput instead of InputStream as ExtDataInput wraps an InputStream in
-            // a DataInputStream which is big-endian and ignores the little-endian behavior.
-            mIn = new ExtDataInput((DataInput) new LittleEndianDataInputStream(stream));
+            mIn = new ExtCountingDataInput(new LittleEndianDataInputStream(stream));
         }
     }
 
@@ -79,7 +74,6 @@ public class AXmlResourceParser implements XmlResourceParser {
         }
         isOperational = false;
         mIn = null;
-        mCountIn = null;
         mStringBlock = null;
         mResourceIds = null;
         mNamespaces.reset();
@@ -687,8 +681,8 @@ public class AXmlResourceParser implements XmlResourceParser {
             }
 
             // #2070 - Some applications have 2 start namespaces, but only 1 end namespace.
-            if (mCountIn.available() == 0) {
-                LOGGER.warning(String.format("AXML hit unexpected end of file at byte: 0x%X", mCountIn.getCount()));
+            if (mIn.remaining() == 0) {
+                LOGGER.warning(String.format("AXML hit unexpected end of file at byte: 0x%X", mIn.position()));
                 mEvent = END_DOCUMENT;
                 break;
             }
@@ -715,7 +709,7 @@ public class AXmlResourceParser implements XmlResourceParser {
             if (chunkType < ARSCHeader.RES_XML_FIRST_CHUNK_TYPE || chunkType > ARSCHeader.RES_XML_LAST_CHUNK_TYPE) {
                 int chunkSize = mIn.readInt();
                 mIn.skipBytes(chunkSize - 8);
-                LOGGER.warning(String.format("Unknown chunk type at: (0x%08x) skipping...", mCountIn.getCount()));
+                LOGGER.warning(String.format("Unknown chunk type at: (0x%08x) skipping...", mIn.position()));
                 break;
             }
 
@@ -806,8 +800,7 @@ public class AXmlResourceParser implements XmlResourceParser {
         }
     }
 
-    private ExtDataInput mIn;
-    private CountingInputStream mCountIn;
+    private ExtCountingDataInput mIn;
     private ResAttrDecoder mAttrDecoder;
     private AndrolibException mFirstError;
 

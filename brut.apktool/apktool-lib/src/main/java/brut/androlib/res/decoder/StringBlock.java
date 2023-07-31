@@ -18,7 +18,7 @@ package brut.androlib.res.decoder;
 
 import brut.androlib.res.data.arsc.ARSCHeader;
 import brut.androlib.res.xml.ResXmlEncoders;
-import brut.util.ExtDataInput;
+import brut.util.ExtCountingDataInput;
 import com.google.common.annotations.VisibleForTesting;
 
 import java.io.IOException;
@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 public class StringBlock {
-    public static StringBlock readWithChunk(ExtDataInput reader) throws IOException {
+    public static StringBlock readWithChunk(ExtCountingDataInput reader) throws IOException {
         reader.skipCheckShort(ARSCHeader.RES_STRING_POOL_TYPE);
         int headerSize = reader.readShort();
         int chunkSize = reader.readInt();
@@ -38,7 +38,7 @@ public class StringBlock {
         return readWithoutChunk(reader, headerSize, chunkSize);
     }
 
-    public static StringBlock readWithoutChunk(ExtDataInput reader, int headerSize, int chunkSize) throws IOException {
+    public static StringBlock readWithoutChunk(ExtCountingDataInput reader, int headerSize, int chunkSize) throws IOException {
         // ResStringPool_header
         int stringCount = reader.readInt();
         int styleCount = reader.readInt();
