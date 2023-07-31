@@ -55,7 +55,7 @@ public class DecodeArrayTest extends BaseTest {
         ExtFile apkFile = new ExtFile(sTmpDir, "issue1994.apk");
         ApkInfo apkInfo = new ApkInfo(apkFile);
         //ApkDecoder apkDecoder = new ApkDecoder(apkFile);
-        ResourcesDecoder resourcesDecoder = new ResourcesDecoder(Config.getDefaultConfig(), apkFile, apkInfo);
+        ResourcesDecoder resourcesDecoder = new ResourcesDecoder(Config.getDefaultConfig(), apkInfo);
 
         resourcesDecoder.loadMainPkg();
         ResTable resTable = resourcesDecoder.getResTable();
@@ -68,7 +68,7 @@ public class DecodeArrayTest extends BaseTest {
     public void decodeArray() throws BrutException {
         ExtFile apkFile = new ExtFile(sTmpDir, "issue1994.apk");
         ApkInfo apkInfo = new ApkInfo(apkFile);
-        ResourcesDecoder resourcesDecoder = new ResourcesDecoder(Config.getDefaultConfig(), apkFile, apkInfo);
+        ResourcesDecoder resourcesDecoder = new ResourcesDecoder(Config.getDefaultConfig(), apkInfo);
 
         resourcesDecoder.loadMainPkg();
         ResTable resTable = resourcesDecoder.getResTable();
