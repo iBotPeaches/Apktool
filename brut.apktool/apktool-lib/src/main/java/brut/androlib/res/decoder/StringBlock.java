@@ -31,14 +31,17 @@ import java.util.logging.Logger;
 
 public class StringBlock {
     public static StringBlock readWithChunk(ExtCountingDataInput reader) throws IOException {
+        int startPosition = reader.position();
         reader.skipCheckShort(ARSCHeader.RES_STRING_POOL_TYPE);
         int headerSize = reader.readShort();
         int chunkSize = reader.readInt();
 
-        return readWithoutChunk(reader, headerSize, chunkSize);
+        return readWithoutChunk(reader, startPosition, headerSize, chunkSize);
     }
 
-    public static StringBlock readWithoutChunk(ExtCountingDataInput reader, int headerSize, int chunkSize) throws IOException {
+    public static StringBlock readWithoutChunk(ExtCountingDataInput reader, int startPosition, int headerSize,
+                                               int chunkSize) throws IOException
+    {
         // ResStringPool_header
         int stringCount = reader.readInt();
         int styleCount = reader.readInt();
@@ -65,12 +68,11 @@ public class StringBlock {
 
         // If we have both strings and even just a lying style offset - lets calculate the size of the strings without
         // accidentally parsing all the styles.
-        if (stylesOffset > 0) {
+        if (styleCount > 0) {
             size = stylesOffset - stringsOffset;
         }
 
-        block.m_strings = new byte[size];
-        reader.readFully(block.m_strings);
+        block.m_strings = reader.readSafeByteArray(size, startPosition + chunkSize);
 
         if (hasStyles) {
             size = chunkSize - stylesOffset;

@@ -21,6 +21,7 @@ import com.google.common.io.LittleEndianDataInputStream;
 
 import java.io.DataInput;
 import java.io.IOException;
+import java.util.logging.Logger;
 
 public class ExtCountingDataInput extends ExtDataInput {
     private final CountingInputStream mCountIn;
@@ -48,4 +49,23 @@ public class ExtCountingDataInput extends ExtDataInput {
     public long skip(int bytes) throws IOException {
         return mCountIn.skip(bytes);
     }
+
+    public byte[] readSafeByteArray(int length, long maxPosition) throws IOException {
+        byte[] array = new byte[length];
+
+        for (int i = 0; i < length; i++) {
+            // #3236 - In some applications we have more strings than fit into the block.
+            if (position() >= maxPosition) {
+                LOGGER.warning(String.format("Bad string block: string entry is at %d, past end at %d",
+                    position(), maxPosition)
+                );
+                return array;
+            }
+
+            array[i] = readByte();
+        }
+        return array;
+    }
+
+    private static final Logger LOGGER = Logger.getLogger(ExtCountingDataInput.class.getName());
 }
