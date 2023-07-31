@@ -227,6 +227,9 @@ public class StringBlock {
                 LOGGER.warning("Failed to decode a string at offset " + offset + " of length " + length);
                 return null;
             }
+        } catch (IndexOutOfBoundsException ex) {
+            LOGGER.warning("string extends outside of pool at  " + offset + " of length " + length);
+            return null;
         }
 
         try {
