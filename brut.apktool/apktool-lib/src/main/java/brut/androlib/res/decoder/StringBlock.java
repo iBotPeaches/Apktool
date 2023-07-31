@@ -32,19 +32,24 @@ import java.util.logging.Logger;
 public class StringBlock {
     public static StringBlock readWithChunk(ExtDataInput reader) throws IOException {
         reader.skipCheckShort(ARSCHeader.RES_STRING_POOL_TYPE);
-        reader.skipShort(); // headerSize
+        int headerSize = reader.readShort();
         int chunkSize = reader.readInt();
 
-        return readWithoutChunk(reader, chunkSize);
+        return readWithoutChunk(reader, headerSize, chunkSize);
     }
 
-    public static StringBlock readWithoutChunk(ExtDataInput reader, int chunkSize) throws IOException {
+    public static StringBlock readWithoutChunk(ExtDataInput reader, int headerSize, int chunkSize) throws IOException {
         // ResStringPool_header
         int stringCount = reader.readInt();
         int styleCount = reader.readInt();
         int flags = reader.readInt();
         int stringsOffset = reader.readInt();
         int stylesOffset = reader.readInt();
+
+        // For some applications they pack the StringBlock header with more unused data at end.
+        if (headerSize > STRING_BLOCK_HEADER_SIZE) {
+            reader.skipBytes(headerSize - STRING_BLOCK_HEADER_SIZE);
+        }
 
         StringBlock block = new StringBlock();
         block.m_isUTF8 = (flags & UTF8_FLAG) != 0;
@@ -275,4 +280,5 @@ public class StringBlock {
     private static final Logger LOGGER = Logger.getLogger(StringBlock.class.getName());
 
     private static final int UTF8_FLAG = 0x00000100;
+    private static final int STRING_BLOCK_HEADER_SIZE = 28;
 }

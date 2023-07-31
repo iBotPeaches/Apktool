@@ -126,7 +126,7 @@ public class ARSCDecoder {
 
     private void readStringPoolChunk() throws IOException, AndrolibException {
         checkChunkType(ARSCHeader.RES_STRING_POOL_TYPE);
-        mTableStrings = StringBlock.readWithoutChunk(mIn, mHeader.chunkSize);
+        mTableStrings = StringBlock.readWithoutChunk(mIn, mHeader.headerSize, mHeader.chunkSize);
     }
 
     private void readTableChunk() throws IOException, AndrolibException {
