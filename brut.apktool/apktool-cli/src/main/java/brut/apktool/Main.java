@@ -106,6 +106,9 @@ public class Main {
             } else if (opt.equalsIgnoreCase("publicize-resources")) {
                 cmdPublicizeResources(commandLine, config);
                 cmdFound = true;
+            } else if (opt.equalsIgnoreCase("compare")) {
+                cmdCompare(commandLine, config);
+                cmdFound = true;
             }
         }
 
@@ -289,6 +292,33 @@ public class Main {
             config.forceDeleteFramework = true;
         }
         new Framework(config).emptyFrameworkDirectory();
+    }
+
+    private static void cmdCompare(CommandLine cli, Config config) {
+        String[] args = cli.getArgs();
+        if (args.length < 3) {
+            setAdvanceMode();
+            usage();
+            System.exit(1);
+        }
+        int argCount = cli.getArgList().size();
+        String originalApk = cli.getArgList().get(argCount - 2);
+        String newApk = cli.getArgList().get(argCount - 1);
+
+        if (cli.hasOption("v") || cli.hasOption("verbose")) {
+            config.verbose = true;
+        }
+
+        // try and build apk
+        try {
+            new ApkCompare(config, new ExtFile(originalApk), new ExtFile(newApk)).compare();
+        } catch (InFileNotFoundException ex) {
+            System.err.println(ex.getMessage());
+            System.exit(1);
+        } catch (BrutException ex) {
+            System.err.println(ex.getMessage());
+            System.exit(1);
+        }
     }
 
     private static String getLastArg(CommandLine cli) {
@@ -507,6 +537,9 @@ public class Main {
         // add list framework options
         listFrameworkOptions.addOption(frameIfDirOption);
 
+        // add basic compare options
+        // compareOptions.addOption(frameIfDirOption);
+
         // add all, loop existing cats then manually add advance
         for (Option op : normalOptions.getOptions()) {
             allOptions.addOption(op);
@@ -573,6 +606,7 @@ public class Main {
             formatter.printHelp("apktool " + verbosityHelp() + "publicize-resources <file_path>", emptyOptions);
             formatter.printHelp("apktool " + verbosityHelp() + "empty-framework-dir [options]", emptyFrameworkOptions);
             formatter.printHelp("apktool " + verbosityHelp() + "list-frameworks [options]", listFrameworkOptions);
+            formatter.printHelp("apktool " + verbosityHelp() + "compare [options] <original.apk> <rebuilded.apk>", compareOptions);
         }
         System.out.println();
 
@@ -662,6 +696,7 @@ public class Main {
     private final static Options emptyOptions;
     private final static Options emptyFrameworkOptions;
     private final static Options listFrameworkOptions;
+    private final static Options compareOptions;
 
     static {
         //normal and advance usage output
@@ -673,5 +708,6 @@ public class Main {
         emptyOptions = new Options();
         emptyFrameworkOptions = new Options();
         listFrameworkOptions = new Options();
+        compareOptions = new Options();
     }
 }
