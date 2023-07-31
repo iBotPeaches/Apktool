@@ -59,20 +59,29 @@ public class StringBlock {
             block.m_styleOffsets = reader.readIntArray(styleCount);
         }
 
-        int size = ((stylesOffset == 0) ? chunkSize : stylesOffset) - stringsOffset;
+        // #3236 - Some applications give a style offset, but have 0 styles. So probably read the string pool.
+        boolean hasStyles = stylesOffset != 0 && styleCount != 0;
+        int size = chunkSize - stringsOffset;
+
+        // If we have both strings and even just a lying style offset - lets calculate the size of the strings without
+        // accidentally parsing all the styles.
+        if (stylesOffset > 0) {
+            size = stylesOffset - stringsOffset;
+        }
+
         block.m_strings = new byte[size];
         reader.readFully(block.m_strings);
 
-        if (stylesOffset != 0) {
-            size = (chunkSize - stylesOffset);
+        if (hasStyles) {
+            size = chunkSize - stylesOffset;
             block.m_styles = reader.readIntArray(size / 4);
+        }
 
-            // read remaining bytes
-            int remaining = size % 4;
-            if (remaining >= 1) {
-                while (remaining-- > 0) {
-                    reader.readByte();
-                }
+        // read remaining bytes
+        int remaining = size % 4;
+        if (remaining >= 1) {
+            while (remaining-- > 0) {
+                reader.readByte();
             }
         }
 
