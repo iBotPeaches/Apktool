@@ -18,7 +18,7 @@ package brut.androlib.res.decoder;
 
 import brut.androlib.res.data.arsc.ARSCHeader;
 import brut.androlib.res.xml.ResXmlEncoders;
-import brut.util.ExtDataInput;
+import brut.util.ExtCountingDataInput;
 import com.google.common.annotations.VisibleForTesting;
 
 import java.io.IOException;
@@ -30,15 +30,18 @@ import java.util.List;
 import java.util.logging.Logger;
 
 public class StringBlock {
-    public static StringBlock readWithChunk(ExtDataInput reader) throws IOException {
+    public static StringBlock readWithChunk(ExtCountingDataInput reader) throws IOException {
+        int startPosition = reader.position();
         reader.skipCheckShort(ARSCHeader.RES_STRING_POOL_TYPE);
-        reader.skipShort(); // headerSize
+        int headerSize = reader.readShort();
         int chunkSize = reader.readInt();
 
-        return readWithoutChunk(reader, chunkSize);
+        return readWithoutChunk(reader, startPosition, headerSize, chunkSize);
     }
 
-    public static StringBlock readWithoutChunk(ExtDataInput reader, int chunkSize) throws IOException {
+    public static StringBlock readWithoutChunk(ExtCountingDataInput reader, int startPosition, int headerSize,
+                                               int chunkSize) throws IOException
+    {
         // ResStringPool_header
         int stringCount = reader.readInt();
         int styleCount = reader.readInt();
@@ -46,28 +49,42 @@ public class StringBlock {
         int stringsOffset = reader.readInt();
         int stylesOffset = reader.readInt();
 
-        StringBlock block = new StringBlock();
-        block.m_isUTF8 = (flags & UTF8_FLAG) != 0;
-        block.m_stringOffsets = reader.readIntArray(stringCount);
-
-        if (styleCount != 0) {
-            block.m_styleOffsets = reader.readIntArray(styleCount);
+        // For some applications they pack the StringBlock header with more unused data at end.
+        if (headerSize > STRING_BLOCK_HEADER_SIZE) {
+            reader.skipBytes(headerSize - STRING_BLOCK_HEADER_SIZE);
         }
 
-        int size = ((stylesOffset == 0) ? chunkSize : stylesOffset) - stringsOffset;
+        StringBlock block = new StringBlock();
+        block.m_isUTF8 = (flags & UTF8_FLAG) != 0;
+        block.m_stringOffsets = reader.readSafeIntArray(stringCount, startPosition + stringsOffset);
+
+        if (styleCount != 0) {
+            block.m_styleOffsets = reader.readSafeIntArray(styleCount, startPosition + stylesOffset);
+        }
+
+        // #3236 - Some applications give a style offset, but have 0 styles. Make this check more robust.
+        boolean hasStyles = stylesOffset != 0 && styleCount != 0;
+        int size = chunkSize - stringsOffset;
+
+        // If we have both strings and even just a lying style offset - lets calculate the size of the strings without
+        // accidentally parsing all the styles.
+        if (styleCount > 0) {
+            size = stylesOffset - stringsOffset;
+        }
+
         block.m_strings = new byte[size];
         reader.readFully(block.m_strings);
 
-        if (stylesOffset != 0) {
-            size = (chunkSize - stylesOffset);
+        if (hasStyles) {
+            size = chunkSize - stylesOffset;
             block.m_styles = reader.readIntArray(size / 4);
+        }
 
-            // read remaining bytes
-            int remaining = size % 4;
-            if (remaining >= 1) {
-                while (remaining-- > 0) {
-                    reader.readByte();
-                }
+        // In case we aren't 4 byte aligned we need to skip the remaining bytes.
+        int remaining = size % 4;
+        if (remaining >= 1) {
+            while (remaining-- > 0) {
+                reader.readByte();
             }
         }
 
@@ -211,6 +228,11 @@ public class StringBlock {
                 LOGGER.warning("Failed to decode a string at offset " + offset + " of length " + length);
                 return null;
             }
+        } catch (IndexOutOfBoundsException ex) {
+            if (!m_isUTF8) {
+                LOGGER.warning("String extends outside of pool at  " + offset + " of length " + length);
+                return null;
+            }
         }
 
         try {
@@ -275,4 +297,5 @@ public class StringBlock {
     private static final Logger LOGGER = Logger.getLogger(StringBlock.class.getName());
 
     private static final int UTF8_FLAG = 0x00000100;
+    private static final int STRING_BLOCK_HEADER_SIZE = 28;
 }
