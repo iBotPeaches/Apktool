@@ -229,8 +229,10 @@ public class StringBlock {
                 return null;
             }
         } catch (IndexOutOfBoundsException ex) {
-            LOGGER.warning("string extends outside of pool at  " + offset + " of length " + length);
-            return null;
+            if (!m_isUTF8) {
+                LOGGER.warning("String extends outside of pool at  " + offset + " of length " + length);
+                return null;
+            }
         }
 
         try {
