@@ -80,7 +80,7 @@ public class StringBlock {
             block.m_styles = reader.readIntArray(size / 4);
         }
 
-        // In case we aren't 4 byte we need to skip the remaining bytes.
+        // In case we aren't 4 byte aligned we need to skip the remaining bytes.
         int remaining = size % 4;
         if (remaining >= 1) {
             while (remaining-- > 0) {
