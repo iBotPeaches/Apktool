@@ -21,8 +21,6 @@ import brut.androlib.exceptions.InFileNotFoundException;
 import brut.androlib.exceptions.OutDirExistsException;
 import brut.androlib.apk.ApkInfo;
 import brut.androlib.res.ResourcesDecoder;
-import brut.androlib.res.data.*;
-import brut.androlib.res.xml.ResXmlPatcher;
 import brut.androlib.src.SmaliDecoder;
 import brut.directory.Directory;
 import brut.directory.ExtFile;
@@ -41,9 +39,7 @@ public class ApkDecoder {
     private final static Logger LOGGER = Logger.getLogger(ApkDecoder.class.getName());
 
     private final Config mConfig;
-    private final ExtFile mApkFile;
-    protected final ResUnknownFiles mResUnknownFiles;
-    private ApkInfo mApkInfo;
+    private final ApkInfo mApkInfo;
     private int mMinSdkVersion = 0;
 
     private final static String SMALI_DIRNAME = "smali";
@@ -73,17 +69,17 @@ public class ApkDecoder {
 
     public ApkDecoder(Config config, ExtFile apkFile) {
         mConfig = config;
-        mApkFile = apkFile;
-        mResUnknownFiles = new ResUnknownFiles();
+        mApkInfo = new ApkInfo(apkFile);
     }
 
     public ApkInfo decode(File outDir) throws AndrolibException, IOException, DirectoryException {
+        ExtFile apkFile = mApkInfo.getApkFile();
         try {
             if (!mConfig.forceDelete && outDir.exists()) {
                 throw new OutDirExistsException();
             }
 
-            if (!mApkFile.isFile() || !mApkFile.canRead()) {
+            if (!apkFile.isFile() || !apkFile.canRead()) {
                 throw new InFileNotFoundException();
             }
 
@@ -94,11 +90,9 @@ public class ApkDecoder {
             }
             outDir.mkdirs();
 
-            LOGGER.info("Using Apktool " + ApktoolProperties.getVersion() + " on " + mApkFile.getName());
+            LOGGER.info("Using Apktool " + ApktoolProperties.getVersion() + " on " + mApkInfo.apkFileName);
 
-            mApkInfo = new ApkInfo(mApkFile);
-
-            ResourcesDecoder resourcesDecoder = new ResourcesDecoder(mConfig, mApkFile, mApkInfo);
+            ResourcesDecoder resourcesDecoder = new ResourcesDecoder(mConfig, mApkInfo);
 
             if (mApkInfo.hasResources()) {
                 switch (mConfig.decodeResources) {
@@ -136,7 +130,7 @@ public class ApkDecoder {
 
             if (mApkInfo.hasMultipleSources()) {
                 // foreach unknown dex file in root, lets disassemble it
-                Set<String> files = mApkFile.getDirectory().getFiles(true);
+                Set<String> files = apkFile.getDirectory().getFiles(true);
                 for (String file : files) {
                     if (file.endsWith(".dex")) {
                         if (!file.equalsIgnoreCase("classes.dex")) {
@@ -174,7 +168,7 @@ public class ApkDecoder {
             return mApkInfo;
         } finally {
             try {
-                mApkFile.close();
+                apkFile.close();
             } catch (IOException ignored) {}
         }
     }
@@ -186,7 +180,7 @@ public class ApkDecoder {
     private void copyManifestRaw(File outDir) throws AndrolibException {
         try {
             LOGGER.info("Copying raw manifest...");
-            mApkFile.getDirectory().copyToDir(outDir, APK_MANIFEST_FILENAMES);
+            mApkInfo.getApkFile().getDirectory().copyToDir(outDir, APK_MANIFEST_FILENAMES);
         } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
         }
@@ -195,7 +189,7 @@ public class ApkDecoder {
     private void copyResourcesRaw(File outDir) throws AndrolibException {
         try {
             LOGGER.info("Copying raw resources...");
-            mApkFile.getDirectory().copyToDir(outDir, APK_RESOURCES_FILENAMES);
+            mApkInfo.getApkFile().getDirectory().copyToDir(outDir, APK_RESOURCES_FILENAMES);
         } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
         }
@@ -204,7 +198,7 @@ public class ApkDecoder {
     private void copySourcesRaw(File outDir, String filename) throws AndrolibException {
         try {
             LOGGER.info("Copying raw " + filename + " file...");
-            mApkFile.getDirectory().copyToDir(outDir, filename);
+            mApkInfo.getApkFile().getDirectory().copyToDir(outDir, filename);
         } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
         }
@@ -222,7 +216,7 @@ public class ApkDecoder {
             //noinspection ResultOfMethodCallIgnored
             smaliDir.mkdirs();
             LOGGER.info("Baksmaling " + filename + "...");
-            DexFile dexFile = SmaliDecoder.decode(mApkFile, smaliDir, filename,
+            DexFile dexFile = SmaliDecoder.decode(mApkInfo.getApkFile(), smaliDir, filename,
                 mConfig.baksmaliDebugMode, mConfig.apiLevel);
             int minSdkVersion = dexFile.getOpcodes().api;
             if (mMinSdkVersion == 0 || mMinSdkVersion > minSdkVersion) {
@@ -236,7 +230,7 @@ public class ApkDecoder {
     private void copyRawFiles(File outDir) throws AndrolibException {
         LOGGER.info("Copying assets and libs...");
         try {
-            Directory in = mApkFile.getDirectory();
+            Directory in = mApkInfo.getApkFile().getDirectory();
 
             if (mConfig.decodeAssets == Config.DECODE_ASSETS_FULL) {
                 if (in.containsDir("assets")) {
@@ -270,7 +264,7 @@ public class ApkDecoder {
         LOGGER.info("Copying unknown files...");
         File unknownOut = new File(outDir, UNK_DIRNAME);
         try {
-            Directory unk = mApkFile.getDirectory();
+            Directory unk = mApkInfo.getApkFile().getDirectory();
 
             // loop all items in container recursively, ignoring any that are pre-defined by aapt
             Set<String> files = unk.getFiles(true);
@@ -281,11 +275,9 @@ public class ApkDecoder {
                     unk.copyToDir(unknownOut, file);
                     // let's record the name of the file, and its compression type
                     // so that we may re-include it the same way
-                    mResUnknownFiles.addUnknownFileInfo(file, String.valueOf(unk.getCompressionLevel(file)));
+                    mApkInfo.addUnknownFileInfo(file, String.valueOf(unk.getCompressionLevel(file)));
                 }
             }
-            // update apk info
-            mApkInfo.unknownFiles = mResUnknownFiles.getUnknownFiles();
         } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
         }
@@ -300,7 +292,7 @@ public class ApkDecoder {
         }
 
         try {
-            Directory in = mApkFile.getDirectory();
+            Directory in = mApkInfo.getApkFile().getDirectory();
             if (in.containsFile("AndroidManifest.xml")) {
                 in.copyToDir(originalDir, "AndroidManifest.xml");
             }
@@ -326,7 +318,7 @@ public class ApkDecoder {
     private void recordUncompressedFiles(Map<String, String> resFileMapping) throws AndrolibException {
         try {
             List<String> uncompressedFilesOrExts = new ArrayList<>();
-            Directory unk = mApkFile.getDirectory();
+            Directory unk = mApkInfo.getApkFile().getDirectory();
             Set<String> files = unk.getFiles(true);
 
             for (String file : files) {

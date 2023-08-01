@@ -27,7 +27,6 @@ import brut.androlib.res.xml.ResValuesXmlSerializable;
 import brut.androlib.res.xml.ResXmlPatcher;
 import brut.directory.Directory;
 import brut.directory.DirectoryException;
-import brut.directory.ExtFile;
 import brut.directory.FileDirectory;
 import org.xmlpull.v1.XmlSerializer;
 
@@ -39,7 +38,6 @@ public class ResourcesDecoder {
     private final static Logger LOGGER = Logger.getLogger(ResourcesDecoder.class.getName());
 
     private final Config mConfig;
-    private final ExtFile mApkFile;
     private final ApkInfo mApkInfo;
     private final ResTable mResTable;
     private final Map<String, String> mResFileMapping = new HashMap<>();
@@ -48,9 +46,8 @@ public class ResourcesDecoder {
         "android", "com.htc", "com.lge", "com.lge.internal", "yi", "flyme", "air.com.adobe.appentry",
         "FFFFFFFFFFFFFFFFFFFFFF" };
 
-    public ResourcesDecoder(Config config, ExtFile apkFile, ApkInfo apkInfo) {
+    public ResourcesDecoder(Config config, ApkInfo apkInfo) {
         mConfig = config;
-        mApkFile = apkFile;
         mApkInfo = apkInfo;
         mResTable = new ResTable(mConfig, mApkInfo);
     }
@@ -68,7 +65,7 @@ public class ResourcesDecoder {
     }
 
     public void loadMainPkg() throws AndrolibException {
-        mResTable.loadMainPkg(mApkFile);
+        mResTable.loadMainPkg(mApkInfo.getApkFile());
     }
 
     public void decodeManifest(File outDir) throws AndrolibException {
@@ -81,7 +78,7 @@ public class ResourcesDecoder {
 
         Directory inApk, out;
         try {
-            inApk = mApkFile.getDirectory();
+            inApk = mApkInfo.getApkFile().getDirectory();
             out = new FileDirectory(outDir);
 
             if (mApkInfo.hasResources()) {
@@ -147,7 +144,7 @@ public class ResourcesDecoder {
             return;
         }
 
-        mResTable.loadMainPkg(mApkFile);
+        mResTable.loadMainPkg(mApkInfo.getApkFile());
 
         ResStreamDecoderContainer decoders = new ResStreamDecoderContainer();
         decoders.setDecoder("raw", new ResRawStreamDecoder());
@@ -161,7 +158,7 @@ public class ResourcesDecoder {
 
         try {
             out = new FileDirectory(outDir);
-            in = mApkFile.getDirectory();
+            in = mApkInfo.getApkFile().getDirectory();
             out = out.createDir("res");
         } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
