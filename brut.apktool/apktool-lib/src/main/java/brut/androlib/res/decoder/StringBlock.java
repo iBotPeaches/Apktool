@@ -56,10 +56,10 @@ public class StringBlock {
 
         StringBlock block = new StringBlock();
         block.m_isUTF8 = (flags & UTF8_FLAG) != 0;
-        block.m_stringOffsets = reader.readIntArray(stringCount);
+        block.m_stringOffsets = reader.readSafeIntArray(stringCount, startPosition + stringsOffset);
 
         if (styleCount != 0) {
-            block.m_styleOffsets = reader.readIntArray(styleCount);
+            block.m_styleOffsets = reader.readSafeIntArray(styleCount, startPosition + stylesOffset);
         }
 
         // #3236 - Some applications give a style offset, but have 0 styles. So probably read the string pool.
@@ -72,7 +72,8 @@ public class StringBlock {
             size = stylesOffset - stringsOffset;
         }
 
-        block.m_strings = reader.readSafeByteArray(size, startPosition + chunkSize);
+        block.m_strings = new byte[size];
+        reader.readFully(block.m_strings);
 
         if (hasStyles) {
             size = chunkSize - stylesOffset;

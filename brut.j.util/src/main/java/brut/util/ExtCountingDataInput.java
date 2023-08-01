@@ -50,19 +50,19 @@ public class ExtCountingDataInput extends ExtDataInput {
         return mCountIn.skip(bytes);
     }
 
-    public byte[] readSafeByteArray(int length, long maxPosition) throws IOException {
-        byte[] array = new byte[length];
+    public int[] readSafeIntArray(int length, long maxPosition) throws IOException {
+        int[] array = new int[length];
 
         for (int i = 0; i < length; i++) {
             // #3236 - In some applications we have more strings than fit into the block.
             if (position() >= maxPosition) {
                 LOGGER.warning(String.format("Bad string block: string entry is at %d, past end at %d",
-                    position(), maxPosition)
+                        position(), maxPosition)
                 );
                 return array;
             }
 
-            array[i] = readByte();
+            array[i] = readInt();
         }
         return array;
     }
