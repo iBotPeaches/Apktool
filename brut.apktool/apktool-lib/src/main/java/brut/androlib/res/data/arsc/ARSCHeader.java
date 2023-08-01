@@ -16,8 +16,8 @@
  */
 package brut.androlib.res.data.arsc;
 
+import brut.util.ExtCountingDataInput;
 import brut.util.ExtDataInput;
-import org.apache.commons.io.input.CountingInputStream;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -39,23 +39,23 @@ public class ARSCHeader {
         this.endPosition = headerStart + chunkSize;
     }
 
-    public static ARSCHeader read(ExtDataInput in, CountingInputStream countIn) throws IOException {
+    public static ARSCHeader read(ExtCountingDataInput in) throws IOException {
         short type;
-        int start = countIn.getCount();
+        int start = in.position();
         try {
             type = in.readShort();
         } catch (EOFException ex) {
-            return new ARSCHeader(RES_NONE_TYPE, 0, 0, countIn.getCount());
+            return new ARSCHeader(RES_NONE_TYPE, 0, 0, in.position());
         }
         return new ARSCHeader(type, in.readShort(), in.readInt(), start);
     }
 
-    public void checkForUnreadHeader(ExtDataInput in, CountingInputStream countIn) throws IOException {
+    public void checkForUnreadHeader(ExtCountingDataInput in) throws IOException {
         // Some applications lie about the reported size of their chunk header. Trusting the chunkSize is misleading
         // So compare to what we actually read in the header vs reported and skip the rest.
         // However, this runs after each chunk and not every chunk reading has a specific distinction between the
         // header and the body.
-        int actualHeaderSize = countIn.getCount() - this.startPosition;
+        int actualHeaderSize = in.position() - this.startPosition;
         int exceedingSize = this.headerSize - actualHeaderSize;
         if (exceedingSize > 0) {
             byte[] buf = new byte[exceedingSize];

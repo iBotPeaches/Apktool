@@ -17,4 +17,5 @@
 dependencies {
   implementation project(':brut.j.common')
   implementation depends.commons_io
+  implementation depends.guava
 }
