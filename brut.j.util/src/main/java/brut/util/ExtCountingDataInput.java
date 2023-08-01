@@ -54,10 +54,11 @@ public class ExtCountingDataInput extends ExtDataInput {
         int[] array = new int[length];
 
         for (int i = 0; i < length; i++) {
-            // #3236 - In some applications we have more strings than fit into the block.
+            // #3236 - In some applications we have more strings than fit into the block. This function takes
+            // an expected max position and if we are past it, we return early during processing.
             if (position() >= maxPosition) {
                 LOGGER.warning(String.format("Bad string block: string entry is at %d, past end at %d",
-                        position(), maxPosition)
+                    position(), maxPosition)
                 );
                 return array;
             }

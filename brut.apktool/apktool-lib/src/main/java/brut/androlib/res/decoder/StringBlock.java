@@ -62,7 +62,7 @@ public class StringBlock {
             block.m_styleOffsets = reader.readSafeIntArray(styleCount, startPosition + stylesOffset);
         }
 
-        // #3236 - Some applications give a style offset, but have 0 styles. So probably read the string pool.
+        // #3236 - Some applications give a style offset, but have 0 styles. Make this check more robust.
         boolean hasStyles = stylesOffset != 0 && styleCount != 0;
         int size = chunkSize - stringsOffset;
 
@@ -80,7 +80,7 @@ public class StringBlock {
             block.m_styles = reader.readIntArray(size / 4);
         }
 
-        // read remaining bytes
+        // In case we aren't 4 byte we need to skip the remaining bytes.
         int remaining = size % 4;
         if (remaining >= 1) {
             while (remaining-- > 0) {
