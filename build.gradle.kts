@@ -15,6 +15,18 @@
  */
 import java.nio.charset.StandardCharsets
 
+val baksmaliVersion by extra("3.0.3")
+val commonsCliVersion by extra("1.5.0")
+val commonsIoVersion by extra("2.13.0")
+val commonsLangVersion by extra("3.13.0")
+val commonsTextVersion by extra("1.10.0")
+val guavaVersion by extra("32.0.1-jre")
+val junitVersion by extra("4.13.2")
+val proguardGradleVersion by extra("7.3.2")
+val smaliVersion by extra("3.0.3")
+val xmlpullVersion by extra("1.1.4c")
+val xmlunitVersion by extra("2.9.1")
+
 buildscript {
     extra.apply{
         set("baksmali", "com.android.tools.smali:smali-baksmali:3.0.3")
@@ -39,223 +51,20 @@ buildscript {
     }
 }
 
-version = "2.8.2"
-suffix = "SNAPSHOT"
+plugins {
+    `java-library`
+}
+
+val version = "2.8.2"
+val suffix = "SNAPSHOT"
 
 defaultTasks("build", "shadowJar", "proguard")
 
-allprojects {
-    apply(plugin = "java")
-    apply(plugin = "com.github.hierynomus.license")
-
+java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
-
-    license {
-        header = rootProject.file("brut.j.common/src/templates/apache2.0-header.txt")
-        exclude = "**/android/content/res/*.java"
-        exclude = "**/android/util/*.java"
-        include = "**/*.java"
-        mapping {
-            java = "SLASHSTAR_STYLE"
-        }
-        ext {
-            year = "2010"
-            brut = "Ryszard Wiśniewski"
-            brutEmail = "brut.alll@gmail.com"
-            ibot = "Connor Tumbleson"
-            ibotEmail = "connor.tumbleson@gmail.com"
-        }
-        strictCheck = true
-    }
-
-    // license plugin automatically fires these tasks, disable them and run them during releases
-    gradle.startParameter.excludedTaskNames += [
-            "licenseMain",
-            "licenseTest"
-    ]
-
-    repositories {
-        mavenCentral()
-        google()
-    }
-}
-
-tasks.withType(JavaCompile).configureEach {
-    options.encoding = StandardCharsets.UTF_8.toString()
-    options.compilerArgs += ["-Xlint:-options"]
-}
-
-mavenVersion = "unspecified"
-if (!("release" in gradle.startParameter.taskNames)) {
-    hash = getCheckedOutGitCommitHash()
-
-    if (hash == null) {
-        project.ext.set("hash", "dirty")
-        project.ext.set("apktool_version", version + "-dirty")
-        project.logger.lifecycle("Building SNAPSHOT (no .git folder found)")
-    } else {
-        project.ext.set("hash", hash)
-        project.ext.set("apktool_version", version + "-" + hash + "-SNAPSHOT")
-        mavenVersion = version + "-SNAPSHOT"
-        project.logger.lifecycle("Building SNAPSHOT (${getCheckedOutBranch()}): $hash")
-    }
-} else {
-    project.ext.set("hash", "")
-    if (suffix.length() > 0) {
-        project.ext.set("apktool_version", version + "-" + suffix)
-    } else {
-        project.ext.set("apktool_version", version)
-    }
-    mavenVersion = version
-    project.logger.lifecycle("Building RELEASE (${getCheckedOutBranch()}): $project.ext.apktool_version")
-}
-
-build.doFirst {
-    javaVersion = System.getProperty("java.version")
-
-    // fail the build if java (1.5/1.6/1.7)
-    if (javaVersion.startsWith("1.5") || javaVersion.startsWith("1.6") || javaVersion.startsWith("1.7")) {
-        throw new GradleException("You can fix this problem!\n" +
-                "We found a " + javaVersion + " JDK\n" +
-                "Please update JAVA_HOME to use at least a 1.8 JDK\n" +
-                "Currently it is set to: " + System.getProperty("java.home")
-        )
-    }
-}
-
-// used for official releases only. Please don"t use
-task release {
-}
-
-// used for publishing snapshot builds to maven.
-task snapshot {
 }
 
 subprojects {
     apply(plugin = "java")
-
-    test {
-        // https://github.com/iBotPeaches/Apktool/issues/3174
-        systemPropert("jdk.nio.zipfs.allowDotZipEntry", true)
-        systemProperty("jdk.util.zip.disableZip64ExtraFieldValidation", true)
-
-        testLogging {
-            exceptionFormat = "full"
-        }
-    }
-
-    mavenProjects = ["apktool-lib", "apktool-cli", "brut.j.common", "brut.j.util", "brut.j.dir"]
-
-    if (project.name in mavenProjects) {
-        apply(plugin = "maven-publish")
-        apply(plugin = "signing")
-
-        publishing {
-            publications {
-                maven(MavenPublication) {
-                    from project.components.java
-
-                    groupId = "org.apktool"
-                    artifactId = project.name
-                    version = mavenVersion
-
-                    pom {
-                        name = "Apktool"
-                        description = "A tool for reverse engineering Android apk files."
-                        url = "https://apktool.org"
-
-                        licenses {
-                            license {
-                                name = "The Apache License 2.0"
-                                url = "https://opensource.org/licenses/Apache-2.0"
-                            }
-                        }
-                        developers {
-                            developer {
-                                id = "iBotPeaches"
-                                name = "Connor Tumbleson"
-                                email = "connor.tumbleson@gmail.com"
-                            }
-                            developer {
-                                id = "brutall"
-                                name = "Ryszard Wiśniewski"
-                                email = "brut.alll@gmail.com"
-                            }
-                        }
-                        scm {
-                            connection = "scm:git:git://github.com/iBotPeaches/Apktool.git"
-                            developerConnection = "scm:git:git@github.com:iBotPeaches/Apktool.git"
-                            url = "https://github.com/iBotPeaches/Apktool"
-                        }
-                    }
-                }
-            }
-            if (rootProject.hasProperty("ossrhUsername") && rootProject.hasProperty("ossrhPassword")) {
-                repositories {
-                    maven {
-                        if (mavenVersion.endsWith("-SNAPSHOT")) {
-                            url = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
-                        } else {
-                            url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
-                        }
-                        credentials {
-                            username ossrhUsername
-                            password ossrhPassword
-                        }
-                    }
-                }
-            }
-        }
-
-        signing {
-            required { gradle.taskGraph.hasTask("publish") }
-            sign(publishing.publications["maven"])
-        }
-
-        java {
-            withJavadocJar()
-            withSourcesJar()
-        }
-
-        tasks.getByPath(":release").dependsOn(publish)
-        tasks.getByPath(":snapshot").dependsOn(publish)
-
-        tasks.withType(Javadoc).tap {
-            configureEach {
-                options.addStringOption("Xdoclint:none", "-quiet")
-            }
-        }
-    }
-}
-
-
-def getCheckedOutGitCommitHash() {
-    def gitFolder = "$projectDir/.git/"
-    def takeFromHash = 6
-
-    def head
-        try {
-            head = new File(gitFolder + "HEAD").text.split(":")
-        } catch(Exception ignored) {
-            return null
-        }
-
-    def isCommit = head.length == 1
-    if(isCommit) return head[0].trim().take(takeFromHash)
-
-    def refHead = new File(gitFolder + head[1].trim())
-    refHead.text.trim().take takeFromHash
-}
-
-def getCheckedOutBranch() {
-    def gitFolder = "$projectDir/.git/"
-
-    def head
-        try {
-            head = new File(gitFolder + "HEAD").text.split("/")
-            return head[2].trim()
-        } catch(Exception ignored) {
-            return "SNAPSHOT"
-        }
 }

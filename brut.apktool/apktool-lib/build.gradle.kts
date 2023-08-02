@@ -15,17 +15,17 @@
  */
 import org.apache.tools.ant.filters.*
 
-apply plugin: 'java-library'
+apply plugin: "java-library"
 
 processResources {
-  from('src/main/resources/properties') {
-    include '**/*.properties'
-    into 'properties'
+  from("src/main/resources/properties") {
+    include "**/*.properties"
+    into "properties"
     filter(ReplaceTokens, tokens: [version: project.apktool_version, gitrev: project.hash] )
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
   }
-  from('src/main/resources/') {
-    include '**/*.jar'
+  from("src/main/resources/") {
+    include "**/*.jar"
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
   }
 
@@ -33,9 +33,9 @@ processResources {
 }
 
 dependencies {
-    api project(':brut.j.dir')
-    api project(':brut.j.util')
-    api project(':brut.j.common')
+    api project(":brut.j.dir")
+    api project(":brut.j.util")
+    api project(":brut.j.common")
 
     implementation depends.baksmali
     implementation depends.smali

@@ -13,9 +13,10 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+val commonsIoVersion: String by rootProject.extra
 
 dependencies {
-  implementation project(':brut.j.common')
-  implementation project(':brut.j.util')
-  implementation depends.commons_io
+  implementation(project(":brut.j.common"))
+  implementation(project(":brut.j.util"))
+  implementation("commons-io:commons-io:$commonsIoVersion")
 }

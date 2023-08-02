@@ -13,7 +13,9 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-import proguard.gradle.ProGuardTask
+
+val proguardGradleVersion: String by rootProject.extra
+val commonsCliVersion: String by rootProject.extra
 
 buildscript {
     dependencies {
@@ -21,80 +23,27 @@ buildscript {
             mavenCentral()
             gradlePluginPortal()
         }
-
-        classpath(depends.proguard_gradle) {
-            exclude group: 'com.android.tools.build'
-        }
     }
 }
 
 plugins {
-    id 'com.github.johnrengelman.shadow'
-    id 'application'
+    id("com.github.johnrengelman.shadow")
+    application
 }
 
 dependencies {
-    implementation depends.commons_cli
-    implementation project(':brut.apktool:apktool-lib')
+    implementation("commons-cli:commons-cli:$commonsCliVersion")
+    implementation(project(":brut.apktool:apktool-lib"))
 }
 
 application {
-    mainClass = 'brut.apktool.Main'
+    mainClass.set("brut.apktool.Main")
+
+    tasks.run.get().workingDir = file(System.getProperty("user.dir"))
 }
 
-tasks.named('run') {
-    // run from root directory
-    // otherwise run from brut.apktool/apktool-cli
-    workingDir = file(System.getProperty('user.dir'))
-}
-
-jar {
+tasks.withType<Jar> {
     manifest {
-        attributes 'Main-Class': 'brut.apktool.Main'
+        attributes["Main-Class"] = "brut.apktool.Main"
     }
 }
-
-tasks.register('cleanOutputDirectory', Delete) {
-    delete fileTree(dir: jar.getDestinationDirectory().getAsFile(), exclude: "apktool-cli-all.jar")
-}
-
-tasks.register('proguard', ProGuardTask) {
-    dependsOn shadowJar
-    injars shadowJar.getArchiveFile()
-
-    // Java 9 and prior uses merged package for runtime, later uses split jmod files.
-    if (JavaVersion.current() <= JavaVersion.VERSION_1_8) {
-        libraryjars "${System.properties['java.home']}/lib/jce.jar"
-        libraryjars "${System.properties['java.home']}/lib/rt.jar"
-    } else {
-        libraryjars "${System.properties['java.home']}/jmods/java.base.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
-        libraryjars "${System.properties['java.home']}/jmods/java.compiler.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
-        libraryjars "${System.properties['java.home']}/jmods/java.logging.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
-        libraryjars "${System.properties['java.home']}/jmods/java.xml.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
-        libraryjars "${System.properties['java.home']}/jmods/java.desktop.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
-        libraryjars "${System.properties['java.home']}/jmods/java.sql.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
-        libraryjars "${System.properties['java.home']}/jmods/java.scripting.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
-
-        libraryjars "${System.properties['java.home']}/jmods/jdk.unsupported.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
-    }
-
-    dontobfuscate
-    dontoptimize
-
-    keep 'public class brut.apktool.Main { public static void main(java.lang.String[]); }'
-    keepclassmembers 'enum * { public static **[] values(); public static ** valueOf(java.lang.String); }'
-    dontwarn 'com.google.common.base.**'
-    dontwarn 'com.google.common.collect.**'
-    dontwarn 'com.google.common.util.**'
-    dontwarn 'javax.xml.xpath.**'
-    dontnote '**'
-    // between Java 1.8 and 1.9, the signature of `flip()` changed, which trips up proguard.
-
-    def outPath = jar.getDestinationDirectory().getAsFile().get().toString()
-    def extension = jar.archiveExtension.get().toString()
-    def outFile = outPath + '/' + "apktool" + '-' + project.apktool_version + '-small' + '.' + extension
-    outjars outFile
-}
-
-proguard.dependsOn cleanOutputDirectory
-tasks.getByPath(':release').dependsOn(proguard)

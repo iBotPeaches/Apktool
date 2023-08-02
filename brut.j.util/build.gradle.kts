@@ -13,9 +13,11 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+val commonsIoVersion: String by rootProject.extra
+val guavaVersion: String by rootProject.extra
 
 dependencies {
-  implementation project(':brut.j.common')
-  implementation depends.commons_io
-  implementation depends.guava
+    implementation(project(":brut.j.common"))
+    implementation("commons-io:commons-io:$commonsIoVersion")
+    implementation("com.google.guava:guava:$guavaVersion")
 }
