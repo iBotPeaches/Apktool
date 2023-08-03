@@ -24,8 +24,21 @@ val commonsTextVersion: String by rootProject.extra
 val junitVersion: String by rootProject.extra
 val xmlunitVersion: String by rootProject.extra
 
-plugins {
-    `java-library`
+tasks {
+    processResources {
+        from("src/main/resources") {
+            include("**/*.jar")
+            duplicatesStrategy = DuplicatesStrategy.INCLUDE
+        }
+        includeEmptyDirs = false
+    }
+
+    test {
+        // https://github.com/iBotPeaches/Apktool/issues/3174 - CVE-2023-22036
+        // Increases validation of extra field of zip header. Some older Android applications
+        // used this field to store data violating the zip specification.
+        systemProperty("jdk.util.zip.disableZip64ExtraFieldValidation", true)
+    }
 }
 
 dependencies {
