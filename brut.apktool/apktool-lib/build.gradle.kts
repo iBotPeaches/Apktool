@@ -13,7 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-import org.apache.tools.ant.filters.*
 
 val baksmaliVersion: String by rootProject.extra
 val smaliVersion: String by rootProject.extra

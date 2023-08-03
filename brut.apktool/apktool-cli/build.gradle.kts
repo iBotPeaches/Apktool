@@ -17,15 +17,6 @@
 val proguardGradleVersion: String by rootProject.extra
 val commonsCliVersion: String by rootProject.extra
 
-buildscript {
-    dependencies {
-        repositories {
-            mavenCentral()
-            gradlePluginPortal()
-        }
-    }
-}
-
 plugins {
     id("com.github.johnrengelman.shadow")
     application
