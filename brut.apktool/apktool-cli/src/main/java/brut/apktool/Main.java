@@ -553,7 +553,7 @@ public class Main {
 
         // print out license info prior to formatter.
         System.out.println(
-                "Apktool v" + ApktoolProperties.getVersion() + " - a tool for reengineering Android apk files\n" +
+                "Apktool " + ApktoolProperties.getVersion() + " - a tool for reengineering Android apk files\n" +
                         "with smali v" + ApktoolProperties.get("smaliVersion") +
                         " and baksmali v" + ApktoolProperties.get("baksmaliVersion") + "\n" +
                         "Copyright 2010 Ryszard Wiśniewski <brut.alll@gmail.com>\n" +
@@ -577,9 +577,8 @@ public class Main {
         System.out.println();
 
         // print out more information
-        System.out.println(
-                "For additional info, see: https://apktool.org/ \n"
-                        + "For smali/baksmali info, see: https://github.com/google/smali");
+        System.out.println("For additional info, see: https://apktool.org \n"
+            + "For smali/baksmali info, see: https://github.com/google/smali");
     }
 
     private static void setupLogging(final Verbosity verbosity) {

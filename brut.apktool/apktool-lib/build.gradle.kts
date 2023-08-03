@@ -24,8 +24,17 @@ val commonsTextVersion: String by rootProject.extra
 val junitVersion: String by rootProject.extra
 val xmlunitVersion: String by rootProject.extra
 
+val gitRevision: String by rootProject.extra
+val apktoolVersion: String by rootProject.extra
+
 tasks {
     processResources {
+        from("src/main/resources/properties") {
+            include("**/*.properties")
+            into("properties")
+            expand("version" to apktoolVersion, "gitrev" to gitRevision)
+            duplicatesStrategy = DuplicatesStrategy.INCLUDE
+        }
         from("src/main/resources") {
             include("**/*.jar")
             duplicatesStrategy = DuplicatesStrategy.INCLUDE

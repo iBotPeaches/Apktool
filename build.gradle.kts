@@ -31,6 +31,10 @@ val version = "2.8.2"
 var mavenVersion = "unspecified"
 val suffix = "SNAPSHOT"
 
+// Strings embedded into the build.
+var gitRevision by extra("")
+var apktoolVersion by extra("")
+
 plugins {
     `java-library`
 }
@@ -106,23 +110,19 @@ if ("release" !in gradle.startParameter.taskNames) {
     val hash = this.gitDescribe
 
     if (hash == null) {
-        project.ext.set("hash", "dirty")
-        project.ext.set("apktool_version", "$version-dirty")
+        gitRevision = "dirty"
+        apktoolVersion = "$version-dirty"
         project.logger.lifecycle("Building SNAPSHOT (no .git folder found)")
     } else {
-        project.ext.set("hash", hash)
-        project.ext.set("apktool_version", "$version-$hash-SNAPSHOT")
+        gitRevision = hash
+        apktoolVersion = "$hash-SNAPSHOT"
         mavenVersion = "$version-SNAPSHOT"
-        project.logger.lifecycle("Building SNAPSHOT (${gitBranch}): $hash")
+        project.logger.lifecycle("Building SNAPSHOT (${gitBranch}): $gitRevision")
     }
 } else {
-    project.ext.set("hash", "")
-    if (suffix.isNotEmpty()) {
-        project.ext.set("apktool_version", "$version-$suffix")
-    } else {
-        project.ext.set("apktool_version", version)
-    }
+    gitRevision = ""
+    apktoolVersion = if (suffix.isNotEmpty()) "$version-$suffix" else version;
     mavenVersion = version
-    project.logger.lifecycle("Building RELEASE (${gitBranch}): ${project.ext.get("apktool_version")}")
+    project.logger.lifecycle("Building RELEASE (${gitBranch}): ${apktoolVersion}}")
 }
 
