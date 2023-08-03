@@ -15,36 +15,33 @@
  */
 import org.apache.tools.ant.filters.*
 
-apply plugin: "java-library"
+val baksmaliVersion: String by rootProject.extra
+val smaliVersion: String by rootProject.extra
+val xmlpullVersion: String by rootProject.extra
+val guavaVersion: String by rootProject.extra
+val commonsLangVersion: String by rootProject.extra
+val commonsIoVersion: String by rootProject.extra
+val commonsTextVersion: String by rootProject.extra
+val junitVersion: String by rootProject.extra
+val xmlunitVersion: String by rootProject.extra
 
-processResources {
-  from("src/main/resources/properties") {
-    include "**/*.properties"
-    into "properties"
-    filter(ReplaceTokens, tokens: [version: project.apktool_version, gitrev: project.hash] )
-    duplicatesStrategy = DuplicatesStrategy.INCLUDE
-  }
-  from("src/main/resources/") {
-    include "**/*.jar"
-    duplicatesStrategy = DuplicatesStrategy.INCLUDE
-  }
-
-  includeEmptyDirs = false
+plugins {
+    `java-library`
 }
 
 dependencies {
-    api project(":brut.j.dir")
-    api project(":brut.j.util")
-    api project(":brut.j.common")
+    api(project(":brut.j.dir"))
+    api(project(":brut.j.util"))
+    api(project(":brut.j.common"))
 
-    implementation depends.baksmali
-    implementation depends.smali
-    implementation depends.xmlpull
-    implementation depends.guava
-    implementation depends.commons_lang
-    implementation depends.commons_io
-    implementation depends.commons_text
+    implementation("com.android.tools.smali:smali-baksmali:$baksmaliVersion")
+    implementation("com.android.tools.smali:smali:$smaliVersion")
+    implementation("xpp3:xpp3:$xmlpullVersion")
+    implementation("com.google.guava:guava:$guavaVersion")
+    implementation("org.apache.commons:commons-lang3:$commonsLangVersion")
+    implementation("commons-io:commons-io:$commonsIoVersion")
+    implementation("org.apache.commons:commons-text:$commonsTextVersion")
 
-    testImplementation depends.junit
-    testImplementation depends.xmlunit
+    testImplementation("junit:junit:$junitVersion")
+    testImplementation("org.xmlunit:xmlunit-legacy:$xmlunitVersion")
 }
