@@ -23,6 +23,16 @@ plugins {
 }
 
 dependencies {
+    compileOnly("com.guardsquare:proguard-gradle:$proguardGradleVersion")
+}
+
+configurations {
+    compileClasspath {
+        exclude(group = "com.android.tools.build")
+    }
+}
+
+dependencies {
     implementation("commons-cli:commons-cli:$commonsCliVersion")
     implementation(project(":brut.apktool:apktool-lib"))
 }
