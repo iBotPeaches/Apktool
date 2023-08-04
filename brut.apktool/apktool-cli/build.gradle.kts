@@ -38,12 +38,6 @@ dependencies {
     implementation(project(":brut.apktool:apktool-lib"))
 }
 
-configurations {
-    compileClasspath {
-        exclude(group = "com.android.tools.build")
-    }
-}
-
 application {
     mainClass.set("brut.apktool.Main")
 
@@ -54,6 +48,12 @@ tasks.withType<Jar> {
     manifest {
         attributes["Main-Class"] = "brut.apktool.Main"
     }
+}
+
+tasks.register<Delete>("cleanOutputDirectory") {
+    delete(fileTree("build/libs") {
+        exclude("apktool-cli-all.jar")
+    })
 }
 
 tasks.register<ProGuardTask>("proguard") {
@@ -87,4 +87,5 @@ tasks.register<ProGuardTask>("proguard") {
     outjars(outPath)
 }
 
+tasks.getByPath("proguard").dependsOn("cleanOutputDirectory")
 tasks.getByPath(":release").dependsOn("proguard")
