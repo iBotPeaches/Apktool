@@ -19,6 +19,8 @@ val suffix = "SNAPSHOT"
 var gitRevision by extra("")
 var apktoolVersion by extra("")
 
+defaultTasks("build", "shadowJar", "proguard")
+
 plugins {
     `java-library`
 }
@@ -34,11 +36,16 @@ buildscript {
     }
 }
 
-defaultTasks("build", "shadowJar", "proguard")
-
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+tasks.withType<JavaCompile> {
+    options.compilerArgs.add("-Xlint:-options")
+    options.compilerArgs.add("--release 8")
+
+    options.encoding = "UTF-8"
 }
 
 allprojects {
