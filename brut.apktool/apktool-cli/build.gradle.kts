@@ -42,6 +42,7 @@ tasks.register<Delete>("cleanOutputDirectory") {
 }
 
 tasks.register<ProGuardTask>("proguard") {
+    dependsOn("cleanOutputDirectory")
     dependsOn("shadowJar")
     injars(tasks.named("shadowJar").get().outputs.files)
 
@@ -71,6 +72,3 @@ tasks.register<ProGuardTask>("proguard") {
     val outPath = "build/libs/apktool-cli-$apktoolVersion.jar"
     outjars(outPath)
 }
-
-tasks.getByPath("proguard").dependsOn("cleanOutputDirectory")
-tasks.getByPath(":release").dependsOn("proguard")

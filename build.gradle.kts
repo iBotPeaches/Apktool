@@ -23,6 +23,8 @@ defaultTasks("build", "shadowJar", "proguard")
 
 plugins {
     `java-library`
+    `maven-publish`
+    signing
 }
 
 buildscript {
@@ -58,6 +60,70 @@ allprojects {
 subprojects {
     apply(plugin = "java")
     apply(plugin = "java-library")
+
+    val mavenProjects = arrayOf("apktool-lib", "apktool-cli", "brut.j.common", "brut.j.util", "brut.j.dir")
+
+    if (project.name in mavenProjects) {
+        apply(plugin = "maven-publish")
+        apply(plugin = "signing")
+
+        if (rootProject.hasProperty("ossrhUsername") && rootProject.hasProperty("ossrhPassword")) {
+            repositories {
+                maven {
+                    url = if (mavenVersion.endsWith("-SNAPSHOT")) {
+                        uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+                    } else {
+                        uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+                    }
+                    credentials {
+                        username = rootProject.property("ossrhUsername") as String
+                        password = rootProject.property("ossrhPassword") as String
+                    }
+                }
+            }
+        }
+
+        publishing {
+            publications {
+                register("mavenJava", MavenPublication::class) {
+                    from(components["java"])
+                    groupId = "org.apktool"
+                    artifactId = project.name
+                    version = mavenVersion
+
+                    pom {
+                        name = "Apktool"
+                        description = "A tool for reverse engineering Android apk files."
+                        url = "https://apktool.org"
+
+                        licenses {
+                            license {
+                                name = "The Apache License 2.0"
+                                url = "https://opensource.org/licenses/Apache-2.0"
+                            }
+                        }
+                        developers {
+                            developer {
+                                id = "iBotPeaches"
+                                name = "Connor Tumbleson"
+                                email = "connor.tumbleson@gmail.com"
+                            }
+                            developer {
+                                id = "brutall"
+                                name = "Ryszard Wiśniewski"
+                                email = "brut.alll@gmail.com"
+                            }
+                        }
+                        scm {
+                            connection = "scm:git:git://github.com/iBotPeaches/Apktool.git"
+                            developerConnection = "scm:git:git@github.com:iBotPeaches/Apktool.git"
+                            url = "https://github.com/iBotPeaches/Apktool"
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 // Used for publishing snapshots to maven.
@@ -68,6 +134,14 @@ task("snapshot") {
 // Used for official releases.
 task("release") {
 
+}
+
+tasks.withType<PublishToMavenRepository> {
+    dependsOn("release")
+}
+
+tasks.withType<Javadoc>() {
+    (options as StandardJavadocDocletOptions).addStringOption("Xdoclint:none", "-quiet")
 }
 
 // Functions
