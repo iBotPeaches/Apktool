@@ -108,12 +108,12 @@ if ("release" !in gradle.startParameter.taskNames) {
         gitRevision = hash
         apktoolVersion = "$hash-SNAPSHOT"
         mavenVersion = "$version-SNAPSHOT"
-        project.logger.lifecycle("Building SNAPSHOT (${gitBranch}): $gitRevision")
+        project.logger.lifecycle("Building SNAPSHOT ($gitBranch): $gitRevision")
     }
 } else {
     gitRevision = ""
     apktoolVersion = if (suffix.isNotEmpty()) "$version-$suffix" else version;
     mavenVersion = version
-    project.logger.lifecycle("Building RELEASE (${gitBranch}): ${apktoolVersion}}")
+    project.logger.lifecycle("Building RELEASE ($gitBranch): $apktoolVersion")
 }
 
