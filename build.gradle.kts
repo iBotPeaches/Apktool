@@ -12,7 +12,6 @@ val xmlpullVersion by extra("1.1.4c")
 val xmlunitVersion by extra("2.9.1")
 
 val version = "2.8.2"
-var mavenVersion = "unspecified"
 val suffix = "SNAPSHOT"
 
 // Strings embedded into the build.
@@ -67,29 +66,33 @@ subprojects {
         apply(plugin = "maven-publish")
         apply(plugin = "signing")
 
-        if (rootProject.hasProperty("ossrhUsername") && rootProject.hasProperty("ossrhPassword")) {
+        java {
+            withJavadocJar()
+            withSourcesJar()
+        }
+
+        publishing {
             repositories {
                 maven {
-                    url = if (mavenVersion.endsWith("-SNAPSHOT")) {
+                    url = if (suffix.contains("SNAPSHOT")) {
                         uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
                     } else {
                         uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
                     }
                     credentials {
-                        username = rootProject.property("ossrhUsername") as String
-                        password = rootProject.property("ossrhPassword") as String
+                        username = (project.properties["ossrhUsername"] ?: "").toString()
+                        password = (project.properties["ossrhPassword"] ?: "").toString()
                     }
                 }
             }
-        }
-
-        publishing {
             publications {
                 register("mavenJava", MavenPublication::class) {
                     from(components["java"])
                     groupId = "org.apktool"
                     artifactId = project.name
-                    version = mavenVersion
+                    afterEvaluate {
+                        version = apktoolVersion
+                    }
 
                     pom {
                         name = "Apktool"
@@ -123,25 +126,21 @@ subprojects {
                 }
             }
         }
+
+        tasks.withType<Javadoc>() {
+            (options as StandardJavadocDocletOptions).addStringOption("Xdoclint:none", "-quiet")
+        }
+
+        signing {
+            sign(publishing.publications["mavenJava"])
+        }
     }
-}
-
-// Used for publishing snapshots to maven.
-task("snapshot") {
-
 }
 
 // Used for official releases.
 task("release") {
-
-}
-
-tasks.withType<PublishToMavenRepository> {
-    dependsOn("release")
-}
-
-tasks.withType<Javadoc>() {
-    (options as StandardJavadocDocletOptions).addStringOption("Xdoclint:none", "-quiet")
+    dependsOn("build")
+    finalizedBy("publish")
 }
 
 // Functions
@@ -181,13 +180,11 @@ if ("release" !in gradle.startParameter.taskNames) {
     } else {
         gitRevision = hash
         apktoolVersion = "$hash-SNAPSHOT"
-        mavenVersion = "$version-SNAPSHOT"
         project.logger.lifecycle("Building SNAPSHOT ($gitBranch): $gitRevision")
     }
 } else {
     gitRevision = ""
     apktoolVersion = if (suffix.isNotEmpty()) "$version-$suffix" else version;
-    mavenVersion = version
     project.logger.lifecycle("Building RELEASE ($gitBranch): $apktoolVersion")
 }
 
