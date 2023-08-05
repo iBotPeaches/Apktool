@@ -328,7 +328,6 @@ public class ARSCDecoder {
         return mType;
     }
 
-
     private EntryData readEntryData() throws IOException, AndrolibException {
         short size = mIn.readShort();
         if (size < 0) {
@@ -342,6 +341,12 @@ public class ARSCDecoder {
         }
 
         ResValue value = (flags & ENTRY_FLAG_COMPLEX) == 0 ? readValue() : readComplexEntry();
+        // #2824 - In some applications the res entries are duplicated with the 2nd being malformed.
+        // AOSP skips this, so we will do the same.
+        if (value == null) {
+            return null;
+        }
+
         EntryData entryData = new EntryData();
         entryData.mFlags = flags;
         entryData.mSpecNamesId = specNamesId;
@@ -416,7 +421,11 @@ public class ARSCDecoder {
     }
 
     private ResIntBasedValue readValue() throws IOException, AndrolibException {
-		mIn.skipCheckShort((short) 8); // size
+		int size = mIn.readShort();
+        if (size < 8) {
+            return null;
+        }
+
 		mIn.skipCheckByte((byte) 0); // zero
         byte type = mIn.readByte();
         int data = mIn.readInt();
