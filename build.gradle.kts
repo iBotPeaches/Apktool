@@ -20,6 +20,51 @@ var apktoolVersion by extra("")
 
 defaultTasks("build", "shadowJar", "proguard")
 
+// Functions
+val gitDescribe: String? by lazy {
+    val stdout = ByteArrayOutputStream()
+    try {
+        rootProject.exec {
+            commandLine("git", "describe", "--tags")
+            standardOutput = stdout
+        }
+        stdout.toString().trim().replace("-g", "-")
+    } catch (e: Exception) {
+        null
+    }
+}
+
+val gitBranch: String? by lazy {
+    val stdout = ByteArrayOutputStream()
+    try {
+        rootProject.exec {
+            commandLine("git", "rev-parse", "--abbrev-ref", "HEAD")
+            standardOutput = stdout
+        }
+        stdout.toString().trim()
+    } catch (e: Exception) {
+        null
+    }
+}
+
+if ("release" !in gradle.startParameter.taskNames) {
+    val hash = this.gitDescribe
+
+    if (hash == null) {
+        gitRevision = "dirty"
+        apktoolVersion = "$version-dirty"
+        project.logger.lifecycle("Building SNAPSHOT (no .git folder found)")
+    } else {
+        gitRevision = hash
+        apktoolVersion = "$hash-SNAPSHOT"
+        project.logger.lifecycle("Building SNAPSHOT ($gitBranch): $gitRevision")
+    }
+} else {
+    gitRevision = ""
+    apktoolVersion = if (suffix.isNotEmpty()) "$version-$suffix" else version;
+    project.logger.lifecycle("Building RELEASE ($gitBranch): $apktoolVersion")
+}
+
 plugins {
     `java-library`
     `maven-publish`
@@ -90,9 +135,7 @@ subprojects {
                     from(components["java"])
                     groupId = "org.apktool"
                     artifactId = project.name
-                    afterEvaluate {
-                        version = apktoolVersion
-                    }
+                    version = apktoolVersion
 
                     pom {
                         name = "Apktool"
@@ -142,49 +185,3 @@ task("release") {
     dependsOn("build")
     finalizedBy("publish")
 }
-
-// Functions
-val gitDescribe: String? by lazy {
-    val stdout = ByteArrayOutputStream()
-    try {
-        rootProject.exec {
-            commandLine("git", "describe", "--tags")
-            standardOutput = stdout
-        }
-        stdout.toString().trim().replace("-g", "-")
-    } catch (e: Exception) {
-        null
-    }
-}
-val gitBranch: String? by lazy {
-    val stdout = ByteArrayOutputStream()
-    try {
-        rootProject.exec {
-            commandLine("git", "rev-parse", "--abbrev-ref", "HEAD")
-            standardOutput = stdout
-        }
-        stdout.toString().trim()
-    } catch (e: Exception) {
-        null
-    }
-}
-
-// Runtime
-if ("release" !in gradle.startParameter.taskNames) {
-    val hash = this.gitDescribe
-
-    if (hash == null) {
-        gitRevision = "dirty"
-        apktoolVersion = "$version-dirty"
-        project.logger.lifecycle("Building SNAPSHOT (no .git folder found)")
-    } else {
-        gitRevision = hash
-        apktoolVersion = "$hash-SNAPSHOT"
-        project.logger.lifecycle("Building SNAPSHOT ($gitBranch): $gitRevision")
-    }
-} else {
-    gitRevision = ""
-    apktoolVersion = if (suffix.isNotEmpty()) "$version-$suffix" else version;
-    project.logger.lifecycle("Building RELEASE ($gitBranch): $apktoolVersion")
-}
-
