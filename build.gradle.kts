@@ -78,7 +78,6 @@ buildscript {
     }
     dependencies {
         classpath("gradle.plugin.com.github.johnrengelman:shadow:8.0.0")
-        classpath("gradle.plugin.com.hierynomus.gradle.plugins:license-gradle-plugin:0.16.1")
     }
 }
 
