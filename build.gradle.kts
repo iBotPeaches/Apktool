@@ -72,14 +72,17 @@ plugins {
 }
 
 buildscript {
-    repositories {
-        gradlePluginPortal()
-        google()
+  repositories {
+    maven {
+      url = uri("https://plugins.gradle.org/m2/")
     }
-    dependencies {
-        classpath("gradle.plugin.com.github.johnrengelman:shadow:8.0.0")
-    }
+  }
+  dependencies {
+    classpath("com.github.johnrengelman:shadow:8.1.1")
+  }
 }
+
+apply(plugin = "com.github.johnrengelman.shadow")
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
