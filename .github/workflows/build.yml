@@ -6,7 +6,7 @@ on:
   pull_request:
     paths:
       - '**.java'
-      - '**.gradle'
+      - '**.kts'
       - 'brut.apktool/apktool-lib/src/main/resources/**'
       - 'brut.apktool/apktool-lib/src/test/**'
       - '.github/workflows/**'
