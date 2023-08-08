@@ -55,11 +55,11 @@ public class StringBlock {
         }
 
         StringBlock block = new StringBlock();
-        block.m_isUTF8 = (flags & UTF8_FLAG) != 0;
-        block.m_stringOffsets = reader.readSafeIntArray(stringCount, startPosition + stringsOffset);
+        block.mIsUtf8 = (flags & UTF8_FLAG) != 0;
+        block.mStringOffsets = reader.readSafeIntArray(stringCount, startPosition + stringsOffset);
 
         if (styleCount != 0) {
-            block.m_styleOffsets = reader.readSafeIntArray(styleCount, startPosition + stylesOffset);
+            block.mStyleOffsets = reader.readSafeIntArray(styleCount, startPosition + stylesOffset);
         }
 
         // #3236 - Some applications give a style offset, but have 0 styles. Make this check more robust.
@@ -72,12 +72,12 @@ public class StringBlock {
             size = stylesOffset - stringsOffset;
         }
 
-        block.m_strings = new byte[size];
-        reader.readFully(block.m_strings);
+        block.mStrings = new byte[size];
+        reader.readFully(block.mStrings);
 
         if (hasStyles) {
             size = chunkSize - stylesOffset;
-            block.m_styles = reader.readIntArray(size / 4);
+            block.mStyles = reader.readIntArray(size / 4);
         }
 
         // In case we aren't 4 byte aligned we need to skip the remaining bytes.
@@ -97,18 +97,18 @@ public class StringBlock {
      * @return String
      */
     public String getString(int index) {
-        if (index < 0 || m_stringOffsets == null || index >= m_stringOffsets.length) {
+        if (index < 0 || mStringOffsets == null || index >= mStringOffsets.length) {
             return null;
         }
-        int offset = m_stringOffsets[index];
+        int offset = mStringOffsets[index];
         int length;
 
         int[] val;
-        if (m_isUTF8) {
-            val = getUtf8(m_strings, offset);
+        if (mIsUtf8) {
+            val = getUtf8(mStrings, offset);
             offset = val[0];
         } else {
-            val = getUtf16(m_strings, offset);
+            val = getUtf16(mStrings, offset);
             offset += val[0];
         }
         length = val[1];
@@ -155,16 +155,16 @@ public class StringBlock {
         if (string == null) {
             return -1;
         }
-        for (int i = 0; i != m_stringOffsets.length; ++i) {
-            int offset = m_stringOffsets[i];
-            int length = getShort(m_strings, offset);
+        for (int i = 0; i != mStringOffsets.length; ++i) {
+            int offset = mStringOffsets[i];
+            int length = getShort(mStrings, offset);
             if (length != string.length()) {
                 continue;
             }
             int j = 0;
             for (; j != length; ++j) {
                 offset += 2;
-                if (string.charAt(j) != getShort(m_strings, offset)) {
+                if (string.charAt(j) != getShort(mStrings, offset)) {
                     break;
                 }
             }
@@ -180,8 +180,8 @@ public class StringBlock {
 
     @VisibleForTesting
     StringBlock(byte[] strings, boolean isUTF8) {
-        m_strings = strings;
-        m_isUTF8 = isUTF8;
+        mStrings = strings;
+        mIsUtf8 = isUTF8;
     }
 
     /**
@@ -190,15 +190,15 @@ public class StringBlock {
      * start index in string * third int is tag end index in string
      */
     private int[] getStyle(int index) {
-        if (m_styleOffsets == null || m_styles == null|| index >= m_styleOffsets.length) {
+        if (mStyleOffsets == null || mStyles == null|| index >= mStyleOffsets.length) {
             return null;
         }
-        int offset = m_styleOffsets[index] / 4;
+        int offset = mStyleOffsets[index] / 4;
         int count = 0;
         int[] style;
 
-        for (int i = offset; i < m_styles.length; ++i) {
-            if (m_styles[i] == -1) {
+        for (int i = offset; i < mStyles.length; ++i) {
+            if (mStyles[i] == -1) {
                 break;
             }
             count += 1;
@@ -209,11 +209,11 @@ public class StringBlock {
         }
         style = new int[count];
 
-        for (int i = offset, j = 0; i < m_styles.length;) {
-            if (m_styles[i] == -1) {
+        for (int i = offset, j = 0; i < mStyles.length;) {
+            if (mStyles[i] == -1) {
                 break;
             }
-            style[j++] = m_styles[i++];
+            style[j++] = mStyles[i++];
         }
         return style;
     }
@@ -221,22 +221,22 @@ public class StringBlock {
     @VisibleForTesting
     String decodeString(int offset, int length) {
         try {
-            final ByteBuffer wrappedBuffer = ByteBuffer.wrap(m_strings, offset, length);
-            return (m_isUTF8 ? UTF8_DECODER : UTF16LE_DECODER).decode(wrappedBuffer).toString();
+            final ByteBuffer wrappedBuffer = ByteBuffer.wrap(mStrings, offset, length);
+            return (mIsUtf8 ? UTF8_DECODER : UTF16LE_DECODER).decode(wrappedBuffer).toString();
         } catch (CharacterCodingException ex) {
-            if (!m_isUTF8) {
+            if (!mIsUtf8) {
                 LOGGER.warning("Failed to decode a string at offset " + offset + " of length " + length);
                 return null;
             }
         } catch (IndexOutOfBoundsException ex) {
-            if (!m_isUTF8) {
+            if (!mIsUtf8) {
                 LOGGER.warning("String extends outside of pool at  " + offset + " of length " + length);
                 return null;
             }
         }
 
         try {
-            final ByteBuffer wrappedBufferRetry = ByteBuffer.wrap(m_strings, offset, length);
+            final ByteBuffer wrappedBufferRetry = ByteBuffer.wrap(mStrings, offset, length);
             // in some places, Android uses 3-byte UTF-8 sequences instead of 4-bytes.
             // If decoding failed, we try to use CESU-8 decoder, which is closer to what Android actually uses.
             return CESU8_DECODER.decode(wrappedBufferRetry).toString();
@@ -285,11 +285,11 @@ public class StringBlock {
         return new int[] {2, val * 2};
     }
 
-    private int[] m_stringOffsets;
-    private byte[] m_strings;
-    private int[] m_styleOffsets;
-    private int[] m_styles;
-    private boolean m_isUTF8;
+    private int[] mStringOffsets;
+    private byte[] mStrings;
+    private int[] mStyleOffsets;
+    private int[] mStyles;
+    private boolean mIsUtf8;
 
     private final CharsetDecoder UTF16LE_DECODER = StandardCharsets.UTF_16LE.newDecoder();
     private final CharsetDecoder UTF8_DECODER = StandardCharsets.UTF_8.newDecoder();
