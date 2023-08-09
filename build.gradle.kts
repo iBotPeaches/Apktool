@@ -72,12 +72,12 @@ plugins {
 }
 
 buildscript {
-  repositories {
+    repositories {
     maven {
       url = uri("https://plugins.gradle.org/m2/")
+      }
     }
-  }
-  dependencies {
+    dependencies {
     classpath("com.github.johnrengelman:shadow:8.1.1")
   }
 }
