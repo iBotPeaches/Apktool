@@ -271,9 +271,6 @@ public class ARSCDecoder {
         mHeader.checkForUnreadHeader(mIn);
 
         if ((typeFlags & 0x01) != 0) {
-            LOGGER.fine("Sparse type flags detected: " + mTypeSpec.getName());
-
-            // We've detected sparse resources, lets record this so we can rebuild in that same format
             mResTable.setSparseResources(true);
         }
 
