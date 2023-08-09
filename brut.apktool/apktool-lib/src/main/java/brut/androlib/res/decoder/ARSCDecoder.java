@@ -63,7 +63,6 @@ public class ARSCDecoder {
 
     private ResPackage[] readResourceTable() throws IOException, AndrolibException {
         Set<ResPackage> pkgs = new LinkedHashSet<>();
-        mMissingResSpecMap = new HashSet<>();
 
         ResTypeSpec typeSpec;
 
@@ -112,10 +111,6 @@ public class ARSCDecoder {
                     }
                     break chunkLoop;
             }
-        }
-
-        if (mPkg != null && mPkg.getResSpecCount() > 0) {
-            addMissingResSpecs();
         }
 
         return pkgs.toArray(new ResPackage[0]);
@@ -247,7 +242,7 @@ public class ARSCDecoder {
         mHeader.checkForUnreadHeader(mIn);
 
         mIn.skipBytes(entryCount * 4); // flags
-        mTypeSpec = new ResTypeSpec(mTypeNames.getString(id - 1), mResTable, mPkg, id, entryCount);
+        mTypeSpec = new ResTypeSpec(mTypeNames.getString(id - 1), id);
         mPkg.addType(mTypeSpec);
 
         return mTypeSpec;
@@ -301,7 +296,6 @@ public class ARSCDecoder {
             mResId = (mResId & 0xffff0000) | i;
             int offset = entryOffsetMap.get(i);
             if (offset == NO_ENTRY) {
-                mMissingResSpecMap.add(mResId);
                 continue;
             }
 
@@ -591,33 +585,6 @@ public class ARSCDecoder {
         mResTypeSpecs.put(resTypeSpec.getId(), resTypeSpec);
     }
 
-    private void addMissingResSpecs() throws AndrolibException {
-        for (int i : mMissingResSpecMap) {
-            ResID resId = new ResID(i);
-            ResResSpec spec = new ResResSpec(resId, "APKTOOL_DUMMY_" + Integer.toHexString(resId.id), mPkg, mTypeSpec);
-
-            // If we already have this resID don't add it again.
-            if (mPkg.hasResSpec(resId)) {
-                continue;
-            }
-
-            mPkg.addResSpec(spec);
-            mTypeSpec.addResSpec(spec);
-
-            if (mType == null) {
-                mType = mPkg.getOrCreateConfig(new ResConfigFlags());
-            }
-
-            // We are going to make dummy attributes a null reference (@null) now instead of a boolean false.
-            // This is because aapt2 is much stricter when it comes to what we can put in an application.
-            ResValue value = new ResReferenceValue(mPkg, 0, "");
-
-            ResResource res = new ResResource(mType, spec, value);
-            mType.addResource(res);
-            spec.addResource(res);
-        }
-    }
-
     private ARSCHeader nextChunk() throws IOException {
         return mHeader = ARSCHeader.read(mIn);
     }
@@ -643,7 +610,6 @@ public class ARSCDecoder {
     private ResType mType;
     private int mResId;
     private int mTypeIdOffset = 0;
-    private Set<Integer> mMissingResSpecMap;
     private final HashMap<Integer, ResTypeSpec> mResTypeSpecs = new HashMap<>();
 
     private final static short ENTRY_FLAG_COMPLEX = 0x0001;
