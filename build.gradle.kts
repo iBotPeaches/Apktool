@@ -66,19 +66,10 @@ if ("release" !in gradle.startParameter.taskNames) {
 }
 
 plugins {
+    id("com.github.johnrengelman.shadow") version "8.1.1"
     `java-library`
     `maven-publish`
     signing
-}
-
-buildscript {
-    repositories {
-        gradlePluginPortal()
-        google()
-    }
-    dependencies {
-        classpath("gradle.plugin.com.github.johnrengelman:shadow:8.0.0")
-    }
 }
 
 java {
