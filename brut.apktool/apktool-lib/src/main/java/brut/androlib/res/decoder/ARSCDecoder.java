@@ -63,6 +63,7 @@ public class ARSCDecoder {
 
     private ResPackage[] readResourceTable() throws IOException, AndrolibException {
         Set<ResPackage> pkgs = new LinkedHashSet<>();
+
         ResTypeSpec typeSpec;
 
         chunkLoop:
@@ -110,10 +111,6 @@ public class ARSCDecoder {
                     }
                     break chunkLoop;
             }
-        }
-
-        if (mPkg != null && mPkg.getResSpecCount() > 0) {
-            addMissingResSpecs();
         }
 
         return pkgs.toArray(new ResPackage[0]);
@@ -245,7 +242,7 @@ public class ARSCDecoder {
         mHeader.checkForUnreadHeader(mIn);
 
         mIn.skipBytes(entryCount * 4); // flags
-        mTypeSpec = new ResTypeSpec(mTypeNames.getString(id - 1), mResTable, mPkg, id, entryCount);
+        mTypeSpec = new ResTypeSpec(mTypeNames.getString(id - 1), id);
         mPkg.addType(mTypeSpec);
 
         return mTypeSpec;
@@ -264,7 +261,6 @@ public class ARSCDecoder {
         int entryCount = mIn.readInt();
         mIn.skipInt(); // entriesStart
 
-        mMissingResSpecMap = new LinkedHashMap<>();
         ResConfigFlags flags = readConfigFlags();
 
         mHeader.checkForUnreadHeader(mIn);
@@ -297,12 +293,11 @@ public class ARSCDecoder {
         mType = flags.isInvalid && !mKeepBroken ? null : mPkg.getOrCreateConfig(flags);
 
         for (int i : entryOffsetMap.keySet()) {
+            mResId = (mResId & 0xffff0000) | i;
             int offset = entryOffsetMap.get(i);
             if (offset == NO_ENTRY) {
                 continue;
             }
-            mMissingResSpecMap.put(i, false);
-            mResId = (mResId & 0xffff0000) | i;
 
             // As seen in some recent APKs - there are more entries reported than can fit in the chunk.
             if (mIn.position() == mHeader.endPosition) {
@@ -369,14 +364,6 @@ public class ARSCDecoder {
         ResResSpec spec;
         if (mPkg.hasResSpec(resId)) {
             spec = mPkg.getResSpec(resId);
-
-            if (spec.isDummyResSpec()) {
-                removeResSpec(spec);
-
-                spec = new ResResSpec(resId, mSpecNames.getString(specNamesId), mPkg, mTypeSpec);
-                mPkg.addResSpec(spec);
-                mTypeSpec.addResSpec(spec);
-            }
         } else {
             spec = new ResResSpec(resId, mSpecNames.getString(specNamesId), mPkg, mTypeSpec);
             mPkg.addResSpec(spec);
@@ -598,41 +585,6 @@ public class ARSCDecoder {
         mResTypeSpecs.put(resTypeSpec.getId(), resTypeSpec);
     }
 
-    private void addMissingResSpecs() throws AndrolibException {
-        int resId = mResId & 0xffff0000;
-
-        for (int i : mMissingResSpecMap.keySet()) {
-            if (mMissingResSpecMap.get(i)) continue;
-
-            ResResSpec spec = new ResResSpec(new ResID(resId | i), "APKTOOL_DUMMY_" + Integer.toHexString(i), mPkg, mTypeSpec);
-
-            // If we already have this resID don't add it again.
-            if (! mPkg.hasResSpec(new ResID(resId | i))) {
-                mPkg.addResSpec(spec);
-                mTypeSpec.addResSpec(spec);
-
-                if (mType == null) {
-                    mType = mPkg.getOrCreateConfig(new ResConfigFlags());
-                }
-
-                // We are going to make dummy attributes a null reference (@null) now instead of a boolean false.
-                // This is because aapt2 is much more strict when it comes to what we can put in an application.
-                ResValue value = new ResReferenceValue(mPkg, 0, "");
-
-                ResResource res = new ResResource(mType, spec, value);
-                mType.addResource(res);
-                spec.addResource(res);
-            }
-        }
-    }
-
-    private void removeResSpec(ResResSpec spec) {
-        if (mPkg.hasResSpec(spec.getId())) {
-            mPkg.removeResSpec(spec);
-            mTypeSpec.removeResSpec(spec);
-        }
-    }
-
     private ARSCHeader nextChunk() throws IOException {
         return mHeader = ARSCHeader.read(mIn);
     }
@@ -658,7 +610,6 @@ public class ARSCDecoder {
     private ResType mType;
     private int mResId;
     private int mTypeIdOffset = 0;
-    private HashMap<Integer, Boolean> mMissingResSpecMap;
     private final HashMap<Integer, ResTypeSpec> mResTypeSpecs = new HashMap<>();
 
     private final static short ENTRY_FLAG_COMPLEX = 0x0001;
