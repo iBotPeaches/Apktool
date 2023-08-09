@@ -65,10 +65,15 @@ public class ARSCDecoder {
         Set<ResPackage> pkgs = new LinkedHashSet<>();
 
         ResTypeSpec typeSpec;
+        int chunkNumber = 1;
 
         chunkLoop:
         for (;;) {
             nextChunk();
+
+            LOGGER.fine(String.format(
+                "Chunk #%d start: type=0x%04x chunkSize=0x%08x", chunkNumber++, mHeader.type, mHeader.chunkSize
+            ));
 
             switch (mHeader.type) {
                 case ARSCHeader.RES_NULL_TYPE:
