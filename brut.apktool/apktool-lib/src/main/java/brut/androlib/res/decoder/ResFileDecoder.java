@@ -62,7 +62,7 @@ public class ResFileDecoder {
             resFileMapping.put(inFilePath, outFilePath);
         }
 
-        LOGGER.fine("Decoding file: " + inFilePath + " to: " + outFilePath);
+        LOGGER.fine("Decoding file " + inFilePath + " to " + outFilePath);
 
         try {
             if (typeName.equals("raw")) {

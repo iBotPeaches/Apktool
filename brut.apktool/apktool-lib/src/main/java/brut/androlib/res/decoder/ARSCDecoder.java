@@ -65,10 +65,15 @@ public class ARSCDecoder {
         Set<ResPackage> pkgs = new LinkedHashSet<>();
 
         ResTypeSpec typeSpec;
+        int chunkNumber = 1;
 
         chunkLoop:
         for (;;) {
             nextChunk();
+
+            LOGGER.fine(String.format(
+                "Chunk #%d start: type=0x%04x chunkSize=0x%08x", chunkNumber++, mHeader.type, mHeader.chunkSize
+            ));
 
             switch (mHeader.type) {
                 case ARSCHeader.RES_NULL_TYPE:
@@ -266,9 +271,6 @@ public class ARSCDecoder {
         mHeader.checkForUnreadHeader(mIn);
 
         if ((typeFlags & 0x01) != 0) {
-            LOGGER.fine("Sparse type flags detected: " + mTypeSpec.getName());
-
-            // We've detected sparse resources, lets record this so we can rebuild in that same format
             mResTable.setSparseResources(true);
         }
 
