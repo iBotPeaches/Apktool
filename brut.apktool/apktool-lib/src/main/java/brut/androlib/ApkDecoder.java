@@ -68,8 +68,12 @@ public class ApkDecoder {
     }
 
     public ApkDecoder(Config config, ExtFile apkFile) {
+        this(config, new ApkInfo(apkFile));
+    }
+
+    public ApkDecoder(Config config, ApkInfo apkInfo) {
         mConfig = config;
-        mApkInfo = new ApkInfo(apkFile);
+        mApkInfo = apkInfo;
     }
 
     public ApkInfo decode(File outDir) throws AndrolibException, IOException, DirectoryException {
