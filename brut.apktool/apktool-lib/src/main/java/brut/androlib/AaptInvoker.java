@@ -365,7 +365,14 @@ public class AaptInvoker {
         List<String> cmd = new ArrayList<>();
 
         try {
-            String aaptCommand = AaptManager.getAaptExecutionCommand(aaptPath, getAaptBinaryFile());
+            // Instead of AaptManager.getAaptExecutionCommand(aaptPath, getAaptBinaryFile());
+            // it is needed to use the following command, because getAaptBinaryFile()
+            // may throw BrutException even when not used by AaptManager.getAaptExecutionCommand
+            File aaptFile;
+            if (aaptPath.isEmpty() || !(aaptFile = new File(aaptPath)).exists())
+                aaptFile = getAaptBinaryFile();
+            String aaptCommand = aaptFile.getPath();
+
             cmd.add(aaptCommand);
         } catch (BrutException ex) {
             LOGGER.warning("aapt: " + ex.getMessage() + " (defaulting to $PATH binary)");
