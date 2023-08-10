@@ -11,6 +11,20 @@ val xmlunitVersion: String by rootProject.extra
 val gitRevision: String by rootProject.extra
 val apktoolVersion: String by rootProject.extra
 
+// region Determine Android SDK location
+
+val sdkRoot: String? = System.getenv("ANDROID_SDK_ROOT")
+val androidJarPath: String = if (sdkRoot == null) {
+    GradleException("Missing ANDROID_SDK_ROOT").printStackTrace()
+
+    "com.google.android:android:4.1.1.4"
+} else {
+    val androidVersion = 33
+    File("$sdkRoot/platforms/android-$androidVersion/android.jar").path
+}
+
+// endregion
+
 tasks {
     processResources {
         from("src/main/resources/properties") {
@@ -49,4 +63,6 @@ dependencies {
 
     testImplementation("junit:junit:$junitVersion")
     testImplementation("org.xmlunit:xmlunit-legacy:$xmlunitVersion")
+
+    compileOnly(files(androidJarPath))
 }

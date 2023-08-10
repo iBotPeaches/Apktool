@@ -28,6 +28,7 @@ import brut.androlib.res.xml.ResXmlPatcher;
 import brut.directory.Directory;
 import brut.directory.DirectoryException;
 import brut.directory.FileDirectory;
+import brut.util.OSDetection;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.*;
@@ -148,7 +149,11 @@ public class ResourcesDecoder {
 
         ResStreamDecoderContainer decoders = new ResStreamDecoderContainer();
         decoders.setDecoder("raw", new ResRawStreamDecoder());
-        decoders.setDecoder("9patch", new Res9patchStreamDecoder());
+
+        decoders.setDecoder(
+                "9patch",
+                OSDetection.isAndroid() ? new Res9patchAndroidStreamDecoder() : new Res9patchStreamDecoder()
+        );
 
         AXmlResourceParser axmlParser = new AXmlResourceParser(mResTable);
         decoders.setDecoder("xml", new XmlPullStreamDecoder(axmlParser, getResXmlSerializer()));

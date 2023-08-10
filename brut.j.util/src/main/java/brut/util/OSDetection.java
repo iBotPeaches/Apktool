@@ -32,6 +32,15 @@ public class OSDetection {
         return (OS.contains("nix") || OS.contains("nux") || OS.contains("aix") || (OS.contains("sunos")));
     }
 
+    public static boolean isAndroid() {
+        try {
+            Class.forName("android.app.Activity");
+            return true;
+        } catch (ClassNotFoundException ignored) {
+            return false;
+        }
+    }
+
     public static boolean is64Bit() {
         if (isWindows()) {
             String arch = System.getenv("PROCESSOR_ARCHITECTURE");

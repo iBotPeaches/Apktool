@@ -18,10 +18,13 @@ package brut.androlib.decode;
 
 import brut.androlib.BaseTest;
 import brut.androlib.TestUtils;
+import brut.androlib.res.decoder.Res9patchAndroidStreamDecoder;
 import brut.androlib.res.decoder.Res9patchStreamDecoder;
+import brut.androlib.res.decoder.ResStreamDecoder;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
 import brut.util.OS;
+import brut.util.OSDetection;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -51,7 +54,7 @@ public class MissingDiv9PatchTest extends BaseTest {
         InputStream inputStream = getFileInputStream();
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
-        Res9patchStreamDecoder decoder = new Res9patchStreamDecoder();
+        ResStreamDecoder decoder = OSDetection.isAndroid() ? new Res9patchAndroidStreamDecoder() : new Res9patchStreamDecoder();
         decoder.decode(inputStream, outputStream);
 
         BufferedImage image = ImageIO.read(new ByteArrayInputStream(outputStream.toByteArray()));
