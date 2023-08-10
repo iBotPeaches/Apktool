@@ -315,7 +315,7 @@ public class ApkDecoder {
         }
     }
 
-    private void recordUncompressedFiles(Map<String, String> resFileMapping) throws AndrolibException {
+    public void recordUncompressedFiles(Map<String, String> resFileMapping) throws AndrolibException {
         try {
             List<String> uncompressedFilesOrExts = new ArrayList<>();
             Directory unk = mApkInfo.getApkFile().getDirectory();
