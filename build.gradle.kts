@@ -161,6 +161,7 @@ subprojects {
         }
 
         signing {
+            useGpgCmd()
             sign(publishing.publications["mavenJava"])
         }
     }
