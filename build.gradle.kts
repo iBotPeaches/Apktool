@@ -123,7 +123,7 @@ subprojects {
             publications {
                 register("mavenJava", MavenPublication::class) {
                     from(components["java"])
-                    groupId = "org.apktool"
+                    groupId = "app.revanced"
                     artifactId = project.name
                     version = apktoolVersion
 
