@@ -25,11 +25,11 @@ We use gradle to build. First clone the repository using either
 
 1. Navigate to the Apktool folder: `cd Apktool`
 2. For remaining steps use `./gradlew` for unix based systems or `gradlew.bat` for windows.
-3. `[./gradlew][gradlew.bat] build shadowJar` - Builds Apktool, including final binary.
-4. Optional (You may build a Proguard jar) `[./gradlew][gradlew.bat] build shadowJar proguard`
-
-After build completes you should have a bunch of jar files built. The best one to use is:
-`./brut.apktool/apktool-cli/build/libs/apktool-cli-all.jar`
+3. You can build the project in two ways:
+    1. Without proguard `[./gradlew][gradlew.bat] build shadowJar`
+        - This will build the project and create a jar file: `brut.apktool/apktool-cli/build/libs/apktool-cli-all.jar`        
+    2. With proguard: `[./gradlew][gradlew.bat] build shadowJar proguard`
+        - This will build the project and create a jar file: `brut.apktool/apktool-cli/build/libs/apktool-vXXX.jar`
 
 #### Windows Requirements
 
