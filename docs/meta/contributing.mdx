@@ -17,6 +17,22 @@ It's quite crucial you follow the issue template. With the little time the maint
 Any large project needs a good set of documentation and Apktool is no exception.
 The docs remain in the same repository on the [docs](https://github.com/iBotPeaches/Apktool/tree/docs) branch. So pull requests are welcome to grow this documentation.
 
+When updating the docs, please follow the same style as the rest of the docs.
+There is a Lint check that will run on the docs to ensure they are formatted correctly.
+
+To set up your codebase to run the lint check, make sure that the node package dependencies are installed.
+To do this, run the following command:
+
+`npm install`
+
+To run the lint check, run the following command:
+
+`npm run lint`
+
+To fix the majority of the issues picked up by the lint check above, run the following command:
+
+`npm run lint:fix`
+
 ### Responding to Issues
 
 Another great way to help Apktool is to triage/respond to issues. This is a great way to get started with the project and help out fellow users.
