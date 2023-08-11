@@ -12,7 +12,7 @@ val xmlpullVersion by extra("1.1.4c")
 val xmlunitVersion by extra("2.9.1")
 
 val version = "2.8.2"
-val suffix = "2"
+val suffix = "3"
 
 // Strings embedded into the build.
 var gitRevision by extra("")
