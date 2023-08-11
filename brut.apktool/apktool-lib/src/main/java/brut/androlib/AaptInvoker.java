@@ -83,6 +83,10 @@ public class AaptInvoker {
 
         if (resDir != null) {
             File buildDir = new File(resDir.getParent(), "build");
+
+            //noinspection ResultOfMethodCallIgnored
+            buildDir.mkdir();
+
             resourcesZip = new File(buildDir, "resources.zip");
         }
 
