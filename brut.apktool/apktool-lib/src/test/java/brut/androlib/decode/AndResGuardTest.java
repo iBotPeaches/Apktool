@@ -59,7 +59,7 @@ public class AndResGuardTest extends BaseTest {
     }
 
     @Test
-    public void checkifAndResDecodeRemapsRFolderInRawMode() throws BrutException, IOException {
+    public void checkIfAndResDecodeRemapsRFolderInRawMode() throws BrutException, IOException {
 
         Config config = Config.getDefaultConfig();
         config.forceDelete = true;
