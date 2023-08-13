@@ -157,18 +157,6 @@ public class ResFileDecoder {
         }
     }
 
-    public void decodeManifest(Directory inDir, String inFileName,
-                               Directory outDir, String outFileName) throws AndrolibException {
-        try (
-            InputStream in = inDir.getFileInput(inFileName);
-            OutputStream out = outDir.getFileOutput(outFileName)
-        ) {
-            ((XmlPullStreamDecoder) mDecoders.getDecoder("xml")).decodeManifest(in, out);
-        } catch (DirectoryException | IOException ex) {
-            throw new AndrolibException(ex);
-        }
-    }
-
     private final static Logger LOGGER = Logger.getLogger(ResFileDecoder.class.getName());
 
     private final static String[] RAW_IMAGE_EXTENSIONS = new String[] {
