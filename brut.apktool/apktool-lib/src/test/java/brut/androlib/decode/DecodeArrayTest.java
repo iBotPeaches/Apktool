@@ -16,7 +16,6 @@
  */
 package brut.androlib.decode;
 
-import brut.androlib.ApkDecoder;
 import brut.androlib.BaseTest;
 import brut.androlib.Config;
 import brut.androlib.TestUtils;
@@ -32,9 +31,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.File;
-
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertTrue;
 
 public class DecodeArrayTest extends BaseTest {
 
@@ -54,7 +51,6 @@ public class DecodeArrayTest extends BaseTest {
     public void decodeStringArray() throws BrutException {
         ExtFile apkFile = new ExtFile(sTmpDir, "issue1994.apk");
         ApkInfo apkInfo = new ApkInfo(apkFile);
-        //ApkDecoder apkDecoder = new ApkDecoder(apkFile);
         ResourcesDecoder resourcesDecoder = new ResourcesDecoder(Config.getDefaultConfig(), apkInfo);
 
         resourcesDecoder.loadMainPkg();

@@ -77,13 +77,13 @@ public class SkipAssetTest extends BaseTest {
         checkFileDoesExist("assets" + File.separator + "ranges" + File.separator + "ranges.kotlin_builtins");
     }
 
-    private void checkFileDoesNotExist(String path) throws BrutException {
+    private void checkFileDoesNotExist(String path) {
         File f =  new File(sTestOrigDir, path);
 
         assertFalse(f.isFile());
     }
 
-    private void checkFileDoesExist(String path) throws BrutException {
+    private void checkFileDoesExist(String path) {
         File f =  new File(sTestOrigDir, path);
 
         assertTrue(f.isFile());
