@@ -92,8 +92,8 @@ const config = {
           {to: '/docs/install', label: 'Install', position: 'left'},
           {to: '/blog', label: 'Releases', position: 'left'},
           {
-            href: 'https://bitbucket.org/iBotPeaches/apktool/downloads/apktool_2.8.0.jar',
-            label: 'Download 2.8.0',
+            href: 'https://bitbucket.org/iBotPeaches/apktool/downloads/apktool_2.8.1.jar',
+            label: 'Download 2.8.1',
             position: 'right',
           },
           {
@@ -160,6 +160,15 @@ const config = {
         theme: lightCodeTheme,
         darkTheme: darkCodeTheme,
         additionalLanguages: ['java', 'smali', 'bash'],
+      },
+      algolia: {
+        appId: 'P3KZHU1SCW',
+        apiKey: '10bf8c8c0768d8404b2bc87d75ec8c1b',
+        indexName: 'apktool',
+        contextualSearch: true,
+        externalUrlRegex: 'apktool\\.org',
+        searchParameters: {},
+        searchPagePath: 'search',
       },
     }),
 };
