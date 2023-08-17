@@ -196,18 +196,12 @@ public class YamlReader {
     }
 
     public void readStringList(List<String> list) throws AndrolibException {
-        readList(list,
-            (items, reader) -> {
-                items.add(reader.getLine().getValue());
-            });
-    };
+        readList(list, (items, reader) -> items.add(reader.getLine().getValue()));
+    }
 
     public void readIntList(List<Integer> list) throws AndrolibException {
-        readList(list,
-            (items, reader) -> {
-                items.add(reader.getLine().getValueInt());
-            });
-    };
+        readList(list, (items, reader) -> items.add(reader.getLine().getValueInt()));
+    }
 
     public void readMap(Map<String, String> map) throws AndrolibException {
         readObject(map,
@@ -216,5 +210,5 @@ public class YamlReader {
                 YamlLine line = reader.getLine();
                 items.put(line.getKey(), line.getValue());
             });
-    };
+    }
 }
