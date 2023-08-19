@@ -407,28 +407,13 @@ public class AXmlResourceParser implements XmlResourceParser {
             String stringBlockValue = valueRaw == -1 ? null : ResXmlEncoders.escapeXmlChars(mStringBlock.getString(valueRaw));
             String resourceMapValue = null;
 
-            // Ensure we only track down obfuscated values for reference/attribute type values. Otherwise we might
+            // Ensure we only track down obfuscated values for reference/attribute type values. Otherwise, we might
             // spam lookups against resource table for invalid ids.
             if (valueType == TypedValue.TYPE_REFERENCE || valueType == TypedValue.TYPE_DYNAMIC_REFERENCE ||
                 valueType == TypedValue.TYPE_ATTRIBUTE || valueType == TypedValue.TYPE_DYNAMIC_ATTRIBUTE) {
                 resourceMapValue = decodeFromResourceId(valueData);
             }
-            String value = stringBlockValue;
-
-            if (stringBlockValue != null && resourceMapValue != null) {
-                int slashPos = stringBlockValue.lastIndexOf("/");
-                int colonPos = stringBlockValue.lastIndexOf(":");
-
-                // Handle a value with a format of "@yyy/xxx", but avoid "@yyy/zzz:xxx"
-                if (slashPos != -1) {
-                    if (colonPos == -1) {
-                        String type = stringBlockValue.substring(0, slashPos);
-                        value = type + "/" + resourceMapValue;
-                    }
-                } else if (! stringBlockValue.equals(resourceMapValue)) {
-                    value = resourceMapValue;
-                }
-            }
+            String value = getPreferredString(stringBlockValue, resourceMapValue);
 
             // try to decode from resource table
             int attrResId = getAttributeNameResource(index);
@@ -660,6 +645,26 @@ public class AXmlResourceParser implements XmlResourceParser {
             }
         }
         return -1;
+    }
+
+    private static String getPreferredString(String stringBlockValue, String resourceMapValue) {
+        String value = stringBlockValue;
+
+        if (stringBlockValue != null && resourceMapValue != null) {
+            int slashPos = stringBlockValue.lastIndexOf("/");
+            int colonPos = stringBlockValue.lastIndexOf(":");
+
+            // Handle a value with a format of "@yyy/xxx", but avoid "@yyy/zzz:xxx"
+            if (slashPos != -1) {
+                if (colonPos == -1) {
+                    String type = stringBlockValue.substring(0, slashPos);
+                    value = type + "/" + resourceMapValue;
+                }
+            } else if (! stringBlockValue.equals(resourceMapValue)) {
+                value = resourceMapValue;
+            }
+        }
+        return value;
     }
 
     private void resetEventInfo() {

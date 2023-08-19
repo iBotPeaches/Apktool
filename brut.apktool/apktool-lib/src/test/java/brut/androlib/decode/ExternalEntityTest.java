@@ -58,7 +58,6 @@ public class ExternalEntityTest extends BaseTest {
 
     @Test
     public void doctypeTest() throws IOException {
-
         String expected = TestUtils.replaceNewlines("<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
                 "<manifest android:versionCode=\"1\" android:versionName=\"1.0\" android:compileSdkVersion=\"23\" android:compileSdkVersionCodename=\"6.0-2438415\" " +
                 "hardwareAccelerated=\"true\" package=\"com.ibotpeaches.doctype\" platformBuildVersionCode=\"24\" platformBuildVersionName=\"6.0-2456767\"  " +
