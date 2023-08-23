@@ -69,6 +69,6 @@ tasks.register<ProGuardTask>("proguard") {
     dontwarn("javax.xml.xpath.**")
     dontnote("**")
 
-    val outPath = "build/libs/apktool-cli-$apktoolVersion.jar"
+    val outPath = "build/libs/apktool-$apktoolVersion.jar"
     outjars(outPath)
 }
