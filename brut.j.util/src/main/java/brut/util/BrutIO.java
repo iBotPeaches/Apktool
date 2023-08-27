@@ -75,7 +75,7 @@ public class BrutIO {
     }
 
     public static String sanitizeUnknownFile(final File directory, final String entry) throws IOException, BrutException {
-        if (entry.length() == 0) {
+        if (entry.isEmpty()) {
             throw new InvalidUnknownFileException("Invalid Unknown File");
         }
 

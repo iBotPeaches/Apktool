@@ -95,7 +95,7 @@ public class ResFlagsAttr extends ResAttr {
         for (FlagItem flag : flags) {
             ret.append("|").append(flag.getValue());
         }
-        if (ret.length() == 0) {
+        if (ret.isEmpty()) {
             return ret.toString();
         }
         return ret.substring(1);

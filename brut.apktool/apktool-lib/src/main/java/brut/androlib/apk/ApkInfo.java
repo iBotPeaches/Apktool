@@ -299,7 +299,7 @@ public class ApkInfo implements YamlSerializable {
         writer.writeBool("resourcesAreCompressed", resourcesAreCompressed);
         writer.writeBool("sharedLibrary", sharedLibrary);
         writer.writeBool("sparseResources", sparseResources);
-        if (unknownFiles.size() > 0) {
+        if (!unknownFiles.isEmpty()) {
             writer.writeStringMap("unknownFiles", unknownFiles);
         }
         writer.writeList("doNotCompress", doNotCompress);
