@@ -18,6 +18,7 @@ package brut.directory;
 
 import java.io.*;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 
@@ -29,7 +30,7 @@ public class FileDirectory extends AbstractDirectory {
     }
 
     public FileDirectory(String dir) throws DirectoryException, UnsupportedEncodingException {
-        this(new File(URLDecoder.decode(dir, "UTF-8")));
+        this(new File(URLDecoder.decode(dir, StandardCharsets.UTF_8)));
     }
 
     public FileDirectory(File dir) throws DirectoryException {
