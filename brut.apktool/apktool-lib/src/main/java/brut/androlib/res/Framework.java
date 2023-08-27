@@ -77,7 +77,7 @@ public class Framework {
             crc.update(data);
             entry = new ZipEntry("resources.arsc");
             entry.setSize(data.length);
-            entry.setMethod(ZipOutputStream.STORED);
+            entry.setMethod(ZipEntry.STORED);
             entry.setCrc(crc.getValue());
             out.putNextEntry(entry);
             out.write(data);
