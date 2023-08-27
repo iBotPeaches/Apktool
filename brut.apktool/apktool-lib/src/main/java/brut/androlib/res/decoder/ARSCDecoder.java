@@ -270,7 +270,9 @@ public class ARSCDecoder {
 
         mHeader.checkForUnreadHeader(mIn);
 
-        if ((typeFlags & 0x01) != 0) {
+        // Be sure we don't poison mResTable by marking the application as sparse
+        // Only flag the ResTable as sparse if the main package is not loaded.
+        if ((typeFlags & 0x01) != 0 && !mResTable.isMainPkgLoaded()) {
             mResTable.setSparseResources(true);
         }
 
