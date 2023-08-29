@@ -12,14 +12,6 @@ It is NOT intended for piracy and other non-legal uses. It could be used for loc
 - [Project Page](https://ibotpeaches.github.io/Apktool/)
 - [#apktool on libera.chat](https://web.libera.chat/)
 
-#### Sponsored by
-
-* [Sourcetoad](https://www.sourcetoad.com/cool-tools/apktool/) - helping with a weekly sponsorship for continued improvement and maintenance of the project.
-
-#### IDE of Choice
-
-* [JetBrains IntelliJ](https://www.jetbrains.com/idea/)
-
 #### Security Vulnerabilities
 
 If you discover a security vulnerability within Apktool, please send an e-mail to Connor Tumbleson at connor.tumbleson(at)gmail.com. All security vulnerabilities will be promptly addressed.
@@ -35,3 +27,28 @@ If you discover a security vulnerability within Apktool, please send an e-mail t
 - [Source (Github)](https://github.com/iBotPeaches/Apktool)
 - [Source (Bitbucket)](https://bitbucket.org/iBotPeaches/apktool/)
 
+
+## Sponsors
+
+Special thanks goes to the following sponsors:
+
+### Sourcetoad
+[Sourcetoad](https://sourcetoad.com/) is an award-winning software and app development firm committed to the co-creation of technology solutions that solve complex business problems, delight users, and help our clients achieve their goals.
+
+<a href="https://www.sourcetoad.com" alt="Sourcetoad">
+    <picture>
+        <img src="https://github.com/ibotpeaches/apktool/raw/master/.github/assets/sponsors/sourcetoad-horizontal.svg">
+    </picture>
+</a>
+
+### Emerge Tools
+
+[Emerge Tools](https://www.emergetools.com) is a suite of revolutionary products designed to supercharge mobile apps and the teams that build them.
+
+<a href="https://www.emergetools.com" alt="Emerge Tools">
+    <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="https://github.com/ibotpeaches/apktool/raw/master/.github/assets/sponsors/emerge-tools-vertical-white.svg">
+        <source media="(prefers-color-scheme: light)" srcset="https://github.com/ibotpeaches/apktool/raw/master/.github/assets/sponsors/emerge-tools-vertical-black.svg">
+        <img src="https://github.com/ibotpeaches/apktool/raw/master/.github/assets/sponsors/emerge-tools-vertical-black.svg">
+    </picture>
+</a>
