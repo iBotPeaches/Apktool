@@ -592,11 +592,18 @@ public class Main {
             return;
         }
 
-        Handler handler = new Handler(){
+        Handler handler = new Handler() {
             @Override
             public void publish(LogRecord record) {
                 if (getFormatter() == null) {
-                    setFormatter(new SimpleFormatter());
+                    setFormatter(new Formatter() {
+                        @Override
+                        public String format(LogRecord record) {
+                            return record.getLevel().toString().charAt(0) + ": "
+                                + record.getMessage()
+                                + System.getProperty("line.separator");
+                        }
+                    });
                 }
 
                 try {
@@ -616,6 +623,7 @@ public class Main {
                     reportError(null, exception, ErrorManager.FORMAT_FAILURE);
                 }
             }
+
             @Override
             public void close() throws SecurityException {}
             @Override
@@ -627,15 +635,6 @@ public class Main {
         if (verbosity == Verbosity.VERBOSE) {
             handler.setLevel(Level.ALL);
             logger.setLevel(Level.ALL);
-        } else {
-            handler.setFormatter(new Formatter() {
-                @Override
-                public String format(LogRecord record) {
-                    return record.getLevel().toString().charAt(0) + ": "
-                            + record.getMessage()
-                            + System.getProperty("line.separator");
-                }
-            });
         }
     }
 

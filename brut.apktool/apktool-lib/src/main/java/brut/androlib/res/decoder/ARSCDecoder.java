@@ -207,7 +207,7 @@ public class ARSCDecoder {
         mHeader.checkForUnreadHeader(mIn);
 
         for (int i = 0; i < count; i++) {
-            LOGGER.fine(String.format("Skipping staged alias stagedId (%h) finalId: %h", mIn.readInt(), mIn.readInt()));
+            LOGGER.fine(String.format("Staged alias: 0x%08x -> 0x%08x", mIn.readInt(), mIn.readInt()));
         }
     }
 
