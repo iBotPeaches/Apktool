@@ -251,7 +251,7 @@ public class ARSCDecoder {
         mHeader.checkForUnreadHeader(mIn);
 
         mIn.skipBytes(entryCount * 4); // flags
-        mTypeSpec = new ResTypeSpec(mTypeNames.getString(id - 1),  id);
+        mTypeSpec = new ResTypeSpec(mTypeNames.getString(id - 1), id);
         mPkg.addType(mTypeSpec);
 
         return mTypeSpec;
