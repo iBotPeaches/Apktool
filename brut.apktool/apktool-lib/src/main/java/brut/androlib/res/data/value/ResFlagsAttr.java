@@ -17,6 +17,7 @@
 package brut.androlib.res.data.value;
 
 import brut.androlib.exceptions.AndrolibException;
+import brut.androlib.res.data.ResResSpec;
 import brut.androlib.res.data.ResResource;
 import brut.util.Duo;
 import org.xmlpull.v1.XmlSerializer;
@@ -73,10 +74,16 @@ public class ResFlagsAttr extends ResAttr {
     protected void serializeBody(XmlSerializer serializer, ResResource res)
             throws AndrolibException, IOException {
         for (FlagItem item : mItems) {
+            // #2836 - As a temporary workaround due to "bugged" dummy resources. Skip adding a flag
+            // if we have no reference to the resource.
+            ResResSpec referent = item.ref.getReferent();
+            if (referent == null) {
+                continue;
+            }
+
             serializer.startTag(null, "flag");
             serializer.attribute(null, "name", item.getValue());
-            serializer.attribute(null, "value",
-                String.format("0x%08x", item.flag));
+            serializer.attribute(null, "value", String.format("0x%08x", item.flag));
             serializer.endTag(null, "flag");
         }
     }

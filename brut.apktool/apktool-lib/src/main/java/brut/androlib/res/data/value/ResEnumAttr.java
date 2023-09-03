@@ -50,12 +50,15 @@ public class ResEnumAttr extends ResAttr {
             throws AndrolibException, IOException {
         for (Duo<ResReferenceValue, ResIntValue> duo : mItems) {
             int intVal = duo.m2.getValue();
+            // #2836 - As a temporary workaround due to "bugged" dummy resources. Skip adding an enum
+            // if we have no reference to the resource.
             ResResSpec m1Referent = duo.m1.getReferent();
+            if (m1Referent == null) {
+                continue;
+            }
 
             serializer.startTag(null, "enum");
-            serializer.attribute(null, "name",
-                    m1Referent != null ? m1Referent.getName() : "@null"
-            );
+            serializer.attribute(null, "name", m1Referent.getName());
             serializer.attribute(null, "value", String.valueOf(intVal));
             serializer.endTag(null, "enum");
         }
