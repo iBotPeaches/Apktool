@@ -81,6 +81,11 @@ public abstract class ResScalarValue extends ResIntBasedValue implements
             }
         }
 
+        // Dummy attributes should be <item> with type attribute
+        if (res.getResSpec().isDummyResSpec()) {
+            item = true;
+        }
+
         // Android does not allow values (false) for ids.xml anymore
         // https://issuetracker.google.com/issues/80475496
         // But it decodes as a ResBoolean, which makes no sense. So force it to empty
