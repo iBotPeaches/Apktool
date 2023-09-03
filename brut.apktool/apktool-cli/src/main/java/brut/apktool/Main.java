@@ -147,13 +147,16 @@ public class Main {
             System.exit(1);
         }
         if (cli.hasOption("b") || cli.hasOption("no-debug-info")) {
-            config.baksmaliDebugMode = false;
+            config.debugInfo = false;
         }
         if (cli.hasOption("f") || cli.hasOption("force")) {
             config.forceDelete = true;
         }
         if (cli.hasOption("r") || cli.hasOption("no-res")) {
             config.setDecodeResources(Config.DECODE_RESOURCES_NONE);
+        }
+        if (cli.hasOption("rr") || cli.hasOption("resolve-resources")) {
+            config.resolveResources = true;
         }
         if (cli.hasOption("force-manifest")) {
             config.setForceDecodeManifest(Config.FORCE_DECODE_MANIFEST_FULL);
@@ -317,6 +320,12 @@ public class Main {
                 .longOpt("no-src")
                 .desc("Do not decode sources.")
                 .build();
+
+        Option resolveResourcesOption = Option.builder("rr")
+            .longOpt("resolve-resources")
+            .desc("Parse smali files, appending resource names alongside\n"
+                + "            referenced resource IDs.")
+            .build();
 
         Option onlyMainClassesOption = Option.builder()
                 .longOpt("only-main-classes")
@@ -490,6 +499,7 @@ public class Main {
         decodeOptions.addOption(forceDecOption);
         decodeOptions.addOption(noSrcOption);
         decodeOptions.addOption(noResOption);
+        decodeOptions.addOption(resolveResourcesOption);
 
         // add basic build options
         buildOptions.addOption(outputBuiOption);

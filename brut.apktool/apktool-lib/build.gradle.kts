@@ -40,6 +40,7 @@ dependencies {
     api(project(":brut.j.common"))
 
     implementation("com.android.tools.smali:smali-baksmali:$baksmaliVersion")
+    implementation("com.android.tools.smali:smali-util:$smaliVersion")
     implementation("com.android.tools.smali:smali:$smaliVersion")
     implementation("xpp3:xpp3:$xmlpullVersion")
     implementation("com.google.guava:guava:$guavaVersion")

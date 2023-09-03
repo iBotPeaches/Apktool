@@ -228,11 +228,18 @@ public class ResourcesDecoder {
             serial.startTag(null, "resources");
 
             for (ResResSpec spec : pkg.listResSpecs()) {
+                String resourceId = String.format("0x%08x", spec.getId().id);
+
                 serial.startTag(null, "public");
                 serial.attribute(null, "type", spec.getType().getName());
                 serial.attribute(null, "name", spec.getName());
-                serial.attribute(null, "id", String.format("0x%08x", spec.getId().id));
+                serial.attribute(null, "id", resourceId);
                 serial.endTag(null, "public");
+
+		        if (mConfig.resolveResources) {
+                    String qualifiedResourceName = String.format("%s.%s", spec.getType().getName(), spec.getName());
+                    mConfig.resourceIds.put(Integer.decode(resourceId), qualifiedResourceName);
+                }
             }
 
             serial.endTag(null, "resources");
