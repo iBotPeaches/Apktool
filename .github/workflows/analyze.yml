@@ -21,8 +21,8 @@ jobs:
         with:
           languages: java
 
-      - name: Autobuild
-        uses: github/codeql-action/autobuild@v2
+      - name: Build
+        run: ./gradlew build shadowJar proguard
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
