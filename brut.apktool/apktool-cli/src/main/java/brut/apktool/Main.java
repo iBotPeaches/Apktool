@@ -178,9 +178,6 @@ public class Main {
             // make out folder manually using name of apk
             String outName = apkName;
 
-            config.fileName = outName.substring(outName.lastIndexOf('/') + 1);
-            config.fileName = config.fileName.substring(0, config.fileName.length() - 4).trim();
-
             outName = outName.endsWith(".apk") ? outName.substring(0,
                     outName.length() - 4).trim() : outName + ".out";
 
@@ -190,6 +187,10 @@ public class Main {
         }
 
         ExtFile apkFile = new ExtFile(apkName);
+
+        config.fileName = apkFile.getName().substring(0,
+                apkFile.getName().length() - 4).trim();
+
         ApkDecoder decoder = new ApkDecoder(config, apkFile);
 
         try {
