@@ -18,6 +18,7 @@ package brut.androlib.res.data.value;
 
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.data.ResResource;
+import brut.androlib.res.data.arsc.FlagItem;
 import brut.util.Duo;
 import org.xmlpull.v1.XmlSerializer;
 
@@ -130,24 +131,5 @@ public class ResFlagsAttr extends ResAttr {
     private FlagItem[] mZeroFlags;
     private FlagItem[] mFlags;
 
-    private static class FlagItem {
-        public final ResReferenceValue ref;
-        public final int flag;
-        public String value;
-
-        public FlagItem(ResReferenceValue ref, int flag) {
-            this.ref = ref;
-            this.flag = flag;
-        }
-
-        public String getValue() throws AndrolibException {
-            if (value == null) {
-                if (ref.referentIsNull()) {
-                    return "@null";
-                }
-                value = ref.getReferent().getName();
-            }
-            return value;
-        }
-    }
+    private static final Logger LOGGER = Logger.getLogger(ResFlagsAttr.class.getName());
 }
