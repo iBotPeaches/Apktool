@@ -25,6 +25,7 @@ import org.xmlpull.v1.XmlSerializer;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 public class ResEnumAttr extends ResAttr {
     ResEnumAttr(ResReferenceValue parent, int type, Integer min, Integer max,
@@ -46,15 +47,21 @@ public class ResEnumAttr extends ResAttr {
     }
 
     @Override
-    protected void serializeBody(XmlSerializer serializer, ResResource res)
-            throws AndrolibException, IOException {
+    protected void serializeBody(XmlSerializer serializer, ResResource res) throws AndrolibException, IOException {
         for (Duo<ResReferenceValue, ResIntValue> duo : mItems) {
             int intVal = duo.m2.getValue();
+
+            // #2836 - Support skipping items if the resource cannot be identified.
             ResResSpec m1Referent = duo.m1.getReferent();
+            if (m1Referent == null && shouldRemoveUnknownRes()) {
+                LOGGER.fine(String.format("null enum reference: m1=0x%08x(%s), m2=0x%08x(%s)",
+                    duo.m1.getRawIntValue(), duo.m1.getType(), duo.m2.getRawIntValue(), duo.m2.getType()));
+                continue;
+            }
 
             serializer.startTag(null, "enum");
             serializer.attribute(null, "name",
-                    m1Referent != null ? m1Referent.getName() : "@null"
+                m1Referent != null ? m1Referent.getName() : "@null"
             );
             serializer.attribute(null, "value", String.valueOf(intVal));
             serializer.endTag(null, "enum");
@@ -81,4 +88,6 @@ public class ResEnumAttr extends ResAttr {
 
     private final Duo<ResReferenceValue, ResIntValue>[] mItems;
     private final Map<Integer, String> mItemsCache = new HashMap<>();
+
+    private static final Logger LOGGER = Logger.getLogger(ResEnumAttr.class.getName());
 }
