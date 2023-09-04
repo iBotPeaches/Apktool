@@ -118,7 +118,7 @@ public class ARSCDecoder {
             }
         }
 
-        if (mPkg != null && mPkg.getResSpecCount() > 0) {
+        if (mResTable.getConfig().useDummyResources() && mPkg != null && mPkg.getResSpecCount() > 0) {
             addMissingResSpecs();
         }
 
@@ -645,7 +645,7 @@ public class ARSCDecoder {
     private ResType mType;
     private int mResId;
     private int mTypeIdOffset = 0;
-    private HashMap<Integer, Integer> mMissingResSpecMap;
+    private final HashMap<Integer, Integer> mMissingResSpecMap;
     private final HashMap<Integer, ResTypeSpec> mResTypeSpecs = new HashMap<>();
 
     private final static short ENTRY_FLAG_COMPLEX = 0x0001;
