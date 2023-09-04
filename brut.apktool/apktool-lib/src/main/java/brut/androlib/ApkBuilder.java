@@ -67,10 +67,6 @@ public class ApkBuilder {
     private final static String[] APK_MANIFEST_FILENAMES = new String[] {
         "AndroidManifest.xml" };
 
-    public ApkBuilder(ExtFile apkDir) {
-        this(Config.getDefaultConfig(), apkDir);
-    }
-
     public ApkBuilder(Config config, ExtFile apkDir) {
         mConfig = config;
         mApkDir = apkDir;
@@ -556,7 +552,7 @@ public class ApkBuilder {
         File[] files = new File[ids.size()];
         int i = 0;
         for (int id : ids) {
-            files[i++] = framework.getFrameworkApk(id, tag);
+            files[i++] = framework.getFrameworkApk(id, mConfig);
         }
         return files;
     }

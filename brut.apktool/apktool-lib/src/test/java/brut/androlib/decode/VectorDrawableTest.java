@@ -16,6 +16,7 @@
  */
 package brut.androlib.decode;
 
+import brut.androlib.Config;
 import brut.androlib.ApkDecoder;
 import brut.androlib.BaseTest;
 import brut.androlib.TestUtils;
@@ -48,9 +49,10 @@ public class VectorDrawableTest extends BaseTest {
     @Test
     public void checkIfDrawableFileDecodesProperly() throws BrutException, IOException {
         String apk = "issue1456.apk";
+        Config config = Config.getDefaultConfig();
 
         // decode issue1456.apk
-        ApkDecoder apkDecoder = new ApkDecoder(new File(sTmpDir + File.separator + apk));
+        ApkDecoder apkDecoder = new ApkDecoder(config, new File(sTmpDir + File.separator + apk));
         sTestOrigDir = new ExtFile(sTmpDir + File.separator + apk + ".out");
 
         File outDir = new File(sTmpDir + File.separator + apk + ".out");

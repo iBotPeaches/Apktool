@@ -53,12 +53,8 @@ public class ResTable {
 
     private boolean mMainPkgLoaded = false;
 
-    public ResTable() {
-        this(Config.getDefaultConfig(), new ApkInfo());
-    }
-
-    public ResTable(ExtFile apkFile) {
-        this(Config.getDefaultConfig(), new ApkInfo(apkFile));
+    public ResTable(Config config) {
+        this(config, new ApkInfo());
     }
 
     public ResTable(Config config, ApkInfo apkInfo) {
@@ -127,7 +123,7 @@ public class ResTable {
 
     public void loadMainPkg(ExtFile apkFile) throws AndrolibException {
         LOGGER.info("Loading resource table...");
-        ResPackage[] pkgs = loadResPackagesFromApk(apkFile, mConfig.keepBrokenResources);
+        ResPackage[] pkgs = loadResPackagesFromApk(apkFile, mConfig);
         ResPackage pkg;
 
         switch (pkgs.length) {
@@ -151,10 +147,10 @@ public class ResTable {
 
     private ResPackage loadFrameworkPkg(int id) throws AndrolibException {
         Framework framework = new Framework(mConfig);
-        File frameworkApk = framework.getFrameworkApk(id, mConfig.frameworkTag);
+        File frameworkApk = framework.getFrameworkApk(id, mConfig);
 
         LOGGER.info("Loading resource table from file: " + frameworkApk);
-        ResPackage[] pkgs = loadResPackagesFromApk(new ExtFile(frameworkApk), true);
+        ResPackage[] pkgs = loadResPackagesFromApk(new ExtFile(frameworkApk), mConfig);
 
         ResPackage pkg;
         if (pkgs.length > 1) {
@@ -171,11 +167,11 @@ public class ResTable {
         return pkg;
     }
 
-    private ResPackage[] loadResPackagesFromApk(ExtFile apkFile, boolean keepBrokenResources) throws AndrolibException {
+    private ResPackage[] loadResPackagesFromApk(ExtFile apkFile, Config mConfig) throws AndrolibException {
         try {
             Directory dir = apkFile.getDirectory();
             try (BufferedInputStream bfi = new BufferedInputStream(dir.getFileInput("resources.arsc"))) {
-                return ARSCDecoder.decode(bfi, false, keepBrokenResources, this).getPackages();
+                return ARSCDecoder.decode(bfi, false, mConfig, this).getPackages();
             }
         } catch (DirectoryException | IOException ex) {
             throw new AndrolibException("Could not load resources.arsc from file: " + apkFile, ex);

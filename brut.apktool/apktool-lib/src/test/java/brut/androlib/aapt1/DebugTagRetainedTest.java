@@ -17,7 +17,6 @@
 package brut.androlib.aapt1;
 
 import brut.androlib.*;
-import brut.androlib.Config;
 import brut.directory.ExtFile;
 import brut.common.BrutException;
 import brut.util.OS;
@@ -54,7 +53,7 @@ public class DebugTagRetainedTest extends BaseTest {
         new ApkBuilder(config, sTestOrigDir).build(testApk);
 
         LOGGER.info("Decoding issue1235.apk...");
-        ApkDecoder apkDecoder = new ApkDecoder(testApk);
+        ApkDecoder apkDecoder = new ApkDecoder(config, testApk);
         apkDecoder.decode(sTestNewDir);
     }
 

@@ -16,6 +16,7 @@
  */
 package brut.androlib.res.decoder;
 
+import brut.androlib.Config;
 import android.util.TypedValue;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.data.*;
@@ -31,16 +32,16 @@ import java.util.*;
 import java.util.logging.Logger;
 
 public class ARSCDecoder {
-    public static ARSCData decode(InputStream arscStream, boolean findFlagsOffsets, boolean keepBroken)
+    public static ARSCData decode(InputStream arscStream, boolean findFlagsOffsets, Config mConfig)
             throws AndrolibException {
-        return decode(arscStream, findFlagsOffsets, keepBroken, new ResTable());
+        return decode(arscStream, findFlagsOffsets, mConfig, new ResTable(mConfig));
     }
 
-    public static ARSCData decode(InputStream arscStream, boolean findFlagsOffsets, boolean keepBroken,
+    public static ARSCData decode(InputStream arscStream, boolean findFlagsOffsets, Config mConfig,
                                   ResTable resTable)
             throws AndrolibException {
         try {
-            ARSCDecoder decoder = new ARSCDecoder(arscStream, resTable, findFlagsOffsets, keepBroken);
+            ARSCDecoder decoder = new ARSCDecoder(arscStream, resTable, findFlagsOffsets, mConfig);
             ResPackage[] pkgs = decoder.readResourceTable();
             return new ARSCData(pkgs, decoder.mFlagsOffsets == null
                     ? null
@@ -50,7 +51,7 @@ public class ARSCDecoder {
         }
     }
 
-    private ARSCDecoder(InputStream arscStream, ResTable resTable, boolean storeFlagsOffsets, boolean keepBroken) {
+    private ARSCDecoder(InputStream arscStream, ResTable resTable, boolean storeFlagsOffsets, Config mConfig) {
         if (storeFlagsOffsets) {
             mFlagsOffsets = new ArrayList<>();
         } else {
@@ -58,7 +59,7 @@ public class ARSCDecoder {
         }
         mIn = new ExtCountingDataInput(new LittleEndianDataInputStream(arscStream));
         mResTable = resTable;
-        mKeepBroken = keepBroken;
+        mKeepBroken = mConfig.keepBrokenResources;
     }
 
     private ResPackage[] readResourceTable() throws IOException, AndrolibException {

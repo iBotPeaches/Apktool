@@ -55,14 +55,6 @@ public class ApkDecoder {
         "jpg|jpeg|png|gif|wav|mp2|mp3|ogg|aac|mpg|mpeg|mid|midi|smf|jet|rtttl|imy|xmf|mp4|" +
         "m4a|m4v|3gp|3gpp|3g2|3gpp2|amr|awb|wma|wmv|webm|webp|mkv)$");
 
-    public ApkDecoder(File apkFile) {
-        this(Config.getDefaultConfig(), new ExtFile(apkFile));
-    }
-
-    public ApkDecoder(ExtFile apkFile) {
-        this(Config.getDefaultConfig(), apkFile);
-    }
-
     public ApkDecoder(Config config, File apkFile) {
         this(config, new ExtFile(apkFile));
     }

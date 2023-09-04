@@ -16,6 +16,7 @@
  */
 package brut.androlib.aapt1;
 
+import brut.androlib.Config;
 import brut.androlib.ApkBuilder;
 import brut.androlib.ApkDecoder;
 import brut.androlib.BaseTest;
@@ -45,9 +46,10 @@ public class LargeIntsInManifestTest extends BaseTest {
     @Test
     public void checkIfLargeIntsAreHandledTest() throws BrutException, IOException {
         String apk = "issue767.apk";
+        Config config = Config.getDefaultConfig();
 
         // decode issue767.apk
-        ApkDecoder apkDecoder = new ApkDecoder(new File(sTmpDir + File.separator + apk));
+        ApkDecoder apkDecoder = new ApkDecoder(config, new File(sTmpDir + File.separator + apk));
         sTestOrigDir = new ExtFile(sTmpDir + File.separator + apk + ".out");
 
         File outDir = new File(sTmpDir + File.separator + apk + ".out");
@@ -55,11 +57,11 @@ public class LargeIntsInManifestTest extends BaseTest {
 
         // build issue767
         ExtFile testApk = new ExtFile(sTmpDir, apk + ".out");
-        new ApkBuilder(testApk).build(null);
+        new ApkBuilder(config, testApk).build(null);
         String newApk = apk + ".out" + File.separator + "dist" + File.separator + apk;
 
         // decode issue767 again
-        apkDecoder = new ApkDecoder(new File(sTmpDir + File.separator + newApk));
+        apkDecoder = new ApkDecoder(config, new File(sTmpDir + File.separator + newApk));
         sTestNewDir = new ExtFile(sTmpDir + File.separator + apk + ".out.two");
 
         outDir = new File(sTmpDir + File.separator + apk + ".out.two");

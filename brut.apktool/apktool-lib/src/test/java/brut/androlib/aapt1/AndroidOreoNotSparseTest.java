@@ -17,7 +17,6 @@
 package brut.androlib.aapt1;
 
 import brut.androlib.*;
-import brut.androlib.Config;
 import brut.directory.ExtFile;
 import brut.common.BrutException;
 import brut.util.OS;
@@ -38,15 +37,15 @@ public class AndroidOreoNotSparseTest extends BaseTest {
         sTestNewDir = new ExtFile(sTmpDir, "issue1594-new");
         LOGGER.info("Unpacking not_sparse.apk...");
         TestUtils.copyResourceDir(AndroidOreoNotSparseTest.class, "aapt1/issue1594", sTestOrigDir);
+        Config config = Config.getDefaultConfig();
 
         File testApk = new File(sTestOrigDir, "not_sparse.apk");
 
         LOGGER.info("Decoding not_sparse.apk...");
-        ApkDecoder apkDecoder = new ApkDecoder(testApk);
+        ApkDecoder apkDecoder = new ApkDecoder(config, testApk);
         apkDecoder.decode(sTestNewDir);
 
         LOGGER.info("Building not_sparse.apk...");
-        Config config = Config.getDefaultConfig();
         new ApkBuilder(config, sTestNewDir).build(testApk);
     }
 

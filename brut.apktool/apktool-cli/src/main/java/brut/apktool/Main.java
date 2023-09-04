@@ -179,9 +179,11 @@ public class Main {
         if (cli.hasOption("i") || cli.hasOption("implicit-references")) {
             config.implicitReferences = true;
         }
-        if (cli.hasOption("l") || cli.hasOption("locals-directive")) {
+        if (cli.hasOption("l") || cli.hasOption("use-locals")) {
             config.localsDirective = true;
-            config.parameterRegisters = false;
+        }
+        if (cli.hasOption("pr") || cli.hasOption("parameter-registers")) {
+            config.localsDirective = false;
         }
         if (cli.hasOption("sl") || cli.hasOption("sequential-labels")) {
             config.sequentialLabels = true;
@@ -355,10 +357,16 @@ public class Main {
             .build();
 
         Option localsDirectiveOption = Option.builder("l")
-            .longOpt("locals-directive")
+            .longOpt("use-locals")
             .desc("When disassembling smali, output the .locals directive with the number\n"
                 + "            of non-parameter registers instead of the .registers directive with the\n"
                 + "            total number of registers. Default: disabled.")
+            .build();
+
+        Option parameterRegistersOption = Option.builder("pr")
+            .longOpt("parameter-registers")
+            .desc("Use the pNN syntax for registers that refer to a method parameter on\n"
+                + "            method entry. Default: enabled.\n")
             .build();
 
         Option resolveResourcesOption = Option.builder("rr")
@@ -551,6 +559,7 @@ public class Main {
         decodeOptions.addOption(noResOption);
         decodeOptions.addOption(resolveResourcesOption);
         decodeOptions.addOption(localsDirectiveOption);
+        decodeOptions.addOption(parameterRegistersOption);
 
         // add basic build options
         buildOptions.addOption(outputBuiOption);

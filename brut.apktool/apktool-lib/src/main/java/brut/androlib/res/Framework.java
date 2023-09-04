@@ -63,7 +63,7 @@ public class Framework {
             in = zip.getInputStream(entry);
             byte[] data = IOUtils.toByteArray(in);
 
-            ARSCData arsc = ARSCDecoder.decode(new ByteArrayInputStream(data), true, true);
+            ARSCData arsc = ARSCDecoder.decode(new ByteArrayInputStream(data), true, config);
             publicizeResources(data, arsc.getFlagsOffsets());
 
             File outFile = new File(getFrameworkDirectory(), arsc
@@ -137,7 +137,7 @@ public class Framework {
     }
 
     private void publicizeResources(byte[] arsc) throws AndrolibException {
-        publicizeResources(arsc, ARSCDecoder.decode(new ByteArrayInputStream(arsc), true, true).getFlagsOffsets());
+        publicizeResources(arsc, ARSCDecoder.decode(new ByteArrayInputStream(arsc), true, config).getFlagsOffsets());
     }
 
     public void publicizeResources(byte[] arsc, FlagsOffset[] flagsOffsets) {
@@ -197,12 +197,12 @@ public class Framework {
         return dir;
     }
 
-    public File getFrameworkApk(int id, String frameTag) throws AndrolibException {
+    public File getFrameworkApk(int id, Config mConfig) throws AndrolibException {
         File dir = getFrameworkDirectory();
         File apk;
 
-        if (frameTag != null) {
-            apk = new File(dir, String.valueOf(id) + '-' + frameTag + ".apk");
+        if (mConfig.frameworkTag != null) {
+            apk = new File(dir, String.valueOf(id) + '-' + mConfig.frameworkTag + ".apk");
             if (apk.exists()) {
                 return apk;
             }

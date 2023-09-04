@@ -16,6 +16,7 @@
  */
 package brut.androlib.decode;
 
+import brut.androlib.Config;
 import brut.androlib.ApkDecoder;
 import brut.androlib.BaseTest;
 import brut.androlib.TestUtils;
@@ -38,11 +39,12 @@ public class OutsideOfDirectoryEntryTest extends BaseTest {
         TestUtils.cleanFrameworkFile();
         sTmpDir = new ExtFile(OS.createTempDirectory());
         TestUtils.copyResourceDir(OutsideOfDirectoryEntryTest.class, "decode/issue1589/", sTmpDir);
+        Config config = Config.getDefaultConfig();
 
         String apk = "issue1589.apk";
 
         // decode issue1589.apk
-        ApkDecoder apkDecoder = new ApkDecoder(new File(sTmpDir + File.separator + apk));
+        ApkDecoder apkDecoder = new ApkDecoder(config, new File(sTmpDir + File.separator + apk));
         sTestNewDir = new ExtFile(sTmpDir + File.separator + apk + ".out");
 
         File outDir = new File(sTmpDir + File.separator + apk + ".out");
