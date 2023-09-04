@@ -16,6 +16,7 @@
  */
 package brut.androlib.decode;
 
+import brut.androlib.Config;
 import brut.androlib.ApkDecoder;
 import brut.androlib.BaseTest;
 import brut.androlib.TestUtils;
@@ -41,9 +42,10 @@ public class DecodeKotlinTest extends BaseTest {
         TestUtils.copyResourceDir(DecodeKotlinTest.class, "decode/testkotlin/", sTmpDir);
 
         String apk = "testkotlin.apk";
+        Config config = Config.getDefaultConfig();
 
         // decode testkotlin.apk
-        ApkDecoder apkDecoder = new ApkDecoder(new File(sTmpDir + File.separator + apk));
+        ApkDecoder apkDecoder = new ApkDecoder(config, new File(sTmpDir + File.separator + apk));
         sTestNewDir = new ExtFile(sTmpDir + File.separator + apk + ".out");
 
         File outDir = new File(sTmpDir + File.separator + apk + ".out");

@@ -16,6 +16,7 @@
  */
 package brut.androlib.decode;
 
+import brut.androlib.Config;
 import brut.androlib.ApkDecoder;
 import brut.androlib.BaseTest;
 import brut.androlib.TestUtils;
@@ -50,9 +51,10 @@ public class DoubleExtensionUnknownFileTest extends BaseTest {
     @Test
     public void multipleExtensionUnknownFileTest() throws BrutException, IOException {
         String apk = "issue1244.apk";
+        Config config = Config.getDefaultConfig();
 
         // decode issue1244.apk
-        ApkDecoder apkDecoder = new ApkDecoder(new File(sTmpDir + File.separator + apk));
+        ApkDecoder apkDecoder = new ApkDecoder(config, new File(sTmpDir + File.separator + apk));
         ExtFile decodedApk = new ExtFile(sTmpDir + File.separator + apk + ".out");
         File outDir = new File(sTmpDir + File.separator + apk + ".out");
         apkDecoder.decode(outDir);

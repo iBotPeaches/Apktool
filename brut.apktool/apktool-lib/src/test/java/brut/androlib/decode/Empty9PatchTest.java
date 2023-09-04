@@ -16,6 +16,7 @@
  */
 package brut.androlib.decode;
 
+import brut.androlib.Config;
 import brut.androlib.ApkDecoder;
 import brut.androlib.BaseTest;
 import brut.androlib.TestUtils;
@@ -49,9 +50,10 @@ public class Empty9PatchTest extends BaseTest {
     @Test
     public void decodeWithEmpty9PatchFile() throws BrutException, IOException {
         String apk = "empty9patch.apk";
+        Config config = Config.getDefaultConfig();
 
         // decode empty9patch.apk
-        ApkDecoder apkDecoder = new ApkDecoder(new File(sTmpDir + File.separator + apk));
+        ApkDecoder apkDecoder = new ApkDecoder(config, new File(sTmpDir + File.separator + apk));
         sTestOrigDir = new ExtFile(sTmpDir + File.separator + apk + ".out");
 
         File outDir = new File(sTmpDir + File.separator + apk + ".out");

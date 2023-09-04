@@ -18,7 +18,6 @@ package brut.androlib.aapt2;
 
 import brut.androlib.*;
 import brut.androlib.apk.ApkInfo;
-import brut.androlib.Config;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
 import brut.util.OS;
@@ -57,7 +56,7 @@ public class BuildAndDecodeTest extends BaseTest {
         new ApkBuilder(config, sTestOrigDir).build(testApk);
 
         LOGGER.info("Decoding testapp.apk...");
-        ApkDecoder apkDecoder = new ApkDecoder(testApk);
+        ApkDecoder apkDecoder = new ApkDecoder(config, testApk);
         apkDecoder.decode(sTestNewDir);
     }
 

@@ -16,6 +16,7 @@
  */
 package brut.androlib.decode;
 
+import brut.androlib.Config;
 import brut.androlib.ApkBuilder;
 import brut.androlib.ApkDecoder;
 import brut.androlib.BaseTest;
@@ -40,13 +41,14 @@ public class ExternalEntityTest extends BaseTest {
     public static void beforeClass() throws Exception {
         sTestOrigDir = new ExtFile(OS.createTempDirectory());
         TestUtils.copyResourceDir(ExternalEntityTest.class, "decode/doctype/", sTestOrigDir);
+        Config config = Config.getDefaultConfig();
 
         LOGGER.info("Building doctype.apk...");
         File testApk = new File(sTestOrigDir, "doctype.apk");
-        new ApkBuilder(sTestOrigDir).build(testApk);
+        new ApkBuilder(config, sTestOrigDir).build(testApk);
 
         LOGGER.info("Decoding doctype.apk...");
-        ApkDecoder apkDecoder = new ApkDecoder(testApk);
+        ApkDecoder apkDecoder = new ApkDecoder(config, testApk);
         File outDir = new File(sTestOrigDir + File.separator + "output");
         apkDecoder.decode(outDir);
     }

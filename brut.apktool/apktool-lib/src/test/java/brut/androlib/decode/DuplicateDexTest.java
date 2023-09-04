@@ -46,13 +46,13 @@ public class DuplicateDexTest extends BaseTest {
     @Test(expected = AndrolibException.class)
     public void decodeAllSourcesShouldThrowException() throws BrutException, IOException {
         File testApk = new File(sTestOrigDir, "duplicatedex.apk");
+        Config config = Config.getDefaultConfig();
 
         LOGGER.info("Decoding duplicatedex.apk...");
-        ApkDecoder apkDecoder = new ApkDecoder(testApk);
+        ApkDecoder apkDecoder = new ApkDecoder(config, testApk);
         apkDecoder.decode(sTestNewDir);
 
         LOGGER.info("Building duplicatedex.apk...");
-        Config config = Config.getDefaultConfig();
         new ApkBuilder(config, sTestNewDir).build(testApk);
     }
 

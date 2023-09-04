@@ -16,6 +16,7 @@
  */
 package brut.androlib.aapt1;
 
+import brut.androlib.Config;
 import brut.androlib.ApkBuilder;
 import brut.androlib.ApkDecoder;
 import brut.androlib.BaseTest;
@@ -43,6 +44,7 @@ public class BuildAndDecodeTest extends BaseTest {
     @BeforeClass
     public static void beforeClass() throws Exception {
         TestUtils.cleanFrameworkFile();
+        Config config = Config.getDefaultConfig();
 
         sTmpDir = new ExtFile(OS.createTempDirectory());
         sTestOrigDir = new ExtFile(sTmpDir, "testapp-orig");
@@ -52,10 +54,10 @@ public class BuildAndDecodeTest extends BaseTest {
 
         LOGGER.info("Building testapp.apk...");
         File testApk = new File(sTmpDir, "testapp.apk");
-        new ApkBuilder(sTestOrigDir).build(testApk);
+        new ApkBuilder(config, sTestOrigDir).build(testApk);
 
         LOGGER.info("Decoding testapp.apk...");
-        ApkDecoder apkDecoder = new ApkDecoder(testApk);
+        ApkDecoder apkDecoder = new ApkDecoder(config, testApk);
         apkDecoder.decode(sTestNewDir);
     }
 

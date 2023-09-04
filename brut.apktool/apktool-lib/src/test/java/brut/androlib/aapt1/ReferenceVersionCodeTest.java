@@ -16,6 +16,7 @@
  */
 package brut.androlib.aapt1;
 
+import brut.androlib.Config;
 import brut.androlib.ApkDecoder;
 import brut.androlib.BaseTest;
 import brut.androlib.TestUtils;
@@ -49,9 +50,10 @@ public class ReferenceVersionCodeTest extends BaseTest {
     @Test
     public void referenceBecomesLiteralTest() throws BrutException, IOException {
         String apk = "issue1234.apk";
+        Config config = Config.getDefaultConfig();
 
         // decode issue1234.apk
-        ApkDecoder apkDecoder = new ApkDecoder(new ExtFile(sTmpDir + File.separator + apk));
+        ApkDecoder apkDecoder = new ApkDecoder(config, new ExtFile(sTmpDir + File.separator + apk));
         ExtFile decodedApk = new ExtFile(sTmpDir + File.separator + apk + ".out");
         File outDir = new File(sTmpDir + File.separator + apk + ".out");
         apkDecoder.decode(outDir);

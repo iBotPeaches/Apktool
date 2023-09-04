@@ -16,6 +16,7 @@
  */
 package brut.androlib.decode;
 
+import brut.androlib.Config;
 import brut.androlib.ApkDecoder;
 import brut.androlib.BaseTest;
 import brut.androlib.TestUtils;
@@ -45,9 +46,10 @@ public class ProtectedApkTest extends BaseTest {
     @Test
     public void checkIfDecodeWorksWithoutCrash() throws BrutException, IOException {
         String apk = "protected-v1.apk";
+        Config config = Config.getDefaultConfig();
 
         // decode protected-v1.apk
-        ApkDecoder apkDecoder = new ApkDecoder(new File(sTmpDir + File.separator + apk));
+        ApkDecoder apkDecoder = new ApkDecoder(config, new File(sTmpDir + File.separator + apk));
         sTestOrigDir = new ExtFile(sTmpDir + File.separator + apk + ".out");
 
         File outDir = new File(sTmpDir + File.separator + apk + ".out");

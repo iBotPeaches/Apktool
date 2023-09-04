@@ -147,13 +147,16 @@ public class Main {
             System.exit(1);
         }
         if (cli.hasOption("b") || cli.hasOption("no-debug-info")) {
-            config.baksmaliDebugMode = false;
+            config.debugInfo = false;
         }
         if (cli.hasOption("f") || cli.hasOption("force")) {
             config.forceDelete = true;
         }
-        if (cli.hasOption("r") || cli.hasOption("no-res")) {
+        if (cli.hasOption("nr") || cli.hasOption("no-res")) {
             config.setDecodeResources(Config.DECODE_RESOURCES_NONE);
+        }
+        if (cli.hasOption("rr") || cli.hasOption("resolve-resources")) {
+            config.resolveResources = true;
         }
         if (cli.hasOption("force-manifest")) {
             config.setForceDecodeManifest(Config.FORCE_DECODE_MANIFEST_FULL);
@@ -166,6 +169,24 @@ public class Main {
         }
         if (cli.hasOption("m") || cli.hasOption("match-original")) {
             config.analysisMode = true;
+        }
+        if (cli.hasOption("ac") || cli.hasOption("accessor-comments")) {
+            config.accessorComments = true;
+        }
+        if (cli.hasOption("co") || cli.hasOption("code-offests")) {
+            config.codeOffsets = true;
+        }
+        if (cli.hasOption("i") || cli.hasOption("implicit-references")) {
+            config.implicitReferences = true;
+        }
+        if (cli.hasOption("l") || cli.hasOption("use-locals")) {
+            config.localsDirective = true;
+        }
+        if (cli.hasOption("pr") || cli.hasOption("parameter-registers")) {
+            config.localsDirective = false;
+        }
+        if (cli.hasOption("sl") || cli.hasOption("sequential-labels")) {
+            config.sequentialLabels = true;
         }
 
         File outDir;
@@ -318,12 +339,54 @@ public class Main {
                 .desc("Do not decode sources.")
                 .build();
 
+        Option accessorCommentsOption = Option.builder("ac")
+            .longOpt("accessor-comments")
+            .desc("Generate helper comments for synthetic accessors.Default: disabled.\n")
+            .build();
+
+        Option codeOffestsOption = Option.builder("co")
+            .longOpt("code-offsets")
+            .desc("Add a comment before each instruction with it's code offset within\n"
+                        + "            the method. Default: disabled.\n")
+            .build();
+
+        Option implicitReferencesOption = Option.builder("i")
+            .longOpt("implicit-references")
+            .desc("Use implicit method and field references (without the class name) for\n"
+                + "            methods and fields from the current class. Default: disabled.\n")
+            .build();
+
+        Option localsDirectiveOption = Option.builder("l")
+            .longOpt("use-locals")
+            .desc("When disassembling smali, output the .locals directive with the number\n"
+                + "            of non-parameter registers instead of the .registers directive with the\n"
+                + "            total number of registers. Default: disabled.")
+            .build();
+
+        Option parameterRegistersOption = Option.builder("pr")
+            .longOpt("parameter-registers")
+            .desc("Use the pNN syntax for registers that refer to a method parameter on\n"
+                + "            method entry. Default: enabled.\n")
+            .build();
+
+        Option resolveResourcesOption = Option.builder("rr")
+            .longOpt("resolve-resources")
+            .desc("Parse smali files, appending resource names alongside\n"
+                + "            referenced resource IDs.")
+            .build();
+
+        Option sequentialLabelsOption = Option.builder("sl")
+            .longOpt("sequential-labels")
+            .desc("Create label names using a sequential numbering scheme per label type,\n"
+                        + "            rather than using the bytecode address. Default: disabled.\n")
+            .build();
+
         Option onlyMainClassesOption = Option.builder()
                 .longOpt("only-main-classes")
                 .desc("Only disassemble the main dex classes (classes[0-9]*.dex) in the root.")
                 .build();
 
-        Option noResOption = Option.builder("r")
+        Option noResOption = Option.builder("nr")
                 .longOpt("no-res")
                 .desc("Do not decode resources.")
                 .build();
@@ -469,6 +532,10 @@ public class Main {
             decodeOptions.addOption(apiLevelOption);
             decodeOptions.addOption(noAssetOption);
             decodeOptions.addOption(forceManOption);
+            decodeOptions.addOption(accessorCommentsOption);
+            decodeOptions.addOption(codeOffestsOption);
+            decodeOptions.addOption(implicitReferencesOption);
+            decodeOptions.addOption(sequentialLabelsOption);
 
             buildOptions.addOption(apiLevelOption);
             buildOptions.addOption(debugBuiOption);
@@ -490,6 +557,9 @@ public class Main {
         decodeOptions.addOption(forceDecOption);
         decodeOptions.addOption(noSrcOption);
         decodeOptions.addOption(noResOption);
+        decodeOptions.addOption(resolveResourcesOption);
+        decodeOptions.addOption(localsDirectiveOption);
+        decodeOptions.addOption(parameterRegistersOption);
 
         // add basic build options
         buildOptions.addOption(outputBuiOption);

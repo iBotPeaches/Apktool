@@ -41,15 +41,15 @@ public class EmptyResourcesArscTest {
         sTestNewDir = new ExtFile(sTmpDir, "issue1730-new");
         LOGGER.info("Unpacking issue1730.apk...");
         TestUtils.copyResourceDir(EmptyResourcesArscTest.class, "aapt1/issue1730", sTestOrigDir);
+        Config config = Config.getDefaultConfig();
 
         File testApk = new File(sTestOrigDir, "issue1730.apk");
 
         LOGGER.info("Decoding issue1730.apk...");
-        ApkDecoder apkDecoder = new ApkDecoder(testApk);
+        ApkDecoder apkDecoder = new ApkDecoder(config, testApk);
         apkDecoder.decode(sTestNewDir);
 
         LOGGER.info("Building issue1730.apk...");
-        Config config = Config.getDefaultConfig();
         new ApkBuilder(config, sTestNewDir).build(testApk);
     }
 
