@@ -16,13 +16,15 @@
  */
 package brut.androlib;
 
+import com.android.tools.smali.baksmali.BaksmaliOptions;
+
 import brut.androlib.exceptions.AndrolibException;
 import brut.util.OSDetection;
 
 import java.io.File;
 import java.util.logging.Logger;
 
-public class Config {
+public class Config extends BaksmaliOptions {
     private final static Logger LOGGER = Logger.getLogger(Config.class.getName());
 
     public final static short DECODE_SOURCES_NONE = 0x0000;
@@ -59,13 +61,17 @@ public class Config {
     public boolean analysisMode = false;
     public boolean forceDelete = false;
     public boolean keepBrokenResources = false;
-    public boolean baksmaliDebugMode = true;
+    public boolean resolveResources = false;
 
     // Common options
     public String frameworkDirectory = null;
     public String frameworkTag = null;
     public String aaptPath = "";
     public int aaptVersion = 1; // default to v1
+    public File outDir = null;
+    public String dexFile = null;
+    public File apkFile = null;
+    public String fileName = "";
 
     // Utility functions
     public boolean isAapt2() {

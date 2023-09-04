@@ -52,7 +52,7 @@ public class DexStaticFieldValueTest extends BaseTest {
         new ApkBuilder(config, sTestOrigDir).build(testApk);
 
         LOGGER.info("Decoding issue2543.apk...");
-        config.baksmaliDebugMode = false;
+        config.debugInfo = false;
         ApkDecoder apkDecoder = new ApkDecoder(config, new ExtFile(testApk));
         apkDecoder.decode(sTestNewDir);
     }

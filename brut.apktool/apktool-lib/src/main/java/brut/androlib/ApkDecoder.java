@@ -216,8 +216,7 @@ public class ApkDecoder {
             //noinspection ResultOfMethodCallIgnored
             smaliDir.mkdirs();
             LOGGER.info("Baksmaling " + filename + "...");
-            DexFile dexFile = SmaliDecoder.decode(mApkInfo.getApkFile(), smaliDir, filename,
-                mConfig.baksmaliDebugMode, mConfig.apiLevel);
+            DexFile dexFile = SmaliDecoder.decode(mApkInfo.getApkFile(), smaliDir, filename, mConfig);
             int minSdkVersion = dexFile.getOpcodes().api;
             if (mMinSdkVersion == 0 || mMinSdkVersion > minSdkVersion) {
                 mMinSdkVersion = minSdkVersion;

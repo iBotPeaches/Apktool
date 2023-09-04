@@ -17,48 +17,59 @@
 package brut.androlib.src;
 
 import brut.androlib.exceptions.AndrolibException;
-import com.android.tools.smali.baksmali.Baksmali;
-import com.android.tools.smali.baksmali.BaksmaliOptions;
+import com.android.tools.smali.baksmali.Adaptors.ClassDefinition;
+import com.android.tools.smali.baksmali.formatter.BaksmaliWriter;
 import com.android.tools.smali.dexlib2.DexFileFactory;
 import com.android.tools.smali.dexlib2.Opcodes;
 import com.android.tools.smali.dexlib2.dexbacked.DexBackedDexFile;
 import com.android.tools.smali.dexlib2.dexbacked.DexBackedOdexFile;
 import com.android.tools.smali.dexlib2.analysis.InlineMethodResolver;
+import com.android.tools.smali.dexlib2.iface.ClassDef;
 import com.android.tools.smali.dexlib2.iface.DexFile;
 import com.android.tools.smali.dexlib2.iface.MultiDexContainer;
+import com.android.tools.smali.util.ClassFileNameHandler;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Ordering;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.logging.Logger;
+
+import javax.annotation.Nullable;
+
+import brut.androlib.Config;
 
 public class SmaliDecoder {
 
-    public static DexFile decode(File apkFile, File outDir, String dexName, boolean bakDeb, int apiLevel)
+    Config config;
+    private final static Logger LOGGER = Logger.getLogger(SmaliDecoder.class.getName());
+
+    public static DexFile decode(File apkFile, File outDir, String dexName, Config mConfig)
             throws AndrolibException {
-        return new SmaliDecoder(apkFile, outDir, dexName, bakDeb, apiLevel).decode();
+        return new SmaliDecoder(apkFile, outDir, dexName, mConfig).decode();
     }
 
-    private SmaliDecoder(File apkFile, File outDir, String dexName, boolean bakDeb, int apiLevel) {
-        mApkFile = apkFile;
-        mOutDir = outDir;
-        mDexFile = dexName;
-        mBakDeb = bakDeb;
-        mApiLevel = apiLevel;
+    private SmaliDecoder(File mApkFile, File mOutDir, String mDexName, Config mConfig) {
+        config = mConfig;
+        config.dexFile = mDexName;
+        config.apkFile = mApkFile;
+        config.outDir = mOutDir;
     }
 
     private DexFile decode() throws AndrolibException {
         try {
-            final BaksmaliOptions options = new BaksmaliOptions();
-
             // options
-            options.deodex = false;
-            options.implicitReferences = false;
-            options.parameterRegisters = true;
-            options.localsDirective = true;
-            options.sequentialLabels = true;
-            options.debugInfo = mBakDeb;
-            options.codeOffsets = false;
-            options.accessorComments = false;
-            options.registerInfo = 0;
-            options.inlineResolver = null;
+            config.deodex = false;
+            config.implicitReferences = false;
+            config.parameterRegisters = true;
+            config.localsDirective = true;
+            config.sequentialLabels = true;
+            config.codeOffsets = false;
+            config.accessorComments = false;
+            config.registerInfo = 0;
+            config.inlineResolver = null;
 
             // set jobs automatically
             int jobs = Runtime.getRuntime().availableProcessors();
@@ -68,7 +79,7 @@ public class SmaliDecoder {
 
             // create the container
             MultiDexContainer<? extends DexBackedDexFile> container =
-                    DexFileFactory.loadDexContainer(mApkFile, mApiLevel > 0 ? Opcodes.forApi(mApiLevel) : null);
+                    DexFileFactory.loadDexContainer(config.apkFile, config.apiLevel > 0 ? Opcodes.forApi(config.apiLevel) : null);
             MultiDexContainer.DexEntry<? extends DexBackedDexFile> dexEntry;
             DexBackedDexFile dexFile;
 
@@ -76,7 +87,7 @@ public class SmaliDecoder {
             if (container.getDexEntryNames().size() == 1) {
                 dexEntry = container.getEntry(container.getDexEntryNames().get(0));
             } else {
-                dexEntry = container.getEntry(mDexFile);
+                dexEntry = container.getEntry(config.dexFile);
             }
 
             // Double-check the passed param exists
@@ -92,11 +103,13 @@ public class SmaliDecoder {
             }
 
             if (dexFile instanceof DexBackedOdexFile) {
-                options.inlineResolver =
+                config.inlineResolver =
                         InlineMethodResolver.createInlineMethodResolver(((DexBackedOdexFile)dexFile).getOdexVersion());
             }
 
-            Baksmali.disassembleDexFile(dexFile, mOutDir, jobs, options);
+            if (config.resolveResources)
+                LOGGER.info("Parsing resource ids in " + config.dexFile + "...");
+            disassembleDexFile(dexFile, config.outDir, jobs, config);
 
             return dexFile;
         } catch (IOException ex) {
@@ -104,9 +117,120 @@ public class SmaliDecoder {
         }
     }
 
-    private final File mApkFile;
-    private final File mOutDir;
-    private final String mDexFile;
-    private final boolean mBakDeb;
-    private final int mApiLevel;
+    public static boolean disassembleDexFile(DexFile dexFile, File outputDir, int jobs, final Config config) {
+        return disassembleDexFile(dexFile, outputDir, jobs, config, null);
+    }
+
+    public static boolean disassembleDexFile(DexFile dexFile, File outputDir, int jobs, final Config config,
+                                             @Nullable List<String> classes) {
+
+        List<? extends ClassDef> classDefs = Ordering.natural().sortedCopy(dexFile.getClasses());
+
+        final ClassFileNameHandler fileNameHandler = new ClassFileNameHandler(outputDir, ".smali");
+
+        ExecutorService executor = Executors.newFixedThreadPool(jobs);
+        List<Future<Boolean>> tasks = Lists.newArrayList();
+
+        Set<String> classSet = null;
+        if (classes != null) {
+            classSet = new HashSet<String>(classes);
+        }
+
+        for (final ClassDef classDef: classDefs) {
+            if (classSet != null && !classSet.contains(classDef.getType())) {
+                continue;
+            }
+            tasks.add(executor.submit(new Callable<Boolean>() {
+                @Override public Boolean call() throws Exception {
+                    return disassembleClass(classDef, fileNameHandler, config);
+                }
+            }));
+        }
+
+        boolean errorOccurred = false;
+        try {
+            for (Future<Boolean> task: tasks) {
+                while(true) {
+                    try {
+                        if (!task.get()) {
+                            errorOccurred = true;
+                        }
+                    } catch (InterruptedException ex) {
+                        continue;
+                    } catch (ExecutionException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                    break;
+                }
+            }
+        } finally {
+            executor.shutdown();
+        }
+        return !errorOccurred;
+    }
+
+    private static boolean disassembleClass(ClassDef classDef, ClassFileNameHandler fileNameHandler,
+                                            Config config) {
+        String classDescriptor = classDef.getType();
+
+        if (classDescriptor.charAt(0) != 'L' ||
+                classDescriptor.charAt(classDescriptor.length()-1) != ';') {
+            System.err.println("Unrecognized class descriptor - " + classDescriptor + " - skipping class");
+            return false;
+        }
+
+        File smaliFile = null;
+        try {
+            smaliFile = fileNameHandler.getUniqueFilenameForClass(classDescriptor);
+        } catch (IOException ex) {
+            System.err.println("\n\nError occurred while creating file for class " + classDescriptor);
+            ex.printStackTrace();
+            return false;
+        }
+
+        ClassDefinition classDefinition = new ClassDefinition(config, classDef);
+
+        BaksmaliWriter writer = null;
+        try {
+            File smaliParent = smaliFile.getParentFile();
+            if (!smaliParent.exists()) {
+                if (!smaliParent.mkdirs()) {
+                    if (!smaliParent.exists()) {
+                        System.err.println("Unable to create directory " + smaliParent.toString() + " - skipping class");
+                        return false;
+                    }
+                }
+            }
+
+            if (!smaliFile.exists()){
+                if (!smaliFile.createNewFile()) {
+                    System.err.println("Unable to create file " + smaliFile.toString() + " - skipping class");
+                    return false;
+                }
+            }
+
+            BufferedWriter bufWriter = new BufferedWriter(new OutputStreamWriter(
+                    new FileOutputStream(smaliFile), StandardCharsets.UTF_8));
+
+            writer = new BaksmaliWriter(
+                    bufWriter,
+                    config.implicitReferences ? classDef.getType() : null);
+            classDefinition.writeTo(writer);
+        } catch (Exception ex) {
+            System.err.println("\n\nError occurred while disassembling class " + classDescriptor.replace('/', '.') + " - skipping class");
+            ex.printStackTrace();
+            smaliFile.delete();
+            return false;
+        } finally {
+            if (writer != null) {
+                try {
+                    writer.close();
+                } catch (Throwable ex) {
+                    System.err.println("\n\nError occurred while closing file " + smaliFile.toString());
+                    ex.printStackTrace();
+                }
+            }
+        }
+        return true;
+    }
 }
