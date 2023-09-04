@@ -70,6 +70,10 @@ public class ResTable {
         return mConfig.analysisMode;
     }
 
+    public Config getConfig() {
+        return mConfig;
+    }
+
     public boolean isMainPkgLoaded() {
         return mMainPkgLoaded;
     }
