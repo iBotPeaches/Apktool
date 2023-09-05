@@ -118,7 +118,7 @@ public class ARSCDecoder {
             }
         }
 
-        if (mResTable.getConfig().useDummyResources() && mPkg != null && mPkg.getResSpecCount() > 0) {
+        if (mResTable.getConfig().isDecodeResolveModeUsingDummies() && mPkg != null && mPkg.getResSpecCount() > 0) {
             addMissingResSpecs();
         }
 

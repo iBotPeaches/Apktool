@@ -78,11 +78,11 @@ public class Config {
         return this.useAapt2 || this.aaptVersion == 2;
     }
 
-    public boolean useDummyResources() {
+    public boolean isDecodeResolveModeUsingDummies() {
         return decodeResolveMode == DECODE_RES_RESOLVE_DUMMY;
     }
 
-    public boolean isRemoveResolveMode() {
+    public boolean isDecodeResolveModeRemoving() {
         return decodeResolveMode == DECODE_RES_RESOLVE_REMOVE;
     }
 

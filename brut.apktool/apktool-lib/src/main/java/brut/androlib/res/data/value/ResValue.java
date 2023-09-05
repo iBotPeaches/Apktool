@@ -20,6 +20,6 @@ import brut.androlib.Config;
 
 public class ResValue {
     public boolean shouldRemoveUnknownRes() {
-        return Config.getInstance().isRemoveResolveMode();
+        return Config.getInstance().isDecodeResolveModeRemoving();
     }
 }
