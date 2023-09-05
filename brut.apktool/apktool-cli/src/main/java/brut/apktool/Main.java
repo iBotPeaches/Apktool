@@ -173,13 +173,21 @@ public class Main {
                 mode = cli.getOptionValue("resolve-resources-mode");
             }
             switch (mode) {
-                case "remove", "delete" -> config.setDecodeResolveMode(Config.DECODE_RES_RESOLVE_REMOVE);
-                case "dummy", "dummies" -> config.setDecodeResolveMode(Config.DECODE_RES_RESOLVE_DUMMY);
-                case "keep", "leave" -> config.setDecodeResolveMode(Config.DECODE_RES_RESOLVE_RETAIN);
-                default -> {
+                case "remove":
+                case "delete":
+                    config.setDecodeResolveMode(Config.DECODE_RES_RESOLVE_REMOVE);
+                    break;
+                case "dummy":
+                case "dummies":
+                    config.setDecodeResolveMode(Config.DECODE_RES_RESOLVE_DUMMY);
+                    break;
+                case "keep":
+                case "leave":
+                    config.setDecodeResolveMode(Config.DECODE_RES_RESOLVE_RETAIN);
+                    break;
+                default:
                     System.err.println("Unknown resolve resources mode: " + mode);
                     System.exit(1);
-                }
             }
         }
 
