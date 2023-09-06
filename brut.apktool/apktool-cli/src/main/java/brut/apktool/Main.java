@@ -187,6 +187,7 @@ public class Main {
                     break;
                 default:
                     System.err.println("Unknown resolve resources mode: " + mode);
+                    System.err.println("Expect: 'remove', 'dummy' or 'keep'.");
                     System.exit(1);
             }
         }
@@ -430,9 +431,9 @@ public class Main {
                 .desc("Skip changes detection and build all files.")
                 .build();
 
-        Option resolveResModeOption = Option.builder("res-mode")
+        Option resolveResModeOption = Option.builder("resm")
                 .longOpt("resolve-resources-mode")
-                .desc("Sets the resolve resources mode. Possible values are: 'remove' (default), 'dummy' or 'leave'.")
+                .desc("Sets the resolve resources mode. Possible values are: 'remove' (default), 'dummy' or 'keep'.")
                 .hasArg(true)
                 .argName("mode")
                 .build();
