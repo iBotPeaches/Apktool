@@ -32,7 +32,7 @@ public class FlagItem {
     public String getValue() throws AndrolibException {
         if (value == null) {
             if (ref.referentIsNull()) {
-                return "@null";
+                return String.format("APKTOOL_MISSING_0x%08x", ref.getRawIntValue());
             }
             value = ref.getReferent().getName();
         }
