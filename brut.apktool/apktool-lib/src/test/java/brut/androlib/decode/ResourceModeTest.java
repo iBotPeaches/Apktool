@@ -27,6 +27,8 @@ import java.io.File;
 import java.io.IOException;
 
 import org.junit.*;
+import org.w3c.dom.Document;
+
 import static org.junit.Assert.*;
 
 public class ResourceModeTest extends BaseTest {
@@ -51,13 +53,88 @@ public class ResourceModeTest extends BaseTest {
         config.setDecodeResolveMode(Config.DECODE_RES_RESOLVE_REMOVE);
 
         // decode issue2836.apk
-        ApkDecoder apkDecoder = new ApkDecoder(new File(sTmpDir + File.separator + apk));
-        sTestOrigDir = new ExtFile(sTmpDir + File.separator + apk + ".out");
+        ApkDecoder apkDecoder = new ApkDecoder(config, new File(sTmpDir + File.separator + apk));
+        sTestOrigDir = new ExtFile(sTmpDir + File.separator + apk + "remove.out");
 
-        File outDir = new File(sTmpDir + File.separator + apk + ".out");
+        File outDir = new File(sTmpDir + File.separator + apk + "remove.out");
         apkDecoder.decode(outDir);
 
         File stringsXml =  new File(sTestOrigDir,"res/values/strings.xml");
         assertTrue(stringsXml.isFile());
+
+        File attrXml =  new File(sTestOrigDir,"res/values/attrs.xml");
+        Document attrDocument = TestUtils.getDocumentFromFile(attrXml);
+        assertEquals(3, attrDocument.getElementsByTagName("enum").getLength());
+
+        File colorXml =  new File(sTestOrigDir,"res/values/colors.xml");
+        Document colorDocument = TestUtils.getDocumentFromFile(colorXml);
+        assertEquals(8, colorDocument.getElementsByTagName("color").getLength());
+        assertEquals(0, colorDocument.getElementsByTagName("item").getLength());
+
+        File publicXml =  new File(sTestOrigDir,"res/values/public.xml");
+        Document publicDocument = TestUtils.getDocumentFromFile(publicXml);
+        assertEquals(21, publicDocument.getElementsByTagName("public").getLength());
+    }
+
+    @Test
+    public void checkDecodingModeAsDummies() throws BrutException, IOException {
+        String apk = "issue2836.apk";
+
+        Config config = Config.getDefaultConfig();
+        config.setDecodeResolveMode(Config.DECODE_RES_RESOLVE_DUMMY);
+
+        // decode issue2836.apk
+        ApkDecoder apkDecoder = new ApkDecoder(config, new File(sTmpDir + File.separator + apk));
+        sTestOrigDir = new ExtFile(sTmpDir + File.separator + apk + "dummies.out");
+
+        File outDir = new File(sTmpDir + File.separator + apk + "dummies.out");
+        apkDecoder.decode(outDir);
+
+        File stringsXml =  new File(sTestOrigDir,"res/values/strings.xml");
+        assertTrue(stringsXml.isFile());
+
+        File attrXml =  new File(sTestOrigDir,"res/values/attrs.xml");
+        Document attrDocument = TestUtils.getDocumentFromFile(attrXml);
+        assertEquals(4, attrDocument.getElementsByTagName("enum").getLength());
+
+        File colorXml =  new File(sTestOrigDir,"res/values/colors.xml");
+        Document colorDocument = TestUtils.getDocumentFromFile(colorXml);
+        assertEquals(8, colorDocument.getElementsByTagName("color").getLength());
+        assertEquals(1, colorDocument.getElementsByTagName("item").getLength());
+
+        File publicXml =  new File(sTestOrigDir,"res/values/public.xml");
+        Document publicDocument = TestUtils.getDocumentFromFile(publicXml);
+        assertEquals(22, publicDocument.getElementsByTagName("public").getLength());
+    }
+
+    @Test
+    public void checkDecodingModeAsLeave() throws BrutException, IOException {
+        String apk = "issue2836.apk";
+
+        Config config = Config.getDefaultConfig();
+        config.setDecodeResolveMode(Config.DECODE_RES_RESOLVE_RETAIN);
+
+        // decode issue2836.apk
+        ApkDecoder apkDecoder = new ApkDecoder(config, new File(sTmpDir + File.separator + apk));
+        sTestOrigDir = new ExtFile(sTmpDir + File.separator + apk + "leave.out");
+
+        File outDir = new File(sTmpDir + File.separator + apk + "leave.out");
+        apkDecoder.decode(outDir);
+
+        File stringsXml =  new File(sTestOrigDir,"res/values/strings.xml");
+        assertTrue(stringsXml.isFile());
+
+        File attrXml =  new File(sTestOrigDir,"res/values/attrs.xml");
+        Document attrDocument = TestUtils.getDocumentFromFile(attrXml);
+        assertEquals(4, attrDocument.getElementsByTagName("enum").getLength());
+
+        File colorXml =  new File(sTestOrigDir,"res/values/colors.xml");
+        Document colorDocument = TestUtils.getDocumentFromFile(colorXml);
+        assertEquals(8, colorDocument.getElementsByTagName("color").getLength());
+        assertEquals(0, colorDocument.getElementsByTagName("item").getLength());
+
+        File publicXml =  new File(sTestOrigDir,"res/values/public.xml");
+        Document publicDocument = TestUtils.getDocumentFromFile(publicXml);
+        assertEquals(21, publicDocument.getElementsByTagName("public").getLength());
     }
 }
