@@ -432,7 +432,7 @@ public class Main {
                 .build();
 
         Option resolveResModeOption = Option.builder("resm")
-                .longOpt("resolve-resources-mode")
+                .longOpt("resource-mode")
                 .desc("Sets the resolve resources mode. Possible values are: 'remove' (default), 'dummy' or 'keep'.")
                 .hasArg(true)
                 .argName("mode")
