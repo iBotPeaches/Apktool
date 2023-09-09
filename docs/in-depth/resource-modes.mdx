@@ -1,0 +1,132 @@
+---
+title: Resource Modes
+sidebar_position: 3
+---
+
+Introduced in Apktool v2.9.0 added configuration for how Apktool decides to handle unresolved resources during disassembly.
+
+## Background
+
+Given an application you could leverage aapt (`aapt d resources app.apk`) to get a view of the resources in play.
+
+```text
+➜ aapt d resources bugged.apk
+Package Groups (1)
+Package Group 0 id=0x7f packageCount=1 name=com.ibotpeaches.arsctest
+  Package 0 id=0x7f name=com.ibotpeaches.arsctest
+    type 0 configCount=1 entryCount=10
+      spec resource 0x7f010000 com.ibotpeaches.arsctest:color/black: flags=0x00000000
+      spec resource 0x7f010001 com.ibotpeaches.arsctest:color/purple_200: flags=0x00000000
+      spec resource 0x7f010002 com.ibotpeaches.arsctest:color/purple_500: flags=0x00000000
+      spec resource 0x7f010003 com.ibotpeaches.arsctest:color/purple_700: flags=0x00000000
+      spec resource 0x7f010004 com.ibotpeaches.arsctest:color/teal_200: flags=0x00000000
+      spec resource 0x7f010005 com.ibotpeaches.arsctest:color/teal_700: flags=0x00000000
+      spec resource 0x7f010006 com.ibotpeaches.arsctest:color/white: flags=0x00000000
+      INVALID TYPE CONFIG FOR RESOURCE 0x7f010007
+      INVALID TYPE CONFIG FOR RESOURCE 0x7f010008
+      spec resource 0x7f010009 com.ibotpeaches.arsctest:color/bugged: flags=0x00000000
+```
+
+In this example you can see the following two resources had issues being resolved:
+
+- `0x7f010007`
+- `0x7f010008`
+
+The problem being though that the message exposed to end user is just a wrapper of the underlying issue, which could be one of the following:
+
+- No package found for resource.
+- No type found for resource.
+- Invalid identifier for resource name.
+- Invalid UTF-8 index during unpack of strings.
+- Invalid UTF-16 index during unpack of strings.
+- Entry not found for resource.
+
+So basically it is difficult to understand the exact reason this occurs.
+
+## History
+
+Apktool prior to being able to keep resource ids static - would intentionally make dummy resources for any of these issues.
+
+These would be resources like:
+
+```xml
+<item type="color" name="APKTOOL_DUMMY_7f010007" />
+<item type="color" name="APKTOOL_DUMMY_7f010008" />
+```
+
+So when the resource table was built - the ids would not shift as dummy resources filled all locations in which resources did not disassemble properly.
+
+Over time, this became unneeded because resource ids were kept static at the cost of turning them public. Something that continues to bite us in the increasing
+security of Android to this day.
+
+Additionally, this became a bit of a problem because Apktool would unintentionally fingerprint applications with dummy resources. In 2019 this was noticed
+when a large company used Apktool in order to rename their package and republish to the store. This post can be found [here](https://connortumbleson.com/2019/06/02/apktool-in-the-wild/).
+
+So unintentionally dummy resources just broke during the support of sparse resources and people didn't really notice. This was a good thing, but it led to
+some odd issues that were previously handled.
+
+Given an example like follows:
+
+```xml
+<attr name="actionBarSize" format="dimension">
+    <enum name="@null" value="0" />
+</attr>
+```
+
+This is how Apktool disassembled an unknown application during the v2.8.x release cycle. This was improper as an unresolved resource name cannot be `@null`.
+
+However, would replacing this with a dummy resource be better?
+
+```xml
+<attr name="actionBarSize" formats="dimension">
+    <enum name="APKTOOL_DUMMY_0x7f090459" value="0" />
+</attr>
+```
+
+You could argue it was better, but chances are if you are disassembling a resource with no references to this attribute - it would seem odd to invent a dummy resource to fulfill it.
+
+So it seemed another alternative was to just remove unresolved resources.
+
+```xml
+<attr name="actionBarSize" formats="dimension"/>
+```
+
+The challenge here that every single use-case might prefer a different option.
+
+## Modes
+
+During disassembly run `-resm <mode>` to set the mode for how Apktool should handle unresolved resources.
+
+### Remove (default)
+
+- `remove` | `delete`
+
+Apktool will remove any unresolved resource. This is the default behavior.
+
+```xml
+<attr name="actionBarSize" formats="dimension"/>
+```
+
+### Dummy
+
+- `dummy` | `dummies`
+
+Apktool will populate unresolved resources with dummy values.
+
+```xml
+<attr name="actionBarSize" formats="dimension">
+    <enum name="APKTOOL_DUMMY_0x7f090459" value="0" />
+</attr>
+```
+
+### Keep
+
+- `keep` | `preserve`
+
+Apktool will leave resources, but properly make up valid resource names if the name was stripped.
+
+```xml
+<attr name="actionBarSize" format="dimension">
+    <enum name="resUnk0x7f090459" value="0" />
+</attr>
+```

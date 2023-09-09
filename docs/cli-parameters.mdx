@@ -17,7 +17,7 @@ _Options used for utility commands (`apktool {options}`)_
 -version, --version
 ```
 
-- Outputs current version. (Ex: 1.5.2
+- Outputs current version. (Ex: 1.5.2)
 
 ### Decoding Options
 
@@ -83,6 +83,15 @@ _Options used for decoding commands (`apktool d file.apk {options}`)_
 ```
 
 - This will prevent the decompile of resources. This keeps the `resources.arsc`
+
+```
+-resm,--resource-mode <mode>
+```
+
+- The mode to use when resolving resources. Presently supported options are:
+  - `remove` (default) - Remove resources that cannot be resolved.
+  - `dummy` - Add a dummy resource for resources that cannot be resolved.
+  - `keep` - Keep unresolved resources using `APKTOOL_MISSING_{resId}` nomenclature.
 
 ```
 -s, --no-src
