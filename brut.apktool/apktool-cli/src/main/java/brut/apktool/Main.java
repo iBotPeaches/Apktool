@@ -55,7 +55,7 @@ public class Main {
         CommandLine commandLine;
 
         // load options
-        _Options();
+        _options();
 
         try {
             commandLine = parser.parse(allOptions, args, false);
@@ -324,7 +324,7 @@ public class Main {
         System.out.println(ApktoolProperties.getVersion());
     }
 
-    private static void _Options() {
+    private static void _options() {
         Option versionOption = Option.builder("version")
                 .longOpt("version")
                 .desc("Print the version.")
@@ -578,7 +578,7 @@ public class Main {
     }
 
     private static void usage() {
-        _Options();
+        _options();
         HelpFormatter formatter = new HelpFormatter();
         formatter.setWidth(120);
 
