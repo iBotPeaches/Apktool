@@ -93,19 +93,6 @@ public class ApkDecoder {
 
             LOGGER.info("Using Apktool " + ApktoolProperties.getVersion() + " on " + mApkInfo.apkFileName);
 
-            if (mConfig.resolveResources) {
-                ResTable mResTable = new ResTable(mConfig, new ApkInfo(apkFile));
-	            ResPackage pkg = mResTable.getPackage(1);
-
-    	        LOGGER.info("Parsing framework resource ids...");
-                for (ResResSpec spec : pkg.listResSpecs()) {
-                    String resourceId = String.format("0x%08x", spec.getId().id);
-
-                    String qualifiedResourceName = String.format("Android.%s.%s", spec.getType().getName(), spec.getName());
-                    mConfig.resourceIds.put(Integer.decode(resourceId), qualifiedResourceName);
-                }
-            }
-
             ResourcesDecoder resourcesDecoder = new ResourcesDecoder(mConfig, mApkInfo);
 
             if (mApkInfo.hasResources()) {

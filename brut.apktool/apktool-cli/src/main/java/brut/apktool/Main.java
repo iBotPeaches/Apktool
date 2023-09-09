@@ -147,7 +147,7 @@ public class Main {
             System.exit(1);
         }
         if (cli.hasOption("b") || cli.hasOption("no-debug-info")) {
-            config.debugInfo = false;
+            config.options.debugInfo = false;
         }
         if (cli.hasOption("f") || cli.hasOption("force")) {
             config.forceDelete = true;

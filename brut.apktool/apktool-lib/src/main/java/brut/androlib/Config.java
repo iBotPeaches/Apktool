@@ -24,7 +24,7 @@ import brut.util.OSDetection;
 import java.io.File;
 import java.util.logging.Logger;
 
-public class Config extends BaksmaliOptions {
+public class Config {
     private final static Logger LOGGER = Logger.getLogger(Config.class.getName());
 
     public final static short DECODE_SOURCES_NONE = 0x0000;
@@ -39,6 +39,8 @@ public class Config extends BaksmaliOptions {
 
     public final static short DECODE_ASSETS_NONE = 0x0000;
     public final static short DECODE_ASSETS_FULL = 0x0001;
+
+    public BaksmaliOptions options = new BaksmaliOptions();
 
     // Build options
     public boolean forceBuildAll = false;

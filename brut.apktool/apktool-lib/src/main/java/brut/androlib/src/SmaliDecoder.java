@@ -19,6 +19,7 @@ package brut.androlib.src;
 import brut.androlib.exceptions.AndrolibException;
 import com.android.tools.smali.baksmali.Adaptors.ClassDefinition;
 import com.android.tools.smali.baksmali.formatter.BaksmaliWriter;
+import com.android.tools.smali.baksmali.BaksmaliOptions;
 import com.android.tools.smali.dexlib2.DexFileFactory;
 import com.android.tools.smali.dexlib2.Opcodes;
 import com.android.tools.smali.dexlib2.dexbacked.DexBackedDexFile;
@@ -61,15 +62,15 @@ public class SmaliDecoder {
     private DexFile decode() throws AndrolibException {
         try {
             // options
-            config.deodex = false;
-            config.implicitReferences = false;
-            config.parameterRegisters = true;
-            config.localsDirective = true;
-            config.sequentialLabels = true;
-            config.codeOffsets = false;
-            config.accessorComments = false;
-            config.registerInfo = 0;
-            config.inlineResolver = null;
+            config.options.deodex = false;
+            config.options.implicitReferences = false;
+            config.options.parameterRegisters = true;
+            config.options.localsDirective = true;
+            config.options.sequentialLabels = true;
+            config.options.codeOffsets = false;
+            config.options.accessorComments = false;
+            config.options.registerInfo = 0;
+            config.options.inlineResolver = null;
 
             // set jobs automatically
             int jobs = Runtime.getRuntime().availableProcessors();
@@ -103,13 +104,13 @@ public class SmaliDecoder {
             }
 
             if (dexFile instanceof DexBackedOdexFile) {
-                config.inlineResolver =
+                config.options.inlineResolver =
                         InlineMethodResolver.createInlineMethodResolver(((DexBackedOdexFile)dexFile).getOdexVersion());
             }
 
             if (config.resolveResources)
                 LOGGER.info("Parsing resource ids in " + config.dexFile + "...");
-            disassembleDexFile(dexFile, config.outDir, jobs, config);
+            disassembleDexFile(dexFile, config.outDir, jobs, config.options);
 
             return dexFile;
         } catch (IOException ex) {
@@ -117,11 +118,11 @@ public class SmaliDecoder {
         }
     }
 
-    public static boolean disassembleDexFile(DexFile dexFile, File outputDir, int jobs, final Config config) {
-        return disassembleDexFile(dexFile, outputDir, jobs, config, null);
+    public static boolean disassembleDexFile(DexFile dexFile, File outputDir, int jobs, final BaksmaliOptions options) {
+        return disassembleDexFile(dexFile, outputDir, jobs, options, null);
     }
 
-    public static boolean disassembleDexFile(DexFile dexFile, File outputDir, int jobs, final Config config,
+    public static boolean disassembleDexFile(DexFile dexFile, File outputDir, int jobs, final BaksmaliOptions options,
                                              @Nullable List<String> classes) {
 
         List<? extends ClassDef> classDefs = Ordering.natural().sortedCopy(dexFile.getClasses());
@@ -142,7 +143,7 @@ public class SmaliDecoder {
             }
             tasks.add(executor.submit(new Callable<Boolean>() {
                 @Override public Boolean call() throws Exception {
-                    return disassembleClass(classDef, fileNameHandler, config);
+                    return disassembleClass(classDef, fileNameHandler, options);
                 }
             }));
         }
@@ -170,7 +171,7 @@ public class SmaliDecoder {
     }
 
     private static boolean disassembleClass(ClassDef classDef, ClassFileNameHandler fileNameHandler,
-                                            Config config) {
+                                            BaksmaliOptions options) {
         String classDescriptor = classDef.getType();
 
         if (classDescriptor.charAt(0) != 'L' ||
@@ -188,7 +189,7 @@ public class SmaliDecoder {
             return false;
         }
 
-        ClassDefinition classDefinition = new ClassDefinition(config, classDef);
+        ClassDefinition classDefinition = new ClassDefinition(options, classDef);
 
         BaksmaliWriter writer = null;
         try {
@@ -214,7 +215,7 @@ public class SmaliDecoder {
 
             writer = new BaksmaliWriter(
                     bufWriter,
-                    config.implicitReferences ? classDef.getType() : null);
+                    options.implicitReferences ? classDef.getType() : null);
             classDefinition.writeTo(writer);
         } catch (Exception ex) {
             System.err.println("\n\nError occurred while disassembling class " + classDescriptor.replace('/', '.') + " - skipping class");

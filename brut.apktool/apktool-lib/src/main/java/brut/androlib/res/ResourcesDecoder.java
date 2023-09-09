@@ -226,18 +226,29 @@ public class ResourcesDecoder {
             serial.startDocument(null, null);
             serial.startTag(null, "resources");
 
+            if (mConfig.resolveResources) {
+	            ResPackage frameworkpkg = mResTable.getPackage(1);
+
+                for (ResResSpec spec : frameworkpkg.listResSpecs()) {
+                    String resId = String.format("0x%08x", spec.getId().id);
+
+                    String resourceName = String.format("Android.%s.%s", spec.getType().getName(), spec.getName());
+                    mConfig.options.resourceIds.put(Integer.decode(resId), resourceName);
+                }
+            }
+
             for (ResResSpec spec : pkg.listResSpecs()) {
                 String resourceId = String.format("0x%08x", spec.getId().id);
 
-		serial.startTag(null, "public");
+		        serial.startTag(null, "public");
                 serial.attribute(null, "type", spec.getType().getName());
                 serial.attribute(null, "name", spec.getName());
                 serial.attribute(null, "id", resourceId);
                 serial.endTag(null, "public");
 
-		if (mConfig.resolveResources) {
+		        if (mConfig.resolveResources) {
                     String qualifiedResourceName = String.format("%s.%s.%s", mConfig.fileName, spec.getType().getName(), spec.getName());
-                    mConfig.resourceIds.put(Integer.decode(resourceId), qualifiedResourceName);
+                    mConfig.options.resourceIds.put(Integer.decode(resourceId), qualifiedResourceName);
                 }
             }
 
