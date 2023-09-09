@@ -182,7 +182,7 @@ public class Main {
                     config.setDecodeResolveMode(Config.DECODE_RES_RESOLVE_DUMMY);
                     break;
                 case "keep":
-                case "leave":
+                case "preserve":
                     config.setDecodeResolveMode(Config.DECODE_RES_RESOLVE_RETAIN);
                     break;
                 default:
