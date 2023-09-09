@@ -167,6 +167,30 @@ public class Main {
         if (cli.hasOption("m") || cli.hasOption("match-original")) {
             config.analysisMode = true;
         }
+        if (cli.hasOption("res-mode") || cli.hasOption("resolve-resources-mode")) {
+            String mode = cli.getOptionValue("res-mode");
+            if (mode == null) {
+                mode = cli.getOptionValue("resolve-resources-mode");
+            }
+            switch (mode) {
+                case "remove":
+                case "delete":
+                    config.setDecodeResolveMode(Config.DECODE_RES_RESOLVE_REMOVE);
+                    break;
+                case "dummy":
+                case "dummies":
+                    config.setDecodeResolveMode(Config.DECODE_RES_RESOLVE_DUMMY);
+                    break;
+                case "keep":
+                case "preserve":
+                    config.setDecodeResolveMode(Config.DECODE_RES_RESOLVE_RETAIN);
+                    break;
+                default:
+                    System.err.println("Unknown resolve resources mode: " + mode);
+                    System.err.println("Expect: 'remove', 'dummy' or 'keep'.");
+                    System.exit(1);
+            }
+        }
 
         File outDir;
         if (cli.hasOption("o") || cli.hasOption("output")) {
@@ -301,8 +325,6 @@ public class Main {
     }
 
     private static void _Options() {
-
-        // create options
         Option versionOption = Option.builder("version")
                 .longOpt("version")
                 .desc("Print the version.")
@@ -409,6 +431,13 @@ public class Main {
                 .desc("Skip changes detection and build all files.")
                 .build();
 
+        Option resolveResModeOption = Option.builder("resm")
+                .longOpt("resource-mode")
+                .desc("Sets the resolve resources mode. Possible values are: 'remove' (default), 'dummy' or 'keep'.")
+                .hasArg(true)
+                .argName("mode")
+                .build();
+
         Option aaptOption = Option.builder("a")
                 .longOpt("aapt")
                 .hasArg(true)
@@ -469,6 +498,7 @@ public class Main {
             decodeOptions.addOption(apiLevelOption);
             decodeOptions.addOption(noAssetOption);
             decodeOptions.addOption(forceManOption);
+            decodeOptions.addOption(resolveResModeOption);
 
             buildOptions.addOption(apiLevelOption);
             buildOptions.addOption(debugBuiOption);
@@ -525,6 +555,7 @@ public class Main {
         allOptions.addOption(debugDecOption);
         allOptions.addOption(noDbgOption);
         allOptions.addOption(forceManOption);
+        allOptions.addOption(resolveResModeOption);
         allOptions.addOption(noAssetOption);
         allOptions.addOption(keepResOption);
         allOptions.addOption(debugBuiOption);

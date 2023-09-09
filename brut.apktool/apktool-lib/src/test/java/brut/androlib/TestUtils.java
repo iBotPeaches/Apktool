@@ -18,15 +18,19 @@ package brut.androlib;
 
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.Framework;
+import brut.androlib.res.xml.ResXmlPatcher;
 import brut.common.BrutException;
 import brut.directory.DirUtil;
 import brut.directory.Directory;
 import brut.directory.FileDirectory;
 import brut.util.OS;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -73,6 +77,14 @@ public abstract class TestUtils {
 
             return map;
         } catch (IOException | XmlPullParserException ex) {
+            throw new BrutException(ex);
+        }
+    }
+
+    public static Document getDocumentFromFile(File file) throws BrutException {
+        try {
+            return ResXmlPatcher.loadDocument(file);
+        } catch (ParserConfigurationException | SAXException | IOException ex) {
             throw new BrutException(ex);
         }
     }
