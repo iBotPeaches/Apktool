@@ -91,6 +91,4 @@ public class ResArrayValue extends ResBagValue implements ResValuesXmlSerializab
 
     private final ResScalarValue[] mItems;
     private final String[] AllowedArrayTypes = {"string", "integer"};
-
-    public static final int BAG_KEY_ARRAY_START = 0x02000000;
 }
