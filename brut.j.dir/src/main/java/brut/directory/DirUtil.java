@@ -23,6 +23,7 @@ import brut.common.TraversalUnknownFileException;
 import brut.util.BrutIO;
 import brut.util.OS;
 import java.io.*;
+import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.util.logging.Logger;
 
@@ -96,9 +97,11 @@ public class DirUtil {
                     BrutIO.copyAndClose(in.getFileInput(fileName), Files.newOutputStream(outFile.toPath()));
                 }
             }
-        } catch (RootUnknownFileException | InvalidUnknownFileException | TraversalUnknownFileException exception) {
+        } catch (FileSystemException exception) {
+            LOGGER.warning(String.format("Skipping file %s (%s)", fileName, exception.getReason()));
+        } catch (RootUnknownFileException | InvalidUnknownFileException | TraversalUnknownFileException | IOException exception) {
             LOGGER.warning(String.format("Skipping file %s (%s)", fileName, exception.getMessage()));
-        } catch (IOException | BrutException ex) {
+        } catch (BrutException ex) {
             throw new DirectoryException("Error copying file: " + fileName, ex);
         }
     }

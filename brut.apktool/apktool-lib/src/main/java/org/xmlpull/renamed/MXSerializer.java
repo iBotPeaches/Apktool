@@ -18,11 +18,10 @@ package org.xmlpull.renamed;
 
 import org.xmlpull.v1.XmlSerializer;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
+import java.io.*;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Implementation of XmlSerializer interface from XmlPull V1 API. This
@@ -649,14 +648,24 @@ public class MXSerializer implements XmlSerializer {
 	}
 
 	protected void writeNamespaceDeclarations() throws IOException {
+        Set<String> uniqueNamespaces = new HashSet<>();
 		for (int i = elNamespaceCount[depth - 1]; i < namespaceEnd; i++) {
-			if (doIndent && namespaceUri[i].length() > 40) {
+            String prefix = namespacePrefix[i];
+            String uri = namespaceUri[i];
+
+            // Some applications as seen in #2664 have duplicated namespaces.
+            // AOSP doesn't care, but the parser does. So we filter them out.
+            if (uniqueNamespaces.contains(prefix + uri)) {
+                continue;
+            }
+
+			if (doIndent && uri.length() > 40) {
 				writeIndent();
 				out.write(" ");
 			}
-			if (namespacePrefix[i] != "") {
+			if (prefix != "") {
 				out.write(" xmlns:");
-				out.write(namespacePrefix[i]);
+				out.write(prefix);
 				out.write('=');
 			} else {
 				out.write(" xmlns=");
@@ -664,8 +673,10 @@ public class MXSerializer implements XmlSerializer {
 			out.write(attributeUseApostrophe ? '\'' : '"');
 
 			// NOTE: escaping of namespace value the same way as attributes!!!!
-			writeAttributeValue(namespaceUri[i], out);
+			writeAttributeValue(uri, out);
 			out.write(attributeUseApostrophe ? '\'' : '"');
+
+            uniqueNamespaces.add(prefix + uri);
 		}
 	}
 

@@ -29,8 +29,7 @@ import brut.util.AaptManager;
 import brut.util.OSDetection;
 import org.apache.commons.cli.*;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.logging.*;
 
 /**
@@ -56,7 +55,7 @@ public class Main {
         CommandLine commandLine;
 
         // load options
-        _Options();
+        _options();
 
         try {
             commandLine = parser.parse(allOptions, args, false);
@@ -168,6 +167,30 @@ public class Main {
         if (cli.hasOption("m") || cli.hasOption("match-original")) {
             config.analysisMode = true;
         }
+        if (cli.hasOption("res-mode") || cli.hasOption("resolve-resources-mode")) {
+            String mode = cli.getOptionValue("res-mode");
+            if (mode == null) {
+                mode = cli.getOptionValue("resolve-resources-mode");
+            }
+            switch (mode) {
+                case "remove":
+                case "delete":
+                    config.setDecodeResolveMode(Config.DECODE_RES_RESOLVE_REMOVE);
+                    break;
+                case "dummy":
+                case "dummies":
+                    config.setDecodeResolveMode(Config.DECODE_RES_RESOLVE_DUMMY);
+                    break;
+                case "keep":
+                case "preserve":
+                    config.setDecodeResolveMode(Config.DECODE_RES_RESOLVE_RETAIN);
+                    break;
+                default:
+                    System.err.println("Unknown resolve resources mode: " + mode);
+                    System.err.println("Expect: 'remove', 'dummy' or 'keep'.");
+                    System.exit(1);
+            }
+        }
 
         File outDir;
         if (cli.hasOption("o") || cli.hasOption("output")) {
@@ -235,7 +258,6 @@ public class Main {
             config.aaptPath = cli.getOptionValue("a");
         }
         if (cli.hasOption("c") || cli.hasOption("copy-original")) {
-            System.err.println("-c/--copy-original has been deprecated. Removal planned for v3.0.0 (#2129)");
             config.copyOriginalFiles = true;
         }
         if (cli.hasOption("nc") || cli.hasOption("no-crunch")) {
@@ -302,9 +324,7 @@ public class Main {
         System.out.println(ApktoolProperties.getVersion());
     }
 
-    private static void _Options() {
-
-        // create options
+    private static void _options() {
         Option versionOption = Option.builder("version")
                 .longOpt("version")
                 .desc("Print the version.")
@@ -411,6 +431,13 @@ public class Main {
                 .desc("Skip changes detection and build all files.")
                 .build();
 
+        Option resolveResModeOption = Option.builder("resm")
+                .longOpt("resource-mode")
+                .desc("Sets the resolve resources mode. Possible values are: 'remove' (default), 'dummy' or 'keep'.")
+                .hasArg(true)
+                .argName("mode")
+                .build();
+
         Option aaptOption = Option.builder("a")
                 .longOpt("aapt")
                 .hasArg(true)
@@ -471,6 +498,7 @@ public class Main {
             decodeOptions.addOption(apiLevelOption);
             decodeOptions.addOption(noAssetOption);
             decodeOptions.addOption(forceManOption);
+            decodeOptions.addOption(resolveResModeOption);
 
             buildOptions.addOption(apiLevelOption);
             buildOptions.addOption(debugBuiOption);
@@ -527,6 +555,7 @@ public class Main {
         allOptions.addOption(debugDecOption);
         allOptions.addOption(noDbgOption);
         allOptions.addOption(forceManOption);
+        allOptions.addOption(resolveResModeOption);
         allOptions.addOption(noAssetOption);
         allOptions.addOption(keepResOption);
         allOptions.addOption(debugBuiOption);
@@ -549,13 +578,13 @@ public class Main {
     }
 
     private static void usage() {
-        _Options();
+        _options();
         HelpFormatter formatter = new HelpFormatter();
         formatter.setWidth(120);
 
         // print out license info prior to formatter.
         System.out.println(
-                "Apktool v" + ApktoolProperties.getVersion() + " - a tool for reengineering Android apk files\n" +
+                "Apktool " + ApktoolProperties.getVersion() + " - a tool for reengineering Android apk files\n" +
                         "with smali v" + ApktoolProperties.get("smaliVersion") +
                         " and baksmali v" + ApktoolProperties.get("baksmaliVersion") + "\n" +
                         "Copyright 2010 Ryszard Wiśniewski <brut.alll@gmail.com>\n" +
@@ -579,9 +608,8 @@ public class Main {
         System.out.println();
 
         // print out more information
-        System.out.println(
-                "For additional info, see: https://apktool.org/ \n"
-                        + "For smali/baksmali info, see: https://github.com/google/smali");
+        System.out.println("For additional info, see: https://apktool.org \n"
+            + "For smali/baksmali info, see: https://github.com/google/smali");
     }
 
     private static void setupLogging(final Verbosity verbosity) {
@@ -595,11 +623,18 @@ public class Main {
             return;
         }
 
-        Handler handler = new Handler(){
+        Handler handler = new Handler() {
             @Override
             public void publish(LogRecord record) {
                 if (getFormatter() == null) {
-                    setFormatter(new SimpleFormatter());
+                    setFormatter(new Formatter() {
+                        @Override
+                        public String format(LogRecord record) {
+                            return record.getLevel().toString().charAt(0) + ": "
+                                + record.getMessage()
+                                + System.getProperty("line.separator");
+                        }
+                    });
                 }
 
                 try {
@@ -619,6 +654,7 @@ public class Main {
                     reportError(null, exception, ErrorManager.FORMAT_FAILURE);
                 }
             }
+
             @Override
             public void close() throws SecurityException {}
             @Override
@@ -630,15 +666,6 @@ public class Main {
         if (verbosity == Verbosity.VERBOSE) {
             handler.setLevel(Level.ALL);
             logger.setLevel(Level.ALL);
-        } else {
-            handler.setFormatter(new Formatter() {
-                @Override
-                public String format(LogRecord record) {
-                    return record.getLevel().toString().charAt(0) + ": "
-                            + record.getMessage()
-                            + System.getProperty("line.separator");
-                }
-            });
         }
     }
 

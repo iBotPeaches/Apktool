@@ -20,22 +20,17 @@ import brut.androlib.ApktoolProperties;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.data.ResConfigFlags;
 import brut.directory.DirectoryException;
+import brut.directory.ExtFile;
 import brut.directory.FileDirectory;
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.LoaderOptions;
-import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.introspector.PropertyUtils;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
-public class ApkInfo {
+public class ApkInfo implements YamlSerializable {
+    private transient ExtFile mApkFile;
+
     public String version;
-
-    private String apkFileName;
+    public String apkFileName;
     public boolean isFrameworkApk;
     public UsesFramework usesFramework;
     private Map<String, String> sdkInfo = new LinkedHashMap<>();
@@ -44,34 +39,89 @@ public class ApkInfo {
     public boolean resourcesAreCompressed;
     public boolean sharedLibrary;
     public boolean sparseResources;
-    public Map<String, String> unknownFiles;
-    public Collection<String> doNotCompress;
+    public Map<String, String> unknownFiles = new LinkedHashMap<>();
+    public List<String> doNotCompress;
 
-    /** @deprecated use {@link #resourcesAreCompressed} */
+    /** @Deprecated use {@link #resourcesAreCompressed} */
     public boolean compressionType;
 
     public ApkInfo() {
+        this(null);
+    }
+
+    public ApkInfo(ExtFile apkFile) {
         this.version = ApktoolProperties.getVersion();
+        if (apkFile != null) {
+            setApkFile(apkFile);
+        }
     }
 
-    private static Yaml getYaml() {
-        DumperOptions dumpOptions = new DumperOptions();
-        dumpOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-
-        EscapedStringRepresenter representer = new EscapedStringRepresenter();
-        PropertyUtils propertyUtils = representer.getPropertyUtils();
-        propertyUtils.setSkipMissingProperties(true);
-
-        LoaderOptions loaderOptions = new LoaderOptions();
-        loaderOptions.setCodePointLimit(10 * 1024 * 1024); // 10mb
-
-        return new Yaml(new ClassSafeConstructor(), representer, dumpOptions, loaderOptions);
+    public ExtFile getApkFile() {
+        return mApkFile;
     }
 
-    public void save(Writer output) {
-        DumperOptions options = new DumperOptions();
-        options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-        getYaml().dump(this, output);
+    public void setApkFile(ExtFile apkFile) {
+        mApkFile = apkFile;
+        if (this.apkFileName == null) {
+            this.apkFileName = apkFile.getName();
+        }
+    }
+
+    public boolean hasManifest() throws AndrolibException {
+        if (mApkFile == null) {
+            return false;
+        }
+        try {
+            return mApkFile.getDirectory().containsFile("AndroidManifest.xml");
+        } catch (DirectoryException ex) {
+            throw new AndrolibException(ex);
+        }
+    }
+
+    public boolean hasResources() throws AndrolibException {
+        if (mApkFile == null) {
+            return false;
+        }
+        try {
+            return mApkFile.getDirectory().containsFile("resources.arsc");
+        } catch (DirectoryException ex) {
+            throw new AndrolibException(ex);
+        }
+    }
+
+    public boolean hasSources() throws AndrolibException {
+        if (mApkFile == null) {
+            return false;
+        }
+        try {
+            return mApkFile.getDirectory().containsFile("classes.dex");
+        } catch (DirectoryException ex) {
+            throw new AndrolibException(ex);
+        }
+    }
+
+    public boolean hasMultipleSources() throws AndrolibException {
+        if (mApkFile == null) {
+            return false;
+        }
+        try {
+            Set<String> files = mApkFile.getDirectory().getFiles(false);
+            for (String file : files) {
+                if (file.endsWith(".dex")) {
+                    if (!file.equalsIgnoreCase("classes.dex")) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        } catch (DirectoryException ex) {
+            throw new AndrolibException(ex);
+        }
+    }
+
+    public void addUnknownFileInfo(String file, String value) {
+        unknownFiles.put(file, value);
     }
 
     public String checkTargetSdkVersionBounds() {
@@ -83,14 +133,6 @@ public class ApkInfo {
         target = Math.min(max, target);
         target = Math.max(min, target);
         return Integer.toString(target);
-    }
-
-    public String getApkFileName() {
-        return apkFileName;
-    }
-
-    public void setApkFileName(String apkFileName) {
-        this.apkFileName = apkFileName;
     }
 
     public Map<String, String> getSdkInfo() {
@@ -157,28 +199,109 @@ public class ApkInfo {
         }
     }
 
-    public void save(File file) throws IOException {
-        try(
-                FileOutputStream fos = new FileOutputStream(file);
-                OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
-                Writer writer = new BufferedWriter(outputStreamWriter)
-        ) {
-            save(writer);
+    public void save(File file) throws AndrolibException {
+        try (YamlWriter writer = new YamlWriter(new FileOutputStream(file))) {
+            write(writer);
+        } catch (FileNotFoundException e) {
+            throw new AndrolibException("File not found");
+        } catch (Exception e) {
+            throw new AndrolibException(e);
         }
     }
 
-    public static ApkInfo load(InputStream is) {
-        return getYaml().loadAs(is, ApkInfo.class);
+    public static ApkInfo load(InputStream is) throws AndrolibException {
+        YamlReader reader = new YamlReader(is);
+        ApkInfo apkInfo = new ApkInfo();
+        reader.readRoot(apkInfo);
+        return apkInfo;
     }
 
-    public static ApkInfo load(File appDir)
-        throws AndrolibException {
-        try(
-            InputStream in = new FileDirectory(appDir).getFileInput("apktool.yml")
-        ) {
-            return ApkInfo.load(in);
+    public static ApkInfo load(File appDir) throws AndrolibException {
+        try (InputStream in = new FileDirectory(appDir).getFileInput("apktool.yml")) {
+            ApkInfo apkInfo = ApkInfo.load(in);
+            apkInfo.setApkFile(new ExtFile(appDir));
+            return apkInfo;
         } catch (DirectoryException | IOException ex) {
             throw new AndrolibException(ex);
         }
+    }
+
+    @Override
+    public void readItem(YamlReader reader) throws AndrolibException {
+        YamlLine line = reader.getLine();
+        switch (line.getKey()) {
+            case "version": {
+                this.version = line.getValue();
+                break;
+            }
+            case "apkFileName": {
+                this.apkFileName = line.getValue();
+                break;
+            }
+            case "isFrameworkApk": {
+                this.isFrameworkApk = line.getValueBool();
+                break;
+            }
+            case "usesFramework": {
+                this.usesFramework = new UsesFramework();
+                reader.readObject(usesFramework);
+                break;
+            }
+            case "sdkInfo": {
+                reader.readMap(sdkInfo);
+                break;
+            }
+            case "packageInfo": {
+                this.packageInfo = new PackageInfo();
+                reader.readObject(packageInfo);
+                break;
+            }
+            case "versionInfo": {
+                this.versionInfo = new VersionInfo();
+                reader.readObject(versionInfo);
+                break;
+            }
+            case "compressionType":
+            case "resourcesAreCompressed": {
+                this.resourcesAreCompressed = line.getValueBool();
+                break;
+            }
+            case "sharedLibrary": {
+                this.sharedLibrary = line.getValueBool();
+                break;
+            }
+            case "sparseResources": {
+                this.sparseResources = line.getValueBool();
+                break;
+            }
+            case "unknownFiles": {
+                this.unknownFiles = new LinkedHashMap<>();
+                reader.readMap(unknownFiles);
+                break;
+            }
+            case "doNotCompress": {
+                this.doNotCompress = new ArrayList<>();
+                reader.readStringList(doNotCompress);
+                break;
+            }
+        }
+    }
+
+    @Override
+    public void write(YamlWriter writer) {
+        writer.writeString("version", version);
+        writer.writeString("apkFileName", apkFileName);
+        writer.writeBool("isFrameworkApk", isFrameworkApk);
+        writer.writeObject("usesFramework", usesFramework);
+        writer.writeStringMap("sdkInfo", sdkInfo);
+        writer.writeObject("packageInfo", packageInfo);
+        writer.writeObject("versionInfo", versionInfo);
+        writer.writeBool("resourcesAreCompressed", resourcesAreCompressed);
+        writer.writeBool("sharedLibrary", sharedLibrary);
+        writer.writeBool("sparseResources", sparseResources);
+        if (unknownFiles.size() > 0) {
+            writer.writeStringMap("unknownFiles", unknownFiles);
+        }
+        writer.writeList("doNotCompress", doNotCompress);
     }
 }

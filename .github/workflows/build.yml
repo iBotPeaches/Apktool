@@ -6,7 +6,7 @@ on:
   pull_request:
     paths:
       - '**.java'
-      - '**.gradle'
+      - '**.kts'
       - 'brut.apktool/apktool-lib/src/main/resources/**'
       - 'brut.apktool/apktool-lib/src/test/**'
       - '.github/workflows/**'
@@ -76,7 +76,7 @@ jobs:
           distribution: 'zulu'
           java-version: ${{ matrix.java }}
       - name: Build and test
-        uses: gradle/gradle-build-action@v2.6.1
+        uses: gradle/gradle-build-action@v2.8.0
         with:
           arguments: build shadowJar proguard
 
@@ -88,16 +88,18 @@ jobs:
       - build-and-test-with-Java-8-and-later
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
           java-version: 17
       - name: Build
-        uses: gradle/gradle-build-action@v2.6.1
+        uses: gradle/gradle-build-action@v2.8.0
         with:
           arguments: build shadowJar proguard
       - name: Upload
         uses: actions/upload-artifact@v3
         with:
           name: apktool.jar
-          path: brut.apktool/apktool-cli/build/libs/apktool-*-small.jar
+          path: brut.apktool/apktool-cli/build/libs/apktool-v*

@@ -157,8 +157,11 @@ public class StyledString {
             }
 
             // write encoded raw text preceding the closing tag
-            if (spanEnd > lastOffset) {
+            if (spanEnd > lastOffset && text.length() >= spanEnd) {
                 xmlValue.append(ResXmlEncoders.escapeXmlChars(text.substring(lastOffset, spanEnd)));
+            } else if (text.length() >= lastOffset && text.length() < spanEnd) {
+                LOGGER.warning("Span (" + name + ") exceeds text length " + text.length());
+                xmlValue.append(ResXmlEncoders.escapeXmlChars(text.substring(lastOffset)));
             }
             lastOffset = spanEnd;
 

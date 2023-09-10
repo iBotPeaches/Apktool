@@ -54,6 +54,7 @@ public class SparseFlagTest extends BaseTest {
 
         LOGGER.info("Decoding sparse.apk...");
         Config config = Config.getDefaultConfig();
+        config.frameworkTag = "issue-3298";
 
         ApkDecoder apkDecoder = new ApkDecoder(config, testApk);
         ApkInfo apkInfo = apkDecoder.decode(sTestNewDir);
@@ -70,6 +71,7 @@ public class SparseFlagTest extends BaseTest {
 
         LOGGER.info("Decoding not-sparse.apk...");
         Config config = Config.getDefaultConfig();
+        config.frameworkTag = "issue-3298";
 
         ApkDecoder apkDecoder = new ApkDecoder(config, testApk);
         ApkInfo apkInfo = apkDecoder.decode(sTestNewDir);

@@ -1,0 +1,25 @@
+version: 2.0.0
+apkFileName: testapp.apk
+isFrameworkApk: false
+usesFramework:
+  ids:
+  - 1
+packageInfo:
+  forcedPackageId: '127'
+versionInfo:
+  versionCode: '1'
+  versionName: '1.0'
+compressionType: false
+doNotCompress:
+- assets/0byte_file.jpg
+- arsc
+- png
+- mp3
+unknownFiles:
+  AssetBundle/assets/a.txt: '8'
+  AssetBundle/b.txt: '8'
+  hidden.file: '8'
+  non\u007Fprintable.file: '8'
+  stored.file: '0'
+  unk_folder/unknown_file: '8'
+  lib_bug603/bug603: '8'

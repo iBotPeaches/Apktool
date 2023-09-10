@@ -14,38 +14,22 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib.yaml;
+package brut.androlib.apk;
 
-import brut.androlib.BaseTest;
-import brut.androlib.TestUtils;
-import brut.androlib.apk.ApkInfo;
-import brut.common.BrutException;
-import brut.directory.ExtFile;
-import brut.util.OS;
-import org.junit.BeforeClass;
+import brut.androlib.exceptions.AndrolibException;
 import org.junit.Test;
-import java.io.File;
 
 import static org.junit.Assert.*;
 
-public class ConsistentPropertyTest extends BaseTest {
-
-    @BeforeClass
-    public static void beforeClass() throws Exception {
-        TestUtils.cleanFrameworkFile();
-
-        sTmpDir = new ExtFile(OS.createTempDirectory());
-        sTestNewDir = new ExtFile(sTmpDir, "yaml");
-        LOGGER.info("Unpacking yaml files...");
-        TestUtils.copyResourceDir(ConsistentPropertyTest.class, "decode/yaml/", sTestNewDir);
-    }
+public class ConsistentPropertyTest {
 
     @Test
-    public void testAssertingAllKnownApkInfoProperties() throws BrutException {
-        ApkInfo apkInfo = ApkInfo.load(new File(sTestNewDir, "basic"));
+    public void testAssertingAllKnownApkInfoProperties() throws AndrolibException {
+        ApkInfo apkInfo = ApkInfo.load(
+            this.getClass().getResourceAsStream("/apk/basic.yml"));
 
         assertEquals("2.8.0", apkInfo.version);
-        assertEquals("basic.apk", apkInfo.getApkFileName());
+        assertEquals("basic.apk", apkInfo.apkFileName);
         assertFalse(apkInfo.isFrameworkApk);
         assertEquals(1, apkInfo.usesFramework.ids.size());
         assertEquals("tag", apkInfo.usesFramework.tag);

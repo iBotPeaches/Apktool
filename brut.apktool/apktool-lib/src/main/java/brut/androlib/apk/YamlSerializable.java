@@ -1,5 +1,6 @@
-/**
- *  Copyright 2014 Ryszard Wiśniewski <brut.alll@gmail.com>
+/*
+ *  Copyright (C) 2010 Ryszard Wiśniewski <brut.alll@gmail.com>
+ *  Copyright (C) 2010 Connor Tumbleson <connor.tumbleson@gmail.com>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -13,3 +14,11 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+package brut.androlib.apk;
+
+import brut.androlib.exceptions.AndrolibException;
+
+public interface YamlSerializable {
+    void readItem(YamlReader reader) throws AndrolibException;
+    void write(YamlWriter writer);
+}

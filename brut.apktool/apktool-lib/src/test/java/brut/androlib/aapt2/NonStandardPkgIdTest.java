@@ -17,6 +17,7 @@
 package brut.androlib.aapt2;
 
 import brut.androlib.*;
+import brut.androlib.apk.ApkInfo;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.ResourcesDecoder;
 import brut.androlib.res.data.ResTable;
@@ -26,8 +27,6 @@ import brut.util.OS;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.io.File;
 
 import static org.junit.Assert.*;
 
@@ -50,16 +49,18 @@ public class NonStandardPkgIdTest extends BaseTest {
         config.verbose = true;
 
         LOGGER.info("Building pkgid8.apk...");
-        File testApk = new File(sTmpDir, "pkgid8.apk");
+        ExtFile testApk = new ExtFile(sTmpDir, "pkgid8.apk");
         new ApkBuilder(config, sTestOrigDir).build(testApk);
 
         LOGGER.info("Decoding pkgid8.apk...");
-        ResourcesDecoder resourcesDecoder = new ResourcesDecoder(
-            Config.getDefaultConfig(), new ExtFile(testApk));
+        ApkInfo testInfo = new ApkInfo(testApk);
+        ResourcesDecoder resourcesDecoder = new ResourcesDecoder(Config.getDefaultConfig(), testInfo);
 
         sTestNewDir.mkdirs();
-        mResTable = resourcesDecoder.decodeResources(sTestNewDir);
+        resourcesDecoder.decodeResources(sTestNewDir);
         resourcesDecoder.decodeManifest(sTestNewDir);
+
+        mResTable = resourcesDecoder.getResTable();
     }
 
     @AfterClass

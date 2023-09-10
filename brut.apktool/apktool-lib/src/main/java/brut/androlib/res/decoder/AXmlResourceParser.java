@@ -19,18 +19,21 @@ package brut.androlib.res.decoder;
 import android.content.res.XmlResourceParser;
 import android.util.TypedValue;
 import brut.androlib.exceptions.AndrolibException;
+import brut.androlib.exceptions.CantFindFrameworkResException;
+import brut.androlib.exceptions.UndefinedResObjectException;
 import brut.androlib.res.data.ResID;
+import brut.androlib.res.data.ResResSpec;
 import brut.androlib.res.data.ResTable;
 import brut.androlib.res.data.arsc.ARSCHeader;
 import brut.androlib.res.data.axml.NamespaceStack;
+import brut.androlib.res.data.value.ResAttr;
+import brut.androlib.res.data.value.ResScalarValue;
 import brut.androlib.res.xml.ResXmlEncoders;
-import brut.util.ExtDataInput;
+import brut.util.ExtCountingDataInput;
 import com.google.common.io.LittleEndianDataInputStream;
 import org.xmlpull.v1.XmlPullParserException;
-import java.io.DataInput;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
+
+import java.io.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -46,29 +49,22 @@ import java.util.logging.Logger;
 public class AXmlResourceParser implements XmlResourceParser {
 
     public AXmlResourceParser(ResTable resTable) {
+        mResTable = resTable;
         resetEventInfo();
-        setAttrDecoder(new ResAttrDecoder(resTable));
     }
 
     public AndrolibException getFirstError() {
         return mFirstError;
     }
 
-    public ResAttrDecoder getAttrDecoder() {
-        return mAttrDecoder;
-    }
-
-    public void setAttrDecoder(ResAttrDecoder attrDecoder) {
-        mAttrDecoder = attrDecoder;
+    public ResTable getResTable() {
+        return mResTable;
     }
 
     public void open(InputStream stream) {
         close();
         if (stream != null) {
-            // We need to explicitly cast to DataInput as otherwise the constructor is ambiguous.
-            // We choose DataInput instead of InputStream as ExtDataInput wraps an InputStream in
-            // a DataInputStream which is big-endian and ignores the little-endian behavior.
-            mIn = new ExtDataInput((DataInput) new LittleEndianDataInputStream(stream));
+            mIn = new ExtCountingDataInput(new LittleEndianDataInputStream(stream));
         }
     }
 
@@ -275,6 +271,15 @@ public class AXmlResourceParser implements XmlResourceParser {
     public String getAttributeNamespace(int index) {
         int offset = getAttributeOffset(index);
         int namespace = mAttributes[offset + ATTRIBUTE_IX_NAMESPACE_URI];
+
+        // #2972 - If the namespace index is -1, the attribute is not present, but if the attribute is from system
+        // we can resolve it to the default namespace. This may prove to be too aggressive as we scope the entire
+        // system namespace, but it is better than not resolving it at all.
+        ResID resId = new ResID(getAttributeNameResource(index));
+        if (namespace == -1 && resId.pkgId == 1) {
+            return ANDROID_RES_NS;
+        }
+
         if (namespace == -1) {
             return "";
         }
@@ -283,16 +288,28 @@ public class AXmlResourceParser implements XmlResourceParser {
         // unless the pkgId of the resource is private. We will grab the non-standard one.
         String value = mStringBlock.getString(namespace);
 
-        if (value == null || value.length() == 0) {
-            ResID resId = new ResID(getAttributeNameResource(index));
+        if (value == null || value.isEmpty()) {
             if (resId.pkgId == PRIVATE_PKG_ID) {
-                value = getNonDefaultNamespaceUri(offset);
+                return getNonDefaultNamespaceUri(offset);
             } else {
-                value = "http://schemas.android.com/apk/res/android";
+                return ANDROID_RES_NS;
             }
         }
 
         return value;
+    }
+
+    public String decodeFromResourceId(int attrResId) throws AndrolibException {
+        if (attrResId != 0) {
+            try {
+                ResResSpec resResSpec = mResTable.getResSpec(attrResId);
+                if (resResSpec != null) {
+                    return resResSpec.getName();
+                }
+            } catch (UndefinedResObjectException | CantFindFrameworkResException ignored) {}
+        }
+
+        return null;
     }
 
     private String getNonDefaultNamespaceUri(int offset) {
@@ -307,7 +324,7 @@ public class AXmlResourceParser implements XmlResourceParser {
         // We have the namespaces that can't be touched in the opening tag.
         // Though no known way to correlate them at this time.
         // So return the res-auto namespace.
-        return "http://schemas.android.com/apk/res-auto";
+        return ANDROID_RES_NS_AUTO;
     }
 
     @Override
@@ -334,7 +351,7 @@ public class AXmlResourceParser implements XmlResourceParser {
         int resourceId = getAttributeNameResource(index);
 
         try {
-            resourceMapValue = mAttrDecoder.decodeFromResourceId(resourceId);
+            resourceMapValue = decodeFromResourceId(resourceId);
         } catch (AndrolibException ignored) {
             resourceMapValue = null;
         }
@@ -386,48 +403,41 @@ public class AXmlResourceParser implements XmlResourceParser {
         int valueData = mAttributes[offset + ATTRIBUTE_IX_VALUE_DATA];
         int valueRaw = mAttributes[offset + ATTRIBUTE_IX_VALUE_STRING];
 
-        if (mAttrDecoder != null) {
-            try {
-                String stringBlockValue = valueRaw == -1 ? null : ResXmlEncoders.escapeXmlChars(mStringBlock.getString(valueRaw));
-                String resourceMapValue = null;
+        try {
+            String stringBlockValue = valueRaw == -1 ? null : ResXmlEncoders.escapeXmlChars(mStringBlock.getString(valueRaw));
+            String resourceMapValue = null;
 
-                // Ensure we only track down obfuscated values for reference/attribute type values. Otherwise we might
-                // spam lookups against resource table for invalid ids.
-                if (valueType == TypedValue.TYPE_REFERENCE || valueType == TypedValue.TYPE_DYNAMIC_REFERENCE ||
-                    valueType == TypedValue.TYPE_ATTRIBUTE || valueType == TypedValue.TYPE_DYNAMIC_ATTRIBUTE) {
-                    resourceMapValue = mAttrDecoder.decodeFromResourceId(valueData);
-                }
-                String value = stringBlockValue;
-
-                if (stringBlockValue != null && resourceMapValue != null) {
-                    int slashPos = stringBlockValue.lastIndexOf("/");
-                    int colonPos = stringBlockValue.lastIndexOf(":");
-
-                    // Handle a value with a format of "@yyy/xxx", but avoid "@yyy/zzz:xxx"
-                    if (slashPos != -1) {
-                        if (colonPos == -1) {
-                            String type = stringBlockValue.substring(0, slashPos);
-                            value = type + "/" + resourceMapValue;
-                        }
-                    } else if (! stringBlockValue.equals(resourceMapValue)) {
-                        value = resourceMapValue;
-                    }
-                }
-
-                return mAttrDecoder.decode(
-                    valueType,
-                    valueData,
-                    value,
-                    getAttributeNameResource(index)
-                );
-            } catch (AndrolibException ex) {
-                setFirstError(ex);
-                LOGGER.log(Level.WARNING, String.format("Could not decode attr value, using undecoded value "
-                                + "instead: ns=%s, name=%s, value=0x%08x",
-                        getAttributePrefix(index),
-                        getAttributeName(index),
-                        valueData), ex);
+            // Ensure we only track down obfuscated values for reference/attribute type values. Otherwise, we might
+            // spam lookups against resource table for invalid ids.
+            if (valueType == TypedValue.TYPE_REFERENCE || valueType == TypedValue.TYPE_DYNAMIC_REFERENCE ||
+                valueType == TypedValue.TYPE_ATTRIBUTE || valueType == TypedValue.TYPE_DYNAMIC_ATTRIBUTE) {
+                resourceMapValue = decodeFromResourceId(valueData);
             }
+            String value = getPreferredString(stringBlockValue, resourceMapValue);
+
+            // try to decode from resource table
+            int attrResId = getAttributeNameResource(index);
+            ResScalarValue resValue = mResTable.getCurrentResPackage()
+                .getValueFactory().factory(valueType, valueData, value);
+
+            String decoded = null;
+            if (attrResId > 0) {
+                try {
+                    ResAttr attr = (ResAttr) mResTable.getResSpec(attrResId).getDefaultResource().getValue();
+
+                    decoded = attr.convertToResXmlFormat(resValue);
+                } catch (UndefinedResObjectException | ClassCastException ignored) {}
+            }
+
+            return decoded != null ? decoded : resValue.encodeAsResXmlAttr();
+
+        } catch (AndrolibException ex) {
+            setFirstError(ex);
+            LOGGER.log(Level.WARNING, String.format("Could not decode attr value, using undecoded value "
+                            + "instead: ns=%s, name=%s, value=0x%08x",
+                    getAttributePrefix(index),
+                    getAttributeName(index),
+                    valueData), ex);
         }
         return TypedValue.coerceToString(valueType, valueData);
     }
@@ -637,6 +647,26 @@ public class AXmlResourceParser implements XmlResourceParser {
         return -1;
     }
 
+    private static String getPreferredString(String stringBlockValue, String resourceMapValue) {
+        String value = stringBlockValue;
+
+        if (stringBlockValue != null && resourceMapValue != null) {
+            int slashPos = stringBlockValue.lastIndexOf("/");
+            int colonPos = stringBlockValue.lastIndexOf(":");
+
+            // Handle a value with a format of "@yyy/xxx", but avoid "@yyy/zzz:xxx"
+            if (slashPos != -1) {
+                if (colonPos == -1) {
+                    String type = stringBlockValue.substring(0, slashPos);
+                    value = type + "/" + resourceMapValue;
+                }
+            } else if (! stringBlockValue.equals(resourceMapValue)) {
+                value = resourceMapValue;
+            }
+        }
+        return value;
+    }
+
     private void resetEventInfo() {
         mEvent = -1;
         mLineNumber = -1;
@@ -677,6 +707,13 @@ public class AXmlResourceParser implements XmlResourceParser {
                 break;
             }
 
+            // #2070 - Some applications have 2 start namespaces, but only 1 end namespace.
+            if (mIn.remaining() == 0) {
+                LOGGER.warning(String.format("AXML hit unexpected end of file at byte: 0x%X", mIn.position()));
+                mEvent = END_DOCUMENT;
+                break;
+            }
+
             int chunkType;
             int headerSize = 0;
             if (event == START_DOCUMENT) {
@@ -697,7 +734,10 @@ public class AXmlResourceParser implements XmlResourceParser {
             }
 
             if (chunkType < ARSCHeader.RES_XML_FIRST_CHUNK_TYPE || chunkType > ARSCHeader.RES_XML_LAST_CHUNK_TYPE) {
-                throw new IOException("Invalid chunk type (" + chunkType + ").");
+                int chunkSize = mIn.readInt();
+                mIn.skipBytes(chunkSize - 8);
+                LOGGER.warning(String.format("Unknown chunk type at: (0x%08x) skipping...", mIn.position()));
+                break;
             }
 
             // Fake START_DOCUMENT event.
@@ -787,8 +827,8 @@ public class AXmlResourceParser implements XmlResourceParser {
         }
     }
 
-    private ExtDataInput mIn;
-    private ResAttrDecoder mAttrDecoder;
+    private ExtCountingDataInput mIn;
+    private final ResTable mResTable;
     private AndrolibException mFirstError;
 
     private boolean isOperational = false;
@@ -819,4 +859,7 @@ public class AXmlResourceParser implements XmlResourceParser {
     private static final int ATTRIBUTE_LENGTH = 5;
 
     private static final int PRIVATE_PKG_ID = 0x7F;
+
+    private static final String ANDROID_RES_NS_AUTO = "http://schemas.android.com/apk/res-auto";
+    private static final String ANDROID_RES_NS = "http://schemas.android.com/apk/res/android";
 }

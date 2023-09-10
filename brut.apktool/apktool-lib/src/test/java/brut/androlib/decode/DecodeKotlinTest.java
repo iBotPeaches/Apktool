@@ -67,6 +67,6 @@ public class DecodeKotlinTest extends BaseTest {
     public void kotlinDecodeTest() throws IOException {
         File kotlinActivity = new File(sTestNewDir, "smali/org/example/kotlin/mixed/KotlinActivity.smali");
 
-        assertTrue(FileUtils.readFileToString(kotlinActivity).contains("KotlinActivity.kt"));
+        assertTrue(FileUtils.readFileToString(kotlinActivity, "UTF-8").contains("KotlinActivity.kt"));
     }
 }

@@ -30,18 +30,11 @@ public final class ResTypeSpec {
     private final String mName;
     private final Map<String, ResResSpec> mResSpecs = new LinkedHashMap<>();
 
-    private final ResTable mResTable;
-    private final ResPackage mPackage;
-
     private final int mId;
-    private final int mEntryCount;
 
-    public ResTypeSpec(String name, ResTable resTable, ResPackage package_, int id, int entryCount) {
+    public ResTypeSpec(String name, int id) {
         this.mName = name;
-        this.mResTable = resTable;
-        this.mPackage = package_;
         this.mId = id;
-        this.mEntryCount = entryCount;
     }
 
     public String getName() {
@@ -66,10 +59,6 @@ public final class ResTypeSpec {
 
     public ResResSpec getResSpecUnsafe(String name) {
         return mResSpecs.get(name);
-    }
-
-    public void removeResSpec(ResResSpec spec) {
-        mResSpecs.remove(spec.getName());
     }
 
     public void addResSpec(ResResSpec spec) throws AndrolibException {

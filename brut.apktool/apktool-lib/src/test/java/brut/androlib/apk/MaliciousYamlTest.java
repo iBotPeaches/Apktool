@@ -1,5 +1,6 @@
-/**
- *  Copyright 2014 Ryszard Wiśniewski <brut.alll@gmail.com>
+/*
+ *  Copyright (C) 2010 Ryszard Wiśniewski <brut.alll@gmail.com>
+ *  Copyright (C) 2010 Connor Tumbleson <connor.tumbleson@gmail.com>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -13,9 +14,19 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+package brut.androlib.apk;
 
-dependencies {
-  implementation project(':brut.j.common')
-  implementation project(':brut.j.util')
-  implementation depends.commons_io
+import brut.androlib.exceptions.AndrolibException;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+public class MaliciousYamlTest {
+
+    @Test
+    public void testMaliciousYaml() throws AndrolibException {
+        ApkInfo apkInfo = ApkInfo.load(
+            this.getClass().getResourceAsStream("/apk/cve20220476.yml"));
+        assertEquals("2.6.1-ddc4bb-SNAPSHOT", apkInfo.version);
+    }
 }

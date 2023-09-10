@@ -4,17 +4,7 @@ The steps taken for slicing an official release of Apktool.
 
 ### Ensuring proper license headers
 
-Before we build a release, its a good practice to ensure all headers in source files contain
-proper licenses.
-
-    ./gradlew licenseMain && ./gradlew licenseTest
-
-If any license violations were found you can automatically fix them with either
-
-    ./gradlew licenseFormatMain
-    ./gradlew licenseFormatTest
-
-Like described, one formats the `src/main` directory, while the other formats the `src/test` directory.
+_Currently broken after movement to kotlin dsl._
 
 ### Tagging the release.
 
@@ -56,12 +46,12 @@ ossrhUsername={sonatypeUsername}
 ossrhPassword={sonatypePassword}
 ```
 
-If `release` or `snapshot` is used publishing will be automatically attempted.
+Release with maven with `./gradlew build shadowJar release publish`.
 
 ### Building the binary.
 
 In order to maintain a clean slate. Run `gradlew clean` to start from a clean slate. Now lets build
-the new version. We should not have any new commits since the tagged commit.
+the new binary version. We should not have any new commits since the tagged commit.
 
     ./gradlew build shadowJar proguard release
 
@@ -150,7 +140,6 @@ Additionally check the `sha256.shasum` file for the hashes. This file will look 
 except for containing sha256 hashes.
 
 The hashes match so we are good with the backup server.
-
 
 #### Sonatype
 

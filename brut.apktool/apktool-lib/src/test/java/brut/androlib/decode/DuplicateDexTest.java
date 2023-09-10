@@ -26,7 +26,6 @@ import org.junit.*;
 import java.io.File;
 import java.io.IOException;
 
-
 public class DuplicateDexTest extends BaseTest {
 
     @Before

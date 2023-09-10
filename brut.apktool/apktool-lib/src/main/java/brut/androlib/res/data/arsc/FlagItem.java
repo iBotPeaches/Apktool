@@ -14,25 +14,28 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib.apk;
+package brut.androlib.res.data.arsc;
 
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.nodes.Node;
-import org.yaml.snakeyaml.representer.Representer;
+import brut.androlib.exceptions.AndrolibException;
+import brut.androlib.res.data.value.ResReferenceValue;
 
-public class EscapedStringRepresenter extends Representer {
-    public EscapedStringRepresenter() {
-        super(new DumperOptions());
-        RepresentStringEx representStringEx = new RepresentStringEx();
-        multiRepresenters.put(String.class, representStringEx);
-        representers.put(String.class, representStringEx);
+public class FlagItem {
+    public final ResReferenceValue ref;
+    public final int flag;
+    public String value;
+
+    public FlagItem(ResReferenceValue ref, int flag) {
+        this.ref = ref;
+        this.flag = flag;
     }
 
-    private class RepresentStringEx extends RepresentString {
-
-        @Override
-        public Node representData(Object data) {
-            return super.representData(YamlStringEscapeUtils.escapeString(data.toString()));
+    public String getValue() throws AndrolibException {
+        if (value == null) {
+            if (ref.referentIsNull()) {
+                return String.format("APKTOOL_MISSING_0x%08x", ref.getRawIntValue());
+            }
+            value = ref.getReferent().getName();
         }
+        return value;
     }
 }

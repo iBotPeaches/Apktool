@@ -27,14 +27,10 @@ import brut.androlib.res.xml.ResValuesXmlSerializable;
 import brut.androlib.res.xml.ResXmlPatcher;
 import brut.directory.Directory;
 import brut.directory.DirectoryException;
-import brut.directory.ExtFile;
 import brut.directory.FileDirectory;
 import org.xmlpull.v1.XmlSerializer;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -42,94 +38,50 @@ public class ResourcesDecoder {
     private final static Logger LOGGER = Logger.getLogger(ResourcesDecoder.class.getName());
 
     private final Config mConfig;
-    private final ExtFile mApkFile;
-    private final ResTable mResTable;
     private final ApkInfo mApkInfo;
+    private final ResTable mResTable;
     private final Map<String, String> mResFileMapping = new HashMap<>();
 
     private final static String[] IGNORED_PACKAGES = new String[] {
         "android", "com.htc", "com.lge", "com.lge.internal", "yi", "flyme", "air.com.adobe.appentry",
         "FFFFFFFFFFFFFFFFFFFFFF" };
 
-    public ResourcesDecoder(Config config, ExtFile apkFile) {
+    public ResourcesDecoder(Config config, ApkInfo apkInfo) {
         mConfig = config;
-        mApkFile = apkFile;
-        mApkInfo = new ApkInfo();
-        mApkInfo.setApkFileName(apkFile.getName());
+        mApkInfo = apkInfo;
         mResTable = new ResTable(mConfig, mApkInfo);
     }
 
-    public boolean hasManifest() throws AndrolibException {
-        try {
-            return mApkFile.getDirectory().containsFile("AndroidManifest.xml");
-        } catch (DirectoryException ex) {
-            throw new AndrolibException(ex);
-        }
-    }
-
-    public boolean hasResources() throws AndrolibException {
-        try {
-            return mApkFile.getDirectory().containsFile("resources.arsc");
-        } catch (DirectoryException ex) {
-            throw new AndrolibException(ex);
-        }
-    }
-
     public ResTable getResTable() throws AndrolibException {
-        if (! (hasManifest() || hasResources())) {
+        if (!mApkInfo.hasManifest() && !mApkInfo.hasResources()) {
             throw new AndrolibException(
                 "Apk doesn't contain either AndroidManifest.xml file or resources.arsc file");
         }
         return mResTable;
     }
 
-    public ApkInfo getApkInfo() {
-        return mApkInfo;
-    }
-
     public  Map<String, String> getResFileMapping() {
         return mResFileMapping;
     }
 
+    public void loadMainPkg() throws AndrolibException {
+        mResTable.loadMainPkg(mApkInfo.getApkFile());
+    }
+
     public void decodeManifest(File outDir) throws AndrolibException {
-        if (hasManifest()) {
-            decodeManifest(getResTable(), mApkFile, outDir);
-            if (hasResources()) {
-                if (!mConfig.analysisMode) {
-                    // Remove versionName / versionCode (aapt API 16)
-                    //
-                    // check for a mismatch between resources.arsc package and the package listed in AndroidManifest
-                    // also remove the android::versionCode / versionName from manifest for rebuild
-                    // this is a required change to prevent aapt warning about conflicting versions
-                    // it will be passed as a parameter to aapt like "--min-sdk-version" via apktool.yml
-                    adjustPackageManifest(getResTable(), outDir.getAbsolutePath() + File.separator + "AndroidManifest.xml");
-
-                    ResXmlPatcher.removeManifestVersions(new File(
-                        outDir.getAbsolutePath() + File.separator + "AndroidManifest.xml"));
-
-                    // update apk info
-                    mApkInfo.packageInfo.forcedPackageId = String.valueOf(mResTable.getPackageId());
-                }
-            }
+        if (!mApkInfo.hasManifest()) {
+            return;
         }
-    }
 
-    public void updateApkInfo(File outDir) throws AndrolibException {
-        mResTable.initApkInfo(mApkInfo, outDir);
-    }
-
-    private void decodeManifest(ResTable resTable, ExtFile apkFile, File outDir)
-        throws AndrolibException {
-
-        AXmlResourceParser axmlParser = new AndroidManifestResourceParser(resTable);
+        AXmlResourceParser axmlParser = new AndroidManifestResourceParser(mResTable);
         XmlPullStreamDecoder fileDecoder = new XmlPullStreamDecoder(axmlParser, getResXmlSerializer());
 
         Directory inApk, out;
         try {
-            inApk = apkFile.getDirectory();
+            inApk = mApkInfo.getApkFile().getDirectory();
             out = new FileDirectory(outDir);
 
-            if (hasResources()) {
+            if (mApkInfo.hasResources()) {
                 LOGGER.info("Decoding AndroidManifest.xml with resources...");
             } else {
                 LOGGER.info("Decoding AndroidManifest.xml with only framework resources...");
@@ -141,18 +93,38 @@ public class ResourcesDecoder {
         } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
         }
+
+        if (mApkInfo.hasResources()) {
+            if (!mConfig.analysisMode) {
+                // Remove versionName / versionCode (aapt API 16)
+                //
+                // check for a mismatch between resources.arsc package and the package listed in AndroidManifest
+                // also remove the android::versionCode / versionName from manifest for rebuild
+                // this is a required change to prevent aapt warning about conflicting versions
+                // it will be passed as a parameter to aapt like "--min-sdk-version" via apktool.yml
+                adjustPackageManifest(outDir.getAbsolutePath() + File.separator + "AndroidManifest.xml");
+
+                ResXmlPatcher.removeManifestVersions(new File(
+                    outDir.getAbsolutePath() + File.separator + "AndroidManifest.xml"));
+
+                // update apk info
+                mApkInfo.packageInfo.forcedPackageId = String.valueOf(mResTable.getPackageId());
+            }
+        }
     }
 
-    private void adjustPackageManifest(ResTable resTable, String filePath)
-        throws AndrolibException {
+    public void updateApkInfo(File outDir) throws AndrolibException {
+        mResTable.initApkInfo(mApkInfo, outDir);
+    }
 
+    private void adjustPackageManifest(String filePath) throws AndrolibException {
         // compare resources.arsc package name to the one present in AndroidManifest
-        ResPackage resPackage = resTable.getCurrentResPackage();
+        ResPackage resPackage = mResTable.getCurrentResPackage();
         String pkgOriginal = resPackage.getName();
-        String pkgRenamed = resTable.getPackageRenamed();
+        String pkgRenamed = mResTable.getPackageRenamed();
 
-        resTable.setPackageId(resPackage.getId());
-        resTable.setPackageOriginal(pkgOriginal);
+        mResTable.setPackageId(resPackage.getId());
+        mResTable.setPackageOriginal(pkgOriginal);
 
         // 1) Check if pkgOriginal is null (empty resources.arsc)
         // 2) Check if pkgRenamed is null
@@ -167,35 +139,18 @@ public class ResourcesDecoder {
         }
     }
 
-    private ExtMXSerializer getResXmlSerializer() {
-        ExtMXSerializer serial = new ExtMXSerializer();
-        serial.setProperty(ExtXmlSerializer.PROPERTY_SERIALIZER_INDENTATION, "    ");
-        serial.setProperty(ExtXmlSerializer.PROPERTY_SERIALIZER_LINE_SEPARATOR, System.getProperty("line.separator"));
-        serial.setProperty(ExtXmlSerializer.PROPERTY_DEFAULT_ENCODING, "utf-8");
-        serial.setDisabledAttrEscape(true);
-        return serial;
-    }
-
-    public void loadMainPkg() throws AndrolibException {
-        mResTable.loadMainPkg(mApkFile);
-    }
-
-    public ResTable decodeResources(File outDir) throws AndrolibException {
-        if (hasResources()) {
-            loadMainPkg();
-            decodeResources(getResTable(), mApkFile, outDir);
+    public void decodeResources(File outDir) throws AndrolibException {
+        if (!mApkInfo.hasResources()) {
+            return;
         }
-        return mResTable;
-    }
 
-    private void decodeResources(ResTable resTable, ExtFile apkFile, File outDir)
-        throws AndrolibException {
+        mResTable.loadMainPkg(mApkInfo.getApkFile());
 
         ResStreamDecoderContainer decoders = new ResStreamDecoderContainer();
         decoders.setDecoder("raw", new ResRawStreamDecoder());
         decoders.setDecoder("9patch", new Res9patchStreamDecoder());
 
-        AXmlResourceParser axmlParser = new AXmlResourceParser(resTable);
+        AXmlResourceParser axmlParser = new AXmlResourceParser(mResTable);
         decoders.setDecoder("xml", new XmlPullStreamDecoder(axmlParser, getResXmlSerializer()));
 
         ResFileDecoder fileDecoder = new ResFileDecoder(decoders);
@@ -203,14 +158,14 @@ public class ResourcesDecoder {
 
         try {
             out = new FileDirectory(outDir);
-            in = apkFile.getDirectory();
+            in = mApkInfo.getApkFile().getDirectory();
             out = out.createDir("res");
         } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
         }
 
         ExtMXSerializer xmlSerializer = getResXmlSerializer();
-        for (ResPackage pkg : resTable.listMainPackages()) {
+        for (ResPackage pkg : mResTable.listMainPackages()) {
 
             LOGGER.info("Decoding file-resources...");
             for (ResResource res : pkg.listFiles()) {
@@ -228,6 +183,15 @@ public class ResourcesDecoder {
         if (decodeError != null) {
             throw decodeError;
         }
+    }
+
+    private ExtMXSerializer getResXmlSerializer() {
+        ExtMXSerializer serial = new ExtMXSerializer();
+        serial.setProperty(ExtXmlSerializer.PROPERTY_SERIALIZER_INDENTATION, "    ");
+        serial.setProperty(ExtXmlSerializer.PROPERTY_SERIALIZER_LINE_SEPARATOR, System.getProperty("line.separator"));
+        serial.setProperty(ExtXmlSerializer.PROPERTY_DEFAULT_ENCODING, "utf-8");
+        serial.setDisabledAttrEscape(true);
+        return serial;
     }
 
     private void generateValuesFile(ResValuesFile valuesFile, Directory out,

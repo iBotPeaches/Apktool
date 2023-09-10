@@ -14,37 +14,52 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib.yaml;
+package brut.androlib.decode;
 
-import brut.androlib.ApkBuilder;
+import brut.androlib.ApkDecoder;
 import brut.androlib.BaseTest;
 import brut.androlib.TestUtils;
-import brut.androlib.Config;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
 import brut.util.OS;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.yaml.snakeyaml.constructor.ConstructorException;
 
 import java.io.File;
+import java.io.IOException;
 
-public class MaliciousYamlTest extends BaseTest {
+import static org.junit.Assert.assertTrue;
+
+public class EmptyArscTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
         TestUtils.cleanFrameworkFile();
-
         sTmpDir = new ExtFile(OS.createTempDirectory());
-        sTestNewDir = new ExtFile(sTmpDir, "cve20220476");
-        LOGGER.info("Unpacking cve20220476...");
-        TestUtils.copyResourceDir(MaliciousYamlTest.class, "yaml/cve20220476/", sTestNewDir);
+        TestUtils.copyResourceDir(EmptyArscTest.class, "decode/issue2701/", sTmpDir);
     }
 
-    @Test(expected = ConstructorException.class)
-    public void testMaliciousYamlNotLoaded() throws BrutException {
-        Config config = Config.getDefaultConfig();
-        File testApk = new File(sTmpDir, "cve20220476.apk");
-        new ApkBuilder(config, sTestNewDir).build(testApk);
+    @AfterClass
+    public static void afterClass() throws BrutException {
+        OS.rmdir(sTmpDir);
+    }
+
+    @Test
+    public void decodeWithEmptyArscFile() throws BrutException, IOException {
+        String apk = "test.apk";
+
+        // decode test.apk
+        ApkDecoder apkDecoder = new ApkDecoder(new File(sTmpDir + File.separator + apk));
+        sTestOrigDir = new ExtFile(sTmpDir + File.separator + apk + ".out");
+
+        File outDir = new File(sTmpDir + File.separator + apk + ".out");
+        apkDecoder.decode(outDir);
+
+        File publicXmlFile =  new File(sTestOrigDir,"res/values/public.xml");
+        assertTrue(publicXmlFile.isFile());
+
+        File androidManifestXmlFile =  new File(sTestOrigDir,"AndroidManifest.xml");
+        assertTrue(androidManifestXmlFile.isFile());
     }
 }

@@ -16,7 +16,28 @@
  */
 package brut.androlib.apk;
 
-public class VersionInfo {
+public class VersionInfo implements YamlSerializable {
     public String versionCode;
     public String versionName;
+
+    @Override
+    public void readItem(YamlReader reader) {
+        YamlLine line = reader.getLine();
+        switch (line.getKey()) {
+            case "versionCode": {
+                versionCode = line.getValue();
+                break;
+            }
+            case "versionName": {
+                versionName = line.getValue();
+                break;
+            }
+        }
+    }
+
+    @Override
+    public void write(YamlWriter writer) {
+        writer.writeString("versionCode", versionCode);
+        writer.writeString("versionName", versionName);
+    }
 }

@@ -16,7 +16,28 @@
  */
 package brut.androlib.apk;
 
-public class PackageInfo {
+public class PackageInfo implements YamlSerializable {
     public String forcedPackageId;
     public String renameManifestPackage;
+
+    @Override
+    public void readItem(YamlReader reader) {
+        YamlLine line = reader.getLine();
+        switch (line.getKey()) {
+            case "forcedPackageId": {
+                forcedPackageId = line.getValue();
+                break;
+            }
+            case "renameManifestPackage": {
+                renameManifestPackage = line.getValue();
+                break;
+            }
+        }
+    }
+
+    @Override
+    public void write(YamlWriter writer) {
+        writer.writeString("forcedPackageId", forcedPackageId);
+        writer.writeString("renameManifestPackage", renameManifestPackage);
+    }
 }

@@ -28,12 +28,10 @@ import org.xmlpull.v1.wrapper.XmlPullWrapperFactory;
 import org.xmlpull.v1.wrapper.XmlSerializerWrapper;
 import org.xmlpull.v1.wrapper.classic.StaticXmlSerializerWrapper;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 
 public class XmlPullStreamDecoder implements ResStreamDecoder {
-    public XmlPullStreamDecoder(XmlPullParser parser,
+    public XmlPullStreamDecoder(AXmlResourceParser parser,
                                 ExtXmlSerializer serializer) {
         this.mParser = parser;
         this.mSerial = serializer;
@@ -45,7 +43,7 @@ public class XmlPullStreamDecoder implements ResStreamDecoder {
         try {
             XmlPullWrapperFactory factory = XmlPullWrapperFactory.newInstance();
             XmlPullParserWrapper par = factory.newPullParserWrapper(mParser);
-            final ResTable resTable = ((AXmlResourceParser) mParser).getAttrDecoder().getResTable();
+            final ResTable resTable = mParser.getResTable();
 
             XmlSerializerWrapper ser = new StaticXmlSerializerWrapper(mSerial, factory) {
                 boolean hideSdkInfo = false;
@@ -151,6 +149,6 @@ public class XmlPullStreamDecoder implements ResStreamDecoder {
             decode(in, out);
     }
 
-    private final XmlPullParser mParser;
+    private final AXmlResourceParser mParser;
     private final ExtXmlSerializer mSerial;
 }
