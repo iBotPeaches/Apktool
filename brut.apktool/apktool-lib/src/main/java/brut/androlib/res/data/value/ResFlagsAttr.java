@@ -29,12 +29,12 @@ import java.util.logging.Logger;
 
 public class ResFlagsAttr extends ResAttr {
     ResFlagsAttr(ResReferenceValue parent, int type, Integer min, Integer max,
-                 Boolean l10n, Duo<ResReferenceValue, ResIntValue>[] items) {
+                 Boolean l10n, Duo<ResReferenceValue, ResScalarValue>[] items) {
         super(parent, type, min, max, l10n);
 
         mItems = new FlagItem[items.length];
         for (int i = 0; i < items.length; i++) {
-            mItems[i] = new FlagItem(items[i].m1, items[i].m2.getValue());
+            mItems[i] = new FlagItem(items[i].m1, items[i].m2.getRawIntValue());
         }
     }
 

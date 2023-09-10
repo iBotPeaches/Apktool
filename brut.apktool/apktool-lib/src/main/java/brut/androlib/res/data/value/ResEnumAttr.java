@@ -29,7 +29,7 @@ import java.util.logging.Logger;
 
 public class ResEnumAttr extends ResAttr {
     ResEnumAttr(ResReferenceValue parent, int type, Integer min, Integer max,
-                Boolean l10n, Duo<ResReferenceValue, ResIntValue>[] items) {
+                Boolean l10n, Duo<ResReferenceValue, ResScalarValue>[] items) {
         super(parent, type, min, max, l10n);
         mItems = items;
     }
@@ -48,8 +48,8 @@ public class ResEnumAttr extends ResAttr {
 
     @Override
     protected void serializeBody(XmlSerializer serializer, ResResource res) throws AndrolibException, IOException {
-        for (Duo<ResReferenceValue, ResIntValue> duo : mItems) {
-            int intVal = duo.m2.getValue();
+        for (Duo<ResReferenceValue, ResScalarValue> duo : mItems) {
+            int intVal = duo.m2.getRawIntValue();
 
             // #2836 - Support skipping items if the resource cannot be identified.
             ResResSpec m1Referent = duo.m1.getReferent();
@@ -72,8 +72,8 @@ public class ResEnumAttr extends ResAttr {
         String value2 = mItemsCache.get(value);
         if (value2 == null) {
             ResReferenceValue ref = null;
-            for (Duo<ResReferenceValue, ResIntValue> duo : mItems) {
-                if (duo.m2.getValue() == value) {
+            for (Duo<ResReferenceValue, ResScalarValue> duo : mItems) {
+                if (duo.m2.getRawIntValue() == value) {
                     ref = duo.m1;
                     break;
                 }
@@ -86,7 +86,7 @@ public class ResEnumAttr extends ResAttr {
         return value2;
     }
 
-    private final Duo<ResReferenceValue, ResIntValue>[] mItems;
+    private final Duo<ResReferenceValue, ResScalarValue>[] mItems;
     private final Map<Integer, String> mItemsCache = new HashMap<>();
 
     private static final Logger LOGGER = Logger.getLogger(ResEnumAttr.class.getName());
