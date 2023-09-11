@@ -14,12 +14,28 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib.res.data.value;
+package brut.androlib.res.data.arsc;
 
-import brut.androlib.Config;
+import brut.androlib.exceptions.AndrolibException;
+import brut.androlib.res.data.value.ResReferenceValue;
 
-public class ResValue {
-    public boolean shouldRemoveUnknownRes() {
-        return Config.getInstance().isDecodeResolveModeRemoving();
+public class FlagItem {
+    public final ResReferenceValue ref;
+    public final int flag;
+    public String value;
+
+    public FlagItem(ResReferenceValue ref, int flag) {
+        this.ref = ref;
+        this.flag = flag;
+    }
+
+    public String getValue() throws AndrolibException {
+        if (value == null) {
+            if (ref.referentIsNull()) {
+                return String.format("APKTOOL_MISSING_0x%08x", ref.getRawIntValue());
+            }
+            value = ref.getReferent().getName();
+        }
+        return value;
     }
 }

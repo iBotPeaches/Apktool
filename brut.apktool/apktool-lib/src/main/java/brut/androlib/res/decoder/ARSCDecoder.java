@@ -59,11 +59,11 @@ public class ARSCDecoder {
         mIn = new ExtCountingDataInput(new LittleEndianDataInputStream(arscStream));
         mResTable = resTable;
         mKeepBroken = keepBroken;
+        mMissingResSpecMap = new LinkedHashMap<>();
     }
 
     private ResPackage[] readResourceTable() throws IOException, AndrolibException {
         Set<ResPackage> pkgs = new LinkedHashSet<>();
-
         ResTypeSpec typeSpec;
         int chunkNumber = 1;
 
@@ -116,6 +116,10 @@ public class ARSCDecoder {
                     }
                     break chunkLoop;
             }
+        }
+
+        if (mResTable.getConfig().isDecodeResolveModeUsingDummies() && mPkg != null && mPkg.getResSpecCount() > 0) {
+            addMissingResSpecs();
         }
 
         return pkgs.toArray(new ResPackage[0]);
@@ -300,6 +304,7 @@ public class ARSCDecoder {
             mResId = (mResId & 0xffff0000) | i;
             int offset = entryOffsetMap.get(i);
             if (offset == NO_ENTRY) {
+                mMissingResSpecMap.put(mResId, typeId);
                 continue;
             }
 
@@ -315,6 +320,8 @@ public class ARSCDecoder {
             EntryData entryData = readEntryData();
             if (entryData != null) {
                 readEntry(entryData);
+            } else {
+                mMissingResSpecMap.put(mResId, typeId);
             }
         }
 
@@ -589,6 +596,30 @@ public class ARSCDecoder {
         mResTypeSpecs.put(resTypeSpec.getId(), resTypeSpec);
     }
 
+    private void addMissingResSpecs() throws AndrolibException {
+        for (int resId : mMissingResSpecMap.keySet()) {
+            int typeId = mMissingResSpecMap.get(resId);
+            String resName = "APKTOOL_DUMMY_" + Integer.toHexString(resId);
+            ResID id = new ResID(resId);
+            ResResSpec spec = new ResResSpec(id, resName, mPkg, mResTypeSpecs.get(typeId));
+
+            // If we already have this resID don't add it again.
+            if (! mPkg.hasResSpec(id)) {
+                mPkg.addResSpec(spec);
+                spec.getType().addResSpec(spec);
+                ResType resType = mPkg.getOrCreateConfig(new ResConfigFlags());
+
+                // We are going to make dummy attributes a null reference (@null) now instead of a boolean false.
+                // This is because aapt2 is stricter when it comes to what we can put in an application.
+                ResValue value = new ResReferenceValue(mPkg, 0, "");
+
+                ResResource res = new ResResource(resType, spec, value);
+                resType.addResource(res);
+                spec.addResource(res);
+            }
+        }
+    }
+
     private ARSCHeader nextChunk() throws IOException {
         return mHeader = ARSCHeader.read(mIn);
     }
@@ -614,6 +645,7 @@ public class ARSCDecoder {
     private ResType mType;
     private int mResId;
     private int mTypeIdOffset = 0;
+    private final HashMap<Integer, Integer> mMissingResSpecMap;
     private final HashMap<Integer, ResTypeSpec> mResTypeSpecs = new HashMap<>();
 
     private final static short ENTRY_FLAG_COMPLEX = 0x0001;

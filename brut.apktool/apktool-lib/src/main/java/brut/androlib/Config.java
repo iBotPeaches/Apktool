@@ -25,6 +25,7 @@ import java.io.File;
 import java.util.logging.Logger;
 
 public class Config {
+    private static Config instance = null;
     private final static Logger LOGGER = Logger.getLogger(Config.class.getName());
 
     public final static short DECODE_SOURCES_NONE = 0x0000;
@@ -39,6 +40,10 @@ public class Config {
 
     public final static short DECODE_ASSETS_NONE = 0x0000;
     public final static short DECODE_ASSETS_FULL = 0x0001;
+
+    public final static short DECODE_RES_RESOLVE_REMOVE = 0x0000;
+    public final static short DECODE_RES_RESOLVE_DUMMY = 0x0001;
+    public final static short DECODE_RES_RESOLVE_RETAIN = 0x0002;
 
     public BaksmaliOptions options = new BaksmaliOptions();
 
@@ -59,6 +64,7 @@ public class Config {
     public short decodeResources = DECODE_RESOURCES_FULL;
     public short forceDecodeManifest = FORCE_DECODE_MANIFEST_NONE;
     public short decodeAssets = DECODE_ASSETS_FULL;
+    public short decodeResolveMode = DECODE_RES_RESOLVE_REMOVE;
     public int apiLevel = 0;
     public boolean analysisMode = false;
     public boolean forceDelete = false;
@@ -80,8 +86,23 @@ public class Config {
         return this.useAapt2 || this.aaptVersion == 2;
     }
 
-    private Config() {
+    public boolean isDecodeResolveModeUsingDummies() {
+        return decodeResolveMode == DECODE_RES_RESOLVE_DUMMY;
+    }
 
+    public boolean isDecodeResolveModeRemoving() {
+        return decodeResolveMode == DECODE_RES_RESOLVE_REMOVE;
+    }
+
+    private Config() {
+        instance = this;
+    }
+
+    public static Config getInstance() {
+        if (instance == null) {
+            instance = new Config();
+        }
+        return instance;
     }
 
     private void setDefaultFrameworkDirectory() {
@@ -111,6 +132,13 @@ public class Config {
             return;
         }
         decodeSources = mode;
+    }
+
+    public void setDecodeResolveMode(short mode) throws AndrolibException {
+        if (mode != DECODE_RES_RESOLVE_REMOVE && mode != DECODE_RES_RESOLVE_DUMMY && mode != DECODE_RES_RESOLVE_RETAIN) {
+            throw new AndrolibException("Invalid decode resources mode");
+        }
+        decodeResolveMode = mode;
     }
 
     public void setDecodeResources(short mode) throws AndrolibException {

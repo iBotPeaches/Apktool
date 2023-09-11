@@ -17,12 +17,15 @@
 package brut.androlib.res.data.value;
 
 import brut.androlib.exceptions.AndrolibException;
+import brut.androlib.res.data.ResResSpec;
 import brut.androlib.res.data.ResResource;
+import brut.androlib.res.data.arsc.FlagItem;
 import brut.util.Duo;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.logging.Logger;
 
 public class ResFlagsAttr extends ResAttr {
     ResFlagsAttr(ResReferenceValue parent, int type, Integer min, Integer max,
@@ -38,7 +41,7 @@ public class ResFlagsAttr extends ResAttr {
     @Override
     public String convertToResXmlFormat(ResScalarValue value)
             throws AndrolibException {
-        if(value instanceof ResReferenceValue) {
+        if (value instanceof ResReferenceValue) {
             return value.encodeAsResXml();
         }
         if (!(value instanceof ResIntValue)) {
@@ -70,13 +73,19 @@ public class ResFlagsAttr extends ResAttr {
     }
 
     @Override
-    protected void serializeBody(XmlSerializer serializer, ResResource res)
-            throws AndrolibException, IOException {
+    protected void serializeBody(XmlSerializer serializer, ResResource res) throws AndrolibException, IOException {
         for (FlagItem item : mItems) {
+            ResResSpec referent = item.ref.getReferent();
+
+            // #2836 - Support skipping items if the resource cannot be identified.
+            if (referent == null && shouldRemoveUnknownRes()) {
+                LOGGER.fine(String.format("null flag reference: 0x%08x(%s)", item.ref.getValue(), item.ref.getType()));
+                continue;
+            }
+
             serializer.startTag(null, "flag");
             serializer.attribute(null, "name", item.getValue());
-            serializer.attribute(null, "value",
-                String.format("0x%08x", item.flag));
+            serializer.attribute(null, "value", String.format("0x%08x", item.flag));
             serializer.endTag(null, "flag");
         }
     }
@@ -130,24 +139,5 @@ public class ResFlagsAttr extends ResAttr {
     private FlagItem[] mZeroFlags;
     private FlagItem[] mFlags;
 
-    private static class FlagItem {
-        public final ResReferenceValue ref;
-        public final int flag;
-        public String value;
-
-        public FlagItem(ResReferenceValue ref, int flag) {
-            this.ref = ref;
-            this.flag = flag;
-        }
-
-        public String getValue() throws AndrolibException {
-            if (value == null) {
-                if (ref.referentIsNull()) {
-                    return "@null";
-                }
-                value = ref.getReferent().getName();
-            }
-            return value;
-        }
-    }
+    private static final Logger LOGGER = Logger.getLogger(ResFlagsAttr.class.getName());
 }
