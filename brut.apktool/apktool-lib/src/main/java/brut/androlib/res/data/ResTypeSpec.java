@@ -23,9 +23,11 @@ import java.util.*;
 public final class ResTypeSpec {
 
     public static final String RES_TYPE_NAME_ARRAY = "array";
-    public static final String RES_TYPE_NAME_PLURALS = "plurals";
-    public static final String RES_TYPE_NAME_STYLES = "style";
     public static final String RES_TYPE_NAME_ATTR = "attr";
+    public static final String RES_TYPE_NAME_ATTR_PRIVATE = "^attr-private";
+    public static final String RES_TYPE_NAME_PLURALS = "plurals";
+    public static final String RES_TYPE_NAME_STRING = "string";
+    public static final String RES_TYPE_NAME_STYLES = "style";
 
     private final String mName;
     private final Map<String, ResResSpec> mResSpecs = new LinkedHashMap<>();
@@ -46,7 +48,7 @@ public final class ResTypeSpec {
     }
 
     public boolean isString() {
-        return mName.equalsIgnoreCase("string");
+        return mName.equalsIgnoreCase(RES_TYPE_NAME_STRING);
     }
 
     public ResResSpec getResSpec(String name) throws AndrolibException {
