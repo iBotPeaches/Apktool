@@ -17,6 +17,7 @@
 package brut.androlib.src;
 
 import brut.androlib.exceptions.AndrolibException;
+import com.android.tools.smali.baksmali.Baksmali;
 import com.android.tools.smali.baksmali.Adaptors.ClassDefinition;
 import com.android.tools.smali.baksmali.formatter.BaksmaliWriter;
 import com.android.tools.smali.baksmali.BaksmaliOptions;
@@ -110,128 +111,11 @@ public class SmaliDecoder {
 
             if (config.resolveResources)
                 LOGGER.info("Parsing resource ids in " + config.dexFile + "...");
-            disassembleDexFile(dexFile, config.outDir, jobs, config.options);
+            Baksmali.disassembleDexFile(dexFile, config.outDir, jobs, config.options);
 
             return dexFile;
         } catch (IOException ex) {
             throw new AndrolibException(ex);
         }
-    }
-
-    public static boolean disassembleDexFile(DexFile dexFile, File outputDir, int jobs, final BaksmaliOptions options) {
-        return disassembleDexFile(dexFile, outputDir, jobs, options, null);
-    }
-
-    public static boolean disassembleDexFile(DexFile dexFile, File outputDir, int jobs, final BaksmaliOptions options,
-                                             @Nullable List<String> classes) {
-
-        List<? extends ClassDef> classDefs = Ordering.natural().sortedCopy(dexFile.getClasses());
-
-        final ClassFileNameHandler fileNameHandler = new ClassFileNameHandler(outputDir, ".smali");
-
-        ExecutorService executor = Executors.newFixedThreadPool(jobs);
-        List<Future<Boolean>> tasks = Lists.newArrayList();
-
-        Set<String> classSet = null;
-        if (classes != null) {
-            classSet = new HashSet<String>(classes);
-        }
-
-        for (final ClassDef classDef: classDefs) {
-            if (classSet != null && !classSet.contains(classDef.getType())) {
-                continue;
-            }
-            tasks.add(executor.submit(new Callable<Boolean>() {
-                @Override public Boolean call() throws Exception {
-                    return disassembleClass(classDef, fileNameHandler, options);
-                }
-            }));
-        }
-
-        boolean errorOccurred = false;
-        try {
-            for (Future<Boolean> task: tasks) {
-                while(true) {
-                    try {
-                        if (!task.get()) {
-                            errorOccurred = true;
-                        }
-                    } catch (InterruptedException ex) {
-                        continue;
-                    } catch (ExecutionException ex) {
-                        throw new RuntimeException(ex);
-                    }
-                    break;
-                }
-            }
-        } finally {
-            executor.shutdown();
-        }
-        return !errorOccurred;
-    }
-
-    private static boolean disassembleClass(ClassDef classDef, ClassFileNameHandler fileNameHandler,
-                                            BaksmaliOptions options) {
-        String classDescriptor = classDef.getType();
-
-        if (classDescriptor.charAt(0) != 'L' ||
-                classDescriptor.charAt(classDescriptor.length()-1) != ';') {
-            System.err.println("Unrecognized class descriptor - " + classDescriptor + " - skipping class");
-            return false;
-        }
-
-        File smaliFile = null;
-        try {
-            smaliFile = fileNameHandler.getUniqueFilenameForClass(classDescriptor);
-        } catch (IOException ex) {
-            System.err.println("\n\nError occurred while creating file for class " + classDescriptor);
-            ex.printStackTrace();
-            return false;
-        }
-
-        ClassDefinition classDefinition = new ClassDefinition(options, classDef);
-
-        BaksmaliWriter writer = null;
-        try {
-            File smaliParent = smaliFile.getParentFile();
-            if (!smaliParent.exists()) {
-                if (!smaliParent.mkdirs()) {
-                    if (!smaliParent.exists()) {
-                        System.err.println("Unable to create directory " + smaliParent.toString() + " - skipping class");
-                        return false;
-                    }
-                }
-            }
-
-            if (!smaliFile.exists()){
-                if (!smaliFile.createNewFile()) {
-                    System.err.println("Unable to create file " + smaliFile.toString() + " - skipping class");
-                    return false;
-                }
-            }
-
-            BufferedWriter bufWriter = new BufferedWriter(new OutputStreamWriter(
-                    new FileOutputStream(smaliFile), StandardCharsets.UTF_8));
-
-            writer = new BaksmaliWriter(
-                    bufWriter,
-                    options.implicitReferences ? classDef.getType() : null);
-            classDefinition.writeTo(writer);
-        } catch (Exception ex) {
-            System.err.println("\n\nError occurred while disassembling class " + classDescriptor.replace('/', '.') + " - skipping class");
-            ex.printStackTrace();
-            smaliFile.delete();
-            return false;
-        } finally {
-            if (writer != null) {
-                try {
-                    writer.close();
-                } catch (Throwable ex) {
-                    System.err.println("\n\nError occurred while closing file " + smaliFile.toString());
-                    ex.printStackTrace();
-                }
-            }
-        }
-        return true;
     }
 }
