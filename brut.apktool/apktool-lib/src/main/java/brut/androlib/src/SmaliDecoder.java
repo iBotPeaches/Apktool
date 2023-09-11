@@ -18,25 +18,15 @@ package brut.androlib.src;
 
 import brut.androlib.exceptions.AndrolibException;
 import com.android.tools.smali.baksmali.Baksmali;
-import com.android.tools.smali.baksmali.Adaptors.ClassDefinition;
-import com.android.tools.smali.baksmali.formatter.BaksmaliWriter;
-import com.android.tools.smali.baksmali.BaksmaliOptions;
 import com.android.tools.smali.dexlib2.DexFileFactory;
 import com.android.tools.smali.dexlib2.Opcodes;
 import com.android.tools.smali.dexlib2.dexbacked.DexBackedDexFile;
 import com.android.tools.smali.dexlib2.dexbacked.DexBackedOdexFile;
 import com.android.tools.smali.dexlib2.analysis.InlineMethodResolver;
-import com.android.tools.smali.dexlib2.iface.ClassDef;
 import com.android.tools.smali.dexlib2.iface.DexFile;
 import com.android.tools.smali.dexlib2.iface.MultiDexContainer;
-import com.android.tools.smali.util.ClassFileNameHandler;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Ordering;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
-import java.util.concurrent.*;
 import java.util.logging.Logger;
 
 import javax.annotation.Nullable;
