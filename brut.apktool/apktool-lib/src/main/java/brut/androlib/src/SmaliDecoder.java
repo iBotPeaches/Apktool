@@ -28,9 +28,6 @@ import com.android.tools.smali.dexlib2.iface.MultiDexContainer;
 
 import java.io.*;
 import java.util.logging.Logger;
-
-import javax.annotation.Nullable;
-
 import brut.androlib.Config;
 
 public class SmaliDecoder {

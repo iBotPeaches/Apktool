@@ -21,7 +21,6 @@ import brut.androlib.exceptions.InFileNotFoundException;
 import brut.androlib.exceptions.OutDirExistsException;
 import brut.androlib.apk.ApkInfo;
 import brut.androlib.res.ResourcesDecoder;
-import brut.androlib.res.data.*;
 import brut.androlib.src.SmaliDecoder;
 import brut.directory.Directory;
 import brut.directory.ExtFile;
