@@ -26,10 +26,8 @@ import org.xmlpull.v1.XmlSerializer;
 import java.io.IOException;
 import java.util.logging.Logger;
 
-public class ResStyleValue extends ResBagValue implements
-        ResValuesXmlSerializable {
-    ResStyleValue(ResReferenceValue parent,
-                  Duo<Integer, ResScalarValue>[] items, ResValueFactory factory) {
+public class ResStyleValue extends ResBagValue implements ResValuesXmlSerializable {
+    ResStyleValue(ResReferenceValue parent, Duo<Integer, ResScalarValue>[] items, ResValueFactory factory) {
         super(parent);
 
         mItems = new Duo[items.length];

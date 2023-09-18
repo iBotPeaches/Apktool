@@ -26,8 +26,7 @@ import org.xmlpull.v1.XmlSerializer;
 import java.io.IOException;
 
 public class ResAttr extends ResBagValue implements ResValuesXmlSerializable {
-    ResAttr(ResReferenceValue parentVal, int type, Integer min, Integer max,
-            Boolean l10n) {
+    ResAttr(ResReferenceValue parentVal, int type, Integer min, Integer max, Boolean l10n) {
         super(parentVal);
         mType = type;
         mMin = min;
