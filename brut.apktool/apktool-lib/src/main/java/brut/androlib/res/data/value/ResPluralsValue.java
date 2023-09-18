@@ -25,10 +25,8 @@ import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
 
-public class ResPluralsValue extends ResBagValue implements
-        ResValuesXmlSerializable {
-    ResPluralsValue(ResReferenceValue parent,
-                    Duo<Integer, ResScalarValue>[] items) {
+public class ResPluralsValue extends ResBagValue implements ResValuesXmlSerializable {
+    ResPluralsValue(ResReferenceValue parent, Duo<Integer, ResScalarValue>[] items) {
         super(parent);
 
         mItems = new ResScalarValue[6];
