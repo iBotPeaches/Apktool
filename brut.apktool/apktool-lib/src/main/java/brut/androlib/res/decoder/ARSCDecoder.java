@@ -415,6 +415,12 @@ public class ARSCDecoder {
             resId = mIn.readInt();
             resValue = readValue();
 
+            // #2824 - In some applications the res entries are duplicated with the 2nd being malformed.
+            // AOSP skips this, so we will do the same.
+            if (resValue == null) {
+                continue;
+            }
+
             if (!(resValue instanceof ResScalarValue)) {
                 resValue = new ResStringValue(resValue.toString(), resValue.getRawIntValue());
             }
