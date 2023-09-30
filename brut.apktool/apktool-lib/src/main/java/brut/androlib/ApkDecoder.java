@@ -88,6 +88,7 @@ public class ApkDecoder {
             } catch (BrutException ex) {
                 throw new AndrolibException(ex);
             }
+            //noinspection ResultOfMethodCallIgnored
             outDir.mkdirs();
 
             LOGGER.info("Using Apktool " + ApktoolProperties.getVersion() + " on " + mApkInfo.apkFileName);
