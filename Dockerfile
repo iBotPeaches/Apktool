@@ -7,8 +7,7 @@ RUN \
     # APKTool
     apt-get install --no-install-recommends -y curl zipalign &&\
     curl -o /usr/local/bin/apktool https://raw.githubusercontent.com/iBotPeaches/Apktool/master/scripts/linux/apktool &&\
-    #curl -L -o /usr/local/bin/apktool.jar $(curl -s https://api.github.com/repos/iBotPeaches/Apktool/releases/latest |grep browser_download_url |awk '{print $2}' |sed 's/"//g') &&\
-    curl -L -o /usr/local/bin/apktool.jar https://github.com/iBotPeaches/Apktool/releases/download/v2.7.0/apktool_2.7.0.jar &&\
+    curl -L -o /usr/local/bin/apktool.jar $(curl -s https://api.github.com/repos/iBotPeaches/Apktool/releases/latest |grep browser_download_url |awk '{print $2}' |sed 's/"//g') &&\
     chmod +x /usr/local/bin/apktool /usr/local/bin/apktool.jar &&\
     \
     # Android SDK
