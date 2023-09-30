@@ -1,5 +1,6 @@
 import proguard.gradle.ProGuardTask
 
+val baksmaliVersion: String by rootProject.extra
 val commonsCliVersion: String by rootProject.extra
 val apktoolVersion: String by rootProject.extra
 
@@ -20,6 +21,7 @@ buildscript {
 
 dependencies {
     implementation("commons-cli:commons-cli:$commonsCliVersion")
+    implementation("com.android.tools.smali:smali-baksmali:$baksmaliVersion")
     implementation(project(":brut.apktool:apktool-lib"))
 }
 

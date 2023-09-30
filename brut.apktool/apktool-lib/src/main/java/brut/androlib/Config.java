@@ -16,6 +16,8 @@
  */
 package brut.androlib;
 
+import com.android.tools.smali.baksmali.BaksmaliOptions;
+
 import brut.androlib.exceptions.AndrolibException;
 import brut.util.OSDetection;
 
@@ -43,6 +45,8 @@ public class Config {
     public final static short DECODE_RES_RESOLVE_DUMMY = 0x0001;
     public final static short DECODE_RES_RESOLVE_RETAIN = 0x0002;
 
+    public BaksmaliOptions options = new BaksmaliOptions();
+
     // Build options
     public boolean forceBuildAll = false;
     public boolean forceDeleteFramework = false;
@@ -65,13 +69,17 @@ public class Config {
     public boolean analysisMode = false;
     public boolean forceDelete = false;
     public boolean keepBrokenResources = false;
-    public boolean baksmaliDebugMode = true;
+    public boolean resolveResources = false;
 
     // Common options
     public String frameworkDirectory = null;
     public String frameworkTag = null;
     public String aaptPath = "";
     public int aaptVersion = 1; // default to v1
+    public File outDir = null;
+    public String dexFile = null;
+    public File apkFile = null;
+    public String fileName = "";
 
     // Utility functions
     public boolean isAapt2() {
