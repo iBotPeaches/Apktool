@@ -167,11 +167,15 @@ public class Main {
         if (cli.hasOption("m") || cli.hasOption("match-original")) {
             config.analysisMode = true;
         }
-        if (cli.hasOption("res-mode") || cli.hasOption("resolve-resources-mode")) {
-            String mode = cli.getOptionValue("res-mode");
+        if (cli.hasOption("resm") || cli.hasOption("res-mode") || cli.hasOption("resolve-resources-mode")) {
+            String mode = cli.getOptionValue("resm");
+            if (mode == null) {
+                mode = cli.getOptionValue("res-mode");
+            }
             if (mode == null) {
                 mode = cli.getOptionValue("resolve-resources-mode");
             }
+
             switch (mode) {
                 case "remove":
                 case "delete":
