@@ -97,6 +97,7 @@ jobs:
       - name: Build
         uses: gradle/gradle-build-action@v2.8.0
         with:
+          dependency-graph: generate-and-submit
           arguments: build shadowJar proguard
       - name: Upload
         uses: actions/upload-artifact@v3
