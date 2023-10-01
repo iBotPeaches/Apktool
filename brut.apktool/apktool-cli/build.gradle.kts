@@ -1,10 +1,9 @@
 import proguard.gradle.ProGuardTask
 
-val commonsCliVersion: String by rootProject.extra
 val apktoolVersion: String by rootProject.extra
 
 plugins {
-    id("com.github.johnrengelman.shadow")
+    alias(libs.plugins.shadow)
     application
 }
 
@@ -14,12 +13,12 @@ plugins {
 buildscript {
     dependencies {
         // Proguard doesn't support plugin DSL - https://github.com/Guardsquare/proguard/issues/225
-        classpath("com.guardsquare:proguard-gradle:7.3.2")
+        classpath(libs.proguard)
     }
 }
 
 dependencies {
-    implementation("commons-cli:commons-cli:$commonsCliVersion")
+    implementation(libs.commons.cli)
     implementation(project(":brut.apktool:apktool-lib"))
 }
 

@@ -1,16 +1,5 @@
 import java.io.ByteArrayOutputStream
 
-val baksmaliVersion by extra("3.0.3")
-val commonsCliVersion by extra("1.5.0")
-val commonsIoVersion by extra("2.13.0")
-val commonsLangVersion by extra("3.13.0")
-val commonsTextVersion by extra("1.10.0")
-val guavaVersion by extra("32.0.1-jre")
-val junitVersion by extra("4.13.2")
-val smaliVersion by extra("3.0.3")
-val xmlpullVersion by extra("1.1.4c")
-val xmlunitVersion by extra("2.9.1")
-
 val version = "2.8.2"
 val suffix = "SNAPSHOT"
 
@@ -66,7 +55,7 @@ if ("release" !in gradle.startParameter.taskNames) {
 }
 
 plugins {
-    id("com.github.johnrengelman.shadow") version "8.1.1"
+    alias(libs.plugins.shadow)
     `java-library`
     `maven-publish`
     signing

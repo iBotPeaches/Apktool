@@ -1,13 +1,3 @@
-val baksmaliVersion: String by rootProject.extra
-val smaliVersion: String by rootProject.extra
-val xmlpullVersion: String by rootProject.extra
-val guavaVersion: String by rootProject.extra
-val commonsLangVersion: String by rootProject.extra
-val commonsIoVersion: String by rootProject.extra
-val commonsTextVersion: String by rootProject.extra
-val junitVersion: String by rootProject.extra
-val xmlunitVersion: String by rootProject.extra
-
 val gitRevision: String by rootProject.extra
 val apktoolVersion: String by rootProject.extra
 
@@ -39,14 +29,14 @@ dependencies {
     api(project(":brut.j.util"))
     api(project(":brut.j.common"))
 
-    implementation("com.android.tools.smali:smali-baksmali:$baksmaliVersion")
-    implementation("com.android.tools.smali:smali:$smaliVersion")
-    implementation("xpp3:xpp3:$xmlpullVersion")
-    implementation("com.google.guava:guava:$guavaVersion")
-    implementation("org.apache.commons:commons-lang3:$commonsLangVersion")
-    implementation("commons-io:commons-io:$commonsIoVersion")
-    implementation("org.apache.commons:commons-text:$commonsTextVersion")
+    implementation(libs.baksmali)
+    implementation(libs.smali)
+    implementation(libs.xmlpull)
+    implementation(libs.guava)
+    implementation(libs.commons.lang3)
+    implementation(libs.commons.io)
+    implementation(libs.commons.text)
 
-    testImplementation("junit:junit:$junitVersion")
-    testImplementation("org.xmlunit:xmlunit-legacy:$xmlunitVersion")
+    testImplementation(libs.junit)
+    testImplementation(libs.xmlunit)
 }
