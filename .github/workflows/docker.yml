@@ -26,16 +26,19 @@ jobs:
       packages: write
     steps:
       - name: Check out the repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Log in to the Container registry
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Get Hash
+      - name: Get hash
         id: hash
         run: echo "GITHUB_HASH=$(echo $GITHUB_SHA | cut -c 1-6)" >> $GITHUB_ENV
+      - name: Get release tag
+        id: tag
+        run: echo "GITHUB_TAG=$(echo ${GITHUB_REF:-no-tag})" >> $GITHUB_ENV
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
@@ -47,4 +50,4 @@ jobs:
           platforms: linux/arm64/v8
           file: ./docker/dockerfiles/seed.Dockerfile
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.GITHUB_HASH }},${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.GITHUB_HASH }},${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.GITHUB_TAG }},${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
