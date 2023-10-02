@@ -38,7 +38,7 @@ jobs:
         run: echo "GITHUB_HASH=$(echo $GITHUB_SHA | cut -c 1-6)" >> $GITHUB_ENV
       - name: Get release tag
         id: tag
-        run: echo "GITHUB_TAG=$(echo ${GITHUB_REF:-no-tag})" >> $GITHUB_ENV
+        run: echo "GITHUB_TAG=$(echo ${GITHUB_REF:-no-tag} |sed 's|refs/tags/||g')" >> $GITHUB_ENV
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
