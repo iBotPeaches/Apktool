@@ -47,7 +47,10 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          platforms: linux/arm64/v8
-          file: ./docker/dockerfiles/seed.Dockerfile
+          platforms: linux/amd64
+          file: ./Dockerfile
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.GITHUB_HASH }},${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.GITHUB_TAG }},${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          tags: |
+          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.GITHUB_HASH }}
+          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.GITHUB_TAG }}
+          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
