@@ -1,16 +1,8 @@
-name: Build and push docker
+name: Build and push docker (release)
 
 on:
   release:
     types: [published]
-
-# Use the below to integrate into a Beta build from master
-# Changes to the Dockerfile to use the manually built Jar
-# from the build automation would be required.
-# on:
-#   pull_request:
-#     branches: [master]
-#     types: [closed]
 
 env:
   REGISTRY: ghcr.io
@@ -45,7 +37,7 @@ jobs:
         with:
           context: .
           platforms: linux/amd64
-          file: ./Dockerfile
+          file: ./docker/release.Dockerfile
           push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.APKTOOL_HASH }}
