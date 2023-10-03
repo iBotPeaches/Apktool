@@ -2,17 +2,19 @@
 We provide an easy way to leverage `apktool`, along with common Android tools such as `zipalign` and `apksigner`, all from within Docker.
 
 ## Building the Docker image
-To build the image, use the included Dockerfile:
+To use the image, pull or build with the included Dockerfile:
 ```bash
-docker build -t apktool:latest .
+docker pull ghcr.io/ibotpeaches/apktool:latest
+# OR
+docker build -t apktool:local .
 ```
 
 ## Using the Docker image
-The best way to use the image is to create aliases to run the internal commands:
+The best way to use the image is to create aliases to run the internal commands. Replace `ghcr.io/ibotpeaches/apktool:latest` with `apktool:local` if you have built the image locally.
 ```bash
-alias apktool="docker run --rm -ti --name=apktool -v \"${PWD}:${PWD}\" -w \"${PWD}\" apktool:latest apktool"
-alias zipalign="docker run --rm -ti --name=zipalign -v \"${PWD}:${PWD}\" -w \"${PWD}\" apktool:latest zipalign"
-alias apksigner="docker run --rm -ti --name=apksigner -v \"${PWD}:${PWD}\" -w \"${PWD}\" apktool:latest apksigner"
+alias apktool="docker run --rm -ti --name=apktool -v \"${PWD}:${PWD}\" -w \"${PWD}\" ghcr.io/ibotpeaches/apktool:latest apktool"
+alias zipalign="docker run --rm -ti --name=zipalign -v \"${PWD}:${PWD}\" -w \"${PWD}\" ghcr.io/ibotpeaches/apktool:latest zipalign"
+alias apksigner="docker run --rm -ti --name=apksigner -v \"${PWD}:${PWD}\" -w \"${PWD}\" ghcr.io/ibotpeaches/apktool:latest apksigner"
 ```
 
 ## Running the commands
