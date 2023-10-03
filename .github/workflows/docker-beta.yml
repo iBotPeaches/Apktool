@@ -35,7 +35,7 @@ jobs:
         with:
           context: .
           platforms: linux/amd64
-          file: ./docker/beta.Dockerfile
+          file: ./docker/Dockerfile
           push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.APKTOOL_HASH }}
