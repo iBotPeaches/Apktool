@@ -28,9 +28,6 @@ jobs:
       - name: Get hash
         id: hash
         run: echo "APKTOOL_HASH=$(echo $GITHUB_SHA | cut -c 1-6)" >> $GITHUB_ENV
-      - name: Get release tag
-        id: tag
-        run: echo "APKTOOL_TAG=$(echo ${GITHUB_REF:-no-tag} |sed 's|refs/tags/||g')" >> $GITHUB_ENV
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2        
       - name: Build and push Docker image
@@ -43,3 +40,4 @@ jobs:
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.APKTOOL_HASH }}
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:beta
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:master

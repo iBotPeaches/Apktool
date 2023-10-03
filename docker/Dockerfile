@@ -1,4 +1,16 @@
-FROM sapmachine:21-jre-headless-ubuntu-jammy
+# BUILDER
+# =====================================================
+FROM sapmachine:21-jdk-headless-ubuntu-jammy AS builder
+
+COPY . /build
+WORKDIR /build
+RUN \
+    # Apktool
+    ./gradlew build shadowJar proguard
+
+# BASE
+# =====================================================
+FROM sapmachine:21-jre-headless-ubuntu-jammy AS base
 
 # Latest version as of 2023.10.01
 # Ref: https://developer.android.com/studio/index.html#command-line-tools-only
@@ -6,9 +18,15 @@ ARG COMMAND_LINE_TOOLS_VERSION=10406996
 
 ARG ANDROID_SDK_ROOT=/opt/android-sdk
 
+COPY --from=builder /build/brut.apktool/apktool-cli/build/libs/apktool-v*.jar /usr/local/bin/apktool.jar
+COPY --from=builder /scripts/linux/apktool /usr/local/bin/apktool
+
 RUN \
     # Update
     apt-get update &&\
+    \
+    # Apktool final setup
+    chmod +x /usr/local/bin/apktool /usr/local/bin/apktool.jar &&\
     \
     # Android SDK
     apt-get install -y --no-install-recommends \
@@ -30,11 +48,6 @@ RUN \
     export BUILD_TOOLS_VERSION=$(sdkmanager --list |grep build-tools |grep -v rc |awk '{print $1}' |sed 's/build-tools;//g' |sort |tail -n1) &&\
     sdkmanager --install "build-tools;${BUILD_TOOLS_VERSION}" &&\
     ln -s ${ANDROID_SDK_ROOT}/build-tools/${BUILD_TOOLS_VERSION} /opt/bin &&\
-    \
-    # Apktool
-    curl -o /usr/local/bin/apktool https://raw.githubusercontent.com/iBotPeaches/Apktool/master/scripts/linux/apktool &&\
-    curl -L -o /usr/local/bin/apktool.jar $(curl -s https://api.github.com/repos/iBotPeaches/Apktool/releases/latest |grep browser_download_url |awk '{print $2}' |sed 's/"//g') &&\
-    chmod +x /usr/local/bin/apktool /usr/local/bin/apktool.jar &&\
     \
     # Cleanup
     rm -rf /var/lib/apt/lists/*
