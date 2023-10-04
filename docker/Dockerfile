@@ -1,6 +1,6 @@
 # BUILDER
 # =====================================================
-FROM sapmachine:21-jdk-headless-ubuntu-jammy AS builder
+FROM ibm-semeru-runtimes:open-17-jdk-jammy AS builder
 
 COPY . /build
 WORKDIR /build
@@ -8,9 +8,14 @@ RUN \
     # Apktool
     ./gradlew build shadowJar proguard
 
+RUN \
+    # Relocate for easier copying
+    JAR=$(find /build/brut.apktool/apktool-cli/build/libs/apktool-*.jar |grep -v cli-all) &&\
+    mv ${JAR} /build/apktool.jar
+
 # BASE
 # =====================================================
-FROM sapmachine:21-jre-headless-ubuntu-jammy AS base
+FROM ibm-semeru-runtimes:open-17-jre-jammy AS base
 
 # Latest version as of 2023.10.01
 # Ref: https://developer.android.com/studio/index.html#command-line-tools-only
@@ -18,8 +23,8 @@ ARG COMMAND_LINE_TOOLS_VERSION=10406996
 
 ARG ANDROID_SDK_ROOT=/opt/android-sdk
 
-COPY --from=builder /build/brut.apktool/apktool-cli/build/libs/apktool-v*.jar /usr/local/bin/apktool.jar
-COPY --from=builder /scripts/linux/apktool /usr/local/bin/apktool
+COPY --from=builder /build/apktool.jar /usr/local/bin/apktool.jar
+COPY --from=builder /build/scripts/linux/apktool /usr/local/bin/apktool
 
 RUN \
     # Update
