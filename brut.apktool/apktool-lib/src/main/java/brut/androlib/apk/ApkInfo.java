@@ -191,6 +191,7 @@ public class ApkInfo implements YamlSerializable {
                 return ResConfigFlags.SDK_TIRAMISU;
             case "UPSIDEDOWNCAKE":
             case "UPSIDE_DOWN_CAKE":
+                return ResConfigFlags.SDK_UPSIDEDOWN_CAKE;
             case "VANILLAICECREAM":
             case "VANILLA_ICE_CREAM":
                 return ResConfigFlags.SDK_DEVELOPMENT;
