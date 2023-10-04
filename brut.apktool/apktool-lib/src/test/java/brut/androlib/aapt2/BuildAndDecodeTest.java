@@ -87,6 +87,12 @@ public class BuildAndDecodeTest extends BaseTest {
     }
 
     @Test
+    public void valuesGrammaticalGenderTest() throws BrutException {
+        compareValuesFiles("values-neuter/strings.xml");
+        compareValuesFiles("values-feminine/strings.xml");
+    }
+
+    @Test
     public void valuesBcp47LanguageScriptRegionVariantTest() throws BrutException {
         compareValuesFiles("values-b+ast+Latn+IT+AREVELA/strings.xml");
         compareValuesFiles("values-b+ast+Hant+IT+ARABEXT/strings.xml");
