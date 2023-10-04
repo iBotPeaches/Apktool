@@ -352,7 +352,15 @@ public class ARSCDecoder {
             return null;
         }
 
-        ResValue value = (flags & ENTRY_FLAG_COMPLEX) == 0 ? readValue() : readComplexEntry();
+        boolean isComplex = (flags & ENTRY_FLAG_COMPLEX) != 0;
+        boolean isCompact = (flags & ENTRY_FLAG_COMPACT) != 0;
+
+        if (isCompact) {
+            LOGGER.warning("Please report this application to Apktool for a fix: https://github.com/iBotPeaches/Apktool/issues/3366");
+            throw new AndrolibException("Unexpected entry type: compact");
+        }
+
+        ResValue value = isComplex ? readComplexEntry() : readValue();
         // #2824 - In some applications the res entries are duplicated with the 2nd being malformed.
         // AOSP skips this, so we will do the same.
         if (value == null) {
@@ -665,6 +673,7 @@ public class ARSCDecoder {
     private final static short ENTRY_FLAG_COMPLEX = 0x0001;
     private final static short ENTRY_FLAG_PUBLIC = 0x0002;
     private final static short ENTRY_FLAG_WEAK = 0x0004;
+    private final static short ENTRY_FLAG_COMPACT = 0x0008;
 
     private static final int KNOWN_CONFIG_BYTES = 64;
 
