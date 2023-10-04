@@ -436,6 +436,9 @@ public class ResConfigFlags {
     }
 
     private short getNaturalSdkVersionRequirement() {
+        if (grammaticalInflection != 0) {
+            return SDK_UPSIDEDOWN_CAKE;
+        }
         if ((uiMode & MASK_UI_MODE_TYPE) == UI_MODE_TYPE_VR_HEADSET || (colorMode & COLOR_WIDE_MASK) != 0 || ((colorMode & COLOR_HDR_MASK) != 0)) {
             return SDK_OREO;
         }
@@ -565,6 +568,7 @@ public class ResConfigFlags {
     public final static byte SDK_S = 31;
     public final static byte SDK_S_V2 = 32;
     public final static byte SDK_TIRAMISU = 33;
+    public final static byte SDK_UPSIDEDOWN_CAKE = 34;
 
     // AOSP has this as 10,000 for dev purposes.
     // platform_frameworks_base/commit/c7a1109a1fe0771d4c9b572dcf178e2779fc4f2d
