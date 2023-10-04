@@ -10,6 +10,7 @@ on:
       - 'brut.apktool/apktool-lib/src/main/resources/**'
       - 'brut.apktool/apktool-lib/src/test/**'
       - '.github/workflows/**'
+      - 'gradle/libs.versions.toml'
       - 'gradle/wrapper/**'
       - 'gradlew'
       - 'gradlew.bat'
@@ -27,7 +28,7 @@ jobs:
       matrix:
         file: [ aapt_64, aapt2_64 ]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Verify Executable
         run: ${{ env.BINARY_PATH }}/macosx/${{ matrix.file }} version
       - name: Output Static
@@ -39,7 +40,7 @@ jobs:
       matrix:
         file: [ aapt, aapt_64, aapt2, aapt2_64 ]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Verify Executable
         run: ${{ env.BINARY_PATH }}/linux/${{ matrix.file }} version
       - name: Output Static
@@ -51,7 +52,7 @@ jobs:
       matrix:
         file: [ aapt.exe, aapt_64.exe, aapt2.exe, aapt2_64.exe ]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Verify Executable
         run: ${{ env.BINARY_PATH }}/windows/${{ matrix.file }} version
       - name: Output Static
@@ -70,13 +71,13 @@ jobs:
         os: [ ubuntu-latest, macOS-latest, windows-latest ]
         java: [ 8, 11, 17, 18, 19, 20 ]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
           java-version: ${{ matrix.java }}
       - name: Build and test
-        uses: gradle/gradle-build-action@v2.8.0
+        uses: gradle/gradle-build-action@v2.9.0
         with:
           arguments: build shadowJar proguard
 
@@ -87,7 +88,7 @@ jobs:
     needs:
       - build-and-test-with-Java-8-and-later
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - uses: actions/setup-java@v3
@@ -95,8 +96,9 @@ jobs:
           distribution: 'zulu'
           java-version: 17
       - name: Build
-        uses: gradle/gradle-build-action@v2.8.0
+        uses: gradle/gradle-build-action@v2.9.0
         with:
+          dependency-graph: generate-and-submit
           arguments: build shadowJar proguard
       - name: Upload
         uses: actions/upload-artifact@v3

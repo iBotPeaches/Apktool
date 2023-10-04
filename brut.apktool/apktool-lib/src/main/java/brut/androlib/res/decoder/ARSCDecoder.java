@@ -260,10 +260,16 @@ public class ARSCDecoder {
     private ResType readTableType() throws IOException, AndrolibException {
         checkChunkType(ARSCHeader.XML_TYPE_TYPE);
         int typeId = mIn.readUnsignedByte() - mTypeIdOffset;
+
+        // #3311 - Some older applications have no TYPE_SPEC chunks, but still define TYPE chunks.
         if (mResTypeSpecs.containsKey(typeId)) {
-            mResId = (0xff000000 & mResId) | mResTypeSpecs.get(typeId).getId() << 16;
             mTypeSpec = mResTypeSpecs.get(typeId);
+        } else {
+            mTypeSpec = new ResTypeSpec(mTypeNames.getString(typeId - 1), typeId);
+            addTypeSpec(mTypeSpec);
+            mPkg.addType(mTypeSpec);
         }
+        mResId = (0xff000000 & mResId) | mTypeSpec.getId() << 16;
 
         int typeFlags = mIn.readByte();
         mIn.skipBytes(2); // reserved
@@ -408,6 +414,12 @@ public class ARSCDecoder {
         for (int i = 0; i < count; i++) {
             resId = mIn.readInt();
             resValue = readValue();
+
+            // #2824 - In some applications the res entries are duplicated with the 2nd being malformed.
+            // AOSP skips this, so we will do the same.
+            if (resValue == null) {
+                continue;
+            }
 
             if (!(resValue instanceof ResScalarValue)) {
                 resValue = new ResStringValue(resValue.toString(), resValue.getRawIntValue());

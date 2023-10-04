@@ -36,18 +36,15 @@ public class ResBagValue extends ResValue implements ResValuesXmlSerializable {
                                         ResResource res) throws IOException, AndrolibException {
         String type = res.getResSpec().getType().getName();
         if ("style".equals(type)) {
-            new ResStyleValue(mParent, new Duo[0], null)
-                    .serializeToResValuesXml(serializer, res);
+            new ResStyleValue(mParent, new Duo[0], null).serializeToResValuesXml(serializer, res);
             return;
         }
         if ("array".equals(type)) {
-            new ResArrayValue(mParent, new Duo[0]).serializeToResValuesXml(
-                    serializer, res);
+            new ResArrayValue(mParent, new Duo[0]).serializeToResValuesXml(serializer, res);
             return;
         }
         if ("plurals".equals(type)) {
-            new ResPluralsValue(mParent, new Duo[0]).serializeToResValuesXml(
-                    serializer, res);
+            new ResPluralsValue(mParent, new Duo[0]).serializeToResValuesXml(serializer, res);
             return;
         }
 

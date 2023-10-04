@@ -1,0 +1,53 @@
+name: Build and push docker
+
+on:
+  release:
+    types: [published]
+
+# Use the below to integrate into a Beta build from master
+# Changes to the Dockerfile to use the manually built Jar
+# from the build automation would be required.
+# on:
+#   pull_request:
+#     branches: [master]
+#     types: [closed]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+
+  build_and_push:
+    name: Build and push
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Log in to the Container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Get hash
+        id: hash
+        run: echo "APKTOOL_HASH=$(echo $GITHUB_SHA | cut -c 1-6)" >> $GITHUB_ENV
+      - name: Get release tag
+        id: tag
+        run: echo "APKTOOL_TAG=$(echo ${GITHUB_REF:-no-tag} |sed 's|refs/tags/||g')" >> $GITHUB_ENV
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2        
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          platforms: linux/amd64
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.APKTOOL_HASH }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.APKTOOL_TAG }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
