@@ -282,13 +282,18 @@ public class ARSCDecoder {
 
         // Be sure we don't poison mResTable by marking the application as sparse
         // Only flag the ResTable as sparse if the main package is not loaded.
-        if ((typeFlags & 0x01) != 0 && !mResTable.isMainPkgLoaded()) {
+        if ((typeFlags & TABLE_TYPE_FLAG_SPARSE) != 0 && !mResTable.isMainPkgLoaded()) {
             mResTable.setSparseResources(true);
+        }
+
+        if ((typeFlags & TABLE_TYPE_FLAG_OFFSET16) != 0) {
+            LOGGER.warning("Please report this application to Apktool for a fix: https://github.com/iBotPeaches/Apktool/issues/3367");
+            throw new AndrolibException("Unexpected TYPE_FLAG_OFFSET16");
         }
 
         HashMap<Integer, Integer> entryOffsetMap = new LinkedHashMap<>();
         for (int i = 0; i < entryCount; i++) {
-            if ((typeFlags & 0x01) != 0) {
+            if ((typeFlags & TABLE_TYPE_FLAG_SPARSE) != 0) {
                 entryOffsetMap.put(mIn.readUnsignedShort(), mIn.readUnsignedShort());
             } else {
                 entryOffsetMap.put(i, mIn.readInt());
@@ -352,7 +357,15 @@ public class ARSCDecoder {
             return null;
         }
 
-        ResValue value = (flags & ENTRY_FLAG_COMPLEX) == 0 ? readValue() : readComplexEntry();
+        boolean isComplex = (flags & ENTRY_FLAG_COMPLEX) != 0;
+        boolean isCompact = (flags & ENTRY_FLAG_COMPACT) != 0;
+
+        if (isCompact) {
+            LOGGER.warning("Please report this application to Apktool for a fix: https://github.com/iBotPeaches/Apktool/issues/3366");
+            throw new AndrolibException("Unexpected entry type: compact");
+        }
+
+        ResValue value = isComplex ? readComplexEntry() : readValue();
         // #2824 - In some applications the res entries are duplicated with the 2nd being malformed.
         // AOSP skips this, so we will do the same.
         if (value == null) {
@@ -483,11 +496,12 @@ public class ARSCDecoder {
         byte keyboard = 0;
         byte navigation = 0;
         byte inputFlags = 0;
+        byte grammaticalInflection = 0;
         if (size >= 20) {
             keyboard = mIn.readByte();
             navigation = mIn.readByte();
             inputFlags = mIn.readByte();
-            mIn.skipBytes(1); // inputPad0
+            grammaticalInflection = mIn.readByte();
             read = 20;
         }
 
@@ -545,6 +559,7 @@ public class ARSCDecoder {
         }
 
         int exceedingKnownSize = size - KNOWN_CONFIG_BYTES;
+
         if (exceedingKnownSize > 0) {
             byte[] buf = new byte[exceedingKnownSize];
             read += exceedingKnownSize;
@@ -569,7 +584,7 @@ public class ARSCDecoder {
 
         return new ResConfigFlags(mcc, mnc, language, country,
                 orientation, touchscreen, density, keyboard, navigation,
-                inputFlags, screenWidth, screenHeight, sdkVersion,
+                inputFlags, grammaticalInflection, screenWidth, screenHeight, sdkVersion,
                 screenLayout, uiMode, smallestScreenWidthDp, screenWidthDp,
                 screenHeightDp, localeScript, localeVariant, screenLayout2,
                 colorMode, localeNumberingSystem, isInvalid, size);
@@ -663,6 +678,10 @@ public class ARSCDecoder {
     private final static short ENTRY_FLAG_COMPLEX = 0x0001;
     private final static short ENTRY_FLAG_PUBLIC = 0x0002;
     private final static short ENTRY_FLAG_WEAK = 0x0004;
+    private final static short ENTRY_FLAG_COMPACT = 0x0008;
+
+    private final static short TABLE_TYPE_FLAG_SPARSE = 0x01;
+    private final static short TABLE_TYPE_FLAG_OFFSET16 = 0x02;
 
     private static final int KNOWN_CONFIG_BYTES = 64;
 

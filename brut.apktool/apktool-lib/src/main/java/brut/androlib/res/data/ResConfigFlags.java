@@ -32,6 +32,7 @@ public class ResConfigFlags {
     public final byte keyboard;
     public final byte navigation;
     public final byte inputFlags;
+    public final byte grammaticalInflection;
 
     public final short screenWidth;
     public final short screenHeight;
@@ -70,6 +71,7 @@ public class ResConfigFlags {
         keyboard = KEYBOARD_ANY;
         navigation = NAVIGATION_ANY;
         inputFlags = KEYSHIDDEN_ANY | NAVHIDDEN_ANY;
+        grammaticalInflection = GRAMMATICAL_GENDER_ANY;
         screenWidth = 0;
         screenHeight = 0;
         sdkVersion = 0;
@@ -91,7 +93,7 @@ public class ResConfigFlags {
     public ResConfigFlags(short mcc, short mnc, char[] language,
                           char[] region, byte orientation,
                           byte touchscreen, int density, byte keyboard, byte navigation,
-                          byte inputFlags, short screenWidth, short screenHeight,
+                          byte inputFlags, byte grammaticalInflection, short screenWidth, short screenHeight,
                           short sdkVersion, byte screenLayout, byte uiMode,
                           short smallestScreenWidthDp, short screenWidthDp,
                           short screenHeightDp, char[] localeScript, char[] localeVariant,
@@ -149,6 +151,7 @@ public class ResConfigFlags {
         this.keyboard = keyboard;
         this.navigation = navigation;
         this.inputFlags = inputFlags;
+        this.grammaticalInflection = grammaticalInflection;
         this.screenWidth = screenWidth;
         this.screenHeight = screenHeight;
         this.sdkVersion = sdkVersion;
@@ -197,6 +200,18 @@ public class ResConfigFlags {
             }
         }
         ret.append(getLocaleString());
+
+        switch (grammaticalInflection) {
+            case GRAMMATICAL_GENDER_NEUTER:
+                ret.append("-neuter");
+                break;
+            case GRAMMATICAL_GENDER_FEMININE:
+                ret.append("-feminine");
+                break;
+            case GRAMMATICAL_GENDER_MASCULINE:
+                ret.append("-masculine");
+                break;
+        }
 
         switch (screenLayout & MASK_LAYOUTDIR) {
             case SCREENLAYOUT_LAYOUTDIR_RTL:
@@ -421,6 +436,9 @@ public class ResConfigFlags {
     }
 
     private short getNaturalSdkVersionRequirement() {
+        if (grammaticalInflection != 0) {
+            return SDK_UPSIDEDOWN_CAKE;
+        }
         if ((uiMode & MASK_UI_MODE_TYPE) == UI_MODE_TYPE_VR_HEADSET || (colorMode & COLOR_WIDE_MASK) != 0 || ((colorMode & COLOR_HDR_MASK) != 0)) {
             return SDK_OREO;
         }
@@ -550,6 +568,7 @@ public class ResConfigFlags {
     public final static byte SDK_S = 31;
     public final static byte SDK_S_V2 = 32;
     public final static byte SDK_TIRAMISU = 33;
+    public final static byte SDK_UPSIDEDOWN_CAKE = 34;
 
     // AOSP has this as 10,000 for dev purposes.
     // platform_frameworks_base/commit/c7a1109a1fe0771d4c9b572dcf178e2779fc4f2d
@@ -589,6 +608,11 @@ public class ResConfigFlags {
     public final static short SCREENLAYOUT_ROUND_ANY = 0;
     public final static short SCREENLAYOUT_ROUND_NO = 0x1;
     public final static short SCREENLAYOUT_ROUND_YES = 0x2;
+
+    public final static byte GRAMMATICAL_GENDER_ANY = 0;
+    public final static byte GRAMMATICAL_GENDER_NEUTER = 1;
+    public final static byte GRAMMATICAL_GENDER_FEMININE = 2;
+    public final static byte GRAMMATICAL_GENDER_MASCULINE = 3;
 
     public final static byte KEYBOARD_ANY = 0;
     public final static byte KEYBOARD_NOKEYS = 1;
