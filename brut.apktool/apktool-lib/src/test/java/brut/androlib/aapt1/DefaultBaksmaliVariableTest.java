@@ -16,10 +16,7 @@
  */
 package brut.androlib.aapt1;
 
-import brut.androlib.ApkBuilder;
-import brut.androlib.ApkDecoder;
-import brut.androlib.BaseTest;
-import brut.androlib.TestUtils;
+import brut.androlib.*;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
 import brut.util.OS;
@@ -46,7 +43,9 @@ public class DefaultBaksmaliVariableTest extends BaseTest {
 
         LOGGER.info("Building issue1481.jar...");
         File testJar = new File(sTmpDir, "issue1481.jar");
-        new ApkBuilder(sTestOrigDir).build(testJar);
+        Config config = Config.getDefaultConfig();
+        config.useAapt2 = false;
+        new ApkBuilder(config, sTestOrigDir).build(testJar);
 
         LOGGER.info("Decoding issue1481.jar...");
         ApkDecoder apkDecoder = new ApkDecoder(testJar);

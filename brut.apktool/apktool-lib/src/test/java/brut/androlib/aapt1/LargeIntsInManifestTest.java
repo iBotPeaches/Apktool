@@ -16,10 +16,7 @@
  */
 package brut.androlib.aapt1;
 
-import brut.androlib.ApkBuilder;
-import brut.androlib.ApkDecoder;
-import brut.androlib.BaseTest;
-import brut.androlib.TestUtils;
+import brut.androlib.*;
 import brut.directory.ExtFile;
 import brut.common.BrutException;
 import brut.util.OS;
@@ -54,8 +51,10 @@ public class LargeIntsInManifestTest extends BaseTest {
         apkDecoder.decode(outDir);
 
         // build issue767
+        Config config = Config.getDefaultConfig();
+        config.useAapt2 = false;
         ExtFile testApk = new ExtFile(sTmpDir, apk + ".out");
-        new ApkBuilder(testApk).build(null);
+        new ApkBuilder(config, testApk).build(null);
         String newApk = apk + ".out" + File.separator + "dist" + File.separator + apk;
 
         // decode issue767 again

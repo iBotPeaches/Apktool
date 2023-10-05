@@ -14,12 +14,9 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib.decode;
+package brut.androlib.aapt1;
 
-import brut.androlib.ApkBuilder;
-import brut.androlib.ApkDecoder;
-import brut.androlib.BaseTest;
-import brut.androlib.TestUtils;
+import brut.androlib.*;
 import brut.directory.ExtFile;
 import brut.common.BrutException;
 import brut.util.OS;
@@ -43,7 +40,9 @@ public class ExternalEntityTest extends BaseTest {
 
         LOGGER.info("Building doctype.apk...");
         File testApk = new File(sTestOrigDir, "doctype.apk");
-        new ApkBuilder(sTestOrigDir).build(testApk);
+        Config config = Config.getDefaultConfig();
+        config.useAapt2 = false;
+        new ApkBuilder(config, sTestOrigDir).build(testApk);
 
         LOGGER.info("Decoding doctype.apk...");
         ApkDecoder apkDecoder = new ApkDecoder(testApk);

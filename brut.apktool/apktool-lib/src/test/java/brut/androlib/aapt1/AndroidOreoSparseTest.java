@@ -47,6 +47,7 @@ public class AndroidOreoSparseTest extends BaseTest {
 
         LOGGER.info("Building sparse.apk...");
         Config config = Config.getDefaultConfig();
+        config.useAapt2 = false;
         new ApkBuilder(config, sTestNewDir).build(testApk);
     }
 

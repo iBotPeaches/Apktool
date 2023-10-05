@@ -267,11 +267,13 @@ public class Main {
         if (cli.hasOption("nc") || cli.hasOption("no-crunch")) {
             config.noCrunch = true;
         }
+        if (cli.hasOption("use-aapt1")) {
+            config.useAapt2 = false;
+        }
 
-        // Temporary flag to enable the use of aapt2. This will transform in time to a use-aapt1 flag, which will be
-        // legacy and eventually removed.
-        if (cli.hasOption("use-aapt2")) {
-            config.useAapt2 = true;
+        if (cli.hasOption("use-aapt1") && cli.hasOption("use-aapt2")) {
+            System.err.println("You can only use one of --use-aapt1 or --use-aapt2.");
+            System.exit(1);
         }
 
         File outFile;
@@ -449,9 +451,14 @@ public class Main {
                 .desc("Load aapt from specified location.")
                 .build();
 
+        Option aapt1Option = Option.builder()
+            .longOpt("use-aapt1")
+            .desc("Use aapt binary instead of aapt2 during the build step.")
+            .build();
+
         Option aapt2Option = Option.builder()
                 .longOpt("use-aapt2")
-                .desc("Use aapt2 binary instead of aapt1 during the build step.")
+                .desc("Use aapt2 binary instead of aapt during the build step.")
                 .build();
 
         Option originalOption = Option.builder("c")
@@ -509,7 +516,7 @@ public class Main {
             buildOptions.addOption(netSecConfOption);
             buildOptions.addOption(aaptOption);
             buildOptions.addOption(originalOption);
-            buildOptions.addOption(aapt2Option);
+            buildOptions.addOption(aapt1Option);
             buildOptions.addOption(noCrunchOption);
         }
 
@@ -568,6 +575,7 @@ public class Main {
         allOptions.addOption(originalOption);
         allOptions.addOption(verboseOption);
         allOptions.addOption(quietOption);
+        allOptions.addOption(aapt1Option);
         allOptions.addOption(aapt2Option);
         allOptions.addOption(noCrunchOption);
         allOptions.addOption(onlyMainClassesOption);

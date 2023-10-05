@@ -48,6 +48,7 @@ public class DebugTagRetainedTest extends BaseTest {
 
         LOGGER.info("Building issue1235.apk...");
         Config config = Config.getDefaultConfig();
+        config.useAapt2 = false;
         config.debugMode = true;
 
         File testApk = new File(sTmpDir, "issue1235.apk");
