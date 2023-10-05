@@ -364,7 +364,10 @@ public class ARSCDecoder {
         ResValue value;
         if (isCompact) {
             byte type = (byte) ((flags >> 8) & 0xFF);
-            value = readCompactValue(size, type, specNamesId);
+            value = readCompactValue(type, specNamesId);
+
+            // To keep code below happy - we know if compact that the size has the key index encoded.
+            specNamesId = size;
         } else if (isComplex) {
             value = readComplexEntry();
         } else {
@@ -377,8 +380,6 @@ public class ARSCDecoder {
             return null;
         }
 
-        // TODO - This is misleading sets with COMPACT entries
-        // TODO - REDESIGN
         EntryData entryData = new EntryData();
         entryData.mFlags = flags;
         entryData.mSpecNamesId = specNamesId;
@@ -450,7 +451,7 @@ public class ARSCDecoder {
         return factory.bagFactory(parent, items, mTypeSpec);
     }
 
-    private ResIntBasedValue readCompactValue(short index, byte type, int data) throws IOException, AndrolibException {
+    private ResIntBasedValue readCompactValue(byte type, int data) throws AndrolibException {
         return type == TypedValue.TYPE_STRING
             ? mPkg.getValueFactory().factory(mTableStrings.getHTML(data), data)
             : mPkg.getValueFactory().factory(type, data, null);
@@ -699,6 +700,7 @@ public class ARSCDecoder {
     private static final int KNOWN_CONFIG_BYTES = 64;
 
     private static final int NO_ENTRY = 0xFFFFFFFF;
+    private static final int NO_ENTRY_OFFSET16 = 0xFFFF;
 
     private static final Logger LOGGER = Logger.getLogger(ARSCDecoder.class.getName());
 }
