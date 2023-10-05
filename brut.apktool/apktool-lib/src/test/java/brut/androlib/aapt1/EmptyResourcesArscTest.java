@@ -50,6 +50,7 @@ public class EmptyResourcesArscTest {
 
         LOGGER.info("Building issue1730.apk...");
         Config config = Config.getDefaultConfig();
+        config.useAapt2 = false;
         new ApkBuilder(config, sTestNewDir).build(testApk);
     }
 

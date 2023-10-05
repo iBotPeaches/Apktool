@@ -81,6 +81,7 @@ public class SharedLibraryTest extends BaseTest {
         Config config = Config.getDefaultConfig();
         config.frameworkDirectory = sTmpDir.getAbsolutePath();
         config.frameworkTag = "shared";
+        config.useAapt2 = false;
 
         // install library/framework
         new Framework(config).installFramework(new File(sTmpDir + File.separator + library));

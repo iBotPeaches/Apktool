@@ -51,7 +51,7 @@ public class Config {
     public boolean verbose = false;
     public boolean copyOriginalFiles = false;
     public boolean updateFiles = false;
-    public boolean useAapt2 = false;
+    public boolean useAapt2 = true;
     public boolean noCrunch = false;
     public int forceApi = 0;
 
