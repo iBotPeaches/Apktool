@@ -293,7 +293,7 @@ public class ARSCDecoder {
 
         HashMap<Integer, Integer> entryOffsetMap = new LinkedHashMap<>();
         for (int i = 0; i < entryCount; i++) {
-            if ((typeFlags & TABLE_TYPE_FLAG_OFFSET16) != 0) {
+            if ((typeFlags & TABLE_TYPE_FLAG_SPARSE) != 0) {
                 entryOffsetMap.put(mIn.readUnsignedShort(), mIn.readUnsignedShort());
             } else {
                 entryOffsetMap.put(i, mIn.readInt());
