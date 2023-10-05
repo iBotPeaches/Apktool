@@ -286,14 +286,12 @@ public class ARSCDecoder {
             mResTable.setSparseResources(true);
         }
 
-        if ((typeFlags & TABLE_TYPE_FLAG_OFFSET16) != 0) {
-            LOGGER.warning("Please report this application to Apktool for a fix: https://github.com/iBotPeaches/Apktool/issues/3367");
-            throw new AndrolibException("Unexpected TYPE_FLAG_OFFSET16");
-        }
-
         HashMap<Integer, Integer> entryOffsetMap = new LinkedHashMap<>();
         for (int i = 0; i < entryCount; i++) {
             if ((typeFlags & TABLE_TYPE_FLAG_SPARSE) != 0) {
+                entryOffsetMap.put(mIn.readUnsignedShort(), mIn.readUnsignedShort());
+            } else if ((typeFlags & TABLE_TYPE_FLAG_OFFSET16) != 0) {
+                // TODO - Support OFFSET16 reading to align offset properly.
                 entryOffsetMap.put(mIn.readUnsignedShort(), mIn.readUnsignedShort());
             } else {
                 entryOffsetMap.put(i, mIn.readInt());
@@ -347,31 +345,40 @@ public class ARSCDecoder {
 
     private EntryData readEntryData() throws IOException, AndrolibException {
         short size = mIn.readShort();
-        if (size < 0) {
-            throw new AndrolibException("Entry size is under 0 bytes.");
-        }
-
         short flags = mIn.readShort();
-        int specNamesId = mIn.readInt();
-        if (specNamesId == NO_ENTRY) {
-            return null;
-        }
 
         boolean isComplex = (flags & ENTRY_FLAG_COMPLEX) != 0;
         boolean isCompact = (flags & ENTRY_FLAG_COMPACT) != 0;
 
-        if (isCompact) {
-            LOGGER.warning("Please report this application to Apktool for a fix: https://github.com/iBotPeaches/Apktool/issues/3366");
-            throw new AndrolibException("Unexpected entry type: compact");
+        if (size < 0 && !isCompact) {
+            throw new AndrolibException("Entry size is under 0 bytes and not compactly packed.");
         }
 
-        ResValue value = isComplex ? readComplexEntry() : readValue();
+        int specNamesId = mIn.readInt();
+        if (specNamesId == NO_ENTRY && !isCompact) {
+            return null;
+        }
+
+        // #3366 - In a compactly packed entry, the key index is the size & type is higher 8 bits on flags.
+        // We assume a size of 8 bytes for compact entries and the specNamesId is the data itself encoded.
+        ResValue value;
+        if (isCompact) {
+            byte type = (byte) ((flags >> 8) & 0xFF);
+            value = readCompactValue(size, type, specNamesId);
+        } else if (isComplex) {
+            value = readComplexEntry();
+        } else {
+            value = readValue();
+        }
+
         // #2824 - In some applications the res entries are duplicated with the 2nd being malformed.
         // AOSP skips this, so we will do the same.
         if (value == null) {
             return null;
         }
 
+        // TODO - This is misleading sets with COMPACT entries
+        // TODO - REDESIGN
         EntryData entryData = new EntryData();
         entryData.mFlags = flags;
         entryData.mSpecNamesId = specNamesId;
@@ -441,6 +448,12 @@ public class ARSCDecoder {
         }
 
         return factory.bagFactory(parent, items, mTypeSpec);
+    }
+
+    private ResIntBasedValue readCompactValue(short index, byte type, int data) throws IOException, AndrolibException {
+        return type == TypedValue.TYPE_STRING
+            ? mPkg.getValueFactory().factory(mTableStrings.getHTML(data), data)
+            : mPkg.getValueFactory().factory(type, data, null);
     }
 
     private ResIntBasedValue readValue() throws IOException, AndrolibException {
