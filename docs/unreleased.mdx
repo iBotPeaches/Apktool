@@ -9,12 +9,14 @@ The changelog of the upcoming release, subject to change prior to finalization.
 :::
 
 - Add manual YAML implementation to drop SnakeYAML dependency. [#3145](https://github.com/iBotPeaches/Apktool/issues/3145) (Thanks sv99)
+- Add Android 14 framework support. [#3202](https://github.com/iBotPeaches/Apktool/issues/3202)
 - Add [Resource Modes](/docs/in-depth/resource-modes) to allow for more control over resource decoding. [#2836](https://github.com/iBotPeaches/Apktool/issues/2836)
 - Add Docker image. [#3351](https://github.com/iBotPeaches/Apktool/pull/3351) (Thanks Fmstrat)
 - Fix regression with detection of sparse resource table. [#3199](https://github.com/iBotPeaches/Apktool/issues/3199)
 - Fix poisoning of sparse detection via sparse framework. [#3298](https://github.com/iBotPeaches/Apktool/issues/3298)
 - Fix over-reading the Res Config Flags if size is larger than known. [#3205](https://github.com/iBotPeaches/Apktool/pull/3205)
 - Fix improperly decoding attribute and arrays. [#2806](https://github.com/iBotPeaches/Apktool/issues/2806)
+- Fix corruption of resource table when aapt2 is used. [#3346](https://github.com/iBotPeaches/Apktool/issues/3346)
 - Fix decoding application with larger chunk header size than used. [#2989](https://github.com/iBotPeaches/Apktool/issues/2989)
 - Fix decoding application with entries offset that resolved to NO_ENTRY (-1). [#1874](https://github.com/iBotPeaches/Apktool/issues/1874)
 - Fix decoding application with larger axml namespace than known. [#2587](https://github.com/iBotPeaches/Apktool/issues/2587), [#2863](https://github.com/iBotPeaches/Apktool/issues/2863)
