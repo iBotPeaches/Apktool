@@ -6,10 +6,9 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  IMAGE_NAME: ibotpeaches/apktool
 
 jobs:
-
   build_and_push:
     name: Build and push
     runs-on: ubuntu-latest
@@ -18,20 +17,25 @@ jobs:
       packages: write
     steps:
       - uses: actions/checkout@v4
+
       - name: Log in to the Container registry
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Get hash
         id: hash
         run: echo "APKTOOL_HASH=$(echo $GITHUB_SHA | cut -c 1-6)" >> $GITHUB_ENV
+
       - name: Get release tag
         id: tag
         run: echo "APKTOOL_TAG=$(echo ${GITHUB_REF:-no-tag} |sed 's|refs/tags/||g')" >> $GITHUB_ENV
+
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2        
+        uses: docker/setup-buildx-action@v2
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:
