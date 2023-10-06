@@ -280,17 +280,20 @@ public class ARSCDecoder {
 
         mHeader.checkForUnreadHeader(mIn);
 
+        boolean isOffset16 = (typeFlags & TABLE_TYPE_FLAG_OFFSET16) != 0;
+        boolean isSparse = (typeFlags & TABLE_TYPE_FLAG_SPARSE) != 0;
+
         // Be sure we don't poison mResTable by marking the application as sparse
         // Only flag the ResTable as sparse if the main package is not loaded.
-        if (isSparse(typeFlags) && !mResTable.isMainPkgLoaded()) {
+        if (isSparse && !mResTable.isMainPkgLoaded()) {
             mResTable.setSparseResources(true);
         }
 
         HashMap<Integer, Integer> entryOffsetMap = new LinkedHashMap<>();
         for (int i = 0; i < entryCount; i++) {
-            if (isSparse(typeFlags)) {
+            if (isSparse) {
                 entryOffsetMap.put(mIn.readUnsignedShort(), mIn.readUnsignedShort());
-            } else if (isOffset16(typeFlags)) {
+            } else if (isOffset16) {
                 entryOffsetMap.put(i, mIn.readUnsignedShort());
             } else {
                 entryOffsetMap.put(i, mIn.readInt());
@@ -307,7 +310,7 @@ public class ARSCDecoder {
         }
 
         mType = flags.isInvalid && !mKeepBroken ? null : mPkg.getOrCreateConfig(flags);
-        int noEntry = isOffset16(typeFlags) ? NO_ENTRY_OFFSET16 : NO_ENTRY;
+        int noEntry = isOffset16 ? NO_ENTRY_OFFSET16 : NO_ENTRY;
 
         for (int i : entryOffsetMap.keySet()) {
             mResId = (mResId & 0xffff0000) | i;
@@ -670,14 +673,6 @@ public class ARSCDecoder {
             throw new AndrolibException(String.format("Invalid chunk type: expected=0x%08x, got=0x%08x",
                     expectedType, mHeader.type));
         }
-    }
-
-    private boolean isOffset16(int flags) {
-        return (flags & TABLE_TYPE_FLAG_OFFSET16) != 0;
-    }
-
-    private boolean isSparse(int flags) {
-        return (flags & TABLE_TYPE_FLAG_SPARSE) != 0;
     }
 
     private final ExtCountingDataInput mIn;
