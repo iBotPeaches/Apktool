@@ -39,4 +39,4 @@ if "%ATTR:~0,1%"=="-" if "%~x1"==".apk" (
 "%java_exe%" -jar -Xmx1024M -Duser.language=en -Dfile.encoding=UTF8 -Djdk.util.zip.disableZip64ExtraFieldValidation=true -Djdk.nio.zipfs.allowDotZipEntry=true "%~dp0%BASENAME%%max%.jar" %fastCommand% %*
 
 rem Pause when ran non interactively
-for /f "tokens=2" %%# in ("%cmdcmdline%") do if /i "%%#" equ "/c" pause
+for %%i in (%cmdcmdline%) do if /i "%%~i"=="/c" pause & exit /b
