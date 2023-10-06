@@ -22,6 +22,7 @@ import brut.directory.ExtFile;
 import brut.directory.FileDirectory;
 import org.custommonkey.xmlunit.*;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -153,6 +154,17 @@ public class BaseTest {
         try (FileInputStream inputStream = new FileInputStream(file)) {
             return docBuilder.parse(inputStream);
         }
+    }
+
+    protected static int getStringEntryCount(Document doc, String key) {
+        int count = 0;
+        Element resources = doc.getDocumentElement();
+        for (int i = 0; i < resources.getChildNodes().getLength(); i++) {
+            if (resources.getChildNodes().item(i).getNodeName().equals(key)) {
+                count++;
+            }
+        }
+        return count;
     }
 
     protected static ExtFile sTmpDir;

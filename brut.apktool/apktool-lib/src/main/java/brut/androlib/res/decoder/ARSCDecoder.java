@@ -280,21 +280,21 @@ public class ARSCDecoder {
 
         mHeader.checkForUnreadHeader(mIn);
 
+        boolean isOffset16 = (typeFlags & TABLE_TYPE_FLAG_OFFSET16) != 0;
+        boolean isSparse = (typeFlags & TABLE_TYPE_FLAG_SPARSE) != 0;
+
         // Be sure we don't poison mResTable by marking the application as sparse
         // Only flag the ResTable as sparse if the main package is not loaded.
-        if ((typeFlags & TABLE_TYPE_FLAG_SPARSE) != 0 && !mResTable.isMainPkgLoaded()) {
+        if (isSparse && !mResTable.isMainPkgLoaded()) {
             mResTable.setSparseResources(true);
-        }
-
-        if ((typeFlags & TABLE_TYPE_FLAG_OFFSET16) != 0) {
-            LOGGER.warning("Please report this application to Apktool for a fix: https://github.com/iBotPeaches/Apktool/issues/3367");
-            throw new AndrolibException("Unexpected TYPE_FLAG_OFFSET16");
         }
 
         HashMap<Integer, Integer> entryOffsetMap = new LinkedHashMap<>();
         for (int i = 0; i < entryCount; i++) {
-            if ((typeFlags & TABLE_TYPE_FLAG_SPARSE) != 0) {
+            if (isSparse) {
                 entryOffsetMap.put(mIn.readUnsignedShort(), mIn.readUnsignedShort());
+            } else if (isOffset16) {
+                entryOffsetMap.put(i, mIn.readUnsignedShort());
             } else {
                 entryOffsetMap.put(i, mIn.readInt());
             }
@@ -310,11 +310,12 @@ public class ARSCDecoder {
         }
 
         mType = flags.isInvalid && !mKeepBroken ? null : mPkg.getOrCreateConfig(flags);
+        int noEntry = isOffset16 ? NO_ENTRY_OFFSET16 : NO_ENTRY;
 
         for (int i : entryOffsetMap.keySet()) {
             mResId = (mResId & 0xffff0000) | i;
             int offset = entryOffsetMap.get(i);
-            if (offset == NO_ENTRY) {
+            if (offset == noEntry) {
                 mMissingResSpecMap.put(mResId, typeId);
                 continue;
             }
@@ -347,25 +348,35 @@ public class ARSCDecoder {
 
     private EntryData readEntryData() throws IOException, AndrolibException {
         short size = mIn.readShort();
-        if (size < 0) {
-            throw new AndrolibException("Entry size is under 0 bytes.");
-        }
-
         short flags = mIn.readShort();
-        int specNamesId = mIn.readInt();
-        if (specNamesId == NO_ENTRY) {
-            return null;
-        }
 
         boolean isComplex = (flags & ENTRY_FLAG_COMPLEX) != 0;
         boolean isCompact = (flags & ENTRY_FLAG_COMPACT) != 0;
 
-        if (isCompact) {
-            LOGGER.warning("Please report this application to Apktool for a fix: https://github.com/iBotPeaches/Apktool/issues/3366");
-            throw new AndrolibException("Unexpected entry type: compact");
+        if (size < 0 && !isCompact) {
+            throw new AndrolibException("Entry size is under 0 bytes and not compactly packed.");
         }
 
-        ResValue value = isComplex ? readComplexEntry() : readValue();
+        int specNamesId = mIn.readInt();
+        if (specNamesId == NO_ENTRY && !isCompact) {
+            return null;
+        }
+
+        // #3366 - In a compactly packed entry, the key index is the size & type is higher 8 bits on flags.
+        // We assume a size of 8 bytes for compact entries and the specNamesId is the data itself encoded.
+        ResValue value;
+        if (isCompact) {
+            byte type = (byte) ((flags >> 8) & 0xFF);
+            value = readCompactValue(type, specNamesId);
+
+            // To keep code below happy - we know if compact that the size has the key index encoded.
+            specNamesId = size;
+        } else if (isComplex) {
+            value = readComplexEntry();
+        } else {
+            value = readValue();
+        }
+
         // #2824 - In some applications the res entries are duplicated with the 2nd being malformed.
         // AOSP skips this, so we will do the same.
         if (value == null) {
@@ -441,6 +452,12 @@ public class ARSCDecoder {
         }
 
         return factory.bagFactory(parent, items, mTypeSpec);
+    }
+
+    private ResIntBasedValue readCompactValue(byte type, int data) throws AndrolibException {
+        return type == TypedValue.TYPE_STRING
+            ? mPkg.getValueFactory().factory(mTableStrings.getHTML(data), data)
+            : mPkg.getValueFactory().factory(type, data, null);
     }
 
     private ResIntBasedValue readValue() throws IOException, AndrolibException {
@@ -686,6 +703,7 @@ public class ARSCDecoder {
     private static final int KNOWN_CONFIG_BYTES = 64;
 
     private static final int NO_ENTRY = 0xFFFFFFFF;
+    private static final int NO_ENTRY_OFFSET16 = 0xFFFF;
 
     private static final Logger LOGGER = Logger.getLogger(ARSCDecoder.class.getName());
 }
