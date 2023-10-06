@@ -282,17 +282,16 @@ public class ARSCDecoder {
 
         // Be sure we don't poison mResTable by marking the application as sparse
         // Only flag the ResTable as sparse if the main package is not loaded.
-        if ((typeFlags & TABLE_TYPE_FLAG_SPARSE) != 0 && !mResTable.isMainPkgLoaded()) {
+        if (isSparse(typeFlags) && !mResTable.isMainPkgLoaded()) {
             mResTable.setSparseResources(true);
         }
 
         HashMap<Integer, Integer> entryOffsetMap = new LinkedHashMap<>();
         for (int i = 0; i < entryCount; i++) {
-            if ((typeFlags & TABLE_TYPE_FLAG_SPARSE) != 0) {
+            if (isSparse(typeFlags)) {
                 entryOffsetMap.put(mIn.readUnsignedShort(), mIn.readUnsignedShort());
-            } else if ((typeFlags & TABLE_TYPE_FLAG_OFFSET16) != 0) {
-                // TODO - Support OFFSET16 reading to align offset properly.
-                entryOffsetMap.put(mIn.readUnsignedShort(), mIn.readUnsignedShort());
+            } else if (isOffset16(typeFlags)) {
+                entryOffsetMap.put(i, mIn.readUnsignedShort());
             } else {
                 entryOffsetMap.put(i, mIn.readInt());
             }
@@ -308,11 +307,12 @@ public class ARSCDecoder {
         }
 
         mType = flags.isInvalid && !mKeepBroken ? null : mPkg.getOrCreateConfig(flags);
+        int noEntry = isOffset16(typeFlags) ? NO_ENTRY_OFFSET16 : NO_ENTRY;
 
         for (int i : entryOffsetMap.keySet()) {
             mResId = (mResId & 0xffff0000) | i;
             int offset = entryOffsetMap.get(i);
-            if (offset == NO_ENTRY) {
+            if (offset == noEntry) {
                 mMissingResSpecMap.put(mResId, typeId);
                 continue;
             }
@@ -670,6 +670,14 @@ public class ARSCDecoder {
             throw new AndrolibException(String.format("Invalid chunk type: expected=0x%08x, got=0x%08x",
                     expectedType, mHeader.type));
         }
+    }
+
+    private boolean isOffset16(int flags) {
+        return (flags & TABLE_TYPE_FLAG_OFFSET16) != 0;
+    }
+
+    private boolean isSparse(int flags) {
+        return (flags & TABLE_TYPE_FLAG_SPARSE) != 0;
     }
 
     private final ExtCountingDataInput mIn;
