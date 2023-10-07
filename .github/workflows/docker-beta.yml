@@ -43,5 +43,4 @@ jobs:
           push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.APKTOOL_HASH }}
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:beta
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:master
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:snapshot
