@@ -1,0 +1,85 @@
+---
+slug: apktool-2.9.0
+title: Apktool 2.9.0
+authors: ibotpeaches
+tags: [release]
+---
+
+:::caution
+
+This release contains an updated internal framework file and changed the default aapt binary to version 2.
+
+- `apktool empty-framework-dir` to remove the old file.
+- `--use-aapt1` to return to old behavior (aapt1) during compilation.
+
+:::
+
+- Add manual YAML implementation to drop SnakeYAML dependency. [#3145](https://github.com/iBotPeaches/Apktool/issues/3145) (Thanks sv99)
+- Add Android 14 framework support. [#3202](https://github.com/iBotPeaches/Apktool/issues/3202)
+- Add [Resource Modes](/docs/in-depth/resource-modes) to allow for more control over resource decoding. [#2836](https://github.com/iBotPeaches/Apktool/issues/2836)
+- Add Docker image. [#3351](https://github.com/iBotPeaches/Apktool/pull/3351) (Thanks Fmstrat)
+- Add support for compactly packed resources. [#3366](https://github.com/iBotPeaches/Apktool/issues/3366)
+- Add support for 16bit offset entries in resource table. [#3367](https://github.com/iBotPeaches/Apktool/issues/3367)
+- Add support for grammatical gender. [#3369](https://github.com/iBotPeaches/Apktool/issues/3369)
+- Fix regression with detection of sparse resource table. [#3199](https://github.com/iBotPeaches/Apktool/issues/3199)
+- Fix poisoning of sparse detection via sparse framework. [#3298](https://github.com/iBotPeaches/Apktool/issues/3298)
+- Fix over-reading the Res Config Flags if size is larger than known. [#3205](https://github.com/iBotPeaches/Apktool/pull/3205)
+- Fix improperly decoding attribute and arrays. [#2806](https://github.com/iBotPeaches/Apktool/issues/2806)
+- Fix corruption of resource table when aapt2 is used. [#3346](https://github.com/iBotPeaches/Apktool/issues/3346)
+- Fix decoding application with larger chunk header size than used. [#2989](https://github.com/iBotPeaches/Apktool/issues/2989)
+- Fix decoding application with entries offset that resolved to NO_ENTRY (-1). [#1874](https://github.com/iBotPeaches/Apktool/issues/1874)
+- Fix decoding application with larger axml namespace than known. [#2587](https://github.com/iBotPeaches/Apktool/issues/2587), [#2863](https://github.com/iBotPeaches/Apktool/issues/2863)
+- Fix decoding application with misleading number of end namespace chunks. [#2070](https://github.com/iBotPeaches/Apktool/issues/2070)
+- Fix decoding application with empty resource table. [#2701](https://github.com/iBotPeaches/Apktool/issues/2701)
+- Fix decoding application with duplicate namespaces. [#2664](https://github.com/iBotPeaches/Apktool/issues/2664)
+- Fix decoding application with missing namespace on system resources. [#2972](https://github.com/iBotPeaches/Apktool/issues/2972), [#2420](https://github.com/iBotPeaches/Apktool/issues/2420)
+- Fix decoding application with string block with more string entries than strings. [#3236](https://github.com/iBotPeaches/Apktool/issues/3236)
+- Fix decoding application with unknown files that exceed file name length limits. [#3238](https://github.com/iBotPeaches/Apktool/pull/3238)
+- Fix decoding application with duplicate smaller res entries. [#2824](https://github.com/iBotPeaches/Apktool/issues/2824)
+- Fix decoding application with styled string with span outside length of string. [#2829](https://github.com/iBotPeaches/Apktool/issues/2829)
+- Fix decoding application from Android Milestone (pre 1.0) builds. [#3311](https://github.com/iBotPeaches/Apktool/issues/3311)
+- Fix "disableZip64ExtraFieldValidation" patch by adding to helper scripts. [#3198](https://github.com/iBotPeaches/Apktool/issues/3198)
+- Fix changing values of `platformBuildVersionCode` and `platformBuildVersionName` in `apktool.yml`. [#3204](https://github.com/iBotPeaches/Apktool/issues/3204)
+- Fix ci build system to properly archive test builds post Kotlin migration. [#3282](https://github.com/iBotPeaches/Apktool/issues/3282)
+- Fix Windows helper scripts to properly handle `/c`. [#2973](https://github.com/iBotPeaches/Apktool/pull/2973) (Thanks maksz42)
+- Change aapt2 to be default build tool. [#3368](https://github.com/iBotPeaches/Apktool/issues/3368)
+- Change build system to ignore missing javadoc blocks. [#3222](https://github.com/iBotPeaches/Apktool/pull/3222) (Thanks sv99)
+- Change `-c/--copy-original` to no longer be deprecated. [#2129](https://github.com/iBotPeaches/Apktool/issues/2129)
+- Change frequency of dummy resources to be less often after proper disassembly of resources. [#2683](https://github.com/iBotPeaches/Apktool/issues/2683), [#2104](https://github.com/iBotPeaches/Apktool/issues/2104)
+- Change build system configuration to Kotlin DSL. [#3249](https://github.com/iBotPeaches/Apktool/pull/3249)
+- Change build system to leverage Gradle version catalog. [#3353](https://github.com/iBotPeaches/Apktool/pull/3353)
+- Change system to no longer generate `APKTOOL_DUMMY_*` resources. [#3258](https://github.com/iBotPeaches/Apktool/pull/3258)
+- Change verbose mode to no longer print out method names. [#3310](https://github.com/iBotPeaches/Apktool/pull/3310)
+- Refactor out specific manifest file decoder for empty resource table. [#3171](https://github.com/iBotPeaches/Apktool/pull/3171) (Thanks sv99)
+- Refactor out duo logic with decoders during resource parser. [#3211](https://github.com/iBotPeaches/Apktool/pull/3211) (Thanks sv99)
+- Refactor for specific method operations for loading full resource table. [#3217](https://github.com/iBotPeaches/Apktool/pull/3217) (Thanks sv99)
+- Refactor ApkDecoder for leveraging ApkInfo for file and unknown files. [#3242](https://github.com/iBotPeaches/Apktool/pull/3242) (Thanks sv99)
+- Refactor ResAttrDecoder into AXmlResourceParser. [#3243](https://github.com/iBotPeaches/Apktool/pull/3243) (Thanks sv99)
+- Refactor Gradle validation job to only run if `gradle/wrapper/gradle-wrapper.jar` is modified. [#3228](https://github.com/iBotPeaches/Apktool/pull/3228) (Thanks ArjunaKumarMohanta)
+- Upgrade Gradle to `8.3.0` [#3275](https://github.com/iBotPeaches/Apktool/pull/3275) (Thanks ArjunaKumarMohanta)
+- Upgrade `@actions/checkout` to `v4`. [#3327](https://github.com/iBotPeaches/Apktool/pull/3327)
+- Upgrade `apache.commons/lang3` to `3.13.0` [#3240](https://github.com/iBotPeaches/Apktool/pull/3240)
+- Upgrade `apaches.common-io` to `2.14.0` [#3358](https://github.com/iBotPeaches/Apktool/pull/3358)
+- Upgrade `gradle/gradle-build-action` to `2.9.0` [#3213](https://github.com/iBotPeaches/Apktool/pull/3213), [#3241](https://github.com/iBotPeaches/Apktool/pull/3241), [#3285](https://github.com/iBotPeaches/Apktool/pull/3285), [#3316](https://github.com/iBotPeaches/Apktool/pull/3316), [#3359](https://github.com/iBotPeaches/Apktool/pull/3359)
+- Upgrade `gradle/wrapper-validation-action` to `1.1.0` [#3214](https://github.com/iBotPeaches/Apktool/pull/3214)
+- Upgrade `xmlunit:xmlunit:1.6` to `org.xmlunit:xmlunit-legacy:2.9.1` [#3235](https://github.com/iBotPeaches/Apktool/pull/3235)
+- Upgrade `com.github.johnrengelman.shadow` to `8.1.1` [#3259](https://github.com/iBotPeaches/Apktool/pull/3259)
+
+:::success
+
+[Download now at Bitbucket](https://bitbucket.org/iBotPeaches/apktool/downloads/apktool_2.9.0.jar), [Maven](https://mvnrepository.com/artifact/org.apktool/apktool-lib)
+
+- md5 - `246e7208cfb92c73d21e4e6a8909dda1`
+- sha256 - `e5ecf759297b845be64a3a5145ccc372db905b15a801a22ea1c91ee03c4c7a65`
+
+:::
+
+:::info
+
+This release has an updated Windows helper script.
+
+- [apktool.bat](https://github.com/iBotPeaches/Apktool/blob/master/scripts/windows/apktool.bat) to download.
+
+:::
+
+> This post was released with commentary at: https://connortumbleson.com/2023/10/08/apktool-v2-9-0-released/
