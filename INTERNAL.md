@@ -251,8 +251,8 @@ we aren't building the entire AOSP package, the initial build is to just see if 
 
 We check out a certain tag or branch. Currently we use
 
- * aapt2 - `master`.
- * aapt1 - `master`.
+ * aapt2 - `android-14.0.0_r2`.
+ * aapt1 - `android-14.0.0_r2`.
 
 ### Including our modified `frameworks/base` package.
 
