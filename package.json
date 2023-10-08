@@ -16,9 +16,9 @@
     "lint:fix": "eslint --fix ./docs/** ./blog/** README.md ./src/**/*.js ./*.js"
   },
   "dependencies": {
-    "@docusaurus/core": "2.4.1",
-    "@docusaurus/plugin-client-redirects": "^2.4.1",
-    "@docusaurus/preset-classic": "2.4.1",
+    "@docusaurus/core": "2.4.3",
+    "@docusaurus/plugin-client-redirects": "^2.4.3",
+    "@docusaurus/preset-classic": "2.4.3",
     "@mdx-js/react": "^1.6.22",
     "clsx": "^1.2.1",
     "prism-react-renderer": "^1.3.5",
@@ -27,7 +27,7 @@
   },
   "devDependencies": {
     "@docusaurus/eslint-plugin": "^2.4.1",
-    "@docusaurus/module-type-aliases": "2.4.1",
+    "@docusaurus/module-type-aliases": "2.4.3",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-mdx": "^2.1.0",
     "eslint-plugin-prettier": "^5.0.0",
