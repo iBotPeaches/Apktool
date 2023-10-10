@@ -72,7 +72,8 @@ public class ARSCDecoder {
             nextChunk();
 
             LOGGER.fine(String.format(
-                "Chunk #%d start: type=0x%04x chunkSize=0x%08x", chunkNumber++, mHeader.type, mHeader.chunkSize
+                "Chunk #%d start=0x%08x type=0x%04x chunkSize=0x%08x",
+                chunkNumber++, mIn.position(), mHeader.type, mHeader.chunkSize
             ));
 
             switch (mHeader.type) {
