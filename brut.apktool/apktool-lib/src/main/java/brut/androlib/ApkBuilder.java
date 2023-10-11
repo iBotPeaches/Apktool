@@ -208,7 +208,7 @@ public class ApkBuilder {
             LOGGER.info("Smaling " + folder + " folder into " + filename + "...");
             //noinspection ResultOfMethodCallIgnored
             dex.delete();
-            SmaliBuilder.build(smaliDir, dex, mConfig.forceApi > 0 ? mConfig.forceApi : mMinSdkVersion);
+            SmaliBuilder.build(smaliDir, dex, mConfig.apiLevel > 0 ? mConfig.apiLevel : mMinSdkVersion);
         }
         return true;
     }
