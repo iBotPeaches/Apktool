@@ -44,7 +44,5 @@ jobs:
           file: ./docker/Dockerfile
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.APKTOOL_HASH }}
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.APKTOOL_TAG }}
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:prod
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
