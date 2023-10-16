@@ -1,9 +1,9 @@
 name: Build and push docker (beta)
 
 on:
-  pull_request:
-    branches: [master]
-    types: [closed]
+  push:
+    branches:
+      - master
 
 env:
   REGISTRY: ghcr.io
