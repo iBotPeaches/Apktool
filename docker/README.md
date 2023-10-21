@@ -2,11 +2,11 @@
 We provide an easy way to leverage `apktool`, along with common Android tools such as `zipalign` and `apksigner`, all from within Docker.
 
 ## Building the Docker image
-To use the image, pull or build with the included Dockerfile:
+To use the image, pull the pre-built image or build one from the repo root with the included Dockerfile:
 ```bash
 docker pull ghcr.io/ibotpeaches/apktool:latest
 # OR
-docker build -t apktool:local .
+docker build -t apktool:local -f docker/Dockerfile .
 ```
 
 ## Using the Docker image
