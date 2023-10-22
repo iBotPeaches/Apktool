@@ -23,7 +23,7 @@ const FeatureList = [
     title: 'Analyze',
     description: (
       <>
-        Not interested in rebuilding? Just attach <code>-a</code> to any command. Apktool will do its best to rip apart the resources and manifest for easy inspection.
+        Not interested in rebuilding? Just attach <code>-m</code> to any disassemble command. Apktool will do its best to rip apart the resources and manifest for easy inspection.
       </>
     ),
   },
