@@ -35,6 +35,7 @@ import brut.util.BrutIO;
 import brut.util.OS;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -49,6 +50,68 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 public class ApkBuilder {
+    private abstract static class BuildAction {
+
+    }
+
+    private static final class BuildSourcesAction extends BuildAction {
+        private final String mFolder;
+        private final String mFileName;
+        private final boolean mBuildSmali;
+
+        public BuildSourcesAction(String folder, String fileName, boolean buildSmali) {
+            mFolder = folder;
+            mFileName = fileName;
+            mBuildSmali = buildSmali;
+        }
+
+        public String getFolder() {
+            return mFolder;
+        }
+
+        public String getFileName() {
+            return mFileName;
+        }
+
+        public boolean getBuildSmali() {
+            return mBuildSmali;
+        }
+    }
+
+    private static final class BuildManifestAndResourcesAction extends BuildAction {
+        private final File mManifest;
+        private final File mManifestOriginal;
+
+        public BuildManifestAndResourcesAction(File manifest, File manifestOriginal) {
+
+            this.mManifest = manifest;
+            this.mManifestOriginal = manifestOriginal;
+        }
+
+        public File getManifest() {
+            return mManifest;
+        }
+
+        public File getManifestOriginal() {
+            return mManifestOriginal;
+        }
+    }
+
+    private static final class BuildLibraryAction extends BuildAction {
+        private final String mFolder;
+
+        public BuildLibraryAction(String folder) {
+            mFolder = folder;
+        }
+
+        public String getFolder() {
+            return mFolder;
+        }
+    }
+
+    private static final class CopyOriginalFilesAction extends BuildAction {
+    }
+
     private final static Logger LOGGER = Logger.getLogger(ApkBuilder.class.getName());
 
     private final Config mConfig;
@@ -96,12 +159,16 @@ public class ApkBuilder {
         File manifest = new File(mApkDir, "AndroidManifest.xml");
         File manifestOriginal = new File(mApkDir, "AndroidManifest.xml.orig");
 
-        buildSources();
-        buildNonDefaultSources();
-        buildManifestFile(manifest, manifestOriginal);
-        buildResources();
-        buildLibs();
-        buildCopyOriginalFiles();
+        // build a list of actions that will be run in parallel
+        List<BuildAction> buildActions = new ArrayList<>();
+        buildActions.add(new BuildManifestAndResourcesAction(manifest, manifestOriginal));
+        buildActions.add(new CopyOriginalFilesAction());
+        addBuildSourcesAction(buildActions);
+        addBuildNonDefaultSourcesActions(buildActions);
+        addBuildLibsActions(buildActions);
+        // then run them all
+        runBuildActionsInParallel(buildActions);
+
         buildApk(outFile);
 
         // we must go after the Apk is built, and copy the files in via Zip
@@ -141,13 +208,56 @@ public class ApkBuilder {
         }
     }
 
-    private void buildSources() throws AndrolibException {
-        if (!buildSourcesRaw("classes.dex") && !buildSourcesSmali("smali", "classes.dex")) {
-            LOGGER.warning("Could not find sources");
+    private void runBuildAction(BuildAction buildAction) throws BrutException {
+        if (buildAction instanceof BuildSourcesAction) {
+            BuildSourcesAction typedAction = (BuildSourcesAction) buildAction;
+            if (typedAction.getBuildSmali() && typedAction.getFolder() != null) {
+                if (!buildSourcesRaw(typedAction.getFileName()) && !buildSourcesSmali(typedAction.getFolder(), typedAction.getFileName())) {
+                    LOGGER.warning("Could not find sources");
+                }
+            } else {
+                if (!buildSourcesRaw(typedAction.getFileName())) {
+                    LOGGER.warning("Could not find sources");
+                }
+            }
+        } else if (buildAction instanceof BuildLibraryAction) {
+            BuildLibraryAction typedAction = (BuildLibraryAction) buildAction;
+            buildLibrary(typedAction.getFolder());
+        } else if (buildAction instanceof BuildManifestAndResourcesAction) {
+            BuildManifestAndResourcesAction typedAction = (BuildManifestAndResourcesAction) buildAction;
+            buildManifestFile(typedAction.getManifest(), typedAction.getManifestOriginal());
+            buildResources();
+        } else if (buildAction instanceof  CopyOriginalFilesAction) {
+            buildCopyOriginalFiles();
+        } else {
+            throw new RuntimeException("Unknown build action");
         }
     }
 
-    private void buildNonDefaultSources() throws AndrolibException {
+    private void runBuildActionsInParallel(List<BuildAction> buildActions) throws BrutException {
+        try {
+            buildActions.parallelStream().forEach(a -> {
+                try {
+                    runBuildAction(a);
+                } catch (BrutException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        } catch (RuntimeException e){
+          Throwable rootCause = ExceptionUtils.getRootCause(e);
+          if (rootCause instanceof BrutException) {
+              throw (BrutException) rootCause;
+          }
+
+          throw e;
+        }
+    }
+
+    private void addBuildSourcesAction(List<BuildAction> buildActions) {
+        buildActions.add(new BuildSourcesAction("smali", "classes.dex", true));
+    }
+
+    private void addBuildNonDefaultSourcesActions(List<BuildAction> buildActions) throws AndrolibException {
         try {
             // loop through any smali_ directories for multi-dex apks
             Map<String, Directory> dirs = mApkDir.getDirectory().getDirs();
@@ -156,9 +266,7 @@ public class ApkBuilder {
                 if (name.startsWith("smali_")) {
                     String filename = name.substring(name.indexOf("_") + 1) + ".dex";
 
-                    if (!buildSourcesRaw(filename) && !buildSourcesSmali(name, filename)) {
-                        LOGGER.warning("Could not find sources");
-                    }
+                    buildActions.add(new BuildSourcesAction(name, filename, true));
                 }
             }
 
@@ -168,7 +276,7 @@ public class ApkBuilder {
                 for (File dex : dexFiles) {
                     // skip classes.dex because we have handled it in buildSources()
                     if (dex.getName().endsWith(".dex") && !dex.getName().equalsIgnoreCase("classes.dex")) {
-                        buildSourcesRaw(dex.getName());
+                        buildActions.add(new BuildSourcesAction(null, dex.getName(), false));
                     }
                 }
             }
@@ -375,11 +483,11 @@ public class ApkBuilder {
         }
     }
 
-    private void buildLibs() throws AndrolibException {
-        buildLibrary("lib");
-        buildLibrary("libs");
-        buildLibrary("kotlin");
-        buildLibrary("META-INF/services");
+    private void addBuildLibsActions(List<BuildAction> buildActions) {
+        buildActions.add(new BuildLibraryAction("lib"));
+        buildActions.add(new BuildLibraryAction("libs"));
+        buildActions.add(new BuildLibraryAction("kotlin"));
+        buildActions.add(new BuildLibraryAction("META-INF/services"));
     }
 
     private void buildLibrary(String folder) throws AndrolibException {
