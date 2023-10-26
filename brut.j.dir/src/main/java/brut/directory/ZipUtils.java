@@ -25,6 +25,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.util.Collection;
 import java.util.zip.CRC32;
+import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -36,11 +37,12 @@ public class ZipUtils {
         // Private constructor for utility class
     }
 
-    public static void zipFolders(final File folder, final File zip, final File assets, final Collection<String> doNotCompress)
+    public static void zipFolders(final File folder, final File zip, final File assets, final Collection<String> doNotCompress, final int level)
             throws BrutException, IOException {
 
         mDoNotCompress = doNotCompress;
         ZipOutputStream zipOutputStream = new ZipOutputStream(Files.newOutputStream(zip.toPath()));
+        zipOutputStream.setLevel(level);
         zipFolders(folder, zipOutputStream);
 
         // We manually set the assets because we need to retain the folder structure

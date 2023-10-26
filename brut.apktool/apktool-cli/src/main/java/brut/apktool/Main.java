@@ -270,6 +270,19 @@ public class Main {
         if (cli.hasOption("use-aapt1")) {
             config.useAapt2 = false;
         }
+        if (cli.hasOption("l") ||cli.hasOption("compression-level")) {
+            try {
+                int intValue = Integer.parseInt(cli.getOptionValue("l"));
+                if (intValue < -1 || intValue > 9) {
+                    System.err.println("Compression level must be a value between 0 and 9 or -1 for default.");
+                    System.exit(1);
+                }
+                config.zipCompressionLevel = intValue;
+            } catch (NumberFormatException e) {
+                System.err.println("Compression level isn't a number.");
+                System.exit(1);
+            }
+        }
 
         if (cli.hasOption("use-aapt1") && cli.hasOption("use-aapt2")) {
             System.err.println("You can only use one of --use-aapt1 or --use-aapt2.");
@@ -471,6 +484,13 @@ public class Main {
                 .desc("Disable crunching of resource files during the build step.")
                 .build();
 
+        Option compressionLevelOption = Option.builder("l")
+            .longOpt("compression-level")
+            .desc("Zip file compression level (A number between 0 and 9 or -1 for default)")
+            .hasArg(true)
+            .argName("level")
+            .build();
+
         Option tagOption = Option.builder("t")
                 .longOpt("tag")
                 .desc("Tag frameworks using <tag>.")
@@ -579,6 +599,7 @@ public class Main {
         allOptions.addOption(aapt2Option);
         allOptions.addOption(noCrunchOption);
         allOptions.addOption(onlyMainClassesOption);
+        allOptions.addOption(compressionLevelOption);
     }
 
     private static String verbosityHelp() {

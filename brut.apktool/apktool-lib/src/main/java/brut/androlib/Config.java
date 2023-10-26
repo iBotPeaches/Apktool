@@ -21,6 +21,7 @@ import brut.util.OSDetection;
 
 import java.io.File;
 import java.util.logging.Logger;
+import java.util.zip.Deflater;
 
 public class Config {
     private static Config instance = null;
@@ -53,6 +54,7 @@ public class Config {
     public boolean updateFiles = false;
     public boolean useAapt2 = true;
     public boolean noCrunch = false;
+    public int zipCompressionLevel = Deflater.DEFAULT_COMPRESSION;
 
     // Decode options
     public short decodeSources = DECODE_SOURCES_SMALI;
