@@ -33,6 +33,7 @@ dependencies {
     implementation(libs.smali)
     implementation(libs.xmlpull)
     implementation(libs.guava)
+    implementation(libs.commons.compress)
     implementation(libs.commons.lang3)
     implementation(libs.commons.io)
     implementation(libs.commons.text)

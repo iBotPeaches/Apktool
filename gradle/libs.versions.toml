@@ -2,6 +2,7 @@
 baksmali = "3.0.3"
 commons_io = "2.14.0"
 commons_cli = "1.5.0"
+commons_compress = "1.24.0"
 commons_lang3 = "3.13.0"
 commons_text = "1.10.0"
 guava = "32.0.1-jre"
@@ -16,6 +17,7 @@ xmlunit = "2.9.1"
 baksmali = { module = "com.android.tools.smali:smali-baksmali", version.ref = "baksmali" }
 commons_cli = { module = "commons-cli:commons-cli", version.ref = "commons_cli"}
 commons_io = { module = "commons-io:commons-io", version.ref = "commons_io" }
+commons_compress = { module = "org.apache.commons:commons-compress", version.ref = "commons_compress" }
 commons_lang3 = { module = "org.apache.commons:commons-lang3", version.ref = "commons_lang3" }
 commons_text = { module = "org.apache.commons:commons-text", version.ref = "commons_text" }
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
