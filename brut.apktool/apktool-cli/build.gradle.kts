@@ -66,6 +66,9 @@ tasks.register<ProGuardTask>("proguard") {
     dontwarn("com.google.common.collect.**")
     dontwarn("com.google.common.util.**")
     dontwarn("javax.xml.xpath.**")
+    dontwarn("org.apache.commons.compress.harmony.**")
+    dontwarn("org.apache.commons.compress.compressors.**")
+    dontwarn("org.apache.commons.compress.archivers.**")
     dontnote("**")
 
     val outPath = "build/libs/apktool-$apktoolVersion.jar"

@@ -18,17 +18,20 @@ package brut.directory;
 
 import brut.common.BrutException;
 import brut.util.BrutIO;
+import org.apache.commons.compress.archivers.zip.*;
+import org.apache.commons.compress.parallel.InputStreamSupplier;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.util.Collection;
+import java.util.concurrent.ExecutionException;
 import java.util.zip.CRC32;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 public class ZipUtils {
+    public interface AdditionalZipOperation {
+        void run(ParallelScatterZipCreator zipCreator) throws BrutException;
+    }
 
     private static Collection<String> mDoNotCompress;
 
@@ -36,53 +39,68 @@ public class ZipUtils {
         // Private constructor for utility class
     }
 
-    public static void zipFolders(final File folder, final File zip, final File assets, final Collection<String> doNotCompress)
+    public static void zipFolders(final File folder, final File zip, final File assets, final Collection<String> doNotCompress, final AdditionalZipOperation additionalZipOperation)
             throws BrutException, IOException {
 
         mDoNotCompress = doNotCompress;
-        ZipOutputStream zipOutputStream = new ZipOutputStream(Files.newOutputStream(zip.toPath()));
-        zipFolders(folder, zipOutputStream);
+        ParallelScatterZipCreator zipCreator = new ParallelScatterZipCreator();
+        zipFolders(folder, zipCreator);
 
         // We manually set the assets because we need to retain the folder structure
         if (assets != null) {
-            processFolder(assets, zipOutputStream, assets.getPath().length() - 6);
+            processFolder(assets, zipCreator, assets.getPath().length() - 6);
+        }
+        if (additionalZipOperation != null) {
+            additionalZipOperation.run(zipCreator);
+        }
+
+        ZipArchiveOutputStream zipOutputStream = new ZipArchiveOutputStream(Files.newOutputStream(zip.toPath()));
+        zipOutputStream.setUseZip64(Zip64Mode.AsNeeded);
+        try {
+            zipCreator.writeTo(zipOutputStream);
+        } catch (InterruptedException | ExecutionException e) {
+            throw new BrutException(e);
         }
         zipOutputStream.close();
     }
 
-    private static void zipFolders(final File folder, final ZipOutputStream outputStream)
+    private static void zipFolders(final File folder, final ParallelScatterZipCreator zipCreator)
             throws BrutException, IOException {
-        processFolder(folder, outputStream, folder.getPath().length() + 1);
+        processFolder(folder, zipCreator, folder.getPath().length() + 1);
     }
 
-    private static void processFolder(final File folder, final ZipOutputStream zipOutputStream, final int prefixLength)
+    private static void processFolder(final File folder, final ParallelScatterZipCreator zipCreator, final int prefixLength)
             throws BrutException, IOException {
         for (final File file : folder.listFiles()) {
             if (file.isFile()) {
                 final String cleanedPath = BrutIO.sanitizeUnknownFile(folder, file.getPath().substring(prefixLength));
-                final ZipEntry zipEntry = new ZipEntry(BrutIO.normalizePath(cleanedPath));
+                final ZipArchiveEntry zipEntry = new ZipArchiveEntry(BrutIO.normalizePath(cleanedPath));
 
                 // aapt binary by default takes in parameters via -0 arsc to list extensions that shouldn't be
                 // compressed. We will replicate that behavior
                 final String extension = FilenameUtils.getExtension(file.getAbsolutePath());
                 if (mDoNotCompress != null && (mDoNotCompress.contains(extension) || mDoNotCompress.contains(zipEntry.getName()))) {
-                    zipEntry.setMethod(ZipEntry.STORED);
+                    zipEntry.setMethod(ZipArchiveEntry.STORED);
                     zipEntry.setSize(file.length());
                     BufferedInputStream unknownFile = new BufferedInputStream(Files.newInputStream(file.toPath()));
                     CRC32 crc = BrutIO.calculateCrc(unknownFile);
                     zipEntry.setCrc(crc.getValue());
                     unknownFile.close();
                 } else {
-                    zipEntry.setMethod(ZipEntry.DEFLATED);
+                    zipEntry.setMethod(ZipArchiveEntry.DEFLATED);
                 }
 
-                zipOutputStream.putNextEntry(zipEntry);
-                try (FileInputStream inputStream = new FileInputStream(file)) {
-                    IOUtils.copy(inputStream, zipOutputStream);
-                }
-                zipOutputStream.closeEntry();
+                InputStreamSupplier streamSupplier = () -> {
+                    try {
+                        return new FileInputStream(file);
+                    } catch (FileNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
+                };
+
+                zipCreator.addArchiveEntry(zipEntry, streamSupplier);
             } else if (file.isDirectory()) {
-                processFolder(file, zipOutputStream, prefixLength);
+                processFolder(file, zipCreator, prefixLength);
             }
         }
     }
