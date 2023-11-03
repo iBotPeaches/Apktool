@@ -72,6 +72,11 @@ public class BuildAndDecodeTest extends BaseTest {
     }
 
     @Test
+    public void valuesColorsTest() throws BrutException {
+        compareValuesFiles("values/colors.xml");
+    }
+
+    @Test
     public void valuesStringsTest() throws BrutException {
         compareValuesFiles("values/strings.xml");
     }

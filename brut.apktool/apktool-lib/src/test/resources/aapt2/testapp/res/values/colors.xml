@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="test_color1">#ff123456</color>
+    <color name="test_color2">@android:color/white</color>
+    <color name="test_color3">#00000000</color>
+    <color name="issue_3416">@null</color>
+</resources>
