@@ -21,7 +21,6 @@ If you discover a security vulnerability within Apktool, please send an e-mail t
 - [Downloads Mirror](https://connortumbleson.com/apktool/)
 - [How to Build](https://ibotpeaches.github.io/Apktool/build/)
 - [Documentation](https://ibotpeaches.github.io/Apktool/documentation/)
-- [Use in Docker](./docker/README.md)
 - [Bug Reports](https://github.com/iBotPeaches/Apktool/issues)
 - [Changelog/Information](https://ibotpeaches.github.io/Apktool/changes/)
 - [XDA Post](https://forum.xda-developers.com/t/util-dec-2-2020-apktool-tool-for-reverse-engineering-apk-files.1755243/)
