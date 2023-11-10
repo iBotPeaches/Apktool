@@ -16,6 +16,7 @@
  */
 package brut.androlib;
 
+import brut.androlib.build_actions.*;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.apk.ApkInfo;
 import brut.androlib.apk.UsesFramework;
@@ -50,68 +51,6 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 public class ApkBuilder {
-    private abstract static class BuildAction {
-
-    }
-
-    private static final class BuildSourcesAction extends BuildAction {
-        private final String mFolder;
-        private final String mFileName;
-        private final boolean mBuildSmali;
-
-        public BuildSourcesAction(String folder, String fileName, boolean buildSmali) {
-            mFolder = folder;
-            mFileName = fileName;
-            mBuildSmali = buildSmali;
-        }
-
-        public String getFolder() {
-            return mFolder;
-        }
-
-        public String getFileName() {
-            return mFileName;
-        }
-
-        public boolean getBuildSmali() {
-            return mBuildSmali;
-        }
-    }
-
-    private static final class BuildManifestAndResourcesAction extends BuildAction {
-        private final File mManifest;
-        private final File mManifestOriginal;
-
-        public BuildManifestAndResourcesAction(File manifest, File manifestOriginal) {
-
-            this.mManifest = manifest;
-            this.mManifestOriginal = manifestOriginal;
-        }
-
-        public File getManifest() {
-            return mManifest;
-        }
-
-        public File getManifestOriginal() {
-            return mManifestOriginal;
-        }
-    }
-
-    private static final class BuildLibraryAction extends BuildAction {
-        private final String mFolder;
-
-        public BuildLibraryAction(String folder) {
-            mFolder = folder;
-        }
-
-        public String getFolder() {
-            return mFolder;
-        }
-    }
-
-    private static final class CopyOriginalFilesAction extends BuildAction {
-    }
-
     private final static Logger LOGGER = Logger.getLogger(ApkBuilder.class.getName());
 
     private final Config mConfig;
@@ -227,7 +166,7 @@ public class ApkBuilder {
             BuildManifestAndResourcesAction typedAction = (BuildManifestAndResourcesAction) buildAction;
             buildManifestFile(typedAction.getManifest(), typedAction.getManifestOriginal());
             buildResources();
-        } else if (buildAction instanceof  CopyOriginalFilesAction) {
+        } else if (buildAction instanceof CopyOriginalFilesAction) {
             buildCopyOriginalFiles();
         } else {
             throw new RuntimeException("Unknown build action");
