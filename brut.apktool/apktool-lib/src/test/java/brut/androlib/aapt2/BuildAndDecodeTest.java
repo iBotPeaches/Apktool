@@ -150,6 +150,11 @@ public class BuildAndDecodeTest extends BaseTest {
     }
 
     @Test
+    public void xmlAccessibilityTest() throws BrutException {
+        compareXmlFiles("res/xml/accessibility_service_config.xml");
+    }
+
+    @Test
     public void multipleDexTest() throws BrutException, IOException {
         compareBinaryFolder("/smali_classes2", false);
         compareBinaryFolder("/smali_classes3", false);
