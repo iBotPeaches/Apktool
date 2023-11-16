@@ -2,7 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" android:appCategory="game" android:compileSdkVersion="23" android:compileSdkVersionCodename="6.0-2438415" package="brut.apktool.testapp" platformBuildVersionCode="23" platformBuildVersionName="6.0-2438415">
     <uses-feature android:glEsVersion="0x00020000" />
     <uses-feature android:glEsVersion="0x00030002" />
-    <application android:label="Issue2799 &amp; B">
+    <application android:label="Issue2799 &amp; B" android:isAccessibilityTool="false">
+        <service android:name=".MyAccessibilityService">
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/accessibility_service_config" />
+        </service>
         <meta-data name="test_int_as_string" value="\ 12345" />
         <meta-data name="test_int" value="12345" />
     </application>

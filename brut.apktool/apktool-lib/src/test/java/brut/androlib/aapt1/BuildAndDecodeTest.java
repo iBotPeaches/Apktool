@@ -195,6 +195,11 @@ public class BuildAndDecodeTest extends BaseTest {
     }
 
     @Test
+    public void xmlAccessibilityTest() throws BrutException {
+        compareXmlFiles("res/xml/accessibility_service_config.xml");
+    }
+
+    @Test
     public void xmlXsdFileTest() throws BrutException {
         compareXmlFiles("res/xml/ww_box_styles_schema.xsd");
     }
