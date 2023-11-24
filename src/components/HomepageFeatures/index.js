@@ -6,16 +6,15 @@ const FeatureList = [
   {
     title: 'Disassemble',
     description: (
-      <>
-        Apktool can help disassemble resources to nearly original form.
-      </>
+      <>Apktool can help disassemble resources to nearly original form.</>
     ),
   },
   {
     title: 'Assemble',
     description: (
       <>
-        Want to translate an app? Change a permission? Apktool can help you do that.
+        Want to translate an app? Change a permission? Apktool can help you do
+        that.
       </>
     ),
   },
@@ -23,7 +22,9 @@ const FeatureList = [
     title: 'Analyze',
     description: (
       <>
-        Not interested in rebuilding? Just attach <code>-m</code> to any disassemble command. Apktool will do its best to rip apart the resources and manifest for easy inspection.
+        Not interested in rebuilding? Just attach <code>-m</code> to any
+        disassemble command. Apktool will do its best to rip apart the resources
+        and manifest for easy inspection.
       </>
     ),
   },
