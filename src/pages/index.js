@@ -6,6 +6,9 @@ import CodeBlock from '@theme/CodeBlock';
 import HomepageFeatures from '@site/src/components/HomepageFeatures';
 
 import styles from './index.module.css';
+import Heading from '@theme/Heading';
+import prismIncludeLanguages from '@theme/prism-include-languages';
+import {languages} from 'prismjs';
 
 function HomepageHeader() {
   const {siteConfig} = useDocusaurusContext();
@@ -13,10 +16,12 @@ function HomepageHeader() {
     <header className={clsx('hero hero--primary', styles.heroBanner)}>
       <div className="container">
         <span className={styles.heroCenter}>
-          <h1 className="hero__title">{siteConfig.title}</h1>
+          <Heading as="h1" className="hero__title">
+            {siteConfig.title}
+          </Heading>
           <p className="hero__subtitle">{siteConfig.tagline}</p>
         </span>
-        <CodeBlock language="text">
+        <CodeBlock language="bash">
           {`$ apktool d test.apk
 I: Using Apktool 2.9.0 on test.apk
 I: Loading resource table...
