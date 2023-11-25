@@ -48,7 +48,7 @@ export default function Home() {
   return (
     <Layout
       title={`${siteConfig.title}`}
-      description="A tool for reverse engineering Android apk files">
+      description="A tool for reverse engineering Android apk files.">
       <HomepageHeader />
       <main>
         <HomepageFeatures />
