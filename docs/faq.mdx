@@ -10,7 +10,7 @@ Read [Issue 199](https://github.com/iBotPeaches/Apktool/issues/199). In short - 
 ### Is it possible to run Apktool on an Android device?
 
 Sadly not officially, there are some incompatibilities with running the `aapt` binary on Android.
-Additionally, older builds of Android have problems with using the `java.nio` library. Unofficial 
+Additionally, older builds of Android have problems with using the `java.nio` library. Unofficial
 packages have only succeeded with cross-compiling binaries.
 
 ### Where can I download the source of Apktool?
@@ -26,14 +26,14 @@ There are a few reasons this might occur.
 
 ### There is no `META-INF` directory in the resulting APK. Is this ok?
 
-Yes, `META-INF` contains the APK's signatures. After modifying an APK it is no longer signed. You 
-can use `-c / --copy-original` to retain these signatures. However, `-c` will use the original 
+Yes, `META-INF` contains the APK's signatures. After modifying an APK it is no longer signed. You
+can use `-c / --copy-original` to retain these signatures. However, `-c` will use the original
 `AndroidManifest.xml` and is only capable of working with the original APK signature v1 scheme.
 
 ### What are "Magic APKs"?
 
-There are some APKs that are built with modified build tools intended for specific OEMs. These APKs 
-are not built with regular AOSP tools and are not compatible with Apktool. Apktool will not be 
+There are some APKs that are built with modified build tools intended for specific OEMs. These APKs
+are not built with regular AOSP tools and are not compatible with Apktool. Apktool will not be
 able to decode or build these APKs.
 
 ### Could I integrate Apktool into my own project? Could I modify it? Do I have to credit you?
