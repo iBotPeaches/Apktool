@@ -16,7 +16,7 @@ on:
     branches: [ "master", "docs", "gh-pages" ]
   pull_request:
     # The branches below must be a subset of the branches above
-    branches: [ "master" ]
+    branches: [ "gh-pages" ]
   schedule:
     - cron: '45 8 * * 1'
 
