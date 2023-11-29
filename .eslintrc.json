@@ -21,6 +21,6 @@
         }
     },
     "settings": {
-        "mdx/code-blocks": false
+        "mdx/code-blocks": true
     }
 }

@@ -7,13 +7,13 @@ The build option can be invoked either from <code>b</code> or <code>build</code>
 
 ```bash
 $ apktool b foo.jar.out
-# builds foo.jar.out folder into foo.jar.out/dist/foo.jar file
+# builds foo.jar.out folder into foo.jar.out/dist/foo.jar
 
 $ apktool build foo.jar.out
-# builds foo.jar.out folder into foo.jar.out/dist/foo.jar file
+# builds foo.jar.out folder into foo.jar.out/dist/foo.jar
 
 $ apktool b bar
-# builds bar folder into bar/dist/bar.apk file
+# builds bar folder into bar/dist/bar.apk
 
 $ apktool b .
 # builds current directory into ./dist
@@ -27,8 +27,6 @@ $ apktool b bar.apk
 ```
 
 :::info
-
-In order to run a rebuilt application. You must resign the application.
+In order to run a rebuilt application, you must resign it.
 Android [documentation](https://developer.android.com/tools/publishing/app-signing.html#signing-manually) can help with this.
-
 :::

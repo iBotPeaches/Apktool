@@ -31,6 +31,18 @@
                 "printWidth": 80,
                 "endOfLine": "auto"
             }
+        },
+        {
+            "files": "*.mdx",
+            "options": {
+                "endOfLine": "auto"
+            }
+        },
+        {
+            "files": "*.yml",
+            "options": {
+                "endOfLine": "auto"
+            }
         }
     ]
 }

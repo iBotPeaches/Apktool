@@ -3,43 +3,44 @@ title: FAQ
 sidebar_position: 4
 ---
 
-### What about the `-j` switch shown from the original YouTube videos?
+### What about the `-j` switch shown in the original YouTube videos?
 
 Read [Issue 199](https://github.com/iBotPeaches/Apktool/issues/199). In short - it doesn't exist.
 
-### Is it possible to run Apktool on a device?
+### Is it possible to run Apktool on an Android device?
 
-Sadly not officially. There are some incompatibilities with running the aapt binary on the device.
-Additionally, older builds of Android have problems with `java.nio` library. Unofficial packages have obtained this
-success with cross-compiling binaries.
+Sadly not officially, there are some incompatibilities with running the `aapt` binary on Android.
+Additionally, older builds of Android have problems with using the `java.nio` library. Unofficial
+packages have only succeeded with cross-compiling binaries.
 
 ### Where can I download the source of Apktool?
 
 From either the [GitHub](https://github.com/iBotPeaches/Apktool) or [Bitbucket](https://bitbucket.org/iBotPeaches/apktool/overview) repositories.
 
-### Resulting apk file is much smaller than original. What is wrong?
+### The resulting APK is much smaller than the original. Is something wrong?
 
 There are a few reasons this might occur.
 
-- Apktool builds unsigned apks. This means directories and files like `META-INF` are missing.
-- Updated build process - Apktool will use a modern version of aapt/aapt2 which may reduce file sizes.
+- Apktool builds unsigned APKs. This means some directories and files like `META-INF` are missing.
+- Updated build process - Apktool uses modern versions of `aapt`/`aapt2` which may reduce file sizes.
 
-### There is no `META-INF` directory in the resulting apk. Is this ok?
+### There is no `META-INF` directory in the resulting APK. Is this ok?
 
-Yes. `META-INF` contains the apk signatures. After modifying an APK it is no longer signed.
-You can use `-c / --copy-original` to retain these signatures. However, `-c` will use the original `AndroidManifest.xml`
-and is only capable of working with the original apk signature v1 scheme.
+Yes, `META-INF` contains the APK's signatures. After modifying an APK it is no longer signed. You
+can use `-c / --copy-original` to retain these signatures. However, `-c` will use the original
+`AndroidManifest.xml` and is only capable of working with the original APK signature v1 scheme.
 
 ### What are "Magic APKs"?
 
-There are some APKs that are built with modified build tools intended for specific OEMs. These APKs are not built with
-regular AOSP tools and are not compatible with Apktool. Apktool will not be able to decode or build these APKs.
+There are some APKs that are built with modified build tools intended for specific OEMs. These APKs
+are not built with regular AOSP tools and are not compatible with Apktool. Apktool will not be
+able to decode or build these APKs.
 
-### Could I integrate Apktool into my own tool? Could I modify it? Do I have to credit you?
+### Could I integrate Apktool into my own project? Could I modify it? Do I have to credit you?
 
 The [Apache license](https://github.com/iBotPeaches/Apktool/blob/master/LICENSE.md), which Apktool uses, answers all these questions.
 
-- Yes you can redistribute and/or modify Apktool without permission.
+- Yes, you can redistribute and/or modify Apktool without permission.
 - However, it would be nice to add contributors (`brut.all`, `iBotPeaches`, `JesusFreke`) to your credits.
 
 ### Where does Apktool store framework files?

@@ -5,31 +5,43 @@ sidebar_position: 1
 
 # Build Apktool
 
-Apktool is a collection of 1 project, containing subprojects and a few dependencies.
+Apktool is a project that contains a collection of subprojects and dependencies.
 
-- **brut.apktool.lib** - (Main, all the Library code)
-- **brut.apktool.cli** - The cli interface of the program
-- **brut.j.dir** - Utility project
-- **brut.j.util** - Utility project
-- **brut.j.common** - Utility project
+- **brut.apktool.lib** - Main Library
+- **brut.apktool.cli** - CLI Interface
+- **brut.j.dir** - Utility
+- **brut.j.util** - Utility
+- **brut.j.common** - Utility
 
 ### Requirements
 
-- JDK > 8
-- git
+- [JDK](https://www.oracle.com/java/technologies/downloads/) > 8
+- [git](https://git-scm.com/downloads)
+- [Gradle](https://gradle.org/)
 
 ### Build Steps
 
-We use gradle to build. First clone the repository using either
+First clone the repository using either:
 [SSH](ssh://git@github.com:iBotPeaches/Apktool.git) or [HTTPS](https://github.com/iBotPeaches/Apktool.git).
 
-1. Navigate to the Apktool folder: `cd Apktool`
-2. For remaining steps use `./gradlew` for unix based systems or `gradlew.bat` for windows.
-3. You can build the project in two ways:
-   1. Without proguard `[./gradlew][gradlew.bat] build shadowJar`
-      - This will build the project and create a jar file: `brut.apktool/apktool-cli/build/libs/apktool-cli-all.jar`
-   2. With proguard: `[./gradlew][gradlew.bat] build shadowJar proguard`
-      - This will build the project and create a jar file: `brut.apktool/apktool-cli/build/libs/apktool-vXXX.jar`
+1. Navigate to the Apktool folder and for the remaining steps use `./gradlew` for Unix based systems or `gradlew.bat` for Windows.
+2. You can build the project in two ways:
+
+- Without ProGuard:
+
+```bash
+[./gradlew][gradlew.bat] build shadowJar
+```
+
+- Creating a jar file: `brut.apktool/apktool-cli/build/libs/apktool-cli-all.jar`.
+
+- With ProGuard:
+
+```bash
+[./gradlew][gradlew.bat] build shadowJar proguard
+```
+
+- Creating a jar file: `brut.apktool/apktool-cli/build/libs/apktool-vXXX.jar`.
 
 #### Windows Requirements
 
@@ -42,7 +54,9 @@ which means due to the limitation of max 255 characters on Windows we need to en
 
 This leaves 37 characters total to clone the project on Windows. For example, I can clone this project to the location
 
-    C:/Users/Connor/Desktop/Apktool
+```text
+C:/Users/Connor/Desktop/Apktool
+```
 
 This is 31 characters, which allows Apktool to be cloned properly. Cloning the project into a directory longer than 37
 characters will not work.

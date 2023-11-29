@@ -3,17 +3,17 @@ title: Frameworks
 sidebar_position: 4
 ---
 
-Frameworks can be installed either from `if` or `install-framework`, in addition two parameters
+Frameworks can be installed either from `if` or `install-framework`, additionally with two paramaters.
 
-- `-p, --frame-path <directory>` - Store framework files into `<dir>`
-- `-t, --tag  <tag>` - Tag frameworks using `<dir>` as the tag
+- `-p, --frame-path <directory>` - Store framework files into the `<dir>`.
+- `-t, --tag  <tag>` - Tag frameworks using `<dir>` as the tag.
 
-Allow for a finer control over how the files are named and how they are stored.
+This allows for finer control over how the files are stored and named.
 
 ```bash
 $ apktool if framework-res.apk
 I: Framework installed to: 1.apk
-# pkgId of framework-res.apk determines number (which is 0x01)
+# pkgId of framework-res.apk determines the number. (which is 0x01)
 
 $ apktool if com.htc.resources.apk
 I: Framework installed to: 2.apk

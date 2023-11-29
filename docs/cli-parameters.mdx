@@ -17,7 +17,7 @@ _Options used for utility commands (`apktool {options}`)_
 -version, --version
 ```
 
-- Outputs current version. (Ex: 1.5.2)
+- Outputs the current software version. (Ex: 1.5.2)
 
 ### Decoding Options
 
@@ -27,77 +27,82 @@ _Options used for decoding commands (`apktool d file.apk {options}`)_
 -api, --api-level <API>
 ```
 
-- The numeric api-level of the smali files to generate (defaults to targetSdkVersion)
+- Sets the API-level used in the generated smali files.
+  - Defaults to `targetSdkVersion`
 
 ```
 -b, --no-debug-info
 ```
 
-- Prevents baksmali from writing out debug info (.local, .param, .line, etc).
+- Prevents baksmali from writing out debug info. (`.local`, `.param`, `.line`, etc.).
 
 ```
 -f, --force
 ```
 
-- Force delete destination directory.
+- Forces the deletion of the destination directory.
 
 ```
 --force-manifest
 ```
 
-- Forces decode of `AndroidManifest.xml` regardless of decoding of resources parameter.
+- Forces Apktool to decode `AndroidManifest.xml` regardless of your decoding options.
 
 ```
 --keep-broken-res
 ```
 
-- Use if there was an error and some resources were dropped, e.g. "Invalid config flags detected. Dropping resources", but you want to decode them anyway, even with errors.
-- You will have to fix them manually before building.
+- Use if an error was thrown and some resources were dropped and you want to decode them anyway.
+  - E.g. `Invalid config flags detected. Dropping resources`.
+  - You will have to fix them manually before building.
 
 ```
 -m, --match-original
 ```
 
-- Matches files closest as possible to original at cost of preventing rebuild.
+- Matches the generated files as close as possible to the originals.
+  - Comes at the cost of preventing you from rebuilding.
 
 ```
 --no-assets
 ```
 
-- Prevents decoding/copying of unknown asset files.
+- Prevents decoding/copying unknown asset files.
 
 ```
 --only-main-classes
 ```
 
-- Only disassemble dex classes in root of application.
+- Only disassembles dex classes that are in the root of the application.
 
 ```
 -p, --frame-path <DIR>
 ```
 
-- The folder location where framework files should be stored/read from.
+- Sets the folder framework files are stored/read from.
 
 ```
 -r, --no-res
 ```
 
-- This will prevent the decompile of resources. This keeps the `resources.arsc`
+- Prevents decompiling resources.
+  - Keeps `resources.arsc` intact.
 
 ```
 -resm,--resource-mode <mode>
 ```
 
-- The mode to use when resolving resources. Presently supported options are:
-  - `remove` (default) - Remove resources that cannot be resolved.
-  - `dummy` - Add a dummy resource for resources that cannot be resolved.
-  - `keep` - Keep unresolved resources using `APKTOOL_MISSING_{resId}` nomenclature.
+- Sets the mode used when resolving resources.
+  - `remove` (default) - Removes resources that cannot be resolved.
+  - `dummy` - Adds a dummy resource for resources that cannot be resolved.
+  - `keep` - Keeps unresolved resources using `APKTOOL_MISSING_{resId}` nomenclature.
 
 ```
 -s, --no-src
 ```
 
-- This will prevent the disassembly of the dex file(s). This keeps the apk dex file(s) and simply moves it during build.
+- Prevents disassembling dex files.
+  - Leaves the dex files untouched and moves them upon build.
 
 ```
 -t, --frame-tag <TAG>
@@ -113,19 +118,21 @@ _Options used for building commands (`apktool b folder {options}`)_
 -a, --aapt <FILE>
 ```
 
-- Loads aapt/aapt2 binary from the specified location, instead of relying on internal version.
+- Loads aapt/aapt2 binaries from the specified location.
+  - These are used instead of the internal version.
 
 ```
 -api, --api-level <API>
 ```
 
-- The numeric api-level of the smali files to build against (defaults to `minSdkVersion`)
+- Sets the API-level of the smali files to build against.
+  - Defaults to `minSdkVersion`.
 
 ```
 -c, --copy-original
 ```
 
-- Copies original `AndroidManifest.xml` and `META-INF`.
+- Copies the original `AndroidManifest.xml` and `META-INF`.
 
 ```
 -d, --debug
@@ -137,7 +144,8 @@ _Options used for building commands (`apktool b folder {options}`)_
 -f, --force-all
 ```
 
-- Overwrites existing files during build, including resources and sources.
+- Overwrites existing files during build.
+  - Includes resources and sources.
 
 ```
 -n, --net-sec-conf
@@ -149,33 +157,34 @@ _Options used for building commands (`apktool b folder {options}`)_
 -nc, --no-crunch
 ```
 
-- Disables crunching of resource files during the build.
+- Disables crunching resource files during build.
 
 ```
 -o, --output <FILE>
 ```
 
-- The name of apk that gets written. Default is `dist/{apkname}.apk`.
+- Sets the name of the output apk.
+  - The Default is `dist/{apkname}.apk`.
 
 ```
 -p, --frame-path <DIR>
 ```
 
-- The location where framework files are stored/read from.
+- Sets the folder framework files are stored/read from.
 
 ```
 --use-aapt1
 ```
 
-- Use aapt instead of aapt2.
-- aapt2 became default in Apktool v2.9.0
+- Use `aapt` instead of `aapt2`.
+  - `aapt2` is used by default in Apktool v2.9.0 and above.
 
 ```
 --use-aapt2
 ```
 
-- Use aapt2 instead of aapt.
-- aapt is default in Apktool v2.8.2 or less.
+- Use `aapt2` instead of `aapt`.
+  - `aapt` is used by default in Apktool v2.8.2 and below.
 
 ### Empty Framework Directory Options
 
@@ -185,13 +194,13 @@ _Options used for empty-framework-dir commands (`apktool empty-framework-dir {op
 -f, --force
 ```
 
-- Force delete destination directory.
+- Forces the deletion of the destination directory.
 
 ```
 -p, --frame-path <DIR>
 ```
 
-- The folder location where framework files should be stored/read from.
+- Sets the folder framework files are stored/read from.
 
 ### List Framework Directory Options
 
@@ -201,7 +210,7 @@ _Options used for list-frameworks commands (`apktool list-frameworks {options}`)
 -p, --frame-path <DIR>
 ```
 
-- The folder location where framework files should be stored/read from.
+- Sets the folder framework files are stored/read from.
 
 ### Common Options
 
@@ -211,7 +220,8 @@ _Options that can be used with any command_
 -v, --verbose
 ```
 
-- Verbose output. Includes any message tagged `FINE` in the logger.
+- Verbose output.
+  - Includes any log messages tagged with `FINE`.
 
 ```
 -q, --quiet
