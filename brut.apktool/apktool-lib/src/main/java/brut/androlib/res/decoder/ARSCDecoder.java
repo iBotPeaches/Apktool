@@ -275,7 +275,7 @@ public class ARSCDecoder {
         int typeFlags = mIn.readByte();
         mIn.skipBytes(2); // reserved
         int entryCount = mIn.readInt();
-        mIn.skipInt(); // entriesStart
+        int entriesStart = mIn.readInt();
 
         ResConfigFlags flags = readConfigFlags();
 
@@ -312,6 +312,13 @@ public class ARSCDecoder {
 
         mType = flags.isInvalid && !mKeepBroken ? null : mPkg.getOrCreateConfig(flags);
         int noEntry = isOffset16 ? NO_ENTRY_OFFSET16 : NO_ENTRY;
+
+        // #3428 - In some applications the res entries are padded for alignment.
+        int entriesStartAligned = mHeader.startPosition + entriesStart;
+        if (mIn.position() < entriesStartAligned) {
+            long bytesSkipped = mIn.skip(entriesStartAligned - mIn.position());
+            LOGGER.fine("Skipping: " + bytesSkipped + " byte(s) to align with ResTable_entry start.");
+        }
 
         for (int i : entryOffsetMap.keySet()) {
             mResId = (mResId & 0xffff0000) | i;
