@@ -140,6 +140,11 @@ public class BuildAndDecodeTest extends BaseTest {
     }
 
     @Test
+    public void miuiRegressionTest() throws BrutException {
+        compareValuesFiles("values-godzillaui/strings.xml");
+    }
+
+    @Test
     public void valuesStringsTest() throws BrutException {
         compareValuesFiles("values-mcc001/strings.xml");
     }
