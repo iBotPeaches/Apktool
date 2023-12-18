@@ -101,7 +101,7 @@ jobs:
           dependency-graph: generate-and-submit
           arguments: build shadowJar proguard
       - name: Upload
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: apktool.jar
           path: brut.apktool/apktool-cli/build/libs/apktool-v*
