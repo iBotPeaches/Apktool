@@ -442,6 +442,7 @@ public class ApkBuilder {
                 ZipFile inputFile = new ZipFile(tempFile);
                 ZipOutputStream actualOutput = new ZipOutputStream(Files.newOutputStream(outFile.toPath()))
             ) {
+                actualOutput.setLevel(mConfig.zipCompressionLevel);
                 copyExistingFiles(inputFile, actualOutput);
                 copyUnknownFiles(actualOutput, files);
             } catch (IOException | BrutException ex) {
@@ -534,7 +535,7 @@ public class ApkBuilder {
 
     private void zipPackage(File apkFile, File rawDir, File assetDir) throws AndrolibException {
         try {
-            ZipUtils.zipFolders(rawDir, apkFile, assetDir, mApkInfo.doNotCompress);
+            ZipUtils.zipFolders(rawDir, apkFile, assetDir, mApkInfo.doNotCompress, mConfig.zipCompressionLevel);
         } catch (IOException | BrutException ex) {
             throw new AndrolibException(ex);
         }
