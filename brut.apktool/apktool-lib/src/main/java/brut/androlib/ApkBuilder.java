@@ -42,6 +42,7 @@ import javax.xml.transform.TransformerException;
 import java.io.*;
 import java.nio.file.Files;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Logger;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
@@ -51,8 +52,10 @@ import java.util.zip.ZipOutputStream;
 public class ApkBuilder {
     private final static Logger LOGGER = Logger.getLogger(ApkBuilder.class.getName());
 
+    private final AtomicReference<AndrolibException> mBuildError = new AtomicReference<>(null);
     private final Config mConfig;
     private final ExtFile mApkDir;
+    private BackgroundWorker mWorker;
     private ApkInfo mApkInfo;
     private int mMinSdkVersion = 0;
 
@@ -78,48 +81,57 @@ public class ApkBuilder {
 
     public void build(File outFile) throws BrutException {
         LOGGER.info("Using Apktool " + ApktoolProperties.getVersion());
+        try {
+            mWorker = new BackgroundWorker();
+            mApkInfo = ApkInfo.load(mApkDir);
 
-        mApkInfo = ApkInfo.load(mApkDir);
-
-        if (mApkInfo.getSdkInfo() != null && mApkInfo.getSdkInfo().get("minSdkVersion") != null) {
-            String minSdkVersion = mApkInfo.getSdkInfo().get("minSdkVersion");
-            mMinSdkVersion = mApkInfo.getMinSdkVersionFromAndroidCodename(minSdkVersion);
-        }
-
-        if (outFile == null) {
-            String outFileName = mApkInfo.apkFileName;
-            outFile = new File(mApkDir, "dist" + File.separator + (outFileName == null ? "out.apk" : outFileName));
-        }
-
-        //noinspection ResultOfMethodCallIgnored
-        new File(mApkDir, APK_DIRNAME).mkdirs();
-        File manifest = new File(mApkDir, "AndroidManifest.xml");
-        File manifestOriginal = new File(mApkDir, "AndroidManifest.xml.orig");
-
-        buildSources();
-        buildNonDefaultSources();
-        buildManifestFile(manifest, manifestOriginal);
-        buildResources();
-        buildLibs();
-        buildCopyOriginalFiles();
-        buildApk(outFile);
-
-        // we must go after the Apk is built, and copy the files in via Zip
-        // this is because Aapt won't add files it doesn't know (ex unknown files)
-        buildUnknownFiles(outFile);
-
-        // we copied the AndroidManifest.xml to AndroidManifest.xml.orig so we can edit it
-        // lets restore the unedited one, to not change the original
-        if (manifest.isFile() && manifest.exists() && manifestOriginal.isFile()) {
-            try {
-                if (new File(mApkDir, "AndroidManifest.xml").delete()) {
-                    FileUtils.moveFile(manifestOriginal, manifest);
-                }
-            } catch (IOException ex) {
-                throw new AndrolibException(ex.getMessage());
+            if (mApkInfo.getSdkInfo() != null && mApkInfo.getSdkInfo().get("minSdkVersion") != null) {
+                String minSdkVersion = mApkInfo.getSdkInfo().get("minSdkVersion");
+                mMinSdkVersion = mApkInfo.getMinSdkVersionFromAndroidCodename(minSdkVersion);
             }
+
+            if (outFile == null) {
+                String outFileName = mApkInfo.apkFileName;
+                outFile = new File(mApkDir, "dist" + File.separator + (outFileName == null ? "out.apk" : outFileName));
+            }
+
+            //noinspection ResultOfMethodCallIgnored
+            new File(mApkDir, APK_DIRNAME).mkdirs();
+            File manifest = new File(mApkDir, "AndroidManifest.xml");
+            File manifestOriginal = new File(mApkDir, "AndroidManifest.xml.orig");
+
+            scheduleBuildSources();                         //create classes.dex
+            scheduleBuildNonDefaultSources();               //create all other dex files
+            buildManifestFile(manifest, manifestOriginal);  //backup AndroidManifest.xml
+            buildResources();                               //create res folder, manifest file and resources.arsc
+            buildLibs();                                    //copy lib, libs, kotlin and META-INF/services
+            buildCopyOriginalFiles();                       //copy some original files if they don't exist
+            mWorker.waitForFinish();                        //wait until all previous build tasks are finished
+            if (mBuildError.get() != null) {
+                throw mBuildError.get();
+            }
+
+            buildApk(outFile);                              //zip semi-finished apk
+
+            // we must go after the Apk is built, and copy the files in via Zip
+            // this is because Aapt won't add files it doesn't know (ex unknown files)
+            buildUnknownFiles(outFile);                     //finish the apk by adding unknown files
+
+            // we copied the AndroidManifest.xml to AndroidManifest.xml.orig so we can edit it
+            // lets restore the unedited one, to not change the original
+            if (manifest.isFile() && manifest.exists() && manifestOriginal.isFile()) {
+                try {
+                    if (new File(mApkDir, "AndroidManifest.xml").delete()) {
+                        FileUtils.moveFile(manifestOriginal, manifest);
+                    }
+                } catch (IOException ex) {
+                    throw new AndrolibException(ex.getMessage());
+                }
+            }
+            LOGGER.info("Built apk into: " + outFile.getPath());
+        } finally {
+            mWorker.shutdownNow();
         }
-        LOGGER.info("Built apk into: " + outFile.getPath());
     }
 
     private void buildManifestFile(File manifest, File manifestOriginal) throws AndrolibException {
@@ -141,13 +153,23 @@ public class ApkBuilder {
         }
     }
 
-    private void buildSources() throws AndrolibException {
-        if (!buildSourcesRaw("classes.dex") && !buildSourcesSmali("smali", "classes.dex")) {
-            LOGGER.warning("Could not find sources");
-        }
+    private void scheduleBuildSources() {
+        Runnable r = () -> {
+            try {
+                if (mBuildError.get() != null) {
+                    return;
+                }
+                if (!buildSourcesRaw("classes.dex") && !buildSourcesSmali("smali", "classes.dex")) {
+                    LOGGER.warning("Could not find sources");
+                }
+            } catch (AndrolibException e) {
+                mBuildError.compareAndSet(null, e);
+            }
+        };
+        mWorker.submit(r);
     }
 
-    private void buildNonDefaultSources() throws AndrolibException {
+    private void scheduleBuildNonDefaultSources() throws AndrolibException {
         try {
             // loop through any smali_ directories for multi-dex apks
             Map<String, Directory> dirs = mApkDir.getDirectory().getDirs();
@@ -156,9 +178,19 @@ public class ApkBuilder {
                 if (name.startsWith("smali_")) {
                     String filename = name.substring(name.indexOf("_") + 1) + ".dex";
 
-                    if (!buildSourcesRaw(filename) && !buildSourcesSmali(name, filename)) {
-                        LOGGER.warning("Could not find sources");
-                    }
+                    Runnable r = () -> {
+                        try {
+                            if (mBuildError.get() != null) {
+                                return;
+                            }
+                            if (!buildSourcesRaw(filename) && !buildSourcesSmali(name, filename)) {
+                                LOGGER.warning("Could not find sources");
+                            }
+                        } catch (AndrolibException e) {
+                            mBuildError.compareAndSet(null, e);
+                        }
+                    };
+                    mWorker.submit(r);
                 }
             }
 

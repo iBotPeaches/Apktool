@@ -32,15 +32,18 @@ import org.apache.commons.io.FilenameUtils;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 public class ApkDecoder {
     private final static Logger LOGGER = Logger.getLogger(ApkDecoder.class.getName());
 
+    private final AtomicReference<RuntimeException> mBuildError = new AtomicReference<>(null);
     private final Config mConfig;
     private final ApkInfo mApkInfo;
-    private int mMinSdkVersion = 0;
+    private volatile int mMinSdkVersion = 0;
+    private BackgroundWorker mWorker;
 
     private final static String SMALI_DIRNAME = "smali";
     private final static String UNK_DIRNAME = "unknown";
@@ -75,6 +78,7 @@ public class ApkDecoder {
     public ApkInfo decode(File outDir) throws AndrolibException, IOException, DirectoryException {
         ExtFile apkFile = mApkInfo.getApkFile();
         try {
+            mWorker = new BackgroundWorker();
             if (!mConfig.forceDelete && outDir.exists()) {
                 throw new OutDirExistsException();
             }
@@ -124,7 +128,7 @@ public class ApkDecoder {
                         break;
                     case Config.DECODE_SOURCES_SMALI:
                     case Config.DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES:
-                        decodeSourcesSmali(outDir, "classes.dex");
+                        scheduleDecodeSourcesSmali(outDir, "classes.dex");
                         break;
                 }
             }
@@ -140,11 +144,11 @@ public class ApkDecoder {
                                     copySourcesRaw(outDir, file);
                                     break;
                                 case Config.DECODE_SOURCES_SMALI:
-                                    decodeSourcesSmali(outDir, file);
+                                    scheduleDecodeSourcesSmali(outDir, file);
                                     break;
                                 case Config.DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES:
                                     if (file.startsWith("classes") && file.endsWith(".dex")) {
-                                        decodeSourcesSmali(outDir, file);
+                                        scheduleDecodeSourcesSmali(outDir, file);
                                     } else {
                                         copySourcesRaw(outDir, file);
                                     }
@@ -153,6 +157,11 @@ public class ApkDecoder {
                         }
                     }
                 }
+            }
+
+            mWorker.waitForFinish();
+            if (mBuildError.get() != null) {
+                throw mBuildError.get();
             }
 
             // In case we have no resources. We should store the minSdk we pulled from the source opcode api level
@@ -168,6 +177,7 @@ public class ApkDecoder {
 
             return mApkInfo;
         } finally {
+            mWorker.shutdownNow();
             try {
                 apkFile.close();
             } catch (IOException ignored) {}
@@ -203,6 +213,17 @@ public class ApkDecoder {
         } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
         }
+    }
+
+    private void scheduleDecodeSourcesSmali(File outDir, String filename) {
+        Runnable r = () -> {
+            try {
+                decodeSourcesSmali(outDir, filename);
+            } catch (AndrolibException e) {
+                mBuildError.compareAndSet(null, new RuntimeException(e));
+            }
+        };
+        mWorker.submit(r);
     }
 
     private void decodeSourcesSmali(File outDir, String filename) throws AndrolibException {
