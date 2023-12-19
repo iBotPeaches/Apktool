@@ -97,30 +97,6 @@ public class ApkDecoder {
 
             LOGGER.info("Using Apktool " + ApktoolProperties.getVersion() + " on " + mApkInfo.apkFileName);
 
-            ResourcesDecoder resourcesDecoder = new ResourcesDecoder(mConfig, mApkInfo);
-
-            if (mApkInfo.hasResources()) {
-                switch (mConfig.decodeResources) {
-                    case Config.DECODE_RESOURCES_NONE:
-                        copyResourcesRaw(outDir);
-                        break;
-                    case Config.DECODE_RESOURCES_FULL:
-                        resourcesDecoder.decodeResources(outDir);
-                        break;
-                }
-            }
-
-            if (mApkInfo.hasManifest()) {
-                if (mConfig.decodeResources == Config.DECODE_RESOURCES_FULL ||
-                    mConfig.forceDecodeManifest == Config.FORCE_DECODE_MANIFEST_FULL) {
-                    resourcesDecoder.decodeManifest(outDir);
-                }
-                else {
-                    copyManifestRaw(outDir);
-                }
-            }
-            resourcesDecoder.updateApkInfo(outDir);
-
             if (mApkInfo.hasSources()) {
                 switch (mConfig.decodeSources) {
                     case Config.DECODE_SOURCES_NONE:
@@ -159,6 +135,34 @@ public class ApkDecoder {
                 }
             }
 
+            ResourcesDecoder resourcesDecoder = new ResourcesDecoder(mConfig, mApkInfo);
+
+            if (mApkInfo.hasResources()) {
+                switch (mConfig.decodeResources) {
+                    case Config.DECODE_RESOURCES_NONE:
+                        copyResourcesRaw(outDir);
+                        break;
+                    case Config.DECODE_RESOURCES_FULL:
+                        resourcesDecoder.decodeResources(outDir);
+                        break;
+                }
+            }
+
+            if (mApkInfo.hasManifest()) {
+                if (mConfig.decodeResources == Config.DECODE_RESOURCES_FULL ||
+                    mConfig.forceDecodeManifest == Config.FORCE_DECODE_MANIFEST_FULL) {
+                    resourcesDecoder.decodeManifest(outDir);
+                }
+                else {
+                    copyManifestRaw(outDir);
+                }
+            }
+            resourcesDecoder.updateApkInfo(outDir);
+
+            copyRawFiles(outDir);
+            copyUnknownFiles(outDir);
+            recordUncompressedFiles(resourcesDecoder.getResFileMapping());
+            copyOriginalFiles(outDir);
             mWorker.waitForFinish();
             if (mBuildError.get() != null) {
                 throw mBuildError.get();
@@ -169,10 +173,6 @@ public class ApkDecoder {
                 mApkInfo.setSdkInfoField("minSdkVersion", Integer.toString(mMinSdkVersion));
             }
 
-            copyRawFiles(outDir);
-            copyUnknownFiles(outDir);
-            recordUncompressedFiles(resourcesDecoder.getResFileMapping());
-            copyOriginalFiles(outDir);
             writeApkInfo(outDir);
 
             return mApkInfo;
