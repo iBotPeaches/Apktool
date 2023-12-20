@@ -46,7 +46,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Logger;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 public class ApkBuilder {
@@ -111,11 +110,7 @@ public class ApkBuilder {
                 throw mBuildError.get();
             }
 
-            buildApk(outFile);                              //zip semi-finished apk
-
-            // we must go after the Apk is built, and copy the files in via Zip
-            // this is because Aapt won't add files it doesn't know (ex unknown files)
-            buildUnknownFiles(outFile);                     //finish the apk by adding unknown files
+            buildApk(outFile);                              //finish the apk by adding common and unknown files
 
             // we copied the AndroidManifest.xml to AndroidManifest.xml.orig so we can edit it
             // lets restore the unedited one, to not change the original
@@ -459,49 +454,33 @@ public class ApkBuilder {
         }
     }
 
-    private void buildUnknownFiles(File outFile) throws AndrolibException {
-        if (mApkInfo.unknownFiles != null) {
-            LOGGER.info("Copying unknown files/dir...");
-
-            Map<String, String> files = mApkInfo.unknownFiles;
-            File tempFile = new File(outFile.getParent(), outFile.getName() + ".apktool_temp");
-            boolean renamed = outFile.renameTo(tempFile);
-            if (!renamed) {
-                throw new AndrolibException("Unable to rename temporary file");
-            }
-
-            try (
-                ZipFile inputFile = new ZipFile(tempFile);
-                ZipOutputStream actualOutput = new ZipOutputStream(Files.newOutputStream(outFile.toPath()))
-            ) {
-                copyExistingFiles(inputFile, actualOutput);
-                copyUnknownFiles(actualOutput, files);
-            } catch (IOException | BrutException ex) {
-                throw new AndrolibException(ex);
-            }
-
-            // Remove our temporary file.
+    private void buildApk(File outApk) throws AndrolibException {
+        LOGGER.info("Building apk file...");
+        if (outApk.exists()) {
             //noinspection ResultOfMethodCallIgnored
-            tempFile.delete();
-        }
-    }
-
-    private void copyExistingFiles(ZipFile inputFile, ZipOutputStream outputFile) throws IOException {
-        // First, copy the contents from the existing outFile:
-        Enumeration<? extends ZipEntry> entries = inputFile.entries();
-        while (entries.hasMoreElements()) {
-            ZipEntry entry = new ZipEntry(entries.nextElement());
-
-            // We can't reuse the compressed size because it depends on compression sizes.
-            entry.setCompressedSize(-1);
-            outputFile.putNextEntry(entry);
-
-            // No need to create directory entries in the final apk
-            if (!entry.isDirectory()) {
-                BrutIO.copy(inputFile, outputFile, entry);
+            outApk.delete();
+        } else {
+            File outDir = outApk.getParentFile();
+            if (outDir != null && !outDir.exists()) {
+                //noinspection ResultOfMethodCallIgnored
+                outDir.mkdirs();
             }
+        }
+        File assetDir = new File(mApkDir, "assets");
+        if (!assetDir.exists()) {
+            assetDir = null;
+        }
+        try (ZipOutputStream zipOutputStream = new ZipOutputStream(Files.newOutputStream(outApk.toPath()))) {
+            ZipUtils.zipFoldersPreserveStream(new File(mApkDir, APK_DIRNAME), zipOutputStream, assetDir, mApkInfo.doNotCompress);
 
-            outputFile.closeEntry();
+            // we must go after the Apk is built, and copy the files in via Zip
+            // this is because Aapt won't add files it doesn't know (ex unknown files)
+            if (mApkInfo.unknownFiles != null) {
+                LOGGER.info("Copying unknown files/dir...");
+                copyUnknownFiles(zipOutputStream, mApkInfo.unknownFiles);
+            }
+        } catch (IOException | BrutException e) {
+            throw new AndrolibException(e);
         }
     }
 
@@ -542,33 +521,6 @@ public class ApkBuilder {
 
             BrutIO.copy(inputFile, outputFile);
             outputFile.closeEntry();
-        }
-    }
-
-    private void buildApk(File outApk) throws AndrolibException {
-        LOGGER.info("Building apk file...");
-        if (outApk.exists()) {
-            //noinspection ResultOfMethodCallIgnored
-            outApk.delete();
-        } else {
-            File outDir = outApk.getParentFile();
-            if (outDir != null && !outDir.exists()) {
-                //noinspection ResultOfMethodCallIgnored
-                outDir.mkdirs();
-            }
-        }
-        File assetDir = new File(mApkDir, "assets");
-        if (!assetDir.exists()) {
-            assetDir = null;
-        }
-        zipPackage(outApk, new File(mApkDir, APK_DIRNAME), assetDir);
-    }
-
-    private void zipPackage(File apkFile, File rawDir, File assetDir) throws AndrolibException {
-        try {
-            ZipUtils.zipFolders(rawDir, apkFile, assetDir, mApkInfo.doNotCompress);
-        } catch (IOException | BrutException ex) {
-            throw new AndrolibException(ex);
         }
     }
 
