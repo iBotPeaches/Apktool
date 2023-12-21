@@ -99,17 +99,17 @@ public class ApkBuilder {
             File manifest = new File(mApkDir, "AndroidManifest.xml");
             File manifestOriginal = new File(mApkDir, "AndroidManifest.xml.orig");
 
-            scheduleBuildDexFiles();                        //create dex files
-            buildManifestFile(manifest, manifestOriginal);  //backup AndroidManifest.xml
-            buildResources();                               //create res folder, manifest file and resources.arsc
-            buildLibs();                                    //copy lib, libs, kotlin and META-INF/services
-            buildCopyOriginalFiles();                       //copy some original files if they don't exist
-            mWorker.waitForFinish();                        //wait until all previous build tasks are finished
+            scheduleBuildDexFiles();
+            backupManifestFile(manifest, manifestOriginal);
+            buildResources();
+            copyLibs();
+            copyOriginalFilesIfEnabled();
+            mWorker.waitForFinish();
             if (mBuildError.get() != null) {
                 throw mBuildError.get();
             }
 
-            buildApk(outFile);                              //finish the apk by adding common and unknown files
+            buildApk(outFile);
 
             // we copied the AndroidManifest.xml to AndroidManifest.xml.orig so we can edit it
             // lets restore the unedited one, to not change the original
@@ -128,7 +128,7 @@ public class ApkBuilder {
         }
     }
 
-    private void buildManifestFile(File manifest, File manifestOriginal) throws AndrolibException {
+    private void backupManifestFile(File manifest, File manifestOriginal) throws AndrolibException {
         // If we decoded in "raw", we cannot patch AndroidManifest
         if (new File(mApkDir, "resources.arsc").exists()) {
             return;
@@ -226,6 +226,7 @@ public class ApkBuilder {
     }
 
     private void buildResources() throws BrutException {
+        // create res folder, manifest file and resources.arsc
         if (!buildResourcesRaw() && !buildResourcesFull() && !buildManifest()) {
             LOGGER.warning("Could not find resources");
         }
@@ -387,7 +388,7 @@ public class ApkBuilder {
         }
     }
 
-    private void buildLibs() throws AndrolibException {
+    private void copyLibs() throws AndrolibException {
         buildLibrary("lib");
         buildLibrary("libs");
         buildLibrary("kotlin");
@@ -413,7 +414,7 @@ public class ApkBuilder {
         }
     }
 
-    private void buildCopyOriginalFiles() throws AndrolibException {
+    private void copyOriginalFilesIfEnabled() throws AndrolibException {
         if (mConfig.copyOriginalFiles) {
             File originalDir = new File(mApkDir, "original");
             if (originalDir.exists()) {
@@ -456,9 +457,10 @@ public class ApkBuilder {
             assetDir = null;
         }
         try (ZipOutputStream zipOutputStream = new ZipOutputStream(Files.newOutputStream(outApk.toPath()))) {
+            // zip all AAPT-generated files
             ZipUtils.zipFoldersPreserveStream(new File(mApkDir, APK_DIRNAME), zipOutputStream, assetDir, mApkInfo.doNotCompress);
 
-            // we must go after the Apk is built, and copy the files in via Zip
+            // we must copy some files manually
             // this is because Aapt won't add files it doesn't know (ex unknown files)
             if (mApkInfo.unknownFiles != null) {
                 LOGGER.info("Copying unknown files/dir...");
