@@ -99,8 +99,7 @@ public class ApkBuilder {
             File manifest = new File(mApkDir, "AndroidManifest.xml");
             File manifestOriginal = new File(mApkDir, "AndroidManifest.xml.orig");
 
-            scheduleBuildSources();                         //create classes.dex
-            scheduleBuildNonDefaultSources();               //create all other dex files
+            scheduleBuildDexFiles();                        //create dex files
             buildManifestFile(manifest, manifestOriginal);  //backup AndroidManifest.xml
             buildResources();                               //create res folder, manifest file and resources.arsc
             buildLibs();                                    //copy lib, libs, kotlin and META-INF/services
@@ -148,44 +147,17 @@ public class ApkBuilder {
         }
     }
 
-    private void scheduleBuildSources() {
-        Runnable r = () -> {
-            try {
-                if (mBuildError.get() != null) {
-                    return;
-                }
-                if (!buildSourcesRaw("classes.dex") && !buildSourcesSmali("smali", "classes.dex")) {
-                    LOGGER.warning("Could not find sources");
-                }
-            } catch (AndrolibException e) {
-                mBuildError.compareAndSet(null, e);
-            }
-        };
-        mWorker.submit(r);
-    }
-
-    private void scheduleBuildNonDefaultSources() throws AndrolibException {
+    private void scheduleBuildDexFiles() throws AndrolibException {
         try {
+            mWorker.submit(() -> scheduleDexBuild("classes.dex", "smali"));
+
             // loop through any smali_ directories for multi-dex apks
             Map<String, Directory> dirs = mApkDir.getDirectory().getDirs();
             for (Map.Entry<String, Directory> directory : dirs.entrySet()) {
                 String name = directory.getKey();
                 if (name.startsWith("smali_")) {
                     String filename = name.substring(name.indexOf("_") + 1) + ".dex";
-
-                    Runnable r = () -> {
-                        try {
-                            if (mBuildError.get() != null) {
-                                return;
-                            }
-                            if (!buildSourcesRaw(filename) && !buildSourcesSmali(name, filename)) {
-                                LOGGER.warning("Could not find sources");
-                            }
-                        } catch (AndrolibException e) {
-                            mBuildError.compareAndSet(null, e);
-                        }
-                    };
-                    mWorker.submit(r);
+                    mWorker.submit(() -> scheduleDexBuild(filename, name));
                 }
             }
 
@@ -201,6 +173,19 @@ public class ApkBuilder {
             }
         } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
+        }
+    }
+
+    private void scheduleDexBuild(String filename, String smali) {
+        try {
+            if (mBuildError.get() != null) {
+                return;
+            }
+            if (!buildSourcesRaw(filename) && !buildSourcesSmali(smali, filename)) {
+                LOGGER.warning("Could not find sources");
+            }
+        } catch (AndrolibException e) {
+            mBuildError.compareAndSet(null, e);
         }
     }
 
