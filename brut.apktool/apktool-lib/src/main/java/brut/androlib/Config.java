@@ -67,6 +67,7 @@ public class Config {
     public boolean baksmaliDebugMode = true;
 
     // Common options
+    public int jobs = Runtime.getRuntime().availableProcessors();
     public String frameworkDirectory = null;
     public String frameworkTag = null;
     public String aaptPath = "";

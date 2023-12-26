@@ -36,14 +36,6 @@ public class ZipUtils {
         // Private constructor for utility class
     }
 
-    public static void zipFolders(final File folder, final File zip, final File assets, final Collection<String> doNotCompress)
-            throws BrutException, IOException {
-
-        ZipOutputStream zipOutputStream = new ZipOutputStream(Files.newOutputStream(zip.toPath()));
-        zipFoldersPreserveStream(folder, zipOutputStream, assets, doNotCompress);
-        zipOutputStream.close();
-    }
-
     public static void zipFoldersPreserveStream(final File folder, final ZipOutputStream zipOutputStream, final File assets, final Collection<String> doNotCompress)
             throws BrutException, IOException {
 

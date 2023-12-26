@@ -79,9 +79,9 @@ public class ApkBuilder {
     }
 
     public void build(File outFile) throws BrutException {
-        LOGGER.info("Using Apktool " + ApktoolProperties.getVersion());
+        LOGGER.info("Using Apktool " + ApktoolProperties.getVersion() + " with " + mConfig.jobs + " thread(s).");
         try {
-            mWorker = new BackgroundWorker();
+            mWorker = new BackgroundWorker(mConfig.jobs);
             mApkInfo = ApkInfo.load(mApkDir);
 
             if (mApkInfo.getSdkInfo() != null && mApkInfo.getSdkInfo().get("minSdkVersion") != null) {
