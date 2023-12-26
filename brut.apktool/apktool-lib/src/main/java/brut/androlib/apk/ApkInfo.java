@@ -42,7 +42,7 @@ public class ApkInfo implements YamlSerializable {
     public Map<String, String> unknownFiles = new LinkedHashMap<>();
     public List<String> doNotCompress;
 
-    /** @Deprecated use {@link #resourcesAreCompressed} */
+    /** @deprecated use {@link #resourcesAreCompressed} */
     public boolean compressionType;
 
     public ApkInfo() {
