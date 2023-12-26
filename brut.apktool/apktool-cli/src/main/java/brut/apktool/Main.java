@@ -130,6 +130,9 @@ public class Main {
         if (cli.hasOption("api") || cli.hasOption("api-level")) {
             config.apiLevel = Integer.parseInt(cli.getOptionValue("api"));
         }
+        if (cli.hasOption("j") || cli.hasOption("jobs")) {
+            config.jobs = Integer.parseInt(cli.getOptionValue("j"));
+        }
     }
 
     private static void cmdDecode(CommandLine cli, Config config) throws AndrolibException {
@@ -341,6 +344,13 @@ public class Main {
                 .desc("Print advanced information.")
                 .build();
 
+        Option jobsOption = Option.builder("j")
+                .longOpt("jobs")
+                .hasArg()
+                .type(Integer.class)
+                .desc("Sets the number of threads to use.")
+                .build();
+
         Option noSrcOption = Option.builder("s")
                 .longOpt("no-src")
                 .desc("Do not decode sources.")
@@ -502,6 +512,7 @@ public class Main {
 
         // check for advance mode
         if (isAdvanceMode()) {
+            decodeOptions.addOption(jobsOption);
             decodeOptions.addOption(noDbgOption);
             decodeOptions.addOption(keepResOption);
             decodeOptions.addOption(analysisOption);
@@ -511,6 +522,7 @@ public class Main {
             decodeOptions.addOption(forceManOption);
             decodeOptions.addOption(resolveResModeOption);
 
+            buildOptions.addOption(jobsOption);
             buildOptions.addOption(apiLevelOption);
             buildOptions.addOption(debugBuiOption);
             buildOptions.addOption(netSecConfOption);
@@ -561,6 +573,7 @@ public class Main {
         for (Option op : frameOptions.getOptions()) {
             allOptions.addOption(op);
         }
+        allOptions.addOption(jobsOption);
         allOptions.addOption(apiLevelOption);
         allOptions.addOption(analysisOption);
         allOptions.addOption(debugDecOption);

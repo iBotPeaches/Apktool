@@ -78,7 +78,7 @@ public class ApkDecoder {
     public ApkInfo decode(File outDir) throws AndrolibException, IOException, DirectoryException {
         ExtFile apkFile = mApkInfo.getApkFile();
         try {
-            mWorker = new BackgroundWorker();
+            mWorker = new BackgroundWorker(mConfig.jobs);
             if (!mConfig.forceDelete && outDir.exists()) {
                 throw new OutDirExistsException();
             }
@@ -95,7 +95,8 @@ public class ApkDecoder {
             //noinspection ResultOfMethodCallIgnored
             outDir.mkdirs();
 
-            LOGGER.info("Using Apktool " + ApktoolProperties.getVersion() + " on " + mApkInfo.apkFileName);
+            LOGGER.info("Using Apktool " + ApktoolProperties.getVersion() + " on " + mApkInfo.apkFileName +
+                " with " + mConfig.jobs + " thread(s).");
 
             if (mApkInfo.hasSources()) {
                 switch (mConfig.decodeSources) {
