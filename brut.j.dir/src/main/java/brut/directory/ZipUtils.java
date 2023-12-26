@@ -39,15 +39,21 @@ public class ZipUtils {
     public static void zipFolders(final File folder, final File zip, final File assets, final Collection<String> doNotCompress)
             throws BrutException, IOException {
 
-        mDoNotCompress = doNotCompress;
         ZipOutputStream zipOutputStream = new ZipOutputStream(Files.newOutputStream(zip.toPath()));
+        zipFoldersPreserveStream(folder, zipOutputStream, assets, doNotCompress);
+        zipOutputStream.close();
+    }
+
+    public static void zipFoldersPreserveStream(final File folder, final ZipOutputStream zipOutputStream, final File assets, final Collection<String> doNotCompress)
+            throws BrutException, IOException {
+
+        mDoNotCompress = doNotCompress;
         zipFolders(folder, zipOutputStream);
 
         // We manually set the assets because we need to retain the folder structure
         if (assets != null) {
             processFolder(assets, zipOutputStream, assets.getPath().length() - 6);
         }
-        zipOutputStream.close();
     }
 
     private static void zipFolders(final File folder, final ZipOutputStream outputStream)
