@@ -74,7 +74,7 @@ public class BrutIO {
         return crc;
     }
 
-    public static String sanitizeUnknownFile(final File directory, final String entry) throws IOException, BrutException {
+    public static String sanitizeFilepath(final File directory, final String entry) throws IOException, BrutException {
         if (entry.length() == 0) {
             throw new InvalidUnknownFileException("Invalid Unknown File");
         }

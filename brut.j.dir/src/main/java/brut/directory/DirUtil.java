@@ -89,7 +89,7 @@ public class DirUtil {
             } else if (!in.containsDir(fileName) && !in.containsFile(fileName)) {
                 // Skip copies of directories/files not found.
             } else {
-                String cleanedFilename = BrutIO.sanitizeUnknownFile(out, fileName);
+                String cleanedFilename = BrutIO.sanitizeFilepath(out, fileName);
                 if (! cleanedFilename.isEmpty()) {
                     File outFile = new File(out, cleanedFilename);
                     //noinspection ResultOfMethodCallIgnored
