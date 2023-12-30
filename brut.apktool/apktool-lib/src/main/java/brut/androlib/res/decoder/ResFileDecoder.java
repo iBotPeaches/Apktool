@@ -22,9 +22,12 @@ import brut.androlib.exceptions.RawXmlEncounteredException;
 import brut.androlib.res.data.ResResource;
 import brut.androlib.res.data.value.ResBoolValue;
 import brut.androlib.res.data.value.ResFileValue;
+import brut.common.BrutException;
 import brut.directory.DirUtil;
 import brut.directory.Directory;
 import brut.directory.DirectoryException;
+import brut.directory.FileDirectory;
+import brut.util.BrutIO;
 
 import java.io.*;
 import java.util.Map;
@@ -41,11 +44,21 @@ public class ResFileDecoder {
     public void decode(ResResource res, Directory inDir, Directory outDir, Map<String, String> resFileMapping)
             throws AndrolibException {
 
+        File baseRes = ((FileDirectory) outDir).getDir();
         ResFileValue fileValue = (ResFileValue) res.getValue();
         String inFilePath = fileValue.toString();
         String inFileName = fileValue.getStrippedPath();
-        String outResName = res.getFilePath();
         String typeName = res.getResSpec().getType().getName();
+        String outResName;
+
+        try {
+            outResName = BrutIO.sanitizeFilepath(baseRes, res.getFilePath());
+        } catch (IOException | BrutException ex) {
+            outResName = inFileName;
+            LOGGER.warning(String.format(
+                "Potentially malicious file path: %s, using instead %s", res.getFilePath(), outResName
+            ));
+        }
 
         String ext = null;
         String outFileName;
