@@ -83,11 +83,11 @@ public class BrutIO {
             throw new RootUnknownFileException("Absolute Unknown Files is not allowed");
         }
 
-        return sanitizeDirectoryTraversal(directory, entry);
+        return sanitizeDirectoryTraversal(directory, entry, File.separator);
     }
 
-    public static String sanitizeDirectoryTraversal(final File directory, final String entry) throws IOException, BrutException {
-        final String canonicalDirPath = directory.getCanonicalPath() + File.separator;
+    public static String sanitizeDirectoryTraversal(final File directory, final String entry, final String separator) throws IOException, BrutException {
+        final String canonicalDirPath = directory.getCanonicalPath() + separator;
         final String canonicalEntryPath = new File(directory, entry).getCanonicalPath();
 
         if (!canonicalEntryPath.startsWith(canonicalDirPath)) {
