@@ -79,7 +79,7 @@ jobs:
       - name: Build and test
         uses: gradle/gradle-build-action@v2.11.1
         with:
-          arguments: build shadowJar proguard
+          arguments: build shadowJar proguard --info
 
   upload-artifact:
     runs-on: ubuntu-latest
