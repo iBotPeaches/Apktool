@@ -88,8 +88,7 @@ public class BrutIO {
 
     public static String sanitizeDirectoryTraversal(final File directory, final String entry) throws IOException, BrutException {
         final String canonicalDirPath = directory.getCanonicalPath() + File.separator;
-        final String entryWithSeparator = entry.replace("/", File.separator).replace("\\", File.separator);
-        final String canonicalEntryPath = new File(directory, entryWithSeparator).getCanonicalPath();
+        final String canonicalEntryPath = new File(directory, entry).getCanonicalPath();
 
         if (!canonicalEntryPath.startsWith(canonicalDirPath)) {
             throw new TraversalUnknownFileException("Directory Traversal is not allowed");

@@ -53,7 +53,6 @@ public class ResFileDecoder {
 
         try {
             outResName = BrutIO.sanitizeDirectoryTraversal(baseRes, res.getFilePath());
-            LOGGER.info(outResName + " | " + res.getFilePath());
         } catch (IOException | BrutException ex) {
             outResName = inFileName;
             LOGGER.warning(String.format(
@@ -71,7 +70,8 @@ public class ResFileDecoder {
             outFileName = outResName + ext;
         }
 
-        String outFilePath = "res/" + outFileName;
+        String outFilePath = "res/" + BrutIO.normalizePath(outFileName);
+        LOGGER.info(outResName + " | " + outFilePath + " | " + res.getFilePath());
         if (!inFilePath.equals(outFilePath)) {
             resFileMapping.put(inFilePath, outFilePath);
         }
