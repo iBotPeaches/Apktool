@@ -23,6 +23,7 @@ import brut.common.TraversalUnknownFileException;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
+import java.nio.file.Paths;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -87,15 +88,14 @@ public class BrutIO {
     }
 
     public static String sanitizeDirectoryTraversal(final File directory, final String entry, final String separator) throws IOException, BrutException {
-        final String canonicalDirPath = directory.getCanonicalPath() + separator;
-        final String canonicalEntryPath = new File(directory, entry).getCanonicalPath();
+        final String normalizedPath = Paths.get(entry).normalize().toString();
+        File file = new File(directory, normalizedPath);
 
-        if (!canonicalEntryPath.startsWith(canonicalDirPath)) {
+        if (! file.getCanonicalPath().startsWith(directory.toString())) {
             throw new TraversalUnknownFileException("Directory Traversal is not allowed");
         }
 
-        // https://stackoverflow.com/q/2375903/455008
-        return canonicalEntryPath.substring(canonicalDirPath.length());
+        return entry;
     }
 
     public static String normalizePath(String path) {
