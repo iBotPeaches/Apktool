@@ -75,7 +75,7 @@ public class BrutIO {
     }
 
     public static String sanitizeFilepath(final File directory, final String entry) throws IOException, BrutException {
-        if (entry.length() == 0) {
+        if (entry.isEmpty()) {
             throw new InvalidUnknownFileException("Invalid Unknown File");
         }
 
@@ -83,6 +83,10 @@ public class BrutIO {
             throw new RootUnknownFileException("Absolute Unknown Files is not allowed");
         }
 
+        return sanitizeDirectoryTraversal(directory, entry);
+    }
+
+    public static String sanitizeDirectoryTraversal(final File directory, final String entry) throws IOException, BrutException {
         final String canonicalDirPath = directory.getCanonicalPath() + File.separator;
         final String canonicalEntryPath = new File(directory, entry).getCanonicalPath();
 
