@@ -23,7 +23,6 @@ import brut.common.TraversalUnknownFileException;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
-import java.nio.file.Paths;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -95,15 +94,11 @@ public class BrutIO {
         return canonicalEntryPath.substring(canonicalDirPath.length());
     }
 
-    public static String sanitizeDirectoryTraversal(final File directory, final String entry) throws IOException, BrutException {
-        final String normalizedPath = Paths.get(entry).normalize().toString();
-        File file = new File(directory, adaptSeparatorToUnix(normalizedPath));
-
-        if (! file.getCanonicalPath().startsWith(directory.toString())) {
-            throw new TraversalUnknownFileException("Directory Traversal is not allowed");
+    public static boolean detectPossibleDirectoryTraversal(String entry) {
+        if (OSDetection.isWindows()) {
+            return entry.contains("..\\") || entry.contains("\\..");
         }
-
-        return entry;
+        return entry.contains("../") || entry.contains("/..");
     }
 
     public static String adaptSeparatorToUnix(String path) {
