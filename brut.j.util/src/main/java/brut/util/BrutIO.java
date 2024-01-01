@@ -84,12 +84,20 @@ public class BrutIO {
             throw new RootUnknownFileException("Absolute Unknown Files is not allowed");
         }
 
-        return sanitizeDirectoryTraversal(directory, entry, File.separator);
+        final String canonicalDirPath = directory.getCanonicalPath() + File.separator;
+        final String canonicalEntryPath = new File(directory, entry).getCanonicalPath();
+
+        if (!canonicalEntryPath.startsWith(canonicalDirPath)) {
+            throw new TraversalUnknownFileException("Directory Traversal is not allowed");
+        }
+
+        // https://stackoverflow.com/q/2375903/455008
+        return canonicalEntryPath.substring(canonicalDirPath.length());
     }
 
-    public static String sanitizeDirectoryTraversal(final File directory, final String entry, final String separator) throws IOException, BrutException {
+    public static String sanitizeDirectoryTraversal(final File directory, final String entry) throws IOException, BrutException {
         final String normalizedPath = Paths.get(entry).normalize().toString();
-        File file = new File(directory, normalizedPath);
+        File file = new File(directory, adaptSeparatorToUnix(normalizedPath));
 
         if (! file.getCanonicalPath().startsWith(directory.toString())) {
             throw new TraversalUnknownFileException("Directory Traversal is not allowed");
@@ -98,7 +106,7 @@ public class BrutIO {
         return entry;
     }
 
-    public static String normalizePath(String path) {
+    public static String adaptSeparatorToUnix(String path) {
         char separator = File.separatorChar;
 
         if (separator != '/') {
