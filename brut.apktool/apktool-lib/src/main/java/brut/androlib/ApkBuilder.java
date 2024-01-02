@@ -482,7 +482,7 @@ public class ApkBuilder {
             File inputFile;
 
             try {
-                inputFile = new File(unknownFileDir, BrutIO.sanitizeUnknownFile(unknownFileDir, unknownFileInfo.getKey()));
+                inputFile = new File(unknownFileDir, BrutIO.sanitizeFilepath(unknownFileDir, unknownFileInfo.getKey()));
             } catch (RootUnknownFileException | InvalidUnknownFileException | TraversalUnknownFileException exception) {
                 LOGGER.warning(String.format("Skipping file %s (%s)", unknownFileInfo.getKey(), exception.getMessage()));
                 continue;

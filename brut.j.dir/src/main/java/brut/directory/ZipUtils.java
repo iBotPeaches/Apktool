@@ -59,8 +59,8 @@ public class ZipUtils {
             throws BrutException, IOException {
         for (final File file : folder.listFiles()) {
             if (file.isFile()) {
-                final String cleanedPath = BrutIO.sanitizeUnknownFile(folder, file.getPath().substring(prefixLength));
-                final ZipEntry zipEntry = new ZipEntry(BrutIO.normalizePath(cleanedPath));
+                final String cleanedPath = BrutIO.sanitizeFilepath(folder, file.getPath().substring(prefixLength));
+                final ZipEntry zipEntry = new ZipEntry(BrutIO.adaptSeparatorToUnix(cleanedPath));
 
                 // aapt binary by default takes in parameters via -0 arsc to list extensions that shouldn't be
                 // compressed. We will replicate that behavior
