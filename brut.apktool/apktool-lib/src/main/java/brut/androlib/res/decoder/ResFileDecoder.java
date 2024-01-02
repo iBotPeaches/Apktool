@@ -25,6 +25,7 @@ import brut.androlib.res.data.value.ResFileValue;
 import brut.directory.DirUtil;
 import brut.directory.Directory;
 import brut.directory.DirectoryException;
+import brut.util.BrutIO;
 
 import java.io.*;
 import java.util.Map;
@@ -46,6 +47,13 @@ public class ResFileDecoder {
         String inFileName = fileValue.getStrippedPath();
         String outResName = res.getFilePath();
         String typeName = res.getResSpec().getType().getName();
+
+        if (BrutIO.detectPossibleDirectoryTraversal(outResName)) {
+            outResName = inFileName;
+            LOGGER.warning(String.format(
+                "Potentially malicious file path: %s, using instead %s", res.getFilePath(), outResName
+            ));
+        }
 
         String ext = null;
         String outFileName;

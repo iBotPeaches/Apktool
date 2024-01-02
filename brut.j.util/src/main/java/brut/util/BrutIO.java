@@ -94,6 +94,13 @@ public class BrutIO {
         return canonicalEntryPath.substring(canonicalDirPath.length());
     }
 
+    public static boolean detectPossibleDirectoryTraversal(String entry) {
+        if (OSDetection.isWindows()) {
+            return entry.contains("..\\") || entry.contains("\\..");
+        }
+        return entry.contains("../") || entry.contains("/..");
+    }
+
     public static String normalizePath(String path) {
         char separator = File.separatorChar;
 
