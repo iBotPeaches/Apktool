@@ -47,7 +47,7 @@ public class ApktoolProperties {
         try {
             sProps.load(in);
             in.close();
-        } catch (IOException ex) {
+        } catch (NullPointerException | IOException ex) {
             LOGGER.warning("Can't load properties.");
         }
 
