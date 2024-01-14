@@ -217,14 +217,13 @@ public class ApkDecoder {
     }
 
     private void scheduleDecodeSourcesSmali(File outDir, String filename) {
-        Runnable r = () -> {
+        mWorker.submit(() -> {
             try {
                 decodeSourcesSmali(outDir, filename);
             } catch (AndrolibException e) {
                 mBuildError.compareAndSet(null, new RuntimeException(e));
             }
-        };
-        mWorker.submit(r);
+        });
     }
 
     private void decodeSourcesSmali(File outDir, String filename) throws AndrolibException {
