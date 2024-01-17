@@ -95,10 +95,7 @@ public class BrutIO {
     }
 
     public static boolean detectPossibleDirectoryTraversal(String entry) {
-        if (OSDetection.isWindows()) {
-            return entry.contains("..\\") || entry.contains("\\..");
-        }
-        return entry.contains("../") || entry.contains("/..");
+        return entry.contains("../") || entry.contains("/..") || entry.contains("..\\") || entry.contains("\\..");
     }
 
     public static String adaptSeparatorToUnix(String path) {
