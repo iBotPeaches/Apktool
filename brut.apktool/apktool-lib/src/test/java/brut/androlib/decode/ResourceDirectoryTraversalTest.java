@@ -23,9 +23,7 @@ import brut.androlib.TestUtils;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
 import brut.util.OS;
-import brut.util.OSDetection;
 import org.junit.AfterClass;
-import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -41,7 +39,6 @@ public class ResourceDirectoryTraversalTest extends BaseTest {
         TestUtils.cleanFrameworkFile();
         sTmpDir = new ExtFile(OS.createTempDirectory());
         TestUtils.copyResourceDir(ResourceDirectoryTraversalTest.class, "decode/arbitrary-write/", sTmpDir);
-        Assume.assumeFalse(OSDetection.isWindows());
     }
 
     @AfterClass
