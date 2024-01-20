@@ -91,8 +91,8 @@ const config = {
           {to: '/docs/install', label: 'Install', position: 'left'},
           {to: '/blog', label: 'Releases', position: 'left'},
           {
-            href: 'https://bitbucket.org/iBotPeaches/apktool/downloads/apktool_2.9.2.jar',
-            label: 'Download 2.9.2',
+            href: 'https://bitbucket.org/iBotPeaches/apktool/downloads/apktool_2.9.3.jar',
+            label: 'Download 2.9.3',
             position: 'right',
           },
           {
