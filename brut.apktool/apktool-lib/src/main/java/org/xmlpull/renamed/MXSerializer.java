@@ -702,11 +702,6 @@ public class MXSerializer implements XmlSerializer {
 		if (checkNamesInterned && namesInterned) {
 			checkInterning(name);
 		}
-		String startTagName = elName[depth];
-		if ((!namesInterned && !name.equals(startTagName)) || (namesInterned && name != startTagName)) {
-			throw new IllegalArgumentException("expected element name "
-					+ printable(elName[depth]) + " and not " + printable(name) + getLocation());
-		}
 		if (startTagIncomplete) {
 			writeNamespaceDeclarations();
 			out.write(" />"); // space is added to make it easier to work in XHTML!!!
