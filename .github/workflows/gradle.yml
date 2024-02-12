@@ -21,4 +21,4 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: 17
-      - uses: gradle/wrapper-validation-action@v2.0.0
+      - uses: gradle/wrapper-validation-action@v2.1.1
