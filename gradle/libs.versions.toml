@@ -1,5 +1,5 @@
 [versions]
-baksmali = "3.0.3"
+baksmali = "3.0.4"
 commons_io = "2.15.1"
 commons_cli = "1.6.0"
 commons_lang3 = "3.14.0"
