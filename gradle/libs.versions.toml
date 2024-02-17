@@ -1,5 +1,5 @@
 [versions]
-baksmali = "3.0.3"
+baksmali = "3.0.5"
 commons_io = "2.15.1"
 commons_cli = "1.6.0"
 commons_lang3 = "3.14.0"
@@ -8,7 +8,7 @@ guava = "32.0.1-jre"
 junit = "4.13.2"
 proguard = "7.4.2"
 shadow = "8.1.1"
-smali = "3.0.3"
+smali = "3.0.5"
 xmlpull = "1.1.4c"
 xmlunit = "2.9.1"
 
