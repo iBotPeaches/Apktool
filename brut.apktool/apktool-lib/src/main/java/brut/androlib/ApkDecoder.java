@@ -49,7 +49,7 @@ public class ApkDecoder {
     private final static String UNK_DIRNAME = "unknown";
     private final static String[] APK_STANDARD_ALL_FILENAMES = new String[] {
         "classes.dex", "AndroidManifest.xml", "resources.arsc", "res", "r", "R",
-        "lib", "libs", "assets", "META-INF", "kotlin" };
+        "lib", "libs", "assets", "META-INF", "kotlin", "stamp-cert-sha256" };
     private final static String[] APK_RESOURCES_FILENAMES = new String[] {
         "resources.arsc", "res", "r", "R" };
     private final static String[] APK_MANIFEST_FILENAMES = new String[] {
