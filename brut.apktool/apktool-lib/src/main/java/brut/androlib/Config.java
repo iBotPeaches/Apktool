@@ -54,6 +54,12 @@ public class Config {
     public boolean useAapt2 = true;
     public boolean noCrunch = false;
 
+    // Optimize options, only supported by aapt2.
+    // see https://developer.android.com/tools/aapt2#optimize_options
+    public boolean shortenResPaths = false;
+    public boolean enableSparseEncoding = false;
+    public boolean collapseResNames = false;
+
     // Decode options
     public short decodeSources = DECODE_SOURCES_SMALI;
     public short decodeResources = DECODE_RESOURCES_FULL;
