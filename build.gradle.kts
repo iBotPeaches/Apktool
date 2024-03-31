@@ -55,7 +55,6 @@ if ("release" !in gradle.startParameter.taskNames) {
 }
 
 plugins {
-    alias(libs.plugins.shadow)
     `java-library`
     `maven-publish`
     signing

@@ -3,7 +3,6 @@ import proguard.gradle.ProGuardTask
 val apktoolVersion: String by rootProject.extra
 
 plugins {
-    alias(libs.plugins.shadow)
     application
 }
 
