@@ -27,10 +27,9 @@ application {
     tasks.run.get().workingDir = file(System.getProperty("user.dir"))
 }
 
-tasks.withType<Jar> {
-    manifest {
-        attributes["Main-Class"] = "brut.apktool.Main"
-    }
+tasks.withType<AbstractArchiveTask>().configureEach {
+    isPreserveFileTimestamps = false
+    isReproducibleFileOrder = true
 }
 
 tasks.register<Delete>("cleanOutputDirectory") {
@@ -39,8 +38,23 @@ tasks.register<Delete>("cleanOutputDirectory") {
     })
 }
 
+tasks.create("shadowJar", Jar::class) {
+    dependsOn("build")
+    group = "build"
+    description = "Creates a single executable JAR with all dependencies"
+    manifest.attributes["Main-Class"] = "brut.apktool.Main"
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    val dependencies = configurations
+        .runtimeClasspath
+        .get()
+        .map(::zipTree)
+
+    from(dependencies)
+    with(tasks.jar.get())
+}
+
 tasks.register<ProGuardTask>("proguard") {
-    dependsOn("cleanOutputDirectory")
     dependsOn("shadowJar")
     injars(tasks.named("shadowJar").get().outputs.files)
 
@@ -70,3 +84,5 @@ tasks.register<ProGuardTask>("proguard") {
     val outPath = "build/libs/apktool-$apktoolVersion.jar"
     outjars(outPath)
 }
+
+tasks.getByPath(":release").dependsOn("proguard")
