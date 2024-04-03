@@ -31,6 +31,8 @@ tasks.register<Delete>("cleanOutputDirectory") {
 
 val shadowJar = tasks.create("shadowJar", Jar::class) {
     dependsOn("build")
+    dependsOn("cleanOutputDirectory")
+
     group = "build"
     description = "Creates a single executable JAR with all dependencies"
     manifest.attributes["Main-Class"] = "brut.apktool.Main"
@@ -49,8 +51,9 @@ tasks.register<JavaExec>("proguard") {
     dependsOn("shadowJar")
 
     val proguardRules = file("proguard-rules.pro")
+    val originalJar = shadowJar.outputs.files.singleFile
 
-    inputs.files(shadowJar, proguardRules)
+    inputs.files(originalJar.toString(), proguardRules)
     outputs.file("build/libs/apktool-$apktoolVersion.jar")
 
     classpath(r8)
@@ -59,9 +62,11 @@ tasks.register<JavaExec>("proguard") {
     args = mutableListOf(
         "--release",
         "--classfile",
+        "--no-minification",
         "--lib", javaLauncher.get().metadata.installationPath.toString(),
-        "--output", "build/libs/apktool-$apktoolVersion.jar",
+        "--output", outputs.files.singleFile.toString(),
         "--pg-conf", proguardRules.toString(),
+        originalJar.toString()
     )
 }
 
