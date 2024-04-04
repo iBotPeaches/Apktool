@@ -63,6 +63,7 @@ tasks.register<JavaExec>("proguard") {
         "--release",
         "--classfile",
         "--no-minification",
+        "--map-diagnostics:UnusedProguardKeepRuleDiagnostic", "info", "none",
         "--lib", javaLauncher.get().metadata.installationPath.toString(),
         "--output", outputs.files.singleFile.toString(),
         "--pg-conf", proguardRules.toString(),
