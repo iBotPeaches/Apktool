@@ -50,6 +50,10 @@ val shadowJar = tasks.create("shadowJar", Jar::class) {
 tasks.register<JavaExec>("proguard") {
     dependsOn("shadowJar")
 
+    onlyIf {
+        JavaVersion.current().isJava11Compatible
+    }
+
     val proguardRules = file("proguard-rules.pro")
     val originalJar = shadowJar.outputs.files.singleFile
 
