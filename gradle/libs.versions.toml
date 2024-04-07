@@ -6,8 +6,7 @@ commons_lang3 = "3.14.0"
 commons_text = "1.11.0"
 guava = "32.0.1-jre"
 junit = "4.13.2"
-proguard = "7.4.2"
-shadow = "8.1.1"
+r8 = "8.3.37"
 smali = "3.0.5"
 xmlpull = "1.1.4c"
 xmlunit = "2.9.1"
@@ -20,10 +19,7 @@ commons_lang3 = { module = "org.apache.commons:commons-lang3", version.ref = "co
 commons_text = { module = "org.apache.commons:commons-text", version.ref = "commons_text" }
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
 junit = { module = "junit:junit", version.ref = "junit" }
-proguard = { module = "com.guardsquare:proguard-gradle", version.ref = "proguard" }
+r8 = { module = "com.android.tools:r8", version.ref = "r8" }
 smali = { module = "com.android.tools.smali:smali", version.ref = "smali" }
 xmlpull = { module = "xpp3:xpp3", version.ref = "xmlpull" }
 xmlunit = { module = "org.xmlunit:xmlunit-legacy", version.ref = "xmlunit" }
-
-[plugins]
-shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }
