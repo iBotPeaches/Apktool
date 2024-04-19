@@ -43,6 +43,11 @@ public class Config {
     public final static short DECODE_RES_RESOLVE_DUMMY = 0x0001;
     public final static short DECODE_RES_RESOLVE_RETAIN = 0x0002;
 
+    // This was added in order to extend BaksmaliOptions and add
+    // the logic used to reference system-level resources in the
+    // smali output alongside the local package-level resources.
+    public BaksmaliConfig baksmaliConfig = new BaksmaliConfig();
+
     // Build options
     public boolean forceBuildAll = false;
     public boolean forceDeleteFramework = false;
@@ -65,6 +70,7 @@ public class Config {
     public boolean forceDelete = false;
     public boolean keepBrokenResources = false;
     public boolean baksmaliDebugMode = true;
+    public boolean resolveResources = false;
 
     // Common options
     public int jobs = Runtime.getRuntime().availableProcessors();

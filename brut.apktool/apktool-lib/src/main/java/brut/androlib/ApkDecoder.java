@@ -21,6 +21,7 @@ import brut.androlib.exceptions.InFileNotFoundException;
 import brut.androlib.exceptions.OutDirExistsException;
 import brut.androlib.apk.ApkInfo;
 import brut.androlib.res.ResourcesDecoder;
+import brut.androlib.res.data.ResTable;
 import brut.androlib.src.SmaliDecoder;
 import brut.directory.Directory;
 import brut.directory.ExtFile;
@@ -36,12 +37,15 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import org.xml.sax.SAXException;
+
 public class ApkDecoder {
     private final static Logger LOGGER = Logger.getLogger(ApkDecoder.class.getName());
 
     private final AtomicReference<RuntimeException> mBuildError = new AtomicReference<>(null);
     private final Config mConfig;
     private final ApkInfo mApkInfo;
+    private final ResTable mResTable;
     private volatile int mMinSdkVersion = 0;
     private BackgroundWorker mWorker;
 
@@ -73,6 +77,7 @@ public class ApkDecoder {
     public ApkDecoder(Config config, ExtFile apkFile) {
         mConfig = config;
         mApkInfo = new ApkInfo(apkFile);
+        mResTable = new ResTable(mConfig, mApkInfo);
     }
 
     public ApkInfo decode(File outDir) throws AndrolibException, IOException, DirectoryException {
@@ -97,6 +102,41 @@ public class ApkDecoder {
 
             LOGGER.info("Using Apktool " + ApktoolProperties.getVersion() + " on " + mApkInfo.apkFileName +
                 " with " + mConfig.jobs + " thread(s).");
+
+            // Changed the flow of execution so that resources are handled first, during which
+            // the public.xml is created, which is needed to create/store a reference to all resIds
+            // that will be referenced during the disassembly of dex files.
+            ResourcesDecoder resourcesDecoder = new ResourcesDecoder(mConfig, mApkInfo);
+
+            if (mApkInfo.hasResources()) {
+                switch (mConfig.decodeResources) {
+                    case Config.DECODE_RESOURCES_NONE:
+                        copyResourcesRaw(outDir);
+                        break;
+                    case Config.DECODE_RESOURCES_FULL:
+                        resourcesDecoder.decodeResources(outDir);
+                        break;
+                }
+            }
+
+            if (mApkInfo.hasManifest()) {
+                if (mConfig.decodeResources == Config.DECODE_RESOURCES_FULL ||
+                    mConfig.forceDecodeManifest == Config.FORCE_DECODE_MANIFEST_FULL) {
+                    resourcesDecoder.decodeManifest(outDir);
+                }
+                else {
+                    copyManifestRaw(outDir);
+                }
+            }
+            resourcesDecoder.updateApkInfo(outDir);
+
+            if (mConfig.resolveResources) {
+                try {
+                    mConfig.baksmaliConfig.loadResourceIds(mResTable, outDir);
+                } catch (AndrolibException | SAXException | IOException ex) {
+                    throw new AndrolibException("Could not parse apk resources", ex);
+                }
+            }
 
             if (mApkInfo.hasSources()) {
                 switch (mConfig.decodeSources) {
@@ -135,30 +175,6 @@ public class ApkDecoder {
                     }
                 }
             }
-
-            ResourcesDecoder resourcesDecoder = new ResourcesDecoder(mConfig, mApkInfo);
-
-            if (mApkInfo.hasResources()) {
-                switch (mConfig.decodeResources) {
-                    case Config.DECODE_RESOURCES_NONE:
-                        copyResourcesRaw(outDir);
-                        break;
-                    case Config.DECODE_RESOURCES_FULL:
-                        resourcesDecoder.decodeResources(outDir);
-                        break;
-                }
-            }
-
-            if (mApkInfo.hasManifest()) {
-                if (mConfig.decodeResources == Config.DECODE_RESOURCES_FULL ||
-                    mConfig.forceDecodeManifest == Config.FORCE_DECODE_MANIFEST_FULL) {
-                    resourcesDecoder.decodeManifest(outDir);
-                }
-                else {
-                    copyManifestRaw(outDir);
-                }
-            }
-            resourcesDecoder.updateApkInfo(outDir);
 
             copyRawFiles(outDir);
             copyUnknownFiles(outDir);
@@ -238,8 +254,11 @@ public class ApkDecoder {
             //noinspection ResultOfMethodCallIgnored
             smaliDir.mkdirs();
             LOGGER.info("Baksmaling " + filename + "...");
-            DexFile dexFile = SmaliDecoder.decode(mApkInfo.getApkFile(), smaliDir, filename,
-                mConfig.baksmaliDebugMode, mConfig.apiLevel);
+            // Adjusted the parameters to allow for passing the config so that we have a reference
+            // to the baksmaliConfig object, which is holding all of the resource references. The
+            // apiLevel and baksmaliDebugMode parameters are still provided since the config holds
+            // a reference to them as well.
+            DexFile dexFile = SmaliDecoder.decode(mApkInfo.getApkFile(), smaliDir, filename, mConfig);
             int minSdkVersion = dexFile.getOpcodes().api;
             if (mMinSdkVersion == 0 || mMinSdkVersion > minSdkVersion) {
                 mMinSdkVersion = minSdkVersion;

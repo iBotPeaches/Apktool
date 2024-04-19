@@ -158,6 +158,9 @@ public class Main {
         if (cli.hasOption("r") || cli.hasOption("no-res")) {
             config.setDecodeResources(Config.DECODE_RESOURCES_NONE);
         }
+        if (cli.hasOption("rr") || cli.hasOption("resolve-resources")) {
+            config.resolveResources = true;
+        }
         if (cli.hasOption("force-manifest")) {
             config.setForceDecodeManifest(Config.FORCE_DECODE_MANIFEST_FULL);
         }
@@ -366,6 +369,12 @@ public class Main {
                 .desc("Do not decode resources.")
                 .build();
 
+        Option resolveResourcesOption = Option.builder("rr")
+                .longOpt("resolve-resources")
+                .desc("Parse smali files, appending resource names alongside\n"
+                        + "            referenced resource IDs.")
+                .build();
+
         Option forceManOption = Option.builder()
                 .longOpt("force-manifest")
                 .desc("Decode the APK's compiled manifest, even if decoding of resources is set to \"false\".")
@@ -543,6 +552,7 @@ public class Main {
         decodeOptions.addOption(forceDecOption);
         decodeOptions.addOption(noSrcOption);
         decodeOptions.addOption(noResOption);
+        decodeOptions.addOption(resolveResourcesOption);
 
         // add basic build options
         buildOptions.addOption(outputBuiOption);
