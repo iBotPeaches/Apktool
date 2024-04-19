@@ -74,8 +74,8 @@ public class BrutIO {
         return crc;
     }
 
-    public static String sanitizeUnknownFile(final File directory, final String entry) throws IOException, BrutException {
-        if (entry.length() == 0) {
+    public static String sanitizeFilepath(final File directory, final String entry) throws IOException, BrutException {
+        if (entry.isEmpty()) {
             throw new InvalidUnknownFileException("Invalid Unknown File");
         }
 
@@ -94,7 +94,11 @@ public class BrutIO {
         return canonicalEntryPath.substring(canonicalDirPath.length());
     }
 
-    public static String normalizePath(String path) {
+    public static boolean detectPossibleDirectoryTraversal(String entry) {
+        return entry.contains("../") || entry.contains("/..") || entry.contains("..\\") || entry.contains("\\..");
+    }
+
+    public static String adaptSeparatorToUnix(String path) {
         char separator = File.separatorChar;
 
         if (separator != '/') {

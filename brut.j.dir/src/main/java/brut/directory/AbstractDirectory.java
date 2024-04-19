@@ -267,8 +267,7 @@ public abstract class AbstractDirectory implements Directory {
     protected abstract AbstractDirectory createDirLocal(String name) throws DirectoryException;
     protected abstract void removeFileLocal(String name);
 
-
-    private class ParsedPath {
+    private static class ParsedPath {
         public final String dir;
         public final String subpath;
         public ParsedPath(String dir, String subpath) {
@@ -277,7 +276,7 @@ public abstract class AbstractDirectory implements Directory {
         }
     }
 
-    private class SubPath {
+    private static class SubPath {
         public final AbstractDirectory dir;
         public final String path;
 

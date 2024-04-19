@@ -22,4 +22,8 @@ public class ResValue {
     public boolean shouldRemoveUnknownRes() {
         return Config.getInstance().isDecodeResolveModeRemoving();
     }
+
+    public boolean isAnalysisMode() {
+        return Config.getInstance().analysisMode;
+    }
 }

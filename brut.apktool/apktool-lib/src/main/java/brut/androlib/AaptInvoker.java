@@ -178,6 +178,9 @@ public class AaptInvoker {
 
         cmd.add("--no-compile-sdk-metadata");
 
+        // #3427 - Ignore stricter parsing during aapt2
+        cmd.add("--warn-manifest-validation");
+
         if (mApkInfo.sparseResources) {
             cmd.add("--enable-sparse-encoding");
         }

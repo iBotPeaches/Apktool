@@ -130,6 +130,9 @@ public class Main {
         if (cli.hasOption("api") || cli.hasOption("api-level")) {
             config.apiLevel = Integer.parseInt(cli.getOptionValue("api"));
         }
+        if (cli.hasOption("j") || cli.hasOption("jobs")) {
+            config.jobs = Integer.parseInt(cli.getOptionValue("j"));
+        }
     }
 
     private static void cmdDecode(CommandLine cli, Config config) throws AndrolibException {
@@ -170,11 +173,15 @@ public class Main {
         if (cli.hasOption("m") || cli.hasOption("match-original")) {
             config.analysisMode = true;
         }
-        if (cli.hasOption("res-mode") || cli.hasOption("resolve-resources-mode")) {
-            String mode = cli.getOptionValue("res-mode");
+        if (cli.hasOption("resm") || cli.hasOption("res-mode") || cli.hasOption("resolve-resources-mode")) {
+            String mode = cli.getOptionValue("resm");
+            if (mode == null) {
+                mode = cli.getOptionValue("res-mode");
+            }
             if (mode == null) {
                 mode = cli.getOptionValue("resolve-resources-mode");
             }
+
             switch (mode) {
                 case "remove":
                 case "delete":
@@ -271,11 +278,13 @@ public class Main {
         if (cli.hasOption("nc") || cli.hasOption("no-crunch")) {
             config.noCrunch = true;
         }
+        if (cli.hasOption("use-aapt1")) {
+            config.useAapt2 = false;
+        }
 
-        // Temporary flag to enable the use of aapt2. This will transform in time to a use-aapt1 flag, which will be
-        // legacy and eventually removed.
-        if (cli.hasOption("use-aapt2")) {
-            config.useAapt2 = true;
+        if (cli.hasOption("use-aapt1") && cli.hasOption("use-aapt2")) {
+            System.err.println("You can only use one of --use-aapt1 or --use-aapt2.");
+            System.exit(1);
         }
 
         File outFile;
@@ -341,6 +350,13 @@ public class Main {
         Option advanceOption = Option.builder("advance")
                 .longOpt("advanced")
                 .desc("Print advanced information.")
+                .build();
+
+        Option jobsOption = Option.builder("j")
+                .longOpt("jobs")
+                .hasArg()
+                .type(Integer.class)
+                .desc("Sets the number of threads to use.")
                 .build();
 
         Option noSrcOption = Option.builder("s")
@@ -459,9 +475,14 @@ public class Main {
                 .desc("Load aapt from specified location.")
                 .build();
 
+        Option aapt1Option = Option.builder()
+            .longOpt("use-aapt1")
+            .desc("Use aapt binary instead of aapt2 during the build step.")
+            .build();
+
         Option aapt2Option = Option.builder()
                 .longOpt("use-aapt2")
-                .desc("Use aapt2 binary instead of aapt1 during the build step.")
+                .desc("Use aapt2 binary instead of aapt during the build step.")
                 .build();
 
         Option originalOption = Option.builder("c")
@@ -505,6 +526,7 @@ public class Main {
 
         // check for advance mode
         if (isAdvanceMode()) {
+            decodeOptions.addOption(jobsOption);
             decodeOptions.addOption(noDbgOption);
             decodeOptions.addOption(keepResOption);
             decodeOptions.addOption(analysisOption);
@@ -514,12 +536,13 @@ public class Main {
             decodeOptions.addOption(forceManOption);
             decodeOptions.addOption(resolveResModeOption);
 
+            buildOptions.addOption(jobsOption);
             buildOptions.addOption(apiLevelOption);
             buildOptions.addOption(debugBuiOption);
             buildOptions.addOption(netSecConfOption);
             buildOptions.addOption(aaptOption);
             buildOptions.addOption(originalOption);
-            buildOptions.addOption(aapt2Option);
+            buildOptions.addOption(aapt1Option);
             buildOptions.addOption(noCrunchOption);
         }
 
@@ -565,6 +588,7 @@ public class Main {
         for (Option op : frameOptions.getOptions()) {
             allOptions.addOption(op);
         }
+        allOptions.addOption(jobsOption);
         allOptions.addOption(apiLevelOption);
         allOptions.addOption(analysisOption);
         allOptions.addOption(debugDecOption);
@@ -579,6 +603,7 @@ public class Main {
         allOptions.addOption(originalOption);
         allOptions.addOption(verboseOption);
         allOptions.addOption(quietOption);
+        allOptions.addOption(aapt1Option);
         allOptions.addOption(aapt2Option);
         allOptions.addOption(noCrunchOption);
         allOptions.addOption(onlyMainClassesOption);

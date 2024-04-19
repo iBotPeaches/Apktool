@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.util.regex.Pattern;
 
 public class ResStringValue extends ResScalarValue {
-
     public ResStringValue(String value, int rawValue) {
         this(value, rawValue, "string");
     }

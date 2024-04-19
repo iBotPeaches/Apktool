@@ -36,18 +36,16 @@ public class ZipUtils {
         // Private constructor for utility class
     }
 
-    public static void zipFolders(final File folder, final File zip, final File assets, final Collection<String> doNotCompress)
+    public static void zipFoldersPreserveStream(final File folder, final ZipOutputStream zipOutputStream, final File assets, final Collection<String> doNotCompress)
             throws BrutException, IOException {
 
         mDoNotCompress = doNotCompress;
-        ZipOutputStream zipOutputStream = new ZipOutputStream(Files.newOutputStream(zip.toPath()));
         zipFolders(folder, zipOutputStream);
 
         // We manually set the assets because we need to retain the folder structure
         if (assets != null) {
             processFolder(assets, zipOutputStream, assets.getPath().length() - 6);
         }
-        zipOutputStream.close();
     }
 
     private static void zipFolders(final File folder, final ZipOutputStream outputStream)
@@ -59,8 +57,8 @@ public class ZipUtils {
             throws BrutException, IOException {
         for (final File file : folder.listFiles()) {
             if (file.isFile()) {
-                final String cleanedPath = BrutIO.sanitizeUnknownFile(folder, file.getPath().substring(prefixLength));
-                final ZipEntry zipEntry = new ZipEntry(BrutIO.normalizePath(cleanedPath));
+                final String cleanedPath = BrutIO.sanitizeFilepath(folder, file.getPath().substring(prefixLength));
+                final ZipEntry zipEntry = new ZipEntry(BrutIO.adaptSeparatorToUnix(cleanedPath));
 
                 // aapt binary by default takes in parameters via -0 arsc to list extensions that shouldn't be
                 // compressed. We will replicate that behavior

@@ -10,11 +10,11 @@ _Currently broken after movement to kotlin dsl._
 
 Inside `build.gradle` there are two lines.
 
-    apktoolversion_major
-    apktoolversion_minor
+    version
+    suffix
 
-The major variable should be left unchanged. If done correctly, it will already be the version
-you are about to release. In this case `2.2.2`. The minor variable should read `SNAPSHOT` as
+The version variable should be left unchanged. If done correctly, it will already be the version
+you are about to release. In this case `2.2.2`. The suffix variable should read `SNAPSHOT` as
 the `2.2.2` release up until this point was `SNAPSHOT` releases (Unofficial).
 
 We need to remove the `SNAPSHOT` portion and leave the minor version blank. An example can be
@@ -26,11 +26,11 @@ with the commit message - `version bump (x.x.x)`.
 
 At this point we now have the commit of the release, but we need to tag it using the following message.
 
-    git tag -a vx.x.x -m "changed version to vx.x.x"
+    git tag -a vx.x.x -m "changed version to vx.x.x" -s
 
 For example for the `2.2.1` release.
 
-    git tag -a v2.2.1 -m "changed version to v2.2.1"
+    git tag -a v2.2.1 -m "changed version to v2.2.1" -s
 
 ### Prepare for publishing.
 
@@ -251,8 +251,8 @@ we aren't building the entire AOSP package, the initial build is to just see if 
 
 We check out a certain tag or branch. Currently we use
 
- * aapt2 - `master`.
- * aapt1 - `master`.
+ * aapt2 - `android-14.0.0_r2`.
+ * aapt1 - `android-14.0.0_r2`.
 
 ### Including our modified `frameworks/base` package.
 

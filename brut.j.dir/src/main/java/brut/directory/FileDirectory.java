@@ -119,7 +119,7 @@ public class FileDirectory extends AbstractDirectory {
         }
     }
 
-    private File getDir() {
+    public File getDir() {
         return mDir;
     }
 }

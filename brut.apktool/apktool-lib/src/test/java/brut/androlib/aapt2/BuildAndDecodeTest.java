@@ -72,6 +72,11 @@ public class BuildAndDecodeTest extends BaseTest {
     }
 
     @Test
+    public void valuesColorsTest() throws BrutException {
+        compareValuesFiles("values/colors.xml");
+    }
+
+    @Test
     public void valuesStringsTest() throws BrutException {
         compareValuesFiles("values/strings.xml");
     }
@@ -84,6 +89,12 @@ public class BuildAndDecodeTest extends BaseTest {
     @Test
     public void valuesBcp47LanguageVariantTest() throws BrutException {
         compareValuesFiles("values-b+iw+660/strings.xml");
+    }
+
+    @Test
+    public void valuesGrammaticalGenderTest() throws BrutException {
+        compareValuesFiles("values-neuter/strings.xml");
+        compareValuesFiles("values-feminine/strings.xml");
     }
 
     @Test
@@ -136,6 +147,11 @@ public class BuildAndDecodeTest extends BaseTest {
     @Test
     public void xmlXsdFileTest() throws BrutException {
         compareXmlFiles("res/xml/ww_box_styles_schema.xsd");
+    }
+
+    @Test
+    public void xmlAccessibilityTest() throws BrutException {
+        compareXmlFiles("res/xml/accessibility_service_config.xml");
     }
 
     @Test

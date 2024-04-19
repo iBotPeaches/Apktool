@@ -55,9 +55,8 @@ public class Config {
     public boolean verbose = false;
     public boolean copyOriginalFiles = false;
     public boolean updateFiles = false;
-    public boolean useAapt2 = false;
+    public boolean useAapt2 = true;
     public boolean noCrunch = false;
-    public int forceApi = 0;
 
     // Decode options
     public short decodeSources = DECODE_SOURCES_SMALI;
@@ -72,6 +71,7 @@ public class Config {
     public boolean resolveResources = false;
 
     // Common options
+    public int jobs = Runtime.getRuntime().availableProcessors();
     public String frameworkDirectory = null;
     public String frameworkTag = null;
     public String aaptPath = "";

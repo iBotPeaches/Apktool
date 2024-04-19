@@ -16,10 +16,7 @@
  */
 package brut.androlib.aapt1;
 
-import brut.androlib.ApkBuilder;
-import brut.androlib.ApkDecoder;
-import brut.androlib.BaseTest;
-import brut.androlib.TestUtils;
+import brut.androlib.*;
 import brut.androlib.apk.ApkInfo;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
@@ -52,7 +49,9 @@ public class BuildAndDecodeTest extends BaseTest {
 
         LOGGER.info("Building testapp.apk...");
         File testApk = new File(sTmpDir, "testapp.apk");
-        new ApkBuilder(sTestOrigDir).build(testApk);
+        Config config = Config.getDefaultConfig();
+        config.useAapt2 = false;
+        new ApkBuilder(config, sTestOrigDir).build(testApk);
 
         LOGGER.info("Decoding testapp.apk...");
         ApkDecoder apkDecoder = new ApkDecoder(testApk);
@@ -141,6 +140,11 @@ public class BuildAndDecodeTest extends BaseTest {
     }
 
     @Test
+    public void miuiRegressionTest() throws BrutException {
+        compareValuesFiles("values-godzillaui/strings.xml");
+    }
+
+    @Test
     public void valuesStringsTest() throws BrutException {
         compareValuesFiles("values-mcc001/strings.xml");
     }
@@ -193,6 +197,11 @@ public class BuildAndDecodeTest extends BaseTest {
     @Test
     public void xmlReferencesTest() throws BrutException {
         compareXmlFiles("res/xml/references.xml");
+    }
+
+    @Test
+    public void xmlAccessibilityTest() throws BrutException {
+        compareXmlFiles("res/xml/accessibility_service_config.xml");
     }
 
     @Test

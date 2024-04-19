@@ -32,9 +32,7 @@ public class ResValueFactory {
     public ResScalarValue factory(int type, int value, String rawValue) throws AndrolibException {
         switch (type) {
             case TypedValue.TYPE_NULL:
-                if (value == TypedValue.DATA_NULL_UNDEFINED) { // Special case $empty as explicitly defined empty value
-                    return new ResStringValue(null, value);
-                } else if (value == TypedValue.DATA_NULL_EMPTY) {
+                if (value == TypedValue.DATA_NULL_EMPTY) {
                     return new ResEmptyValue(value, rawValue, type);
                 }
                 return new ResReferenceValue(mPackage, 0, null);
@@ -80,39 +78,29 @@ public class ResValueFactory {
         return new ResStringValue(value, rawValue);
     }
 
-    public ResBagValue bagFactory(int parent, Duo<Integer, ResScalarValue>[] items, ResTypeSpec resTypeSpec) throws AndrolibException {
+    public ResBagValue bagFactory(int parent, Duo<Integer, ResScalarValue>[] items, ResTypeSpec resTypeSpec)
+        throws AndrolibException {
         ResReferenceValue parentVal = newReference(parent, null);
 
         if (items.length == 0) {
             return new ResBagValue(parentVal);
         }
-        int key = items[0].m1;
-        if (key == ResAttr.BAG_KEY_ATTR_TYPE) {
-            return ResAttr.factory(parentVal, items, this, mPackage);
-        }
-
         String resTypeName = resTypeSpec.getName();
 
-        // Android O Preview added an unknown enum for c. This is hardcoded as 0 for now.
-        if (ResTypeSpec.RES_TYPE_NAME_ARRAY.equals(resTypeName)
-                || key == ResArrayValue.BAG_KEY_ARRAY_START || key == 0) {
-            return new ResArrayValue(parentVal, items);
+        switch (resTypeName) {
+            case ResTypeSpec.RES_TYPE_NAME_ATTR:
+            case ResTypeSpec.RES_TYPE_NAME_ATTR_PRIVATE:
+                return ResAttr.factory(parentVal, items, this, mPackage);
+            case ResTypeSpec.RES_TYPE_NAME_ARRAY:
+                return new ResArrayValue(parentVal, items);
+            case ResTypeSpec.RES_TYPE_NAME_PLURALS:
+                return new ResPluralsValue(parentVal, items);
+            default:
+                if (resTypeName.startsWith(ResTypeSpec.RES_TYPE_NAME_STYLES)) {
+                    return new ResStyleValue(parentVal, items, this);
+                }
+                throw new AndrolibException("unsupported res type name for bags. Found: " + resTypeName);
         }
-
-        if (ResTypeSpec.RES_TYPE_NAME_PLURALS.equals(resTypeName) ||
-                (key >= ResPluralsValue.BAG_KEY_PLURALS_START && key <= ResPluralsValue.BAG_KEY_PLURALS_END)) {
-            return new ResPluralsValue(parentVal, items);
-        }
-
-        if (ResTypeSpec.RES_TYPE_NAME_ATTR.equals(resTypeName)) {
-            return new ResAttr(parentVal, 0, null, null, null);
-        }
-
-        if (resTypeName.startsWith(ResTypeSpec.RES_TYPE_NAME_STYLES)) {
-            return new ResStyleValue(parentVal, items, this);
-        }
-
-        throw new AndrolibException("unsupported res type name for bags. Found: " + resTypeName);
     }
 
     public ResReferenceValue newReference(int resID, String rawValue) {

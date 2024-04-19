@@ -96,9 +96,6 @@ public class YamlStringEscapeUtils {
             } else {
                 switch (ch) {
                     case '\'' :
-                        if (false) {
-                            out.write('\\');
-                        }
                         out.write('\'');
                         break;
                     case '"' :
@@ -110,9 +107,6 @@ public class YamlStringEscapeUtils {
                         out.write('\\');
                         break;
                     case '/' :
-                        if (false) {
-                            out.write('\\');
-                        }
                         out.write('/');
                         break;
                     default :

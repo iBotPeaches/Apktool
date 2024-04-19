@@ -16,9 +16,9 @@ jobs:
   validate-gradle-wrapper:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-java@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
           java-version: 17
-      - uses: gradle/wrapper-validation-action@v1.1.0
+      - uses: gradle/actions/wrapper-validation@v3.3.0

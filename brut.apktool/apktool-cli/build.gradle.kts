@@ -1,28 +1,15 @@
-import proguard.gradle.ProGuardTask
-
-val baksmaliVersion: String by rootProject.extra
-val commonsCliVersion: String by rootProject.extra
 val apktoolVersion: String by rootProject.extra
 
 plugins {
-    id("com.github.johnrengelman.shadow")
     application
 }
 
-// Buildscript is deprecated, but the alternative approach does not support expanded properties
-// https://github.com/gradle/gradle/issues/9830
-// So we must hard-code the version here.
-buildscript {
-    dependencies {
-        // Proguard doesn't support plugin DSL - https://github.com/Guardsquare/proguard/issues/225
-        classpath("com.guardsquare:proguard-gradle:7.3.2")
-    }
-}
+val r8: Configuration by configurations.creating
 
 dependencies {
-    implementation("commons-cli:commons-cli:$commonsCliVersion")
-    implementation("com.android.tools.smali:smali-baksmali:$baksmaliVersion")
+    implementation(libs.commons.cli)
     implementation(project(":brut.apktool:apktool-lib"))
+    r8(libs.r8)
 }
 
 application {
@@ -31,10 +18,9 @@ application {
     tasks.run.get().workingDir = file(System.getProperty("user.dir"))
 }
 
-tasks.withType<Jar> {
-    manifest {
-        attributes["Main-Class"] = "brut.apktool.Main"
-    }
+tasks.withType<AbstractArchiveTask>().configureEach {
+    isPreserveFileTimestamps = false
+    isReproducibleFileOrder = true
 }
 
 tasks.register<Delete>("cleanOutputDirectory") {
@@ -43,34 +29,50 @@ tasks.register<Delete>("cleanOutputDirectory") {
     })
 }
 
-tasks.register<ProGuardTask>("proguard") {
+val shadowJar = tasks.create("shadowJar", Jar::class) {
+    dependsOn("build")
     dependsOn("cleanOutputDirectory")
-    dependsOn("shadowJar")
-    injars(tasks.named("shadowJar").get().outputs.files)
 
-    val javaHome = System.getProperty("java.home")
-    if (JavaVersion.current() <= JavaVersion.VERSION_1_8) {
-        libraryjars("$javaHome/lib/jce.jar")
-        libraryjars("$javaHome/lib/rt.jar")
-    } else {
-        libraryjars(mapOf("jarfilter" to "!**.jar", "filter" to "!module-info.class"),
-            {
-                "$javaHome/jmods/"
-            }
-        )
+    group = "build"
+    description = "Creates a single executable JAR with all dependencies"
+    manifest.attributes["Main-Class"] = "brut.apktool.Main"
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    val dependencies = configurations
+        .runtimeClasspath
+        .get()
+        .map(::zipTree)
+
+    from(dependencies)
+    with(tasks.jar.get())
+}
+
+tasks.register<JavaExec>("proguard") {
+    dependsOn("shadowJar")
+
+    onlyIf {
+        JavaVersion.current().isJava11Compatible
     }
 
-    dontobfuscate()
-    dontoptimize()
+    val proguardRules = file("proguard-rules.pro")
+    val originalJar = shadowJar.outputs.files.singleFile
 
-    keep("class brut.apktool.Main { public static void main(java.lang.String[]); }")
-    keepclassmembers("enum * { public static **[] values(); public static ** valueOf(java.lang.String); }")
-    dontwarn("com.google.common.base.**")
-    dontwarn("com.google.common.collect.**")
-    dontwarn("com.google.common.util.**")
-    dontwarn("javax.xml.xpath.**")
-    dontnote("**")
+    inputs.files(originalJar.toString(), proguardRules)
+    outputs.file("build/libs/apktool-$apktoolVersion.jar")
 
-    val outPath = "build/libs/apktool-$apktoolVersion.jar"
-    outjars(outPath)
+    classpath(r8)
+    mainClass.set("com.android.tools.r8.R8")
+
+    args = mutableListOf(
+        "--release",
+        "--classfile",
+        "--no-minification",
+        "--map-diagnostics:UnusedProguardKeepRuleDiagnostic", "info", "none",
+        "--lib", javaLauncher.get().metadata.installationPath.toString(),
+        "--output", outputs.files.singleFile.toString(),
+        "--pg-conf", proguardRules.toString(),
+        originalJar.toString()
+    )
 }
+
+tasks.getByPath(":release").dependsOn("proguard")
