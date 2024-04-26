@@ -383,7 +383,7 @@ public class Main {
 
         Option analysisOption = Option.builder("m")
                 .longOpt("match-original")
-                .desc("Keep files to closest to original as possible (prevents rebuild).")
+                .desc("Keep files closest to original as possible (prevents rebuild).")
                 .build();
 
         Option apiLevelOption = Option.builder("api")
@@ -492,7 +492,7 @@ public class Main {
                 .longOpt("output")
                 .desc("The name of apk that gets written. (default: dist/name.apk)")
                 .hasArg(true)
-                .argName("dir")
+                .argName("file")
                 .build();
 
         Option outputDecOption = Option.builder("o")
