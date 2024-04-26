@@ -275,6 +275,10 @@ public class ApkDecoder {
 
     private boolean isAPKFileNames(String file) {
         for (String apkFile : APK_STANDARD_ALL_FILENAMES) {
+            if (file.startsWith("classes") && file.endsWith(".dex")) {
+                return true;
+            }
+
             if (apkFile.equals(file) || file.startsWith(apkFile + "/")) {
                 return true;
             }
