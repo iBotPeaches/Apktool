@@ -692,10 +692,6 @@ public class MXSerializer implements XmlSerializer {
 			}
 		}
 
-		if (namespace != elNamespace[depth]) {
-			throw new IllegalArgumentException("expected namespace " + printable(elNamespace[depth]) + " and not "
-					+ printable(namespace) + getLocation());
-		}
 		if (name == null) {
 			throw new IllegalArgumentException("end tag name can not be null" + getLocation());
 		}
