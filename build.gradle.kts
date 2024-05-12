@@ -163,3 +163,7 @@ task("release") {
     dependsOn("build")
     finalizedBy("publish")
 }
+
+tasks.wrapper {
+    distributionType = Wrapper.DistributionType.ALL
+}
