@@ -158,10 +158,8 @@ subprojects {
     }
 }
 
-// Used for official releases.
 task("release") {
-    dependsOn("build")
-    finalizedBy("publish")
+  // Used for official releases.
 }
 
 tasks.wrapper {

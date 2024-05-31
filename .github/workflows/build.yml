@@ -76,10 +76,16 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: ${{ matrix.java }}
-      - name: Build and test
-        uses: gradle/actions/setup-gradle@v3.3.2
-        with:
-          arguments: build shadowJar proguard
+
+      - uses: gradle/actions/setup-gradle@v3.3.2
+
+      - name: Build (Linux/Mac)
+        if: runner.os != 'Windows'
+        run: ./gradlew build shadowJar proguard
+
+      - name: Build (Windows)
+        if: runner.os == 'Windows'
+        run: ./gradlew.bat build shadowJar proguard
 
   upload-artifact:
     runs-on: ubuntu-latest
@@ -91,15 +97,24 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
       - uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
           java-version: 17
-      - name: Build
-        uses: gradle/actions/setup-gradle@v3.3.2
+
+      - uses: gradle/actions/setup-gradle@v3.3.2
         with:
           dependency-graph: generate-and-submit
-          arguments: build shadowJar proguard
+
+      - name: Build (Linux/Mac)
+        if: runner.os != 'Windows'
+        run: ./gradlew build shadowJar proguard
+
+      - name: Build (Windows)
+        if: runner.os == 'Windows'
+        run: ./gradlew.bat build shadowJar proguard
+
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
