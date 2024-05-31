@@ -1,5 +1,5 @@
 ### Apktool
-**This is the repository for Apktool. Here is the [Apktool website repository](https://github.com/iBotPeaches/Apktool/tree/docs).**
+**This is the repository for Apktool. The website is at the [Apktool docs branch](https://github.com/iBotPeaches/Apktool/tree/docs).**
 
 [![CI](https://github.com/iBotPeaches/Apktool/actions/workflows/build.yml/badge.svg)](https://github.com/iBotPeaches/Apktool/actions/workflows/test.yml)
 [![Software License](https://img.shields.io/badge/license-Apache%202.0-brightgreen.svg)](https://github.com/iBotPeaches/Apktool/blob/master/LICENSE)
