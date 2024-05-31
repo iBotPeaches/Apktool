@@ -74,5 +74,3 @@ tasks.register<JavaExec>("proguard") {
         originalJar.toString()
     )
 }
-
-tasks.getByPath(":release").dependsOn("proguard")
