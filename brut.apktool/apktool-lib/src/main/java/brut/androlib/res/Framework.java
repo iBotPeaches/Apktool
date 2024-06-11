@@ -52,8 +52,7 @@ public class Framework {
     public void installFramework(File frameFile, String tag) throws AndrolibException {
         InputStream in = null;
         ZipOutputStream out = null;
-        try {
-            ZipFile zip = new ZipFile(frameFile);
+        try(ZipFile zip = new ZipFile(frameFile)) {
             ZipEntry entry = zip.getEntry("resources.arsc");
 
             if (entry == null) {
@@ -98,7 +97,6 @@ public class Framework {
                 out.closeEntry();
             }
 
-            zip.close();
             LOGGER.info("Framework installed to: " + outFile);
         } catch (IOException ex) {
             throw new AndrolibException(ex);
