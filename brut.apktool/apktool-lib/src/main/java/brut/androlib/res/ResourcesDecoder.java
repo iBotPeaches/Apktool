@@ -77,6 +77,8 @@ public class ResourcesDecoder {
         XmlPullStreamDecoder fileDecoder = new XmlPullStreamDecoder(axmlParser, getResXmlSerializer());
 
         Directory inApk, out;
+        InputStream inputStream = null;
+        OutputStream outputStream = null;
         try {
             inApk = mApkInfo.getApkFile().getDirectory();
             out = new FileDirectory(outDir);
@@ -86,12 +88,15 @@ public class ResourcesDecoder {
             } else {
                 LOGGER.info("Decoding AndroidManifest.xml with only framework resources...");
             }
-            InputStream inputStream = inApk.getFileInput("AndroidManifest.xml");
-            OutputStream outputStream = out.getFileOutput("AndroidManifest.xml");
+            inputStream = inApk.getFileInput("AndroidManifest.xml");
+            outputStream = out.getFileOutput("AndroidManifest.xml");
             fileDecoder.decodeManifest(inputStream, outputStream);
 
         } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
+        } finally {
+            closeQuietly(inputStream);
+            closeQuietly(outputStream);
         }
 
         if (mApkInfo.hasResources()) {
@@ -109,6 +114,16 @@ public class ResourcesDecoder {
 
                 // update apk info
                 mApkInfo.packageInfo.forcedPackageId = String.valueOf(mResTable.getPackageId());
+            }
+        }
+    }
+
+    private void closeQuietly(Closeable toClose) {
+        if (toClose != null) {
+            try {
+                toClose.close();
+            } catch (IOException e) {
+                LOGGER.warning(String.format("Can`t close: %s!!!", toClose));
             }
         }
     }
