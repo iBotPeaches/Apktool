@@ -28,6 +28,7 @@ import brut.androlib.res.xml.ResXmlPatcher;
 import brut.directory.Directory;
 import brut.directory.DirectoryException;
 import brut.directory.FileDirectory;
+import org.apache.commons.io.IOUtils;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.*;
@@ -95,8 +96,8 @@ public class ResourcesDecoder {
         } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
         } finally {
-            closeQuietly(inputStream);
-            closeQuietly(outputStream);
+            IOUtils.closeQuietly(inputStream);
+            IOUtils.closeQuietly(outputStream);
         }
 
         if (mApkInfo.hasResources()) {
@@ -114,16 +115,6 @@ public class ResourcesDecoder {
 
                 // update apk info
                 mApkInfo.packageInfo.forcedPackageId = String.valueOf(mResTable.getPackageId());
-            }
-        }
-    }
-
-    private void closeQuietly(Closeable toClose) {
-        if (toClose != null) {
-            try {
-                toClose.close();
-            } catch (IOException e) {
-                LOGGER.warning(String.format("Can`t close: %s!!!", toClose));
             }
         }
     }
