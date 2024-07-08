@@ -28,6 +28,7 @@ import brut.androlib.res.xml.ResXmlPatcher;
 import brut.directory.Directory;
 import brut.directory.DirectoryException;
 import brut.directory.FileDirectory;
+import org.apache.commons.io.IOUtils;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.*;
@@ -77,6 +78,8 @@ public class ResourcesDecoder {
         XmlPullStreamDecoder fileDecoder = new XmlPullStreamDecoder(axmlParser, getResXmlSerializer());
 
         Directory inApk, out;
+        InputStream inputStream = null;
+        OutputStream outputStream = null;
         try {
             inApk = mApkInfo.getApkFile().getDirectory();
             out = new FileDirectory(outDir);
@@ -86,12 +89,15 @@ public class ResourcesDecoder {
             } else {
                 LOGGER.info("Decoding AndroidManifest.xml with only framework resources...");
             }
-            InputStream inputStream = inApk.getFileInput("AndroidManifest.xml");
-            OutputStream outputStream = out.getFileOutput("AndroidManifest.xml");
+            inputStream = inApk.getFileInput("AndroidManifest.xml");
+            outputStream = out.getFileOutput("AndroidManifest.xml");
             fileDecoder.decodeManifest(inputStream, outputStream);
 
         } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
+        } finally {
+            IOUtils.closeQuietly(inputStream);
+            IOUtils.closeQuietly(outputStream);
         }
 
         if (mApkInfo.hasResources()) {
