@@ -17,6 +17,7 @@
 package brut.androlib.src;
 
 import brut.androlib.exceptions.AndrolibException;
+import brut.androlib.Config;
 import com.android.tools.smali.baksmali.Baksmali;
 import com.android.tools.smali.baksmali.BaksmaliOptions;
 import com.android.tools.smali.dexlib2.DexFileFactory;
@@ -31,22 +32,24 @@ import java.io.*;
 
 public class SmaliDecoder {
 
-    public static DexFile decode(File apkFile, File outDir, String dexName, boolean bakDeb, int apiLevel)
+    Config config;
+    public static DexFile decode(File apkFile, File outDir, String dexName, Config mConfig)
             throws AndrolibException {
-        return new SmaliDecoder(apkFile, outDir, dexName, bakDeb, apiLevel).decode();
+        return new SmaliDecoder(apkFile, outDir, dexName, mConfig).decode();
     }
 
-    private SmaliDecoder(File apkFile, File outDir, String dexName, boolean bakDeb, int apiLevel) {
+    private SmaliDecoder(File apkFile, File outDir, String dexName, Config mConfig) {
+        config = mConfig;
         mApkFile = apkFile;
         mOutDir = outDir;
         mDexFile = dexName;
-        mBakDeb = bakDeb;
-        mApiLevel = apiLevel;
+        mBakDeb = mConfig.baksmaliDebugMode;
+        mApiLevel = mConfig.apiLevel;
     }
 
     private DexFile decode() throws AndrolibException {
         try {
-            final BaksmaliOptions options = new BaksmaliOptions();
+            final BaksmaliOptions options = (BaksmaliOptions) config.baksmaliConfig;
 
             // options
             options.deodex = false;
