@@ -18,6 +18,8 @@ package brut.directory;
 
 import java.io.*;
 import java.net.URLDecoder;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 
@@ -107,6 +109,8 @@ public class FileDirectory extends AbstractDirectory {
         mDirs = new LinkedHashMap<>();
 
         File[] files = getDir().listFiles();
+        Arrays.sort(files, Comparator.comparing(f -> f.getName()));
+
         for (File file : files) {
             if (file.isFile()) {
                 mFiles.add(file.getName());
