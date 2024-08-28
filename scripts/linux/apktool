@@ -66,9 +66,9 @@ while expr "x$1" : 'x-J' >/dev/null; do
 done
 
 if [ "$OSTYPE" = "cygwin" ] ; then
-	jarpath=`cygpath -w  "$libdir/$jarfile"`
+    jarpath=`cygpath -w  "$libdir/$jarfile"`
 else
-	jarpath="$libdir/$jarfile"
+    jarpath="$libdir/$jarfile"
 fi
 
 # add current location to path for aapt
