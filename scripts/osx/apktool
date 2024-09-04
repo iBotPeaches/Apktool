@@ -14,8 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This script is a wrapper for smali.jar, so you can simply call "smali",
-# instead of java -jar smali.jar. It is heavily based on the "dx" script
+# This script is a wrapper for apktool.jar, so you can simply call "apktool",
+# instead of java -jar apktool.jar. It is heavily based on the "dx" script
 # from the Android SDK
 
 # Set up prog to be the path of this script, including following symlinks,
@@ -43,8 +43,14 @@ jarfile=apktool.jar
 libdir="$progdir"
 if [ ! -r "$libdir/$jarfile" ]
 then
-    echo `basename "$prog"`": can't find $jarfile"
-    exit 1
+    # Find the highest version of apktool_*.jar in the directory.
+    highest_jarfile=$(ls "$libdir"/apktool_*.jar 2>/dev/null | sort -V | tail -n 1)
+    if [ -n "$highest_jarfile" ]; then
+        jarfile=$(basename "$highest_jarfile")
+    else
+        echo `basename "$prog"`": can't find $jarfile"
+        exit 1
+    fi
 fi
 
 javaOpts=""
@@ -66,9 +72,9 @@ while expr "x$1" : 'x-J' >/dev/null; do
 done
 
 if [ "$OSTYPE" = "cygwin" ] ; then
-	jarpath=`cygpath -w  "$libdir/$jarfile"`
+    jarpath=`cygpath -w  "$libdir/$jarfile"`
 else
-	jarpath="$libdir/$jarfile"
+    jarpath="$libdir/$jarfile"
 fi
 
 # add current location to path for aapt
