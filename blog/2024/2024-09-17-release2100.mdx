@@ -1,0 +1,45 @@
+---
+slug: apktool-2.10.0
+title: Apktool 2.10.0
+authors: ibotpeaches
+tags: [release]
+---
+
+- [[#3476](https://github.com/iBotPeaches/Apktool/pull/3476)] Add parallelization to `decode|build` command. (Thanks Cregrant)
+- [[#3559](https://github.com/iBotPeaches/Apktool/pull/3559)] Add reproducible builds (drop Proguard for R8).
+- [[#3683](https://github.com/iBotPeaches/Apktool/pull/3683)] Add automatic selection of latest apktool to helper scripts. (Thanks codebymikey
+- [[#3681](https://github.com/iBotPeaches/Apktool/pull/3681)] Add support for final API 34 (Vanilla Ice Cream)
+- [[#3602](https://github.com/iBotPeaches/Apktool/issues/3602)] Fix stripping of `META-INF` files for xmlpull.
+- [[#3512](https://github.com/iBotPeaches/Apktool/issues/3512)] Fix disassembly of Facebook.
+- [[#3536](https://github.com/iBotPeaches/Apktool/issues/3536)] Fix treating `stamp-cert-sha256` as unknown file.
+- [[#3578](https://github.com/iBotPeaches/Apktool/issues/3578)] Fix treating non-main class dex files as compressed.
+- [[#3583](https://github.com/iBotPeaches/Apktool/issues/3583)] Fix misalignment on namespace restriction from serializer.
+- [[#3618](https://github.com/iBotPeaches/Apktool/pull/3618)] Fix resource leak on unclosed ZipFile on framework install.
+- [[#3634](https://github.com/iBotPeaches/Apktool/pull/3634)] Fix resource leak on unclosed streams on manifest disassemble. (Thanks azotzot)
+- [[#3657](https://github.com/iBotPeaches/Apktool/pull/3657)] Fix sort order of files on tmpfs filesystems. (Thanks luk1337)
+- [[#3676](https://github.com/iBotPeaches/Apktool/pull/3676)] Fix tabs/spaces in linux helper script. (Thanks alexpopov)
+- [[#3519](https://github.com/iBotPeaches/Apktool/pull/3519), [#3601](https://github.com/iBotPeaches/Apktool/pull/3601), [#3690](https://github.com/iBotPeaches/Apktool/pull/3690)] Upgrade baksmali/smali to `3.0.8`.
+- [[#3459](https://github.com/iBotPeaches/Apktool/pull/3459), [#3595](https://github.com/iBotPeaches/Apktool/pull/3595)] Upgrade Gradle to `8.7`. (Thanks ArjunaKumarMohanta)
+- [[#3509](https://github.com/iBotPeaches/Apktool/pull/3509)] Upgrade `proguard-gradle` to `7.4.2`.
+- [[#3671](https://github.com/iBotPeaches/Apktool/pull/3671)] Upgrade `r8` to `8.5.35`.
+- [[#3577](https://github.com/iBotPeaches/Apktool/pull/3577), [#3607](https://github.com/iBotPeaches/Apktool/pull/3607), [#3672](https://github.com/iBotPeaches/Apktool/pull/3672)] Upgrade `commons-cli` to `1.9.0`.
+- [[#3560](https://github.com/iBotPeaches/Apktool/pull/3560), [#3570](https://github.com/iBotPeaches/Apktool/pull/3570)] Upgrade `commons-io` to `2.16.1`.
+- [[#3670](https://github.com/iBotPeaches/Apktool/pull/3670)] Upgrade `guava` to `33.3.0`.
+- [[#3576](https://github.com/iBotPeaches/Apktool/pull/3576)] Upgrade `commons-text` to `1.12.0`.
+- [[#3646](https://github.com/iBotPeaches/Apktool/pull/3647), [#3663](https://github.com/iBotPeaches/Apktool/pull/3663), [#3680](https://github.com/iBotPeaches/Apktool/pull/3680)] Upgrade `commons-lang3` to `3.17.0`.
+- [[#3585](https://github.com/iBotPeaches/Apktool/pull/3585)] Upgrade `xmlunit-legacy` to `2.10.0`.
+- [[#3510](https://github.com/iBotPeaches/Apktool/pull/3510), [#3515](https://github.com/iBotPeaches/Apktool/pull/3515), [#3550](https://github.com/iBotPeaches/Apktool/pull/3550), [#3572](https://github.com/iBotPeaches/Apktool/pull/3572)] Upgrade `wrapper-validation-action` to `3.3.0`.
+- [[#3470](https://github.com/iBotPeaches/Apktool/pull/3470), [#3479](https://github.com/iBotPeaches/Apktool/pull/3479), [#3500](https://github.com/iBotPeaches/Apktool/pull/3500), [#3511](https://github.com/iBotPeaches/Apktool/pull/3511), [#3522](https://github.com/iBotPeaches/Apktool/pull/3522), [#3566](https://github.com/iBotPeaches/Apktool/pull/3566), [#3571](https://github.com/iBotPeaches/Apktool/pull/3571), [#3575](https://github.com/iBotPeaches/Apktool/pull/3575), [#3586](https://github.com/iBotPeaches/Apktool/pull/3586), [#3624](https://github.com/iBotPeaches/Apktool/pull/3624), [#3628](https://github.com/iBotPeaches/Apktool/pull/3628), [#3648](https://github.com/iBotPeaches/Apktool/pull/3648), [#3662](https://github.com/iBotPeaches/Apktool/pull/3662), [#3679](https://github.com/iBotPeaches/Apktool/pull/3679), [#3692](https://github.com/iBotPeaches/Apktool/pull/3692)] Upgrade `gradle/actions` to `4.1.0`.
+- [[#3471](https://github.com/iBotPeaches/Apktool/pull/3471)] Upgrade `github/codeql-action` to `3`.
+- [[#3528](https://github.com/iBotPeaches/Apktool/pull/3528)] Upgrade `actions/upload-artifact` to `4`.
+
+:::success
+
+[Download now at Bitbucket](https://bitbucket.org/iBotPeaches/apktool/downloads/apktool_2.10.0.jar), [Maven](https://mvnrepository.com/artifact/org.apktool/apktool-lib)
+
+- md5 - `5505ce560213730c7366589389469a1b`
+- sha256 - `c0350abbab5314248dfe2ee0c907def4edd14f6faef1f5d372d3d4abd28f0431`
+
+:::
+
+> This post was released with commentary at: https://connortumbleson.com/2024/09/17/apktool-v2-10-0-released/
