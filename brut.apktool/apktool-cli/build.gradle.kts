@@ -25,6 +25,8 @@ tasks.withType<AbstractArchiveTask>().configureEach {
 
 tasks.register<Delete>("cleanOutputDirectory") {
     delete(fileTree("build/libs") {
+        exclude("apktool-cli-sources.jar")
+        exclude("apktool-cli-javadoc.jar")
         exclude("apktool-cli-all.jar")
     })
 }
@@ -73,4 +75,16 @@ tasks.register<JavaExec>("proguard") {
         "--pg-conf", proguardRules.toString(),
         originalJar.toString()
     )
+}
+
+tasks.withType<org.gradle.api.publish.maven.tasks.PublishToMavenRepository> {
+    dependsOn(tasks.named("shadowJar"))
+}
+
+tasks.withType<org.gradle.plugins.signing.Sign> {
+    dependsOn(tasks.named("shadowJar"))
+}
+
+tasks.withType<org.gradle.api.publish.tasks.GenerateModuleMetadata> {
+    dependsOn(tasks.named("shadowJar"))
 }
