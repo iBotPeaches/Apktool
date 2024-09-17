@@ -103,6 +103,6 @@ public class InvalidSdkBoundingTest {
         sdkInfo.put("targetSdkVersion", "VANILLAICECREAM");
 
         apkInfo.setSdkInfo(sdkInfo);
-        assertEquals("10000", apkInfo.checkTargetSdkVersionBounds());
+        assertEquals("35", apkInfo.checkTargetSdkVersionBounds());
     }
 }

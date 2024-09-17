@@ -194,7 +194,7 @@ public class ApkInfo implements YamlSerializable {
                 return ResConfigFlags.SDK_UPSIDEDOWN_CAKE;
             case "VANILLAICECREAM":
             case "VANILLA_ICE_CREAM":
-                return ResConfigFlags.SDK_DEVELOPMENT;
+                return ResConfigFlags.SDK_VANILLA_ICE_CREAM;
             default:
                 return Integer.parseInt(sdkVersion);
         }
