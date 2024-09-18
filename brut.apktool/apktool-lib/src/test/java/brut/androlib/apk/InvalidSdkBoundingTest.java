@@ -100,9 +100,9 @@ public class InvalidSdkBoundingTest {
         ApkInfo apkInfo = new ApkInfo();
 
         Map<String, String> sdkInfo = new LinkedHashMap<>();
-        sdkInfo.put("targetSdkVersion", "VANILLAICECREAM");
+        sdkInfo.put("targetSdkVersion", "SDK_CUR_DEVELOPMENT");
 
         apkInfo.setSdkInfo(sdkInfo);
-        assertEquals("35", apkInfo.checkTargetSdkVersionBounds());
+        assertEquals("10000", apkInfo.checkTargetSdkVersionBounds());
     }
 }
