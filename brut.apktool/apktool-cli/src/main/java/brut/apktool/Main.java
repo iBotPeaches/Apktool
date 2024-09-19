@@ -270,6 +270,15 @@ public class Main {
         if (cli.hasOption("nc") || cli.hasOption("no-crunch")) {
             config.noCrunch = true;
         }
+        if (cli.hasOption("srp") || cli.hasOption("shorten-res-paths")) {
+            config.shortenResPaths = true;
+        }
+        if (cli.hasOption("ese") || cli.hasOption("enable-sparse-encoding")) {
+            config.enableSparseEncoding = true;
+        }
+        if (cli.hasOption("crn") || cli.hasOption("collapse-res-names")) {
+            config.collapseResNames = true;
+        }
         if (cli.hasOption("use-aapt1")) {
             config.useAapt2 = false;
         }
@@ -286,8 +295,8 @@ public class Main {
             outFile = null;
         }
 
-        if (config.netSecConf && !config.useAapt2) {
-            System.err.println("-n / --net-sec-conf is only supported with --use-aapt2.");
+        if ((config.netSecConf || config.shortenResPaths || config.enableSparseEncoding || config.collapseResNames) && !config.useAapt2) {
+            System.err.println("-n / --net-sec-conf, -srp / --shorten-res-paths, -ese / --enable-sparse-encoding, -crn / --collapse-res-names are only supported with --use-aapt2.");
             System.exit(1);
         }
 
@@ -481,6 +490,21 @@ public class Main {
                 .desc("Disable crunching of resource files during the build step.")
                 .build();
 
+        Option shortenResPathsOption = Option.builder("srp")
+                .longOpt("shorten-res-paths")
+                .desc("Shortens the paths of resources inside the APK.")
+                .build();
+
+        Option enableSparseEncodingOption = Option.builder("ese")
+                .longOpt("enable-sparse-encoding")
+                .desc("Enables encoding of sparse entries using a binary search tree. This option is useful for optimization of APK size but at the cost of resource retrieval performance.")
+                .build();
+
+        Option collapseResNamesOption = Option.builder("crn")
+                .longOpt("collapse-res-names")
+                .desc("Collapses resource names to a single value in the key string pool.")
+                .build();
+
         Option tagOption = Option.builder("t")
                 .longOpt("tag")
                 .desc("Tag frameworks using <tag>.")
@@ -530,6 +554,9 @@ public class Main {
             buildOptions.addOption(originalOption);
             buildOptions.addOption(aapt1Option);
             buildOptions.addOption(noCrunchOption);
+            buildOptions.addOption(shortenResPathsOption);
+            buildOptions.addOption(enableSparseEncodingOption);
+            buildOptions.addOption(collapseResNamesOption);
         }
 
         // add global options
