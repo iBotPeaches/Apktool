@@ -211,24 +211,23 @@ public class ApkBuilder {
         return true;
     }
 
-    private void buildSourcesSmali(File outDir, String dirName, String fileName)
-            throws AndrolibException {
+    private void buildSourcesSmali(File outDir, String dirName, String fileName) throws AndrolibException {
         if (mWorker != null) {
             mWorker.submit(() -> {
                 if (mBuildError.get() == null) {
                     try {
-                        buildSourcesSmali(outDir, dirName, fileName);
+                        buildSourcesSmaliJob(outDir, dirName, fileName);
                     } catch (AndrolibException ex) {
                         mBuildError.compareAndSet(null, ex);
                     }
                 }
             });
         } else {
-            buildSourcesSmali(outDir, dirName, fileName);
+            buildSourcesSmaliJob(outDir, dirName, fileName);
         }
     }
 
-    private void buildSourcesSmali(File outDir, String dirName, String fileName) throws AndrolibException {
+    private void buildSourcesSmaliJob(File outDir, String dirName, String fileName) throws AndrolibException {
         File smaliDir = new File(mApkDir, dirName);
         if (!smaliDir.isDirectory()) {
             return;

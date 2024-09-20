@@ -173,18 +173,18 @@ public class ApkDecoder {
             mWorker.submit(() -> {
                 if (mBuildError.get() == null) {
                     try {
-                        decodeSourcesSmali(outDir, fileName);
+                        decodeSourcesSmaliJob(outDir, fileName);
                     } catch (AndrolibException ex) {
                         mBuildError.compareAndSet(null, ex);
                     }
                 }
             });
         } else {
-            decodeSourcesSmali(outDir, fileName);
+            decodeSourcesSmaliJob(outDir, fileName);
         }
     }
 
-    private void decodeSourcesSmali(File outDir, String fileName) throws AndrolibException {
+    private void decodeSourcesSmaliJob(File outDir, String fileName) throws AndrolibException {
         File smaliDir;
         if (fileName.equals("classes.dex")) {
             smaliDir = new File(outDir, "smali");
