@@ -73,7 +73,7 @@ public abstract class ResScalarValue extends ResIntBasedValue implements
         String body = encodeAsResXmlValue();
 
         // check for resource reference
-        if (!type.equalsIgnoreCase("color")) {
+        if (!type.equals("color")) {
             if (body.contains("@")) {
                 if (!res.getFilePath().contains("string")) {
                     item = true;
@@ -89,7 +89,7 @@ public abstract class ResScalarValue extends ResIntBasedValue implements
         // Android does not allow values (false) for ids.xml anymore
         // https://issuetracker.google.com/issues/80475496
         // But it decodes as a ResBoolean, which makes no sense. So force it to empty
-        if (type.equalsIgnoreCase("id") && !body.isEmpty()) {
+        if (type.equals("id") && !body.isEmpty()) {
             body = "";
         }
 

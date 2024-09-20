@@ -70,8 +70,8 @@ public class FileDirectory extends AbstractDirectory {
     protected InputStream getFileInputLocal(String name) throws DirectoryException {
         try {
             return new FileInputStream(generatePath(name));
-        } catch (FileNotFoundException e) {
-            throw new DirectoryException(e);
+        } catch (FileNotFoundException ex) {
+            throw new DirectoryException(ex);
         }
     }
 
@@ -79,8 +79,8 @@ public class FileDirectory extends AbstractDirectory {
     protected OutputStream getFileOutputLocal(String name) throws DirectoryException {
         try {
             return new FileOutputStream(generatePath(name));
-        } catch (FileNotFoundException e) {
-            throw new DirectoryException(e);
+        } catch (FileNotFoundException ex) {
+            throw new DirectoryException(ex);
         }
     }
 
@@ -115,7 +115,6 @@ public class FileDirectory extends AbstractDirectory {
             if (file.isFile()) {
                 mFiles.add(file.getName());
             } else {
-                // IMPOSSIBLE_EXCEPTION
                 try {
                     mDirs.put(file.getName(), new FileDirectory(file));
                 } catch (DirectoryException ignored) {}

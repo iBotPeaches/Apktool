@@ -24,13 +24,9 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.*;
 import java.util.zip.CRC32;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipOutputStream;
 
 public class BrutIO {
-    public static void copyAndClose(InputStream in, OutputStream out)
-            throws IOException {
+    public static void copyAndClose(InputStream in, OutputStream out) throws IOException {
         try {
             IOUtils.copy(in, out);
         } finally {
@@ -68,23 +64,25 @@ public class BrutIO {
         CRC32 crc = new CRC32();
         int bytesRead;
         byte[] buffer = new byte[8192];
-        while((bytesRead = input.read(buffer)) != -1) {
+        while ((bytesRead = input.read(buffer)) != -1) {
             crc.update(buffer, 0, bytesRead);
         }
         return crc;
     }
 
-    public static String sanitizeFilepath(final File directory, final String entry) throws IOException, BrutException {
-        if (entry.isEmpty()) {
+    public static String sanitizePath(File baseDir, String path)
+            throws InvalidUnknownFileException, RootUnknownFileException,
+                   TraversalUnknownFileException, IOException {
+        if (path.isEmpty()) {
             throw new InvalidUnknownFileException("Invalid Unknown File");
         }
 
-        if (new File(entry).isAbsolute()) {
+        if (new File(path).isAbsolute()) {
             throw new RootUnknownFileException("Absolute Unknown Files is not allowed");
         }
 
-        final String canonicalDirPath = directory.getCanonicalPath() + File.separator;
-        final String canonicalEntryPath = new File(directory, entry).getCanonicalPath();
+        String canonicalDirPath = baseDir.getCanonicalPath() + File.separator;
+        String canonicalEntryPath = new File(baseDir, path).getCanonicalPath();
 
         if (!canonicalEntryPath.startsWith(canonicalDirPath)) {
             throw new TraversalUnknownFileException("Directory Traversal is not allowed");
@@ -94,8 +92,11 @@ public class BrutIO {
         return canonicalEntryPath.substring(canonicalDirPath.length());
     }
 
-    public static boolean detectPossibleDirectoryTraversal(String entry) {
-        return entry.contains("../") || entry.contains("/..") || entry.contains("..\\") || entry.contains("\\..");
+    public static boolean detectPossibleDirectoryTraversal(String path) {
+        return path.contains("../")
+                || path.contains("/..")
+                || path.contains("..\\")
+                || path.contains("\\..");
     }
 
     public static String adaptSeparatorToUnix(String path) {
@@ -107,17 +108,4 @@ public class BrutIO {
 
         return path;
     }
-
-    public static void copy(File inputFile, ZipOutputStream outputFile) throws IOException {
-        try (FileInputStream fis = new FileInputStream(inputFile)) {
-            IOUtils.copy(fis, outputFile);
-        }
-    }
-
-    public static void copy(ZipFile inputFile, ZipOutputStream outputFile, ZipEntry entry) throws IOException {
-        try (InputStream is = inputFile.getInputStream(entry)) {
-            IOUtils.copy(is, outputFile);
-        }
-    }
-
 }

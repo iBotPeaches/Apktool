@@ -40,9 +40,9 @@ public class BuildAndDecodeJarTest extends BaseTest {
         TestUtils.copyResourceDir(BuildAndDecodeJarTest.class, "aapt1/testjar/", sTestOrigDir);
 
         LOGGER.info("Building testjar.jar...");
-        File testJar = new File(sTmpDir, "testjar.jar");
+        ExtFile testJar = new ExtFile(sTmpDir, "testjar.jar");
         Config config = Config.getDefaultConfig();
-        config.useAapt2 = false;
+        config.aaptVersion = 1;
         new ApkBuilder(config, sTestOrigDir).build(testJar);
 
         LOGGER.info("Decoding testjar.jar...");

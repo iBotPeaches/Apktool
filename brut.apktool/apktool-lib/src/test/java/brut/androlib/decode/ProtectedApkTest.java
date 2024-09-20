@@ -47,7 +47,7 @@ public class ProtectedApkTest extends BaseTest {
         String apk = "protected-v1.apk";
 
         // decode protected-v1.apk
-        ApkDecoder apkDecoder = new ApkDecoder(new File(sTmpDir + File.separator + apk));
+        ApkDecoder apkDecoder = new ApkDecoder(new ExtFile(sTmpDir + File.separator + apk));
         sTestOrigDir = new ExtFile(sTmpDir + File.separator + apk + ".out");
 
         File outDir = new File(sTmpDir + File.separator + apk + ".out");

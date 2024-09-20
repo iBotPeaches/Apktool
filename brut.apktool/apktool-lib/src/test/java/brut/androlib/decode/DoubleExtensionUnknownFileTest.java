@@ -52,7 +52,7 @@ public class DoubleExtensionUnknownFileTest extends BaseTest {
         String apk = "issue1244.apk";
 
         // decode issue1244.apk
-        ApkDecoder apkDecoder = new ApkDecoder(new File(sTmpDir + File.separator + apk));
+        ApkDecoder apkDecoder = new ApkDecoder(new ExtFile(sTmpDir + File.separator + apk));
         ExtFile decodedApk = new ExtFile(sTmpDir + File.separator + apk + ".out");
         File outDir = new File(sTmpDir + File.separator + apk + ".out");
         apkDecoder.decode(outDir);
@@ -60,7 +60,7 @@ public class DoubleExtensionUnknownFileTest extends BaseTest {
         ApkInfo apkInfo = ApkInfo.load(decodedApk);
         for (String string : apkInfo.doNotCompress) {
             if (StringUtils.countMatches(string, ".") > 1) {
-                assertTrue(string.equalsIgnoreCase("assets/bin/Data/sharedassets1.assets.split0"));
+                assertTrue(string.equals("assets/bin/Data/sharedassets1.assets.split0"));
             }
         }
     }

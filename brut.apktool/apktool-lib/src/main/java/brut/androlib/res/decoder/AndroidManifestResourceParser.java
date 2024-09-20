@@ -58,9 +58,9 @@ public class AndroidManifestResourceParser extends AXmlResourceParser {
     }
 
     private boolean isNumericStringMetadataAttributeValue(int index, String value) {
-        return "meta-data".equalsIgnoreCase(super.getName())
-            && "value".equalsIgnoreCase(super.getAttributeName(index))
-            && super.getAttributeValueType(index) == TypedValue.TYPE_STRING
-            && PATTERN_NUMERIC_STRING.matcher(value).matches();
+        return "meta-data".equals(super.getName())
+                && "value".equals(super.getAttributeName(index))
+                && super.getAttributeValueType(index) == TypedValue.TYPE_STRING
+                && PATTERN_NUMERIC_STRING.matcher(value).matches();
     }
 }

@@ -39,39 +39,39 @@ public class AaptInvoker {
 
     private File getAaptBinaryFile() throws AndrolibException {
         try {
-            if (getAaptVersion() == 2) {
-                return AaptManager.getAapt2();
+            switch (mConfig.aaptVersion) {
+                case 2:
+                    return AaptManager.getAapt2();
+                default:
+                    return AaptManager.getAapt1();
             }
-            return AaptManager.getAapt1();
         } catch (BrutException ex) {
             throw new AndrolibException(ex);
         }
     }
 
-    private int getAaptVersion() {
-        return mConfig.isAapt2() ? 2 : 1;
-    }
+    public void invokeAapt(File apkFile, File manifest, File resDir, File rawDir, File assetDir, File[] include)
+            throws AndrolibException {
 
-    private File createDoNotCompressExtensionsFile(ApkInfo apkInfo) throws AndrolibException {
-        if (apkInfo.doNotCompress == null || apkInfo.doNotCompress.isEmpty()) {
-            return null;
+        String aaptPath = mConfig.aaptPath;
+        boolean customAapt = !aaptPath.isEmpty();
+        List<String> cmd = new ArrayList<>();
+
+        try {
+            String aaptCommand = AaptManager.getAaptExecutionCommand(aaptPath, getAaptBinaryFile());
+            cmd.add(aaptCommand);
+        } catch (BrutException ex) {
+            LOGGER.warning("aapt: " + ex.getMessage() + " (defaulting to $PATH binary)");
+            cmd.add(AaptManager.getAaptBinaryName(mConfig.aaptVersion));
         }
 
-        File doNotCompressFile;
-        try {
-            doNotCompressFile = File.createTempFile("APKTOOL", null);
-            doNotCompressFile.deleteOnExit();
-
-            BufferedWriter fileWriter = new BufferedWriter(new FileWriter(doNotCompressFile));
-            for (String extension : apkInfo.doNotCompress) {
-                fileWriter.write(extension);
-                fileWriter.newLine();
-            }
-            fileWriter.close();
-
-            return doNotCompressFile;
-        } catch (IOException ex) {
-            throw new AndrolibException(ex);
+        switch (mConfig.aaptVersion) {
+            case 2:
+                invokeAapt2(apkFile, manifest, resDir, rawDir, assetDir, include, cmd, customAapt);
+                break;
+            default:
+                invokeAapt1(apkFile, manifest, resDir, rawDir, assetDir, include, cmd, customAapt);
+                break;
         }
     }
 
@@ -131,7 +131,9 @@ public class AaptInvoker {
         cmd.add("-o");
         cmd.add(apkFile.getAbsolutePath());
 
-        if (mApkInfo.packageInfo.forcedPackageId != null && ! mApkInfo.sharedLibrary) {
+        if (mApkInfo.packageInfo.forcedPackageId != null && !mApkInfo.packageInfo.forcedPackageId.equals("1")
+                && !mApkInfo.sharedLibrary) {
+            cmd.add("--allow-reserved-package-id");
             cmd.add("--package-id");
             cmd.add(mApkInfo.packageInfo.forcedPackageId);
         }
@@ -174,8 +176,6 @@ public class AaptInvoker {
         cmd.add("--no-version-transitions");
         cmd.add("--no-resource-deduping");
 
-        cmd.add("--allow-reserved-package-id");
-
         cmd.add("--no-compile-sdk-metadata");
 
         // #3427 - Ignore stricter parsing during aapt2
@@ -189,17 +189,18 @@ public class AaptInvoker {
             cmd.add("-x");
         }
 
-        if (mApkInfo.doNotCompress != null && !customAapt) {
-            // Use custom -e option to avoid limits on commandline length.
-            // Can only be used when custom aapt binary is not used.
-            String extensionsFilePath =
-                Objects.requireNonNull(createDoNotCompressExtensionsFile(mApkInfo)).getAbsolutePath();
-            cmd.add("-e");
-            cmd.add(extensionsFilePath);
-        } else if (mApkInfo.doNotCompress != null) {
-            for (String file : mApkInfo.doNotCompress) {
-                cmd.add("-0");
-                cmd.add(file);
+        if (!mApkInfo.doNotCompress.isEmpty()) {
+            if (customAapt) {
+                for (String file : mApkInfo.doNotCompress) {
+                    cmd.add("-0");
+                    cmd.add(file);
+                }
+            } else {
+                // Use custom -e option to avoid limits on commandline length.
+                // Can only be used when custom aapt binary is not used.
+                String extensionsFilePath = createDoNotCompressExtensionsFile(mApkInfo.doNotCompress);
+                cmd.add("-e");
+                cmd.add(extensionsFilePath);
             }
         }
 
@@ -264,7 +265,7 @@ public class AaptInvoker {
         }
         // force package id so that some frameworks build with correct id
         // disable if user adds own aapt (can't know if they have this feature)
-        if (mApkInfo.packageInfo.forcedPackageId != null && ! customAapt && ! mApkInfo.sharedLibrary) {
+        if (mApkInfo.packageInfo.forcedPackageId != null && !mApkInfo.sharedLibrary && !customAapt) {
             cmd.add("--forced-package-id");
             cmd.add(mApkInfo.packageInfo.forcedPackageId);
         }
@@ -311,17 +312,18 @@ public class AaptInvoker {
             cmd.add("-x");
         }
 
-        if (mApkInfo.doNotCompress != null && !customAapt) {
-            // Use custom -e option to avoid limits on commandline length.
-            // Can only be used when custom aapt binary is not used.
-            String extensionsFilePath =
-                Objects.requireNonNull(createDoNotCompressExtensionsFile(mApkInfo)).getAbsolutePath();
-            cmd.add("-e");
-            cmd.add(extensionsFilePath);
-        } else if (mApkInfo.doNotCompress != null) {
-            for (String file : mApkInfo.doNotCompress) {
-                cmd.add("-0");
-                cmd.add(file);
+        if (!mApkInfo.doNotCompress.isEmpty()) {
+            if (customAapt) {
+                for (String file : mApkInfo.doNotCompress) {
+                    cmd.add("-0");
+                    cmd.add(file);
+                }
+            } else {
+                // Use custom -e option to avoid limits on commandline length.
+                // Can only be used when custom aapt binary is not used.
+                String extensionsFilePath = createDoNotCompressExtensionsFile(mApkInfo.doNotCompress);
+                cmd.add("-e");
+                cmd.add(extensionsFilePath);
             }
         }
 
@@ -360,25 +362,21 @@ public class AaptInvoker {
         }
     }
 
-    public void invokeAapt(File apkFile, File manifest, File resDir, File rawDir, File assetDir, File[] include)
-            throws AndrolibException {
-
-        String aaptPath = mConfig.aaptPath;
-        boolean customAapt = !aaptPath.isEmpty();
-        List<String> cmd = new ArrayList<>();
-
+    private String createDoNotCompressExtensionsFile(Collection<String> doNotCompress) throws AndrolibException {
         try {
-            String aaptCommand = AaptManager.getAaptExecutionCommand(aaptPath, getAaptBinaryFile());
-            cmd.add(aaptCommand);
-        } catch (BrutException ex) {
-            LOGGER.warning("aapt: " + ex.getMessage() + " (defaulting to $PATH binary)");
-            cmd.add(AaptManager.getAaptBinaryName(getAaptVersion()));
-        }
+            File doNotCompressFile = File.createTempFile("APKTOOL", null);
+            doNotCompressFile.deleteOnExit();
 
-        if (mConfig.isAapt2()) {
-            invokeAapt2(apkFile, manifest, resDir, rawDir, assetDir, include, cmd, customAapt);
-            return;
+            BufferedWriter fileWriter = new BufferedWriter(new FileWriter(doNotCompressFile));
+            for (String extension : doNotCompress) {
+                fileWriter.write(extension);
+                fileWriter.newLine();
+            }
+            fileWriter.close();
+
+            return doNotCompressFile.getAbsolutePath();
+        } catch (IOException ex) {
+            throw new AndrolibException(ex);
         }
-        invokeAapt1(apkFile, manifest, resDir, rawDir, assetDir, include, cmd, customAapt);
     }
 }

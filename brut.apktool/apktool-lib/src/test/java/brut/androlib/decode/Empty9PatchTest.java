@@ -51,7 +51,7 @@ public class Empty9PatchTest extends BaseTest {
         String apk = "empty9patch.apk";
 
         // decode empty9patch.apk
-        ApkDecoder apkDecoder = new ApkDecoder(new File(sTmpDir + File.separator + apk));
+        ApkDecoder apkDecoder = new ApkDecoder(new ExtFile(sTmpDir + File.separator + apk));
         sTestOrigDir = new ExtFile(sTmpDir + File.separator + apk + ".out");
 
         File outDir = new File(sTmpDir + File.separator + apk + ".out");

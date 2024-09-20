@@ -317,7 +317,7 @@ public class ARSCDecoder {
         int entriesStartAligned = mHeader.startPosition + entriesStart;
         if (mIn.position() < entriesStartAligned) {
             long bytesSkipped = mIn.skip(entriesStartAligned - mIn.position());
-            LOGGER.fine("Skipping: " + bytesSkipped + " byte(s) to align with ResTable_entry start.");
+            LOGGER.fine(String.format("Skipping: %d byte(s) to align with ResTable_entry start.", bytesSkipped));
         }
 
         for (int i : entryOffsetMap.keySet()) {

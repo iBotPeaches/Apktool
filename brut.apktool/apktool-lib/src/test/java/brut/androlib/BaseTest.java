@@ -67,10 +67,10 @@ public class BaseTest {
         FileDirectory fileDirectory = new FileDirectory(sTestOrigDir, location);
 
         Set<String> files = fileDirectory.getFiles(true);
-        for (String filename : files) {
+        for (String fileName : files) {
 
-            File control = new File((sTestOrigDir + location), filename);
-            File test =  new File((sTestNewDir + location), filename);
+            File control = new File((sTestOrigDir + location), fileName);
+            File test =  new File((sTestNewDir + location), fileName);
 
             if (! test.isFile() || ! control.isFile()) {
                 exists = false;

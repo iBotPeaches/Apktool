@@ -53,8 +53,7 @@ public class NetworkConfigTest extends BaseTest {
         LOGGER.info("Building testapp.apk...");
         Config config = Config.getDefaultConfig();
         config.netSecConf = true;
-        config.useAapt2 = true;
-        File testApk = new File(sTmpDir, "testapp.apk");
+        ExtFile testApk = new ExtFile(sTmpDir, "testapp.apk");
         new ApkBuilder(config, sTestOrigDir).build(testApk);
 
         LOGGER.info("Decoding testapp.apk...");

@@ -50,7 +50,7 @@ public class SparseFlagTest extends BaseTest {
 
     @Test
     public void decodeWithExpectationOfSparseResources() throws BrutException, IOException {
-        File testApk = new File(sTestOrigDir, "sparse.apk");
+        ExtFile testApk = new ExtFile(sTestOrigDir, "sparse.apk");
 
         LOGGER.info("Decoding sparse.apk...");
         Config config = Config.getDefaultConfig();
@@ -67,7 +67,7 @@ public class SparseFlagTest extends BaseTest {
 
     @Test
     public void decodeWithExpectationOfNoSparseResources() throws BrutException, IOException {
-        File testApk = new File(sTestOrigDir, "not-sparse.apk");
+        ExtFile testApk = new ExtFile(sTestOrigDir, "not-sparse.apk");
 
         LOGGER.info("Decoding not-sparse.apk...");
         Config config = Config.getDefaultConfig();

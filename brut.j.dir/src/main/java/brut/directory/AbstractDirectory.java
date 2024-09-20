@@ -59,7 +59,7 @@ public abstract class AbstractDirectory implements Directory {
         SubPath subpath;
         try {
             subpath = getSubPath(path);
-        } catch (PathNotExist e) {
+        } catch (PathNotExist ex) {
             return false;
         }
 
@@ -74,7 +74,7 @@ public abstract class AbstractDirectory implements Directory {
         SubPath subpath;
         try {
             subpath = getSubPath(path);
-        } catch (PathNotExist e) {
+        } catch (PathNotExist ex) {
             return false;
         }
 
@@ -117,10 +117,9 @@ public abstract class AbstractDirectory implements Directory {
         }
 
         Directory dir;
-        // IMPOSSIBLE_EXCEPTION
         try {
             dir = createDir(parsed.dir);
-        } catch (PathAlreadyExists e) {
+        } catch (PathAlreadyExists ex) {
             dir = getAbstractDirs().get(parsed.dir);
         }
         return dir.getFileOutput(parsed.subpath);
@@ -165,7 +164,7 @@ public abstract class AbstractDirectory implements Directory {
         SubPath subpath;
         try {
             subpath = getSubPath(path);
-        } catch (PathNotExist e) {
+        } catch (PathNotExist ex) {
             return false;
         }
 
@@ -226,7 +225,7 @@ public abstract class AbstractDirectory implements Directory {
         }
 
         Map<String, AbstractDirectory> dirs = new LinkedHashMap<>(mDirs);
-        for (Map.Entry<String, AbstractDirectory> dir : getAbstractDirs().entrySet()) {
+        for (Map.Entry<String, AbstractDirectory> dir : mDirs.entrySet()) {
             for (Map.Entry<String, AbstractDirectory> subdir : dir.getValue().getAbstractDirs(
                     true).entrySet()) {
                 dirs.put(dir.getKey() + separator + subdir.getKey(),

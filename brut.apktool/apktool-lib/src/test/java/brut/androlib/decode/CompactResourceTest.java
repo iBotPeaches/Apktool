@@ -48,7 +48,7 @@ public class CompactResourceTest extends BaseTest {
     @Test
     public void checkIfDecodeSucceeds() throws BrutException, IOException, ParserConfigurationException, SAXException {
         String apk = "issue3366.apk";
-        File testApk = new File(sTmpDir, apk);
+        ExtFile testApk = new ExtFile(sTmpDir, apk);
 
         // decode issue3366.apk
         ApkDecoder apkDecoder = new ApkDecoder(testApk);

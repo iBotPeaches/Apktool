@@ -49,10 +49,9 @@ public class DebuggableTrueRetainedTest extends BaseTest {
         LOGGER.info("Building issue2328-debuggable-true.apk...");
         Config config = Config.getDefaultConfig();
         config.debugMode = true;
-        config.useAapt2 = true;
         config.verbose = true;
 
-        File testApk = new File(sTmpDir, "issue2328-debuggable-true.apk");
+        ExtFile testApk = new ExtFile(sTmpDir, "issue2328-debuggable-true.apk");
         new ApkBuilder(config, sTestOrigDir).build(testApk);
 
         LOGGER.info("Decoding issue2328-debuggable-true.apk...");

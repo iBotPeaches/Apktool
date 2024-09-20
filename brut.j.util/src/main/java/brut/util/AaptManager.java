@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AaptManager {
+    public static final int AAPT_VERSION_MIN = 1;
+    public static final int AAPT_VERSION_MAX = 2;
 
     public static File getAapt2() throws BrutException {
         return getAapt(2);
@@ -31,59 +33,71 @@ public class AaptManager {
         return getAapt(1);
     }
 
-    private static File getAapt(Integer version) throws BrutException {
-        File aaptBinary;
-        String aaptVersion = getAaptBinaryName(version);
+    private static File getAapt(int version) throws BrutException {
+        String aaptName = getAaptBinaryName(version);
 
-        if (! OSDetection.is64Bit() && OSDetection.isMacOSX()) {
-            throw new BrutException("32 bit OS detected. No 32 bit binaries available.");
+        if (!OSDetection.is64Bit() && OSDetection.isMacOSX()) {
+            throw new BrutException(aaptName + " binaries are not available for 32-bit platform: " + OSDetection.returnOS());
         }
 
-        // Set the 64 bit flag
-        aaptVersion += OSDetection.is64Bit() ? "_64" : "";
-
-        try {
-            if (OSDetection.isMacOSX()) {
-                aaptBinary = Jar.getResourceAsFile("/prebuilt/macosx/" + aaptVersion, AaptManager.class);
-            } else if (OSDetection.isUnix()) {
-                aaptBinary = Jar.getResourceAsFile("/prebuilt/linux/" + aaptVersion, AaptManager.class);
-            } else if (OSDetection.isWindows()) {
-                aaptBinary = Jar.getResourceAsFile("/prebuilt/windows/" + aaptVersion + ".exe", AaptManager.class);
-            } else {
-                throw new BrutException("Could not identify platform: " + OSDetection.returnOS());
-            }
-        } catch (BrutException ex) {
-            throw new BrutException(ex);
-        }
-
-        if (aaptBinary.setExecutable(true)) {
-            return aaptBinary;
-        }
-
-        throw new BrutException("Can't set aapt binary as executable");
-    }
-
-    public static String getAaptExecutionCommand(String aaptPath, File aapt) throws BrutException {
-        if (! aaptPath.isEmpty()) {
-            File aaptFile = new File(aaptPath);
-            if (aaptFile.canRead() && aaptFile.exists()) {
-                //noinspection ResultOfMethodCallIgnored
-                aaptFile.setExecutable(true);
-                return aaptFile.getPath();
-            } else {
-                throw new BrutException("binary could not be read: " + aaptFile.getAbsolutePath());
-            }
+        StringBuilder aaptPath = new StringBuilder("/prebuilt/");
+        if (OSDetection.isUnix()) {
+            aaptPath.append("linux");
+        } else if (OSDetection.isMacOSX()) {
+            aaptPath.append("macosx");
+        } else if (OSDetection.isWindows()) {
+            aaptPath.append("windows");
         } else {
-            return aapt.getAbsolutePath();
+            throw new BrutException("Could not identify platform: " + OSDetection.returnOS());
+        }
+        aaptPath.append("/");
+        aaptPath.append(aaptName);
+        if (OSDetection.is64Bit()) {
+            aaptPath.append("_64");
+        }
+        if (OSDetection.isWindows()) {
+            aaptPath.append(".exe");
+        }
+
+        File aaptBinary = Jar.getResourceAsFile(aaptPath.toString(), AaptManager.class);
+        if (!aaptBinary.setExecutable(true)) {
+            throw new BrutException("Can't set aapt binary as executable");
+        }
+
+        return aaptBinary;
+    }
+
+    public static String getAaptBinaryName(int version) {
+        switch (version) {
+            case 2:
+                return "aapt2";
+            default:
+                return "aapt";
         }
     }
 
-    public static int getAaptVersion(String aaptLocation) throws BrutException {
-        return getAaptVersion(new File(aaptLocation));
+    public static int getAaptVersion(String aaptPath) throws BrutException {
+        return getAaptVersion(new File(aaptPath));
     }
 
-    public static String getAaptBinaryName(Integer version) {
-        return "aapt" + (version == 2 ? "2" : "");
+    public static int getAaptVersion(File aaptBinary) throws BrutException {
+        if (!aaptBinary.isFile() || !aaptBinary.canRead()) {
+            throw new BrutException("Can't read aapt binary: " + aaptBinary.getAbsolutePath());
+        }
+        if (!aaptBinary.setExecutable(true)) {
+            throw new BrutException("Can't set aapt binary as executable: " + aaptBinary.getAbsolutePath());
+        }
+
+        List<String> cmd = new ArrayList<>();
+        cmd.add(aaptBinary.getAbsolutePath());
+        cmd.add("version");
+
+        String version = OS.execAndReturn(cmd.toArray(new String[0]));
+        if (version == null) {
+            throw new BrutException("Could not execute aapt binary at location: " + aaptBinary.getAbsolutePath());
+        }
+
+        return getAppVersionFromString(version);
     }
 
     public static int getAppVersionFromString(String version) throws BrutException {
@@ -98,23 +112,19 @@ public class AaptManager {
         throw new BrutException("aapt version could not be identified: " + version);
     }
 
-    public static int getAaptVersion(File aapt) throws BrutException {
-        if (!aapt.isFile()) {
-            throw new BrutException("Could not identify aapt binary as executable.");
-        }
-        //noinspection ResultOfMethodCallIgnored
-        aapt.setExecutable(true);
-
-        List<String> cmd = new ArrayList<>();
-        cmd.add(aapt.getAbsolutePath());
-        cmd.add("version");
-
-        String version = OS.execAndReturn(cmd.toArray(new String[0]));
-
-        if (version == null) {
-            throw new BrutException("Could not execute aapt binary at location: " + aapt.getAbsolutePath());
+    public static String getAaptExecutionCommand(String aaptPath, File aaptBinary) throws BrutException {
+        if (aaptPath.isEmpty()) {
+            return aaptBinary.getAbsolutePath();
         }
 
-        return getAppVersionFromString(version);
+        aaptBinary = new File(aaptPath);
+        if (!aaptBinary.isFile() || !aaptBinary.canRead()) {
+            throw new BrutException("Can't read aapt binary: " + aaptBinary.getAbsolutePath());
+        }
+        if (!aaptBinary.setExecutable(true)) {
+            throw new BrutException("Can't set aapt binary as executable: " + aaptBinary.getAbsolutePath());
+        }
+
+        return aaptBinary.getPath();
     }
 }

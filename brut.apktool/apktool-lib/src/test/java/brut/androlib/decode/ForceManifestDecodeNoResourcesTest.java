@@ -139,7 +139,7 @@ public class ForceManifestDecodeNoResourcesTest extends BaseTest {
         config.forceDelete = true;
         config.decodeResources = decodeResources;
         config.forceDecodeManifest = decodeManifest;
-        ApkDecoder apkDecoder = new ApkDecoder(config, new File(apk));
+        ApkDecoder apkDecoder = new ApkDecoder(config, new ExtFile(apk));
         apkDecoder.decode(new File(output));
     }
 }

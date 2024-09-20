@@ -51,8 +51,8 @@ public class Config {
     public boolean verbose = false;
     public boolean copyOriginalFiles = false;
     public boolean updateFiles = false;
-    public boolean useAapt2 = true;
     public boolean noCrunch = false;
+    public boolean noApk = false;
 
     // Decode options
     public short decodeSources = DECODE_SOURCES_SMALI;
@@ -71,13 +71,9 @@ public class Config {
     public String frameworkDirectory = null;
     public String frameworkTag = null;
     public String aaptPath = "";
-    public int aaptVersion = 1; // default to v1
+    public int aaptVersion = 2; // default to v2
 
     // Utility functions
-    public boolean isAapt2() {
-        return this.useAapt2 || this.aaptVersion == 2;
-    }
-
     public boolean isDecodeResolveModeUsingDummies() {
         return decodeResolveMode == DECODE_RES_RESOLVE_DUMMY;
     }

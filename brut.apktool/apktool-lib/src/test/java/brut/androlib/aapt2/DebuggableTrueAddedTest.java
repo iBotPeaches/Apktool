@@ -49,10 +49,9 @@ public class DebuggableTrueAddedTest extends BaseTest {
         LOGGER.info("Building issue2328-debuggable-missing.apk...");
         Config config = Config.getDefaultConfig();
         config.debugMode = true;
-        config.useAapt2 = true;
         config.verbose = true;
 
-        File testApk = new File(sTmpDir, "issue2328-debuggable-missing.apk");
+        ExtFile testApk = new ExtFile(sTmpDir, "issue2328-debuggable-missing.apk");
         new ApkBuilder(config, sTestOrigDir).build(testApk);
 
         LOGGER.info("Decoding issue2328-debuggable-missing.apk...");

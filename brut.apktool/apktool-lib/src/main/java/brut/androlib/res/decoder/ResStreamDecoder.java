@@ -20,6 +20,5 @@ import brut.androlib.exceptions.AndrolibException;
 import java.io.*;
 
 public interface ResStreamDecoder {
-    void decode(InputStream in, OutputStream out)
-            throws AndrolibException;
+    void decode(InputStream in, OutputStream out) throws AndrolibException;
 }

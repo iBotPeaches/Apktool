@@ -39,9 +39,9 @@ public class ExternalEntityTest extends BaseTest {
         TestUtils.copyResourceDir(ExternalEntityTest.class, "decode/doctype/", sTestOrigDir);
 
         LOGGER.info("Building doctype.apk...");
-        File testApk = new File(sTestOrigDir, "doctype.apk");
+        ExtFile testApk = new ExtFile(sTestOrigDir, "doctype.apk");
         Config config = Config.getDefaultConfig();
-        config.useAapt2 = false;
+        config.aaptVersion = 1;
         new ApkBuilder(config, sTestOrigDir).build(testApk);
 
         LOGGER.info("Decoding doctype.apk...");

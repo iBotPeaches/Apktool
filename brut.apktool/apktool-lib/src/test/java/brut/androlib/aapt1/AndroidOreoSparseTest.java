@@ -39,7 +39,7 @@ public class AndroidOreoSparseTest extends BaseTest {
         LOGGER.info("Unpacking sparse.apk...");
         TestUtils.copyResourceDir(AndroidOreoSparseTest.class, "aapt1/issue1594", sTestOrigDir);
 
-        File testApk = new File(sTestOrigDir, "sparse.apk");
+        ExtFile testApk = new ExtFile(sTestOrigDir, "sparse.apk");
 
         LOGGER.info("Decoding sparse.apk...");
         ApkDecoder apkDecoder = new ApkDecoder(testApk);
@@ -47,7 +47,7 @@ public class AndroidOreoSparseTest extends BaseTest {
 
         LOGGER.info("Building sparse.apk...");
         Config config = Config.getDefaultConfig();
-        config.useAapt2 = false;
+        config.aaptVersion = 1;
         new ApkBuilder(config, sTestNewDir).build(testApk);
     }
 

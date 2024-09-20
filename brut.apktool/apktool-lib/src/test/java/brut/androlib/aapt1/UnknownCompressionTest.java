@@ -42,7 +42,7 @@ public class UnknownCompressionTest extends BaseTest {
         String apk = "deflated_unknowns.apk";
         Config config = Config.getDefaultConfig();
         config.frameworkDirectory = sTmpDir.getAbsolutePath();
-        config.useAapt2 = false;
+        config.aaptVersion = 1;
 
         sTestOrigDir = new ExtFile(sTmpDir, apk);
 

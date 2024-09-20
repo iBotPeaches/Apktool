@@ -51,7 +51,7 @@ public class MissingVersionManifestTest extends BaseTest {
         String apk = "issue1264.apk";
 
         // decode issue1264.apk
-        ApkDecoder apkDecoder = new ApkDecoder(new File(sTmpDir + File.separator + apk));
+        ApkDecoder apkDecoder = new ApkDecoder(new ExtFile(sTmpDir + File.separator + apk));
         ExtFile decodedApk = new ExtFile(sTmpDir + File.separator + apk + ".out");
         File outDir = new File(sTmpDir + File.separator + apk + ".out");
         apkDecoder.decode(outDir);

@@ -51,8 +51,8 @@ public class ZipRODirectory extends AbstractDirectory {
         super();
         try {
             mZipFile = new ZipFile(zipFile);
-        } catch (IOException e) {
-            throw new DirectoryException(e);
+        } catch (IOException ex) {
+            throw new DirectoryException(ex);
         }
         mPath = path;
     }
@@ -73,8 +73,8 @@ public class ZipRODirectory extends AbstractDirectory {
             throws DirectoryException {
         try {
             return getZipFile().getInputStream(new ZipEntry(getPath() + name));
-        } catch (IOException e) {
-            throw new PathNotExist(name, e);
+        } catch (IOException ex) {
+            throw new PathNotExist(name, ex);
         }
     }
 

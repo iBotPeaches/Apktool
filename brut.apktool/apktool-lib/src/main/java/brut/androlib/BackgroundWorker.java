@@ -34,8 +34,8 @@ public class BackgroundWorker {
         for (Future<?> future : mWorkerFutures) {
             try {
                 future.get();
-            } catch (InterruptedException | ExecutionException e) {
-                throw new RuntimeException(e);
+            } catch (InterruptedException | ExecutionException ex) {
+                throw new RuntimeException(ex);
             }
         }
         mWorkerFutures.clear();
