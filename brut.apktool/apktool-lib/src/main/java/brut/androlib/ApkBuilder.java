@@ -67,9 +67,10 @@ public class ApkBuilder {
     }
 
     public void build(File outApk) throws AndrolibException {
+        if (mConfig.jobs > 1) {
+            mWorker = new BackgroundWorker(mConfig.jobs - 1);
+        }
         try {
-            boolean isAsync = mConfig.jobs > 1;
-            mWorker = new BackgroundWorker(isAsync ? mConfig.jobs - 1 : 1);
             mApkInfo = ApkInfo.load(mApkDir);
 
             String minSdkVersion = mApkInfo.getMinSdkVersion();
@@ -90,16 +91,16 @@ public class ApkBuilder {
             outDir.mkdirs();
 
             LOGGER.info("Using Apktool " + ApktoolProperties.getVersion() + " on " + outApk.getName()
-                        + (isAsync ? " with " + mConfig.jobs + " threads" : ""));
+                        + (mWorker != null ? " with " + mConfig.jobs + " threads" : ""));
 
-            buildSources(outDir, isAsync);
+            buildSources(outDir);
 
             File manifest = new File(mApkDir, "AndroidManifest.xml");
             File manifestOrig = new File(mApkDir, "AndroidManifest.xml.orig");
             backupManifestFile(manifest, manifestOrig);
             buildResources(outDir, manifest);
 
-            if (isAsync) {
+            if (mWorker != null) {
                 mWorker.waitForFinish();
                 if (mBuildError.get() != null) {
                     throw mBuildError.get();
@@ -154,13 +155,15 @@ public class ApkBuilder {
                 }
             }
         } finally {
-            mWorker.shutdownNow();
+            if (mWorker != null) {
+                mWorker.shutdownNow();
+            }
         }
     }
 
-    private void buildSources(File outDir, boolean isAsync) throws AndrolibException {
+    private void buildSources(File outDir) throws AndrolibException {
         if (!copySourcesRaw(outDir, "classes.dex")) {
-            buildSourcesSmali(outDir, "smali", "classes.dex", isAsync);
+            buildSourcesSmali(outDir, "smali", "classes.dex");
         }
 
         try {
@@ -171,7 +174,7 @@ public class ApkBuilder {
                 if (dirName.startsWith("smali_")) {
                     String fileName = dirName.substring(dirName.indexOf("_") + 1) + ".dex";
                     if (!copySourcesRaw(outDir, fileName)) {
-                        buildSourcesSmali(outDir, dirName, fileName, isAsync);
+                        buildSourcesSmali(outDir, dirName, fileName);
                     }
                 }
             }
@@ -208,9 +211,9 @@ public class ApkBuilder {
         return true;
     }
 
-    private void buildSourcesSmali(File outDir, String dirName, String fileName, boolean isAsync)
+    private void buildSourcesSmali(File outDir, String dirName, String fileName)
             throws AndrolibException {
-        if (isAsync) {
+        if (mWorker != null) {
             mWorker.submit(() -> {
                 if (mBuildError.get() == null) {
                     try {

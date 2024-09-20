@@ -67,9 +67,10 @@ public class ApkDecoder {
         if (!mApkFile.isFile() || !mApkFile.canRead()) {
             throw new InFileNotFoundException();
         }
+        if (mConfig.jobs > 1) {
+            mWorker = new BackgroundWorker(mConfig.jobs - 1);
+        }
         try {
-            boolean isAsync = mConfig.jobs > 1;
-            mWorker = new BackgroundWorker(isAsync ? mConfig.jobs - 1 : 1);
             mApkInfo = new ApkInfo(mApkFile);
 
             try {
@@ -81,16 +82,16 @@ public class ApkDecoder {
             outDir.mkdirs();
 
             LOGGER.info("Using Apktool " + ApktoolProperties.getVersion() + " on " + mApkFile.getName()
-                        + (isAsync ? " with " + mConfig.jobs + " threads" : ""));
+                        + (mWorker != null ? " with " + mConfig.jobs + " threads" : ""));
 
-            decodeSources(outDir, isAsync);
+            decodeSources(outDir);
 
             ResourcesDecoder resDecoder = new ResourcesDecoder(mConfig, mApkInfo);
             decodeResources(outDir, resDecoder);
             decodeManifest(outDir, resDecoder);
             updateApkInfo(outDir, resDecoder);
 
-            if (isAsync) {
+            if (mWorker != null) {
                 mWorker.waitForFinish();
                 if (mBuildError.get() != null) {
                     throw mBuildError.get();
@@ -104,14 +105,16 @@ public class ApkDecoder {
 
             return mApkInfo;
         } finally {
-            mWorker.shutdownNow();
+            if (mWorker != null) {
+                mWorker.shutdownNow();
+            }
             try {
                 mApkFile.close();
             } catch (IOException ignored) {}
         }
     }
 
-    private void decodeSources(File outDir, boolean isAsync) throws AndrolibException {
+    private void decodeSources(File outDir) throws AndrolibException {
         if (!mApkInfo.hasSources()) {
             return;
         }
@@ -122,7 +125,7 @@ public class ApkDecoder {
                 break;
             case Config.DECODE_SOURCES_SMALI:
             case Config.DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES:
-                decodeSourcesSmali(outDir, "classes.dex", isAsync);
+                decodeSourcesSmali(outDir, "classes.dex");
                 break;
         }
 
@@ -137,11 +140,11 @@ public class ApkDecoder {
                             copySourcesRaw(outDir, fileName);
                             break;
                         case Config.DECODE_SOURCES_SMALI:
-                            decodeSourcesSmali(outDir, fileName, isAsync);
+                            decodeSourcesSmali(outDir, fileName);
                             break;
                         case Config.DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES:
                             if (fileName.startsWith("classes")) {
-                                decodeSourcesSmali(outDir, fileName, isAsync);
+                                decodeSourcesSmali(outDir, fileName);
                             } else {
                                 copySourcesRaw(outDir, fileName);
                             }
@@ -165,8 +168,8 @@ public class ApkDecoder {
         }
     }
 
-    private void decodeSourcesSmali(File outDir, String fileName, boolean isAsync) throws AndrolibException {
-        if (isAsync) {
+    private void decodeSourcesSmali(File outDir, String fileName) throws AndrolibException {
+        if (mWorker != null) {
             mWorker.submit(() -> {
                 if (mBuildError.get() == null) {
                     try {
