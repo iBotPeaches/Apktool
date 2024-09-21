@@ -88,24 +88,34 @@ public class Main {
 
         boolean cmdFound = false;
         for (String opt : commandLine.getArgs()) {
-            if (opt.equalsIgnoreCase("d") || opt.equalsIgnoreCase("decode")) {
-                cmdDecode(commandLine, config);
-                cmdFound = true;
-            } else if (opt.equalsIgnoreCase("b") || opt.equalsIgnoreCase("build")) {
-                cmdBuild(commandLine, config);
-                cmdFound = true;
-            } else if (opt.equalsIgnoreCase("if") || opt.equalsIgnoreCase("install-framework")) {
-                cmdInstallFramework(commandLine, config);
-                cmdFound = true;
-            } else if (opt.equalsIgnoreCase("empty-framework-dir")) {
-                cmdEmptyFrameworkDirectory(commandLine, config);
-                cmdFound = true;
-            } else if (opt.equalsIgnoreCase("list-frameworks")) {
-                cmdListFrameworks(commandLine, config);
-                cmdFound = true;
-            } else if (opt.equalsIgnoreCase("publicize-resources")) {
-                cmdPublicizeResources(commandLine, config);
-                cmdFound = true;
+            switch (opt) {
+                case "d":
+                case "decode":
+                    cmdDecode(commandLine, config);
+                    cmdFound = true;
+                    break;
+                case "b":
+                case "build":
+                    cmdBuild(commandLine, config);
+                    cmdFound = true;
+                    break;
+                case "if":
+                case "install-framework":
+                    cmdInstallFramework(commandLine, config);
+                    cmdFound = true;
+                    break;
+                case "empty-framework-dir":
+                    cmdEmptyFrameworkDirectory(commandLine, config);
+                    cmdFound = true;
+                    break;
+                case "list-frameworks":
+                    cmdListFrameworks(commandLine, config);
+                    cmdFound = true;
+                    break;
+                case "publicize-resources":
+                    cmdPublicizeResources(commandLine, config);
+                    cmdFound = true;
+                    break;
             }
         }
 
