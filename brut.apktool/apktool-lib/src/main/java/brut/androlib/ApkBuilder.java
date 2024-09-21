@@ -484,26 +484,16 @@ public class ApkBuilder {
     }
 
     private void importUnknownFiles(ZipOutputStream outStream) throws AndrolibException {
-        Map<String, String> unknownFiles = mApkInfo.unknownFiles;
-        if (unknownFiles == null || unknownFiles.isEmpty()) {
-            return;
-        }
-
         File unknownDir = new File(mApkDir, "unknown");
         if (!unknownDir.isDirectory()) {
             return;
         }
 
         LOGGER.info("Importing unknown files...");
-        for (String fileName : unknownFiles.keySet()) {
-            boolean doNotCompress = Integer.parseInt(unknownFiles.get(fileName)) == 0;
-
-            LOGGER.fine("Importing unknown file " + fileName + " (" + (doNotCompress ? "stored" : "deflated") + ")");
-            try {
-                ZipUtils.zipFile(unknownDir, fileName, outStream, doNotCompress);
-            } catch (IOException ex) {
-                LOGGER.warning("Skipping file " + fileName + " (" + ex.getMessage() + ")");
-            }
+        try {
+            ZipUtils.zipDir(unknownDir, outStream, mApkInfo.doNotCompress);
+        } catch (IOException ex) {
+            throw new AndrolibException(ex);
         }
     }
 

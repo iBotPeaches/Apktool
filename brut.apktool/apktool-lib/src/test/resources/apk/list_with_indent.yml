@@ -14,8 +14,6 @@ sdkInfo:
     targetSdkVersion: '22'
 sharedLibrary: false
 sparseResources: true
-unknownFiles:
-  hidden.file: 1
 usesFramework:
     ids:
         - 1

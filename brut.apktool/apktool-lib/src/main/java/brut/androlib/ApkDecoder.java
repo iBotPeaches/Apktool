@@ -40,7 +40,7 @@ public class ApkDecoder {
     private final static Logger LOGGER = Logger.getLogger(ApkDecoder.class.getName());
 
     // extensions of files that are often packed uncompressed
-    public final static Pattern NO_COMPRESS_EXT_PATTERN = Pattern.compile(
+    private final static Pattern NO_COMPRESS_EXT_PATTERN = Pattern.compile(
         "dex|so|jpg|jpeg|png|gif|wav|mp2|mp3|ogg|aac|mpg|mpeg|mid|midi|smf|jet|rtttl|" +
         "imy|xmf|mp4|m4a|m4v|3gp|3gpp|3g2|3gpp2|amr|awb|wma|wmv|webm|webp|mkv");
 
@@ -369,12 +369,7 @@ public class ApkDecoder {
 
             for (String fileName : in.getFiles(true)) {
                 if (!ApkInfo.STANDARD_FILENAMES_PATTERN.matcher(fileName).matches()) {
-                    // copy file out of archive into special "unknown" folder
                     in.copyToDir(unknownDir, fileName);
-                    // let's record the name of the file, and its compression type
-                    // so that we may re-include it the same way
-                    int compressionLevel = in.getCompressionLevel(fileName);
-                    mApkInfo.addUnknownFileInfo(fileName, String.valueOf(compressionLevel));
                 }
             }
         } catch (DirectoryException ex) {

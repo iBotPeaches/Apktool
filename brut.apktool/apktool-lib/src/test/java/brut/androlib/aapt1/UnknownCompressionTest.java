@@ -71,7 +71,7 @@ public class UnknownCompressionTest extends BaseTest {
         // Check that control = rebuilt (both deflated)
         // Add extra check for checking not equal to 0, just in case control gets broken
         assertEquals(control, rebuilt);
-        assertNotSame(0, rebuilt);
+        assertNotSame(Integer.valueOf(0), rebuilt);
     }
 
     @Test
@@ -95,11 +95,11 @@ public class UnknownCompressionTest extends BaseTest {
     }
 
     @Test
-    public void confirmPngFileIsCorrectlyDeflatedTest() throws BrutException, IOException {
+    public void confirmPngFileIsStoredTest() throws BrutException, IOException {
         Integer control = sTestOrigDir.getDirectory().getCompressionLevel("950x150.png");
         Integer rebuilt = sTestNewDir.getDirectory().getCompressionLevel("950x150.png");
 
-        assertEquals(control, rebuilt);
-        assertEquals(Integer.valueOf(8), rebuilt);
+        assertNotSame(control, rebuilt);
+        assertEquals(Integer.valueOf(0), rebuilt);
     }
 }

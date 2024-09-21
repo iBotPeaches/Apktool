@@ -51,7 +51,6 @@ public class ApkInfo implements YamlSerializable {
     public boolean resourcesAreCompressed;
     public boolean sharedLibrary;
     public boolean sparseResources;
-    public Map<String, String> unknownFiles = new LinkedHashMap<>();
     public List<String> doNotCompress = new ArrayList<>();
 
     /** @deprecated use {@link #resourcesAreCompressed} */
@@ -110,10 +109,6 @@ public class ApkInfo implements YamlSerializable {
         } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
         }
-    }
-
-    public void addUnknownFileInfo(String file, String value) {
-        unknownFiles.put(file, value);
     }
 
     public String checkTargetSdkVersionBounds() {
@@ -279,11 +274,6 @@ public class ApkInfo implements YamlSerializable {
                 sparseResources = line.getValueBool();
                 break;
             }
-            case "unknownFiles": {
-                unknownFiles.clear();
-                reader.readMap(unknownFiles);
-                break;
-            }
             case "doNotCompress": {
                 doNotCompress.clear();
                 reader.readStringList(doNotCompress);
@@ -304,9 +294,6 @@ public class ApkInfo implements YamlSerializable {
         writer.writeBool("resourcesAreCompressed", resourcesAreCompressed);
         writer.writeBool("sharedLibrary", sharedLibrary);
         writer.writeBool("sparseResources", sparseResources);
-        if (!unknownFiles.isEmpty()) {
-            writer.writeStringMap("unknownFiles", unknownFiles);
-        }
         if (!doNotCompress.isEmpty()) {
             writer.writeList("doNotCompress", doNotCompress);
         }

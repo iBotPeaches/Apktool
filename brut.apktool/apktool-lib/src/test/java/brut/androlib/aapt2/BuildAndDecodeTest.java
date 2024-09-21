@@ -174,7 +174,7 @@ public class BuildAndDecodeTest extends BaseTest {
     }
 
     @Test
-    public void unknownFolderTest() throws BrutException {
+    public void unknownFolderTest() throws BrutException, IOException {
         compareUnknownFiles();
     }
 

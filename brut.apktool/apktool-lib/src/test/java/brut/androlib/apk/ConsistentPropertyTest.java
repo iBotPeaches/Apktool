@@ -43,7 +43,6 @@ public class ConsistentPropertyTest {
         assertFalse(apkInfo.resourcesAreCompressed);
         assertFalse(apkInfo.sharedLibrary);
         assertTrue(apkInfo.sparseResources);
-        assertEquals(1, apkInfo.unknownFiles.size());
         assertEquals(2, apkInfo.doNotCompress.size());
         assertFalse(apkInfo.compressionType);
     }

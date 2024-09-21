@@ -189,21 +189,6 @@ public class AaptInvoker {
             cmd.add("-x");
         }
 
-        if (!mApkInfo.doNotCompress.isEmpty()) {
-            if (customAapt) {
-                for (String file : mApkInfo.doNotCompress) {
-                    cmd.add("-0");
-                    cmd.add(file);
-                }
-            } else {
-                // Use custom -e option to avoid limits on commandline length.
-                // Can only be used when custom aapt binary is not used.
-                String extensionsFilePath = createDoNotCompressExtensionsFile(mApkInfo.doNotCompress);
-                cmd.add("-e");
-                cmd.add(extensionsFilePath);
-            }
-        }
-
         if (!mApkInfo.resourcesAreCompressed) {
             cmd.add("-0");
             cmd.add("arsc");
@@ -312,21 +297,6 @@ public class AaptInvoker {
             cmd.add("-x");
         }
 
-        if (!mApkInfo.doNotCompress.isEmpty()) {
-            if (customAapt) {
-                for (String file : mApkInfo.doNotCompress) {
-                    cmd.add("-0");
-                    cmd.add(file);
-                }
-            } else {
-                // Use custom -e option to avoid limits on commandline length.
-                // Can only be used when custom aapt binary is not used.
-                String extensionsFilePath = createDoNotCompressExtensionsFile(mApkInfo.doNotCompress);
-                cmd.add("-e");
-                cmd.add(extensionsFilePath);
-            }
-        }
-
         if (!mApkInfo.resourcesAreCompressed) {
             cmd.add("-0");
             cmd.add("arsc");
@@ -358,24 +328,6 @@ public class AaptInvoker {
             LOGGER.fine("command ran: ");
             LOGGER.fine(cmd.toString());
         } catch (BrutException ex) {
-            throw new AndrolibException(ex);
-        }
-    }
-
-    private String createDoNotCompressExtensionsFile(Collection<String> doNotCompress) throws AndrolibException {
-        try {
-            File doNotCompressFile = File.createTempFile("APKTOOL", null);
-            doNotCompressFile.deleteOnExit();
-
-            BufferedWriter fileWriter = new BufferedWriter(new FileWriter(doNotCompressFile));
-            for (String extension : doNotCompress) {
-                fileWriter.write(extension);
-                fileWriter.newLine();
-            }
-            fileWriter.close();
-
-            return doNotCompressFile.getAbsolutePath();
-        } catch (IOException ex) {
             throw new AndrolibException(ex);
         }
     }
