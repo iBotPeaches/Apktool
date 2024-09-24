@@ -25,9 +25,8 @@ public class ApkInfoReaderTest {
 
     private void checkStandard(ApkInfo apkInfo) {
         assertEquals("standard.apk", apkInfo.apkFileName);
-        assertFalse(apkInfo.resourcesAreCompressed);
         assertEquals(1, apkInfo.doNotCompress.size());
-        assertEquals("resources.arsc", apkInfo.doNotCompress.iterator().next());
+        assertEquals("arsc", apkInfo.doNotCompress.iterator().next());
         assertFalse(apkInfo.isFrameworkApk);
         assertNotNull(apkInfo.packageInfo);
         assertEquals("127", apkInfo.packageInfo.forcedPackageId);
@@ -95,7 +94,6 @@ public class ApkInfoReaderTest {
         assertNotNull(apkInfo.versionInfo);
         assertEquals("1", apkInfo.versionInfo.versionCode);
         assertEquals("1.0", apkInfo.versionInfo.versionName);
-        assertFalse(apkInfo.resourcesAreCompressed);
         assertNotNull(apkInfo.doNotCompress);
         assertEquals(5, apkInfo.doNotCompress.size());
         assertEquals("assets/0byte_file.jpg", apkInfo.doNotCompress.get(0));
@@ -131,7 +129,7 @@ public class ApkInfoReaderTest {
         assertEquals("1.0.70", apkInfo.versionInfo.versionName);
         assertNotNull(apkInfo.doNotCompress);
         assertEquals(2, apkInfo.doNotCompress.size());
-        assertEquals("resources.arsc", apkInfo.doNotCompress.get(0));
+        assertEquals("arsc", apkInfo.doNotCompress.get(0));
         assertEquals("png", apkInfo.doNotCompress.get(1));
     }
 }

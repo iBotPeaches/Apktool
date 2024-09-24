@@ -57,7 +57,6 @@ public class ApkInfoSerializationTest {
         assertNotNull(apkInfo.versionInfo);
         assertEquals("1", apkInfo.versionInfo.versionCode);
         assertEquals("1.0", apkInfo.versionInfo.versionName);
-        assertFalse(apkInfo.resourcesAreCompressed);
         assertNotNull(apkInfo.doNotCompress);
         assertEquals(5, apkInfo.doNotCompress.size());
         assertEquals("assets/0byte_file.jpg", apkInfo.doNotCompress.get(0));

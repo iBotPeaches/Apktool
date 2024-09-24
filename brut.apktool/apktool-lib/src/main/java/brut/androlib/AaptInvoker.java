@@ -189,11 +189,6 @@ public class AaptInvoker {
             cmd.add("-x");
         }
 
-        if (!mApkInfo.resourcesAreCompressed) {
-            cmd.add("-0");
-            cmd.add("arsc");
-        }
-
         if (include != null) {
             for (File file : include) {
                 cmd.add("-I");
@@ -295,11 +290,6 @@ public class AaptInvoker {
 
         if (mApkInfo.isFrameworkApk) {
             cmd.add("-x");
-        }
-
-        if (!mApkInfo.resourcesAreCompressed) {
-            cmd.add("-0");
-            cmd.add("arsc");
         }
 
         if (include != null) {

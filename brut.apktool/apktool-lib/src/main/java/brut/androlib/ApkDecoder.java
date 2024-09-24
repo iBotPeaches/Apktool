@@ -41,8 +41,8 @@ public class ApkDecoder {
 
     // extensions of files that are often packed uncompressed
     private final static Pattern NO_COMPRESS_EXT_PATTERN = Pattern.compile(
-        "dex|so|jpg|jpeg|png|gif|wav|mp2|mp3|ogg|aac|mpg|mpeg|mid|midi|smf|jet|rtttl|" +
-        "imy|xmf|mp4|m4a|m4v|3gp|3gpp|3g2|3gpp2|amr|awb|wma|wmv|webm|webp|mkv");
+        "dex|arsc|so|jpg|jpeg|png|gif|wav|mp2|mp3|ogg|aac|mpg|mpeg|mid|midi|smf|jet|" +
+        "rtttl|imy|xmf|mp4|m4a|m4v|3gp|3gpp|3g2|3gpp2|amr|awb|wma|wmv|webm|webp|mkv");
 
     private final AtomicReference<AndrolibException> mBuildError = new AtomicReference<>(null);
     private final Config mConfig;
@@ -101,6 +101,12 @@ public class ApkDecoder {
             copyOriginalFiles(outDir);
             copyRawFiles(outDir);
             copyUnknownFiles(outDir);
+
+            // in case we have no resources, we should store the minSdk we pulled from the source opcode api level
+            if (!mApkInfo.hasResources() && mMinSdkVersion > 0) {
+                mApkInfo.setMinSdkVersion(Integer.toString(mMinSdkVersion));
+            }
+
             writeApkInfo(outDir);
 
             return mApkInfo;
@@ -263,11 +269,6 @@ public class ApkDecoder {
 
     private void updateApkInfo(File outDir, ResourcesDecoder resDecoder) throws AndrolibException {
         resDecoder.updateApkInfo(outDir);
-
-        // in case we have no resources, we should store the minSdk we pulled from the source opcode api level
-        if (!mApkInfo.hasResources() && mMinSdkVersion > 0) {
-            mApkInfo.setMinSdkVersion(Integer.toString(mMinSdkVersion));
-        }
 
         // record uncompressed files
         try {

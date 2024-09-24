@@ -48,13 +48,9 @@ public class ApkInfo implements YamlSerializable {
     private Map<String, String> sdkInfo = new LinkedHashMap<>();
     public PackageInfo packageInfo = new PackageInfo();
     public VersionInfo versionInfo = new VersionInfo();
-    public boolean resourcesAreCompressed;
     public boolean sharedLibrary;
     public boolean sparseResources;
     public List<String> doNotCompress = new ArrayList<>();
-
-    /** @deprecated use {@link #resourcesAreCompressed} */
-    public boolean compressionType;
 
     public ApkInfo() {
         this(null);
@@ -261,11 +257,6 @@ public class ApkInfo implements YamlSerializable {
                 reader.readObject(versionInfo);
                 break;
             }
-            case "compressionType":
-            case "resourcesAreCompressed": {
-                resourcesAreCompressed = line.getValueBool();
-                break;
-            }
             case "sharedLibrary": {
                 sharedLibrary = line.getValueBool();
                 break;
@@ -291,7 +282,6 @@ public class ApkInfo implements YamlSerializable {
         writer.writeStringMap("sdkInfo", sdkInfo);
         writer.writeObject("packageInfo", packageInfo);
         writer.writeObject("versionInfo", versionInfo);
-        writer.writeBool("resourcesAreCompressed", resourcesAreCompressed);
         writer.writeBool("sharedLibrary", sharedLibrary);
         writer.writeBool("sparseResources", sparseResources);
         if (!doNotCompress.isEmpty()) {
