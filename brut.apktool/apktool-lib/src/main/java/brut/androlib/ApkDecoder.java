@@ -44,20 +44,20 @@ public class ApkDecoder {
         "dex|arsc|so|jpg|jpeg|png|gif|wav|mp2|mp3|ogg|aac|mpg|mpeg|mid|midi|smf|jet|" +
         "rtttl|imy|xmf|mp4|m4a|m4v|3gp|3gpp|3g2|3gpp2|amr|awb|wma|wmv|webm|webp|mkv");
 
-    private final AtomicReference<AndrolibException> mBuildError = new AtomicReference<>(null);
-    private final Config mConfig;
     private final ExtFile mApkFile;
-    private BackgroundWorker mWorker;
+    private final Config mConfig;
     private ApkInfo mApkInfo;
     private volatile int mMinSdkVersion = 0;
+    private BackgroundWorker mWorker;
+    private final AtomicReference<AndrolibException> mBuildError = new AtomicReference<>(null);
 
     public ApkDecoder(ExtFile apkFile) {
-        this(Config.getDefaultConfig(), apkFile);
+        this(apkFile, Config.getDefaultConfig());
     }
 
-    public ApkDecoder(Config config, ExtFile apkFile) {
-        mConfig = config;
+    public ApkDecoder(ExtFile apkFile, Config config) {
         mApkFile = apkFile;
+        mConfig = config;
     }
 
     public ApkInfo decode(File outDir) throws AndrolibException {

@@ -45,7 +45,7 @@ public class DefaultBaksmaliVariableTest extends BaseTest {
         ExtFile testJar = new ExtFile(sTmpDir, "issue1481.jar");
         Config config = Config.getDefaultConfig();
         config.aaptVersion = 1;
-        new ApkBuilder(config, sTestOrigDir).build(testJar);
+        new ApkBuilder(sTestOrigDir, config).build(testJar);
 
         LOGGER.info("Decoding issue1481.jar...");
         ApkDecoder apkDecoder = new ApkDecoder(testJar);

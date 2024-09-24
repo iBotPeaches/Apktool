@@ -52,7 +52,7 @@ public class DebugTagRetainedTest extends BaseTest {
         config.debugMode = true;
 
         ExtFile testApk = new ExtFile(sTmpDir, "issue1235.apk");
-        new ApkBuilder(config, sTestOrigDir).build(testApk);
+        new ApkBuilder(sTestOrigDir, config).build(testApk);
 
         LOGGER.info("Decoding issue1235.apk...");
         ApkDecoder apkDecoder = new ApkDecoder(testApk);

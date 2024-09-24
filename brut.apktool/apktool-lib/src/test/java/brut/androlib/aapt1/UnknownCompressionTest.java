@@ -54,7 +54,7 @@ public class UnknownCompressionTest extends BaseTest {
 
         // build deflated_unknowns
         ExtFile clientApkFolder = new ExtFile(sTestOrigDir.getAbsolutePath() + ".out");
-        new ApkBuilder(config, clientApkFolder).build(null);
+        new ApkBuilder(clientApkFolder, config).build(null);
         sTestNewDir = new ExtFile(clientApkFolder, "dist" + File.separator + apk);
     }
 

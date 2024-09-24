@@ -52,7 +52,7 @@ public class DebuggableTrueRetainedTest extends BaseTest {
         config.verbose = true;
 
         ExtFile testApk = new ExtFile(sTmpDir, "issue2328-debuggable-true.apk");
-        new ApkBuilder(config, sTestOrigDir).build(testApk);
+        new ApkBuilder(sTestOrigDir, config).build(testApk);
 
         LOGGER.info("Decoding issue2328-debuggable-true.apk...");
         ApkDecoder apkDecoder = new ApkDecoder(testApk);

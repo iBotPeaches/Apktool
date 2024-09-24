@@ -61,7 +61,7 @@ public class ProviderAttributeTest extends BaseTest {
         ExtFile testApk = new ExtFile(sTmpDir, apk + ".out");
         Config config = Config.getDefaultConfig();
         config.aaptVersion = 1;
-        new ApkBuilder(config, testApk).build(null);
+        new ApkBuilder(testApk, config).build(null);
         String newApk = apk + ".out" + File.separator + "dist" + File.separator + apk;
         assertTrue(fileExists(newApk));
 

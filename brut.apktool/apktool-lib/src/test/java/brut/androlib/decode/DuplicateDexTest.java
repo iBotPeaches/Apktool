@@ -53,7 +53,7 @@ public class DuplicateDexTest extends BaseTest {
 
         LOGGER.info("Building duplicatedex.apk...");
         Config config = Config.getDefaultConfig();
-        new ApkBuilder(config, sTestNewDir).build(testApk);
+        new ApkBuilder(sTestNewDir, config).build(testApk);
     }
 
     @Test
@@ -64,11 +64,11 @@ public class DuplicateDexTest extends BaseTest {
         Config config = Config.getDefaultConfig();
         config.decodeSources = Config.DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES;
 
-        ApkDecoder apkDecoder = new ApkDecoder(config, testApk);
+        ApkDecoder apkDecoder = new ApkDecoder(testApk, config);
         apkDecoder.decode(sTestNewDir);
 
         LOGGER.info("Building duplicatedex.apk...");
-        new ApkBuilder(config, sTestNewDir).build(testApk);
+        new ApkBuilder(sTestNewDir, config).build(testApk);
     }
 
 }

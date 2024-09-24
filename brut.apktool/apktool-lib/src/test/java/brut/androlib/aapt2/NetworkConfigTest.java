@@ -54,7 +54,7 @@ public class NetworkConfigTest extends BaseTest {
         Config config = Config.getDefaultConfig();
         config.netSecConf = true;
         ExtFile testApk = new ExtFile(sTmpDir, "testapp.apk");
-        new ApkBuilder(config, sTestOrigDir).build(testApk);
+        new ApkBuilder(sTestOrigDir, config).build(testApk);
 
         LOGGER.info("Decoding testapp.apk...");
         ApkDecoder apkDecoder = new ApkDecoder(testApk);

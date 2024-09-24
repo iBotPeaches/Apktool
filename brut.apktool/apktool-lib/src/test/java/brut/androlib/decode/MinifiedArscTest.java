@@ -48,7 +48,7 @@ public class MinifiedArscTest extends BaseTest {
         Config config = Config.getDefaultConfig();
         config.forceDelete = true;
         // decode issue1157.apk
-        ApkDecoder apkDecoder = new ApkDecoder(config, new ExtFile(sTmpDir, apk));
+        ApkDecoder apkDecoder = new ApkDecoder(new ExtFile(sTmpDir, apk), config);
         // this should not raise an exception:
         apkDecoder.decode(sTestNewDir);
     }

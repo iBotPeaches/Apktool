@@ -65,7 +65,7 @@ public class AndResGuardTest extends BaseTest {
         config.forceDelete = true;
         config.decodeResources = Config.DECODE_RESOURCES_NONE;
         String apk = "issue1170.apk";
-        ApkDecoder apkDecoder = new ApkDecoder(config, new ExtFile(sTmpDir + File.separator + apk));
+        ApkDecoder apkDecoder = new ApkDecoder(new ExtFile(sTmpDir + File.separator + apk), config);
         sTestOrigDir = new ExtFile(sTmpDir + File.separator + apk + ".raw.out");
         File outDir = new File(sTmpDir + File.separator + apk + ".raw.out");
         apkDecoder.decode(outDir);

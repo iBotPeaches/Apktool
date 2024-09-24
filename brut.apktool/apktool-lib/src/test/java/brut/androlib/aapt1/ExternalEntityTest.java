@@ -42,7 +42,7 @@ public class ExternalEntityTest extends BaseTest {
         ExtFile testApk = new ExtFile(sTestOrigDir, "doctype.apk");
         Config config = Config.getDefaultConfig();
         config.aaptVersion = 1;
-        new ApkBuilder(config, sTestOrigDir).build(testApk);
+        new ApkBuilder(sTestOrigDir, config).build(testApk);
 
         LOGGER.info("Decoding doctype.apk...");
         ApkDecoder apkDecoder = new ApkDecoder(testApk);

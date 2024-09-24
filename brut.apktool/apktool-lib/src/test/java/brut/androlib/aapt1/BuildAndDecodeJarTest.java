@@ -43,7 +43,7 @@ public class BuildAndDecodeJarTest extends BaseTest {
         ExtFile testJar = new ExtFile(sTmpDir, "testjar.jar");
         Config config = Config.getDefaultConfig();
         config.aaptVersion = 1;
-        new ApkBuilder(config, sTestOrigDir).build(testJar);
+        new ApkBuilder(sTestOrigDir, config).build(testJar);
 
         LOGGER.info("Decoding testjar.jar...");
         ApkDecoder apkDecoder = new ApkDecoder(testJar);

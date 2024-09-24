@@ -50,18 +50,18 @@ import java.util.zip.ZipOutputStream;
 public class ApkBuilder {
     private final static Logger LOGGER = Logger.getLogger(ApkBuilder.class.getName());
 
-    private final AtomicReference<AndrolibException> mBuildError = new AtomicReference<>(null);
-    private final Config mConfig;
     private final ExtFile mApkDir;
-    private BackgroundWorker mWorker;
+    private final Config mConfig;
     private ApkInfo mApkInfo;
     private int mMinSdkVersion = 0;
+    private BackgroundWorker mWorker;
+    private final AtomicReference<AndrolibException> mBuildError = new AtomicReference<>(null);
 
     public ApkBuilder(ExtFile apkDir) {
-        this(Config.getDefaultConfig(), apkDir);
+        this(apkDir, Config.getDefaultConfig());
     }
 
-    public ApkBuilder(Config config, ExtFile apkDir) {
+    public ApkBuilder(ExtFile apkDir, Config config) {
         mConfig = config;
         mApkDir = apkDir;
     }

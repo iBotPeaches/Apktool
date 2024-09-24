@@ -48,7 +48,7 @@ public class AndroidOreoNotSparseTest extends BaseTest {
         LOGGER.info("Building not_sparse.apk...");
         Config config = Config.getDefaultConfig();
         config.aaptVersion = 1;
-        new ApkBuilder(config, sTestNewDir).build(testApk);
+        new ApkBuilder(sTestNewDir, config).build(testApk);
     }
 
     @AfterClass

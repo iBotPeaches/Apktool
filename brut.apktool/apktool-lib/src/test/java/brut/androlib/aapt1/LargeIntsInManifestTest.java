@@ -54,7 +54,7 @@ public class LargeIntsInManifestTest extends BaseTest {
         Config config = Config.getDefaultConfig();
         config.aaptVersion = 1;
         ExtFile testApk = new ExtFile(sTmpDir, apk + ".out");
-        new ApkBuilder(config, testApk).build(null);
+        new ApkBuilder(testApk, config).build(null);
         String newApk = apk + ".out" + File.separator + "dist" + File.separator + apk;
 
         // decode issue767 again

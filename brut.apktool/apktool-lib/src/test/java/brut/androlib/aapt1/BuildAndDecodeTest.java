@@ -51,7 +51,7 @@ public class BuildAndDecodeTest extends BaseTest {
         ExtFile testApk = new ExtFile(sTmpDir, "testapp.apk");
         Config config = Config.getDefaultConfig();
         config.aaptVersion = 1;
-        new ApkBuilder(config, sTestOrigDir).build(testApk);
+        new ApkBuilder(sTestOrigDir, config).build(testApk);
 
         LOGGER.info("Decoding testapp.apk...");
         ApkDecoder apkDecoder = new ApkDecoder(testApk);

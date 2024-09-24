@@ -224,7 +224,7 @@ public class Main {
         }
 
         ExtFile apkFile = new ExtFile(apkName);
-        ApkDecoder decoder = new ApkDecoder(config, apkFile);
+        ApkDecoder decoder = new ApkDecoder(apkFile, config);
         try {
             decoder.decode(outDir);
         } catch (OutDirExistsException ex) {
@@ -315,7 +315,7 @@ public class Main {
         }
 
         ExtFile apkDir = new ExtFile(apkDirName);
-        ApkBuilder builder = new ApkBuilder(config, apkDir);
+        ApkBuilder builder = new ApkBuilder(apkDir, config);
         builder.build(outFile);
     }
 

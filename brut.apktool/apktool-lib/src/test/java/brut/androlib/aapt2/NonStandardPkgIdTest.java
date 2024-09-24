@@ -49,7 +49,7 @@ public class NonStandardPkgIdTest extends BaseTest {
 
         LOGGER.info("Building pkgid8.apk...");
         ExtFile testApk = new ExtFile(sTmpDir, "pkgid8.apk");
-        new ApkBuilder(config, sTestOrigDir).build(testApk);
+        new ApkBuilder(sTestOrigDir, config).build(testApk);
 
         LOGGER.info("Decoding pkgid8.apk...");
         ApkInfo testInfo = new ApkInfo(testApk);

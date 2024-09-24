@@ -62,6 +62,6 @@ public class CompactResourceTest extends BaseTest {
 
         Config config = Config.getDefaultConfig();
         LOGGER.info("Building duplicatedex.apk...");
-        new ApkBuilder(config, sTestOrigDir).build(testApk);
+        new ApkBuilder(sTestOrigDir, config).build(testApk);
     }
 }

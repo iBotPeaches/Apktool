@@ -52,7 +52,7 @@ public class DebuggableFalseChangeToTrueTest extends BaseTest {
         config.verbose = true;
 
         ExtFile testApk = new ExtFile(sTmpDir, "issue2328-debuggable-flase.apk");
-        new ApkBuilder(config, sTestOrigDir).build(testApk);
+        new ApkBuilder(sTestOrigDir, config).build(testApk);
 
         LOGGER.info("Decoding issue2328-debuggable-flase.apk...");
         ApkDecoder apkDecoder = new ApkDecoder(testApk);
