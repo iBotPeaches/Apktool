@@ -62,8 +62,8 @@ public class ApkBuilder {
     }
 
     public ApkBuilder(ExtFile apkDir, Config config) {
-        mConfig = config;
         mApkDir = apkDir;
+        mConfig = config;
     }
 
     public void build(File outApk) throws AndrolibException {
