@@ -267,11 +267,11 @@ public class ResTable {
     }
 
     public void clearSdkInfo() {
-        mApkInfo.getSdkInfo().clear();
+        mApkInfo.sdkInfo.clear();
     }
 
     public void addSdkInfo(String key, String value) {
-        mApkInfo.getSdkInfo().put(key, value);
+        mApkInfo.sdkInfo.put(key, value);
     }
 
     public void setVersionName(String versionName) {
@@ -310,7 +310,7 @@ public class ResTable {
     public void initApkInfo(ApkInfo apkInfo, File outDir) throws AndrolibException {
         apkInfo.isFrameworkApk = isFrameworkApk();
         apkInfo.usesFramework = getUsesFramework();
-        if (!mApkInfo.getSdkInfo().isEmpty()) {
+        if (!mApkInfo.sdkInfo.isEmpty()) {
             updateSdkInfoFromResources(outDir);
         }
         initPackageInfo();

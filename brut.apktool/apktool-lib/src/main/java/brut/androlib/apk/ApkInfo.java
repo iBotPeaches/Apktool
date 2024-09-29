@@ -45,7 +45,7 @@ public class ApkInfo implements YamlSerializable {
     public String apkFileName;
     public boolean isFrameworkApk;
     public UsesFramework usesFramework;
-    private Map<String, String> sdkInfo = new LinkedHashMap<>();
+    public Map<String, String> sdkInfo = new LinkedHashMap<>();
     public PackageInfo packageInfo = new PackageInfo();
     public VersionInfo versionInfo = new VersionInfo();
     public boolean sharedLibrary;
@@ -116,15 +116,6 @@ public class ApkInfo implements YamlSerializable {
         target = Math.min(max, target);
         target = Math.max(min, target);
         return Integer.toString(target);
-    }
-
-    public Map<String, String> getSdkInfo() {
-        return sdkInfo;
-    }
-
-    public void setSdkInfo(Map<String, String> sdkInfo) {
-        this.sdkInfo.clear();
-        this.sdkInfo.putAll(sdkInfo);
     }
 
     public String getMinSdkVersion() {
