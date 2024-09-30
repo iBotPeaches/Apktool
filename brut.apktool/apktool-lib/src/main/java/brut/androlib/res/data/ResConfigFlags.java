@@ -501,7 +501,7 @@ public class ResConfigFlags {
 
     private String toUpper(char[] character) {
         StringBuilder sb = new StringBuilder();
-        for (char ch: character) {
+        for (char ch : character) {
             sb.append(Character.toUpperCase(ch));
         }
         return sb.toString();

@@ -265,7 +265,7 @@ public final class ResXmlPatcher {
         try {
             Document doc = loadDocument(file);
             XPath xPath = XPathFactory.newInstance().newXPath();
-            XPathExpression expression = xPath.compile("/resources/string[@name=" + '"' + key + "\"]/text()");
+            XPathExpression expression = xPath.compile("/resources/string[@name=\"" + key + "\"]/text()");
 
             Object result = expression.evaluate(doc, XPathConstants.STRING);
             return result != null ? (String) result : null;
@@ -296,7 +296,7 @@ public final class ResXmlPatcher {
         try {
             Document doc = loadDocument(file);
             XPath xPath = XPathFactory.newInstance().newXPath();
-            XPathExpression expression = xPath.compile("/resources/integer[@name=" + '"' + key + "\"]/text()");
+            XPathExpression expression = xPath.compile("/resources/integer[@name=\"" + key + "\"]/text()");
 
             Object result = expression.evaluate(doc, XPathConstants.STRING);
             return result != null ? (String) result : null;

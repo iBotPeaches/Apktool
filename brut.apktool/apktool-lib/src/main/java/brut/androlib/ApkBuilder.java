@@ -90,13 +90,13 @@ public class ApkBuilder {
             //noinspection ResultOfMethodCallIgnored
             outDir.mkdirs();
 
+            File manifest = new File(mApkDir, "AndroidManifest.xml");
+            File manifestOrig = new File(mApkDir, "AndroidManifest.xml.orig");
+
             LOGGER.info("Using Apktool " + ApktoolProperties.getVersion() + " on " + outApk.getName()
                         + (mWorker != null ? " with " + mConfig.jobs + " threads" : ""));
 
             buildSources(outDir);
-
-            File manifest = new File(mApkDir, "AndroidManifest.xml");
-            File manifestOrig = new File(mApkDir, "AndroidManifest.xml.orig");
             backupManifestFile(manifest, manifestOrig);
             buildResources(outDir, manifest);
 

@@ -89,9 +89,9 @@ public class YamlWriter implements Closeable {
         }
         writeIndent();
         mWriter.println(escape(key) + ":");
-        for (T item: list) {
+        for (T item : list) {
             writeIndent();
-            mWriter.println("- " +  item);
+            mWriter.println("- " + item);
         }
     }
 
@@ -102,7 +102,7 @@ public class YamlWriter implements Closeable {
         writeIndent();
         mWriter.println(escape(key) + ":");
         nextIndent();
-        for (String mapKey: map.keySet()) {
+        for (String mapKey : map.keySet()) {
             writeString(mapKey, map.get(mapKey));
         }
         prevIndent();

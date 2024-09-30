@@ -47,6 +47,7 @@ public class ApkDecoder {
     private final ExtFile mApkFile;
     private final Config mConfig;
     private ApkInfo mApkInfo;
+    private ResourcesDecoder mResDecoder;
     private volatile int mMinSdkVersion = 0;
     private BackgroundWorker mWorker;
     private final AtomicReference<AndrolibException> mBuildError = new AtomicReference<>(null);
@@ -72,6 +73,7 @@ public class ApkDecoder {
         }
         try {
             mApkInfo = new ApkInfo(mApkFile);
+            mResDecoder = new ResourcesDecoder(mConfig, mApkInfo);
 
             try {
                 OS.rmdir(outDir);
@@ -85,11 +87,8 @@ public class ApkDecoder {
                         + (mWorker != null ? " with " + mConfig.jobs + " threads" : ""));
 
             decodeSources(outDir);
-
-            ResourcesDecoder resDecoder = new ResourcesDecoder(mConfig, mApkInfo);
-            decodeResources(outDir, resDecoder);
-            decodeManifest(outDir, resDecoder);
-            updateApkInfo(outDir, resDecoder);
+            decodeResources(outDir);
+            decodeManifest(outDir);
 
             if (mWorker != null) {
                 mWorker.waitForFinish();
@@ -101,12 +100,6 @@ public class ApkDecoder {
             copyOriginalFiles(outDir);
             copyRawFiles(outDir);
             copyUnknownFiles(outDir);
-
-            // in case we have no resources, we should store the minSdk we pulled from the source opcode api level
-            if (!mApkInfo.hasResources() && mMinSdkVersion > 0) {
-                mApkInfo.setMinSdkVersion(Integer.toString(mMinSdkVersion));
-            }
-
             writeApkInfo(outDir);
 
             return mApkInfo;
@@ -216,7 +209,7 @@ public class ApkDecoder {
         }
     }
 
-    private void decodeResources(File outDir, ResourcesDecoder resDecoder) throws AndrolibException {
+    private void decodeResources(File outDir) throws AndrolibException {
         if (!mApkInfo.hasResources()) {
             return;
         }
@@ -226,7 +219,7 @@ public class ApkDecoder {
                 copyResourcesRaw(outDir);
                 break;
             case Config.DECODE_RESOURCES_FULL:
-                resDecoder.decodeResources(outDir);
+                mResDecoder.decodeResources(outDir);
                 break;
         }
     }
@@ -243,14 +236,14 @@ public class ApkDecoder {
         }
     }
 
-    private void decodeManifest(File outDir, ResourcesDecoder resDecoder) throws AndrolibException {
+    private void decodeManifest(File outDir) throws AndrolibException {
         if (!mApkInfo.hasManifest()) {
             return;
         }
 
         if (mConfig.decodeResources == Config.DECODE_RESOURCES_FULL
                 || mConfig.forceDecodeManifest == Config.FORCE_DECODE_MANIFEST_FULL) {
-            resDecoder.decodeManifest(outDir);
+            mResDecoder.decodeManifest(outDir);
         } else {
             copyManifestRaw(outDir);
         }
@@ -262,64 +255,6 @@ public class ApkDecoder {
             Directory in = mApkFile.getDirectory();
 
             in.copyToDir(outDir, "AndroidManifest.xml");
-        } catch (DirectoryException ex) {
-            throw new AndrolibException(ex);
-        }
-    }
-
-    private void updateApkInfo(File outDir, ResourcesDecoder resDecoder) throws AndrolibException {
-        resDecoder.updateApkInfo(outDir);
-
-        // record uncompressed files
-        try {
-            Map<String, String> resFileMapping = resDecoder.getResFileMapping();
-            Set<String> uncompressedExts = new HashSet<>();
-            Set<String> uncompressedFiles = new HashSet<>();
-            Directory in = mApkFile.getDirectory();
-
-            for (String fileName : in.getFiles(true)) {
-                if (in.getCompressionLevel(fileName) == 0) {
-                    String ext;
-                    if (in.getSize(fileName) > 0
-                            && !(ext = FilenameUtils.getExtension(fileName)).isEmpty()
-                            && NO_COMPRESS_EXT_PATTERN.matcher(ext).matches()) {
-                        uncompressedExts.add(ext);
-                    } else {
-                        uncompressedFiles.add(resFileMapping.getOrDefault(fileName, fileName));
-                    }
-                }
-            }
-
-            // exclude files with an already recorded extenstion
-            if (!uncompressedExts.isEmpty() && !uncompressedFiles.isEmpty()) {
-                Iterator<String> it = uncompressedFiles.iterator();
-                while (it.hasNext()) {
-                    String fileName = it.next();
-                    String ext = FilenameUtils.getExtension(fileName);
-                    if (uncompressedExts.contains(ext)) {
-                        it.remove();
-                    }
-                }
-            }
-
-            // update apk info
-            int doNotCompressSize = uncompressedExts.size() + uncompressedFiles.size();
-            if (doNotCompressSize > 0) {
-                List<String> doNotCompress = new ArrayList<>(doNotCompressSize);
-                if (!uncompressedExts.isEmpty()) {
-                    List<String> uncompressedExtsList = new ArrayList<>(uncompressedExts);
-                    uncompressedExtsList.sort(null);
-                    doNotCompress.addAll(uncompressedExtsList);
-                }
-                if (!uncompressedFiles.isEmpty()) {
-                    List<String> uncompressedFilesList = new ArrayList<>(uncompressedFiles);
-                    uncompressedFilesList.sort(null);
-                    doNotCompress.addAll(uncompressedFilesList);
-                }
-                if (!doNotCompress.isEmpty()) {
-                    mApkInfo.doNotCompress = doNotCompress;
-                }
-            }
         } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
         }
@@ -379,6 +314,68 @@ public class ApkDecoder {
     }
 
     private void writeApkInfo(File outDir) throws AndrolibException {
+        mResDecoder.updateApkInfo(outDir);
+
+        // in case we have no resources, we should store the minSdk we pulled from the source opcode api level
+        if (!mApkInfo.hasResources() && mMinSdkVersion > 0) {
+            mApkInfo.setMinSdkVersion(Integer.toString(mMinSdkVersion));
+        }
+
+        // record uncompressed files
+        try {
+            Map<String, String> resFileMapping = mResDecoder.getResFileMapping();
+            Set<String> uncompressedExts = new HashSet<>();
+            Set<String> uncompressedFiles = new HashSet<>();
+            Directory in = mApkFile.getDirectory();
+
+            for (String fileName : in.getFiles(true)) {
+                if (in.getCompressionLevel(fileName) == 0) {
+                    String ext;
+                    if (in.getSize(fileName) > 0
+                            && !(ext = FilenameUtils.getExtension(fileName)).isEmpty()
+                            && NO_COMPRESS_EXT_PATTERN.matcher(ext).matches()) {
+                        uncompressedExts.add(ext);
+                    } else {
+                        uncompressedFiles.add(resFileMapping.getOrDefault(fileName, fileName));
+                    }
+                }
+            }
+
+            // exclude files with an already recorded extenstion
+            if (!uncompressedExts.isEmpty() && !uncompressedFiles.isEmpty()) {
+                Iterator<String> it = uncompressedFiles.iterator();
+                while (it.hasNext()) {
+                    String fileName = it.next();
+                    String ext = FilenameUtils.getExtension(fileName);
+                    if (uncompressedExts.contains(ext)) {
+                        it.remove();
+                    }
+                }
+            }
+
+            // update apk info
+            int doNotCompressSize = uncompressedExts.size() + uncompressedFiles.size();
+            if (doNotCompressSize > 0) {
+                List<String> doNotCompress = new ArrayList<>(doNotCompressSize);
+                if (!uncompressedExts.isEmpty()) {
+                    List<String> uncompressedExtsList = new ArrayList<>(uncompressedExts);
+                    uncompressedExtsList.sort(null);
+                    doNotCompress.addAll(uncompressedExtsList);
+                }
+                if (!uncompressedFiles.isEmpty()) {
+                    List<String> uncompressedFilesList = new ArrayList<>(uncompressedFiles);
+                    uncompressedFilesList.sort(null);
+                    doNotCompress.addAll(uncompressedFilesList);
+                }
+                if (!doNotCompress.isEmpty()) {
+                    mApkInfo.doNotCompress = doNotCompress;
+                }
+            }
+        } catch (DirectoryException ex) {
+            throw new AndrolibException(ex);
+        }
+
+        // write apk info to file
         mApkInfo.save(new File(outDir, "apktool.yml"));
     }
 }

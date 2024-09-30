@@ -16,8 +16,8 @@
  */
 package brut.androlib;
 
-import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.apk.ApkInfo;
+import brut.androlib.exceptions.AndrolibException;
 import brut.common.BrutException;
 import brut.util.AaptManager;
 import brut.util.OS;

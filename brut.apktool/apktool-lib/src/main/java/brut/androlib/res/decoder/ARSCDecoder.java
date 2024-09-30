@@ -377,7 +377,7 @@ public class ARSCDecoder {
             byte type = (byte) ((flags >> 8) & 0xFF);
             value = readCompactValue(type, specNamesId);
 
-            // To keep code below happy - we know if compact that the size has the key index encoded.
+            // To keep code below happy - we know if compact then the size has the key index encoded.
             specNamesId = size;
         } else if (isComplex) {
             value = readComplexEntry();
@@ -469,7 +469,7 @@ public class ARSCDecoder {
     }
 
     private ResIntBasedValue readValue() throws IOException, AndrolibException {
-		int size = mIn.readShort();
+		short size = mIn.readShort();
         if (size < 8) {
             return null;
         }
