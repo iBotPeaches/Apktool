@@ -469,12 +469,12 @@ public class ARSCDecoder {
     }
 
     private ResIntBasedValue readValue() throws IOException, AndrolibException {
-		short size = mIn.readShort();
+        short size = mIn.readShort();
         if (size < 8) {
             return null;
         }
 
-		mIn.skipCheckByte((byte) 0); // zero
+        mIn.skipCheckByte((byte) 0); // zero
         byte type = mIn.readByte();
         int data = mIn.readInt();
 
