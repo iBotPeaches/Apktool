@@ -58,5 +58,14 @@ public class ExtFile extends File {
         }
     }
 
+    @Override
+    public boolean delete() {
+        try {
+            close();
+        } catch (IOException ignored) {}
+
+        return super.delete();
+    }
+
     private Directory mDirectory;
 }

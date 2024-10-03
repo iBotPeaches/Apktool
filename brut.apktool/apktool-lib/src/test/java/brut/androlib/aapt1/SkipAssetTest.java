@@ -52,7 +52,7 @@ public class SkipAssetTest extends BaseTest {
         config.forceDelete = true;
 
         // decode issue1605.apk
-        ApkDecoder apkDecoder = new ApkDecoder(config, new ExtFile(sTmpDir + File.separator + apk));
+        ApkDecoder apkDecoder = new ApkDecoder(new ExtFile(sTmpDir + File.separator + apk), config);
         sTestOrigDir = new ExtFile(sTmpDir + File.separator + apk + ".out");
         apkDecoder.decode(sTestOrigDir);
 
@@ -69,7 +69,7 @@ public class SkipAssetTest extends BaseTest {
         config.forceDelete = true;
 
         // decode issue1605.apk
-        ApkDecoder apkDecoder = new ApkDecoder(config, new ExtFile(sTmpDir + File.separator + apk));
+        ApkDecoder apkDecoder = new ApkDecoder(new ExtFile(sTmpDir + File.separator + apk), config);
         sTestOrigDir = new ExtFile(sTmpDir + File.separator + apk + ".out");
         apkDecoder.decode(sTestOrigDir);
 

@@ -39,7 +39,7 @@ public class SmaliDecoder {
     private SmaliDecoder(File apkFile, File outDir, String dexName, boolean bakDeb, int apiLevel) {
         mApkFile = apkFile;
         mOutDir = outDir;
-        mDexFile = dexName;
+        mDexName = dexName;
         mBakDeb = bakDeb;
         mApiLevel = apiLevel;
     }
@@ -76,7 +76,7 @@ public class SmaliDecoder {
             if (container.getDexEntryNames().size() == 1) {
                 dexEntry = container.getEntry(container.getDexEntryNames().get(0));
             } else {
-                dexEntry = container.getEntry(mDexFile);
+                dexEntry = container.getEntry(mDexName);
             }
 
             // Double-check the passed param exists
@@ -100,13 +100,13 @@ public class SmaliDecoder {
 
             return dexFile;
         } catch (IOException ex) {
-            throw new AndrolibException(ex);
+            throw new AndrolibException("Could not baksmali file: " + mDexName, ex);
         }
     }
 
     private final File mApkFile;
     private final File mOutDir;
-    private final String mDexFile;
+    private final String mDexName;
     private final boolean mBakDeb;
     private final int mApiLevel;
 }

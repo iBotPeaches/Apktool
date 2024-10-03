@@ -55,7 +55,7 @@ public class DecodeKotlinCoroutinesTest extends BaseTest {
         Config config = Config.getDefaultConfig();
         config.forceDelete = true;
         // decode kotlin coroutines
-        ApkDecoder apkDecoder = new ApkDecoder(config, new File(sTmpDir + File.separator + apk));
+        ApkDecoder apkDecoder = new ApkDecoder(new ExtFile(sTmpDir + File.separator + apk), config);
         File outDir = new File(sTmpDir + File.separator + apk + ".out");
         apkDecoder.decode(outDir);
         File coroutinesExceptionHandler = new File(sTmpDir + File.separator + apk + ".out" + File.separator + "META-INF" + File.separator + "services", "kotlinx.coroutines.CoroutineExceptionHandler");
@@ -66,23 +66,23 @@ public class DecodeKotlinCoroutinesTest extends BaseTest {
     }
 
     @Test
-    public void kotlinCoroutinesEncodeAfterDecodeTest() throws IOException, BrutException {
+    public void kotlinCoroutinesEncodeAfterDecodeTest() throws BrutException, IOException {
 
         Config config = Config.getDefaultConfig();
         config.forceDelete = true;
         // decode kotlin coroutines
-        ApkDecoder apkDecoder = new ApkDecoder(config, new File(sTmpDir + File.separator + apk));
+        ApkDecoder apkDecoder = new ApkDecoder(new ExtFile(sTmpDir + File.separator + apk), config);
         File outDir = new File(sTmpDir + File.separator + apk + ".out");
         apkDecoder.decode(outDir);
 
         // build kotlin coroutines
         ExtFile testApk = new ExtFile(sTmpDir, apk + ".out");
-        new ApkBuilder(config, testApk).build(null);
+        new ApkBuilder(testApk, config).build(null);
         String newApk = apk + ".out" + File.separator + "dist" + File.separator + apk;
         assertTrue(fileExists(newApk));
 
         // decode kotlin coroutines again
-        apkDecoder = new ApkDecoder(config, new File(sTmpDir + File.separator + newApk));
+        apkDecoder = new ApkDecoder(new ExtFile(sTmpDir + File.separator + newApk), config);
         outDir = new File(sTmpDir + File.separator + apk + ".out.two");
         apkDecoder.decode(outDir);
 

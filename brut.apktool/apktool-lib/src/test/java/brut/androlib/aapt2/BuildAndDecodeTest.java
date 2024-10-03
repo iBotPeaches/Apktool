@@ -49,12 +49,11 @@ public class BuildAndDecodeTest extends BaseTest {
         TestUtils.copyResourceDir(BuildAndDecodeTest.class, "aapt2/testapp/", sTestOrigDir);
 
         Config config = Config.getDefaultConfig();
-        config.useAapt2 = true;
         config.verbose = true;
 
         LOGGER.info("Building testapp.apk...");
-        File testApk = new File(sTmpDir, "testapp.apk");
-        new ApkBuilder(config, sTestOrigDir).build(testApk);
+        ExtFile testApk = new ExtFile(sTmpDir, "testapp.apk");
+        new ApkBuilder(sTestOrigDir, config).build(testApk);
 
         LOGGER.info("Decoding testapp.apk...");
         ApkDecoder apkDecoder = new ApkDecoder(testApk);
@@ -135,7 +134,7 @@ public class BuildAndDecodeTest extends BaseTest {
     }
 
     @Test
-    public void samsungQmgFilesHandledTest() throws IOException, BrutException {
+    public void samsungQmgFilesHandledTest() throws BrutException, IOException {
         compareBinaryFolder("drawable-xhdpi", true);
     }
 
@@ -175,7 +174,7 @@ public class BuildAndDecodeTest extends BaseTest {
     }
 
     @Test
-    public void unknownFolderTest() throws BrutException {
+    public void unknownFolderTest() throws BrutException, IOException {
         compareUnknownFiles();
     }
 

@@ -45,7 +45,7 @@ public class DuplicateDexTest extends BaseTest {
 
     @Test(expected = AndrolibException.class)
     public void decodeAllSourcesShouldThrowException() throws BrutException, IOException {
-        File testApk = new File(sTestOrigDir, "duplicatedex.apk");
+        ExtFile testApk = new ExtFile(sTestOrigDir, "duplicatedex.apk");
 
         LOGGER.info("Decoding duplicatedex.apk...");
         ApkDecoder apkDecoder = new ApkDecoder(testApk);
@@ -53,22 +53,22 @@ public class DuplicateDexTest extends BaseTest {
 
         LOGGER.info("Building duplicatedex.apk...");
         Config config = Config.getDefaultConfig();
-        new ApkBuilder(config, sTestNewDir).build(testApk);
+        new ApkBuilder(sTestNewDir, config).build(testApk);
     }
 
     @Test
     public void decodeUsingOnlyMainClassesMode() throws BrutException, IOException {
-        File testApk = new File(sTestOrigDir, "duplicatedex.apk");
+        ExtFile testApk = new ExtFile(sTestOrigDir, "duplicatedex.apk");
 
         LOGGER.info("Decoding duplicatedex.apk...");
         Config config = Config.getDefaultConfig();
         config.decodeSources = Config.DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES;
 
-        ApkDecoder apkDecoder = new ApkDecoder(config, testApk);
+        ApkDecoder apkDecoder = new ApkDecoder(testApk, config);
         apkDecoder.decode(sTestNewDir);
 
         LOGGER.info("Building duplicatedex.apk...");
-        new ApkBuilder(config, sTestNewDir).build(testApk);
+        new ApkBuilder(sTestNewDir, config).build(testApk);
     }
 
 }

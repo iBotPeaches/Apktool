@@ -52,7 +52,7 @@ public class ResourceDirectoryTraversalTest extends BaseTest {
 
         Config config = Config.getDefaultConfig();
         config.forceDelete = true;
-        ApkDecoder apkDecoder = new ApkDecoder(config, new File(sTmpDir + File.separator + apk));
+        ApkDecoder apkDecoder = new ApkDecoder(new ExtFile(sTmpDir + File.separator + apk), config);
         File outDir = new File(sTmpDir + File.separator + apk + ".out");
         apkDecoder.decode(outDir);
 

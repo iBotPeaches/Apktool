@@ -1,8 +1,7 @@
 !!brut.androlib.meta.MetaInfo
 apkFileName: basic.apk
-compressionType: false
 doNotCompress:
-    - resources.arsc
+    - arsc
     - png
 isFrameworkApk: false
 packageInfo:
@@ -14,8 +13,6 @@ sdkInfo:
     targetSdkVersion: '22'
 sharedLibrary: false
 sparseResources: true
-unknownFiles:
-  hidden.file: 1
 usesFramework:
     ids:
         - 1

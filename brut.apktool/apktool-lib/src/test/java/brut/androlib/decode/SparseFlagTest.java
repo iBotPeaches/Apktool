@@ -50,35 +50,35 @@ public class SparseFlagTest extends BaseTest {
 
     @Test
     public void decodeWithExpectationOfSparseResources() throws BrutException, IOException {
-        File testApk = new File(sTestOrigDir, "sparse.apk");
+        ExtFile testApk = new ExtFile(sTestOrigDir, "sparse.apk");
 
         LOGGER.info("Decoding sparse.apk...");
         Config config = Config.getDefaultConfig();
         config.frameworkTag = "issue-3298";
 
-        ApkDecoder apkDecoder = new ApkDecoder(config, testApk);
+        ApkDecoder apkDecoder = new ApkDecoder(testApk, config);
         ApkInfo apkInfo = apkDecoder.decode(sTestNewDir);
 
         assertTrue("Expecting sparse resources", apkInfo.sparseResources);
 
         LOGGER.info("Building sparse.apk...");
-        new ApkBuilder(config, sTestNewDir).build(testApk);
+        new ApkBuilder(sTestNewDir, config).build(testApk);
     }
 
     @Test
     public void decodeWithExpectationOfNoSparseResources() throws BrutException, IOException {
-        File testApk = new File(sTestOrigDir, "not-sparse.apk");
+        ExtFile testApk = new ExtFile(sTestOrigDir, "not-sparse.apk");
 
         LOGGER.info("Decoding not-sparse.apk...");
         Config config = Config.getDefaultConfig();
         config.frameworkTag = "issue-3298";
 
-        ApkDecoder apkDecoder = new ApkDecoder(config, testApk);
+        ApkDecoder apkDecoder = new ApkDecoder(testApk, config);
         ApkInfo apkInfo = apkDecoder.decode(sTestNewDir);
 
         assertFalse("Expecting not-sparse resources", apkInfo.sparseResources);
 
         LOGGER.info("Building not-sparse.apk...");
-        new ApkBuilder(config, sTestNewDir).build(testApk);
+        new ApkBuilder(sTestNewDir, config).build(testApk);
     }
 }

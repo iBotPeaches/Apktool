@@ -65,7 +65,7 @@ public class ApktoolProperties {
                 properties.load(templateStream);
                 version = properties.getProperty("application.version");
                 templateStream.close();
-            } catch (IOException ignored) { }
+            } catch (IOException ignored) {}
         }
         sProps.put("baksmaliVersion", version);
 
@@ -83,7 +83,7 @@ public class ApktoolProperties {
                 properties.load(templateStream);
                 version = properties.getProperty("application.version");
                 templateStream.close();
-            } catch (IOException ignored) { }
+            } catch (IOException ignored) {}
         }
         sProps.put("smaliVersion", version);
     }

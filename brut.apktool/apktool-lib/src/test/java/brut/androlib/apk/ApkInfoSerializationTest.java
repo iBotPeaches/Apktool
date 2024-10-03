@@ -37,7 +37,7 @@ public class ApkInfoSerializationTest {
             this.getClass().getResourceAsStream("/apk/unknown_files.yml"));
         check(control);
 
-        File savedApkInfo = folder.newFile( "saved.yml" );
+        File savedApkInfo = folder.newFile("saved.yml");
         control.save(savedApkInfo);
         try (FileInputStream fis = new FileInputStream(savedApkInfo)) {
             ApkInfo saved = ApkInfo.load(fis);
@@ -57,21 +57,12 @@ public class ApkInfoSerializationTest {
         assertNotNull(apkInfo.versionInfo);
         assertEquals("1", apkInfo.versionInfo.versionCode);
         assertEquals("1.0", apkInfo.versionInfo.versionName);
-        assertFalse(apkInfo.resourcesAreCompressed);
         assertNotNull(apkInfo.doNotCompress);
-        assertEquals(4, apkInfo.doNotCompress.size());
+        assertEquals(5, apkInfo.doNotCompress.size());
         assertEquals("assets/0byte_file.jpg", apkInfo.doNotCompress.get(0));
         assertEquals("arsc", apkInfo.doNotCompress.get(1));
         assertEquals("png", apkInfo.doNotCompress.get(2));
         assertEquals("mp3", apkInfo.doNotCompress.get(3));
-        assertNotNull(apkInfo.unknownFiles);
-        assertEquals(7, apkInfo.unknownFiles.size());
-        assertEquals("8", apkInfo.unknownFiles.get("AssetBundle/assets/a.txt"));
-        assertEquals("8", apkInfo.unknownFiles.get("AssetBundle/b.txt"));
-        assertEquals("8", apkInfo.unknownFiles.get("hidden.file"));
-        assertEquals("8", apkInfo.unknownFiles.get("non\u007Fprintable.file"));
-        assertEquals("0", apkInfo.unknownFiles.get("stored.file"));
-        assertEquals("8", apkInfo.unknownFiles.get("unk_folder/unknown_file"));
-        assertEquals("8", apkInfo.unknownFiles.get("lib_bug603/bug603"));
+        assertEquals("stored.file", apkInfo.doNotCompress.get(4));
     }
 }

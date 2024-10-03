@@ -38,22 +38,6 @@ import static org.junit.Assert.*;
 
 public class BaseTest {
 
-    protected void compareUnknownFiles() throws BrutException {
-        ApkInfo control = ApkInfo.load(sTestOrigDir);
-        ApkInfo test = ApkInfo.load(sTestNewDir);
-        assertNotNull(control.unknownFiles);
-        assertNotNull(test.unknownFiles);
-
-        Map<String, String> controlFiles = control.unknownFiles;
-        Map<String, String> testFiles = test.unknownFiles;
-        assertEquals(controlFiles.size(), testFiles.size());
-
-        // Make sure that the compression methods are still the same
-        for (Map.Entry<String, String> controlEntry : controlFiles.entrySet()) {
-            assertEquals(controlEntry.getValue(), testFiles.get(controlEntry.getKey()));
-        }
-    }
-
     protected void compareBinaryFolder(String path, boolean res) throws BrutException, IOException {
         boolean exists = true;
 
@@ -67,10 +51,10 @@ public class BaseTest {
         FileDirectory fileDirectory = new FileDirectory(sTestOrigDir, location);
 
         Set<String> files = fileDirectory.getFiles(true);
-        for (String filename : files) {
+        for (String fileName : files) {
 
-            File control = new File((sTestOrigDir + location), filename);
-            File test =  new File((sTestNewDir + location), filename);
+            File control = new File((sTestOrigDir + location), fileName);
+            File test =  new File((sTestNewDir + location), fileName);
 
             if (! test.isFile() || ! control.isFile()) {
                 exists = false;
@@ -90,6 +74,10 @@ public class BaseTest {
 
     protected void compareAssetsFolder(String path) throws BrutException, IOException {
         compareBinaryFolder(File.separatorChar + "assets" + File.separatorChar + path, false);
+    }
+
+    protected void compareUnknownFiles() throws BrutException, IOException {
+        compareBinaryFolder(File.separatorChar + "unknown", false);
     }
 
     protected void compareValuesFiles(String path) throws BrutException {

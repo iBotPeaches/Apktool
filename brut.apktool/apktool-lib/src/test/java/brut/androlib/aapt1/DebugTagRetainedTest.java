@@ -48,11 +48,11 @@ public class DebugTagRetainedTest extends BaseTest {
 
         LOGGER.info("Building issue1235.apk...");
         Config config = Config.getDefaultConfig();
-        config.useAapt2 = false;
+        config.aaptVersion = 1;
         config.debugMode = true;
 
-        File testApk = new File(sTmpDir, "issue1235.apk");
-        new ApkBuilder(config, sTestOrigDir).build(testApk);
+        ExtFile testApk = new ExtFile(sTmpDir, "issue1235.apk");
+        new ApkBuilder(sTestOrigDir, config).build(testApk);
 
         LOGGER.info("Decoding issue1235.apk...");
         ApkDecoder apkDecoder = new ApkDecoder(testApk);

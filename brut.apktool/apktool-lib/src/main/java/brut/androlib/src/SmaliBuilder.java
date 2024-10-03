@@ -20,7 +20,6 @@ import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.mod.SmaliMod;
 import brut.directory.DirectoryException;
 import brut.directory.ExtFile;
-import org.antlr.runtime.RecognitionException;
 import com.android.tools.smali.dexlib2.Opcodes;
 import com.android.tools.smali.dexlib2.writer.builder.DexBuilder;
 import com.android.tools.smali.dexlib2.writer.io.FileDataStore;
@@ -31,12 +30,12 @@ import java.util.logging.Logger;
 
 public class SmaliBuilder {
 
-    public static void build(ExtFile smaliDir, File dexFile, int apiLevel) throws AndrolibException {
+    public static void build(File smaliDir, File dexFile, int apiLevel) throws AndrolibException {
         new SmaliBuilder(smaliDir, dexFile, apiLevel).build();
     }
 
-    private SmaliBuilder(ExtFile smaliDir, File dexFile, int apiLevel) {
-        mSmaliDir = smaliDir;
+    private SmaliBuilder(File smaliDir, File dexFile, int apiLevel) {
+        mSmaliDir = new ExtFile(smaliDir);
         mDexFile = dexFile;
         mApiLevel = apiLevel;
     }
@@ -53,29 +52,35 @@ public class SmaliBuilder {
             for (String fileName : mSmaliDir.getDirectory().getFiles(true)) {
                 buildFile(fileName, dexBuilder);
             }
-            dexBuilder.writeTo(new FileDataStore( new File(mDexFile.getAbsolutePath())));
-        } catch (IOException | DirectoryException ex) {
-            throw new AndrolibException(ex);
+            dexBuilder.writeTo(new FileDataStore(new File(mDexFile.getAbsolutePath())));
+        } catch (DirectoryException | IOException | RuntimeException ex) {
+            throw new AndrolibException("Could not smali folder: " + mSmaliDir.getName(), ex);
         }
     }
 
-    private void buildFile(String fileName, DexBuilder dexBuilder)
-            throws AndrolibException, IOException {
-        File inFile = new File(mSmaliDir, fileName);
-        InputStream inStream = Files.newInputStream(inFile.toPath());
-
-        if (fileName.endsWith(".smali")) {
-            try {
-                if (!SmaliMod.assembleSmaliFile(inFile, dexBuilder, mApiLevel, false, false)) {
-                    throw new AndrolibException("Could not smali file: " + fileName);
-                }
-            } catch (IOException | RecognitionException ex) {
-                throw new AndrolibException(ex);
-            }
-        } else {
-            LOGGER.warning("Unknown file type, ignoring: " + inFile);
+    private void buildFile(String fileName, DexBuilder dexBuilder) throws AndrolibException {
+        if (!fileName.endsWith(".smali")) {
+            LOGGER.warning("Unknown file type, ignoring: " + fileName);
+            return;
         }
-        inStream.close();
+
+        boolean success;
+        Exception cause;
+        try {
+            File inFile = new File(mSmaliDir, fileName);
+            success = SmaliMod.assembleSmaliFile(inFile, dexBuilder, mApiLevel, false, false);
+            cause = null;
+        } catch (Exception ex) {
+            success = false;
+            cause = ex;
+        }
+        if (!success) {
+            AndrolibException ex = new AndrolibException("Could not smali file: " + fileName);
+            if (cause != null) {
+                ex.initCause(cause);
+            }
+            throw ex;
+        }
     }
 
     private final ExtFile mSmaliDir;

@@ -89,9 +89,9 @@ public class AXmlResourceParser implements XmlResourceParser {
         try {
             doNext();
             return mEvent;
-        } catch (IOException e) {
+        } catch (IOException ex) {
             close();
-            throw e;
+            throw ex;
         }
     }
 
@@ -348,10 +348,10 @@ public class AXmlResourceParser implements XmlResourceParser {
 
         String resourceMapValue;
         String stringBlockValue = mStringBlock.getString(name);
-        int resourceId = getAttributeNameResource(index);
+        int attrResId = getAttributeNameResource(index);
 
         try {
-            resourceMapValue = decodeFromResourceId(resourceId);
+            resourceMapValue = decodeFromResourceId(attrResId);
         } catch (AndrolibException ignored) {
             resourceMapValue = null;
         }
@@ -371,7 +371,7 @@ public class AXmlResourceParser implements XmlResourceParser {
         }
 
         // In this case we have a bogus resource. If it was not found in either.
-        return "APKTOOL_MISSING_" + Integer.toHexString(resourceId);
+        return "APKTOOL_MISSING_" + Integer.toHexString(attrResId);
     }
 
     @Override
@@ -409,8 +409,10 @@ public class AXmlResourceParser implements XmlResourceParser {
 
             // Ensure we only track down obfuscated values for reference/attribute type values. Otherwise, we might
             // spam lookups against resource table for invalid ids.
-            if (valueType == TypedValue.TYPE_REFERENCE || valueType == TypedValue.TYPE_DYNAMIC_REFERENCE ||
-                valueType == TypedValue.TYPE_ATTRIBUTE || valueType == TypedValue.TYPE_DYNAMIC_ATTRIBUTE) {
+            if (valueType == TypedValue.TYPE_REFERENCE
+                    || valueType == TypedValue.TYPE_DYNAMIC_REFERENCE
+                    || valueType == TypedValue.TYPE_ATTRIBUTE
+                    || valueType == TypedValue.TYPE_DYNAMIC_ATTRIBUTE) {
                 resourceMapValue = decodeFromResourceId(valueData);
             }
             String value = getPreferredString(stringBlockValue, resourceMapValue);

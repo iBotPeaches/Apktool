@@ -44,7 +44,7 @@ public class LargeIntsInManifestTest extends BaseTest {
         String apk = "issue767.apk";
 
         // decode issue767.apk
-        ApkDecoder apkDecoder = new ApkDecoder(new File(sTmpDir + File.separator + apk));
+        ApkDecoder apkDecoder = new ApkDecoder(new ExtFile(sTmpDir + File.separator + apk));
         sTestOrigDir = new ExtFile(sTmpDir + File.separator + apk + ".out");
 
         File outDir = new File(sTmpDir + File.separator + apk + ".out");
@@ -52,13 +52,13 @@ public class LargeIntsInManifestTest extends BaseTest {
 
         // build issue767
         Config config = Config.getDefaultConfig();
-        config.useAapt2 = false;
+        config.aaptVersion = 1;
         ExtFile testApk = new ExtFile(sTmpDir, apk + ".out");
-        new ApkBuilder(config, testApk).build(null);
+        new ApkBuilder(testApk, config).build(null);
         String newApk = apk + ".out" + File.separator + "dist" + File.separator + apk;
 
         // decode issue767 again
-        apkDecoder = new ApkDecoder(new File(sTmpDir + File.separator + newApk));
+        apkDecoder = new ApkDecoder(new ExtFile(sTmpDir + File.separator + newApk));
         sTestNewDir = new ExtFile(sTmpDir + File.separator + apk + ".out.two");
 
         outDir = new File(sTmpDir + File.separator + apk + ".out.two");

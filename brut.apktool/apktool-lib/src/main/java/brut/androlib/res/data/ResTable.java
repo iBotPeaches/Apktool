@@ -118,7 +118,7 @@ public class ResTable {
 
         for (int i = 0; i < pkgs.length; i++) {
             ResPackage resPackage = pkgs[i];
-            if (resPackage.getResSpecCount() > value && ! resPackage.getName().equalsIgnoreCase("android")) {
+            if (resPackage.getResSpecCount() > value && ! resPackage.getName().equals("android")) {
                 value = resPackage.getResSpecCount();
                 id = resPackage.getId();
                 index = i;
@@ -178,8 +178,8 @@ public class ResTable {
     private ResPackage[] loadResPackagesFromApk(ExtFile apkFile, boolean keepBrokenResources) throws AndrolibException {
         try {
             Directory dir = apkFile.getDirectory();
-            try (BufferedInputStream bfi = new BufferedInputStream(dir.getFileInput("resources.arsc"))) {
-                return ARSCDecoder.decode(bfi, false, keepBrokenResources, this).getPackages();
+            try (BufferedInputStream bis = new BufferedInputStream(dir.getFileInput("resources.arsc"))) {
+                return ARSCDecoder.decode(bis, false, keepBrokenResources, this).getPackages();
             }
         } catch (DirectoryException | IOException ex) {
             throw new AndrolibException("Could not load resources.arsc from file: " + apkFile, ex);
@@ -190,7 +190,7 @@ public class ResTable {
         int id = 0;
         int value = 0;
         for (ResPackage resPackage : mPackagesById.values()) {
-            if (resPackage.getResSpecCount() > value && !resPackage.getName().equalsIgnoreCase("android")) {
+            if (resPackage.getResSpecCount() > value && !resPackage.getName().equals("android")) {
                 value = resPackage.getResSpecCount();
                 id = resPackage.getId();
             }
@@ -267,11 +267,11 @@ public class ResTable {
     }
 
     public void clearSdkInfo() {
-        mApkInfo.getSdkInfo().clear();
+        mApkInfo.sdkInfo.clear();
     }
 
     public void addSdkInfo(String key, String value) {
-        mApkInfo.getSdkInfo().put(key, value);
+        mApkInfo.sdkInfo.put(key, value);
     }
 
     public void setVersionName(String versionName) {
@@ -310,7 +310,7 @@ public class ResTable {
     public void initApkInfo(ApkInfo apkInfo, File outDir) throws AndrolibException {
         apkInfo.isFrameworkApk = isFrameworkApk();
         apkInfo.usesFramework = getUsesFramework();
-        if (!mApkInfo.getSdkInfo().isEmpty()) {
+        if (!mApkInfo.sdkInfo.isEmpty()) {
             updateSdkInfoFromResources(outDir);
         }
         initPackageInfo();
@@ -331,24 +331,25 @@ public class ResTable {
     }
 
     private void updateSdkInfoFromResources(File outDir) {
-        String refValue;
-        Map<String, String> sdkInfo = mApkInfo.getSdkInfo();
-        if (sdkInfo.get("minSdkVersion") != null) {
-            refValue = ResXmlPatcher.pullValueFromIntegers(outDir, sdkInfo.get("minSdkVersion"));
+        String minSdkVersion = mApkInfo.getMinSdkVersion();
+        if (minSdkVersion != null) {
+            String refValue = ResXmlPatcher.pullValueFromIntegers(outDir, minSdkVersion);
             if (refValue != null) {
-                sdkInfo.put("minSdkVersion", refValue);
+                mApkInfo.setMinSdkVersion(refValue);
             }
         }
-        if (sdkInfo.get("targetSdkVersion") != null) {
-            refValue = ResXmlPatcher.pullValueFromIntegers(outDir, sdkInfo.get("targetSdkVersion"));
+        String targetSdkVersion = mApkInfo.getTargetSdkVersion();
+        if (targetSdkVersion != null) {
+            String refValue = ResXmlPatcher.pullValueFromIntegers(outDir, targetSdkVersion);
             if (refValue != null) {
-                sdkInfo.put("targetSdkVersion", refValue);
+                mApkInfo.setTargetSdkVersion(refValue);
             }
         }
-        if (sdkInfo.get("maxSdkVersion") != null) {
-            refValue = ResXmlPatcher.pullValueFromIntegers(outDir, sdkInfo.get("maxSdkVersion"));
+        String maxSdkVersion = mApkInfo.getMaxSdkVersion();
+        if (maxSdkVersion != null) {
+            String refValue = ResXmlPatcher.pullValueFromIntegers(outDir, maxSdkVersion);
             if (refValue != null) {
-                sdkInfo.put("maxSdkVersion", refValue);
+                mApkInfo.setMaxSdkVersion(refValue);
             }
         }
     }
@@ -367,7 +368,7 @@ public class ResTable {
         }
 
         // only put rename-manifest-package into apktool.yml, if the change will be required
-        if (renamed != null && !renamed.equalsIgnoreCase(original)) {
+        if (renamed != null && !renamed.equals(original)) {
             mApkInfo.packageInfo.renameManifestPackage = renamed;
         }
         mApkInfo.packageInfo.forcedPackageId = String.valueOf(id);

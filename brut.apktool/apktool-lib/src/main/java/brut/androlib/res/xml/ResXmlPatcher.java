@@ -41,24 +41,25 @@ public final class ResXmlPatcher {
      * @throws AndrolibException Error reading Manifest file
      */
     public static void removeApplicationDebugTag(File file) throws AndrolibException {
-        if (file.exists()) {
-            try {
-                Document doc = loadDocument(file);
-                Node application = doc.getElementsByTagName("application").item(0);
+        if (!file.exists()) {
+            return;
+        }
+        try {
+            Document doc = loadDocument(file);
+            Node application = doc.getElementsByTagName("application").item(0);
 
-                // load attr
-                NamedNodeMap attr = application.getAttributes();
-                Node debugAttr = attr.getNamedItem("android:debuggable");
+            // load attr
+            NamedNodeMap attr = application.getAttributes();
+            Node debugAttr = attr.getNamedItem("android:debuggable");
 
-                // remove application:debuggable
-                if (debugAttr != null) {
-                    attr.removeNamedItem("android:debuggable");
-                }
-
-                saveDocument(file, doc);
-
-            } catch (SAXException | ParserConfigurationException | IOException | TransformerException ignored) {
+            // remove application:debuggable
+            if (debugAttr != null) {
+                attr.removeNamedItem("android:debuggable");
             }
+
+            saveDocument(file, doc);
+
+        } catch (SAXException | ParserConfigurationException | IOException | TransformerException ignored) {
         }
     }
 
@@ -68,27 +69,28 @@ public final class ResXmlPatcher {
      * @param file AndroidManifest file
      */
     public static void setApplicationDebugTagTrue(File file) {
-        if (file.exists()) {
-            try {
-                Document doc = loadDocument(file);
-                Node application = doc.getElementsByTagName("application").item(0);
+        if (!file.exists()) {
+            return;
+        }
+        try {
+            Document doc = loadDocument(file);
+            Node application = doc.getElementsByTagName("application").item(0);
 
-                // load attr
-                NamedNodeMap attr = application.getAttributes();
-                Node debugAttr = attr.getNamedItem("android:debuggable");
+            // load attr
+            NamedNodeMap attr = application.getAttributes();
+            Node debugAttr = attr.getNamedItem("android:debuggable");
 
-                if (debugAttr == null) {
-                    debugAttr = doc.createAttribute("android:debuggable");
-                    attr.setNamedItem(debugAttr);
-                }
-
-                // set application:debuggable to 'true
-                debugAttr.setNodeValue("true");
-
-                saveDocument(file, doc);
-
-            } catch (SAXException | ParserConfigurationException | IOException | TransformerException ignored) {
+            if (debugAttr == null) {
+                debugAttr = doc.createAttribute("android:debuggable");
+                attr.setNamedItem(debugAttr);
             }
+
+            // set application:debuggable to 'true
+            debugAttr.setNodeValue("true");
+
+            saveDocument(file, doc);
+
+        } catch (SAXException | ParserConfigurationException | IOException | TransformerException ignored) {
         }
     }
 
@@ -98,28 +100,29 @@ public final class ResXmlPatcher {
      * @param file AndroidManifest file
      */
     public static void setNetworkSecurityConfig(File file) {
-        if (file.exists()) {
-            try {
-                Document doc = loadDocument(file);
-                Node application = doc.getElementsByTagName("application").item(0);
+        if (!file.exists()) {
+            return;
+        }
+        try {
+            Document doc = loadDocument(file);
+            Node application = doc.getElementsByTagName("application").item(0);
 
-                // load attr
-                NamedNodeMap attr = application.getAttributes();
-                Node netSecConfAttr = attr.getNamedItem("android:networkSecurityConfig");
+            // load attr
+            NamedNodeMap attr = application.getAttributes();
+            Node netSecConfAttr = attr.getNamedItem("android:networkSecurityConfig");
 
-                if (netSecConfAttr == null) {
-                    // there is not an already existing network security configuration
-                    netSecConfAttr = doc.createAttribute("android:networkSecurityConfig");
-                    attr.setNamedItem(netSecConfAttr);
-                }
-
-                // whether it already existed or it was created now set it to the proper value
-                netSecConfAttr.setNodeValue("@xml/network_security_config");
-
-                saveDocument(file, doc);
-
-            } catch (SAXException | ParserConfigurationException | IOException | TransformerException ignored) {
+            if (netSecConfAttr == null) {
+                // there is not an already existing network security configuration
+                netSecConfAttr = doc.createAttribute("android:networkSecurityConfig");
+                attr.setNamedItem(netSecConfAttr);
             }
+
+            // whether it already existed or it was created now set it to the proper value
+            netSecConfAttr.setNodeValue("@xml/network_security_config");
+
+            saveDocument(file, doc);
+
+        } catch (SAXException | ParserConfigurationException | IOException | TransformerException ignored) {
         }
     }
 
@@ -173,50 +176,52 @@ public final class ResXmlPatcher {
      * @param file File for AndroidManifest.xml
      */
     public static void fixingPublicAttrsInProviderAttributes(File file) {
-        boolean saved = false;
-        if (file.exists()) {
-            try {
-                Document doc = loadDocument(file);
-                XPath xPath = XPathFactory.newInstance().newXPath();
-                XPathExpression expression = xPath.compile("/manifest/application/provider");
+        if (!file.exists()) {
+            return;
+        }
+        try {
+            Document doc = loadDocument(file);
+            XPath xPath = XPathFactory.newInstance().newXPath();
+            XPathExpression expression = xPath.compile("/manifest/application/provider");
 
-                Object result = expression.evaluate(doc, XPathConstants.NODESET);
-                NodeList nodes = (NodeList) result;
+            Object result = expression.evaluate(doc, XPathConstants.NODESET);
+            NodeList nodes = (NodeList) result;
 
-                for (int i = 0; i < nodes.getLength(); i++) {
-                    Node node = nodes.item(i);
-                    NamedNodeMap attrs = node.getAttributes();
-                    Node provider = attrs.getNamedItem("android:authorities");
+            boolean saved = false;
 
-                    if (provider != null) {
-                        saved = isSaved(file, saved, provider);
-                    }
+            for (int i = 0; i < nodes.getLength(); i++) {
+                Node node = nodes.item(i);
+                NamedNodeMap attrs = node.getAttributes();
+                Node provider = attrs.getNamedItem("android:authorities");
+
+                if (provider != null) {
+                    saved = isSaved(file, saved, provider);
                 }
-
-                // android:scheme
-                xPath = XPathFactory.newInstance().newXPath();
-                expression = xPath.compile("/manifest/application/activity/intent-filter/data");
-
-                result = expression.evaluate(doc, XPathConstants.NODESET);
-                nodes = (NodeList) result;
-
-                for (int i = 0; i < nodes.getLength(); i++) {
-                    Node node = nodes.item(i);
-                    NamedNodeMap attrs = node.getAttributes();
-                    Node provider = attrs.getNamedItem("android:scheme");
-
-                    if (provider != null) {
-                        saved = isSaved(file, saved, provider);
-                    }
-                }
-
-                if (saved) {
-                    saveDocument(file, doc);
-                }
-
-            }  catch (SAXException | ParserConfigurationException | IOException |
-                    XPathExpressionException | TransformerException ignored) {
             }
+
+            // android:scheme
+            xPath = XPathFactory.newInstance().newXPath();
+            expression = xPath.compile("/manifest/application/activity/intent-filter/data");
+
+            result = expression.evaluate(doc, XPathConstants.NODESET);
+            nodes = (NodeList) result;
+
+            for (int i = 0; i < nodes.getLength(); i++) {
+                Node node = nodes.item(i);
+                NamedNodeMap attrs = node.getAttributes();
+                Node provider = attrs.getNamedItem("android:scheme");
+
+                if (provider != null) {
+                    saved = isSaved(file, saved, provider);
+                }
+            }
+
+            if (saved) {
+                saveDocument(file, doc);
+            }
+
+        } catch (SAXException | ParserConfigurationException | IOException
+                | XPathExpressionException | TransformerException ignored) {
         }
     }
 
@@ -254,23 +259,20 @@ public final class ResXmlPatcher {
         File file = new File(directory, "/res/values/strings.xml");
         key = key.replace("@string/", "");
 
-        if (file.exists()) {
-            try {
-                Document doc = loadDocument(file);
-                XPath xPath = XPathFactory.newInstance().newXPath();
-                XPathExpression expression = xPath.compile("/resources/string[@name=" + '"' + key + "\"]/text()");
-
-                Object result = expression.evaluate(doc, XPathConstants.STRING);
-
-                if (result != null) {
-                    return (String) result;
-                }
-
-            }  catch (SAXException | ParserConfigurationException | IOException | XPathExpressionException ignored) {
-            }
+        if (!file.exists()) {
+            return null;
         }
+        try {
+            Document doc = loadDocument(file);
+            XPath xPath = XPathFactory.newInstance().newXPath();
+            XPathExpression expression = xPath.compile("/resources/string[@name=\"" + key + "\"]/text()");
 
-        return null;
+            Object result = expression.evaluate(doc, XPathConstants.STRING);
+            return result != null ? (String) result : null;
+
+        } catch (SAXException | ParserConfigurationException | IOException | XPathExpressionException ignored) {
+            return null;
+        }
     }
 
     /**
@@ -288,23 +290,20 @@ public final class ResXmlPatcher {
         File file = new File(directory, "/res/values/integers.xml");
         key = key.replace("@integer/", "");
 
-        if (file.exists()) {
-            try {
-                Document doc = loadDocument(file);
-                XPath xPath = XPathFactory.newInstance().newXPath();
-                XPathExpression expression = xPath.compile("/resources/integer[@name=" + '"' + key + "\"]/text()");
-
-                Object result = expression.evaluate(doc, XPathConstants.STRING);
-
-                if (result != null) {
-                    return (String) result;
-                }
-
-            }  catch (SAXException | ParserConfigurationException | IOException | XPathExpressionException ignored) {
-            }
+        if (!file.exists()) {
+            return null;
         }
+        try {
+            Document doc = loadDocument(file);
+            XPath xPath = XPathFactory.newInstance().newXPath();
+            XPathExpression expression = xPath.compile("/resources/integer[@name=\"" + key + "\"]/text()");
 
-        return null;
+            Object result = expression.evaluate(doc, XPathConstants.STRING);
+            return result != null ? (String) result : null;
+
+        } catch (SAXException | ParserConfigurationException | IOException | XPathExpressionException ignored) {
+            return null;
+        }
     }
 
     /**
@@ -313,24 +312,25 @@ public final class ResXmlPatcher {
      * @param file File representing AndroidManifest.xml
      */
     public static void removeManifestVersions(File file) {
-        if (file.exists()) {
-            try {
-                Document doc = loadDocument(file);
-                Node manifest = doc.getFirstChild();
-                NamedNodeMap attr = manifest.getAttributes();
-                Node vCode = attr.getNamedItem("android:versionCode");
-                Node vName = attr.getNamedItem("android:versionName");
+        if (!file.exists()) {
+            return;
+        }
+        try {
+            Document doc = loadDocument(file);
+            Node manifest = doc.getFirstChild();
+            NamedNodeMap attr = manifest.getAttributes();
+            Node vCode = attr.getNamedItem("android:versionCode");
+            Node vName = attr.getNamedItem("android:versionName");
 
-                if (vCode != null) {
-                    attr.removeNamedItem("android:versionCode");
-                }
-                if (vName != null) {
-                    attr.removeNamedItem("android:versionName");
-                }
-                saveDocument(file, doc);
-
-            } catch (SAXException | ParserConfigurationException | IOException | TransformerException ignored) {
+            if (vCode != null) {
+                attr.removeNamedItem("android:versionCode");
             }
+            if (vName != null) {
+                attr.removeNamedItem("android:versionName");
+            }
+            saveDocument(file, doc);
+
+        } catch (SAXException | ParserConfigurationException | IOException | TransformerException ignored) {
         }
     }
 

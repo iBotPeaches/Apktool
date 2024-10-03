@@ -81,30 +81,30 @@ public class SharedLibraryTest extends BaseTest {
         Config config = Config.getDefaultConfig();
         config.frameworkDirectory = sTmpDir.getAbsolutePath();
         config.frameworkTag = "shared";
-        config.useAapt2 = false;
+        config.aaptVersion = 1;
 
         // install library/framework
         new Framework(config).installFramework(new File(sTmpDir + File.separator + library));
         assertTrue(fileExists("2-shared.apk"));
 
         // decode client.apk
-        ApkDecoder apkDecoder = new ApkDecoder(config, new ExtFile(sTmpDir + File.separator + client));
+        ApkDecoder apkDecoder = new ApkDecoder(new ExtFile(sTmpDir + File.separator + client), config);
         File outDir = new File(sTmpDir + File.separator + client + ".out");
         apkDecoder.decode(outDir);
 
         // decode library.apk
-        ApkDecoder libraryDecoder = new ApkDecoder(config, new ExtFile(sTmpDir + File.separator + library));
+        ApkDecoder libraryDecoder = new ApkDecoder(new ExtFile(sTmpDir + File.separator + library), config);
         outDir = new File(sTmpDir + File.separator + library + ".out");
         libraryDecoder.decode(outDir);
 
         // build client.apk
         ExtFile clientApk = new ExtFile(sTmpDir, client + ".out");
-        new ApkBuilder(config, clientApk).build(null);
+        new ApkBuilder(clientApk, config).build(null);
         assertTrue(fileExists(client + ".out" + File.separator + "dist" + File.separator + client));
 
         // build library.apk (shared library)
         ExtFile libraryApk = new ExtFile(sTmpDir, library + ".out");
-        new ApkBuilder(config, libraryApk).build(null);
+        new ApkBuilder(libraryApk, config).build(null);
         assertTrue(fileExists(library + ".out" + File.separator + "dist" + File.separator + library));
     }
 

@@ -43,7 +43,7 @@ public class DecodeKotlinTest extends BaseTest {
         String apk = "testkotlin.apk";
 
         // decode testkotlin.apk
-        ApkDecoder apkDecoder = new ApkDecoder(new File(sTmpDir + File.separator + apk));
+        ApkDecoder apkDecoder = new ApkDecoder(new ExtFile(sTmpDir + File.separator + apk));
         sTestNewDir = new ExtFile(sTmpDir + File.separator + apk + ".out");
 
         File outDir = new File(sTmpDir + File.separator + apk + ".out");

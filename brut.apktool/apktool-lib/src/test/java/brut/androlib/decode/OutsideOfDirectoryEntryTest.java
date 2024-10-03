@@ -42,7 +42,7 @@ public class OutsideOfDirectoryEntryTest extends BaseTest {
         String apk = "issue1589.apk";
 
         // decode issue1589.apk
-        ApkDecoder apkDecoder = new ApkDecoder(new File(sTmpDir + File.separator + apk));
+        ApkDecoder apkDecoder = new ApkDecoder(new ExtFile(sTmpDir + File.separator + apk));
         sTestNewDir = new ExtFile(sTmpDir + File.separator + apk + ".out");
 
         File outDir = new File(sTmpDir + File.separator + apk + ".out");

@@ -45,12 +45,11 @@ public class NonStandardPkgIdTest extends BaseTest {
         TestUtils.copyResourceDir(BuildAndDecodeTest.class, "aapt2/pkgid8/", sTestOrigDir);
 
         Config config = Config.getDefaultConfig();
-        config.useAapt2 = true;
         config.verbose = true;
 
         LOGGER.info("Building pkgid8.apk...");
         ExtFile testApk = new ExtFile(sTmpDir, "pkgid8.apk");
-        new ApkBuilder(config, sTestOrigDir).build(testApk);
+        new ApkBuilder(sTestOrigDir, config).build(testApk);
 
         LOGGER.info("Decoding pkgid8.apk...");
         ApkInfo testInfo = new ApkInfo(testApk);

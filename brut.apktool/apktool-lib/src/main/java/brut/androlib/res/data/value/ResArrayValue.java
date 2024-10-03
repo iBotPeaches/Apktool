@@ -41,8 +41,8 @@ public class ResArrayValue extends ResBagValue implements ResValuesXmlSerializab
     }
 
     @Override
-    public void serializeToResValuesXml(XmlSerializer serializer,
-                                        ResResource res) throws IOException, AndrolibException {
+    public void serializeToResValuesXml(XmlSerializer serializer, ResResource res)
+            throws IOException, AndrolibException {
         String type = getType();
         type = (type == null ? "" : type + "-") + "array";
         serializer.startTag(null, type);

@@ -42,10 +42,10 @@ public class DefaultBaksmaliVariableTest extends BaseTest {
         TestUtils.copyResourceDir(DefaultBaksmaliVariableTest.class, "aapt1/issue1481/", sTestOrigDir);
 
         LOGGER.info("Building issue1481.jar...");
-        File testJar = new File(sTmpDir, "issue1481.jar");
+        ExtFile testJar = new ExtFile(sTmpDir, "issue1481.jar");
         Config config = Config.getDefaultConfig();
-        config.useAapt2 = false;
-        new ApkBuilder(config, sTestOrigDir).build(testJar);
+        config.aaptVersion = 1;
+        new ApkBuilder(sTestOrigDir, config).build(testJar);
 
         LOGGER.info("Decoding issue1481.jar...");
         ApkDecoder apkDecoder = new ApkDecoder(testJar);

@@ -53,20 +53,20 @@ public class ProviderAttributeTest extends BaseTest {
         String apk = "issue636.apk";
 
         // decode issue636.apk
-        ApkDecoder apkDecoder = new ApkDecoder(new File(sTmpDir + File.separator + apk));
+        ApkDecoder apkDecoder = new ApkDecoder(new ExtFile(sTmpDir + File.separator + apk));
         File outDir = new File(sTmpDir + File.separator + apk + ".out");
         apkDecoder.decode(outDir);
 
         // build issue636
         ExtFile testApk = new ExtFile(sTmpDir, apk + ".out");
         Config config = Config.getDefaultConfig();
-        config.useAapt2 = false;
-        new ApkBuilder(config, testApk).build(null);
+        config.aaptVersion = 1;
+        new ApkBuilder(testApk, config).build(null);
         String newApk = apk + ".out" + File.separator + "dist" + File.separator + apk;
         assertTrue(fileExists(newApk));
 
         // decode issues636 again
-        apkDecoder = new ApkDecoder(new File(sTmpDir + File.separator + newApk));
+        apkDecoder = new ApkDecoder(new ExtFile(sTmpDir + File.separator + newApk));
         outDir = new File(sTmpDir + File.separator + apk + ".out.two");
         apkDecoder.decode(outDir);
 

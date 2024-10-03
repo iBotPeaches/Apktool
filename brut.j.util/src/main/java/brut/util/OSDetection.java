@@ -39,7 +39,7 @@ public class OSDetection {
 
             return arch != null && arch.endsWith("64") || wow64Arch != null && wow64Arch.endsWith("64");
         }
-        return BIT.equalsIgnoreCase("64");
+        return BIT.equals("64");
     }
 
     public static String returnOS() {

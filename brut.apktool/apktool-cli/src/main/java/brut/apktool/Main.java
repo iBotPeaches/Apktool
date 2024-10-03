@@ -88,24 +88,34 @@ public class Main {
 
         boolean cmdFound = false;
         for (String opt : commandLine.getArgs()) {
-            if (opt.equalsIgnoreCase("d") || opt.equalsIgnoreCase("decode")) {
-                cmdDecode(commandLine, config);
-                cmdFound = true;
-            } else if (opt.equalsIgnoreCase("b") || opt.equalsIgnoreCase("build")) {
-                cmdBuild(commandLine, config);
-                cmdFound = true;
-            } else if (opt.equalsIgnoreCase("if") || opt.equalsIgnoreCase("install-framework")) {
-                cmdInstallFramework(commandLine, config);
-                cmdFound = true;
-            } else if (opt.equalsIgnoreCase("empty-framework-dir")) {
-                cmdEmptyFrameworkDirectory(commandLine, config);
-                cmdFound = true;
-            } else if (opt.equalsIgnoreCase("list-frameworks")) {
-                cmdListFrameworks(commandLine, config);
-                cmdFound = true;
-            } else if (opt.equalsIgnoreCase("publicize-resources")) {
-                cmdPublicizeResources(commandLine, config);
-                cmdFound = true;
+            switch (opt) {
+                case "d":
+                case "decode":
+                    cmdDecode(commandLine, config);
+                    cmdFound = true;
+                    break;
+                case "b":
+                case "build":
+                    cmdBuild(commandLine, config);
+                    cmdFound = true;
+                    break;
+                case "if":
+                case "install-framework":
+                    cmdInstallFramework(commandLine, config);
+                    cmdFound = true;
+                    break;
+                case "empty-framework-dir":
+                    cmdEmptyFrameworkDirectory(commandLine, config);
+                    cmdFound = true;
+                    break;
+                case "list-frameworks":
+                    cmdListFrameworks(commandLine, config);
+                    cmdFound = true;
+                    break;
+                case "publicize-resources":
+                    cmdPublicizeResources(commandLine, config);
+                    cmdFound = true;
+                    break;
             }
         }
 
@@ -214,8 +224,7 @@ public class Main {
         }
 
         ExtFile apkFile = new ExtFile(apkName);
-        ApkDecoder decoder = new ApkDecoder(config, apkFile);
-
+        ApkDecoder decoder = new ApkDecoder(apkFile, config);
         try {
             decoder.decode(outDir);
         } catch (OutDirExistsException ex) {
@@ -235,18 +244,12 @@ public class Main {
                             + ". You must install proper "
                             + "framework files, see project website for more info.");
             System.exit(1);
-        } catch (IOException ex) {
-            System.err.println("Could not modify file. Please ensure you have permission.");
-            System.exit(1);
-        } catch (DirectoryException ex) {
-            System.err.println("Could not modify internal dex files. Please ensure you have permission.");
-            System.exit(1);
         }
     }
 
-    private static void cmdBuild(CommandLine cli, Config config) {
+    private static void cmdBuild(CommandLine cli, Config config) throws AndrolibException {
         String[] args = cli.getArgs();
-        String appDirName = args.length < 2 ? "." : args[1];
+        String apkDirName = args.length < 2 ? "." : args[1];
 
         // check for build options
         if (cli.hasOption("f") || cli.hasOption("force-all")) {
@@ -262,7 +265,32 @@ public class Main {
             config.verbose = true;
         }
         if (cli.hasOption("a") || cli.hasOption("aapt")) {
-            config.aaptPath = cli.getOptionValue("a");
+            if (cli.hasOption("use-aapt1") || cli.hasOption("use-aapt2")) {
+                System.err.println("You can only use one of -a/--aapt or --use-aapt1 or --use-aapt2.");
+                System.exit(1);
+            }
+
+            try {
+                String aaptPath = cli.getOptionValue("a");
+                int aaptVersion = AaptManager.getAaptVersion(aaptPath);
+                if (aaptVersion < AaptManager.AAPT_VERSION_MIN && aaptVersion > AaptManager.AAPT_VERSION_MAX) {
+                    System.err.println("AAPT version " + aaptVersion + " is not supported");
+                    System.exit(1);
+                }
+
+                config.aaptPath = aaptPath;
+                config.aaptVersion = aaptVersion;
+            } catch (BrutException ex) {
+                System.err.println(ex.getMessage());
+                System.exit(1);
+            }
+        } else if (cli.hasOption("use-aapt1")) {
+            if (cli.hasOption("use-aapt2")) {
+                System.err.println("You can only use one of --use-aapt1 or --use-aapt2.");
+                System.exit(1);
+            }
+
+            config.aaptVersion = 1;
         }
         if (cli.hasOption("c") || cli.hasOption("copy-original")) {
             config.copyOriginalFiles = true;
@@ -270,13 +298,8 @@ public class Main {
         if (cli.hasOption("nc") || cli.hasOption("no-crunch")) {
             config.noCrunch = true;
         }
-        if (cli.hasOption("use-aapt1")) {
-            config.useAapt2 = false;
-        }
-
-        if (cli.hasOption("use-aapt1") && cli.hasOption("use-aapt2")) {
-            System.err.println("You can only use one of --use-aapt1 or --use-aapt2.");
-            System.exit(1);
+        if (cli.hasOption("na") || cli.hasOption("no-apk")) {
+            config.noApk = true;
         }
 
         File outFile;
@@ -286,21 +309,14 @@ public class Main {
             outFile = null;
         }
 
-        if (config.netSecConf && !config.useAapt2) {
-            System.err.println("-n / --net-sec-conf is only supported with --use-aapt2.");
+        if (config.netSecConf && config.aaptVersion == 1) {
+            System.err.println("-n / --net-sec-conf is not supported with legacy AAPT.");
             System.exit(1);
         }
 
-        // try and build apk
-        try {
-            if (cli.hasOption("a") || cli.hasOption("aapt")) {
-                config.aaptVersion = AaptManager.getAaptVersion(cli.getOptionValue("a"));
-            }
-            new ApkBuilder(config, new ExtFile(appDirName)).build(outFile);
-        } catch (BrutException ex) {
-            System.err.println(ex.getMessage());
-            System.exit(1);
-        }
+        ExtFile apkDir = new ExtFile(apkDirName);
+        ApkBuilder builder = new ApkBuilder(apkDir, config);
+        builder.build(outFile);
     }
 
     private static void cmdInstallFramework(CommandLine cli, Config config) throws AndrolibException {
@@ -462,13 +478,13 @@ public class Main {
                 .build();
 
         Option aapt1Option = Option.builder()
-            .longOpt("use-aapt1")
-            .desc("Use aapt binary instead of aapt2 during the build step.")
-            .build();
+                .longOpt("use-aapt1")
+                .desc("Use aapt binary instead of aapt2 during the build step.")
+                .build();
 
         Option aapt2Option = Option.builder()
                 .longOpt("use-aapt2")
-                .desc("Use aapt2 binary instead of aapt during the build step.")
+                .desc("Use aapt2 binary instead of aapt during the build step. (default)")
                 .build();
 
         Option originalOption = Option.builder("c")
@@ -479,6 +495,11 @@ public class Main {
         Option noCrunchOption = Option.builder("nc")
                 .longOpt("no-crunch")
                 .desc("Disable crunching of resource files during the build step.")
+                .build();
+
+        Option noApkOption = Option.builder("na")
+                .longOpt("no-apk")
+                .desc("Disable repacking of the built files into a new apk.")
                 .build();
 
         Option tagOption = Option.builder("t")
@@ -530,6 +551,7 @@ public class Main {
             buildOptions.addOption(originalOption);
             buildOptions.addOption(aapt1Option);
             buildOptions.addOption(noCrunchOption);
+            buildOptions.addOption(noApkOption);
         }
 
         // add global options
@@ -591,6 +613,7 @@ public class Main {
         allOptions.addOption(aapt1Option);
         allOptions.addOption(aapt2Option);
         allOptions.addOption(noCrunchOption);
+        allOptions.addOption(noApkOption);
         allOptions.addOption(onlyMainClassesOption);
     }
 
@@ -675,8 +698,8 @@ public class Main {
                             }
                         }
                     }
-                } catch (Exception exception) {
-                    reportError(null, exception, ErrorManager.FORMAT_FAILURE);
+                } catch (Exception ex) {
+                    reportError(null, ex, ErrorManager.FORMAT_FAILURE);
                 }
             }
 

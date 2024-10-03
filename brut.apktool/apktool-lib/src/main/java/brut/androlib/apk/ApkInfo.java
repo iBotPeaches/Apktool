@@ -25,32 +25,39 @@ import brut.directory.FileDirectory;
 
 import java.io.*;
 import java.util.*;
+import java.util.regex.Pattern;
 
 public class ApkInfo implements YamlSerializable {
+    public final static String[] RESOURCES_DIRNAMES = new String[] { "res", "r", "R" };
+    public final static String[] RAW_DIRNAMES = new String[] { "assets", "lib", "libs", "kotlin", "META-INF/services" };
+
+    public final static Pattern ORIGINAL_FILENAMES_PATTERN = Pattern.compile(
+        "AndroidManifest\\.xml|META-INF/[^/]+\\.(RSA|SF|MF)|stamp-cert-sha256");
+
+    public final static Pattern STANDARD_FILENAMES_PATTERN = Pattern.compile(
+        "[^/]+\\.dex|resources\\.arsc|(" + String.join("|", RESOURCES_DIRNAMES) + "|" + 
+        String.join("|", RAW_DIRNAMES) + ")/.*|" + ORIGINAL_FILENAMES_PATTERN.pattern());
+
+    // only set when loaded from a file (not a stream)
     private transient ExtFile mApkFile;
 
     public String version;
     public String apkFileName;
     public boolean isFrameworkApk;
     public UsesFramework usesFramework;
-    private Map<String, String> sdkInfo = new LinkedHashMap<>();
+    public Map<String, String> sdkInfo = new LinkedHashMap<>();
     public PackageInfo packageInfo = new PackageInfo();
     public VersionInfo versionInfo = new VersionInfo();
-    public boolean resourcesAreCompressed;
     public boolean sharedLibrary;
     public boolean sparseResources;
-    public Map<String, String> unknownFiles = new LinkedHashMap<>();
-    public List<String> doNotCompress;
-
-    /** @deprecated use {@link #resourcesAreCompressed} */
-    public boolean compressionType;
+    public List<String> doNotCompress = new ArrayList<>();
 
     public ApkInfo() {
         this(null);
     }
 
     public ApkInfo(ExtFile apkFile) {
-        this.version = ApktoolProperties.getVersion();
+        version = ApktoolProperties.getVersion();
         if (apkFile != null) {
             setApkFile(apkFile);
         }
@@ -62,8 +69,19 @@ public class ApkInfo implements YamlSerializable {
 
     public void setApkFile(ExtFile apkFile) {
         mApkFile = apkFile;
-        if (this.apkFileName == null) {
-            this.apkFileName = apkFile.getName();
+        if (apkFileName == null) {
+            apkFileName = apkFile.getName();
+        }
+    }
+
+    public boolean hasSources() throws AndrolibException {
+        if (mApkFile == null) {
+            return false;
+        }
+        try {
+            return mApkFile.getDirectory().containsFile("classes.dex");
+        } catch (DirectoryException ex) {
+            throw new AndrolibException(ex);
         }
     }
 
@@ -89,41 +107,6 @@ public class ApkInfo implements YamlSerializable {
         }
     }
 
-    public boolean hasSources() throws AndrolibException {
-        if (mApkFile == null) {
-            return false;
-        }
-        try {
-            return mApkFile.getDirectory().containsFile("classes.dex");
-        } catch (DirectoryException ex) {
-            throw new AndrolibException(ex);
-        }
-    }
-
-    public boolean hasMultipleSources() throws AndrolibException {
-        if (mApkFile == null) {
-            return false;
-        }
-        try {
-            Set<String> files = mApkFile.getDirectory().getFiles(false);
-            for (String file : files) {
-                if (file.endsWith(".dex")) {
-                    if (!file.equalsIgnoreCase("classes.dex")) {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
-        } catch (DirectoryException ex) {
-            throw new AndrolibException(ex);
-        }
-    }
-
-    public void addUnknownFileInfo(String file, String value) {
-        unknownFiles.put(file, value);
-    }
-
     public String checkTargetSdkVersionBounds() {
         int target = mapSdkShorthandToVersion(getTargetSdkVersion());
 
@@ -135,35 +118,35 @@ public class ApkInfo implements YamlSerializable {
         return Integer.toString(target);
     }
 
-    public Map<String, String> getSdkInfo() {
-        return sdkInfo;
-    }
-
-    public void setSdkInfo(Map<String, String> sdkInfo) {
-        this.sdkInfo = sdkInfo;
-    }
-
-    public void setSdkInfoField(String key, String value) {
-        sdkInfo.put(key, value);
-    }
-
     public String getMinSdkVersion() {
         return sdkInfo.get("minSdkVersion");
+    }
+
+    public void setMinSdkVersion(String minSdkVersion) {
+        sdkInfo.put("minSdkVersion", minSdkVersion);
     }
 
     public String getMaxSdkVersion() {
         return sdkInfo.get("maxSdkVersion");
     }
 
+    public void setMaxSdkVersion(String maxSdkVersion) {
+        sdkInfo.put("maxSdkVersion", maxSdkVersion);
+    }
+
     public String getTargetSdkVersion() {
         return sdkInfo.get("targetSdkVersion");
+    }
+
+    public void setTargetSdkVersion(String targetSdkVersion) {
+        sdkInfo.put("targetSdkVersion", targetSdkVersion);
     }
 
     public int getMinSdkVersionFromAndroidCodename(String sdkVersion) {
         int sdkNumber = mapSdkShorthandToVersion(sdkVersion);
 
         if (sdkNumber == ResConfigFlags.SDK_BASE) {
-            return Integer.parseInt(sdkInfo.get("minSdkVersion"));
+            return Integer.parseInt(getMinSdkVersion());
         }
         return sdkNumber;
     }
@@ -205,15 +188,15 @@ public class ApkInfo implements YamlSerializable {
     public void save(File file) throws AndrolibException {
         try (YamlWriter writer = new YamlWriter(new FileOutputStream(file))) {
             write(writer);
-        } catch (FileNotFoundException e) {
+        } catch (FileNotFoundException ex) {
             throw new AndrolibException("File not found");
-        } catch (Exception e) {
-            throw new AndrolibException(e);
+        } catch (Exception ex) {
+            throw new AndrolibException(ex);
         }
     }
 
-    public static ApkInfo load(InputStream is) throws AndrolibException {
-        YamlReader reader = new YamlReader(is);
+    public static ApkInfo load(InputStream in) throws AndrolibException {
+        YamlReader reader = new YamlReader(in);
         ApkInfo apkInfo = new ApkInfo();
         reader.readRoot(apkInfo);
         return apkInfo;
@@ -234,56 +217,47 @@ public class ApkInfo implements YamlSerializable {
         YamlLine line = reader.getLine();
         switch (line.getKey()) {
             case "version": {
-                this.version = line.getValue();
+                version = line.getValue();
                 break;
             }
             case "apkFileName": {
-                this.apkFileName = line.getValue();
+                apkFileName = line.getValue();
                 break;
             }
             case "isFrameworkApk": {
-                this.isFrameworkApk = line.getValueBool();
+                isFrameworkApk = line.getValueBool();
                 break;
             }
             case "usesFramework": {
-                this.usesFramework = new UsesFramework();
+                usesFramework = new UsesFramework();
                 reader.readObject(usesFramework);
                 break;
             }
             case "sdkInfo": {
+                sdkInfo.clear();
                 reader.readMap(sdkInfo);
                 break;
             }
             case "packageInfo": {
-                this.packageInfo = new PackageInfo();
+                packageInfo = new PackageInfo();
                 reader.readObject(packageInfo);
                 break;
             }
             case "versionInfo": {
-                this.versionInfo = new VersionInfo();
+                versionInfo = new VersionInfo();
                 reader.readObject(versionInfo);
                 break;
             }
-            case "compressionType":
-            case "resourcesAreCompressed": {
-                this.resourcesAreCompressed = line.getValueBool();
-                break;
-            }
             case "sharedLibrary": {
-                this.sharedLibrary = line.getValueBool();
+                sharedLibrary = line.getValueBool();
                 break;
             }
             case "sparseResources": {
-                this.sparseResources = line.getValueBool();
-                break;
-            }
-            case "unknownFiles": {
-                this.unknownFiles = new LinkedHashMap<>();
-                reader.readMap(unknownFiles);
+                sparseResources = line.getValueBool();
                 break;
             }
             case "doNotCompress": {
-                this.doNotCompress = new ArrayList<>();
+                doNotCompress.clear();
                 reader.readStringList(doNotCompress);
                 break;
             }
@@ -299,12 +273,10 @@ public class ApkInfo implements YamlSerializable {
         writer.writeStringMap("sdkInfo", sdkInfo);
         writer.writeObject("packageInfo", packageInfo);
         writer.writeObject("versionInfo", versionInfo);
-        writer.writeBool("resourcesAreCompressed", resourcesAreCompressed);
         writer.writeBool("sharedLibrary", sharedLibrary);
         writer.writeBool("sparseResources", sparseResources);
-        if (unknownFiles.size() > 0) {
-            writer.writeStringMap("unknownFiles", unknownFiles);
+        if (!doNotCompress.isEmpty()) {
+            writer.writeList("doNotCompress", doNotCompress);
         }
-        writer.writeList("doNotCompress", doNotCompress);
     }
 }

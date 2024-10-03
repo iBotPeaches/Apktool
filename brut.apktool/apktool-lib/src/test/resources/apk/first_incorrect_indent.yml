@@ -1,9 +1,8 @@
 !!brut.androlib.meta.MetaInfo
   version: 2.0.0
 apkFileName: standard.apk
-compressionType: false
 doNotCompress:
-- resources.arsc
+- arsc
 isFrameworkApk: false
 packageInfo:
   forcedPackageId: '127'

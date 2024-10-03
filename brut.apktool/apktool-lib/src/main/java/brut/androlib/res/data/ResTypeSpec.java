@@ -48,7 +48,7 @@ public final class ResTypeSpec {
     }
 
     public boolean isString() {
-        return mName.equalsIgnoreCase(RES_TYPE_NAME_STRING);
+        return mName.equals(RES_TYPE_NAME_STRING);
     }
 
     public ResResSpec getResSpec(String name) throws AndrolibException {

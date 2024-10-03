@@ -75,7 +75,7 @@ public class ResourcesDecoder {
         }
 
         AXmlResourceParser axmlParser = new AndroidManifestResourceParser(mResTable);
-        XmlPullStreamDecoder fileDecoder = new XmlPullStreamDecoder(axmlParser, getResXmlSerializer());
+        ResStreamDecoder fileDecoder = new AndroidManifestPullStreamDecoder(axmlParser, getResXmlSerializer());
 
         Directory inApk, out;
         InputStream inputStream = null;
@@ -91,7 +91,7 @@ public class ResourcesDecoder {
             }
             inputStream = inApk.getFileInput("AndroidManifest.xml");
             outputStream = out.getFileOutput("AndroidManifest.xml");
-            fileDecoder.decodeManifest(inputStream, outputStream);
+            fileDecoder.decode(inputStream, outputStream);
 
         } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
@@ -136,8 +136,8 @@ public class ResourcesDecoder {
         // 2) Check if pkgRenamed is null
         // 3) Check if pkgOriginal === mPackageRenamed
         // 4) Check if pkgOriginal is ignored via IGNORED_PACKAGES
-        if (pkgOriginal == null || pkgRenamed == null || pkgOriginal.equalsIgnoreCase(pkgRenamed)
-            || (Arrays.asList(IGNORED_PACKAGES).contains(pkgOriginal))) {
+        if (pkgOriginal == null || pkgRenamed == null || pkgOriginal.equals(pkgRenamed)
+                || (Arrays.asList(IGNORED_PACKAGES).contains(pkgOriginal))) {
             LOGGER.info("Regular manifest package...");
         } else {
             LOGGER.info("Renamed manifest package found! Replacing " + pkgRenamed + " with " + pkgOriginal);
@@ -157,7 +157,7 @@ public class ResourcesDecoder {
         decoders.setDecoder("9patch", new Res9patchStreamDecoder());
 
         AXmlResourceParser axmlParser = new AXmlResourceParser(mResTable);
-        decoders.setDecoder("xml", new XmlPullStreamDecoder(axmlParser, getResXmlSerializer()));
+        decoders.setDecoder("xml", new ResXmlPullStreamDecoder(axmlParser, getResXmlSerializer()));
 
         ResFileDecoder fileDecoder = new ResFileDecoder(decoders);
         Directory in, out, outRes;
@@ -220,7 +220,7 @@ public class ResourcesDecoder {
             serial.endDocument();
             serial.flush();
             outStream.close();
-        } catch (IOException | DirectoryException ex) {
+        } catch (DirectoryException | IOException ex) {
             throw new AndrolibException("Could not generate: " + valuesFile.getPath(), ex);
         }
     }
@@ -245,7 +245,7 @@ public class ResourcesDecoder {
             serial.endDocument();
             serial.flush();
             outStream.close();
-        } catch (IOException | DirectoryException ex) {
+        } catch (DirectoryException | IOException ex) {
             throw new AndrolibException("Could not generate public.xml file", ex);
         }
     }

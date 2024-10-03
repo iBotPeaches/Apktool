@@ -49,11 +49,11 @@ public class DexStaticFieldValueTest extends BaseTest {
 
         LOGGER.info("Building issue2543.apk...");
         File testApk = new File(sTmpDir, "issue2543.apk");
-        new ApkBuilder(config, sTestOrigDir).build(testApk);
+        new ApkBuilder(sTestOrigDir, config).build(testApk);
 
         LOGGER.info("Decoding issue2543.apk...");
         config.baksmaliDebugMode = false;
-        ApkDecoder apkDecoder = new ApkDecoder(config, new ExtFile(testApk));
+        ApkDecoder apkDecoder = new ApkDecoder(new ExtFile(testApk), config);
         apkDecoder.decode(sTestNewDir);
     }
 

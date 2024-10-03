@@ -53,7 +53,7 @@ public class ResourceModeTest extends BaseTest {
         config.setDecodeResolveMode(Config.DECODE_RES_RESOLVE_REMOVE);
 
         // decode issue2836.apk
-        ApkDecoder apkDecoder = new ApkDecoder(config, new File(sTmpDir + File.separator + apk));
+        ApkDecoder apkDecoder = new ApkDecoder(new ExtFile(sTmpDir + File.separator + apk), config);
         sTestOrigDir = new ExtFile(sTmpDir + File.separator + apk + "remove.out");
 
         File outDir = new File(sTmpDir + File.separator + apk + "remove.out");
@@ -84,7 +84,7 @@ public class ResourceModeTest extends BaseTest {
         config.setDecodeResolveMode(Config.DECODE_RES_RESOLVE_DUMMY);
 
         // decode issue2836.apk
-        ApkDecoder apkDecoder = new ApkDecoder(config, new File(sTmpDir + File.separator + apk));
+        ApkDecoder apkDecoder = new ApkDecoder(new ExtFile(sTmpDir + File.separator + apk), config);
         sTestOrigDir = new ExtFile(sTmpDir + File.separator + apk + "dummies.out");
 
         File outDir = new File(sTmpDir + File.separator + apk + "dummies.out");
@@ -115,7 +115,7 @@ public class ResourceModeTest extends BaseTest {
         config.setDecodeResolveMode(Config.DECODE_RES_RESOLVE_RETAIN);
 
         // decode issue2836.apk
-        ApkDecoder apkDecoder = new ApkDecoder(config, new File(sTmpDir + File.separator + apk));
+        ApkDecoder apkDecoder = new ApkDecoder(new ExtFile(sTmpDir + File.separator + apk), config);
         sTestOrigDir = new ExtFile(sTmpDir + File.separator + apk + "leave.out");
 
         File outDir = new File(sTmpDir + File.separator + apk + "leave.out");

@@ -79,7 +79,7 @@ public class ResValueFactory {
     }
 
     public ResBagValue bagFactory(int parent, Duo<Integer, ResScalarValue>[] items, ResTypeSpec resTypeSpec)
-        throws AndrolibException {
+            throws AndrolibException {
         ResReferenceValue parentVal = newReference(parent, null);
 
         if (items.length == 0) {

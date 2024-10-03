@@ -317,7 +317,7 @@ public class ARSCDecoder {
         int entriesStartAligned = mHeader.startPosition + entriesStart;
         if (mIn.position() < entriesStartAligned) {
             long bytesSkipped = mIn.skip(entriesStartAligned - mIn.position());
-            LOGGER.fine("Skipping: " + bytesSkipped + " byte(s) to align with ResTable_entry start.");
+            LOGGER.fine(String.format("Skipping: %d byte(s) to align with ResTable_entry start.", bytesSkipped));
         }
 
         for (int i : entryOffsetMap.keySet()) {
@@ -377,7 +377,7 @@ public class ARSCDecoder {
             byte type = (byte) ((flags >> 8) & 0xFF);
             value = readCompactValue(type, specNamesId);
 
-            // To keep code below happy - we know if compact that the size has the key index encoded.
+            // To keep code below happy - we know if compact then the size has the key index encoded.
             specNamesId = size;
         } else if (isComplex) {
             value = readComplexEntry();
@@ -469,7 +469,7 @@ public class ARSCDecoder {
     }
 
     private ResIntBasedValue readValue() throws IOException, AndrolibException {
-		int size = mIn.readShort();
+		short size = mIn.readShort();
         if (size < 8) {
             return null;
         }

@@ -50,32 +50,32 @@ public class UnknownDirectoryTraversalTest extends BaseTest {
     }
 
     @Test
-    public void validFileTest() throws IOException, BrutException {
-        String validFilename = BrutIO.sanitizeFilepath(sTmpDir, "file");
-        assertEquals(validFilename, "file");
+    public void validFileTest() throws BrutException, IOException {
+        String validFileName = BrutIO.sanitizePath(sTmpDir, "file");
+        assertEquals(validFileName, "file");
 
-        File validFile = new File(sTmpDir, validFilename);
+        File validFile = new File(sTmpDir, validFileName);
         assertTrue(validFile.isFile());
     }
 
     @Test(expected = TraversalUnknownFileException.class)
-    public void invalidBackwardFileTest() throws IOException, BrutException {
-        BrutIO.sanitizeFilepath(sTmpDir, "../file");
+    public void invalidBackwardFileTest() throws BrutException, IOException {
+        BrutIO.sanitizePath(sTmpDir, "../file");
     }
 
     @Test(expected = RootUnknownFileException.class)
-    public void invalidRootFileTest() throws IOException, BrutException {
+    public void invalidRootFileTest() throws BrutException, IOException {
         String rootLocation = OSDetection.isWindows() ? "C:/" : File.separator;
-        BrutIO.sanitizeFilepath(sTmpDir, rootLocation + "file");
+        BrutIO.sanitizePath(sTmpDir, rootLocation + "file");
     }
 
     @Test(expected = InvalidUnknownFileException.class)
-    public void noFilePassedTest() throws IOException, BrutException {
-        BrutIO.sanitizeFilepath(sTmpDir, "");
+    public void noFilePassedTest() throws BrutException, IOException {
+        BrutIO.sanitizePath(sTmpDir, "");
     }
 
     @Test(expected = TraversalUnknownFileException.class)
-    public void invalidBackwardPathOnWindows() throws IOException, BrutException {
+    public void invalidBackwardPathOnWindows() throws BrutException, IOException {
         String invalidPath;
         if (! OSDetection.isWindows()) {
             invalidPath = "../../app";
@@ -83,12 +83,12 @@ public class UnknownDirectoryTraversalTest extends BaseTest {
             invalidPath = "..\\..\\app.exe";
         }
 
-        BrutIO.sanitizeFilepath(sTmpDir, invalidPath);
+        BrutIO.sanitizePath(sTmpDir, invalidPath);
     }
 
     @Test
-    public void validDirectoryFileTest() throws IOException, BrutException {
-        String validFilename = BrutIO.sanitizeFilepath(sTmpDir, "dir" + File.separator + "file");
-        assertEquals("dir" + File.separator + "file", validFilename);
+    public void validDirectoryFileTest() throws BrutException, IOException {
+        String validFileName = BrutIO.sanitizePath(sTmpDir, "dir" + File.separator + "file");
+        assertEquals("dir" + File.separator + "file", validFileName);
     }
 }

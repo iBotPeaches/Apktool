@@ -126,7 +126,7 @@ public class OS {
                 System.err.println("Stream collector did not terminate.");
             }
             return collector.get();
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException | InterruptedException ex) {
             return null;
         }
     }
@@ -149,8 +149,8 @@ public class OS {
 
     static class StreamForwarder extends Thread {
 
-        StreamForwarder(InputStream is, String type) {
-            mIn = is;
+        StreamForwarder(InputStream in, String type) {
+            mIn = in;
             mType = type;
         }
 
