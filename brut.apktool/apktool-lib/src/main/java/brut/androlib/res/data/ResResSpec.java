@@ -41,17 +41,12 @@ public class ResResSpec {
 
     public ResResSpec(ResID id, String name, ResPackage pkg, ResTypeSpec type) {
         this.mId = id;
-        String cleanName;
-        name = EMPTY_RESOURCE_NAMES.contains(name) ? null : name;
-
-        ResResSpec resResSpec = type.getResSpecUnsafe(name);
-        if (resResSpec != null) {
-            cleanName = String.format("APKTOOL_DUPLICATE_%s_%s", type, id.toString());
-        } else {
-            cleanName = ((name == null || name.isEmpty()) ? ("APKTOOL_DUMMYVAL_" + id.toString()) : name);
+        if (name == null || name.isEmpty() || EMPTY_RESOURCE_NAMES.contains(name)) {
+            name = "APKTOOL_DUMMYVAL_" + id.toString();
+        } else if (type.getResSpecUnsafe(name) != null) {
+            name = String.format("APKTOOL_DUPLICATE_%s_%s", type, id.toString());
         }
-
-        this.mName = cleanName;
+        this.mName = name;
         this.mPackage = pkg;
         this.mType = type;
     }
