@@ -95,7 +95,7 @@ public class YamlWriter implements Closeable {
         }
     }
 
-    public void writeStringMap(String key, Map<String, String> map) {
+    public <T> void writeMap(String key, Map<String, T> map) {
         if (Objects.isNull(map)) {
             return;
         }
@@ -103,7 +103,7 @@ public class YamlWriter implements Closeable {
         mWriter.println(escape(key) + ":");
         nextIndent();
         for (String mapKey : map.keySet()) {
-            writeString(mapKey, map.get(mapKey));
+            writeString(mapKey, String.valueOf(map.get(mapKey)));
         }
         prevIndent();
     }
