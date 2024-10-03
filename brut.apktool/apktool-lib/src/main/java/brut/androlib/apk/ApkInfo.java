@@ -48,6 +48,7 @@ public class ApkInfo implements YamlSerializable {
     public Map<String, String> sdkInfo = new LinkedHashMap<>();
     public PackageInfo packageInfo = new PackageInfo();
     public VersionInfo versionInfo = new VersionInfo();
+    public Map<String, Boolean> featureFlags = new LinkedHashMap<>();
     public boolean sharedLibrary;
     public boolean sparseResources;
     public List<String> doNotCompress = new ArrayList<>();
@@ -185,6 +186,10 @@ public class ApkInfo implements YamlSerializable {
         }
     }
 
+    public void addFeatureFlag(String flag, boolean value) {
+        featureFlags.put(flag, value);
+    }
+
     public void save(File file) throws AndrolibException {
         try (YamlWriter writer = new YamlWriter(new FileOutputStream(file))) {
             write(writer);
@@ -235,7 +240,7 @@ public class ApkInfo implements YamlSerializable {
             }
             case "sdkInfo": {
                 sdkInfo.clear();
-                reader.readMap(sdkInfo);
+                reader.readStringMap(sdkInfo);
                 break;
             }
             case "packageInfo": {
@@ -246,6 +251,11 @@ public class ApkInfo implements YamlSerializable {
             case "versionInfo": {
                 versionInfo = new VersionInfo();
                 reader.readObject(versionInfo);
+                break;
+            }
+            case "featureFlags": {
+                featureFlags.clear();
+                reader.readBoolMap(featureFlags);
                 break;
             }
             case "sharedLibrary": {
@@ -270,9 +280,12 @@ public class ApkInfo implements YamlSerializable {
         writer.writeString("apkFileName", apkFileName);
         writer.writeBool("isFrameworkApk", isFrameworkApk);
         writer.writeObject("usesFramework", usesFramework);
-        writer.writeStringMap("sdkInfo", sdkInfo);
+        writer.writeMap("sdkInfo", sdkInfo);
         writer.writeObject("packageInfo", packageInfo);
         writer.writeObject("versionInfo", versionInfo);
+        if (!featureFlags.isEmpty()) {
+            writer.writeMap("featureFlags", featureFlags);
+        }
         writer.writeBool("sharedLibrary", sharedLibrary);
         writer.writeBool("sparseResources", sparseResources);
         if (!doNotCompress.isEmpty()) {
