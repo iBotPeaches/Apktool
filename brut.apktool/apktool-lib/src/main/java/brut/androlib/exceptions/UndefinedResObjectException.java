@@ -17,7 +17,7 @@
 package brut.androlib.exceptions;
 
 public class UndefinedResObjectException extends AndrolibException {
-	public UndefinedResObjectException(String message) {
-		super(message);
-	}
+    public UndefinedResObjectException(String message) {
+        super(message);
+    }
 }
