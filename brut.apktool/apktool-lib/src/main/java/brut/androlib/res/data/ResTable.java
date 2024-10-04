@@ -266,6 +266,13 @@ public class ResTable {
         mApkInfo.sparseResources = flag;
     }
 
+    public void setCompactEntries(boolean flag) {
+        if (mApkInfo.compactEntries != flag) {
+            LOGGER.info("Compactly packed resource entries detected.");
+        }
+        mApkInfo.compactEntries = flag;
+    }
+
     public void addSdkInfo(String key, String value) {
         mApkInfo.sdkInfo.put(key, value);
     }

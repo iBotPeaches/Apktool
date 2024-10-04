@@ -366,6 +366,12 @@ public class ARSCDecoder {
             return null;
         }
 
+        // Be sure we don't poison mResTable by marking the application as compact
+        // Only flag the ResTable as compact if the main package is not loaded.
+        if (isCompact && !mResTable.isMainPkgLoaded()) {
+            mResTable.setCompactEntries(true);
+        }
+
         // #3366 - In a compactly packed entry, the key index is the size & type is higher 8 bits on flags.
         // We assume a size of 8 bytes for compact entries and the specNamesId is the data itself encoded.
         ResValue value;
