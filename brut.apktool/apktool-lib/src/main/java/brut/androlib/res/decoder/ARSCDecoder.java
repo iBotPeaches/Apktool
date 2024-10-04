@@ -355,15 +355,11 @@ public class ARSCDecoder {
     }
 
     private EntryData readEntryData() throws IOException, AndrolibException {
-        short size = mIn.readShort();
+        int size = mIn.readUnsignedShort();
         short flags = mIn.readShort();
 
         boolean isComplex = (flags & ENTRY_FLAG_COMPLEX) != 0;
         boolean isCompact = (flags & ENTRY_FLAG_COMPACT) != 0;
-
-        if (size < 0 && !isCompact) {
-            throw new AndrolibException("Entry size is under 0 bytes and not compactly packed.");
-        }
 
         int specNamesId = mIn.readInt();
         if (specNamesId == NO_ENTRY && !isCompact) {

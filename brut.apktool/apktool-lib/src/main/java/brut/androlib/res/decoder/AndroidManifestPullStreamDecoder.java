@@ -46,8 +46,7 @@ public class AndroidManifestPullStreamDecoder implements ResStreamDecoder {
             final ResTable resTable = mParser.getResTable();
 
             XmlSerializerWrapper ser = new StaticXmlSerializerWrapper(mSerial, factory) {
-                boolean hideSdkInfo = false;
-                boolean hidePackageInfo = false;
+                final boolean hideSdkInfo = !resTable.getAnalysisMode();
 
                 @Override
                 public void event(XmlPullParser pp)
@@ -57,76 +56,76 @@ public class AndroidManifestPullStreamDecoder implements ResStreamDecoder {
                     if (type == XmlPullParser.START_TAG) {
                         if ("manifest".equals(pp.getName())) {
                             try {
-                                hidePackageInfo = parseManifest(pp);
+                                parseManifest(pp);
                             } catch (AndrolibException ignored) {}
                         } else if ("uses-sdk".equals(pp.getName())) {
                             try {
-                                hideSdkInfo = parseAttr(pp);
-                                if (hideSdkInfo) {
-                                    return;
-                                }
+                                parseUsesSdk(pp);
                             } catch (AndrolibException ignored) {}
+                            if (hideSdkInfo) {
+                                return;
+                            }
                         }
-                    } else if (hideSdkInfo && type == XmlPullParser.END_TAG
+                    } else if (type == XmlPullParser.END_TAG
                             && "uses-sdk".equals(pp.getName())) {
-                        return;
-                    } else if (hidePackageInfo && type == XmlPullParser.END_TAG
-                            && "manifest".equals(pp.getName())) {
-                        super.event(pp);
-                        return;
+                        if (hideSdkInfo) {
+                            return;
+                        }
                     }
+
                     super.event(pp);
                 }
 
-                private boolean parseManifest(XmlPullParser pp)
+                private void parseManifest(XmlPullParser pp)
                         throws AndrolibException {
-                    String attr_name;
-
-                    // read <manifest> for package:
                     for (int i = 0; i < pp.getAttributeCount(); i++) {
-                        attr_name = pp.getAttributeName(i);
+                        String ns = pp.getAttributeNamespace(i);
+                        String name = pp.getAttributeName(i);
+                        String value = pp.getAttributeValue(i);
 
-                        if (attr_name.equals(("package"))) {
-                            resTable.setPackageRenamed(pp.getAttributeValue(i));
-                        } else if (attr_name.equals("versionCode")) {
-                            resTable.setVersionCode(pp.getAttributeValue(i));
-                        } else if (attr_name.equals("versionName")) {
-                            resTable.setVersionName(pp.getAttributeValue(i));
+                        if (value.isEmpty()) {
+                            continue;
+                        }
+
+                        if (ns.isEmpty()) {
+                            if (name.equals("package")) {
+                                resTable.setPackageRenamed(value);
+                            }
+                        } else if (ns.equals(AXmlResourceParser.ANDROID_RES_NS)) {
+                            switch (name) {
+                                case "versionCode":
+                                    resTable.setVersionCode(value);
+                                    break;
+                                case "versionName":
+                                    resTable.setVersionName(value);
+                                    break;
+                            }
                         }
                     }
-                    return true;
                 }
 
-                private boolean parseAttr(XmlPullParser pp)
+                private void parseUsesSdk(XmlPullParser pp)
                         throws AndrolibException {
                     for (int i = 0; i < pp.getAttributeCount(); i++) {
-                        final String a_ns = "http://schemas.android.com/apk/res/android";
                         String ns = pp.getAttributeNamespace(i);
+                        String name = pp.getAttributeName(i);
+                        String value = pp.getAttributeValue(i);
 
-                        if (a_ns.equals(ns)) {
-                            String name = pp.getAttributeName(i);
-                            String value = pp.getAttributeValue(i);
-                            if (name != null && value != null) {
-                                if (name.equals("minSdkVersion")
-                                        || name.equals("targetSdkVersion")
-                                        || name.equals("maxSdkVersion")
-                                        || name.equals("compileSdkVersion")) {
+                        if (value.isEmpty()) {
+                            continue;
+                        }
+
+                        if (ns.equals(AXmlResourceParser.ANDROID_RES_NS)) {
+                            switch (name) {
+                                case "minSdkVersion":
+                                case "targetSdkVersion":
+                                case "maxSdkVersion":
+                                case "compileSdkVersion":
                                     resTable.addSdkInfo(name, value);
-                                } else {
-                                    resTable.clearSdkInfo();
-                                    return false; // Found unknown flags
-                                }
-                            }
-                        } else {
-                            resTable.clearSdkInfo();
-
-                            if (i >= pp.getAttributeCount()) {
-                                return false; // Found unknown flags
+                                    break;
                             }
                         }
                     }
-
-                    return ! resTable.getAnalysisMode();
                 }
             };
 
