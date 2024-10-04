@@ -185,6 +185,10 @@ public class AaptInvoker {
             cmd.add("--enable-sparse-encoding");
         }
 
+        if (mApkInfo.compactEntries) {
+            cmd.add("--enable-compact-entries");
+        }
+
         if (mApkInfo.isFrameworkApk) {
             cmd.add("-x");
         }

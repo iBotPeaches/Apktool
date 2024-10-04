@@ -51,6 +51,7 @@ public class ApkInfo implements YamlSerializable {
     public Map<String, Boolean> featureFlags = new LinkedHashMap<>();
     public boolean sharedLibrary;
     public boolean sparseResources;
+    public boolean compactEntries;
     public List<String> doNotCompress = new ArrayList<>();
 
     public ApkInfo() {
@@ -266,6 +267,10 @@ public class ApkInfo implements YamlSerializable {
                 sparseResources = line.getValueBool();
                 break;
             }
+            case "compactEntries": {
+                compactEntries = line.getValueBool();
+                break;
+            }
             case "doNotCompress": {
                 doNotCompress.clear();
                 reader.readStringList(doNotCompress);
@@ -288,6 +293,7 @@ public class ApkInfo implements YamlSerializable {
         }
         writer.writeBool("sharedLibrary", sharedLibrary);
         writer.writeBool("sparseResources", sparseResources);
+        writer.writeBool("compactEntries", compactEntries);
         if (!doNotCompress.isEmpty()) {
             writer.writeList("doNotCompress", doNotCompress);
         }
