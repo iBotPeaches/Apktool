@@ -30,6 +30,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.*;
 import java.io.*;
+import java.util.*;
 import java.util.logging.Logger;
 
 public final class ResXmlPatcher {
@@ -354,6 +355,42 @@ public final class ResXmlPatcher {
             saveDocument(file, doc);
 
         } catch (SAXException | ParserConfigurationException | IOException | TransformerException ignored) {
+        }
+    }
+
+    /**
+     * Finds all feature flags set on permissions in AndroidManifest.xml.
+     *
+     * @param file File for AndroidManifest.xml
+     */
+    public static List<String> pullManifestFeatureFlags(File file) {
+        if (!file.exists()) {
+            return null;
+        }
+        try {
+            Document doc = loadDocument(file);
+            XPath xPath = XPathFactory.newInstance().newXPath();
+            XPathExpression expression = xPath.compile("/manifest/permission");
+
+            Object result = expression.evaluate(doc, XPathConstants.NODESET);
+            NodeList nodes = (NodeList) result;
+
+            List<String> featureFlags = new ArrayList<>();
+
+            for (int i = 0; i < nodes.getLength(); i++) {
+                Node node = nodes.item(i);
+                NamedNodeMap attrs = node.getAttributes();
+                Node featureFlagAttr = attrs.getNamedItem("android:featureFlag");
+
+                if (featureFlagAttr != null) {
+                    featureFlags.add(featureFlagAttr.getNodeValue());
+                }
+            }
+
+            return featureFlags;
+
+        } catch (SAXException | ParserConfigurationException | IOException | XPathExpressionException ignored) {
+            return null;
         }
     }
 

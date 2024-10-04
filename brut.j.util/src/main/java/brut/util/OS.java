@@ -53,7 +53,7 @@ public class OS {
     }
 
     public static void rmfile(String file) {
-    	File del = new File(file);
+        File del = new File(file);
         //noinspection ResultOfMethodCallIgnored
         del.delete();
     }

@@ -189,6 +189,15 @@ public class AaptInvoker {
             cmd.add("-x");
         }
 
+        if (!mApkInfo.featureFlags.isEmpty()) {
+            List<String> featureFlags = new ArrayList<>();
+            for (Map.Entry<String, Boolean> entry : mApkInfo.featureFlags.entrySet()) {
+                featureFlags.add(entry.getKey() + "=" + entry.getValue());
+            }
+            cmd.add("--feature-flags");
+            cmd.add(String.join(",", featureFlags));
+        }
+
         if (include != null) {
             for (File file : include) {
                 cmd.add("-I");

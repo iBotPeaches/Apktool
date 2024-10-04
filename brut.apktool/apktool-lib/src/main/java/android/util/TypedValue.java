@@ -119,7 +119,7 @@ public class TypedValue {
     /** Identifies the end of plain integer values. */
     public static final int TYPE_LAST_INT = 0x1f;
 
-	/* ------------------------------------------------------------ */
+    /* ------------------------------------------------------------ */
 
     /** Complex data: bit location of unit information. */
     public static final int COMPLEX_UNIT_SHIFT = 0;
@@ -182,7 +182,7 @@ public class TypedValue {
      */
     public static final int COMPLEX_MANTISSA_MASK = 0xffffff;
 
-	/* ------------------------------------------------------------ */
+    /* ------------------------------------------------------------ */
 
     /**
      * {@link #TYPE_NULL} data indicating the value was not specified.
@@ -207,7 +207,7 @@ public class TypedValue {
      */
     public static final int DENSITY_NONE = 0xffff;
 
-	/* ------------------------------------------------------------ */
+    /* ------------------------------------------------------------ */
 
     /**
      * The type held by this value, as defined by the constants here. This tells

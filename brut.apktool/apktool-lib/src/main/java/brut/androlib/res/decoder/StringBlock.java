@@ -262,8 +262,8 @@ public class StringBlock {
         val = array[offset];
         offset += 1;
         if ((val & 0x80) != 0) {
-        	int low = (array[offset] & 0xFF);
-        	length = ((val & 0x7F) << 8) + low;
+            int low = (array[offset] & 0xFF);
+            length = ((val & 0x7F) << 8) + low;
             offset += 1;
         } else {
             length = val;

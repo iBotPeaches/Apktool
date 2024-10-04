@@ -11,4 +11,5 @@
         <meta-data name="test_int" value="12345" />
     </application>
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN" android:usesPermissionFlags="neverForLocation" />
+    <permission android:featureFlag="brut.feature.flag" android:label="Test Permission" android:name="brut.permission.TEST" android:permissionGroup="android.permission-group.UNDEFINED" android:protectionLevel="signature"/>
 </manifest>
