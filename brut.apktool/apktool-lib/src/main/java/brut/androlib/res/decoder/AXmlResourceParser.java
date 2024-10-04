@@ -863,5 +863,5 @@ public class AXmlResourceParser implements XmlResourceParser {
     private static final int PRIVATE_PKG_ID = 0x7F;
 
     private static final String ANDROID_RES_NS_AUTO = "http://schemas.android.com/apk/res-auto";
-    private static final String ANDROID_RES_NS = "http://schemas.android.com/apk/res/android";
+    public static final String ANDROID_RES_NS = "http://schemas.android.com/apk/res/android";
 }

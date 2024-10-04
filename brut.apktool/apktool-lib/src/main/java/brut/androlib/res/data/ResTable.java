@@ -266,10 +266,6 @@ public class ResTable {
         mApkInfo.sparseResources = flag;
     }
 
-    public void clearSdkInfo() {
-        mApkInfo.sdkInfo.clear();
-    }
-
     public void addSdkInfo(String key, String value) {
         mApkInfo.sdkInfo.put(key, value);
     }

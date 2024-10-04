@@ -23,6 +23,8 @@ import brut.directory.FileDirectory;
 import org.custommonkey.xmlunit.*;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -153,6 +155,20 @@ public class BaseTest {
             }
         }
         return count;
+    }
+
+    protected static boolean resourceNameContains(Element element, String name) {
+        if (element.hasAttribute("name") && element.getAttribute("name").contains(name)) {
+            return true;
+        }
+        NodeList children = element.getChildNodes();
+        for (int i = 0; i < children.getLength(); i++) {
+            Node child = children.item(i);
+            if (child.getNodeType() == Node.ELEMENT_NODE && resourceNameContains((Element) child, name)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     protected static ExtFile sTmpDir;
