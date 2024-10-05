@@ -25,13 +25,13 @@ tasks {
 }
 
 dependencies {
-    api(project(":brut.j.dir"))
-    api(project(":brut.j.util"))
     api(project(":brut.j.common"))
+    api(project(":brut.j.util"))
+    api(project(":brut.j.dir"))
+    api(project(":brut.j.xml"))
 
     implementation(libs.baksmali)
     implementation(libs.smali)
-    implementation(libs.xmlpull)
     implementation(libs.guava)
     implementation(libs.commons.lang3)
     implementation(libs.commons.io)
