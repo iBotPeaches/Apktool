@@ -23,12 +23,15 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.io.*;
 import java.util.*;
 import java.util.logging.Logger;
@@ -436,11 +439,19 @@ public final class ResXmlPatcher {
     private static void saveDocument(File file, Document doc)
             throws IOException, SAXException, ParserConfigurationException, TransformerException {
 
-        TransformerFactory transformerFactory = TransformerFactory.newInstance();
-        Transformer transformer = transformerFactory.newTransformer();
-        DOMSource source = new DOMSource(doc);
-        StreamResult result = new StreamResult(file);
-        transformer.transform(source, result);
+        TransformerFactory factory = TransformerFactory.newInstance();
+        Transformer transformer = factory.newTransformer();
+        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+
+        byte[] xmlDecl = "<?xml version=\"1.0\" encoding=\"utf-8\"?>".getBytes(StandardCharsets.US_ASCII);
+        byte[] newLine = System.getProperty("line.separator").getBytes(StandardCharsets.US_ASCII);
+
+        try (OutputStream output = Files.newOutputStream(file.toPath())) {
+            output.write(xmlDecl);
+            output.write(newLine);
+            transformer.transform(new DOMSource(doc), new StreamResult(output));
+            output.write(newLine);
+        }
     }
 
     private static final String ACCESS_EXTERNAL_DTD = "http://javax.xml.XMLConstants/property/accessExternalDTD";

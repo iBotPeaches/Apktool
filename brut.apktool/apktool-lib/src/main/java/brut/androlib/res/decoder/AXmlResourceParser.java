@@ -611,12 +611,12 @@ public class AXmlResourceParser implements XmlResourceParser {
     }
 
     @Override
-    public boolean getFeature(String feature) {
+    public boolean getFeature(String name) {
         return false;
     }
 
     @Override
-    public void setFeature(String name, boolean value) throws XmlPullParserException {
+    public void setFeature(String name, boolean state) throws XmlPullParserException {
         throw new XmlPullParserException(E_NOT_SUPPORTED);
     }
 

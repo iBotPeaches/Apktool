@@ -19,45 +19,31 @@ package brut.androlib.res.decoder;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.exceptions.AXmlDecodingException;
 import brut.androlib.exceptions.RawXmlEncounteredException;
-import brut.androlib.res.util.ExtXmlSerializer;
-import org.xmlpull.v1.XmlPullParser;
+import brut.xmlpull.XmlPullUtils;
 import org.xmlpull.v1.XmlPullParserException;
-import org.xmlpull.v1.wrapper.XmlPullParserWrapper;
-import org.xmlpull.v1.wrapper.XmlPullWrapperFactory;
-import org.xmlpull.v1.wrapper.XmlSerializerWrapper;
-import org.xmlpull.v1.wrapper.classic.StaticXmlSerializerWrapper;
+import org.xmlpull.v1.XmlSerializer;
 
 import java.io.*;
 
 public class ResXmlPullStreamDecoder implements ResStreamDecoder {
-    public ResXmlPullStreamDecoder(AXmlResourceParser parser,
-                                ExtXmlSerializer serializer) {
-        this.mParser = parser;
-        this.mSerial = serializer;
+    private final AXmlResourceParser mParser;
+    private final XmlSerializer mSerial;
+
+    public ResXmlPullStreamDecoder(AXmlResourceParser parser, XmlSerializer serial) {
+        mParser = parser;
+        mSerial = serial;
     }
 
     @Override
-    public void decode(InputStream in, OutputStream out)
-            throws AndrolibException {
+    public void decode(InputStream in, OutputStream out) throws AndrolibException {
         try {
-            XmlPullWrapperFactory factory = XmlPullWrapperFactory.newInstance();
-            XmlPullParserWrapper par = factory.newPullParserWrapper(mParser);
-            XmlSerializerWrapper ser = new StaticXmlSerializerWrapper(mSerial, factory);
-
-            par.setInput(in, null);
-            ser.setOutput(out, null);
-
-            while (par.nextToken() != XmlPullParser.END_DOCUMENT) {
-                ser.event(par);
-            }
-            ser.flush();
+            mParser.setInput(in, null);
+            mSerial.setOutput(out, null);
+            XmlPullUtils.copy(mParser, mSerial);
         } catch (XmlPullParserException ex) {
             throw new AXmlDecodingException("Could not decode XML", ex);
         } catch (IOException ex) {
             throw new RawXmlEncounteredException("Could not decode XML", ex);
         }
     }
-
-    private final AXmlResourceParser mParser;
-    private final ExtXmlSerializer mSerial;
 }

@@ -20,122 +20,28 @@ import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.exceptions.AXmlDecodingException;
 import brut.androlib.exceptions.RawXmlEncounteredException;
 import brut.androlib.res.data.ResTable;
-import brut.androlib.res.util.ExtXmlSerializer;
+import brut.xmlpull.XmlPullUtils;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
-import org.xmlpull.v1.wrapper.XmlPullParserWrapper;
-import org.xmlpull.v1.wrapper.XmlPullWrapperFactory;
-import org.xmlpull.v1.wrapper.XmlSerializerWrapper;
-import org.xmlpull.v1.wrapper.classic.StaticXmlSerializerWrapper;
+import org.xmlpull.v1.XmlSerializer;
 
 import java.io.*;
 
 public class AndroidManifestPullStreamDecoder implements ResStreamDecoder {
-    public AndroidManifestPullStreamDecoder(AXmlResourceParser parser,
-                                ExtXmlSerializer serializer) {
-        this.mParser = parser;
-        this.mSerial = serializer;
+    private final AXmlResourceParser mParser;
+    private final XmlSerializer mSerial;
+
+    public AndroidManifestPullStreamDecoder(AXmlResourceParser parser, XmlSerializer serial) {
+        mParser = parser;
+        mSerial = serial;
     }
 
     @Override
-    public void decode(InputStream in, OutputStream out)
-            throws AndrolibException {
+    public void decode(InputStream in, OutputStream out) throws AndrolibException {
         try {
-            XmlPullWrapperFactory factory = XmlPullWrapperFactory.newInstance();
-            XmlPullParserWrapper par = factory.newPullParserWrapper(mParser);
-            final ResTable resTable = mParser.getResTable();
-
-            XmlSerializerWrapper ser = new StaticXmlSerializerWrapper(mSerial, factory) {
-                final boolean hideSdkInfo = !resTable.getAnalysisMode();
-
-                @Override
-                public void event(XmlPullParser pp)
-                        throws XmlPullParserException, IOException {
-                    int type = pp.getEventType();
-
-                    if (type == XmlPullParser.START_TAG) {
-                        if ("manifest".equals(pp.getName())) {
-                            try {
-                                parseManifest(pp);
-                            } catch (AndrolibException ignored) {}
-                        } else if ("uses-sdk".equals(pp.getName())) {
-                            try {
-                                parseUsesSdk(pp);
-                            } catch (AndrolibException ignored) {}
-                            if (hideSdkInfo) {
-                                return;
-                            }
-                        }
-                    } else if (type == XmlPullParser.END_TAG
-                            && "uses-sdk".equals(pp.getName())) {
-                        if (hideSdkInfo) {
-                            return;
-                        }
-                    }
-
-                    super.event(pp);
-                }
-
-                private void parseManifest(XmlPullParser pp)
-                        throws AndrolibException {
-                    for (int i = 0; i < pp.getAttributeCount(); i++) {
-                        String ns = pp.getAttributeNamespace(i);
-                        String name = pp.getAttributeName(i);
-                        String value = pp.getAttributeValue(i);
-
-                        if (value.isEmpty()) {
-                            continue;
-                        }
-
-                        if (ns.isEmpty()) {
-                            if (name.equals("package")) {
-                                resTable.setPackageRenamed(value);
-                            }
-                        } else if (ns.equals(AXmlResourceParser.ANDROID_RES_NS)) {
-                            switch (name) {
-                                case "versionCode":
-                                    resTable.setVersionCode(value);
-                                    break;
-                                case "versionName":
-                                    resTable.setVersionName(value);
-                                    break;
-                            }
-                        }
-                    }
-                }
-
-                private void parseUsesSdk(XmlPullParser pp)
-                        throws AndrolibException {
-                    for (int i = 0; i < pp.getAttributeCount(); i++) {
-                        String ns = pp.getAttributeNamespace(i);
-                        String name = pp.getAttributeName(i);
-                        String value = pp.getAttributeValue(i);
-
-                        if (value.isEmpty()) {
-                            continue;
-                        }
-
-                        if (ns.equals(AXmlResourceParser.ANDROID_RES_NS)) {
-                            switch (name) {
-                                case "minSdkVersion":
-                                case "targetSdkVersion":
-                                case "maxSdkVersion":
-                                case "compileSdkVersion":
-                                    resTable.addSdkInfo(name, value);
-                                    break;
-                            }
-                        }
-                    }
-                }
-            };
-
-            par.setInput(in, null);
-            ser.setOutput(out, null);
-
-            while (par.nextToken() != XmlPullParser.END_DOCUMENT) {
-                ser.event(par);
-            }
-            ser.flush();
+            mParser.setInput(in, null);
+            mSerial.setOutput(out, null);
+            XmlPullUtils.copy(mParser, mSerial, new EventHandler(mParser.getResTable()));
         } catch (XmlPullParserException ex) {
             throw new AXmlDecodingException("Could not decode XML", ex);
         } catch (IOException ex) {
@@ -143,6 +49,90 @@ public class AndroidManifestPullStreamDecoder implements ResStreamDecoder {
         }
     }
 
-    private final AXmlResourceParser mParser;
-    private final ExtXmlSerializer mSerial;
+    private static class EventHandler implements XmlPullUtils.EventHandler {
+        private final ResTable mResTable;
+        private final boolean mHideSdkInfo;
+
+        public EventHandler(ResTable resTable) {
+            mResTable = resTable;
+            mHideSdkInfo = !resTable.getAnalysisMode();
+        }
+
+        @Override
+        public boolean onEvent(XmlPullParser in, XmlSerializer out) throws XmlPullParserException {
+            int type = in.getEventType();
+
+            if (type == XmlPullParser.START_TAG) {
+                String name = in.getName();
+
+                if (name.equals("manifest")) {
+                    parseManifest(in);
+                } else if (name.equals("uses-sdk")) {
+                    parseUsesSdk(in);
+
+                    if (mHideSdkInfo) {
+                        return true;
+                    }
+                }
+            } else if (type == XmlPullParser.END_TAG) {
+                String name = in.getName();
+
+                if (name.equals("uses-sdk")) {
+                    if (mHideSdkInfo) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private void parseManifest(XmlPullParser in) {
+            for (int i = 0; i < in.getAttributeCount(); i++) {
+                String ns = in.getAttributeNamespace(i);
+                String name = in.getAttributeName(i);
+                String value = in.getAttributeValue(i);
+
+                if (value.isEmpty()) {
+                    continue;
+                }
+                if (ns.isEmpty()) {
+                    if (name.equals("package")) {
+                        mResTable.setPackageRenamed(value);
+                    }
+                } else if (ns.equals(AXmlResourceParser.ANDROID_RES_NS)) {
+                    switch (name) {
+                        case "versionCode":
+                            mResTable.setVersionCode(value);
+                            break;
+                        case "versionName":
+                            mResTable.setVersionName(value);
+                            break;
+                    }
+                }
+            }
+        }
+
+        private void parseUsesSdk(XmlPullParser in) {
+            for (int i = 0; i < in.getAttributeCount(); i++) {
+                String ns = in.getAttributeNamespace(i);
+                String name = in.getAttributeName(i);
+                String value = in.getAttributeValue(i);
+
+                if (value.isEmpty()) {
+                    continue;
+                }
+                if (ns.equals(AXmlResourceParser.ANDROID_RES_NS)) {
+                    switch (name) {
+                        case "minSdkVersion":
+                        case "targetSdkVersion":
+                        case "maxSdkVersion":
+                        case "compileSdkVersion":
+                            mResTable.addSdkInfo(name, value);
+                            break;
+                    }
+                }
+            }
+        }
+    }
 }

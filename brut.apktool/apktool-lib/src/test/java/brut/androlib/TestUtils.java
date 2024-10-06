@@ -25,12 +25,16 @@ import brut.directory.Directory;
 import brut.directory.FileDirectory;
 import brut.util.OS;
 import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-import org.xmlpull.v1.XmlPullParserFactory;
 
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 import java.io.*;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -40,43 +44,24 @@ import java.util.Map;
 
 public abstract class TestUtils {
 
-    public static Map<String, String> parseStringsXml(File file)
-            throws BrutException {
+    public static Map<String, String> parseStringsXml(File file) throws BrutException {
         try {
-            XmlPullParser xpp = XmlPullParserFactory.newInstance().newPullParser();
-            xpp.setInput(new FileReader(file));
+            Document doc = getDocumentFromFile(file);
+            XPath xPath = XPathFactory.newInstance().newXPath();
+            String expression = "/resources/string[@name]";
+            NodeList nodes = (NodeList) xPath.evaluate(expression, doc, XPathConstants.NODESET);
 
-            int eventType;
-            String key = null;
             Map<String, String> map = new HashMap<>();
-            while ((eventType = xpp.next()) != XmlPullParser.END_DOCUMENT) {
-                switch (eventType) {
-                    case XmlPullParser.START_TAG:
-                        if ("string".equals(xpp.getName())) {
-                            int attrCount = xpp.getAttributeCount();
-                            for (int i = 0; i < attrCount; i++) {
-                                if ("name".equals(xpp.getAttributeName(i))) {
-                                    key = xpp.getAttributeValue(i);
-                                    break;
-                                }
-                            }
-                        }
-                        break;
-                    case XmlPullParser.END_TAG:
-                        if ("string".equals(xpp.getName())) {
-                            key = null;
-                        }
-                        break;
-                    case XmlPullParser.TEXT:
-                        if (key != null) {
-                            map.put(key, xpp.getText());
-                        }
-                        break;
-                }
+
+            for (int i = 0; i < nodes.getLength(); i++) {
+                Node node = nodes.item(i);
+                NamedNodeMap attrs = node.getAttributes();
+                Node nameAttr = attrs.getNamedItem("name");
+                map.put(nameAttr.getNodeValue(), node.getTextContent());
             }
 
             return map;
-        } catch (IOException | XmlPullParserException ex) {
+        } catch (XPathExpressionException ex) {
             throw new BrutException(ex);
         }
     }
@@ -84,7 +69,7 @@ public abstract class TestUtils {
     public static Document getDocumentFromFile(File file) throws BrutException {
         try {
             return ResXmlPatcher.loadDocument(file);
-        } catch (ParserConfigurationException | SAXException | IOException ex) {
+        } catch (IOException | SAXException | ParserConfigurationException ex) {
             throw new BrutException(ex);
         }
     }

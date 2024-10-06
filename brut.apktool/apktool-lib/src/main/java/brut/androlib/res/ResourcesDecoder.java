@@ -21,13 +21,12 @@ import brut.androlib.apk.ApkInfo;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.data.*;
 import brut.androlib.res.decoder.*;
-import brut.androlib.res.util.ExtMXSerializer;
-import brut.androlib.res.util.ExtXmlSerializer;
 import brut.androlib.res.xml.ResValuesXmlSerializable;
 import brut.androlib.res.xml.ResXmlPatcher;
 import brut.directory.Directory;
 import brut.directory.DirectoryException;
 import brut.directory.FileDirectory;
+import brut.xmlpull.MXSerializer;
 import org.apache.commons.io.IOUtils;
 import org.xmlpull.v1.XmlSerializer;
 
@@ -75,7 +74,8 @@ public class ResourcesDecoder {
         }
 
         AXmlResourceParser axmlParser = new AndroidManifestResourceParser(mResTable);
-        ResStreamDecoder fileDecoder = new AndroidManifestPullStreamDecoder(axmlParser, getResXmlSerializer());
+        XmlSerializer xmlSerializer = newXmlSerializer();
+        ResStreamDecoder fileDecoder = new AndroidManifestPullStreamDecoder(axmlParser, xmlSerializer);
 
         Directory inApk, out;
         InputStream inputStream = null;
@@ -157,7 +157,8 @@ public class ResourcesDecoder {
         decoders.setDecoder("9patch", new Res9patchStreamDecoder());
 
         AXmlResourceParser axmlParser = new AXmlResourceParser(mResTable);
-        decoders.setDecoder("xml", new ResXmlPullStreamDecoder(axmlParser, getResXmlSerializer()));
+        XmlSerializer xmlSerializer = newXmlSerializer();
+        decoders.setDecoder("xml", new ResXmlPullStreamDecoder(axmlParser, xmlSerializer));
 
         ResFileDecoder fileDecoder = new ResFileDecoder(decoders);
         Directory in, out, outRes;
@@ -170,7 +171,6 @@ public class ResourcesDecoder {
             throw new AndrolibException(ex);
         }
 
-        ExtMXSerializer xmlSerializer = getResXmlSerializer();
         for (ResPackage pkg : mResTable.listMainPackages()) {
 
             LOGGER.info("Decoding file-resources...");
@@ -191,20 +191,24 @@ public class ResourcesDecoder {
         }
     }
 
-    private ExtMXSerializer getResXmlSerializer() {
-        ExtMXSerializer serial = new ExtMXSerializer();
-        serial.setProperty(ExtXmlSerializer.PROPERTY_SERIALIZER_INDENTATION, "    ");
-        serial.setProperty(ExtXmlSerializer.PROPERTY_SERIALIZER_LINE_SEPARATOR, System.getProperty("line.separator"));
-        serial.setProperty(ExtXmlSerializer.PROPERTY_DEFAULT_ENCODING, "utf-8");
-        serial.setDisabledAttrEscape(true);
-        return serial;
+    private XmlSerializer newXmlSerializer() throws AndrolibException {
+        try {
+            XmlSerializer serial = new MXSerializer();
+            serial.setFeature(MXSerializer.FEATURE_ATTR_VALUE_NO_ESCAPE, true);
+            serial.setProperty(MXSerializer.PROPERTY_DEFAULT_ENCODING, "utf-8");
+            serial.setProperty(MXSerializer.PROPERTY_INDENTATION, "    ");
+            serial.setProperty(MXSerializer.PROPERTY_LINE_SEPARATOR, System.getProperty("line.separator"));
+            return serial;
+        } catch (IllegalArgumentException | IllegalStateException ex) {
+            throw new AndrolibException(ex);
+        }
     }
 
     private void generateValuesFile(ResValuesFile valuesFile, Directory out,
-                                    ExtXmlSerializer serial) throws AndrolibException {
+                                    XmlSerializer serial) throws AndrolibException {
         try {
             OutputStream outStream = out.getFileOutput(valuesFile.getPath());
-            serial.setOutput((outStream), null);
+            serial.setOutput(outStream, null);
             serial.startDocument(null, null);
             serial.startTag(null, "resources");
 
@@ -216,7 +220,6 @@ public class ResourcesDecoder {
             }
 
             serial.endTag(null, "resources");
-            serial.newLine();
             serial.endDocument();
             serial.flush();
             outStream.close();

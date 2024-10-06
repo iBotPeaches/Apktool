@@ -83,7 +83,7 @@ subprojects {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 
-    val mavenProjects = arrayOf("apktool-lib", "apktool-cli", "brut.j.common", "brut.j.util", "brut.j.dir")
+    val mavenProjects = arrayOf("brut.j.common", "brut.j.util", "brut.j.dir", "brut.j.xml", "apktool-lib", "apktool-cli")
 
     if (project.name in mavenProjects) {
         apply(plugin = "maven-publish")
