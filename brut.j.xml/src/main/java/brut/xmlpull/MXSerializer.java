@@ -434,7 +434,7 @@ public class MXSerializer implements XmlSerializer {
             } else {
                 write("no");
             }
-            write('\"');
+            write('"');
         }
         write("?>");
         if (writeLineSeparator) {
