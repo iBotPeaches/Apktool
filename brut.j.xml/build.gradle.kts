@@ -1,0 +1,3 @@
+dependencies {
+    api(libs.xmlpull)
+}
