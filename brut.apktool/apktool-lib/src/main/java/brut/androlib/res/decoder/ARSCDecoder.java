@@ -501,8 +501,8 @@ public class ARSCDecoder {
         char[] language = new char[0];
         char[] country = new char[0];
         if (size >= 12) {
-            language = this.unpackLanguageOrRegion(mIn.readByte(), mIn.readByte(), 'a');
-            country = this.unpackLanguageOrRegion(mIn.readByte(), mIn.readByte(), '0');
+            language = unpackLanguageOrRegion(mIn.readByte(), mIn.readByte(), 'a');
+            country = unpackLanguageOrRegion(mIn.readByte(), mIn.readByte(), '0');
             read = 12;
         }
 

@@ -36,7 +36,7 @@ public class ResFileDecoder {
     private final ResStreamDecoderContainer mDecoders;
 
     public ResFileDecoder(ResStreamDecoderContainer decoders) {
-        this.mDecoders = decoders;
+        mDecoders = decoders;
     }
 
     public void decode(ResResource res, Directory inDir, Directory outDir, Map<String, String> resFileMapping)

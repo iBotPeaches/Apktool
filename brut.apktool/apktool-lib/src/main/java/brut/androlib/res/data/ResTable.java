@@ -260,16 +260,10 @@ public class ResTable {
     }
 
     public void setSparseResources(boolean flag) {
-        if (mApkInfo.sparseResources != flag) {
-            LOGGER.info("Sparsely packed resources detected.");
-        }
         mApkInfo.sparseResources = flag;
     }
 
     public void setCompactEntries(boolean flag) {
-        if (mApkInfo.compactEntries != flag) {
-            LOGGER.info("Compactly packed resource entries detected.");
-        }
         mApkInfo.compactEntries = flag;
     }
 
