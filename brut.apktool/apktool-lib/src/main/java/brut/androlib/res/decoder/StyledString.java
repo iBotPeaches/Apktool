@@ -31,8 +31,8 @@ public class StyledString {
     private final List<Span> mSpans;
 
     public StyledString(String text, List<Span> spans) {
-        this.mText = text;
-        this.mSpans = spans;
+        mText = text;
+        mSpans = spans;
     }
 
     String getText() {

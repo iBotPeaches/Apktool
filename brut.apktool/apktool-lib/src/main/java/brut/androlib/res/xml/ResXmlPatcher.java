@@ -20,6 +20,7 @@ import brut.androlib.exceptions.AndrolibException;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -29,10 +30,14 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.xpath.*;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.io.*;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -413,8 +418,8 @@ public final class ResXmlPatcher {
         docFactory.setFeature(FEATURE_LOAD_DTD, false);
 
         try {
-            docFactory.setAttribute(ACCESS_EXTERNAL_DTD, " ");
-            docFactory.setAttribute(ACCESS_EXTERNAL_SCHEMA, " ");
+            docFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, " ");
+            docFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, " ");
         } catch (IllegalArgumentException ex) {
             LOGGER.warning("JAXP 1.5 Support is required to validate XML");
         }
@@ -454,8 +459,6 @@ public final class ResXmlPatcher {
         }
     }
 
-    private static final String ACCESS_EXTERNAL_DTD = "http://javax.xml.XMLConstants/property/accessExternalDTD";
-    private static final String ACCESS_EXTERNAL_SCHEMA = "http://javax.xml.XMLConstants/property/accessExternalSchema";
     private static final String FEATURE_LOAD_DTD = "http://apache.org/xml/features/nonvalidating/load-external-dtd";
     private static final String FEATURE_DISABLE_DOCTYPE_DECL = "http://apache.org/xml/features/disallow-doctype-decl";
 

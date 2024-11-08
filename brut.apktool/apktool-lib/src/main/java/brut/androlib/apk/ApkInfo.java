@@ -24,6 +24,7 @@ import brut.directory.ExtFile;
 import brut.directory.FileDirectory;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -192,7 +193,10 @@ public class ApkInfo implements YamlSerializable {
     }
 
     public void save(File file) throws AndrolibException {
-        try (YamlWriter writer = new YamlWriter(new FileOutputStream(file))) {
+        try (
+            OutputStream out = Files.newOutputStream(file.toPath());
+            YamlWriter writer = new YamlWriter(out)
+        ) {
             write(writer);
         } catch (FileNotFoundException ex) {
             throw new AndrolibException("File not found");

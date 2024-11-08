@@ -100,21 +100,28 @@ public class ResourcesDecoder {
             IOUtils.closeQuietly(outputStream);
         }
 
-        if (mApkInfo.hasResources()) {
-            if (!mConfig.analysisMode) {
-                // Remove versionName / versionCode (aapt API 16)
-                //
-                // check for a mismatch between resources.arsc package and the package listed in AndroidManifest
-                // also remove the android::versionCode / versionName from manifest for rebuild
-                // this is a required change to prevent aapt warning about conflicting versions
-                // it will be passed as a parameter to aapt like "--min-sdk-version" via apktool.yml
-                adjustPackageManifest(outDir.getAbsolutePath() + File.separator + "AndroidManifest.xml");
+        File manifest = new File(outDir, "AndroidManifest.xml");
 
-                ResXmlPatcher.removeManifestVersions(new File(
-                    outDir.getAbsolutePath() + File.separator + "AndroidManifest.xml"));
+        if (mApkInfo.hasResources() && !mConfig.analysisMode) {
+            // Remove versionName / versionCode (aapt API 16)
+            //
+            // check for a mismatch between resources.arsc package and the package listed in AndroidManifest
+            // also remove the android::versionCode / versionName from manifest for rebuild
+            // this is a required change to prevent aapt warning about conflicting versions
+            // it will be passed as a parameter to aapt like "--min-sdk-version" via apktool.yml
+            adjustPackageManifest(manifest);
 
-                // update apk info
-                mApkInfo.packageInfo.forcedPackageId = String.valueOf(mResTable.getPackageId());
+            ResXmlPatcher.removeManifestVersions(manifest);
+
+            // update apk info
+            mApkInfo.packageInfo.forcedPackageId = String.valueOf(mResTable.getPackageId());
+        }
+
+        // record feature flags
+        List<String> featureFlags = ResXmlPatcher.pullManifestFeatureFlags(manifest);
+        if (featureFlags != null) {
+            for (String flag : featureFlags) {
+                mApkInfo.addFeatureFlag(flag, true);
             }
         }
     }
@@ -123,7 +130,7 @@ public class ResourcesDecoder {
         mResTable.initApkInfo(mApkInfo, outDir);
     }
 
-    private void adjustPackageManifest(String filePath) throws AndrolibException {
+    private void adjustPackageManifest(File manifest) throws AndrolibException {
         // compare resources.arsc package name to the one present in AndroidManifest
         ResPackage resPackage = mResTable.getCurrentResPackage();
         String pkgOriginal = resPackage.getName();
@@ -141,7 +148,7 @@ public class ResourcesDecoder {
             LOGGER.info("Regular manifest package...");
         } else {
             LOGGER.info("Renamed manifest package found! Replacing " + pkgRenamed + " with " + pkgOriginal);
-            ResXmlPatcher.renameManifestPackage(new File(filePath), pkgOriginal);
+            ResXmlPatcher.renameManifestPackage(manifest, pkgOriginal);
         }
     }
 

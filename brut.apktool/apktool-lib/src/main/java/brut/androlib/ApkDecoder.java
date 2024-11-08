@@ -21,7 +21,6 @@ import brut.androlib.exceptions.InFileNotFoundException;
 import brut.androlib.exceptions.OutDirExistsException;
 import brut.androlib.apk.ApkInfo;
 import brut.androlib.res.ResourcesDecoder;
-import brut.androlib.res.xml.ResXmlPatcher;
 import brut.androlib.src.SmaliDecoder;
 import brut.directory.Directory;
 import brut.directory.ExtFile;
@@ -320,15 +319,6 @@ public class ApkDecoder {
         // in case we have no resources, we should store the minSdk we pulled from the source opcode api level
         if (!mApkInfo.hasResources() && mMinSdkVersion > 0) {
             mApkInfo.setMinSdkVersion(Integer.toString(mMinSdkVersion));
-        }
-
-        // record feature flags
-        File manifest = new File(outDir, "AndroidManifest.xml");
-        List<String> featureFlags = ResXmlPatcher.pullManifestFeatureFlags(manifest);
-        if (featureFlags != null) {
-            for (String flag : featureFlags) {
-                mApkInfo.addFeatureFlag(flag, true);
-            }
         }
 
         // record uncompressed files
