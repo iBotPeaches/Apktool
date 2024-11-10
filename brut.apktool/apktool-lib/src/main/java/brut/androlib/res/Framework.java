@@ -22,8 +22,8 @@ import brut.androlib.exceptions.CantFindFrameworkResException;
 import brut.androlib.res.decoder.ARSCDecoder;
 import brut.androlib.res.data.arsc.ARSCData;
 import brut.androlib.res.data.arsc.FlagsOffset;
+import brut.util.BrutIO;
 import brut.util.Jar;
-import org.apache.commons.io.IOUtils;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -50,8 +50,6 @@ public class Framework {
     }
 
     public void installFramework(File frameFile, String tag) throws AndrolibException {
-        InputStream in = null;
-        ZipOutputStream out = null;
         try (ZipFile zip = new ZipFile(frameFile)) {
             ZipEntry entry = zip.getEntry("resources.arsc");
 
@@ -59,9 +57,7 @@ public class Framework {
                 throw new AndrolibException("Can't find resources.arsc file");
             }
 
-            in = zip.getInputStream(entry);
-            byte[] data = IOUtils.toByteArray(in);
-
+            byte[] data = BrutIO.readAndClose(zip.getInputStream(entry));
             ARSCData arsc = ARSCDecoder.decode(new ByteArrayInputStream(data), true, true);
             publicizeResources(data, arsc.getFlagsOffsets());
 
@@ -70,39 +66,36 @@ public class Framework {
                 + (tag == null ? "" : '-' + tag)
                 + ".apk");
 
-            out = new ZipOutputStream(Files.newOutputStream(outFile.toPath()));
-            out.setMethod(ZipOutputStream.STORED);
-            CRC32 crc = new CRC32();
-            crc.update(data);
-            entry = new ZipEntry("resources.arsc");
-            entry.setSize(data.length);
-            entry.setMethod(ZipEntry.STORED);
-            entry.setCrc(crc.getValue());
-            out.putNextEntry(entry);
-            out.write(data);
-            out.closeEntry();
-
-            //Write fake AndroidManifest.xml file to support original aapt
-            entry = zip.getEntry("AndroidManifest.xml");
-            if (entry != null) {
-                in = zip.getInputStream(entry);
-                byte[] manifest = IOUtils.toByteArray(in);
-                CRC32 manifestCrc = new CRC32();
-                manifestCrc.update(manifest);
-                entry.setSize(manifest.length);
-                entry.setCompressedSize(-1);
-                entry.setCrc(manifestCrc.getValue());
+            try (ZipOutputStream out = new ZipOutputStream(Files.newOutputStream(outFile.toPath()))) {
+                out.setMethod(ZipOutputStream.STORED);
+                CRC32 crc = new CRC32();
+                crc.update(data);
+                entry = new ZipEntry("resources.arsc");
+                entry.setSize(data.length);
+                entry.setMethod(ZipEntry.STORED);
+                entry.setCrc(crc.getValue());
                 out.putNextEntry(entry);
-                out.write(manifest);
+                out.write(data);
                 out.closeEntry();
+
+                // write fake AndroidManifest.xml file to support original aapt
+                entry = zip.getEntry("AndroidManifest.xml");
+                if (entry != null) {
+                    byte[] manifest = BrutIO.readAndClose(zip.getInputStream(entry));
+                    CRC32 manifestCrc = new CRC32();
+                    manifestCrc.update(manifest);
+                    entry.setSize(manifest.length);
+                    entry.setCompressedSize(-1);
+                    entry.setCrc(manifestCrc.getValue());
+                    out.putNextEntry(entry);
+                    out.write(manifest);
+                    out.closeEntry();
+                }
             }
 
             LOGGER.info("Framework installed to: " + outFile);
         } catch (IOException ex) {
             throw new AndrolibException(ex);
-        } finally {
-            IOUtils.closeQuietly(in);
-            IOUtils.closeQuietly(out);
         }
     }
 
@@ -212,15 +205,12 @@ public class Framework {
         }
 
         if (id == 1) {
-            try (
-                InputStream in = getAndroidFrameworkResourcesAsStream();
-                OutputStream out = Files.newOutputStream(apk.toPath())
-            ) {
-                IOUtils.copy(in, out);
-                return apk;
+            try {
+                BrutIO.copyAndClose(getAndroidFrameworkResourcesAsStream(), Files.newOutputStream(apk.toPath()));
             } catch (IOException ex) {
                 throw new AndrolibException(ex);
             }
+            return apk;
         }
 
         throw new CantFindFrameworkResException(id);

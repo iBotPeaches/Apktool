@@ -22,9 +22,9 @@ import brut.androlib.exceptions.RawXmlEncounteredException;
 import brut.androlib.res.data.ResResource;
 import brut.androlib.res.data.value.ResBoolValue;
 import brut.androlib.res.data.value.ResFileValue;
-import brut.directory.DirUtil;
 import brut.directory.Directory;
 import brut.directory.DirectoryException;
+import brut.directory.DirUtil;
 import brut.util.BrutIO;
 
 import java.io.*;
