@@ -35,7 +35,6 @@ import brut.util.AaptManager;
 import brut.util.BrutIO;
 import brut.util.OS;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -377,7 +376,7 @@ public class ApkBuilder {
 
         try {
             AaptInvoker invoker = new AaptInvoker(mConfig, mApkInfo);
-            invoker.invokeAapt(tmpFile, manifest, resDir, ninePatch, null, getIncludeFiles());
+            invoker.invoke(tmpFile, manifest, resDir, ninePatch, null, getIncludeFiles());
 
             Directory tmpDir = tmpFile.getDirectory();
             tmpDir.copyToDir(outDir, "AndroidManifest.xml");
@@ -417,7 +416,7 @@ public class ApkBuilder {
 
         try {
             AaptInvoker invoker = new AaptInvoker(mConfig, mApkInfo);
-            invoker.invokeAapt(tmpFile, manifest, null, ninePatch, null, getIncludeFiles());
+            invoker.invoke(tmpFile, manifest, null, ninePatch, null, getIncludeFiles());
 
             Directory tmpDir = tmpFile.getDirectory();
             tmpDir.copyToDir(outDir, "AndroidManifest.xml");

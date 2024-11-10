@@ -52,16 +52,16 @@ public class DirUtil {
         copyToDir(in, out, fileName, fileName);
     }
 
-    public static void copyToDir(Directory in, Directory out, String inFile, String outFile)
+    public static void copyToDir(Directory in, Directory out, String inFileName, String outFileName)
             throws DirectoryException {
         try {
-            if (in.containsDir(inFile)) {
-                in.getDir(inFile).copyToDir(out.createDir(outFile));
+            if (in.containsDir(inFileName)) {
+                in.getDir(inFileName).copyToDir(out.createDir(outFileName));
             } else {
-                BrutIO.copyAndClose(in.getFileInput(inFile), out.getFileOutput(outFile));
+                BrutIO.copyAndClose(in.getFileInput(inFileName), out.getFileOutput(outFileName));
             }
         } catch (IOException ex) {
-            throw new DirectoryException("Error copying file: " + inFile, ex);
+            throw new DirectoryException("Error copying file: " + inFileName, ex);
         }
     }
 
@@ -81,28 +81,33 @@ public class DirUtil {
 
     public static void copyToDir(Directory in, File out, String fileName)
             throws DirectoryException {
+        copyToDir(in, out, fileName, fileName);
+    }
+
+    public static void copyToDir(Directory in, File out, String inFileName, String outFileName)
+            throws DirectoryException {
         try {
-            if (in.containsDir(fileName)) {
-                File outDir = new File(out, fileName);
+            if (in.containsDir(inFileName)) {
+                File outDir = new File(out, outFileName);
                 OS.rmdir(outDir);
-                in.getDir(fileName).copyToDir(outDir);
-            } else if (in.containsFile(fileName)) {
-                String validFileName = BrutIO.sanitizePath(out, fileName);
-                if (!validFileName.isEmpty()) {
-                    File outFile = new File(out, validFileName);
+                in.getDir(inFileName).copyToDir(outDir);
+            } else if (in.containsFile(inFileName)) {
+                outFileName = BrutIO.sanitizePath(out, outFileName);
+                if (!outFileName.isEmpty()) {
+                    File outFile = new File(out, outFileName);
                     //noinspection ResultOfMethodCallIgnored
                     outFile.getParentFile().mkdirs();
-                    BrutIO.copyAndClose(in.getFileInput(fileName), Files.newOutputStream(outFile.toPath()));
+                    BrutIO.copyAndClose(in.getFileInput(inFileName), Files.newOutputStream(outFile.toPath()));
                 }
             } else {
                 // Skip if directory/file not found
             }
         } catch (FileSystemException ex) {
-            LOGGER.warning(String.format("Skipping file %s (%s)", fileName, ex.getReason()));
+            LOGGER.warning(String.format("Skipping file %s (%s)", inFileName, ex.getReason()));
         } catch (RootUnknownFileException | InvalidUnknownFileException | TraversalUnknownFileException | IOException ex) {
-            LOGGER.warning(String.format("Skipping file %s (%s)", fileName, ex.getMessage()));
+            LOGGER.warning(String.format("Skipping file %s (%s)", inFileName, ex.getMessage()));
         } catch (BrutException ex) {
-            throw new DirectoryException("Error copying file: " + fileName, ex);
+            throw new DirectoryException("Error copying file: " + inFileName, ex);
         }
     }
 }

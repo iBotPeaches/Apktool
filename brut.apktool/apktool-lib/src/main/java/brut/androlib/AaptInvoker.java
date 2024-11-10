@@ -50,7 +50,7 @@ public class AaptInvoker {
         }
     }
 
-    public void invokeAapt(File apkFile, File manifest, File resDir, File rawDir, File assetDir, File[] include)
+    public void invoke(File apkFile, File manifest, File resDir, File rawDir, File assetDir, File[] include)
             throws AndrolibException {
 
         String aaptPath = mConfig.aaptPath;

@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.util.logging.Logger;
 
 public class ExtCountingDataInput extends ExtDataInput {
+    private static final Logger LOGGER = Logger.getLogger(ExtCountingDataInput.class.getName());
+
     private final CountingInputStream mCountIn;
 
     public ExtCountingDataInput(LittleEndianDataInputStream in) {
@@ -67,6 +69,4 @@ public class ExtCountingDataInput extends ExtDataInput {
         }
         return array;
     }
-
-    private static final Logger LOGGER = Logger.getLogger(ExtCountingDataInput.class.getName());
 }

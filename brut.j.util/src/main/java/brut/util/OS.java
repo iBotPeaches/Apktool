@@ -17,7 +17,7 @@
 package brut.util;
 
 import brut.common.BrutException;
-import org.apache.commons.io.IOUtils;
+import brut.util.BrutIO;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -28,7 +28,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 public class OS {
-
     private static final Logger LOGGER = Logger.getLogger("");
 
     public static void rmdir(File dir) throws BrutException {
@@ -77,11 +76,7 @@ public class OS {
                 continue;
             }
             try {
-                try (InputStream in = Files.newInputStream(file.toPath())) {
-                    try (OutputStream out = Files.newOutputStream(destFile.toPath())) {
-                        IOUtils.copy(in, out);
-                    }
-                }
+                BrutIO.copyAndClose(Files.newInputStream(file.toPath()), Files.newOutputStream(destFile.toPath()));
             } catch (IOException ex) {
                 throw new BrutException("Could not copy file: " + file, ex);
             }

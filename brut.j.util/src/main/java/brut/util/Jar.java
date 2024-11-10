@@ -17,6 +17,7 @@
 package brut.util;
 
 import brut.common.BrutException;
+import brut.util.BrutIO;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
@@ -42,8 +43,9 @@ public abstract class Jar {
     }
 
     public static File extractToTmp(String resourcePath, String tmpPrefix, Class<?> clazz) throws BrutException {
+        InputStream in = null;
         try {
-            InputStream in = clazz.getResourceAsStream(resourcePath);
+            in = clazz.getResourceAsStream(resourcePath);
             if (in == null) {
                 throw new FileNotFoundException(resourcePath);
             }
@@ -52,14 +54,13 @@ public abstract class Jar {
             File fileOut = File.createTempFile(tmpPrefix, suffix + ".tmp");
             fileOut.deleteOnExit();
 
-            OutputStream out = Files.newOutputStream(fileOut.toPath());
-            IOUtils.copy(in, out);
-            in.close();
-            out.close();
+            BrutIO.copyAndClose(in, Files.newOutputStream(fileOut.toPath()));
 
             return fileOut;
         } catch (IOException ex) {
             throw new BrutException("Could not extract resource: " + resourcePath, ex);
+        } finally {
+            IOUtils.closeQuietly(in);
         }
     }
 }

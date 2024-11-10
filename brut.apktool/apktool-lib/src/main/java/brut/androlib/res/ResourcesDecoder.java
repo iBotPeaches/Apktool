@@ -25,9 +25,8 @@ import brut.androlib.res.xml.ResValuesXmlSerializable;
 import brut.androlib.res.xml.ResXmlPatcher;
 import brut.directory.Directory;
 import brut.directory.DirectoryException;
-import brut.directory.FileDirectory;
+import brut.directory.ExtFile;
 import brut.xmlpull.MXSerializer;
-import org.apache.commons.io.IOUtils;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.*;
@@ -77,27 +76,25 @@ public class ResourcesDecoder {
         XmlSerializer xmlSerializer = newXmlSerializer();
         ResStreamDecoder fileDecoder = new AndroidManifestPullStreamDecoder(axmlParser, xmlSerializer);
 
-        Directory inApk, out;
-        InputStream inputStream = null;
-        OutputStream outputStream = null;
+        Directory in, out;
         try {
-            inApk = mApkInfo.getApkFile().getDirectory();
-            out = new FileDirectory(outDir);
+            in = mApkInfo.getApkFile().getDirectory();
+            out = new ExtFile(outDir).getDirectory();
 
             if (mApkInfo.hasResources()) {
                 LOGGER.info("Decoding AndroidManifest.xml with resources...");
             } else {
                 LOGGER.info("Decoding AndroidManifest.xml with only framework resources...");
             }
-            inputStream = inApk.getFileInput("AndroidManifest.xml");
-            outputStream = out.getFileOutput("AndroidManifest.xml");
-            fileDecoder.decode(inputStream, outputStream);
 
-        } catch (DirectoryException ex) {
+            try (
+                InputStream is = in.getFileInput("AndroidManifest.xml");
+                OutputStream os = out.getFileOutput("AndroidManifest.xml")
+            ) {
+                fileDecoder.decode(is, os);
+            }
+        } catch (DirectoryException | IOException ex) {
             throw new AndrolibException(ex);
-        } finally {
-            IOUtils.closeQuietly(inputStream);
-            IOUtils.closeQuietly(outputStream);
         }
 
         File manifest = new File(outDir, "AndroidManifest.xml");
@@ -171,25 +168,24 @@ public class ResourcesDecoder {
         Directory in, out, outRes;
 
         try {
-            out = new FileDirectory(outDir);
             in = mApkInfo.getApkFile().getDirectory();
-            outRes = out.createDir("res");
+            out = new ExtFile(outDir).getDirectory().createDir("res");
         } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
         }
 
         for (ResPackage pkg : mResTable.listMainPackages()) {
-
             LOGGER.info("Decoding file-resources...");
             for (ResResource res : pkg.listFiles()) {
-                fileDecoder.decode(res, in, outRes, mResFileMapping);
+                fileDecoder.decode(res, in, out, mResFileMapping);
             }
 
             LOGGER.info("Decoding values */* XMLs...");
             for (ResValuesFile valuesFile : pkg.listValuesFiles()) {
-                generateValuesFile(valuesFile, outRes, xmlSerializer);
+                generateValuesFile(valuesFile, out, xmlSerializer);
             }
-            generatePublicXml(pkg, outRes, xmlSerializer);
+
+            generatePublicXml(pkg, out, xmlSerializer);
         }
 
         AndrolibException decodeError = axmlParser.getFirstError();

@@ -26,6 +26,14 @@ import java.io.*;
 import java.util.zip.CRC32;
 
 public class BrutIO {
+    public static byte[] readAndClose(InputStream in) throws IOException {
+        try {
+            return IOUtils.toByteArray(in);
+        } finally {
+            IOUtils.closeQuietly(in);
+        }
+    }
+
     public static void copyAndClose(InputStream in, OutputStream out) throws IOException {
         try {
             IOUtils.copy(in, out);
@@ -60,11 +68,11 @@ public class BrutIO {
         return modified;
     }
 
-    public static CRC32 calculateCrc(InputStream input) throws IOException {
+    public static CRC32 calculateCrc(InputStream in) throws IOException {
         CRC32 crc = new CRC32();
         int bytesRead;
         byte[] buffer = new byte[8192];
-        while ((bytesRead = input.read(buffer)) != -1) {
+        while ((bytesRead = in.read(buffer)) != -1) {
             crc.update(buffer, 0, bytesRead);
         }
         return crc;

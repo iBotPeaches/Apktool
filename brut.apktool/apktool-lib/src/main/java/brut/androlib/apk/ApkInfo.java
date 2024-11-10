@@ -21,7 +21,6 @@ import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.data.ResConfigFlags;
 import brut.directory.DirectoryException;
 import brut.directory.ExtFile;
-import brut.directory.FileDirectory;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -212,10 +211,10 @@ public class ApkInfo implements YamlSerializable {
         return apkInfo;
     }
 
-    public static ApkInfo load(File appDir) throws AndrolibException {
-        try (InputStream in = new FileDirectory(appDir).getFileInput("apktool.yml")) {
+    public static ApkInfo load(ExtFile apkDir) throws AndrolibException {
+        try (InputStream in = apkDir.getDirectory().getFileInput("apktool.yml")) {
             ApkInfo apkInfo = ApkInfo.load(in);
-            apkInfo.setApkFile(new ExtFile(appDir));
+            apkInfo.setApkFile(apkDir);
             return apkInfo;
         } catch (DirectoryException | IOException ex) {
             throw new AndrolibException(ex);
