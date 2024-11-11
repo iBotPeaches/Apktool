@@ -343,12 +343,6 @@ public class ApkBuilder {
                 }
 
                 File netSecConfOrig = new File(mApkDir, "res/xml/network_security_config.xml");
-                if (netSecConfOrig.exists()) {
-                    LOGGER.info("Replacing existing network_security_config.xml!");
-                    //noinspection ResultOfMethodCallIgnored
-                    netSecConfOrig.delete();
-                }
-
                 ResXmlPatcher.modNetworkSecurityConfig(netSecConfOrig);
                 ResXmlPatcher.setNetworkSecurityConfig(manifest);
                 LOGGER.info("Added permissive network security config in manifest");
