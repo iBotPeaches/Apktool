@@ -146,30 +146,59 @@ public final class ResXmlPatcher {
      */
     public static void modNetworkSecurityConfig(File file)
             throws ParserConfigurationException, TransformerException, IOException, SAXException {
-
         DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder documentBuilder = documentFactory.newDocumentBuilder();
-        Document document = documentBuilder.newDocument();
+        Document document;
+        if (file.exists()) {
+            document = documentBuilder.parse(file);
+            document.getDocumentElement().normalize();
+        } else {
+            document = documentBuilder.newDocument();
+        }
+        
+        Element root = (Element) document.getElementsByTagName("network-security-config").item(0);
+        if (root == null) {
+            root = document.createElement("network-security-config");
+            document.appendChild(root);
+        }
+            
+        Element baseConfig = (Element) document.getElementsByTagName("base-config").item(0);
+        if (baseConfig == null) {
+            baseConfig = document.createElement("base-config");
+            root.appendChild(baseConfig);
+        }
 
-        Element root = document.createElement("network-security-config");
-        document.appendChild(root);
-        Element baseConfig = document.createElement("base-config");
-        root.appendChild(baseConfig);
-        Element trustAnchors = document.createElement("trust-anchors");
-        baseConfig.appendChild(trustAnchors);
+        Element trustAnchors = (Element) document.getElementsByTagName("trust-anchors").item(0);
+        if (trustAnchors == null) {
+            trustAnchors = document.createElement("trust-anchors");
+            baseConfig.appendChild(trustAnchors);
+        }
 
-        Element certSystem = document.createElement("certificates");
-        Attr attrSystem = document.createAttribute("src");
-        attrSystem.setValue("system");
-        certSystem.setAttributeNode(attrSystem);
-        trustAnchors.appendChild(certSystem);
+        NodeList certificates = document.getElementsByTagName("certificates");
+        boolean hasSystemCert = false;
+        boolean hasUserCert = false;
+        for (int i = 0; i < certificates.getLength(); i++) {
+            Element cert = (Element) certificates.item(i);
+            String src = cert.getAttribute("src");
+            if ("system".equals(src)) {
+                hasSystemCert = true;
+            } else if ("user".equals(src)) {
+                hasUserCert = true;
+            }
+        }
 
-        Element certUser = document.createElement("certificates");
-        Attr attrUser = document.createAttribute("src");
-        attrUser.setValue("user");
-        certUser.setAttributeNode(attrUser);
-        trustAnchors.appendChild(certUser);
-
+        if (!hasSystemCert) {
+            Element certSystem = document.createElement("certificates");
+            certSystem.setAttribute("src", "system");
+            trustAnchors.appendChild(certSystem);
+        }
+            
+        if (!hasUserCert) {
+            Element certUser = document.createElement("certificates");
+            certUser.setAttribute("src", "user");
+            trustAnchors.appendChild(certUser);
+        }
+            
         saveDocument(file, document);
     }
 
