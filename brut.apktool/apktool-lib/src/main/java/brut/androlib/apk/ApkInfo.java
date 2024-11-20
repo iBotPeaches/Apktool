@@ -35,7 +35,7 @@ public class ApkInfo implements YamlSerializable {
         "AndroidManifest\\.xml|META-INF/[^/]+\\.(RSA|SF|MF)|stamp-cert-sha256");
 
     public final static Pattern STANDARD_FILENAMES_PATTERN = Pattern.compile(
-        "[^/]+\\.dex|resources\\.arsc|(" + String.join("|", RESOURCES_DIRNAMES) + "|" + 
+        "[^/]+\\.dex|resources\\.arsc|(" + String.join("|", RESOURCES_DIRNAMES) + "|" +
         String.join("|", RAW_DIRNAMES) + ")/.*|" + ORIGINAL_FILENAMES_PATTERN.pattern());
 
     // only set when loaded from a file (not a stream)
@@ -180,6 +180,8 @@ public class ApkInfo implements YamlSerializable {
             case "VANILLAICECREAM":
             case "VANILLA_ICE_CREAM":
                 return ResConfigFlags.SDK_VANILLA_ICE_CREAM;
+            case "BAKLAVA":
+                return ResConfigFlags.SDK_BAKLAVA;
             case "SDK_CUR_DEVELOPMENT":
                 return ResConfigFlags.SDK_DEVELOPMENT;
             default:
