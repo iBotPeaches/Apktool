@@ -224,6 +224,13 @@ _Options used for list-frameworks commands (`apktool list-frameworks {options}`)
 _Options that can be used with any command_
 
 ```
+-j <NUM>, --jobs <NUM>
+```
+
+- Sets the number of threads to use when parallel operations are available.
+  - Defaults to the number of processors available, with a max of 8.
+
+```
 -v, --verbose
 ```
 
