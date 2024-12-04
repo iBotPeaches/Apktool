@@ -27,42 +27,35 @@ import java.util.*;
 import java.util.logging.Logger;
 
 public class AaptInvoker {
+    private static final Logger LOGGER = Logger.getLogger(AaptInvoker.class.getName());
+
     private final Config mConfig;
     private final ApkInfo mApkInfo;
-
-    private final static Logger LOGGER = Logger.getLogger(AaptInvoker.class.getName());
 
     public AaptInvoker(Config config, ApkInfo apkInfo) {
         mConfig = config;
         mApkInfo = apkInfo;
     }
 
-    private File getAaptBinaryFile() throws AndrolibException {
-        try {
-            switch (mConfig.aaptVersion) {
-                case 2:
-                    return AaptManager.getAapt2();
-                default:
-                    return AaptManager.getAapt1();
-            }
-        } catch (BrutException ex) {
-            throw new AndrolibException(ex);
-        }
-    }
-
     public void invoke(File apkFile, File manifest, File resDir, File rawDir, File assetDir, File[] include)
             throws AndrolibException {
+        File aaptBinary = mConfig.aaptBinary;
 
-        String aaptPath = mConfig.aaptPath;
-        boolean customAapt = !aaptPath.isEmpty();
         List<String> cmd = new ArrayList<>();
+        boolean customAapt = false;
 
-        try {
-            String aaptCommand = AaptManager.getAaptExecutionCommand(aaptPath, getAaptBinaryFile());
-            cmd.add(aaptCommand);
-        } catch (BrutException ex) {
-            LOGGER.warning("aapt: " + ex.getMessage() + " (defaulting to $PATH binary)");
-            cmd.add(AaptManager.getAaptBinaryName(mConfig.aaptVersion));
+        if (mConfig.aaptBinary != null) {
+            cmd.add(mConfig.aaptBinary.getPath());
+            customAapt = true;
+        } else {
+            String aaptName = AaptManager.getAaptName(mConfig.aaptVersion);
+            try {
+                cmd.add(AaptManager.getAaptBinary(aaptName).getPath());
+            } catch (BrutException ex) {
+                LOGGER.warning("aapt: " + ex.getMessage() + " (defaulting to $PATH binary)");
+                cmd.add(aaptName);
+                customAapt = true;
+            }
         }
 
         switch (mConfig.aaptVersion) {
@@ -77,7 +70,6 @@ public class AaptInvoker {
 
     private void invokeAapt2(File apkFile, File manifest, File resDir, File rawDir, File assetDir, File[] include,
                              List<String> cmd, boolean customAapt) throws AndrolibException {
-
         List<String> compileCommand = new ArrayList<>(cmd);
         File resourcesZip = null;
 
@@ -87,7 +79,6 @@ public class AaptInvoker {
         }
 
         if (resDir != null && !resourcesZip.exists()) {
-
             // Compile the files into flat arsc files
             cmd.add("compile");
 
@@ -241,7 +232,6 @@ public class AaptInvoker {
 
     private void invokeAapt1(File apkFile, File manifest, File resDir, File rawDir, File assetDir, File[] include,
                              List<String> cmd, boolean customAapt) throws AndrolibException {
-
         cmd.add("p");
 
         if (mConfig.verbose) { // output aapt verbose

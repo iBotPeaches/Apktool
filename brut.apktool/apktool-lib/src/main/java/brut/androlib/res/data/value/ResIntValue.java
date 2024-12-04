@@ -21,16 +21,16 @@ import brut.androlib.exceptions.AndrolibException;
 
 public class ResIntValue extends ResScalarValue {
     protected final int mValue;
-    private int type;
+    private int mType;
 
     public ResIntValue(int value, String rawValue, int type) {
         this(value, rawValue, "integer");
-        this.type = type;
+        mType = type;
     }
 
     public ResIntValue(int value, String rawValue, String type) {
         super(type, value, rawValue);
-        this.mValue = value;
+        mValue = value;
     }
 
     public int getValue() {
@@ -39,6 +39,6 @@ public class ResIntValue extends ResScalarValue {
 
     @Override
     protected String encodeAsResXml() throws AndrolibException {
-        return TypedValue.coerceToString(type, mValue);
+        return TypedValue.coerceToString(mType, mValue);
     }
 }

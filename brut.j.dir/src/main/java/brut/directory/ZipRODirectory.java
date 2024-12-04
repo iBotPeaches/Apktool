@@ -48,7 +48,6 @@ public class ZipRODirectory extends AbstractDirectory {
     }
 
     public ZipRODirectory(File zipFile, String path) throws DirectoryException {
-        super();
         try {
             mZipFile = new ZipFile(zipFile);
         } catch (IOException ex) {
@@ -58,7 +57,6 @@ public class ZipRODirectory extends AbstractDirectory {
     }
 
     public ZipRODirectory(ZipFile zipFile, String path) {
-        super();
         mZipFile = zipFile;
         mPath = path;
     }

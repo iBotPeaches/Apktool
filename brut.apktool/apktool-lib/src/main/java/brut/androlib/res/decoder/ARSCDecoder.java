@@ -22,8 +22,7 @@ import brut.androlib.res.data.*;
 import brut.androlib.res.data.arsc.*;
 import brut.androlib.res.data.value.*;
 import brut.util.Duo;
-import brut.util.ExtCountingDataInput;
-import com.google.common.io.LittleEndianDataInputStream;
+import brut.util.ExtDataInputStream;
 
 import java.io.*;
 import java.math.BigInteger;
@@ -31,35 +30,56 @@ import java.util.*;
 import java.util.logging.Logger;
 
 public class ARSCDecoder {
-    public static ARSCData decode(InputStream arscStream, boolean findFlagsOffsets, boolean keepBroken)
-            throws AndrolibException {
-        return decode(arscStream, findFlagsOffsets, keepBroken, new ResTable());
+    private static final Logger LOGGER = Logger.getLogger(ARSCDecoder.class.getName());
+
+    private static final short ENTRY_FLAG_COMPLEX = 0x0001;
+    private static final short ENTRY_FLAG_PUBLIC = 0x0002;
+    private static final short ENTRY_FLAG_WEAK = 0x0004;
+    private static final short ENTRY_FLAG_COMPACT = 0x0008;
+
+    private static final short TABLE_TYPE_FLAG_SPARSE = 0x01;
+    private static final short TABLE_TYPE_FLAG_OFFSET16 = 0x02;
+
+    private static final int KNOWN_CONFIG_BYTES = 64;
+
+    private static final int NO_ENTRY = 0xFFFFFFFF;
+    private static final int NO_ENTRY_OFFSET16 = 0xFFFF;
+
+    private final ExtDataInputStream mIn;
+    private final ResTable mResTable;
+    private final List<FlagsOffset> mFlagsOffsets;
+    private final boolean mKeepBroken;
+    private final HashMap<Integer, Integer> mMissingResSpecMap;
+    private final HashMap<Integer, ResTypeSpec> mResTypeSpecs;
+
+    private ARSCHeader mHeader;
+    private StringBlock mTableStrings;
+    private StringBlock mTypeNames;
+    private StringBlock mSpecNames;
+    private ResPackage mPkg;
+    private ResTypeSpec mTypeSpec;
+    private ResType mType;
+    private int mResId;
+    private int mTypeIdOffset;
+
+    public ARSCDecoder(InputStream in, ResTable resTable, boolean storeFlagsOffsets, boolean keepBroken)
+             throws IOException {
+        mIn = ExtDataInputStream.littleEndian(in);
+        mResTable = resTable != null ? resTable : new ResTable();
+        mFlagsOffsets = storeFlagsOffsets ? new ArrayList<>() : null;
+        mKeepBroken = keepBroken;
+        mMissingResSpecMap = new LinkedHashMap<>();
+        mResTypeSpecs = new HashMap<>();
     }
 
-    public static ARSCData decode(InputStream arscStream, boolean findFlagsOffsets, boolean keepBroken,
-                                  ResTable resTable)
-            throws AndrolibException {
+    public ARSCData decode() throws AndrolibException {
         try {
-            ARSCDecoder decoder = new ARSCDecoder(arscStream, resTable, findFlagsOffsets, keepBroken);
-            ResPackage[] pkgs = decoder.readResourceTable();
-            return new ARSCData(pkgs, decoder.mFlagsOffsets == null
-                    ? null
-                    : decoder.mFlagsOffsets.toArray(new FlagsOffset[0]));
+            ResPackage[] pkgs = readResourceTable();
+            FlagsOffset[] flagsOffsets = mFlagsOffsets != null ? mFlagsOffsets.toArray(new FlagsOffset[0]) : null;
+            return new ARSCData(pkgs, flagsOffsets);
         } catch (IOException ex) {
             throw new AndrolibException("Could not decode arsc file", ex);
         }
-    }
-
-    private ARSCDecoder(InputStream arscStream, ResTable resTable, boolean storeFlagsOffsets, boolean keepBroken) {
-        if (storeFlagsOffsets) {
-            mFlagsOffsets = new ArrayList<>();
-        } else {
-            mFlagsOffsets = null;
-        }
-        mIn = new ExtCountingDataInput(new LittleEndianDataInputStream(arscStream));
-        mResTable = resTable;
-        mKeepBroken = keepBroken;
-        mMissingResSpecMap = new LinkedHashMap<>();
     }
 
     private ResPackage[] readResourceTable() throws IOException, AndrolibException {
@@ -170,7 +190,7 @@ public class ARSCDecoder {
 
         // TypeIdOffset was added platform_frameworks_base/@f90f2f8dc36e7243b85e0b6a7fd5a590893c827e
         // which is only in split/new applications.
-        int splitHeaderSize = (2 + 2 + 4 + 4 + (2 * 128) + (4 * 5)); // short, short, int, int, char[128], int * 4
+        int splitHeaderSize = 2 + 2 + 4 + 4 + (2 * 128) + (4 * 5); // short, short, int, int, char[128], int * 4
         if (mHeader.headerSize == splitHeaderSize) {
             mTypeIdOffset = mIn.readInt();
         }
@@ -246,7 +266,7 @@ public class ARSCDecoder {
         int entryCount = mIn.readInt();
 
         if (mFlagsOffsets != null) {
-            mFlagsOffsets.add(new FlagsOffset(mIn.position(), entryCount));
+            mFlagsOffsets.add(new FlagsOffset((int) mIn.position(), entryCount));
         }
 
         mHeader.checkForUnreadHeader(mIn);
@@ -310,11 +330,11 @@ public class ARSCDecoder {
             }
         }
 
-        mType = flags.isInvalid && !mKeepBroken ? null : mPkg.getOrCreateConfig(flags);
+        mType = !flags.isInvalid || mKeepBroken ? mPkg.getOrCreateConfig(flags) : null;
         int noEntry = isOffset16 ? NO_ENTRY_OFFSET16 : NO_ENTRY;
 
         // #3428 - In some applications the res entries are padded for alignment.
-        int entriesStartAligned = mHeader.startPosition + entriesStart;
+        long entriesStartAligned = mHeader.startPosition + entriesStart;
         if (mIn.position() < entriesStartAligned) {
             long bytesSkipped = mIn.skip(entriesStartAligned - mIn.position());
             LOGGER.fine(String.format("Skipping: %d byte(s) to align with ResTable_entry start.", bytesSkipped));
@@ -394,15 +414,15 @@ public class ARSCDecoder {
         }
 
         EntryData entryData = new EntryData();
-        entryData.mFlags = flags;
-        entryData.mSpecNamesId = specNamesId;
-        entryData.mValue = value;
+        entryData.flags = flags;
+        entryData.specNamesId = specNamesId;
+        entryData.value = value;
         return entryData;
     }
 
     private void readEntry(EntryData entryData) throws AndrolibException {
-        int specNamesId = entryData.mSpecNamesId;
-        ResValue value = entryData.mValue;
+        int specNamesId = entryData.specNamesId;
+        ResValue value = entryData.value;
 
         if (mTypeSpec.isString() && value instanceof ResFileValue) {
             value = new ResStringValue(value.toString(), ((ResFileValue) value).getRawIntValue());
@@ -481,8 +501,8 @@ public class ARSCDecoder {
         int data = mIn.readInt();
 
         return type == TypedValue.TYPE_STRING
-                ? mPkg.getValueFactory().factory(mTableStrings.getHTML(data), data)
-                : mPkg.getValueFactory().factory(type, data, null);
+            ? mPkg.getValueFactory().factory(mTableStrings.getHTML(data), data)
+            : mPkg.getValueFactory().factory(type, data, null);
     }
 
     private ResConfigFlags readConfigFlags() throws IOException, AndrolibException {
@@ -684,36 +704,4 @@ public class ARSCDecoder {
                     expectedType, mHeader.type));
         }
     }
-
-    private final ExtCountingDataInput mIn;
-    private final ResTable mResTable;
-    private final List<FlagsOffset> mFlagsOffsets;
-    private final boolean mKeepBroken;
-
-    private ARSCHeader mHeader;
-    private StringBlock mTableStrings;
-    private StringBlock mTypeNames;
-    private StringBlock mSpecNames;
-    private ResPackage mPkg;
-    private ResTypeSpec mTypeSpec;
-    private ResType mType;
-    private int mResId;
-    private int mTypeIdOffset = 0;
-    private final HashMap<Integer, Integer> mMissingResSpecMap;
-    private final HashMap<Integer, ResTypeSpec> mResTypeSpecs = new HashMap<>();
-
-    private final static short ENTRY_FLAG_COMPLEX = 0x0001;
-    private final static short ENTRY_FLAG_PUBLIC = 0x0002;
-    private final static short ENTRY_FLAG_WEAK = 0x0004;
-    private final static short ENTRY_FLAG_COMPACT = 0x0008;
-
-    private final static short TABLE_TYPE_FLAG_SPARSE = 0x01;
-    private final static short TABLE_TYPE_FLAG_OFFSET16 = 0x02;
-
-    private static final int KNOWN_CONFIG_BYTES = 64;
-
-    private static final int NO_ENTRY = 0xFFFFFFFF;
-    private static final int NO_ENTRY_OFFSET16 = 0xFFFF;
-
-    private static final Logger LOGGER = Logger.getLogger(ARSCDecoder.class.getName());
 }

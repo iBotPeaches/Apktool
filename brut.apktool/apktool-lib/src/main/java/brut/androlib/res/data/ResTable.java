@@ -25,7 +25,7 @@ import brut.androlib.apk.UsesFramework;
 import brut.androlib.res.Framework;
 import brut.androlib.res.data.value.ResValue;
 import brut.androlib.res.decoder.ARSCDecoder;
-import brut.androlib.res.xml.ResXmlPatcher;
+import brut.androlib.res.xml.ResXmlUtils;
 import brut.directory.Directory;
 import brut.directory.DirectoryException;
 import brut.directory.ExtFile;
@@ -38,20 +38,19 @@ import java.util.*;
 import java.util.logging.Logger;
 
 public class ResTable {
-    private final static Logger LOGGER = Logger.getLogger(ApkDecoder.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(ApkDecoder.class.getName());
 
     private final Config mConfig;
     private final ApkInfo mApkInfo;
-    private final Map<Integer, ResPackage> mPackagesById = new HashMap<>();
-    private final Map<String, ResPackage> mPackagesByName = new HashMap<>();
-    private final Set<ResPackage> mMainPackages = new LinkedHashSet<>();
-    private final Set<ResPackage> mFramePackages = new LinkedHashSet<>();
+    private final Map<Integer, ResPackage> mPackagesById;
+    private final Map<String, ResPackage> mPackagesByName;
+    private final Set<ResPackage> mMainPackages;
+    private final Set<ResPackage> mFramePackages;
 
     private String mPackageRenamed;
     private String mPackageOriginal;
     private int mPackageId;
-
-    private boolean mMainPkgLoaded = false;
+    private boolean mMainPkgLoaded;
 
     public ResTable() {
         this(Config.getDefaultConfig(), new ApkInfo());
@@ -64,6 +63,10 @@ public class ResTable {
     public ResTable(Config config, ApkInfo apkInfo) {
         mConfig = config;
         mApkInfo = apkInfo;
+        mPackagesById = new HashMap<>();
+        mPackagesByName = new HashMap<>();
+        mMainPackages = new LinkedHashSet<>();
+        mFramePackages = new LinkedHashSet<>();
     }
 
     public boolean getAnalysisMode() {
@@ -179,7 +182,8 @@ public class ResTable {
         try {
             Directory dir = apkFile.getDirectory();
             try (BufferedInputStream bis = new BufferedInputStream(dir.getFileInput("resources.arsc"))) {
-                return ARSCDecoder.decode(bis, false, keepBrokenResources, this).getPackages();
+                ARSCDecoder decoder = new ARSCDecoder(bis, this, false, keepBrokenResources);
+                return decoder.decode().getPackages();
             }
         } catch (DirectoryException | IOException ex) {
             throw new AndrolibException("Could not load resources.arsc from file: " + apkFile, ex);
@@ -220,8 +224,8 @@ public class ResTable {
         return pkg;
     }
 
-    public ResValue getValue(String package_, String type, String name) throws AndrolibException {
-        return getPackage(package_).getType(type).getResSpec(name).getDefaultResource().getValue();
+    public ResValue getValue(String pkg, String type, String name) throws AndrolibException {
+        return getPackage(pkg).getType(type).getResSpec(name).getDefaultResource().getValue();
     }
 
     public void addPackage(ResPackage pkg, boolean main) throws AndrolibException {
@@ -330,21 +334,21 @@ public class ResTable {
     private void updateSdkInfoFromResources(File outDir) {
         String minSdkVersion = mApkInfo.getMinSdkVersion();
         if (minSdkVersion != null) {
-            String refValue = ResXmlPatcher.pullValueFromIntegers(outDir, minSdkVersion);
+            String refValue = ResXmlUtils.pullValueFromIntegers(outDir, minSdkVersion);
             if (refValue != null) {
                 mApkInfo.setMinSdkVersion(refValue);
             }
         }
         String targetSdkVersion = mApkInfo.getTargetSdkVersion();
         if (targetSdkVersion != null) {
-            String refValue = ResXmlPatcher.pullValueFromIntegers(outDir, targetSdkVersion);
+            String refValue = ResXmlUtils.pullValueFromIntegers(outDir, targetSdkVersion);
             if (refValue != null) {
                 mApkInfo.setTargetSdkVersion(refValue);
             }
         }
         String maxSdkVersion = mApkInfo.getMaxSdkVersion();
         if (maxSdkVersion != null) {
-            String refValue = ResXmlPatcher.pullValueFromIntegers(outDir, maxSdkVersion);
+            String refValue = ResXmlUtils.pullValueFromIntegers(outDir, maxSdkVersion);
             if (refValue != null) {
                 mApkInfo.setMaxSdkVersion(refValue);
             }
@@ -373,7 +377,7 @@ public class ResTable {
 
     private void loadVersionName(File outDir) {
         String versionName = mApkInfo.versionInfo.versionName;
-        String refValue = ResXmlPatcher.pullValueFromStrings(outDir, versionName);
+        String refValue = ResXmlUtils.pullValueFromStrings(outDir, versionName);
         if (refValue != null) {
             mApkInfo.versionInfo.versionName = refValue;
         }

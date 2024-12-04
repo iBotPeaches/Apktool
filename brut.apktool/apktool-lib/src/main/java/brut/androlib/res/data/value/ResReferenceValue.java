@@ -25,14 +25,13 @@ public class ResReferenceValue extends ResIntValue {
     private final ResPackage mPackage;
     private final boolean mTheme;
 
-    public ResReferenceValue(ResPackage package_, int value, String rawValue) {
-        this(package_, value, rawValue, false);
+    public ResReferenceValue(ResPackage pkg, int value, String rawValue) {
+        this(pkg, value, rawValue, false);
     }
 
-    public ResReferenceValue(ResPackage package_, int value, String rawValue,
-                             boolean theme) {
+    public ResReferenceValue(ResPackage pkg, int value, String rawValue, boolean theme) {
         super(value, rawValue, "reference");
-        mPackage = package_;
+        mPackage = pkg;
         mTheme = theme;
     }
 

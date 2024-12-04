@@ -21,7 +21,6 @@ import brut.androlib.exceptions.UndefinedResObjectException;
 import java.util.*;
 
 public final class ResTypeSpec {
-
     public static final String RES_TYPE_NAME_ARRAY = "array";
     public static final String RES_TYPE_NAME_ATTR = "attr";
     public static final String RES_TYPE_NAME_ATTR_PRIVATE = "^attr-private";
@@ -30,13 +29,13 @@ public final class ResTypeSpec {
     public static final String RES_TYPE_NAME_STYLES = "style";
 
     private final String mName;
-    private final Map<String, ResResSpec> mResSpecs = new LinkedHashMap<>();
-
     private final int mId;
+    private final Map<String, ResResSpec> mResSpecs;
 
     public ResTypeSpec(String name, int id) {
-        this.mName = name;
-        this.mId = id;
+        mName = name;
+        mId = id;
+        mResSpecs = new LinkedHashMap<>();
     }
 
     public String getName() {

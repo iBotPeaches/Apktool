@@ -33,7 +33,7 @@ import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-public class ZipUtils {
+public final class ZipUtils {
     private static final Logger LOGGER = Logger.getLogger("");
 
     private ZipUtils() {

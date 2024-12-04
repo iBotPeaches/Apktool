@@ -93,7 +93,7 @@ public class NetworkConfigTest extends BaseTest {
         // XPath expression to check for user and system certificates
         XPathFactory xPathFactory = XPathFactory.newInstance();
         XPath xpath = xPathFactory.newXPath();
-        
+
         // Check if 'system' certificate exists
         XPathExpression systemCertExpr = xpath.compile("//certificates[@src='system']");
         NodeList systemCertNodes = (NodeList) systemCertExpr.evaluate(document, XPathConstants.NODESET);

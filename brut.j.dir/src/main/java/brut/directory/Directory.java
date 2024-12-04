@@ -24,6 +24,8 @@ import java.util.Map;
 import java.util.Set;
 
 public interface Directory {
+    char separator = '/';
+
     Set<String> getFiles();
 
     Set<String> getFiles(boolean recursive);
@@ -65,6 +67,4 @@ public interface Directory {
     int getCompressionLevel(String fileName) throws DirectoryException;
 
     void close() throws IOException;
-
-    char separator = '/';
 }

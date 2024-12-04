@@ -28,13 +28,13 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 public class ApkInfo implements YamlSerializable {
-    public final static String[] RESOURCES_DIRNAMES = new String[] { "res", "r", "R" };
-    public final static String[] RAW_DIRNAMES = new String[] { "assets", "lib", "libs", "kotlin", "META-INF/services" };
+    public static final String[] RESOURCES_DIRNAMES = { "res", "r", "R" };
+    public static final String[] RAW_DIRNAMES = { "assets", "lib", "libs", "kotlin", "META-INF/services" };
 
-    public final static Pattern ORIGINAL_FILENAMES_PATTERN = Pattern.compile(
+    public static final Pattern ORIGINAL_FILENAMES_PATTERN = Pattern.compile(
         "AndroidManifest\\.xml|META-INF/[^/]+\\.(RSA|SF|MF)|stamp-cert-sha256");
 
-    public final static Pattern STANDARD_FILENAMES_PATTERN = Pattern.compile(
+    public static final Pattern STANDARD_FILENAMES_PATTERN = Pattern.compile(
         "[^/]+\\.dex|resources\\.arsc|(" + String.join("|", RESOURCES_DIRNAMES) + "|" +
         String.join("|", RAW_DIRNAMES) + ")/.*|" + ORIGINAL_FILENAMES_PATTERN.pattern());
 

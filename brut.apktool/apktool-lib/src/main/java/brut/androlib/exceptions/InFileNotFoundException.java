@@ -17,6 +17,8 @@
 package brut.androlib.exceptions;
 
 public class InFileNotFoundException extends AndrolibException {
+
     public InFileNotFoundException() {
+        super();
     }
 }

@@ -36,6 +36,19 @@ import java.util.logging.*;
  * Main entry point of the apktool.
  */
 public class Main {
+    private enum Verbosity { NORMAL, VERBOSE, QUIET }
+
+    private static final Options normalOptions = new Options();
+    private static final Options decodeOptions = new Options();
+    private static final Options buildOptions = new Options();
+    private static final Options frameOptions = new Options();
+    private static final Options allOptions = new Options();
+    private static final Options emptyOptions = new Options();
+    private static final Options emptyFrameworkOptions = new Options();
+    private static final Options listFrameworkOptions = new Options();
+
+    private static boolean advanceMode = false;
+
     public static void main(String[] args) throws BrutException {
 
         // headless
@@ -239,7 +252,7 @@ public class Main {
             System.exit(1);
         } catch (CantFindFrameworkResException ex) {
             System.err
-                    .println("Can't find framework resources for package of id: "
+                    .println("Could not find framework resources for package of id: "
                             + ex.getPkgId()
                             + ". You must install proper "
                             + "framework files, see project website for more info.");
@@ -271,15 +284,8 @@ public class Main {
             }
 
             try {
-                String aaptPath = cli.getOptionValue("a");
-                int aaptVersion = AaptManager.getAaptVersion(aaptPath);
-                if (aaptVersion < AaptManager.AAPT_VERSION_MIN && aaptVersion > AaptManager.AAPT_VERSION_MAX) {
-                    System.err.println("AAPT version " + aaptVersion + " is not supported");
-                    System.exit(1);
-                }
-
-                config.aaptPath = aaptPath;
-                config.aaptVersion = aaptVersion;
+                config.aaptBinary = new File(cli.getOptionValue("a"));
+                config.aaptVersion = AaptManager.getAaptVersion(config.aaptBinary);
             } catch (BrutException ex) {
                 System.err.println(ex.getMessage());
                 System.exit(1);
@@ -310,7 +316,7 @@ public class Main {
         }
 
         if (config.netSecConf && config.aaptVersion == 1) {
-            System.err.println("-n / --net-sec-conf is not supported with legacy AAPT.");
+            System.err.println("-n / --net-sec-conf is not supported with legacy aapt.");
             System.exit(1);
         }
 
@@ -723,32 +729,5 @@ public class Main {
 
     private static void setAdvanceMode() {
         Main.advanceMode = true;
-    }
-
-    private enum Verbosity {
-        NORMAL, VERBOSE, QUIET
-    }
-
-    private static boolean advanceMode = false;
-
-    private final static Options normalOptions;
-    private final static Options decodeOptions;
-    private final static Options buildOptions;
-    private final static Options frameOptions;
-    private final static Options allOptions;
-    private final static Options emptyOptions;
-    private final static Options emptyFrameworkOptions;
-    private final static Options listFrameworkOptions;
-
-    static {
-        //normal and advance usage output
-        normalOptions = new Options();
-        buildOptions = new Options();
-        decodeOptions = new Options();
-        frameOptions = new Options();
-        allOptions = new Options();
-        emptyOptions = new Options();
-        emptyFrameworkOptions = new Options();
-        listFrameworkOptions = new Options();
     }
 }

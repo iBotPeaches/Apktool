@@ -30,7 +30,12 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
-public class SmaliMod {
+public final class SmaliMod {
+
+    private SmaliMod() {
+        // Private constructor for utility class
+    }
+
     public static boolean assembleSmaliFile(File smaliFile, DexBuilder dexBuilder, int apiLevel, boolean verboseErrors,
                                             boolean printTokens) throws IOException, RecognitionException {
         try (

@@ -28,7 +28,7 @@ public class ResBagValue extends ResValue implements ResValuesXmlSerializable {
     protected final ResReferenceValue mParent;
 
     public ResBagValue(ResReferenceValue parent) {
-        this.mParent = parent;
+        mParent = parent;
     }
 
     @Override

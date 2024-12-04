@@ -3,9 +3,8 @@ val apktoolVersion: String by rootProject.extra
 
 tasks {
     processResources {
-        from("src/main/resources/properties") {
-            include("**/*.properties")
-            into("properties")
+        from("src/main/resources") {
+            include("apktool.properties")
             expand("version" to apktoolVersion, "gitrev" to gitRevision)
             duplicatesStrategy = DuplicatesStrategy.INCLUDE
         }

@@ -33,6 +33,7 @@ import java.io.*;
 import static org.junit.Assert.*;
 
 public class MissingDiv9PatchTest extends BaseTest {
+    private static final int NP_COLOR = 0xff000000;
 
     @BeforeClass
     public static void beforeClass() throws Exception {
@@ -68,6 +69,4 @@ public class MissingDiv9PatchTest extends BaseTest {
         File file = new File(sTmpDir, "pip_dismiss_scrim.9.png");
         return new FileInputStream(file.toPath().toString());
     }
-
-    private static final int NP_COLOR = 0xff000000;
 }

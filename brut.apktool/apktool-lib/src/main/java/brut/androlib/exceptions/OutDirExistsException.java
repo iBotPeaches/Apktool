@@ -17,6 +17,8 @@
 package brut.androlib.exceptions;
 
 public class OutDirExistsException extends AndrolibException {
+
     public OutDirExistsException() {
+        super();
     }
 }

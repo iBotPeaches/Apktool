@@ -26,9 +26,14 @@ import org.xmlpull.v1.XmlSerializer;
 import java.io.IOException;
 
 public class ResPluralsValue extends ResBagValue implements ResValuesXmlSerializable {
+    private static final String[] QUANTITY_MAP = { "other", "zero", "one", "two", "few", "many" };
+
+    private static final int BAG_KEY_PLURALS_START = 0x01000004;
+
+    private final ResScalarValue[] mItems;
+
     ResPluralsValue(ResReferenceValue parent, Duo<Integer, ResScalarValue>[] items) {
         super(parent);
-
         mItems = new ResScalarValue[6];
         for (Duo<Integer, ResScalarValue> item : items) {
             mItems[item.m1 - BAG_KEY_PLURALS_START] = item.m2;
@@ -53,9 +58,4 @@ public class ResPluralsValue extends ResBagValue implements ResValuesXmlSerializ
         }
         serializer.endTag(null, "plurals");
     }
-
-    private final ResScalarValue[] mItems;
-
-    public static final int BAG_KEY_PLURALS_START = 0x01000004;
-    private static final String[] QUANTITY_MAP = new String[] { "other", "zero", "one", "two", "few", "many" };
 }

@@ -41,7 +41,15 @@ import java.nio.file.Files;
 import java.util.*;
 import java.util.logging.Logger;
 
-public final class ResXmlPatcher {
+public final class ResXmlUtils {
+    private static final Logger LOGGER = Logger.getLogger(ResXmlUtils.class.getName());
+
+    private static final String FEATURE_LOAD_DTD = "http://apache.org/xml/features/nonvalidating/load-external-dtd";
+    private static final String FEATURE_DISABLE_DOCTYPE_DECL = "http://apache.org/xml/features/disallow-doctype-decl";
+
+    private ResXmlUtils() {
+        // Private constructor for utility class
+    }
 
     /**
      * Removes "debug" tag from file
@@ -155,13 +163,13 @@ public final class ResXmlPatcher {
         } else {
             document = documentBuilder.newDocument();
         }
-        
+
         Element root = (Element) document.getElementsByTagName("network-security-config").item(0);
         if (root == null) {
             root = document.createElement("network-security-config");
             document.appendChild(root);
         }
-            
+
         Element baseConfig = (Element) document.getElementsByTagName("base-config").item(0);
         if (baseConfig == null) {
             baseConfig = document.createElement("base-config");
@@ -192,13 +200,13 @@ public final class ResXmlPatcher {
             certSystem.setAttribute("src", "system");
             trustAnchors.appendChild(certSystem);
         }
-            
+
         if (!hasUserCert) {
             Element certUser = document.createElement("certificates");
             certUser.setAttribute("src", "user");
             trustAnchors.appendChild(certUser);
         }
-            
+
         saveDocument(file, document);
     }
 
@@ -487,9 +495,4 @@ public final class ResXmlPatcher {
             output.write(newLine);
         }
     }
-
-    private static final String FEATURE_LOAD_DTD = "http://apache.org/xml/features/nonvalidating/load-external-dtd";
-    private static final String FEATURE_DISABLE_DOCTYPE_DECL = "http://apache.org/xml/features/disallow-doctype-decl";
-
-    private static final Logger LOGGER = Logger.getLogger(ResXmlPatcher.class.getName());
 }

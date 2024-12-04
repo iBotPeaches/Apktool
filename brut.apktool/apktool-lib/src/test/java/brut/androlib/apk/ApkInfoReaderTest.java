@@ -40,7 +40,7 @@ public class ApkInfoReaderTest {
         assertNotNull(apkInfo.usesFramework);
         assertNotNull(apkInfo.usesFramework.ids);
         assertEquals(1, apkInfo.usesFramework.ids.size());
-        assertEquals(1, (long)apkInfo.usesFramework.ids.get(0));
+        assertEquals(1, (long) apkInfo.usesFramework.ids.get(0));
         assertNull(apkInfo.usesFramework.tag);
         assertNotNull(apkInfo.versionInfo);
         assertNull(apkInfo.versionInfo.versionCode);
@@ -88,7 +88,7 @@ public class ApkInfoReaderTest {
         assertFalse(apkInfo.isFrameworkApk);
         assertNotNull(apkInfo.usesFramework);
         assertEquals(1, apkInfo.usesFramework.ids.size());
-        assertEquals(1, (long)apkInfo.usesFramework.ids.get(0));
+        assertEquals(1, (long) apkInfo.usesFramework.ids.get(0));
         assertNotNull(apkInfo.packageInfo);
         assertEquals("127", apkInfo.packageInfo.forcedPackageId);
         assertNotNull(apkInfo.versionInfo);
@@ -112,7 +112,7 @@ public class ApkInfoReaderTest {
         assertFalse(apkInfo.isFrameworkApk);
         assertNotNull(apkInfo.usesFramework);
         assertEquals(1, apkInfo.usesFramework.ids.size());
-        assertEquals(1, (long)apkInfo.usesFramework.ids.get(0));
+        assertEquals(1, (long) apkInfo.usesFramework.ids.get(0));
         assertEquals("tag", apkInfo.usesFramework.tag);
         assertNotNull(apkInfo.packageInfo);
         assertEquals("127", apkInfo.packageInfo.forcedPackageId);

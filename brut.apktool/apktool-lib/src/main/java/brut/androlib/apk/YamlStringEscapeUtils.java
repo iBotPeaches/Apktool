@@ -23,7 +23,11 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 
-public class YamlStringEscapeUtils {
+public final class YamlStringEscapeUtils {
+
+    private YamlStringEscapeUtils() {
+        // Private constructor for utility class
+    }
 
     public static String escapeString(String str) {
         return escapeJavaStyleString(str);

@@ -45,7 +45,7 @@ public class ResID {
     @Override
     public int hashCode() {
         int hash = 17;
-        hash = 31 * hash + this.id;
+        hash = 31 * hash + id;
         return hash;
     }
 
@@ -58,6 +58,6 @@ public class ResID {
             return false;
         }
         final ResID other = (ResID) obj;
-        return this.id == other.id;
+        return id == other.id;
     }
 }

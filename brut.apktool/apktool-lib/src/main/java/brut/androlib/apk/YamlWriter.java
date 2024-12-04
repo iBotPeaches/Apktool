@@ -21,10 +21,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class YamlWriter implements Closeable {
+    private static final String QUOTE = "'";
 
-    private int mIndent = 0;
     private final PrintWriter mWriter;
-    private final String QUOTE = "'";
+    private int mIndent;
 
     public YamlWriter(OutputStream out) {
         mWriter = new PrintWriter(new BufferedWriter(

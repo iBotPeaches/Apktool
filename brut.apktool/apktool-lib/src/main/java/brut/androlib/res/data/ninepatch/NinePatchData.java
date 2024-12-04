@@ -17,6 +17,7 @@
 package brut.androlib.res.data.ninepatch;
 
 import brut.util.ExtDataInput;
+
 import java.io.IOException;
 
 public class NinePatchData {
@@ -32,19 +33,19 @@ public class NinePatchData {
         this.yDivs = yDivs;
     }
 
-    public static NinePatchData decode(ExtDataInput di) throws IOException {
-        di.skipBytes(1); // wasDeserialized
-        byte numXDivs = di.readByte();
-        byte numYDivs = di.readByte();
-        di.skipBytes(1); // numColors
-        di.skipBytes(8); // xDivs/yDivs offset
-        int padLeft = di.readInt();
-        int padRight = di.readInt();
-        int padTop = di.readInt();
-        int padBottom = di.readInt();
-        di.skipBytes(4); // colorsOffset
-        int[] xDivs = di.readIntArray(numXDivs);
-        int[] yDivs = di.readIntArray(numYDivs);
+    public static NinePatchData decode(ExtDataInput in) throws IOException {
+        in.skipBytes(1); // wasDeserialized
+        byte numXDivs = in.readByte();
+        byte numYDivs = in.readByte();
+        in.skipBytes(1); // numColors
+        in.skipBytes(8); // xDivs/yDivs offset
+        int padLeft = in.readInt();
+        int padRight = in.readInt();
+        int padTop = in.readInt();
+        int padBottom = in.readInt();
+        in.skipBytes(4); // colorsOffset
+        int[] xDivs = in.readIntArray(numXDivs);
+        int[] yDivs = in.readIntArray(numYDivs);
 
         return new NinePatchData(padLeft, padRight, padTop, padBottom, xDivs, yDivs);
     }

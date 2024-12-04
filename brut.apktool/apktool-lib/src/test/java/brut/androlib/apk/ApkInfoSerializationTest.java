@@ -27,7 +27,6 @@ import java.io.*;
 import static org.junit.Assert.*;
 
 public class ApkInfoSerializationTest {
-
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
 
@@ -51,7 +50,7 @@ public class ApkInfoSerializationTest {
         assertFalse(apkInfo.isFrameworkApk);
         assertNotNull(apkInfo.usesFramework);
         assertEquals(1, apkInfo.usesFramework.ids.size());
-        assertEquals(1, (long)apkInfo.usesFramework.ids.get(0));
+        assertEquals(1, (long) apkInfo.usesFramework.ids.get(0));
         assertNotNull(apkInfo.packageInfo);
         assertEquals("127", apkInfo.packageInfo.forcedPackageId);
         assertNotNull(apkInfo.versionInfo);

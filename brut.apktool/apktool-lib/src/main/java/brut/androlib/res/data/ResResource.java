@@ -25,9 +25,9 @@ public class ResResource {
     private final ResValue mValue;
 
     public ResResource(ResType config, ResResSpec spec, ResValue value) {
-        this.mConfig = config;
-        this.mResSpec = spec;
-        this.mValue = value;
+        mConfig = config;
+        mResSpec = spec;
+        mValue = value;
     }
 
     public String getFilePath() {

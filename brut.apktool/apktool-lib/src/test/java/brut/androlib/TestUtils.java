@@ -18,9 +18,9 @@ package brut.androlib;
 
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.Framework;
-import brut.androlib.res.xml.ResXmlPatcher;
+import brut.androlib.res.xml.ResXmlUtils;
 import brut.common.BrutException;
-import brut.directory.DirUtil;
+import brut.directory.DirUtils;
 import brut.directory.Directory;
 import brut.directory.FileDirectory;
 import brut.util.OS;
@@ -42,7 +42,11 @@ import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class TestUtils {
+public final class TestUtils {
+
+    private TestUtils() {
+        // Private constructor for utility class
+    }
 
     public static Map<String, String> parseStringsXml(File file) throws BrutException {
         try {
@@ -68,28 +72,28 @@ public abstract class TestUtils {
 
     public static Document getDocumentFromFile(File file) throws BrutException {
         try {
-            return ResXmlPatcher.loadDocument(file);
+            return ResXmlUtils.loadDocument(file);
         } catch (IOException | SAXException | ParserConfigurationException ex) {
             throw new BrutException(ex);
         }
     }
 
-    public static void copyResourceDir(Class<?> class_, String dirPath, File out) throws BrutException {
+    public static void copyResourceDir(Class<?> clz, String dirPath, File out) throws BrutException {
         if (!out.exists()) {
             out.mkdirs();
         }
-        copyResourceDir(class_, dirPath, new FileDirectory(out));
+        copyResourceDir(clz, dirPath, new FileDirectory(out));
     }
 
-    public static void copyResourceDir(Class<?> class_, String dirPath, Directory out) throws BrutException {
-        if (class_ == null) {
-            class_ = Class.class;
+    public static void copyResourceDir(Class<?> clz, String dirPath, Directory out) throws BrutException {
+        if (clz == null) {
+            clz = Class.class;
         }
 
-        URL dirURL = class_.getClassLoader().getResource(dirPath);
+        URL dirURL = clz.getClassLoader().getResource(dirPath);
         if (dirURL != null && dirURL.getProtocol().equals("file")) {
             try {
-                DirUtil.copyToDir(new FileDirectory(dirURL.getFile()), out);
+                DirUtils.copyToDir(new FileDirectory(dirURL.getFile()), out);
             } catch (UnsupportedEncodingException ex) {
                 throw new BrutException(ex);
             }
@@ -97,15 +101,15 @@ public abstract class TestUtils {
         }
 
         if (dirURL == null) {
-            String className = class_.getName().replace(".", "/") + ".class";
-            dirURL = class_.getClassLoader().getResource(className);
+            String className = clz.getName().replace(".", "/") + ".class";
+            dirURL = clz.getClassLoader().getResource(className);
         }
 
         if (dirURL.getProtocol().equals("jar")) {
             String jarPath;
             try {
                 jarPath = URLDecoder.decode(dirURL.getPath().substring(5, dirURL.getPath().indexOf("!")), "UTF-8");
-                DirUtil.copyToDir(new FileDirectory(jarPath), out);
+                DirUtils.copyToDir(new FileDirectory(jarPath), out);
             } catch (UnsupportedEncodingException ex) {
                 throw new BrutException(ex);
             }

@@ -31,6 +31,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class NonStandardPkgIdTest extends BaseTest {
+    private static ResTable mResTable;
 
     @BeforeClass
     public static void beforeClass() throws Exception {
@@ -90,6 +91,4 @@ public class NonStandardPkgIdTest extends BaseTest {
         assertEquals(0x80, mResTable.getResSpec(0x80020001).getPackage().getId());
         assertEquals(0x80, mResTable.getResSpec(0x80030000).getPackage().getId());
     }
-
-    private static ResTable mResTable;
 }

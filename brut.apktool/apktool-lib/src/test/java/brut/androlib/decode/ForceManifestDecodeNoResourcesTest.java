@@ -34,8 +34,7 @@ import java.util.Arrays;
 import static org.junit.Assert.*;
 
 public class ForceManifestDecodeNoResourcesTest extends BaseTest {
-
-    private final byte[] xmlHeader = new byte[] {
+    private static final byte[] XML_HEADER = {
             0x3C, // <
             0x3F, // ?
             0x78, // x
@@ -68,7 +67,7 @@ public class ForceManifestDecodeNoResourcesTest extends BaseTest {
         // let's probe filetype of manifest, we should detect XML
         File manifestFile = new File(output + File.separator + "AndroidManifest.xml");
         byte[] magic = TestUtils.readHeaderOfFile(manifestFile, 6);
-        assertArrayEquals(this.xmlHeader, magic);
+        assertArrayEquals(XML_HEADER, magic);
 
         // confirm resources.arsc still exists, as its raw
         File resourcesArsc = new File(output + File.separator + "resources.arsc");
@@ -87,7 +86,7 @@ public class ForceManifestDecodeNoResourcesTest extends BaseTest {
         // let's probe filetype of manifest, we should detect XML
         File manifestFile = new File(output + File.separator + "AndroidManifest.xml");
         byte[] magic = TestUtils.readHeaderOfFile(manifestFile, 6);
-        assertArrayEquals(this.xmlHeader, magic);
+        assertArrayEquals(XML_HEADER, magic);
 
         // confirm resources.arsc does not exist
         File resourcesArsc = new File(output + File.separator + "resources.arsc");
@@ -106,7 +105,7 @@ public class ForceManifestDecodeNoResourcesTest extends BaseTest {
         // lets probe filetype of manifest, we should detect XML
         File manifestFile = new File(output + File.separator + "AndroidManifest.xml");
         byte[] magic = TestUtils.readHeaderOfFile(manifestFile, 6);
-        assertArrayEquals(this.xmlHeader, magic);
+        assertArrayEquals(XML_HEADER, magic);
 
         // confirm resources.arsc does not exist
         File resourcesArsc = new File(output + File.separator + "resources.arsc");
@@ -125,7 +124,7 @@ public class ForceManifestDecodeNoResourcesTest extends BaseTest {
         // lets probe filetype of manifest, we should not detect XML
         File manifestFile = new File(output + File.separator + "AndroidManifest.xml");
         byte[] magic = TestUtils.readHeaderOfFile(manifestFile, 6);
-        assertFalse(Arrays.equals(this.xmlHeader, magic));
+        assertFalse(Arrays.equals(XML_HEADER, magic));
 
         // confirm resources.arsc exists
         File resourcesArsc = new File(output + File.separator + "resources.arsc");

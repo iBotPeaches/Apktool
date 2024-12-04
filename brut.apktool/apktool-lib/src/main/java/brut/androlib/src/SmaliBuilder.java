@@ -29,30 +29,27 @@ import java.nio.file.Files;
 import java.util.logging.Logger;
 
 public class SmaliBuilder {
+    private static final Logger LOGGER = Logger.getLogger(SmaliBuilder.class.getName());
 
-    public static void build(File smaliDir, File dexFile, int apiLevel) throws AndrolibException {
-        new SmaliBuilder(smaliDir, dexFile, apiLevel).build();
-    }
+    private final ExtFile mSmaliDir;
+    private final int mApiLevel;
 
-    private SmaliBuilder(File smaliDir, File dexFile, int apiLevel) {
+    public SmaliBuilder(File smaliDir, int apiLevel) {
         mSmaliDir = new ExtFile(smaliDir);
-        mDexFile = dexFile;
         mApiLevel = apiLevel;
     }
 
-    private void build() throws AndrolibException {
+    public void build(File dexFile) throws AndrolibException {
         try {
-            DexBuilder dexBuilder;
-            if (mApiLevel > 0) {
-                dexBuilder = new DexBuilder(Opcodes.forApi(mApiLevel));
-            } else {
-                dexBuilder = new DexBuilder(Opcodes.getDefault());
-            }
+            DexBuilder dexBuilder = mApiLevel > 0
+                ? new DexBuilder(Opcodes.forApi(mApiLevel))
+                : new DexBuilder(Opcodes.getDefault());
 
             for (String fileName : mSmaliDir.getDirectory().getFiles(true)) {
                 buildFile(fileName, dexBuilder);
             }
-            dexBuilder.writeTo(new FileDataStore(new File(mDexFile.getAbsolutePath())));
+
+            dexBuilder.writeTo(new FileDataStore(dexFile));
         } catch (DirectoryException | IOException | RuntimeException ex) {
             throw new AndrolibException("Could not smali folder: " + mSmaliDir.getName(), ex);
         }
@@ -82,10 +79,4 @@ public class SmaliBuilder {
             throw ex;
         }
     }
-
-    private final ExtFile mSmaliDir;
-    private final File mDexFile;
-    private final int mApiLevel;
-
-    private final static Logger LOGGER = Logger.getLogger(SmaliBuilder.class.getName());
 }

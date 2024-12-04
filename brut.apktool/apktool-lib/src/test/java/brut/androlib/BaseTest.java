@@ -39,6 +39,16 @@ import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 import static org.junit.Assert.*;
 
 public class BaseTest {
+    protected static final Logger LOGGER = Logger.getLogger(BaseTest.class.getName());
+
+    private static final String ACCESS_EXTERNAL_DTD = "http://javax.xml.XMLConstants/property/accessExternalDTD";
+    private static final String ACCESS_EXTERNAL_SCHEMA = "http://javax.xml.XMLConstants/property/accessExternalSchema";
+    private static final String FEATURE_LOAD_DTD = "http://apache.org/xml/features/nonvalidating/load-external-dtd";
+    private static final String FEATURE_DISABLE_DOCTYPE_DECL = "http://apache.org/xml/features/disallow-doctype-decl";
+
+    protected static ExtFile sTmpDir;
+    protected static ExtFile sTestOrigDir;
+    protected static ExtFile sTestNewDir;
 
     protected void compareBinaryFolder(String path, boolean res) throws BrutException, IOException {
         boolean exists = true;
@@ -170,15 +180,4 @@ public class BaseTest {
         }
         return false;
     }
-
-    protected static ExtFile sTmpDir;
-    protected static ExtFile sTestOrigDir;
-    protected static ExtFile sTestNewDir;
-
-    protected final static Logger LOGGER = Logger.getLogger(BaseTest.class.getName());
-
-    private static final String ACCESS_EXTERNAL_DTD = "http://javax.xml.XMLConstants/property/accessExternalDTD";
-    private static final String ACCESS_EXTERNAL_SCHEMA = "http://javax.xml.XMLConstants/property/accessExternalSchema";
-    private static final String FEATURE_LOAD_DTD = "http://apache.org/xml/features/nonvalidating/load-external-dtd";
-    private static final String FEATURE_DISABLE_DOCTYPE_DECL = "http://apache.org/xml/features/disallow-doctype-decl";
 }

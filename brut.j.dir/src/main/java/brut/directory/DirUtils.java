@@ -28,10 +28,10 @@ import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.util.logging.Logger;
 
-public class DirUtil {
+public final class DirUtils {
     private static final Logger LOGGER = Logger.getLogger("");
 
-    private DirUtil() {
+    private DirUtils() {
         // Private constructor for utility class
     }
 

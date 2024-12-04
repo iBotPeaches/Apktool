@@ -22,9 +22,8 @@ import java.io.InputStream;
 import java.util.*;
 
 public class YamlReader {
-
     private ArrayList<YamlLine> mLines;
-    private int mCurrent = 0;
+    private int mCurrent;
 
     public YamlReader(InputStream in) {
         mLines = new ArrayList<>();
