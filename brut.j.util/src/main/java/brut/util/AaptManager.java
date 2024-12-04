@@ -37,7 +37,9 @@ public final class AaptManager {
         }
     }
 
-    public static File getAaptBinary(String aaptName) throws BrutException {
+    public static File getAaptBinary(int version) throws BrutException {
+        String aaptName = getAaptName(version);
+
         if (!OSDetection.is64Bit() && OSDetection.isMacOSX()) {
             throw new BrutException(aaptName + " binary is not available for 32-bit platform: " + OSDetection.returnOS());
         }

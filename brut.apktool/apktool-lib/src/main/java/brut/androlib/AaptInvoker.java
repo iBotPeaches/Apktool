@@ -48,11 +48,11 @@ public class AaptInvoker {
             cmd.add(mConfig.aaptBinary.getPath());
             customAapt = true;
         } else {
-            String aaptName = AaptManager.getAaptName(mConfig.aaptVersion);
             try {
-                cmd.add(AaptManager.getAaptBinary(aaptName).getPath());
+                cmd.add(AaptManager.getAaptBinary(mConfig.aaptVersion).getPath());
             } catch (BrutException ex) {
-                LOGGER.warning("aapt: " + ex.getMessage() + " (defaulting to $PATH binary)");
+                String aaptName = AaptManager.getAaptName(mConfig.aaptVersion);
+                LOGGER.warning(aaptName + ": " + ex.getMessage() + " (defaulting to $PATH binary)");
                 cmd.add(aaptName);
                 customAapt = true;
             }
