@@ -23,6 +23,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.*;
+import java.nio.file.Files;
 
 import static org.junit.Assert.*;
 
@@ -33,14 +34,13 @@ public class ApkInfoSerializationTest {
     @Test
     public void checkApkInfoSerialization() throws IOException, AndrolibException {
         ApkInfo control = ApkInfo.load(
-            this.getClass().getResourceAsStream("/apk/unknown_files.yml"));
+            getClass().getResourceAsStream("/apk/unknown_files.yml"));
         check(control);
 
         File savedApkInfo = folder.newFile("saved.yml");
         control.save(savedApkInfo);
-        try (FileInputStream fis = new FileInputStream(savedApkInfo)) {
-            ApkInfo saved = ApkInfo.load(fis);
-            check(saved);
+        try (InputStream in = Files.newInputStream(savedApkInfo.toPath())) {
+            check(ApkInfo.load(in));
         }
     }
 

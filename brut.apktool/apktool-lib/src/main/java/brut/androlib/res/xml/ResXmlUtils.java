@@ -58,9 +58,6 @@ public final class ResXmlUtils {
      * @throws AndrolibException Error reading Manifest file
      */
     public static void removeApplicationDebugTag(File file) throws AndrolibException {
-        if (!file.exists()) {
-            return;
-        }
         try {
             Document doc = loadDocument(file);
             Node application = doc.getElementsByTagName("application").item(0);
@@ -75,7 +72,6 @@ public final class ResXmlUtils {
             }
 
             saveDocument(file, doc);
-
         } catch (SAXException | ParserConfigurationException | IOException | TransformerException ignored) {
         }
     }
@@ -86,9 +82,6 @@ public final class ResXmlUtils {
      * @param file AndroidManifest file
      */
     public static void setApplicationDebugTagTrue(File file) {
-        if (!file.exists()) {
-            return;
-        }
         try {
             Document doc = loadDocument(file);
             Node application = doc.getElementsByTagName("application").item(0);
@@ -106,7 +99,6 @@ public final class ResXmlUtils {
             debugAttr.setNodeValue("true");
 
             saveDocument(file, doc);
-
         } catch (SAXException | ParserConfigurationException | IOException | TransformerException ignored) {
         }
     }
@@ -117,9 +109,6 @@ public final class ResXmlUtils {
      * @param file AndroidManifest file
      */
     public static void setNetworkSecurityConfig(File file) {
-        if (!file.exists()) {
-            return;
-        }
         try {
             Document doc = loadDocument(file);
             Node application = doc.getElementsByTagName("application").item(0);
@@ -138,7 +127,6 @@ public final class ResXmlUtils {
             netSecConfAttr.setNodeValue("@xml/network_security_config");
 
             saveDocument(file, doc);
-
         } catch (SAXException | ParserConfigurationException | IOException | TransformerException ignored) {
         }
     }
@@ -222,9 +210,6 @@ public final class ResXmlUtils {
      * @param file File for AndroidManifest.xml
      */
     public static void fixingPublicAttrsInProviderAttributes(File file) {
-        if (!file.exists()) {
-            return;
-        }
         try {
             Document doc = loadDocument(file);
             XPath xPath = XPathFactory.newInstance().newXPath();
@@ -265,7 +250,6 @@ public final class ResXmlUtils {
             if (saved) {
                 saveDocument(file, doc);
             }
-
         } catch (SAXException | ParserConfigurationException | IOException
                 | XPathExpressionException | TransformerException ignored) {
         }
@@ -293,16 +277,16 @@ public final class ResXmlUtils {
     /**
      * Finds key in strings.xml file and returns text value
      *
-     * @param directory Root directory of apk
+     * @param apkDir Root directory of apk
      * @param key String reference (ie @string/foo)
      * @return String|null
      */
-    public static String pullValueFromStrings(File directory, String key) {
+    public static String pullValueFromStrings(File apkDir, String key) {
         if (key == null || ! key.contains("@")) {
             return null;
         }
 
-        File file = new File(directory, "/res/values/strings.xml");
+        File file = new File(apkDir, "/res/values/strings.xml");
         key = key.replace("@string/", "");
 
         if (!file.exists()) {
@@ -315,7 +299,6 @@ public final class ResXmlUtils {
 
             Object result = expression.evaluate(doc, XPathConstants.STRING);
             return result != null ? (String) result : null;
-
         } catch (SAXException | ParserConfigurationException | IOException | XPathExpressionException ignored) {
             return null;
         }
@@ -324,16 +307,16 @@ public final class ResXmlUtils {
     /**
      * Finds key in integers.xml file and returns text value
      *
-     * @param directory Root directory of apk
+     * @param apkDir Root directory of apk
      * @param key Integer reference (ie @integer/foo)
      * @return String|null
      */
-    public static String pullValueFromIntegers(File directory, String key) {
+    public static String pullValueFromIntegers(File apkDir, String key) {
         if (key == null || ! key.contains("@")) {
             return null;
         }
 
-        File file = new File(directory, "/res/values/integers.xml");
+        File file = new File(apkDir, "/res/values/integers.xml");
         key = key.replace("@integer/", "");
 
         if (!file.exists()) {
@@ -358,9 +341,6 @@ public final class ResXmlUtils {
      * @param file File representing AndroidManifest.xml
      */
     public static void removeManifestVersions(File file) {
-        if (!file.exists()) {
-            return;
-        }
         try {
             Document doc = loadDocument(file);
             Node manifest = doc.getFirstChild();
@@ -398,7 +378,6 @@ public final class ResXmlUtils {
             Node nodeAttr = attr.getNamedItem("package");
             nodeAttr.setNodeValue(packageOriginal);
             saveDocument(file, doc);
-
         } catch (SAXException | ParserConfigurationException | IOException | TransformerException ignored) {
         }
     }
@@ -409,9 +388,6 @@ public final class ResXmlUtils {
      * @param file File for AndroidManifest.xml
      */
     public static List<String> pullManifestFeatureFlags(File file) {
-        if (!file.exists()) {
-            return null;
-        }
         try {
             Document doc = loadDocument(file);
             XPath xPath = XPathFactory.newInstance().newXPath();
@@ -433,7 +409,6 @@ public final class ResXmlUtils {
             }
 
             return featureFlags;
-
         } catch (SAXException | ParserConfigurationException | IOException | XPathExpressionException ignored) {
             return null;
         }
@@ -449,23 +424,22 @@ public final class ResXmlUtils {
      */
     public static Document loadDocument(File file)
             throws IOException, SAXException, ParserConfigurationException {
-
-        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-        docFactory.setFeature(FEATURE_DISABLE_DOCTYPE_DECL, true);
-        docFactory.setFeature(FEATURE_LOAD_DTD, false);
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setFeature(FEATURE_DISABLE_DOCTYPE_DECL, true);
+        factory.setFeature(FEATURE_LOAD_DTD, false);
 
         try {
-            docFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, " ");
-            docFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, " ");
+            factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, " ");
+            factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, " ");
         } catch (IllegalArgumentException ex) {
             LOGGER.warning("JAXP 1.5 Support is required to validate XML");
         }
 
-        DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+        DocumentBuilder builder = factory.newDocumentBuilder();
         // Not using the parse(File) method on purpose, so that we can control when
         // to close it. Somehow parse(File) does not seem to close the file in all cases.
-        try (FileInputStream inputStream = new FileInputStream(file)) {
-            return docBuilder.parse(inputStream);
+        try (InputStream in = Files.newInputStream(file.toPath())) {
+            return builder.parse(in);
         }
     }
 
@@ -480,7 +454,6 @@ public final class ResXmlUtils {
      */
     private static void saveDocument(File file, Document doc)
             throws IOException, SAXException, ParserConfigurationException, TransformerException {
-
         TransformerFactory factory = TransformerFactory.newInstance();
         Transformer transformer = factory.newTransformer();
         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
@@ -488,11 +461,11 @@ public final class ResXmlUtils {
         byte[] xmlDecl = "<?xml version=\"1.0\" encoding=\"utf-8\"?>".getBytes(StandardCharsets.US_ASCII);
         byte[] newLine = System.getProperty("line.separator").getBytes(StandardCharsets.US_ASCII);
 
-        try (OutputStream output = Files.newOutputStream(file.toPath())) {
-            output.write(xmlDecl);
-            output.write(newLine);
-            transformer.transform(new DOMSource(doc), new StreamResult(output));
-            output.write(newLine);
+        try (OutputStream out = Files.newOutputStream(file.toPath())) {
+            out.write(xmlDecl);
+            out.write(newLine);
+            transformer.transform(new DOMSource(doc), new StreamResult(out));
+            out.write(newLine);
         }
     }
 }

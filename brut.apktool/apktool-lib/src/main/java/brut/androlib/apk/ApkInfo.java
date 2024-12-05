@@ -194,10 +194,7 @@ public class ApkInfo implements YamlSerializable {
     }
 
     public void save(File file) throws AndrolibException {
-        try (
-            OutputStream out = Files.newOutputStream(file.toPath());
-            YamlWriter writer = new YamlWriter(out)
-        ) {
+        try (YamlWriter writer = new YamlWriter(Files.newOutputStream(file.toPath()))) {
             write(writer);
         } catch (FileNotFoundException ex) {
             throw new AndrolibException("File not found");

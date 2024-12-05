@@ -124,19 +124,19 @@ public class ApkBuilder {
 
                 LOGGER.info("Building apk file...");
 
-                try (ZipOutputStream outStream = new ZipOutputStream(Files.newOutputStream(outApk.toPath()))) {
+                try (ZipOutputStream out = new ZipOutputStream(Files.newOutputStream(outApk.toPath()))) {
                     // zip aapt output files
                     try {
-                        ZipUtils.zipDir(outDir, outStream, mApkInfo.doNotCompress);
+                        ZipUtils.zipDir(outDir, out, mApkInfo.doNotCompress);
                     } catch (IOException ex) {
                         throw new AndrolibException(ex);
                     }
 
                     // zip remaining standard files
-                    importRawFiles(outStream);
+                    importRawFiles(out);
 
                     // zip unknown files
-                    importUnknownFiles(outStream);
+                    importUnknownFiles(out);
                 } catch (IOException ex) {
                     throw new AndrolibException(ex);
                 }
@@ -462,7 +462,7 @@ public class ApkBuilder {
         }
     }
 
-    private void importRawFiles(ZipOutputStream outStream) throws AndrolibException {
+    private void importRawFiles(ZipOutputStream out) throws AndrolibException {
         for (String dirName : ApkInfo.RAW_DIRNAMES) {
             File rawDir = new File(mApkDir, dirName);
             if (!rawDir.isDirectory()) {
@@ -471,14 +471,14 @@ public class ApkBuilder {
 
             LOGGER.info("Importing " + dirName + "...");
             try {
-                ZipUtils.zipDir(mApkDir, dirName, outStream, mApkInfo.doNotCompress);
+                ZipUtils.zipDir(mApkDir, dirName, out, mApkInfo.doNotCompress);
             } catch (IOException ex) {
                 throw new AndrolibException(ex);
             }
         }
     }
 
-    private void importUnknownFiles(ZipOutputStream outStream) throws AndrolibException {
+    private void importUnknownFiles(ZipOutputStream out) throws AndrolibException {
         File unknownDir = new File(mApkDir, "unknown");
         if (!unknownDir.isDirectory()) {
             return;
@@ -486,7 +486,7 @@ public class ApkBuilder {
 
         LOGGER.info("Importing unknown files...");
         try {
-            ZipUtils.zipDir(unknownDir, outStream, mApkInfo.doNotCompress);
+            ZipUtils.zipDir(unknownDir, out, mApkInfo.doNotCompress);
         } catch (IOException ex) {
             throw new AndrolibException(ex);
         }

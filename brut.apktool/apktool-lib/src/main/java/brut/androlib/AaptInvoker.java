@@ -42,21 +42,24 @@ public class AaptInvoker {
         File aaptBinary = mConfig.aaptBinary;
 
         List<String> cmd = new ArrayList<>();
-        boolean customAapt = false;
+        String aaptPath;
+        boolean customAapt;
 
         if (mConfig.aaptBinary != null) {
-            cmd.add(mConfig.aaptBinary.getPath());
+            aaptPath = mConfig.aaptBinary.getPath();
             customAapt = true;
         } else {
             try {
-                cmd.add(AaptManager.getAaptBinary(mConfig.aaptVersion).getPath());
+                aaptPath = AaptManager.getAaptBinary(mConfig.aaptVersion).getPath();
+                customAapt = false;
             } catch (BrutException ex) {
-                String aaptName = AaptManager.getAaptName(mConfig.aaptVersion);
-                LOGGER.warning(aaptName + ": " + ex.getMessage() + " (defaulting to $PATH binary)");
-                cmd.add(aaptName);
+                aaptPath = AaptManager.getAaptName(mConfig.aaptVersion);
                 customAapt = true;
+                LOGGER.warning(aaptPath + ": " + ex.getMessage() + " (defaulting to $PATH binary)");
             }
         }
+
+        cmd.add(aaptPath);
 
         switch (mConfig.aaptVersion) {
             case 2:

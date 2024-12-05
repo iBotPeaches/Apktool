@@ -146,21 +146,20 @@ public final class OS {
         }
     }
 
-    static class StreamForwarder extends Thread {
+    private static class StreamForwarder extends Thread {
         private final InputStream mIn;
         private final String mType;
 
-        StreamForwarder(InputStream in, String type) {
+        public StreamForwarder(InputStream in, String type) {
             mIn = in;
             mType = type;
         }
 
         @Override
         public void run() {
-            try {
-                BufferedReader br = new BufferedReader(new InputStreamReader(mIn));
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(mIn))) {
                 String line;
-                while ((line = br.readLine()) != null) {
+                while ((line = reader.readLine()) != null) {
                     if (mType.equals("OUTPUT")) {
                         LOGGER.info(line);
                     } else {
@@ -173,19 +172,19 @@ public final class OS {
         }
     }
 
-    static class StreamCollector implements Runnable {
-        private final InputStream mInputStream;
+    private static class StreamCollector implements Runnable {
+        private final InputStream mIn;
         private final StringBuilder mBuffer;
 
-        public StreamCollector(InputStream inputStream) {
-            mInputStream = inputStream;
+        public StreamCollector(InputStream in) {
+            mIn = in;
             mBuffer = new StringBuilder();
         }
 
         @Override
         public void run() {
-            String line;
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(mInputStream))) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(mIn))) {
+                String line;
                 while ((line = reader.readLine()) != null) {
                     mBuffer.append(line).append('\n');
                 }

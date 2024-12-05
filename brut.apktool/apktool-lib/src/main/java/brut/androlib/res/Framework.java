@@ -60,10 +60,8 @@ public class Framework {
             ARSCData arsc = decoder.decode();
             publicizeResources(data, arsc.getFlagsOffsets());
 
-            File outFile = new File(getFrameworkDirectory(), arsc
-                .getOnePackage().getId()
-                + (tag == null ? "" : '-' + tag)
-                + ".apk");
+            File outFile = new File(getFrameworkDirectory(),
+                arsc.getOnePackage().getId() + (tag == null ? "" : '-' + tag) + ".apk");
 
             try (ZipOutputStream out = new ZipOutputStream(Files.newOutputStream(outFile.toPath()))) {
                 out.setMethod(ZipOutputStream.STORED);
@@ -115,8 +113,10 @@ public class Framework {
     public void publicizeResources(File arscFile) throws AndrolibException {
         byte[] data = new byte[(int) arscFile.length()];
 
-        try (InputStream in = Files.newInputStream(arscFile.toPath());
-            OutputStream out = Files.newOutputStream(arscFile.toPath())) {
+        try (
+            InputStream in = Files.newInputStream(arscFile.toPath());
+            OutputStream out = Files.newOutputStream(arscFile.toPath())
+        ) {
             //noinspection ResultOfMethodCallIgnored
             in.read(data);
             publicizeResources(data);
@@ -127,13 +127,9 @@ public class Framework {
     }
 
     private void publicizeResources(byte[] data) throws AndrolibException {
-        try {
-            ARSCDecoder decoder = new ARSCDecoder(new ByteArrayInputStream(data), null, true, true);
-            ARSCData arsc = decoder.decode();
-            publicizeResources(data, arsc.getFlagsOffsets());
-        } catch (IOException ex){
-            throw new AndrolibException(ex);
-        }
+        ARSCDecoder decoder = new ARSCDecoder(new ByteArrayInputStream(data), null, true, true);
+        ARSCData arsc = decoder.decode();
+        publicizeResources(data, arsc.getFlagsOffsets());
     }
 
     public void publicizeResources(byte[] data, FlagsOffset[] flagsOffsets) {

@@ -62,8 +62,7 @@ public class ARSCDecoder {
     private int mResId;
     private int mTypeIdOffset;
 
-    public ARSCDecoder(InputStream in, ResTable resTable, boolean storeFlagsOffsets, boolean keepBroken)
-             throws IOException {
+    public ARSCDecoder(InputStream in, ResTable resTable, boolean storeFlagsOffsets, boolean keepBroken) {
         mIn = ExtDataInputStream.littleEndian(in);
         mResTable = resTable != null ? resTable : new ResTable();
         mFlagsOffsets = storeFlagsOffsets ? new ArrayList<>() : null;

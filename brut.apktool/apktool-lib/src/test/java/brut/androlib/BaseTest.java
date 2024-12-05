@@ -31,6 +31,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
+import java.nio.file.Files;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -135,24 +136,24 @@ public class BaseTest {
         assertTrue(path + ": " + diff.getAllDifferences().toString(), diff.similar());
     }
 
-    protected static Document loadDocument(File file) throws IOException, SAXException, ParserConfigurationException {
-
-        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-        docFactory.setFeature(FEATURE_DISABLE_DOCTYPE_DECL, true);
-        docFactory.setFeature(FEATURE_LOAD_DTD, false);
+    protected static Document loadDocument(File file)
+            throws IOException, SAXException, ParserConfigurationException {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setFeature(FEATURE_DISABLE_DOCTYPE_DECL, true);
+        factory.setFeature(FEATURE_LOAD_DTD, false);
 
         try {
-            docFactory.setAttribute(ACCESS_EXTERNAL_DTD, " ");
-            docFactory.setAttribute(ACCESS_EXTERNAL_SCHEMA, " ");
+            factory.setAttribute(ACCESS_EXTERNAL_DTD, " ");
+            factory.setAttribute(ACCESS_EXTERNAL_SCHEMA, " ");
         } catch (IllegalArgumentException ex) {
             LOGGER.warning("JAXP 1.5 Support is required to validate XML");
         }
 
-        DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+        DocumentBuilder builder = factory.newDocumentBuilder();
         // Not using the parse(File) method on purpose, so that we can control when
         // to close it. Somehow parse(File) does not seem to close the file in all cases.
-        try (FileInputStream inputStream = new FileInputStream(file)) {
-            return docBuilder.parse(inputStream);
+        try (InputStream in = Files.newInputStream(file.toPath())) {
+            return builder.parse(in);
         }
     }
 
@@ -174,7 +175,8 @@ public class BaseTest {
         NodeList children = element.getChildNodes();
         for (int i = 0; i < children.getLength(); i++) {
             Node child = children.item(i);
-            if (child.getNodeType() == Node.ELEMENT_NODE && resourceNameContains((Element) child, name)) {
+            if (child.getNodeType() == Node.ELEMENT_NODE
+                    && resourceNameContains((Element) child, name)) {
                 return true;
             }
         }

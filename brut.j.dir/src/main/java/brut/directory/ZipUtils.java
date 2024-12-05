@@ -95,8 +95,8 @@ public final class ZipUtils {
             if (doNotCompress.test(entryName)) {
                 zipEntry.setMethod(ZipEntry.STORED);
                 zipEntry.setSize(file.length());
-                try (BufferedInputStream bis = new BufferedInputStream(Files.newInputStream(file.toPath()))) {
-                    CRC32 crc = BrutIO.calculateCrc(bis);
+                try (BufferedInputStream in = new BufferedInputStream(Files.newInputStream(file.toPath()))) {
+                    CRC32 crc = BrutIO.calculateCrc(in);
                     zipEntry.setCrc(crc.getValue());
                 }
             } else {

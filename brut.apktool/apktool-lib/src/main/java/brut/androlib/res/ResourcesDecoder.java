@@ -70,7 +70,7 @@ public class ResourcesDecoder {
         mResTable.loadMainPkg(mApkInfo.getApkFile());
     }
 
-    public void decodeManifest(File outDir) throws AndrolibException {
+    public void decodeManifest(File apkDir) throws AndrolibException {
         if (!mApkInfo.hasManifest()) {
             return;
         }
@@ -79,10 +79,10 @@ public class ResourcesDecoder {
         XmlSerializer xmlSerializer = newXmlSerializer();
         ResStreamDecoder fileDecoder = new AndroidManifestPullStreamDecoder(axmlParser, xmlSerializer);
 
-        Directory in, out;
+        Directory inDir, outDir;
         try {
-            in = mApkInfo.getApkFile().getDirectory();
-            out = new ExtFile(outDir).getDirectory();
+            inDir = mApkInfo.getApkFile().getDirectory();
+            outDir = new ExtFile(apkDir).getDirectory();
 
             if (mApkInfo.hasResources()) {
                 LOGGER.info("Decoding AndroidManifest.xml with resources...");
@@ -91,16 +91,16 @@ public class ResourcesDecoder {
             }
 
             try (
-                InputStream is = in.getFileInput("AndroidManifest.xml");
-                OutputStream os = out.getFileOutput("AndroidManifest.xml")
+                InputStream in = inDir.getFileInput("AndroidManifest.xml");
+                OutputStream out = outDir.getFileOutput("AndroidManifest.xml")
             ) {
-                fileDecoder.decode(is, os);
+                fileDecoder.decode(in, out);
             }
         } catch (DirectoryException | IOException ex) {
             throw new AndrolibException(ex);
         }
 
-        File manifest = new File(outDir, "AndroidManifest.xml");
+        File manifest = new File(apkDir, "AndroidManifest.xml");
 
         if (mApkInfo.hasResources() && !mConfig.analysisMode) {
             // Remove versionName / versionCode (aapt API 16)
@@ -126,8 +126,8 @@ public class ResourcesDecoder {
         }
     }
 
-    public void updateApkInfo(File outDir) throws AndrolibException {
-        mResTable.initApkInfo(mApkInfo, outDir);
+    public void updateApkInfo(File apkDir) throws AndrolibException {
+        mResTable.initApkInfo(mApkInfo, apkDir);
     }
 
     private void adjustPackageManifest(File manifest) throws AndrolibException {
@@ -152,7 +152,7 @@ public class ResourcesDecoder {
         }
     }
 
-    public void decodeResources(File outDir) throws AndrolibException {
+    public void decodeResources(File apkDir) throws AndrolibException {
         if (!mApkInfo.hasResources()) {
             return;
         }
@@ -168,11 +168,11 @@ public class ResourcesDecoder {
         decoders.setDecoder("xml", new ResXmlPullStreamDecoder(axmlParser, xmlSerializer));
 
         ResFileDecoder fileDecoder = new ResFileDecoder(decoders);
-        Directory in, out, outRes;
+        Directory inDir, outDir;
 
         try {
-            in = mApkInfo.getApkFile().getDirectory();
-            out = new ExtFile(outDir).getDirectory().createDir("res");
+            inDir = mApkInfo.getApkFile().getDirectory();
+            outDir = new ExtFile(apkDir).getDirectory().createDir("res");
         } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
         }
@@ -180,15 +180,15 @@ public class ResourcesDecoder {
         for (ResPackage pkg : mResTable.listMainPackages()) {
             LOGGER.info("Decoding file-resources...");
             for (ResResource res : pkg.listFiles()) {
-                fileDecoder.decode(res, in, out, mResFileMapping);
+                fileDecoder.decode(res, inDir, outDir, mResFileMapping);
             }
 
             LOGGER.info("Decoding values */* XMLs...");
             for (ResValuesFile valuesFile : pkg.listValuesFiles()) {
-                generateValuesFile(valuesFile, out, xmlSerializer);
+                generateValuesFile(valuesFile, outDir, xmlSerializer);
             }
 
-            generatePublicXml(pkg, out, xmlSerializer);
+            generatePublicXml(pkg, outDir, xmlSerializer);
         }
 
         AndrolibException decodeError = axmlParser.getFirstError();
@@ -210,11 +210,10 @@ public class ResourcesDecoder {
         }
     }
 
-    private void generateValuesFile(ResValuesFile valuesFile, Directory out, XmlSerializer serial)
+    private void generateValuesFile(ResValuesFile valuesFile, Directory resDir, XmlSerializer serial)
             throws AndrolibException {
-        try {
-            OutputStream outStream = out.getFileOutput(valuesFile.getPath());
-            serial.setOutput(outStream, null);
+        try (OutputStream out = resDir.getFileOutput(valuesFile.getPath())) {
+            serial.setOutput(out, null);
             serial.startDocument(null, null);
             serial.startTag(null, "resources");
 
@@ -228,17 +227,15 @@ public class ResourcesDecoder {
             serial.endTag(null, "resources");
             serial.endDocument();
             serial.flush();
-            outStream.close();
         } catch (DirectoryException | IOException ex) {
             throw new AndrolibException("Could not generate: " + valuesFile.getPath(), ex);
         }
     }
 
-    private void generatePublicXml(ResPackage pkg, Directory out, XmlSerializer serial)
+    private void generatePublicXml(ResPackage pkg, Directory resDir, XmlSerializer serial)
             throws AndrolibException {
-        try {
-            OutputStream outStream = out.getFileOutput("values/public.xml");
-            serial.setOutput(outStream, null);
+        try (OutputStream out = resDir.getFileOutput("values/public.xml")) {
+            serial.setOutput(out, null);
             serial.startDocument(null, null);
             serial.startTag(null, "resources");
 
@@ -253,7 +250,6 @@ public class ResourcesDecoder {
             serial.endTag(null, "resources");
             serial.endDocument();
             serial.flush();
-            outStream.close();
         } catch (DirectoryException | IOException ex) {
             throw new AndrolibException("Could not generate public.xml file", ex);
         }

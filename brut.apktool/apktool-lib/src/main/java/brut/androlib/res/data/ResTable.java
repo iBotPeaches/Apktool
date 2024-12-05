@@ -31,9 +31,7 @@ import brut.directory.DirectoryException;
 import brut.directory.ExtFile;
 import com.google.common.base.Strings;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -178,11 +176,12 @@ public class ResTable {
         return pkg;
     }
 
-    private ResPackage[] loadResPackagesFromApk(ExtFile apkFile, boolean keepBrokenResources) throws AndrolibException {
+    private ResPackage[] loadResPackagesFromApk(ExtFile apkFile, boolean keepBrokenResources)
+            throws AndrolibException {
         try {
             Directory dir = apkFile.getDirectory();
-            try (BufferedInputStream bis = new BufferedInputStream(dir.getFileInput("resources.arsc"))) {
-                ARSCDecoder decoder = new ARSCDecoder(bis, this, false, keepBrokenResources);
+            try (BufferedInputStream in = new BufferedInputStream(dir.getFileInput("resources.arsc"))) {
+                ARSCDecoder decoder = new ARSCDecoder(in, this, false, keepBrokenResources);
                 return decoder.decode().getPackages();
             }
         } catch (DirectoryException | IOException ex) {
@@ -308,14 +307,14 @@ public class ResTable {
         return false;
     }
 
-    public void initApkInfo(ApkInfo apkInfo, File outDir) throws AndrolibException {
+    public void initApkInfo(ApkInfo apkInfo, File apkDir) throws AndrolibException {
         apkInfo.isFrameworkApk = isFrameworkApk();
         apkInfo.usesFramework = getUsesFramework();
         if (!mApkInfo.sdkInfo.isEmpty()) {
-            updateSdkInfoFromResources(outDir);
+            updateSdkInfoFromResources(apkDir);
         }
         initPackageInfo();
-        loadVersionName(outDir);
+        loadVersionName(apkDir);
     }
 
     private UsesFramework getUsesFramework() {
@@ -331,24 +330,24 @@ public class ResTable {
         return info;
     }
 
-    private void updateSdkInfoFromResources(File outDir) {
+    private void updateSdkInfoFromResources(File apkDir) {
         String minSdkVersion = mApkInfo.getMinSdkVersion();
         if (minSdkVersion != null) {
-            String refValue = ResXmlUtils.pullValueFromIntegers(outDir, minSdkVersion);
+            String refValue = ResXmlUtils.pullValueFromIntegers(apkDir, minSdkVersion);
             if (refValue != null) {
                 mApkInfo.setMinSdkVersion(refValue);
             }
         }
         String targetSdkVersion = mApkInfo.getTargetSdkVersion();
         if (targetSdkVersion != null) {
-            String refValue = ResXmlUtils.pullValueFromIntegers(outDir, targetSdkVersion);
+            String refValue = ResXmlUtils.pullValueFromIntegers(apkDir, targetSdkVersion);
             if (refValue != null) {
                 mApkInfo.setTargetSdkVersion(refValue);
             }
         }
         String maxSdkVersion = mApkInfo.getMaxSdkVersion();
         if (maxSdkVersion != null) {
-            String refValue = ResXmlUtils.pullValueFromIntegers(outDir, maxSdkVersion);
+            String refValue = ResXmlUtils.pullValueFromIntegers(apkDir, maxSdkVersion);
             if (refValue != null) {
                 mApkInfo.setMaxSdkVersion(refValue);
             }
@@ -375,9 +374,9 @@ public class ResTable {
         mApkInfo.packageInfo.forcedPackageId = String.valueOf(id);
     }
 
-    private void loadVersionName(File outDir) {
+    private void loadVersionName(File apkDir) {
         String versionName = mApkInfo.versionInfo.versionName;
-        String refValue = ResXmlUtils.pullValueFromStrings(outDir, versionName);
+        String refValue = ResXmlUtils.pullValueFromStrings(apkDir, versionName);
         if (refValue != null) {
             mApkInfo.versionInfo.versionName = refValue;
         }

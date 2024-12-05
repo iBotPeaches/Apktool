@@ -126,11 +126,11 @@ public final class TestUtils {
 
     public static byte[] readHeaderOfFile(File file, int size) throws IOException {
         byte[] buffer = new byte[size];
-        InputStream inputStream = Files.newInputStream(file.toPath());
-        if (inputStream.read(buffer) != buffer.length) {
+        InputStream in = Files.newInputStream(file.toPath());
+        if (in.read(buffer) != buffer.length) {
             throw new IOException("File size too small for buffer length: " + size);
         }
-        inputStream.close();
+        in.close();
 
         return buffer;
     }

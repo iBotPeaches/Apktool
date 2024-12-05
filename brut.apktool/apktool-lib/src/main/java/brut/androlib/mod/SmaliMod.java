@@ -38,10 +38,8 @@ public final class SmaliMod {
 
     public static boolean assembleSmaliFile(File smaliFile, DexBuilder dexBuilder, int apiLevel, boolean verboseErrors,
                                             boolean printTokens) throws IOException, RecognitionException {
-        try (
-            InputStream in = Files.newInputStream(smaliFile.toPath());
-            InputStreamReader reader = new InputStreamReader(in, StandardCharsets.UTF_8)
-        ) {
+        try (InputStreamReader reader = new InputStreamReader(
+                Files.newInputStream(smaliFile.toPath()), StandardCharsets.UTF_8)) {
             smaliFlexLexer lexer = new smaliFlexLexer(reader, apiLevel);
             lexer.setSourceFile(smaliFile);
             CommonTokenStream tokens = new CommonTokenStream(lexer);
