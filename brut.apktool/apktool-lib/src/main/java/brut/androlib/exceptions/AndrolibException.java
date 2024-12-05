@@ -19,18 +19,20 @@ package brut.androlib.exceptions;
 import brut.common.BrutException;
 
 public class AndrolibException extends BrutException {
+
     public AndrolibException() {
+        super();
     }
 
     public AndrolibException(String message) {
         super(message);
     }
 
-    public AndrolibException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
     public AndrolibException(Throwable cause) {
         super(cause);
+    }
+
+    public AndrolibException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

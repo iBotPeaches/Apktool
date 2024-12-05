@@ -23,7 +23,11 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 
-public class YamlStringEscapeUtils {
+public final class YamlStringEscapeUtils {
+
+    private YamlStringEscapeUtils() {
+        // Private constructor for utility class
+    }
 
     public static String escapeString(String str) {
         return escapeJavaStyleString(str);
@@ -48,12 +52,12 @@ public class YamlStringEscapeUtils {
     }
 
     /**
-     * @param out write to receive the escaped string
+     * @param writer Writer to receive the escaped string
      * @param str String to escape values in, may be null
      * @throws IOException if an IOException occurs
      */
-    private static void escapeJavaStyleString(Writer out, String str) throws IOException {
-        if (out == null) {
+    private static void escapeJavaStyleString(Writer writer, String str) throws IOException {
+        if (writer == null) {
             throw new IllegalArgumentException("The Writer must not be null");
         }
         if (str == null) {
@@ -66,51 +70,51 @@ public class YamlStringEscapeUtils {
             // "[^\t\n\r\u0020-\u007E\u0085\u00A0-\uD7FF\uE000-\uFFFD]"
             // handle unicode
             if (ch > 0xFFFD) {
-                out.write("\\u" + CharSequenceTranslator.hex(ch));
+                writer.write("\\u" + CharSequenceTranslator.hex(ch));
             } else if (ch > 0xD7FF && ch < 0xE000) {
-                out.write("\\u" + CharSequenceTranslator.hex(ch));
+                writer.write("\\u" + CharSequenceTranslator.hex(ch));
             } else if (ch > 0x7E && ch != 0x85 && ch < 0xA0) {
-                out.write("\\u00" + CharSequenceTranslator.hex(ch));
+                writer.write("\\u00" + CharSequenceTranslator.hex(ch));
             } else if (ch < 32) {
                 switch (ch) {
                     case '\t' :
-                        out.write('\\');
-                        out.write('t');
+                        writer.write('\\');
+                        writer.write('t');
                         break;
                     case '\n' :
-                        out.write('\\');
-                        out.write('n');
+                        writer.write('\\');
+                        writer.write('n');
                         break;
                     case '\r' :
-                        out.write('\\');
-                        out.write('r');
+                        writer.write('\\');
+                        writer.write('r');
                         break;
                     default :
                         if (ch > 0xf) {
-                            out.write("\\u00" + CharSequenceTranslator.hex(ch));
+                            writer.write("\\u00" + CharSequenceTranslator.hex(ch));
                         } else {
-                            out.write("\\u000" + CharSequenceTranslator.hex(ch));
+                            writer.write("\\u000" + CharSequenceTranslator.hex(ch));
                         }
                         break;
                 }
             } else {
                 switch (ch) {
                     case '\'' :
-                        out.write('\'');
+                        writer.write('\'');
                         break;
                     case '"' :
-                        out.write('\\');
-                        out.write('"');
+                        writer.write('\\');
+                        writer.write('"');
                         break;
                     case '\\' :
-                        out.write('\\');
-                        out.write('\\');
+                        writer.write('\\');
+                        writer.write('\\');
                         break;
                     case '/' :
-                        out.write('/');
+                        writer.write('/');
                         break;
                     default :
-                        out.write(ch);
+                        writer.write(ch);
                         break;
                 }
             }

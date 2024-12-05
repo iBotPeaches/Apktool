@@ -23,6 +23,6 @@ import org.xmlpull.v1.XmlSerializer;
 import java.io.IOException;
 
 public interface ResValuesXmlSerializable {
-    void serializeToResValuesXml(XmlSerializer serializer,
-                                 ResResource res) throws IOException, AndrolibException;
+    void serializeToResValuesXml(XmlSerializer serializer, ResResource res)
+            throws IOException, AndrolibException;
 }

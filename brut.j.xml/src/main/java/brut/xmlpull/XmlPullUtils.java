@@ -22,12 +22,16 @@ import org.xmlpull.v1.XmlSerializer;
 
 import java.io.*;
 
-public class XmlPullUtils {
+public final class XmlPullUtils {
     private static final String PROPERTY_XMLDECL_STANDALONE
             = "http://xmlpull.org/v1/doc/properties.html#xmldecl-standalone";
 
     public interface EventHandler {
         boolean onEvent(XmlPullParser in, XmlSerializer out) throws XmlPullParserException;
+    }
+
+    private XmlPullUtils() {
+        // Private constructor for utility class
     }
 
     public static void copy(XmlPullParser in, XmlSerializer out)

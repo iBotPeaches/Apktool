@@ -22,26 +22,27 @@ import brut.util.OSDetection;
 import java.io.File;
 import java.util.logging.Logger;
 
-public class Config {
-    private static Config instance = null;
-    private final static Logger LOGGER = Logger.getLogger(Config.class.getName());
+public final class Config {
+    private static final Logger LOGGER = Logger.getLogger(Config.class.getName());
 
-    public final static short DECODE_SOURCES_NONE = 0x0000;
-    public final static short DECODE_SOURCES_SMALI = 0x0001;
-    public final static short DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES = 0x0010;
+    public static final short DECODE_SOURCES_NONE = 0x0000;
+    public static final short DECODE_SOURCES_SMALI = 0x0001;
+    public static final short DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES = 0x0010;
 
-    public final static short DECODE_RESOURCES_NONE = 0x0100;
-    public final static short DECODE_RESOURCES_FULL = 0x0101;
+    public static final short DECODE_RESOURCES_NONE = 0x0100;
+    public static final short DECODE_RESOURCES_FULL = 0x0101;
 
-    public final static short FORCE_DECODE_MANIFEST_NONE = 0x0000;
-    public final static short FORCE_DECODE_MANIFEST_FULL = 0x0001;
+    public static final short FORCE_DECODE_MANIFEST_NONE = 0x0000;
+    public static final short FORCE_DECODE_MANIFEST_FULL = 0x0001;
 
-    public final static short DECODE_ASSETS_NONE = 0x0000;
-    public final static short DECODE_ASSETS_FULL = 0x0001;
+    public static final short DECODE_ASSETS_NONE = 0x0000;
+    public static final short DECODE_ASSETS_FULL = 0x0001;
 
-    public final static short DECODE_RES_RESOLVE_REMOVE = 0x0000;
-    public final static short DECODE_RES_RESOLVE_DUMMY = 0x0001;
-    public final static short DECODE_RES_RESOLVE_RETAIN = 0x0002;
+    public static final short DECODE_RES_RESOLVE_REMOVE = 0x0000;
+    public static final short DECODE_RES_RESOLVE_DUMMY = 0x0001;
+    public static final short DECODE_RES_RESOLVE_RETAIN = 0x0002;
+
+    private static Config sInstance;
 
     // Build options
     public boolean forceBuildAll = false;
@@ -70,7 +71,7 @@ public class Config {
     public int jobs = Math.min(Runtime.getRuntime().availableProcessors(), 8);
     public String frameworkDirectory = null;
     public String frameworkTag = null;
-    public String aaptPath = "";
+    public File aaptBinary = null;
     public int aaptVersion = 2; // default to v2
 
     // Utility functions
@@ -83,14 +84,14 @@ public class Config {
     }
 
     private Config() {
-        instance = this;
+        sInstance = this;
     }
 
     public static Config getInstance() {
-        if (instance == null) {
-            instance = new Config();
+        if (sInstance == null) {
+            sInstance = new Config();
         }
-        return instance;
+        return sInstance;
     }
 
     private void setDefaultFrameworkDirectory() {

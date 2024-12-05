@@ -26,7 +26,7 @@ public class MaliciousYamlTest {
     @Test
     public void testMaliciousYaml() throws AndrolibException {
         ApkInfo apkInfo = ApkInfo.load(
-            this.getClass().getResourceAsStream("/apk/cve20220476.yml"));
+            getClass().getResourceAsStream("/apk/cve20220476.yml"));
         assertEquals("2.6.1-ddc4bb-SNAPSHOT", apkInfo.version);
     }
 }

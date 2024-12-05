@@ -18,37 +18,36 @@ package brut.androlib.res.data;
 
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.exceptions.UndefinedResObjectException;
+import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
 public class ResResSpec {
+    private static final Set<String> EMPTY_RESOURCE_NAMES = Sets.newHashSet(
+        "0_resource_name_obfuscated", "(name removed)"
+    );
+
     private final ResID mId;
     private final String mName;
     private final ResPackage mPackage;
     private final ResTypeSpec mType;
-    private final Map<ResConfigFlags, ResResource> mResources = new LinkedHashMap<>();
-    private static final Set<String> EMPTY_RESOURCE_NAMES = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
-        "0_resource_name_obfuscated",
-        "(name removed)"
-    )));
+    private final Map<ResConfigFlags, ResResource> mResources;
 
     public ResResSpec(ResID id, String name, ResPackage pkg, ResTypeSpec type) {
-        this.mId = id;
+        mId = id;
         if (name == null || name.isEmpty() || EMPTY_RESOURCE_NAMES.contains(name)) {
             name = "APKTOOL_DUMMYVAL_" + id.toString();
         } else if (type.getResSpecUnsafe(name) != null) {
             name = String.format("APKTOOL_DUPLICATE_%s_%s", type, id.toString());
         }
-        this.mName = name;
-        this.mPackage = pkg;
-        this.mType = type;
+        mName = name;
+        mPackage = pkg;
+        mType = type;
+        mResources = new LinkedHashMap<>();
     }
 
     public Set<ResResource> listResources() {

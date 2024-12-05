@@ -24,12 +24,13 @@ public class ResValuesFile {
     private final ResPackage mPackage;
     private final ResTypeSpec mType;
     private final ResType mConfig;
-    private final Set<ResResource> mResources = new LinkedHashSet<>();
+    private final Set<ResResource> mResources;
 
     public ResValuesFile(ResPackage pkg, ResTypeSpec type, ResType config) {
-        this.mPackage = pkg;
-        this.mType = type;
-        this.mConfig = config;
+        mPackage = pkg;
+        mType = type;
+        mConfig = config;
+        mResources = new LinkedHashSet<>();
     }
 
     public String getPath() {
@@ -63,17 +64,17 @@ public class ResValuesFile {
             return false;
         }
         final ResValuesFile other = (ResValuesFile) obj;
-        if (!Objects.equals(this.mType, other.mType)) {
+        if (!Objects.equals(mType, other.mType)) {
             return false;
         }
-        return Objects.equals(this.mConfig, other.mConfig);
+        return Objects.equals(mConfig, other.mConfig);
     }
 
     @Override
     public int hashCode() {
         int hash = 17;
-        hash = 31 * hash + (this.mType != null ? this.mType.hashCode() : 0);
-        hash = 31 * hash + (this.mConfig != null ? this.mConfig.hashCode() : 0);
+        hash = 31 * hash + (mType != null ? mType.hashCode() : 0);
+        hash = 31 * hash + (mConfig != null ? mConfig.hashCode() : 0);
         return hash;
     }
 }

@@ -26,7 +26,7 @@ public class ConsistentPropertyTest {
     @Test
     public void testAssertingAllKnownApkInfoProperties() throws AndrolibException {
         ApkInfo apkInfo = ApkInfo.load(
-            this.getClass().getResourceAsStream("/apk/basic.yml"));
+            getClass().getResourceAsStream("/apk/basic.yml"));
 
         assertEquals("2.8.0", apkInfo.version);
         assertEquals("basic.apk", apkInfo.apkFileName);

@@ -29,9 +29,12 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 public class ResStyleValue extends ResBagValue implements ResValuesXmlSerializable {
+    private static final Logger LOGGER = Logger.getLogger(ResStyleValue.class.getName());
+
+    private final Duo<ResReferenceValue, ResScalarValue>[] mItems;
+
     ResStyleValue(ResReferenceValue parent, Duo<Integer, ResScalarValue>[] items, ResValueFactory factory) {
         super(parent);
-
         mItems = new Duo[items.length];
         for (int i = 0; i < items.length; i++) {
             mItems[i] = new Duo<>(
@@ -97,8 +100,4 @@ public class ResStyleValue extends ResBagValue implements ResValuesXmlSerializab
         serializer.endTag(null, "style");
         processedNames.clear();
     }
-
-    private final Duo<ResReferenceValue, ResScalarValue>[] mItems;
-
-    private static final Logger LOGGER = Logger.getLogger(ResStyleValue.class.getName());
 }

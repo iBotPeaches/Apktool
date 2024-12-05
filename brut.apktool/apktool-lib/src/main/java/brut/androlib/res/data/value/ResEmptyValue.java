@@ -20,18 +20,18 @@ import brut.androlib.exceptions.AndrolibException;
 
 public class ResEmptyValue extends ResScalarValue {
     protected final int mValue;
-    protected int type;
+    protected int mType;
 
     public ResEmptyValue(int value, String rawValue, int type) {
         this(value, rawValue, "integer");
-        this.type = type;
+        mType = type;
     }
 
     public ResEmptyValue(int value, String rawValue, String type) {
         super(type, value, rawValue);
         if (value != 1)
             throw new UnsupportedOperationException();
-        this.mValue = value;
+        mValue = value;
     }
 
     public int getValue() {

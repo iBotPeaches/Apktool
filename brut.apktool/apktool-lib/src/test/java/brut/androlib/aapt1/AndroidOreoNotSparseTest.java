@@ -30,6 +30,7 @@ import java.io.File;
 import static org.junit.Assert.assertTrue;
 
 public class AndroidOreoNotSparseTest extends BaseTest {
+
     @BeforeClass
     public static void beforeClass() throws Exception {
         TestUtils.cleanFrameworkFile();

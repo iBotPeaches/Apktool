@@ -26,20 +26,26 @@ import java.util.*;
 import java.util.logging.Logger;
 
 public class ResPackage {
+    private static final Logger LOGGER = Logger.getLogger(ResPackage.class.getName());
+
     private final ResTable mResTable;
     private final int mId;
     private final String mName;
-    private final Map<ResID, ResResSpec> mResSpecs = new LinkedHashMap<>();
-    private final Map<ResConfigFlags, ResType> mConfigs = new LinkedHashMap<>();
-    private final Map<String, ResTypeSpec> mTypes = new LinkedHashMap<>();
-    private final Set<ResID> mSynthesizedRes = new HashSet<>();
+    private final Map<ResID, ResResSpec> mResSpecs;
+    private final Map<ResConfigFlags, ResType> mConfigs;
+    private final Map<String, ResTypeSpec> mTypes;
+    private final Set<ResID> mSynthesizedRes;
 
     private ResValueFactory mValueFactory;
 
     public ResPackage(ResTable resTable, int id, String name) {
-        this.mResTable = resTable;
-        this.mId = id;
-        this.mName = name;
+        mResTable = resTable;
+        mId = id;
+        mName = name;
+        mResSpecs = new LinkedHashMap<>();
+        mConfigs = new LinkedHashMap<>();
+        mTypes = new LinkedHashMap<>();
+        mSynthesizedRes = new HashSet<>();
     }
 
     public List<ResResSpec> listResSpecs() {
@@ -159,17 +165,17 @@ public class ResPackage {
             return false;
         }
         final ResPackage other = (ResPackage) obj;
-        if (!Objects.equals(this.mResTable, other.mResTable)) {
+        if (!Objects.equals(mResTable, other.mResTable)) {
             return false;
         }
-        return this.mId == other.mId;
+        return mId == other.mId;
     }
 
     @Override
     public int hashCode() {
         int hash = 17;
-        hash = 31 * hash + (this.mResTable != null ? this.mResTable.hashCode() : 0);
-        hash = 31 * hash + this.mId;
+        hash = 31 * hash + (mResTable != null ? mResTable.hashCode() : 0);
+        hash = 31 * hash + mId;
         return hash;
     }
 
@@ -179,6 +185,4 @@ public class ResPackage {
         }
         return mValueFactory;
     }
-
-    private final static Logger LOGGER = Logger.getLogger(ResPackage.class.getName());
 }

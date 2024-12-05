@@ -20,15 +20,19 @@ import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.data.ResResource;
 import brut.androlib.res.xml.ResValuesXmlSerializable;
 import brut.util.Duo;
+import com.google.common.collect.Sets;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.Set;
 
 public class ResArrayValue extends ResBagValue implements ResValuesXmlSerializable {
+    private static final Set<String> ALLOWED_ARRAY_TYPES = Sets.newHashSet("string", "integer");
+
+    private final ResScalarValue[] mItems;
+
     ResArrayValue(ResReferenceValue parent, Duo<Integer, ResScalarValue>[] items) {
         super(parent);
-
         mItems = new ResScalarValue[items.length];
         for (int i = 0; i < items.length; i++) {
             mItems[i] = items[i].m2;
@@ -83,12 +87,9 @@ public class ResArrayValue extends ResBagValue implements ResValuesXmlSerializab
                 return null;
             }
         }
-        if (!Arrays.asList(AllowedArrayTypes).contains(type)) {
+        if (!ALLOWED_ARRAY_TYPES.contains(type)) {
             return "string";
         }
         return type;
     }
-
-    private final ResScalarValue[] mItems;
-    private final String[] AllowedArrayTypes = {"string", "integer"};
 }

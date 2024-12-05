@@ -23,11 +23,10 @@ public class Duo<T1, T2> {
     public final T2 m2;
 
     public Duo(T1 t1, T2 t2) {
-        this.m1 = t1;
-        this.m2 = t2;
+        m1 = t1;
+        m2 = t2;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
@@ -37,17 +36,17 @@ public class Duo<T1, T2> {
             return false;
         }
         final Duo<T1, T2> other = (Duo<T1, T2>) obj;
-        if (!Objects.equals(this.m1, other.m1)) {
+        if (!Objects.equals(m1, other.m1)) {
             return false;
         }
-        return Objects.equals(this.m2, other.m2);
+        return Objects.equals(m2, other.m2);
     }
 
     @Override
     public int hashCode() {
         int hash = 3;
-        hash = 71 * hash + (this.m1 != null ? this.m1.hashCode() : 0);
-        hash = 71 * hash + (this.m2 != null ? this.m2.hashCode() : 0);
+        hash = 71 * hash + (m1 != null ? m1.hashCode() : 0);
+        hash = 71 * hash + (m2 != null ? m2.hashCode() : 0);
         return hash;
     }
 }

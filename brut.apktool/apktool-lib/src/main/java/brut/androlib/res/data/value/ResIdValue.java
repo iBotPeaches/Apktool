@@ -23,6 +23,7 @@ import org.xmlpull.v1.XmlSerializer;
 import java.io.IOException;
 
 public class ResIdValue extends ResValue implements ResValuesXmlSerializable {
+
     @Override
     public void serializeToResValuesXml(XmlSerializer serializer, ResResource res) throws IOException {
         serializer.startTag(null, "item");

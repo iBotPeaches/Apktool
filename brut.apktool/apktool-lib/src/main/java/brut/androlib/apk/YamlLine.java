@@ -19,7 +19,6 @@ package brut.androlib.apk;
 import java.util.Objects;
 
 public class YamlLine {
-
     public int indent = 0;
     private String key = "";
     private String value = "";
@@ -62,7 +61,7 @@ public class YamlLine {
             if (isItem) {
                 // array item line has only the value
                 value = line.substring(1).trim();
-            }  else {
+            } else {
                 // split line to key - value
                 String[] parts = line.split(":");
                 if (parts.length > 0) {

@@ -28,10 +28,16 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 public class ResEnumAttr extends ResAttr {
+    private static final Logger LOGGER = Logger.getLogger(ResEnumAttr.class.getName());
+
+    private final Duo<ResReferenceValue, ResScalarValue>[] mItems;
+    private final Map<Integer, String> mItemsCache;
+
     ResEnumAttr(ResReferenceValue parent, int type, Integer min, Integer max,
                 Boolean l10n, Duo<ResReferenceValue, ResScalarValue>[] items) {
         super(parent, type, min, max, l10n);
         mItems = items;
+        mItemsCache = new HashMap<>();
     }
 
     @Override
@@ -85,9 +91,4 @@ public class ResEnumAttr extends ResAttr {
         }
         return value2;
     }
-
-    private final Duo<ResReferenceValue, ResScalarValue>[] mItems;
-    private final Map<Integer, String> mItemsCache = new HashMap<>();
-
-    private static final Logger LOGGER = Logger.getLogger(ResEnumAttr.class.getName());
 }

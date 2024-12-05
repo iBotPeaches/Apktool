@@ -21,6 +21,7 @@ import brut.androlib.exceptions.CantFind9PatchChunkException;
 import brut.androlib.res.data.ninepatch.NinePatchData;
 import brut.androlib.res.data.ninepatch.OpticalInset;
 import brut.util.ExtDataInput;
+import brut.util.ExtDataInputStream;
 import org.apache.commons.io.IOUtils;
 
 import javax.imageio.ImageIO;
@@ -30,6 +31,11 @@ import java.awt.image.WritableRaster;
 import java.io.*;
 
 public class Res9patchStreamDecoder implements ResStreamDecoder {
+    private static final int NP_CHUNK_TYPE = 0x6e705463; // npTc
+    private static final int OI_CHUNK_TYPE = 0x6e704c62; // npLb
+    private static final int NP_COLOR = 0xff000000;
+    private static final int OI_COLOR = 0xffff0000;
+
     @Override
     public void decode(InputStream in, OutputStream out) throws AndrolibException {
         try {
@@ -122,32 +128,32 @@ public class Res9patchStreamDecoder implements ResStreamDecoder {
 
     private NinePatchData getNinePatch(byte[] data) throws AndrolibException,
         IOException {
-        ExtDataInput di = new ExtDataInput(new ByteArrayInputStream(data));
-        find9patchChunk(di, NP_CHUNK_TYPE);
-        return NinePatchData.decode(di);
+        ExtDataInput in = ExtDataInputStream.bigEndian(new ByteArrayInputStream(data));
+        find9patchChunk(in, NP_CHUNK_TYPE);
+        return NinePatchData.decode(in);
     }
 
     private OpticalInset getOpticalInset(byte[] data) throws AndrolibException,
         IOException {
-        ExtDataInput di = new ExtDataInput(new ByteArrayInputStream(data));
-        find9patchChunk(di, OI_CHUNK_TYPE);
-        return OpticalInset.decode(di);
+        ExtDataInput in = ExtDataInputStream.bigEndian(new ByteArrayInputStream(data));
+        find9patchChunk(in, OI_CHUNK_TYPE);
+        return OpticalInset.decode(in);
     }
 
-    private void find9patchChunk(DataInput di, int magic) throws AndrolibException,
+    private void find9patchChunk(DataInput in, int magic) throws AndrolibException,
         IOException {
-        di.skipBytes(8);
+        in.skipBytes(8);
         while (true) {
             int size;
             try {
-                size = di.readInt();
+                size = in.readInt();
             } catch (IOException ex) {
-                throw new CantFind9PatchChunkException("Cant find nine patch chunk", ex);
+                throw new CantFind9PatchChunkException("Could not find nine patch chunk", ex);
             }
-            if (di.readInt() == magic) {
+            if (in.readInt() == magic) {
                 return;
             }
-            di.skipBytes(size + 4);
+            in.skipBytes(size + 4);
         }
     }
 
@@ -162,9 +168,4 @@ public class Res9patchStreamDecoder implements ResStreamDecoder {
             im.setRGB(x, y, NP_COLOR);
         }
     }
-
-    private static final int NP_CHUNK_TYPE = 0x6e705463; // npTc
-    private static final int OI_CHUNK_TYPE = 0x6e704c62; // npLb
-    private static final int NP_COLOR = 0xff000000;
-    private static final int OI_COLOR = 0xffff0000;
 }

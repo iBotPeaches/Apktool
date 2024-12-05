@@ -27,7 +27,7 @@ import org.xmlpull.v1.XmlPullParser;
 public interface XmlResourceParser extends XmlPullParser, AttributeSet {
     /**
      * Close this interface to the resource. Calls on the interface are no
-     * longer value after this call.
+     * longer valid after this call.
      */
     void close();
 }

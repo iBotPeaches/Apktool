@@ -21,7 +21,7 @@ public class ResBoolValue extends ResScalarValue {
 
     public ResBoolValue(boolean value, int rawIntValue, String rawValue) {
         super("bool", rawIntValue, rawValue);
-        this.mValue = value;
+        mValue = value;
     }
 
     public boolean getValue() {

@@ -28,13 +28,13 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 public class ApkInfo implements YamlSerializable {
-    public final static String[] RESOURCES_DIRNAMES = new String[] { "res", "r", "R" };
-    public final static String[] RAW_DIRNAMES = new String[] { "assets", "lib", "libs", "kotlin", "META-INF/services" };
+    public static final String[] RESOURCES_DIRNAMES = { "res", "r", "R" };
+    public static final String[] RAW_DIRNAMES = { "assets", "lib", "libs", "kotlin", "META-INF/services" };
 
-    public final static Pattern ORIGINAL_FILENAMES_PATTERN = Pattern.compile(
+    public static final Pattern ORIGINAL_FILENAMES_PATTERN = Pattern.compile(
         "AndroidManifest\\.xml|META-INF/[^/]+\\.(RSA|SF|MF)|stamp-cert-sha256");
 
-    public final static Pattern STANDARD_FILENAMES_PATTERN = Pattern.compile(
+    public static final Pattern STANDARD_FILENAMES_PATTERN = Pattern.compile(
         "[^/]+\\.dex|resources\\.arsc|(" + String.join("|", RESOURCES_DIRNAMES) + "|" +
         String.join("|", RAW_DIRNAMES) + ")/.*|" + ORIGINAL_FILENAMES_PATTERN.pattern());
 
@@ -194,10 +194,7 @@ public class ApkInfo implements YamlSerializable {
     }
 
     public void save(File file) throws AndrolibException {
-        try (
-            OutputStream out = Files.newOutputStream(file.toPath());
-            YamlWriter writer = new YamlWriter(out)
-        ) {
+        try (YamlWriter writer = new YamlWriter(Files.newOutputStream(file.toPath()))) {
             write(writer);
         } catch (FileNotFoundException ex) {
             throw new AndrolibException("File not found");

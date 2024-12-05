@@ -216,7 +216,7 @@ public class TypedValue {
     public int type;
 
     private static final float MANTISSA_MULT = 1.0f / (1 << TypedValue.COMPLEX_MANTISSA_SHIFT);
-    private static final float[] RADIX_MULTS = new float[] {
+    private static final float[] RADIX_MULTS = {
         MANTISSA_MULT, 1.0f / (1 << 7) * MANTISSA_MULT,
             1.0f / (1 << 15) * MANTISSA_MULT, 1.0f / (1 << 23) * MANTISSA_MULT };
 
@@ -237,9 +237,10 @@ public class TypedValue {
                 & TypedValue.COMPLEX_RADIX_MASK];
     }
 
-    private static final String[] DIMENSION_UNIT_STRS = new String[] { "px",
-            "dip", "sp", "pt", "in", "mm" };
-    private static final String[] FRACTION_UNIT_STRS = new String[] { "%", "%p" };
+    private static final String[] DIMENSION_UNIT_STRS = {
+            "px", "dip", "sp", "pt", "in", "mm"
+    };
+    private static final String[] FRACTION_UNIT_STRS = { "%", "%p" };
 
     /**
      * Perform type conversion as per coerceToString on an explicitly

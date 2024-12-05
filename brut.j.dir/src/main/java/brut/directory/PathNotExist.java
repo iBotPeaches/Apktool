@@ -17,21 +17,21 @@
 package brut.directory;
 
 public class PathNotExist extends DirectoryException {
+    private static final long serialVersionUID = -6949242015506342032L;
+
     public PathNotExist() {
         super();
     }
 
-    public PathNotExist(String detailMessage, Throwable throwable) {
-        super(detailMessage, throwable);
+    public PathNotExist(String message) {
+        super(message);
     }
 
-    public PathNotExist(String detailMessage) {
-        super(detailMessage);
+    public PathNotExist(Throwable cause) {
+        super(cause);
     }
 
-    public PathNotExist(Throwable throwable) {
-        super(throwable);
+    public PathNotExist(String message, Throwable cause) {
+        super(message, cause);
     }
-
-    private static final long serialVersionUID = -6949242015506342032L;
 }

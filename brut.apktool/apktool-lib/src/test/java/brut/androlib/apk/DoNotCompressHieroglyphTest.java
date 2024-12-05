@@ -26,7 +26,7 @@ public class DoNotCompressHieroglyphTest {
     @Test
     public void testHieroglyph() throws AndrolibException {
         ApkInfo apkInfo = ApkInfo.load(
-            this.getClass().getResourceAsStream("/apk/donotcompress_with_hieroglyph.yml"));
+            getClass().getResourceAsStream("/apk/donotcompress_with_hieroglyph.yml"));
         assertEquals("2.0.0", apkInfo.version);
         assertEquals("testapp.apk", apkInfo.apkFileName);
         assertEquals(2, apkInfo.doNotCompress.size());

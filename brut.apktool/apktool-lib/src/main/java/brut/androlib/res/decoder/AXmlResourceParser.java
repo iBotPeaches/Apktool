@@ -29,8 +29,7 @@ import brut.androlib.res.data.axml.NamespaceStack;
 import brut.androlib.res.data.value.ResAttr;
 import brut.androlib.res.data.value.ResScalarValue;
 import brut.androlib.res.xml.ResXmlEncoders;
-import brut.util.ExtCountingDataInput;
-import com.google.common.io.LittleEndianDataInputStream;
+import brut.util.ExtDataInputStream;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.*;
@@ -47,9 +46,45 @@ import java.util.logging.Logger;
  * this state methods return invalid values or throw exceptions.
  */
 public class AXmlResourceParser implements XmlResourceParser {
+    private static final Logger LOGGER = Logger.getLogger(AXmlResourceParser.class.getName());
+
+    private static final String E_NOT_SUPPORTED = "Method is not supported.";
+    private static final String ANDROID_RES_NS_AUTO = "http://schemas.android.com/apk/res-auto";
+    public static final String ANDROID_RES_NS = "http://schemas.android.com/apk/res/android";
+
+    // ResXMLTree_attribute
+    private static final int ATTRIBUTE_IX_NAMESPACE_URI = 0; // ns
+    private static final int ATTRIBUTE_IX_NAME = 1; // name
+    private static final int ATTRIBUTE_IX_VALUE_STRING = 2; // rawValue
+    private static final int ATTRIBUTE_IX_VALUE_TYPE = 3; // (size/res0/dataType)
+    private static final int ATTRIBUTE_IX_VALUE_DATA = 4; // data
+    private static final int ATTRIBUTE_LENGTH = 5;
+
+    private static final int PRIVATE_PKG_ID = 0x7F;
+
+    private final ResTable mResTable;
+    private final NamespaceStack mNamespaces;
+
+    private boolean mIsOperational;
+    private ExtDataInputStream mIn;
+    private StringBlock mStringBlock;
+    private int[] mResourceIds;
+    private boolean mDecreaseDepth;
+    private AndrolibException mFirstError;
+
+    // All values are essentially indices, e.g. mNameIndex is an index of name in mStringBlock.
+    private int mEvent;
+    private int mLineNumber;
+    private int mNameIndex;
+    private int mNamespaceIndex;
+    private int[] mAttributes;
+    private int mIdIndex;
+    private int mClassIndex;
+    private int mStyleIndex;
 
     public AXmlResourceParser(ResTable resTable) {
         mResTable = resTable;
+        mNamespaces = new NamespaceStack();
         resetEventInfo();
     }
 
@@ -64,16 +99,16 @@ public class AXmlResourceParser implements XmlResourceParser {
     public void open(InputStream stream) {
         close();
         if (stream != null) {
-            mIn = new ExtCountingDataInput(new LittleEndianDataInputStream(stream));
+            mIn = ExtDataInputStream.littleEndian(stream);
         }
     }
 
     @Override
     public void close() {
-        if (!isOperational) {
+        if (!mIsOperational) {
             return;
         }
-        isOperational = false;
+        mIsOperational = false;
         mIn = null;
         mStringBlock = null;
         mResourceIds = null;
@@ -314,17 +349,16 @@ public class AXmlResourceParser implements XmlResourceParser {
 
     private String getNonDefaultNamespaceUri(int offset) {
         String prefix = mStringBlock.getString(mNamespaces.getPrefix(offset));
-        if (prefix != null) {
-            return  mStringBlock.getString(mNamespaces.getUri(offset));
+        if (prefix == null) {
+            // If we are here. There is some clever obfuscation going on. Our reference points to the namespace are gone.
+            // Normally we could take the index * attributeCount to get an offset.
+            // That would point to the URI in the StringBlock table, but that is empty.
+            // We have the namespaces that can't be touched in the opening tag.
+            // Though no known way to correlate them at this time.
+            // So return the res-auto namespace.
+            return ANDROID_RES_NS_AUTO;
         }
-
-        // If we are here. There is some clever obfuscation going on. Our reference points to the namespace are gone.
-        // Normally we could take the index * attributeCount to get an offset.
-        // That would point to the URI in the StringBlock table, but that is empty.
-        // We have the namespaces that can't be touched in the opening tag.
-        // Though no known way to correlate them at this time.
-        // So return the res-auto namespace.
-        return ANDROID_RES_NS_AUTO;
+        return mStringBlock.getString(mNamespaces.getUri(offset));
     }
 
     @Override
@@ -404,7 +438,9 @@ public class AXmlResourceParser implements XmlResourceParser {
         int valueRaw = mAttributes[offset + ATTRIBUTE_IX_VALUE_STRING];
 
         try {
-            String stringBlockValue = valueRaw == -1 ? null : ResXmlEncoders.escapeXmlChars(mStringBlock.getString(valueRaw));
+            String stringBlockValue = valueRaw != -1
+                ? ResXmlEncoders.escapeXmlChars(mStringBlock.getString(valueRaw))
+                : null;
             String resourceMapValue = null;
 
             // Ensure we only track down obfuscated values for reference/attribute type values. Otherwise, we might
@@ -453,21 +489,20 @@ public class AXmlResourceParser implements XmlResourceParser {
     public float getAttributeFloatValue(int index, float defaultValue) {
         int offset = getAttributeOffset(index);
         int valueType = mAttributes[offset + ATTRIBUTE_IX_VALUE_TYPE];
-        if (valueType == TypedValue.TYPE_FLOAT) {
-            int valueData = mAttributes[offset + ATTRIBUTE_IX_VALUE_DATA];
-            return Float.intBitsToFloat(valueData);
+        if (valueType != TypedValue.TYPE_FLOAT) {
+            return defaultValue;
         }
-        return defaultValue;
+        return Float.intBitsToFloat(mAttributes[offset + ATTRIBUTE_IX_VALUE_DATA]);
     }
 
     @Override
     public int getAttributeIntValue(int index, int defaultValue) {
         int offset = getAttributeOffset(index);
         int valueType = mAttributes[offset + ATTRIBUTE_IX_VALUE_TYPE];
-        if (valueType >= TypedValue.TYPE_FIRST_INT && valueType <= TypedValue.TYPE_LAST_INT) {
-            return mAttributes[offset + ATTRIBUTE_IX_VALUE_DATA];
+        if (valueType < TypedValue.TYPE_FIRST_INT || valueType > TypedValue.TYPE_LAST_INT) {
+            return defaultValue;
         }
-        return defaultValue;
+        return mAttributes[offset + ATTRIBUTE_IX_VALUE_DATA];
     }
 
     @Override
@@ -479,10 +514,10 @@ public class AXmlResourceParser implements XmlResourceParser {
     public int getAttributeResourceValue(int index, int defaultValue) {
         int offset = getAttributeOffset(index);
         int valueType = mAttributes[offset + ATTRIBUTE_IX_VALUE_TYPE];
-        if (valueType == TypedValue.TYPE_REFERENCE) {
-            return mAttributes[offset + ATTRIBUTE_IX_VALUE_DATA];
+        if (valueType != TypedValue.TYPE_REFERENCE) {
+            return defaultValue;
         }
-        return defaultValue;
+        return mAttributes[offset + ATTRIBUTE_IX_VALUE_DATA];
     }
 
     @Override
@@ -687,7 +722,7 @@ public class AXmlResourceParser implements XmlResourceParser {
 
             mStringBlock = StringBlock.readWithChunk(mIn);
             mNamespaces.increaseDepth();
-            isOperational = true;
+            mIsOperational = true;
         }
 
         if (mEvent == END_DOCUMENT) {
@@ -698,8 +733,8 @@ public class AXmlResourceParser implements XmlResourceParser {
         resetEventInfo();
 
         while (true) {
-            if (m_decreaseDepth) {
-                m_decreaseDepth = false;
+            if (mDecreaseDepth) {
+                mDecreaseDepth = false;
                 mNamespaces.decreaseDepth();
             }
 
@@ -710,7 +745,7 @@ public class AXmlResourceParser implements XmlResourceParser {
             }
 
             // #2070 - Some applications have 2 start namespaces, but only 1 end namespace.
-            if (mIn.remaining() == 0) {
+            if (mIn.available() == 0) {
                 LOGGER.warning(String.format("AXML hit unexpected end of file at byte: 0x%X", mIn.position()));
                 mEvent = END_DOCUMENT;
                 break;
@@ -809,7 +844,7 @@ public class AXmlResourceParser implements XmlResourceParser {
                 mNamespaceIndex = mIn.readInt();
                 mNameIndex = mIn.readInt();
                 mEvent = END_TAG;
-                m_decreaseDepth = true;
+                mDecreaseDepth = true;
                 break;
             }
 
@@ -828,40 +863,4 @@ public class AXmlResourceParser implements XmlResourceParser {
             mFirstError = error;
         }
     }
-
-    private ExtCountingDataInput mIn;
-    private final ResTable mResTable;
-    private AndrolibException mFirstError;
-
-    private boolean isOperational = false;
-    private StringBlock mStringBlock;
-    private int[] mResourceIds;
-    private final NamespaceStack mNamespaces = new NamespaceStack();
-    private boolean m_decreaseDepth;
-
-    // All values are essentially indices, e.g. mNameIndex is an index of name in mStringBlock.
-    private int mEvent;
-    private int mLineNumber;
-    private int mNameIndex;
-    private int mNamespaceIndex;
-    private int[] mAttributes;
-    private int mIdIndex;
-    private int mClassIndex;
-    private int mStyleIndex;
-
-    private final static Logger LOGGER = Logger.getLogger(AXmlResourceParser.class.getName());
-    private static final String E_NOT_SUPPORTED = "Method is not supported.";
-
-    // ResXMLTree_attribute
-    private static final int ATTRIBUTE_IX_NAMESPACE_URI = 0; // ns
-    private static final int ATTRIBUTE_IX_NAME = 1; // name
-    private static final int ATTRIBUTE_IX_VALUE_STRING = 2; // rawValue
-    private static final int ATTRIBUTE_IX_VALUE_TYPE = 3; // (size/res0/dataType)
-    private static final int ATTRIBUTE_IX_VALUE_DATA = 4; // data
-    private static final int ATTRIBUTE_LENGTH = 5;
-
-    private static final int PRIVATE_PKG_ID = 0x7F;
-
-    private static final String ANDROID_RES_NS_AUTO = "http://schemas.android.com/apk/res-auto";
-    public static final String ANDROID_RES_NS = "http://schemas.android.com/apk/res/android";
 }

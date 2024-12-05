@@ -26,31 +26,35 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
-public abstract class Jar {
-    private static final Map<String, File> mExtracted = new HashMap<>();
+public final class Jar {
+    private static final Map<String, File> sExtracted = new HashMap<>();
 
-    public static File getResourceAsFile(String name, Class<?> clazz) throws BrutException {
-        File file = mExtracted.get(name);
+    private Jar() {
+        // Private constructor for utility class
+    }
+
+    public static File getResourceAsFile(Class<?> clz, String name) throws BrutException {
+        File file = sExtracted.get(name);
         if (file == null) {
-            file = extractToTmp(name, clazz);
-            mExtracted.put(name, file);
+            file = extractToTmp(clz, name);
+            sExtracted.put(name, file);
         }
         return file;
     }
 
-    public static File extractToTmp(String resourcePath, Class<?> clazz) throws BrutException {
-        return extractToTmp(resourcePath, "brut_util_Jar_", clazz);
+    public static File extractToTmp(Class<?> clz, String resourcePath) throws BrutException {
+        return extractToTmp(clz, resourcePath, "brut_util_Jar_");
     }
 
-    public static File extractToTmp(String resourcePath, String tmpPrefix, Class<?> clazz) throws BrutException {
+    public static File extractToTmp(Class<?> clz, String resourcePath, String tmpPrefix) throws BrutException {
         InputStream in = null;
         try {
-            in = clazz.getResourceAsStream(resourcePath);
+            in = clz.getResourceAsStream(resourcePath);
             if (in == null) {
                 throw new FileNotFoundException(resourcePath);
             }
             long suffix = ThreadLocalRandom.current().nextLong();
-            suffix = suffix == Long.MIN_VALUE ? 0 : Math.abs(suffix);
+            suffix = suffix > Long.MIN_VALUE ? Math.abs(suffix) : 0;
             File fileOut = File.createTempFile(tmpPrefix, suffix + ".tmp");
             fileOut.deleteOnExit();
 

@@ -42,20 +42,20 @@ public class ApktoolProperties {
     }
 
     private static void loadProps() {
-        InputStream in = ApktoolProperties.class.getResourceAsStream("/properties/apktool.properties");
+        InputStream in = ApktoolProperties.class.getResourceAsStream("/apktool.properties");
         sProps = new Properties();
         try {
             sProps.load(in);
             in.close();
         } catch (NullPointerException | IOException ex) {
-            LOGGER.warning("Can't load properties.");
+            LOGGER.warning("Could not load properties.");
         }
 
         InputStream templateStream = null;
         try {
-            templateStream = com.android.tools.smali.baksmali.Main.class.getClassLoader().getResourceAsStream("baksmali.properties");
+            templateStream = com.android.tools.smali.baksmali.Main.class.getResourceAsStream("/baksmali.properties");
         } catch(NoClassDefFoundError ex) {
-            LOGGER.warning("Can't load baksmali properties.");
+            LOGGER.warning("Could not load baksmali properties.");
         }
         Properties properties = new Properties();
         String version = "(unknown)";
@@ -71,9 +71,9 @@ public class ApktoolProperties {
 
         templateStream = null;
         try {
-            templateStream = com.android.tools.smali.smali.Main.class.getClassLoader().getResourceAsStream("smali.properties");
+            templateStream = com.android.tools.smali.smali.Main.class.getResourceAsStream("/smali.properties");
         } catch(NoClassDefFoundError ex) {
-            LOGGER.warning("Can't load smali properties.");
+            LOGGER.warning("Could not load smali properties.");
         }
         properties = new Properties();
         version = "(unknown)";

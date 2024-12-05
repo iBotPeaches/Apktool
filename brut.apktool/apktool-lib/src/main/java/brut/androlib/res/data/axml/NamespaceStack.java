@@ -31,38 +31,38 @@ package brut.androlib.res.data.axml;
  * !! functions expect 'prefix'+'uri' pairs, not 'uri'+'prefix' !!
  */
 public final class NamespaceStack {
-    private int[] m_data;
-    private int m_dataLength;
-    private int m_depth;
+    private int[] mData;
+    private int mDataLength;
+    private int mDepth;
 
     public NamespaceStack() {
-        m_data = new int[32];
+        mData = new int[32];
     }
 
     public void reset() {
-        m_dataLength = 0;
-        m_depth = 0;
+        mDataLength = 0;
+        mDepth = 0;
     }
 
     public int getCurrentCount() {
-        if (m_dataLength == 0) {
+        if (mDataLength == 0) {
             return 0;
         }
-        int offset = m_dataLength - 1;
-        return m_data[offset];
+        int offset = mDataLength - 1;
+        return mData[offset];
     }
 
     public int getAccumulatedCount(int depth) {
-        if (m_dataLength == 0 || depth < 0) {
+        if (mDataLength == 0 || depth < 0) {
             return 0;
         }
-        if (depth > m_depth) {
-            depth = m_depth;
+        if (depth > mDepth) {
+            depth = mDepth;
         }
         int accumulatedCount = 0;
         int offset = 0;
         for (; depth != 0; --depth) {
-            int count = m_data[offset];
+            int count = mData[offset];
             accumulatedCount += count;
             offset += (2 + count * 2);
         }
@@ -70,34 +70,34 @@ public final class NamespaceStack {
     }
 
     public void push(int prefix, int uri) {
-        if (m_depth == 0) {
+        if (mDepth == 0) {
             increaseDepth();
         }
         ensureDataCapacity(2);
-        int offset = m_dataLength - 1;
-        int count = m_data[offset];
-        m_data[offset - 1 - count * 2] = count + 1;
-        m_data[offset] = prefix;
-        m_data[offset + 1] = uri;
-        m_data[offset + 2] = count + 1;
-        m_dataLength += 2;
+        int offset = mDataLength - 1;
+        int count = mData[offset];
+        mData[offset - 1 - count * 2] = count + 1;
+        mData[offset] = prefix;
+        mData[offset + 1] = uri;
+        mData[offset + 2] = count + 1;
+        mDataLength += 2;
     }
 
     public boolean pop() {
-        if (m_dataLength == 0) {
+        if (mDataLength == 0) {
             return false;
         }
-        int offset = m_dataLength - 1;
-        int count = m_data[offset];
+        int offset = mDataLength - 1;
+        int count = mData[offset];
         if (count == 0) {
             return false;
         }
         count -= 1;
         offset -= 2;
-        m_data[offset] = count;
+        mData[offset] = count;
         offset -= (1 + count * 2);
-        m_data[offset] = count;
-        m_dataLength -= 2;
+        mData[offset] = count;
+        mDataLength -= 2;
         return true;
     }
 
@@ -114,58 +114,58 @@ public final class NamespaceStack {
     }
 
     public int getDepth() {
-        return m_depth;
+        return mDepth;
     }
 
     public void increaseDepth() {
         ensureDataCapacity(2);
-        int offset = m_dataLength;
-        m_data[offset] = 0;
-        m_data[offset + 1] = 0;
-        m_dataLength += 2;
-        m_depth += 1;
+        int offset = mDataLength;
+        mData[offset] = 0;
+        mData[offset + 1] = 0;
+        mDataLength += 2;
+        mDepth += 1;
     }
 
     public void decreaseDepth() {
-        if (m_dataLength == 0) {
+        if (mDataLength == 0) {
             return;
         }
-        int offset = m_dataLength - 1;
-        int count = m_data[offset];
+        int offset = mDataLength - 1;
+        int count = mData[offset];
         if ((offset - 1 - count * 2) == 0) {
             return;
         }
-        m_dataLength -= 2 + count * 2;
-        m_depth -= 1;
+        mDataLength -= 2 + count * 2;
+        mDepth -= 1;
     }
 
     private void ensureDataCapacity(int capacity) {
-        int available = (m_data.length - m_dataLength);
+        int available = (mData.length - mDataLength);
         if (available > capacity) {
             return;
         }
-        int newLength = (m_data.length + available) * 2;
+        int newLength = (mData.length + available) * 2;
         int[] newData = new int[newLength];
-        System.arraycopy(m_data, 0, newData, 0, m_dataLength);
-        m_data = newData;
+        System.arraycopy(mData, 0, newData, 0, mDataLength);
+        mData = newData;
     }
 
     private int find(int prefixOrUri, boolean prefix) {
-        if (m_dataLength == 0) {
+        if (mDataLength == 0) {
             return -1;
         }
-        int offset = m_dataLength - 1;
-        for (int i = m_depth; i != 0; --i) {
-            int count = m_data[offset];
+        int offset = mDataLength - 1;
+        for (int i = mDepth; i != 0; --i) {
+            int count = mData[offset];
             offset -= 2;
             for (; count != 0; --count) {
                 if (prefix) {
-                    if (m_data[offset] == prefixOrUri) {
-                        return m_data[offset + 1];
+                    if (mData[offset] == prefixOrUri) {
+                        return mData[offset + 1];
                     }
                 } else {
-                    if (m_data[offset + 1] == prefixOrUri) {
-                        return m_data[offset];
+                    if (mData[offset + 1] == prefixOrUri) {
+                        return mData[offset];
                     }
                 }
                 offset -= 2;
@@ -175,12 +175,12 @@ public final class NamespaceStack {
     }
 
     private int get(int index, boolean prefix) {
-        if (m_dataLength == 0 || index < 0) {
+        if (mDataLength == 0 || index < 0) {
             return -1;
         }
         int offset = 0;
-        for (int i = m_depth; i != 0; --i) {
-            int count = m_data[offset];
+        for (int i = mDepth; i != 0; --i) {
+            int count = mData[offset];
             if (index >= count) {
                 index -= count;
                 offset += (2 + count * 2);
@@ -190,7 +190,7 @@ public final class NamespaceStack {
             if (!prefix) {
                 offset += 1;
             }
-            return m_data[offset];
+            return mData[offset];
         }
         return -1;
     }

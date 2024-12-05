@@ -24,7 +24,7 @@ import brut.androlib.res.data.value.ResBoolValue;
 import brut.androlib.res.data.value.ResFileValue;
 import brut.directory.Directory;
 import brut.directory.DirectoryException;
-import brut.directory.DirUtil;
+import brut.directory.DirUtils;
 import brut.util.BrutIO;
 
 import java.io.*;
@@ -33,6 +33,17 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ResFileDecoder {
+    private static final Logger LOGGER = Logger.getLogger(ResFileDecoder.class.getName());
+
+    private static final String[] RAW_IMAGE_EXTENSIONS = {
+        "m4a", // apple
+        "qmg", // samsung
+    };
+    private static final String[] RAW_9PATCH_IMAGE_EXTENSIONS = {
+        "qmg", // samsung
+        "spi", // samsung
+    };
+
     private final ResStreamDecoderContainer mDecoders;
 
     public ResFileDecoder(ResStreamDecoderContainer decoders) {
@@ -109,7 +120,7 @@ public class ResFileDecoder {
                         return;
                     } catch (CantFind9PatchChunkException ex) {
                         LOGGER.log(Level.WARNING, String.format(
-                            "Cant find 9patch chunk in file: \"%s\". Renaming it to *.png.", inFileName
+                            "Could not find 9patch chunk in file: \"%s\". Renaming it to *.png.", inFileName
                         ), ex);
                         outDir.removeFile(outFileName);
                         outFileName = outResName + ext;
@@ -156,24 +167,12 @@ public class ResFileDecoder {
         }
     }
 
-    public void copyRaw(Directory inDir, Directory outDir, String inFilename,
-                        String outFilename) throws AndrolibException {
+    public void copyRaw(Directory inDir, Directory outDir, String inFileName,
+                        String outFileName) throws AndrolibException {
         try {
-            DirUtil.copyToDir(inDir, outDir, inFilename, outFilename);
+            DirUtils.copyToDir(inDir, outDir, inFileName, outFileName);
         } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
         }
     }
-
-    private final static Logger LOGGER = Logger.getLogger(ResFileDecoder.class.getName());
-
-    private final static String[] RAW_IMAGE_EXTENSIONS = new String[] {
-        "m4a", // apple
-        "qmg", // samsung
-    };
-
-    private final static String[] RAW_9PATCH_IMAGE_EXTENSIONS = new String[] {
-        "qmg", // samsung
-        "spi", // samsung
-    };
 }

@@ -27,6 +27,8 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 public class StyledString {
+    private static final Logger LOGGER = Logger.getLogger(StyledString.class.getName());
+
     private final String mText;
     private final List<Span> mSpans;
 
@@ -52,63 +54,63 @@ public class StyledString {
         private static final MapSplitter ATTRIBUTES_SPLITTER =
             Splitter.on(';').omitEmptyStrings().withKeyValueSeparator(Splitter.on('=').limit(2));
 
-        private final String tag;
-        private final int firstChar;
-        private final int lastChar;
+        private final String mTag;
+        private final int mFirstChar;
+        private final int mLastChar;
 
         public Span(String tag, int firstChar, int lastChar) {
-            this.tag = tag;
-            this.firstChar = firstChar;
-            this.lastChar = lastChar;
+            mTag = tag;
+            mFirstChar = firstChar;
+            mLastChar = lastChar;
         }
 
         public String getTag() {
-            return tag;
+            return mTag;
         }
 
         public int getFirstChar() {
-            return firstChar;
+            return mFirstChar;
         }
 
         public int getLastChar() {
-            return lastChar;
+            return mLastChar;
         }
 
         public String getName() {
-            int separatorIdx = tag.indexOf(';');
-            return separatorIdx == -1 ? tag : tag.substring(0, separatorIdx);
+            int separatorIdx = mTag.indexOf(';');
+            return separatorIdx == -1 ? mTag : mTag.substring(0, separatorIdx);
         }
 
         public Map<String, String> getAttributes() {
-            int separatorIdx = tag.indexOf(';');
-            return separatorIdx == -1 ? null : ATTRIBUTES_SPLITTER.split(
-                tag.substring(separatorIdx + 1, tag.endsWith(";") ? tag.length() - 1 : tag.length())
-            );
+            int separatorIdx = mTag.indexOf(';');
+            return separatorIdx != -1 ? ATTRIBUTES_SPLITTER.split(
+                mTag.substring(separatorIdx + 1, mTag.endsWith(";") ? mTag.length() - 1 : mTag.length())
+            ) : null;
         }
 
         @Override
         public int compareTo(Span o) {
-            int res = Integer.compare(firstChar, o.firstChar);
+            int res = Integer.compare(mFirstChar, o.mFirstChar);
             if (res != 0) {
                 return res;
             }
-            res = Integer.compare(lastChar, o.lastChar);
+            res = Integer.compare(mLastChar, o.mLastChar);
             if (res != 0) {
                 return -res;
             }
-            return -tag.compareTo(o.tag);
+            return -mTag.compareTo(o.mTag);
         }
     }
 
     private static class Decoder {
-        private String text;
-        private StringBuilder xmlValue;
-        private int lastOffset;
+        private String mText;
+        private StringBuilder mXmlValue;
+        private int mLastOffset;
 
-        String decode(StyledString styledString) {
-            text = styledString.getText();
-            xmlValue = new StringBuilder(text.length() * 2);
-            lastOffset = 0;
+        public String decode(StyledString styledString) {
+            mText = styledString.getText();
+            mXmlValue = new StringBuilder(mText.length() * 2);
+            mLastOffset = 0;
 
             // recurse top-level tags
             PeekingIterator<Span> it = Iterators.peekingIterator(styledString.getSpans().iterator());
@@ -116,11 +118,11 @@ public class StyledString {
                 decodeIterate(it);
             }
 
-            // write the remaining encoded raw text
-            if (lastOffset < text.length()) {
-                xmlValue.append(ResXmlEncoders.escapeXmlChars(text.substring(lastOffset)));
+            // write the remaining encoded raw mText
+            if (mLastOffset < mText.length()) {
+                mXmlValue.append(ResXmlEncoders.escapeXmlChars(mText.substring(mLastOffset)));
             }
-            return xmlValue.toString();
+            return mXmlValue.toString();
         }
 
         private void decodeIterate(PeekingIterator<Span> it) {
@@ -130,45 +132,43 @@ public class StyledString {
             int spanStart = span.getFirstChar();
             int spanEnd = span.getLastChar() + 1;
 
-            // write encoded raw text preceding the opening tag
-            if (spanStart > lastOffset) {
-                xmlValue.append(ResXmlEncoders.escapeXmlChars(text.substring(lastOffset, spanStart)));
+            // write encoded raw mText preceding the opening tag
+            if (spanStart > mLastOffset) {
+                mXmlValue.append(ResXmlEncoders.escapeXmlChars(mText.substring(mLastOffset, spanStart)));
             }
-            lastOffset = spanStart;
+            mLastOffset = spanStart;
 
             // write opening tag
-            xmlValue.append('<').append(name);
+            mXmlValue.append('<').append(name);
             if (attributes != null) {
                 for (Map.Entry<String, String> attrEntry : attributes.entrySet()) {
-                    xmlValue.append(' ').append(attrEntry.getKey()).append("=\"")
+                    mXmlValue.append(' ').append(attrEntry.getKey()).append("=\"")
                             .append(ResXmlEncoders.escapeXmlChars(attrEntry.getValue())).append('"');
                 }
             }
             // if an opening tag is followed by a matching closing tag, write as an empty-element tag
             if (spanStart == spanEnd) {
-                xmlValue.append("/>");
+                mXmlValue.append("/>");
                 return;
             }
-            xmlValue.append('>');
+            mXmlValue.append('>');
 
             // recurse nested tags
             while (it.hasNext() && it.peek().getFirstChar() < spanEnd) {
                 decodeIterate(it);
             }
 
-            // write encoded raw text preceding the closing tag
-            if (spanEnd > lastOffset && text.length() >= spanEnd) {
-                xmlValue.append(ResXmlEncoders.escapeXmlChars(text.substring(lastOffset, spanEnd)));
-            } else if (text.length() >= lastOffset && text.length() < spanEnd) {
-                LOGGER.warning("Span (" + name + ") exceeds text length " + text.length());
-                xmlValue.append(ResXmlEncoders.escapeXmlChars(text.substring(lastOffset)));
+            // write encoded raw mText preceding the closing tag
+            if (spanEnd > mLastOffset && mText.length() >= spanEnd) {
+                mXmlValue.append(ResXmlEncoders.escapeXmlChars(mText.substring(mLastOffset, spanEnd)));
+            } else if (mText.length() >= mLastOffset && mText.length() < spanEnd) {
+                LOGGER.warning("Span (" + name + ") exceeds mText length " + mText.length());
+                mXmlValue.append(ResXmlEncoders.escapeXmlChars(mText.substring(mLastOffset)));
             }
-            lastOffset = spanEnd;
+            mLastOffset = spanEnd;
 
             // write closing tag
-            xmlValue.append("</").append(name).append('>');
+            mXmlValue.append("</").append(name).append('>');
         }
     }
-
-    private static final Logger LOGGER = Logger.getLogger(StyledString.class.getName());
 }
