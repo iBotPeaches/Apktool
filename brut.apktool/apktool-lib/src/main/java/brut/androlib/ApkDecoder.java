@@ -37,20 +37,21 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 public class ApkDecoder {
-    private final static Logger LOGGER = Logger.getLogger(ApkDecoder.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(ApkDecoder.class.getName());
 
     // extensions of files that are often packed uncompressed
-    private final static Pattern NO_COMPRESS_EXT_PATTERN = Pattern.compile(
+    private static final Pattern NO_COMPRESS_EXT_PATTERN = Pattern.compile(
         "dex|arsc|so|jpg|jpeg|png|gif|wav|mp2|mp3|ogg|aac|mpg|mpeg|mid|midi|smf|jet|" +
         "rtttl|imy|xmf|mp4|m4a|m4v|3gp|3gpp|3g2|3gpp2|amr|awb|wma|wmv|webm|webp|mkv");
 
     private final ExtFile mApkFile;
     private final Config mConfig;
+    private final AtomicReference<AndrolibException> mBuildError;
+
     private ApkInfo mApkInfo;
     private ResourcesDecoder mResDecoder;
-    private volatile int mMinSdkVersion = 0;
+    private volatile int mMinSdkVersion;
     private BackgroundWorker mWorker;
-    private final AtomicReference<AndrolibException> mBuildError = new AtomicReference<>(null);
 
     public ApkDecoder(ExtFile apkFile) {
         this(apkFile, Config.getDefaultConfig());
@@ -59,6 +60,7 @@ public class ApkDecoder {
     public ApkDecoder(ExtFile apkFile, Config config) {
         mApkFile = apkFile;
         mConfig = config;
+        mBuildError = new AtomicReference<>(null);
     }
 
     public ApkInfo decode(File outDir) throws AndrolibException {
@@ -199,8 +201,9 @@ public class ApkDecoder {
         smaliDir.mkdirs();
 
         LOGGER.info("Baksmaling " + fileName + "...");
-        DexFile dexFile = SmaliDecoder.decode(mApkFile, smaliDir, fileName,
+        SmaliDecoder decoder = new SmaliDecoder(mApkFile, fileName,
             mConfig.baksmaliDebugMode, mConfig.apiLevel);
+        DexFile dexFile = decoder.decode(smaliDir);
 
         // record minSdkVersion for jars
         int minSdkVersion = dexFile.getOpcodes().api;

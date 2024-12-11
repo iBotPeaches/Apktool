@@ -17,6 +17,7 @@
 package brut.androlib.exceptions;
 
 public class AXmlDecodingException extends AndrolibException {
+
     public AXmlDecodingException(String message, Throwable cause) {
         super(message, cause);
     }

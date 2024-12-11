@@ -27,8 +27,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-public class OS {
+public final class OS {
     private static final Logger LOGGER = Logger.getLogger("");
+
+    private OS() {
+        // Private constructor for utility class
+    }
 
     public static void rmdir(File dir) throws BrutException {
         if (! dir.exists()) {
@@ -142,19 +146,20 @@ public class OS {
         }
     }
 
-    static class StreamForwarder extends Thread {
+    private static class StreamForwarder extends Thread {
+        private final InputStream mIn;
+        private final String mType;
 
-        StreamForwarder(InputStream in, String type) {
+        public StreamForwarder(InputStream in, String type) {
             mIn = in;
             mType = type;
         }
 
         @Override
         public void run() {
-            try {
-                BufferedReader br = new BufferedReader(new InputStreamReader(mIn));
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(mIn))) {
                 String line;
-                while ((line = br.readLine()) != null) {
+                while ((line = reader.readLine()) != null) {
                     if (mType.equals("OUTPUT")) {
                         LOGGER.info(line);
                     } else {
@@ -165,32 +170,29 @@ public class OS {
                 ex.printStackTrace();
             }
         }
-
-        private final InputStream mIn;
-        private final String mType;
     }
 
-    static class StreamCollector implements Runnable {
-        private final StringBuilder buffer = new StringBuilder();
-        private final InputStream inputStream;
+    private static class StreamCollector implements Runnable {
+        private final InputStream mIn;
+        private final StringBuilder mBuffer;
 
-        public StreamCollector(InputStream inputStream) {
-            super();
-            this.inputStream = inputStream;
+        public StreamCollector(InputStream in) {
+            mIn = in;
+            mBuffer = new StringBuilder();
         }
 
         @Override
         public void run() {
-            String line;
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(mIn))) {
+                String line;
                 while ((line = reader.readLine()) != null) {
-                    buffer.append(line).append('\n');
+                    mBuffer.append(line).append('\n');
                 }
             } catch (IOException ignored) {}
         }
 
         public String get() {
-            return buffer.toString();
+            return mBuffer.toString();
         }
     }
 }

@@ -36,7 +36,6 @@ public class FileDirectory extends AbstractDirectory {
     }
 
     public FileDirectory(File dir) throws DirectoryException {
-        super();
         if (!dir.isDirectory()) {
             throw new DirectoryException("file must be a directory: " + dir);
         }

@@ -25,7 +25,12 @@ import org.apache.commons.io.IOUtils;
 import java.io.*;
 import java.util.zip.CRC32;
 
-public class BrutIO {
+public final class BrutIO {
+
+    private BrutIO() {
+        // Private constructor for utility class
+    }
+
     public static byte[] readAndClose(InputStream in) throws IOException {
         try {
             return IOUtils.toByteArray(in);

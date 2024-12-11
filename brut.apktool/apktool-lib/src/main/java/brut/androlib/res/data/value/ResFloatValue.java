@@ -21,7 +21,7 @@ public class ResFloatValue extends ResScalarValue {
 
     public ResFloatValue(float value, int rawIntValue, String rawValue) {
         super("float", rawIntValue, rawValue);
-        this.mValue = value;
+        mValue = value;
     }
 
     public float getValue() {

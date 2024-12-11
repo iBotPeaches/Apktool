@@ -16,7 +16,6 @@
  */
 package brut.androlib.res.data.arsc;
 
-import brut.util.ExtCountingDataInput;
 import brut.util.ExtDataInput;
 
 import java.io.EOFException;
@@ -25,13 +24,40 @@ import java.math.BigInteger;
 import java.util.logging.Logger;
 
 public class ARSCHeader {
+    private static final Logger LOGGER = Logger.getLogger(ARSCHeader.class.getName());
+
+    public static final short RES_NONE_TYPE = -1;
+    public static final short RES_NULL_TYPE = 0x0000;
+    public static final short RES_STRING_POOL_TYPE = 0x0001;
+    public static final short RES_TABLE_TYPE = 0x0002;
+    public static final short RES_XML_TYPE = 0x0003;
+
+    // RES_TABLE_TYPE Chunks
+    public static final short XML_TYPE_PACKAGE = 0x0200;
+    public static final short XML_TYPE_TYPE = 0x0201;
+    public static final short XML_TYPE_SPEC_TYPE = 0x0202;
+    public static final short XML_TYPE_LIBRARY = 0x0203;
+    public static final short XML_TYPE_OVERLAY = 0x0204;
+    public static final short XML_TYPE_OVERLAY_POLICY = 0x0205;
+    public static final short XML_TYPE_STAGED_ALIAS = 0x0206;
+
+    // RES_XML_TYPE Chunks
+    public static final short RES_XML_FIRST_CHUNK_TYPE = 0x0100;
+    public static final short RES_XML_START_NAMESPACE_TYPE = 0x0100;
+    public static final short RES_XML_END_NAMESPACE_TYPE = 0x0101;
+    public static final short RES_XML_START_ELEMENT_TYPE = 0x0102;
+    public static final short RES_XML_END_ELEMENT_TYPE = 0x0103;
+    public static final short RES_XML_CDATA_TYPE = 0x0104;
+    public static final short RES_XML_LAST_CHUNK_TYPE = 0x017f;
+    public static final short RES_XML_RESOURCE_MAP_TYPE = 0x0180;
+
     public final short type;
     public final int headerSize;
     public final int chunkSize;
-    public final int startPosition;
-    public final int endPosition;
+    public final long startPosition;
+    public final long endPosition;
 
-    public ARSCHeader(short type, int headerSize, int chunkSize, int headerStart) {
+    public ARSCHeader(short type, int headerSize, int chunkSize, long headerStart) {
         this.type = type;
         this.headerSize = headerSize;
         this.chunkSize = chunkSize;
@@ -39,9 +65,9 @@ public class ARSCHeader {
         this.endPosition = headerStart + chunkSize;
     }
 
-    public static ARSCHeader read(ExtCountingDataInput in) throws IOException {
+    public static ARSCHeader read(ExtDataInput in) throws IOException {
         short type;
-        int start = in.position();
+        long start = in.position();
         try {
             type = in.readShort();
         } catch (EOFException ex) {
@@ -50,13 +76,13 @@ public class ARSCHeader {
         return new ARSCHeader(type, in.readShort(), in.readInt(), start);
     }
 
-    public void checkForUnreadHeader(ExtCountingDataInput in) throws IOException {
+    public void checkForUnreadHeader(ExtDataInput in) throws IOException {
         // Some applications lie about the reported size of their chunk header. Trusting the chunkSize is misleading
         // So compare to what we actually read in the header vs reported and skip the rest.
         // However, this runs after each chunk and not every chunk reading has a specific distinction between the
         // header and the body.
-        int actualHeaderSize = in.position() - this.startPosition;
-        int exceedingSize = this.headerSize - actualHeaderSize;
+        int actualHeaderSize = (int) (in.position() - startPosition);
+        int exceedingSize = headerSize - actualHeaderSize;
         if (exceedingSize > 0) {
             byte[] buf = new byte[exceedingSize];
             in.readFully(buf);
@@ -64,11 +90,11 @@ public class ARSCHeader {
 
             if (exceedingBI.equals(BigInteger.ZERO)) {
                 LOGGER.fine(String.format("Chunk header size (%d), read (%d), but exceeding bytes are all zero.",
-                    this.headerSize, actualHeaderSize
+                    headerSize, actualHeaderSize
                 ));
             } else {
                 LOGGER.warning(String.format("Chunk header size (%d), read (%d). Exceeding bytes: 0x%X.",
-                    this.headerSize, actualHeaderSize, exceedingBI
+                    headerSize, actualHeaderSize, exceedingBI
                 ));
             }
         }
@@ -77,31 +103,4 @@ public class ARSCHeader {
     public void skipChunk(ExtDataInput in) throws IOException {
         in.skipBytes(chunkSize - headerSize);
     }
-
-    public final static short RES_NONE_TYPE = -1;
-    public final static short RES_NULL_TYPE = 0x0000;
-    public final static short RES_STRING_POOL_TYPE = 0x0001;
-    public final static short RES_TABLE_TYPE = 0x0002;
-    public final static short RES_XML_TYPE = 0x0003;
-
-    // RES_TABLE_TYPE Chunks
-    public final static short XML_TYPE_PACKAGE = 0x0200;
-    public final static short XML_TYPE_TYPE = 0x0201;
-    public final static short XML_TYPE_SPEC_TYPE = 0x0202;
-    public final static short XML_TYPE_LIBRARY = 0x0203;
-    public final static short XML_TYPE_OVERLAY = 0x0204;
-    public final static short XML_TYPE_OVERLAY_POLICY = 0x0205;
-    public final static short XML_TYPE_STAGED_ALIAS = 0x0206;
-
-    // RES_XML_TYPE Chunks
-    public final static short RES_XML_FIRST_CHUNK_TYPE = 0x0100;
-    public final static short RES_XML_START_NAMESPACE_TYPE = 0x0100;
-    public final static short RES_XML_END_NAMESPACE_TYPE = 0x0101;
-    public final static short RES_XML_START_ELEMENT_TYPE = 0x0102;
-    public final static short RES_XML_END_ELEMENT_TYPE = 0x0103;
-    public final static short RES_XML_CDATA_TYPE = 0x0104;
-    public final static short RES_XML_LAST_CHUNK_TYPE = 0x017f;
-    public final static short RES_XML_RESOURCE_MAP_TYPE = 0x0180;
-
-    private static final Logger LOGGER = Logger.getLogger(ARSCHeader.class.getName());
 }

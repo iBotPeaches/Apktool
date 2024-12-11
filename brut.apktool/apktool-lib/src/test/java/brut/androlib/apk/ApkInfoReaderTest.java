@@ -40,7 +40,7 @@ public class ApkInfoReaderTest {
         assertNotNull(apkInfo.usesFramework);
         assertNotNull(apkInfo.usesFramework.ids);
         assertEquals(1, apkInfo.usesFramework.ids.size());
-        assertEquals(1, (long)apkInfo.usesFramework.ids.get(0));
+        assertEquals(1, (long) apkInfo.usesFramework.ids.get(0));
         assertNull(apkInfo.usesFramework.tag);
         assertNotNull(apkInfo.versionInfo);
         assertNull(apkInfo.versionInfo.versionCode);
@@ -50,7 +50,7 @@ public class ApkInfoReaderTest {
     @Test
     public void testStandard() throws AndrolibException {
         ApkInfo apkInfo = ApkInfo.load(
-            this.getClass().getResourceAsStream("/apk/standard.yml"));
+            getClass().getResourceAsStream("/apk/standard.yml"));
         checkStandard(apkInfo);
         assertEquals("2.8.1", apkInfo.version);
     }
@@ -58,7 +58,7 @@ public class ApkInfoReaderTest {
     @Test
     public void testUnknownFields() throws AndrolibException {
         ApkInfo apkInfo = ApkInfo.load(
-            this.getClass().getResourceAsStream("/apk/unknown_fields.yml"));
+            getClass().getResourceAsStream("/apk/unknown_fields.yml"));
         checkStandard(apkInfo);
         assertEquals("2.8.1", apkInfo.version);
     }
@@ -66,7 +66,7 @@ public class ApkInfoReaderTest {
     @Test
     public void testSkipIncorrectIndent() throws AndrolibException {
         ApkInfo apkInfo = ApkInfo.load(
-            this.getClass().getResourceAsStream("/apk/skip_incorrect_indent.yml"));
+            getClass().getResourceAsStream("/apk/skip_incorrect_indent.yml"));
         checkStandard(apkInfo);
         assertNotEquals("2.0.0", apkInfo.version);
     }
@@ -74,7 +74,7 @@ public class ApkInfoReaderTest {
     @Test
     public void testFirstIncorrectIndent() throws AndrolibException {
         ApkInfo apkInfo = ApkInfo.load(
-            this.getClass().getResourceAsStream("/apk/first_incorrect_indent.yml"));
+            getClass().getResourceAsStream("/apk/first_incorrect_indent.yml"));
         checkStandard(apkInfo);
         assertNotEquals("2.0.0", apkInfo.version);
     }
@@ -82,13 +82,13 @@ public class ApkInfoReaderTest {
     @Test
     public void testUnknownFiles() throws AndrolibException {
         ApkInfo apkInfo = ApkInfo.load(
-            this.getClass().getResourceAsStream("/apk/unknown_files.yml"));
+            getClass().getResourceAsStream("/apk/unknown_files.yml"));
         assertEquals("2.0.0", apkInfo.version);
         assertEquals("testapp.apk", apkInfo.apkFileName);
         assertFalse(apkInfo.isFrameworkApk);
         assertNotNull(apkInfo.usesFramework);
         assertEquals(1, apkInfo.usesFramework.ids.size());
-        assertEquals(1, (long)apkInfo.usesFramework.ids.get(0));
+        assertEquals(1, (long) apkInfo.usesFramework.ids.get(0));
         assertNotNull(apkInfo.packageInfo);
         assertEquals("127", apkInfo.packageInfo.forcedPackageId);
         assertNotNull(apkInfo.versionInfo);
@@ -106,13 +106,13 @@ public class ApkInfoReaderTest {
     @Test
     public void testUlist_with_indent() throws AndrolibException {
         ApkInfo apkInfo = ApkInfo.load(
-            this.getClass().getResourceAsStream("/apk/list_with_indent.yml"));
+            getClass().getResourceAsStream("/apk/list_with_indent.yml"));
         assertEquals("2.8.0", apkInfo.version);
         assertEquals("basic.apk", apkInfo.apkFileName);
         assertFalse(apkInfo.isFrameworkApk);
         assertNotNull(apkInfo.usesFramework);
         assertEquals(1, apkInfo.usesFramework.ids.size());
-        assertEquals(1, (long)apkInfo.usesFramework.ids.get(0));
+        assertEquals(1, (long) apkInfo.usesFramework.ids.get(0));
         assertEquals("tag", apkInfo.usesFramework.tag);
         assertNotNull(apkInfo.packageInfo);
         assertEquals("127", apkInfo.packageInfo.forcedPackageId);

@@ -25,11 +25,6 @@ import java.util.regex.Pattern;
  * AXmlResourceParser specifically for parsing encoded AndroidManifest.xml.
  */
 public class AndroidManifestResourceParser extends AXmlResourceParser {
-
-    public AndroidManifestResourceParser(ResTable resTable) {
-        super(resTable);
-    }
-
     /**
      * Pattern for matching numeric string meta-data values. aapt automatically infers the
      * type for a manifest meta-data value based on the string in the unencoded XML. However,
@@ -38,6 +33,10 @@ public class AndroidManifestResourceParser extends AXmlResourceParser {
      * With aapt1, the escaped space is dropped when encoded. For aapt2, the escaped space is preserved.
      */
     private static final Pattern PATTERN_NUMERIC_STRING = Pattern.compile("\\s?\\d+");
+
+    public AndroidManifestResourceParser(ResTable resTable) {
+        super(resTable);
+    }
 
     @Override
     public String getAttributeValue(int index) {

@@ -21,7 +21,7 @@ import brut.androlib.apk.ApkInfo;
 import brut.androlib.apk.UsesFramework;
 import brut.androlib.res.Framework;
 import brut.androlib.res.data.ResConfigFlags;
-import brut.androlib.res.xml.ResXmlPatcher;
+import brut.androlib.res.xml.ResXmlUtils;
 import brut.androlib.src.SmaliBuilder;
 import brut.common.BrutException;
 import brut.common.InvalidUnknownFileException;
@@ -47,14 +47,15 @@ import java.util.logging.Logger;
 import java.util.zip.ZipOutputStream;
 
 public class ApkBuilder {
-    private final static Logger LOGGER = Logger.getLogger(ApkBuilder.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(ApkBuilder.class.getName());
 
     private final ExtFile mApkDir;
     private final Config mConfig;
+    private final AtomicReference<AndrolibException> mBuildError;
+
     private ApkInfo mApkInfo;
-    private int mMinSdkVersion = 0;
+    private int mMinSdkVersion;
     private BackgroundWorker mWorker;
-    private final AtomicReference<AndrolibException> mBuildError = new AtomicReference<>(null);
 
     public ApkBuilder(ExtFile apkDir) {
         this(apkDir, Config.getDefaultConfig());
@@ -63,6 +64,7 @@ public class ApkBuilder {
     public ApkBuilder(ExtFile apkDir, Config config) {
         mApkDir = apkDir;
         mConfig = config;
+        mBuildError = new AtomicReference<>(null);
     }
 
     public void build(File outApk) throws AndrolibException {
@@ -122,19 +124,19 @@ public class ApkBuilder {
 
                 LOGGER.info("Building apk file...");
 
-                try (ZipOutputStream outStream = new ZipOutputStream(Files.newOutputStream(outApk.toPath()))) {
+                try (ZipOutputStream out = new ZipOutputStream(Files.newOutputStream(outApk.toPath()))) {
                     // zip aapt output files
                     try {
-                        ZipUtils.zipDir(outDir, outStream, mApkInfo.doNotCompress);
+                        ZipUtils.zipDir(outDir, out, mApkInfo.doNotCompress);
                     } catch (IOException ex) {
                         throw new AndrolibException(ex);
                     }
 
                     // zip remaining standard files
-                    importRawFiles(outStream);
+                    importRawFiles(out);
 
                     // zip unknown files
-                    importUnknownFiles(outStream);
+                    importUnknownFiles(out);
                 } catch (IOException ex) {
                     throw new AndrolibException(ex);
                 }
@@ -242,10 +244,10 @@ public class ApkBuilder {
         //noinspection ResultOfMethodCallIgnored
         dex.delete();
 
-        int apiLevel = mConfig.apiLevel > 0 ? mConfig.apiLevel : mMinSdkVersion;
-
         LOGGER.info("Smaling " + dirName + " folder into " + fileName + "...");
-        SmaliBuilder.build(smaliDir, dex, apiLevel);
+        int apiLevel = mConfig.apiLevel > 0 ? mConfig.apiLevel : mMinSdkVersion;
+        SmaliBuilder builder = new SmaliBuilder(smaliDir, apiLevel);
+        builder.build(dex);
     }
 
     private void backupManifestFile(File manifest, File manifestOrig) throws AndrolibException {
@@ -265,7 +267,7 @@ public class ApkBuilder {
 
         try {
             FileUtils.copyFile(manifest, manifestOrig);
-            ResXmlPatcher.fixingPublicAttrsInProviderAttributes(manifest);
+            ResXmlUtils.fixingPublicAttrsInProviderAttributes(manifest);
         } catch (IOException ex) {
             throw new AndrolibException(ex);
         }
@@ -327,10 +329,10 @@ public class ApkBuilder {
         try {
             if (mConfig.debugMode) {
                 if (mConfig.aaptVersion == 2) {
-                    LOGGER.info("Using aapt2 - setting 'debuggable' attribute to 'true' in AndroidManifest.xml");
-                    ResXmlPatcher.setApplicationDebugTagTrue(manifest);
+                    LOGGER.info("Setting 'debuggable' attribute to 'true' in AndroidManifest.xml");
+                    ResXmlUtils.setApplicationDebugTagTrue(manifest);
                 } else {
-                    ResXmlPatcher.removeApplicationDebugTag(manifest);
+                    ResXmlUtils.removeApplicationDebugTag(manifest);
                 }
             }
 
@@ -343,8 +345,8 @@ public class ApkBuilder {
                 }
 
                 File netSecConfOrig = new File(mApkDir, "res/xml/network_security_config.xml");
-                ResXmlPatcher.modNetworkSecurityConfig(netSecConfOrig);
-                ResXmlPatcher.setNetworkSecurityConfig(manifest);
+                ResXmlUtils.modNetworkSecurityConfig(netSecConfOrig);
+                ResXmlUtils.setNetworkSecurityConfig(manifest);
                 LOGGER.info("Added permissive network security config in manifest");
             }
         } catch (IOException | ParserConfigurationException | TransformerException | SAXException ex) {
@@ -366,7 +368,7 @@ public class ApkBuilder {
             ninePatch = null;
         }
 
-        LOGGER.info("Building resources with " + AaptManager.getAaptBinaryName(mConfig.aaptVersion) + "...");
+        LOGGER.info("Building resources with " + AaptManager.getAaptName(mConfig.aaptVersion) + "...");
 
         try {
             AaptInvoker invoker = new AaptInvoker(mConfig, mApkInfo);
@@ -406,7 +408,7 @@ public class ApkBuilder {
             ninePatch = null;
         }
 
-        LOGGER.info("Building AndroidManifest.xml with " + AaptManager.getAaptBinaryName(mConfig.aaptVersion) + "...");
+        LOGGER.info("Building AndroidManifest.xml with " + AaptManager.getAaptName(mConfig.aaptVersion) + "...");
 
         try {
             AaptInvoker invoker = new AaptInvoker(mConfig, mApkInfo);
@@ -460,7 +462,7 @@ public class ApkBuilder {
         }
     }
 
-    private void importRawFiles(ZipOutputStream outStream) throws AndrolibException {
+    private void importRawFiles(ZipOutputStream out) throws AndrolibException {
         for (String dirName : ApkInfo.RAW_DIRNAMES) {
             File rawDir = new File(mApkDir, dirName);
             if (!rawDir.isDirectory()) {
@@ -469,14 +471,14 @@ public class ApkBuilder {
 
             LOGGER.info("Importing " + dirName + "...");
             try {
-                ZipUtils.zipDir(mApkDir, dirName, outStream, mApkInfo.doNotCompress);
+                ZipUtils.zipDir(mApkDir, dirName, out, mApkInfo.doNotCompress);
             } catch (IOException ex) {
                 throw new AndrolibException(ex);
             }
         }
     }
 
-    private void importUnknownFiles(ZipOutputStream outStream) throws AndrolibException {
+    private void importUnknownFiles(ZipOutputStream out) throws AndrolibException {
         File unknownDir = new File(mApkDir, "unknown");
         if (!unknownDir.isDirectory()) {
             return;
@@ -484,7 +486,7 @@ public class ApkBuilder {
 
         LOGGER.info("Importing unknown files...");
         try {
-            ZipUtils.zipDir(unknownDir, outStream, mApkInfo.doNotCompress);
+            ZipUtils.zipDir(unknownDir, out, mApkInfo.doNotCompress);
         } catch (IOException ex) {
             throw new AndrolibException(ex);
         }

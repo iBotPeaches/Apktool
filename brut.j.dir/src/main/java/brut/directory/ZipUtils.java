@@ -33,7 +33,7 @@ import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-public class ZipUtils {
+public final class ZipUtils {
     private static final Logger LOGGER = Logger.getLogger("");
 
     private ZipUtils() {
@@ -95,8 +95,8 @@ public class ZipUtils {
             if (doNotCompress.test(entryName)) {
                 zipEntry.setMethod(ZipEntry.STORED);
                 zipEntry.setSize(file.length());
-                try (BufferedInputStream bis = new BufferedInputStream(Files.newInputStream(file.toPath()))) {
-                    CRC32 crc = BrutIO.calculateCrc(bis);
+                try (BufferedInputStream in = new BufferedInputStream(Files.newInputStream(file.toPath()))) {
+                    CRC32 crc = BrutIO.calculateCrc(in);
                     zipEntry.setCrc(crc.getValue());
                 }
             } else {

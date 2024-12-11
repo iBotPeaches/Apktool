@@ -25,8 +25,8 @@ import brut.util.Duo;
 public class ResValueFactory {
     private final ResPackage mPackage;
 
-    public ResValueFactory(ResPackage package_) {
-        this.mPackage = package_;
+    public ResValueFactory(ResPackage pkg) {
+        mPackage = pkg;
     }
 
     public ResScalarValue factory(int type, int value, String rawValue) throws AndrolibException {

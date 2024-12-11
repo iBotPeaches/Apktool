@@ -20,6 +20,7 @@ import android.util.TypedValue;
 import brut.androlib.exceptions.AndrolibException;
 
 public class ResDimenValue extends ResIntValue {
+
     public ResDimenValue(int value, String rawValue) {
         super(value, rawValue, "dimen");
     }

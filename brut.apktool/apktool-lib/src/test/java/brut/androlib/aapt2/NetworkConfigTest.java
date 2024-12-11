@@ -37,7 +37,6 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
-
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -88,20 +87,19 @@ public class NetworkConfigTest extends BaseTest {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(true);
         DocumentBuilder builder = factory.newDocumentBuilder();
-        Document document = builder.parse(new ByteArrayInputStream(obtained.getBytes()));
+        Document doc = builder.parse(new ByteArrayInputStream(obtained.getBytes()));
 
         // XPath expression to check for user and system certificates
-        XPathFactory xPathFactory = XPathFactory.newInstance();
-        XPath xpath = xPathFactory.newXPath();
-        
+        XPath xPath = XPathFactory.newInstance().newXPath();
+
         // Check if 'system' certificate exists
-        XPathExpression systemCertExpr = xpath.compile("//certificates[@src='system']");
-        NodeList systemCertNodes = (NodeList) systemCertExpr.evaluate(document, XPathConstants.NODESET);
+        XPathExpression systemCertExpr = xPath.compile("//certificates[@src='system']");
+        NodeList systemCertNodes = (NodeList) systemCertExpr.evaluate(doc, XPathConstants.NODESET);
         assertTrue(systemCertNodes.getLength() > 0);
 
         // Check if 'user' certificate exists
-        XPathExpression userCertExpr = xpath.compile("//certificates[@src='user']");
-        NodeList userCertNodes = (NodeList) userCertExpr.evaluate(document, XPathConstants.NODESET);
+        XPathExpression userCertExpr = xPath.compile("//certificates[@src='user']");
+        NodeList userCertNodes = (NodeList) userCertExpr.evaluate(doc, XPathConstants.NODESET);
         assertTrue(userCertNodes.getLength() > 0);
     }
 

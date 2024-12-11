@@ -22,11 +22,13 @@ import brut.androlib.res.data.ResPackage;
 import java.util.logging.Logger;
 
 public class ARSCData {
+    private static final Logger LOGGER = Logger.getLogger(ARSCData.class.getName());
+
     private final ResPackage[] mPackages;
     private final FlagsOffset[] mFlagsOffsets;
 
-    public ARSCData(ResPackage[] packages, FlagsOffset[] flagsOffsets) {
-        mPackages = packages;
+    public ARSCData(ResPackage[] pkgs, FlagsOffset[] flagsOffsets) {
+        mPackages = pkgs;
         mFlagsOffsets = flagsOffsets;
     }
 
@@ -63,6 +65,4 @@ public class ARSCData {
         }
         return id;
     }
-
-    private static final Logger LOGGER = Logger.getLogger(ARSCData.class.getName());
 }

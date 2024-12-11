@@ -33,6 +33,12 @@ import java.util.logging.Logger;
 import static org.junit.Assert.assertTrue;
 
 public class EmptyResourcesArscTest {
+    private static final Logger LOGGER = Logger.getLogger(EmptyResourcesArscTest.class.getName());
+
+    private static ExtFile sTmpDir;
+    private static ExtFile sTestOrigDir;
+    private static ExtFile sTestNewDir;
+
     @BeforeClass
     public static void beforeClass() throws Exception {
         TestUtils.cleanFrameworkFile();
@@ -64,10 +70,4 @@ public class EmptyResourcesArscTest {
         assertTrue(sTestNewDir.isDirectory());
         assertTrue(sTestOrigDir.isDirectory());
     }
-
-    private static ExtFile sTmpDir;
-    private static ExtFile sTestOrigDir;
-    private static ExtFile sTestNewDir;
-
-    private final static Logger LOGGER = Logger.getLogger(EmptyResourcesArscTest.class.getName());
 }

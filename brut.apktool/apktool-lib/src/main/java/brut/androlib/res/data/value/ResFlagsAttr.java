@@ -28,6 +28,12 @@ import java.util.Arrays;
 import java.util.logging.Logger;
 
 public class ResFlagsAttr extends ResAttr {
+    private static final Logger LOGGER = Logger.getLogger(ResFlagsAttr.class.getName());
+
+    private final FlagItem[] mItems;
+    private FlagItem[] mZeroFlags;
+    private FlagItem[] mFlags;
+
     ResFlagsAttr(ResReferenceValue parent, int type, Integer min, Integer max,
                  Boolean l10n, Duo<ResReferenceValue, ResScalarValue>[] items) {
         super(parent, type, min, max, l10n);
@@ -133,11 +139,4 @@ public class ResFlagsAttr extends ResAttr {
 
         Arrays.sort(mFlags, (o1, o2) -> Integer.compare(Integer.bitCount(o2.flag), Integer.bitCount(o1.flag)));
     }
-
-    private final FlagItem[] mItems;
-
-    private FlagItem[] mZeroFlags;
-    private FlagItem[] mFlags;
-
-    private static final Logger LOGGER = Logger.getLogger(ResFlagsAttr.class.getName());
 }

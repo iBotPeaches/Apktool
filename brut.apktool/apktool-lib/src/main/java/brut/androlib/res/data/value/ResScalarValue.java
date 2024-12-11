@@ -115,8 +115,9 @@ public abstract class ResScalarValue extends ResIntBasedValue implements
         return mType;
     }
 
-    protected void serializeExtraXmlAttrs(XmlSerializer serializer,
-                                          ResResource res) throws IOException {
+    protected void serializeExtraXmlAttrs(XmlSerializer serializer, ResResource res)
+            throws IOException {
+        // stub
     }
 
     protected abstract String encodeAsResXml() throws AndrolibException;

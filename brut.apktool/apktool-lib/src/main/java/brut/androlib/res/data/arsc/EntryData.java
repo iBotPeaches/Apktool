@@ -19,7 +19,7 @@ package brut.androlib.res.data.arsc;
 import brut.androlib.res.data.value.ResValue;
 
 public class EntryData {
-    public short mFlags;
-    public int mSpecNamesId;
-    public ResValue mValue;
+    public short flags;
+    public int specNamesId;
+    public ResValue value;
 }

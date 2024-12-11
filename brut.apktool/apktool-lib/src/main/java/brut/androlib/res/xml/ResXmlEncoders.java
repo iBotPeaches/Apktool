@@ -25,6 +25,10 @@ import java.util.List;
 
 public final class ResXmlEncoders {
 
+    private ResXmlEncoders() {
+        // Private constructor for utility class
+    }
+
     public static String escapeXmlChars(String str) {
         return StringUtils.replace(StringUtils.replace(str, "&", "&amp;"), "<", "&lt;");
     }

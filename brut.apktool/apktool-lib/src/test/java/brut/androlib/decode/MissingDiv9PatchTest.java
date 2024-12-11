@@ -29,10 +29,12 @@ import org.junit.Test;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.nio.file.Files;
 
 import static org.junit.Assert.*;
 
 public class MissingDiv9PatchTest extends BaseTest {
+    private static final int NP_COLOR = 0xff000000;
 
     @BeforeClass
     public static void beforeClass() throws Exception {
@@ -48,26 +50,22 @@ public class MissingDiv9PatchTest extends BaseTest {
 
     @Test
     public void assertMissingDivAdded() throws Exception {
-        InputStream inputStream = getFileInputStream();
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        File file = new File(sTmpDir, "pip_dismiss_scrim.9.png");
+        byte[] data;
 
-        Res9patchStreamDecoder decoder = new Res9patchStreamDecoder();
-        decoder.decode(inputStream, outputStream);
+        try (InputStream in = Files.newInputStream(file.toPath())) {
+            Res9patchStreamDecoder decoder = new Res9patchStreamDecoder();
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            decoder.decode(in, out);
+            data = out.toByteArray();
+        }
 
-        BufferedImage image = ImageIO.read(new ByteArrayInputStream(outputStream.toByteArray()));
+        BufferedImage image = ImageIO.read(new ByteArrayInputStream(data));
         int height = image.getHeight() - 1;
 
         // First and last pixel will be invisible, so lets check the first column and ensure its all black
         for (int y = 1; y < height; y++) {
             assertEquals("y coordinate failed at: " + y, NP_COLOR, image.getRGB(0, y));
         }
-
     }
-
-    private FileInputStream getFileInputStream() throws IOException {
-        File file = new File(sTmpDir, "pip_dismiss_scrim.9.png");
-        return new FileInputStream(file.toPath().toString());
-    }
-
-    private static final int NP_COLOR = 0xff000000;
 }

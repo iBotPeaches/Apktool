@@ -23,7 +23,7 @@ public class ResFileValue extends ResIntBasedValue {
 
     public ResFileValue(String path, int rawIntValue) {
         super(rawIntValue);
-        this.mPath = path;
+        mPath = path;
     }
 
     public String getStrippedPath() throws AndrolibException {

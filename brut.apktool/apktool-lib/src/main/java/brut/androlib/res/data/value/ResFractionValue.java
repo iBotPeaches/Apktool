@@ -20,6 +20,7 @@ import android.util.TypedValue;
 import brut.androlib.exceptions.AndrolibException;
 
 public class ResFractionValue extends ResIntValue {
+
     public ResFractionValue(int value, String rawValue) {
         super(value, rawValue, "fraction");
     }
