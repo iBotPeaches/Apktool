@@ -32,7 +32,7 @@ public class AndroidManifestResourceParser extends AXmlResourceParser {
      * For details/discussion, see https://stackoverflow.com/questions/2154945/how-to-force-a-meta-data-value-to-type-string
      * With aapt1, the escaped space is dropped when encoded. For aapt2, the escaped space is preserved.
      */
-    private static final Pattern PATTERN_NUMERIC_STRING = Pattern.compile("\\s?\\d+");
+    private static final Pattern PATTERN_NUMERIC_STRING = Pattern.compile("\\\\ \\d+");
 
     public AndroidManifestResourceParser(ResTable resTable) {
         super(resTable);
@@ -53,7 +53,7 @@ public class AndroidManifestResourceParser extends AXmlResourceParser {
         // Otherwise, when the decoded app is rebuilt, aapt will incorrectly encode
         // the value as an int or float (depending on aapt version), breaking the original
         // app functionality.
-        return "\\ " + value.trim();
+        return value.substring(2);
     }
 
     private boolean isNumericStringMetadataAttributeValue(int index, String value) {
