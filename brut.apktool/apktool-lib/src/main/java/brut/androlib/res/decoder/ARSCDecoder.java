@@ -17,6 +17,8 @@
 package brut.androlib.res.decoder;
 
 import android.util.TypedValue;
+import brut.androlib.Config;
+import brut.androlib.apk.ApkInfo;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.data.*;
 import brut.androlib.res.data.arsc.*;
@@ -49,6 +51,7 @@ public class ARSCDecoder {
     private final ResTable mResTable;
     private final List<FlagsOffset> mFlagsOffsets;
     private final boolean mKeepBroken;
+    private final Config mConfig;
     private final HashMap<Integer, Integer> mMissingResSpecMap;
     private final HashMap<Integer, ResTypeSpec> mResTypeSpecs;
 
@@ -64,9 +67,10 @@ public class ARSCDecoder {
 
     public ARSCDecoder(InputStream in, ResTable resTable, boolean storeFlagsOffsets, boolean keepBroken) {
         mIn = ExtDataInputStream.littleEndian(in);
-        mResTable = resTable != null ? resTable : new ResTable();
+        mResTable = resTable;
         mFlagsOffsets = storeFlagsOffsets ? new ArrayList<>() : null;
         mKeepBroken = keepBroken;
+        mConfig = resTable.getConfig();
         mMissingResSpecMap = new LinkedHashMap<>();
         mResTypeSpecs = new HashMap<>();
     }
@@ -81,7 +85,7 @@ public class ARSCDecoder {
         }
     }
 
-    private ResPackage[] readResourceTable() throws IOException, AndrolibException {
+    private ResPackage[] readResourceTable() throws AndrolibException, IOException {
         Set<ResPackage> pkgs = new LinkedHashSet<>();
         ResTypeSpec typeSpec;
         int chunkNumber = 1;
@@ -138,26 +142,26 @@ public class ARSCDecoder {
             }
         }
 
-        if (mResTable.getConfig().isDecodeResolveModeUsingDummies() && mPkg != null && mPkg.getResSpecCount() > 0) {
+        if (mConfig.getDecodeResolveMode() == Config.DECODE_RES_RESOLVE_DUMMY && mPkg != null && mPkg.getResSpecCount() > 0) {
             addMissingResSpecs();
         }
 
         return pkgs.toArray(new ResPackage[0]);
     }
 
-    private void readStringPoolChunk() throws IOException, AndrolibException {
+    private void readStringPoolChunk() throws AndrolibException, IOException {
         checkChunkType(ARSCHeader.RES_STRING_POOL_TYPE);
         mTableStrings = StringBlock.readWithoutChunk(mIn, mHeader.startPosition, mHeader.headerSize, mHeader.chunkSize);
     }
 
-    private void readTableChunk() throws IOException, AndrolibException {
+    private void readTableChunk() throws AndrolibException, IOException {
         checkChunkType(ARSCHeader.RES_TABLE_TYPE);
         mIn.skipInt(); // packageCount
 
         mHeader.checkForUnreadHeader(mIn);
     }
 
-    private void readUnknownChunk() throws IOException, AndrolibException {
+    private void readUnknownChunk() throws AndrolibException, IOException {
         checkChunkType(ARSCHeader.RES_NULL_TYPE);
 
         mHeader.checkForUnreadHeader(mIn);
@@ -166,7 +170,7 @@ public class ARSCDecoder {
         mHeader.skipChunk(mIn);
     }
 
-    private ResPackage readTablePackage() throws IOException, AndrolibException {
+    private ResPackage readTablePackage() throws AndrolibException, IOException {
         checkChunkType(ARSCHeader.XML_TYPE_PACKAGE);
         int id = mIn.readInt();
 
@@ -277,7 +281,7 @@ public class ARSCDecoder {
         return mTypeSpec;
     }
 
-    private ResType readTableType() throws IOException, AndrolibException {
+    private ResType readTableType() throws AndrolibException, IOException {
         checkChunkType(ARSCHeader.XML_TYPE_TYPE);
         int typeId = mIn.readUnsignedByte() - mTypeIdOffset;
 
@@ -373,7 +377,7 @@ public class ARSCDecoder {
         return mType;
     }
 
-    private EntryData readEntryData() throws IOException, AndrolibException {
+    private EntryData readEntryData() throws AndrolibException, IOException {
         int size = mIn.readUnsignedShort();
         short flags = mIn.readShort();
 
@@ -424,7 +428,8 @@ public class ARSCDecoder {
         ResValue value = entryData.value;
 
         if (mTypeSpec.isString() && value instanceof ResFileValue) {
-            value = new ResStringValue(value.toString(), ((ResFileValue) value).getRawIntValue());
+            value = new ResStringValue(value.toString(), ((ResFileValue) value).getRawIntValue(),
+                mConfig);
         }
         if (mType == null) {
             return;
@@ -455,7 +460,7 @@ public class ARSCDecoder {
         }
     }
 
-    private ResBagValue readComplexEntry() throws IOException, AndrolibException {
+    private ResBagValue readComplexEntry() throws AndrolibException, IOException {
         int parent = mIn.readInt();
         int count = mIn.readInt();
 
@@ -475,7 +480,8 @@ public class ARSCDecoder {
             }
 
             if (!(resValue instanceof ResScalarValue)) {
-                resValue = new ResStringValue(resValue.toString(), resValue.getRawIntValue());
+                resValue = new ResStringValue(resValue.toString(), resValue.getRawIntValue(),
+                    mConfig);
             }
             items[i] = new Duo<>(resId, (ResScalarValue) resValue);
         }
@@ -489,7 +495,7 @@ public class ARSCDecoder {
             : mPkg.getValueFactory().factory(type, data, null);
     }
 
-    private ResIntBasedValue readValue() throws IOException, AndrolibException {
+    private ResIntBasedValue readValue() throws AndrolibException, IOException {
         short size = mIn.readShort();
         if (size < 8) {
             return null;
@@ -504,7 +510,7 @@ public class ARSCDecoder {
             : mPkg.getValueFactory().factory(type, data, null);
     }
 
-    private ResConfigFlags readConfigFlags() throws IOException, AndrolibException {
+    private ResConfigFlags readConfigFlags() throws AndrolibException, IOException {
         int size = mIn.readInt();
         int read = 8;
 
@@ -677,14 +683,14 @@ public class ARSCDecoder {
             ResResSpec spec = new ResResSpec(id, resName, mPkg, mResTypeSpecs.get(typeId));
 
             // If we already have this resID don't add it again.
-            if (! mPkg.hasResSpec(id)) {
+            if (!mPkg.hasResSpec(id)) {
                 mPkg.addResSpec(spec);
                 spec.getType().addResSpec(spec);
                 ResType resType = mPkg.getOrCreateConfig(new ResConfigFlags());
 
                 // We are going to make dummy attributes a null reference (@null) now instead of a boolean false.
                 // This is because aapt2 is stricter when it comes to what we can put in an application.
-                ResValue value = new ResReferenceValue(mPkg, 0, "");
+                ResValue value = new ResReferenceValue(mPkg, 0, "", mConfig);
 
                 ResResource res = new ResResource(resType, spec, value);
                 resType.addResource(res);

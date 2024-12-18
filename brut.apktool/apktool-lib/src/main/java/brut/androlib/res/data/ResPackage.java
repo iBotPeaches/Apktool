@@ -16,6 +16,7 @@
  */
 package brut.androlib.res.data;
 
+import brut.androlib.Config;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.exceptions.UndefinedResObjectException;
 import brut.androlib.res.data.value.ResFileValue;
@@ -46,6 +47,10 @@ public class ResPackage {
         mConfigs = new LinkedHashMap<>();
         mTypes = new LinkedHashMap<>();
         mSynthesizedRes = new HashSet<>();
+    }
+
+    public Config getConfig() {
+        return mResTable.getConfig();
     }
 
     public List<ResResSpec> listResSpecs() {
@@ -164,7 +169,7 @@ public class ResPackage {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final ResPackage other = (ResPackage) obj;
+        ResPackage other = (ResPackage) obj;
         if (!Objects.equals(mResTable, other.mResTable)) {
             return false;
         }

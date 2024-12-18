@@ -55,7 +55,7 @@ public class AndroidManifestPullStreamDecoder implements ResStreamDecoder {
 
         public EventHandler(ResTable resTable) {
             mResTable = resTable;
-            mHideSdkInfo = !resTable.getAnalysisMode();
+            mHideSdkInfo = !resTable.getConfig().isAnalysisMode();
         }
 
         @Override

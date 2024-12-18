@@ -22,70 +22,43 @@ import brut.androlib.Config;
 import brut.androlib.TestUtils;
 import brut.directory.ExtFile;
 import brut.common.BrutException;
-import brut.util.OS;
+
 import java.io.File;
-import java.io.IOException;
 
 import org.junit.*;
 import static org.junit.Assert.*;
 
 public class SkipAssetTest extends BaseTest {
+    private static final String TEST_APK = "issue1605.apk";
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        TestUtils.cleanFrameworkFile();
-        sTmpDir = new ExtFile(OS.createTempDirectory());
-        TestUtils.copyResourceDir(SkipAssetTest.class, "aapt1/issue1605/", sTmpDir);
-    }
-
-    @AfterClass
-    public static void afterClass() throws BrutException {
-        OS.rmdir(sTmpDir);
+        TestUtils.copyResourceDir(SkipAssetTest.class, "aapt1/issue1605", sTmpDir);
     }
 
     @Test
-    public void checkIfEnablingSkipAssetWorks() throws BrutException, IOException {
-        String apk = "issue1605.apk";
+    public void checkIfEnablingSkipAssetWorks() throws BrutException {
+        sConfig.setForceDelete(true);
+        sConfig.setDecodeAssets(Config.DECODE_ASSETS_NONE);
 
-        Config config = Config.getDefaultConfig();
-        config.decodeAssets = Config.DECODE_ASSETS_NONE;
-        config.forceDelete = true;
+        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
+        ExtFile testDir = new ExtFile(testApk + ".out");
+        new ApkDecoder(testApk, sConfig).decode(testDir);
 
-        // decode issue1605.apk
-        ApkDecoder apkDecoder = new ApkDecoder(new ExtFile(sTmpDir + File.separator + apk), config);
-        sTestOrigDir = new ExtFile(sTmpDir + File.separator + apk + ".out");
-        apkDecoder.decode(sTestOrigDir);
-
-        checkFileDoesNotExist("assets" + File.separator + "kotlin.kotlin_builtins");
-        checkFileDoesNotExist("assets" + File.separator + "ranges" + File.separator + "ranges.kotlin_builtins");
+        assertFalse(new File(testDir, "assets/kotlin.kotlin_builtins").isFile());
+        assertFalse(new File(testDir, "assets/ranges/ranges.kotlin_builtins").isFile());
     }
 
     @Test
-    public void checkControl() throws BrutException, IOException {
-        String apk = "issue1605.apk";
+    public void checkControl() throws BrutException {
+        sConfig.setForceDelete(true);
+        sConfig.setDecodeAssets(Config.DECODE_ASSETS_FULL);
 
-        Config config = Config.getDefaultConfig();
-        config.decodeAssets = Config.DECODE_ASSETS_FULL;
-        config.forceDelete = true;
+        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
+        ExtFile testDir = new ExtFile(testApk + ".out");
+        new ApkDecoder(testApk, sConfig).decode(testDir);
 
-        // decode issue1605.apk
-        ApkDecoder apkDecoder = new ApkDecoder(new ExtFile(sTmpDir + File.separator + apk), config);
-        sTestOrigDir = new ExtFile(sTmpDir + File.separator + apk + ".out");
-        apkDecoder.decode(sTestOrigDir);
-
-        checkFileDoesExist("assets" + File.separator + "kotlin.kotlin_builtins");
-        checkFileDoesExist("assets" + File.separator + "ranges" + File.separator + "ranges.kotlin_builtins");
-    }
-
-    private void checkFileDoesNotExist(String path) {
-        File f =  new File(sTestOrigDir, path);
-
-        assertFalse(f.isFile());
-    }
-
-    private void checkFileDoesExist(String path) {
-        File f =  new File(sTestOrigDir, path);
-
-        assertTrue(f.isFile());
+        assertTrue(new File(testDir, "assets/kotlin.kotlin_builtins").isFile());
+        assertTrue(new File(testDir, "assets/ranges/ranges.kotlin_builtins").isFile());
     }
 }

@@ -18,13 +18,10 @@ package brut.androlib.res.data.value;
 
 import brut.androlib.Config;
 
-public class ResValue {
+public abstract class ResValue {
+    protected final Config mConfig;
 
-    public boolean shouldRemoveUnknownRes() {
-        return Config.getInstance().isDecodeResolveModeRemoving();
-    }
-
-    public boolean isAnalysisMode() {
-        return Config.getInstance().analysisMode;
+    protected ResValue(Config config) {
+        mConfig = config;
     }
 }

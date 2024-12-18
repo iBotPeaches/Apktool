@@ -16,14 +16,15 @@
  */
 package brut.androlib.apk;
 
-import org.junit.Test;
+import brut.androlib.BaseTest;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.*;
+import static org.junit.Assert.*;
 
-public class InvalidSdkBoundingTest {
+public class InvalidSdkBoundingTest extends BaseTest {
 
     @Test
     public void checkIfInvalidValuesPass() {

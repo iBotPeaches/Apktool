@@ -16,6 +16,7 @@
  */
 package brut.androlib.res.data.value;
 
+import brut.androlib.Config;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.data.ResResSpec;
 import brut.androlib.res.data.ResResource;
@@ -34,9 +35,9 @@ public class ResFlagsAttr extends ResAttr {
     private FlagItem[] mZeroFlags;
     private FlagItem[] mFlags;
 
-    ResFlagsAttr(ResReferenceValue parent, int type, Integer min, Integer max,
-                 Boolean l10n, Duo<ResReferenceValue, ResScalarValue>[] items) {
-        super(parent, type, min, max, l10n);
+    ResFlagsAttr(ResReferenceValue parent, int type, Integer min, Integer max, Boolean l10n,
+                 Duo<ResReferenceValue, ResScalarValue>[] items, Config config) {
+        super(parent, type, min, max, l10n, config);
 
         mItems = new FlagItem[items.length];
         for (int i = 0; i < items.length; i++) {
@@ -84,7 +85,7 @@ public class ResFlagsAttr extends ResAttr {
             ResResSpec referent = item.ref.getReferent();
 
             // #2836 - Support skipping items if the resource cannot be identified.
-            if (referent == null && shouldRemoveUnknownRes()) {
+            if (referent == null && mConfig.getDecodeResolveMode() == Config.DECODE_RES_RESOLVE_REMOVE) {
                 LOGGER.fine(String.format("null flag reference: 0x%08x(%s)", item.ref.getValue(), item.ref.getType()));
                 continue;
             }

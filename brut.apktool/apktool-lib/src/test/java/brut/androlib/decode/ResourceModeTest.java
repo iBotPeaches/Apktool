@@ -22,119 +22,87 @@ import brut.androlib.Config;
 import brut.androlib.TestUtils;
 import brut.directory.ExtFile;
 import brut.common.BrutException;
-import brut.util.OS;
-import java.io.File;
-import java.io.IOException;
-
-import org.junit.*;
 import org.w3c.dom.Document;
 
+import java.io.File;
+
+import org.junit.*;
 import static org.junit.Assert.*;
 
 public class ResourceModeTest extends BaseTest {
+    private static final String TEST_APK = "issue2836.apk";
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        TestUtils.cleanFrameworkFile();
-        sTmpDir = new ExtFile(OS.createTempDirectory());
-        TestUtils.copyResourceDir(ResourceModeTest.class, "decode/issue2836/", sTmpDir);
-    }
-
-    @AfterClass
-    public static void afterClass() throws BrutException {
-        OS.rmdir(sTmpDir);
+        TestUtils.copyResourceDir(ResourceModeTest.class, "decode/issue2836", sTmpDir);
     }
 
     @Test
-    public void checkDecodingModeAsRemove() throws BrutException, IOException {
-        String apk = "issue2836.apk";
+    public void checkDecodingModeAsRemove() throws BrutException {
+        sConfig.setDecodeResolveMode(Config.DECODE_RES_RESOLVE_REMOVE);
 
-        Config config = Config.getDefaultConfig();
-        config.setDecodeResolveMode(Config.DECODE_RES_RESOLVE_REMOVE);
+        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
+        ExtFile testDir = new ExtFile(testApk + ".out.remove");
+        new ApkDecoder(testApk, sConfig).decode(testDir);
 
-        // decode issue2836.apk
-        ApkDecoder apkDecoder = new ApkDecoder(new ExtFile(sTmpDir + File.separator + apk), config);
-        sTestOrigDir = new ExtFile(sTmpDir + File.separator + apk + "remove.out");
+        assertTrue(new File(testDir, "res/values/strings.xml").isFile());
 
-        File outDir = new File(sTmpDir + File.separator + apk + "remove.out");
-        apkDecoder.decode(outDir);
-
-        File stringsXml =  new File(sTestOrigDir,"res/values/strings.xml");
-        assertTrue(stringsXml.isFile());
-
-        File attrXml =  new File(sTestOrigDir,"res/values/attrs.xml");
-        Document attrDocument = TestUtils.getDocumentFromFile(attrXml);
+        File attrXml = new File(testDir, "res/values/attrs.xml");
+        Document attrDocument = loadDocument(attrXml);
         assertEquals(3, attrDocument.getElementsByTagName("enum").getLength());
 
-        File colorXml =  new File(sTestOrigDir,"res/values/colors.xml");
-        Document colorDocument = TestUtils.getDocumentFromFile(colorXml);
+        File colorXml = new File(testDir, "res/values/colors.xml");
+        Document colorDocument = loadDocument(colorXml);
         assertEquals(8, colorDocument.getElementsByTagName("color").getLength());
         assertEquals(0, colorDocument.getElementsByTagName("item").getLength());
 
-        File publicXml =  new File(sTestOrigDir,"res/values/public.xml");
-        Document publicDocument = TestUtils.getDocumentFromFile(publicXml);
+        File publicXml = new File(testDir, "res/values/public.xml");
+        Document publicDocument = loadDocument(publicXml);
         assertEquals(21, publicDocument.getElementsByTagName("public").getLength());
     }
 
     @Test
-    public void checkDecodingModeAsDummies() throws BrutException, IOException {
-        String apk = "issue2836.apk";
+    public void checkDecodingModeAsDummies() throws BrutException {
+        sConfig.setDecodeResolveMode(Config.DECODE_RES_RESOLVE_DUMMY);
 
-        Config config = Config.getDefaultConfig();
-        config.setDecodeResolveMode(Config.DECODE_RES_RESOLVE_DUMMY);
+        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
+        ExtFile testDir = new ExtFile(testApk + ".out.dummies");
+        new ApkDecoder(testApk, sConfig).decode(testDir);
 
-        // decode issue2836.apk
-        ApkDecoder apkDecoder = new ApkDecoder(new ExtFile(sTmpDir + File.separator + apk), config);
-        sTestOrigDir = new ExtFile(sTmpDir + File.separator + apk + "dummies.out");
+        assertTrue(new File(testDir, "res/values/strings.xml").isFile());
 
-        File outDir = new File(sTmpDir + File.separator + apk + "dummies.out");
-        apkDecoder.decode(outDir);
-
-        File stringsXml =  new File(sTestOrigDir,"res/values/strings.xml");
-        assertTrue(stringsXml.isFile());
-
-        File attrXml =  new File(sTestOrigDir,"res/values/attrs.xml");
-        Document attrDocument = TestUtils.getDocumentFromFile(attrXml);
+        File attrXml = new File(testDir, "res/values/attrs.xml");
+        Document attrDocument = loadDocument(attrXml);
         assertEquals(4, attrDocument.getElementsByTagName("enum").getLength());
 
-        File colorXml =  new File(sTestOrigDir,"res/values/colors.xml");
-        Document colorDocument = TestUtils.getDocumentFromFile(colorXml);
+        File colorXml = new File(testDir, "res/values/colors.xml");
+        Document colorDocument = loadDocument(colorXml);
         assertEquals(8, colorDocument.getElementsByTagName("color").getLength());
         assertEquals(1, colorDocument.getElementsByTagName("item").getLength());
 
-        File publicXml =  new File(sTestOrigDir,"res/values/public.xml");
-        Document publicDocument = TestUtils.getDocumentFromFile(publicXml);
+        File publicXml = new File(testDir, "res/values/public.xml");
+        Document publicDocument = loadDocument(publicXml);
         assertEquals(22, publicDocument.getElementsByTagName("public").getLength());
     }
 
     @Test
-    public void checkDecodingModeAsLeave() throws BrutException, IOException {
-        String apk = "issue2836.apk";
+    public void checkDecodingModeAsLeave() throws BrutException {
+        sConfig.setDecodeResolveMode(Config.DECODE_RES_RESOLVE_RETAIN);
 
-        Config config = Config.getDefaultConfig();
-        config.setDecodeResolveMode(Config.DECODE_RES_RESOLVE_RETAIN);
+        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
+        ExtFile testDir = new ExtFile(testApk + ".out.leave");
+        new ApkDecoder(testApk, sConfig).decode(testDir);
 
-        // decode issue2836.apk
-        ApkDecoder apkDecoder = new ApkDecoder(new ExtFile(sTmpDir + File.separator + apk), config);
-        sTestOrigDir = new ExtFile(sTmpDir + File.separator + apk + "leave.out");
+        assertTrue(new File(testDir, "res/values/strings.xml").isFile());
 
-        File outDir = new File(sTmpDir + File.separator + apk + "leave.out");
-        apkDecoder.decode(outDir);
-
-        File stringsXml =  new File(sTestOrigDir,"res/values/strings.xml");
-        assertTrue(stringsXml.isFile());
-
-        File attrXml =  new File(sTestOrigDir,"res/values/attrs.xml");
-        Document attrDocument = TestUtils.getDocumentFromFile(attrXml);
+        Document attrDocument = loadDocument(new File(testDir, "res/values/attrs.xml"));
         assertEquals(4, attrDocument.getElementsByTagName("enum").getLength());
 
-        File colorXml =  new File(sTestOrigDir,"res/values/colors.xml");
-        Document colorDocument = TestUtils.getDocumentFromFile(colorXml);
+        Document colorDocument = loadDocument(new File(testDir, "res/values/colors.xml"));
         assertEquals(8, colorDocument.getElementsByTagName("color").getLength());
         assertEquals(0, colorDocument.getElementsByTagName("item").getLength());
 
-        File publicXml =  new File(sTestOrigDir,"res/values/public.xml");
-        Document publicDocument = TestUtils.getDocumentFromFile(publicXml);
+        Document publicDocument = loadDocument(new File(testDir, "res/values/public.xml"));
         assertEquals(21, publicDocument.getElementsByTagName("public").getLength());
     }
 }

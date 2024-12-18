@@ -16,53 +16,40 @@
  */
 package brut.androlib.aapt2;
 
-import brut.androlib.*;
+import brut.androlib.ApkBuilder;
+import brut.androlib.ApkDecoder;
+import brut.androlib.BaseTest;
+import brut.androlib.TestUtils;
 import brut.androlib.apk.ApkInfo;
-import brut.androlib.Config;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
-import brut.util.OS;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
-import java.io.IOException;
 
+import org.junit.*;
 import static org.junit.Assert.*;
 
 public class BuildAndDecodeTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        TestUtils.cleanFrameworkFile();
-
-        sTmpDir = new ExtFile(OS.createTempDirectory());
         sTestOrigDir = new ExtFile(sTmpDir, "testapp-orig");
         sTestNewDir = new ExtFile(sTmpDir, "testapp-new");
-        LOGGER.info("Unpacking testapp...");
-        TestUtils.copyResourceDir(BuildAndDecodeTest.class, "aapt2/testapp/", sTestOrigDir);
 
-        Config config = Config.getDefaultConfig();
-        config.verbose = true;
+        LOGGER.info("Unpacking testapp...");
+        TestUtils.copyResourceDir(BuildAndDecodeTest.class, "aapt2/testapp", sTestOrigDir);
+
+        sConfig.setVerbose(true);
 
         LOGGER.info("Building testapp.apk...");
         ExtFile testApk = new ExtFile(sTmpDir, "testapp.apk");
-        new ApkBuilder(sTestOrigDir, config).build(testApk);
+        new ApkBuilder(sTestOrigDir, sConfig).build(testApk);
 
         LOGGER.info("Decoding testapp.apk...");
-        ApkDecoder apkDecoder = new ApkDecoder(testApk);
-        apkDecoder.decode(sTestNewDir);
-    }
-
-    @AfterClass
-    public static void afterClass() throws BrutException {
-        OS.rmdir(sTmpDir);
+        new ApkDecoder(testApk, sConfig).decode(sTestNewDir);
     }
 
     @Test
@@ -104,14 +91,14 @@ public class BuildAndDecodeTest extends BaseTest {
 
     @Test
     public void confirmZeroByteFileExtensionIsNotStored() throws BrutException {
-        ApkInfo apkInfo = ApkInfo.load(sTestNewDir);
-        assertFalse(apkInfo.doNotCompress.contains("jpg"));
+        ApkInfo testInfo = ApkInfo.load(sTestNewDir);
+        assertFalse(testInfo.doNotCompress.contains("jpg"));
     }
 
     @Test
     public void confirmZeroByteFileIsStored() throws BrutException {
-        ApkInfo apkInfo = ApkInfo.load(sTestNewDir);
-        assertTrue(apkInfo.doNotCompress.contains("assets/0byte_file.jpg"));
+        ApkInfo testInfo = ApkInfo.load(sTestNewDir);
+        assertTrue(testInfo.doNotCompress.contains("assets/0byte_file.jpg"));
     }
 
     @Test
@@ -134,8 +121,8 @@ public class BuildAndDecodeTest extends BaseTest {
     }
 
     @Test
-    public void samsungQmgFilesHandledTest() throws BrutException, IOException {
-        compareBinaryFolder("drawable-xhdpi", true);
+    public void samsungQmgFilesHandledTest() throws BrutException {
+        compareBinaryFolder("res/drawable-xhdpi");
     }
 
     @Test
@@ -154,46 +141,40 @@ public class BuildAndDecodeTest extends BaseTest {
     }
 
     @Test
-    public void multipleDexTest() throws BrutException, IOException {
-        compareBinaryFolder("/smali_classes2", false);
-        compareBinaryFolder("/smali_classes3", false);
-
-        File classes2Dex = new File(sTestOrigDir, "build/apk/classes2.dex");
-        File classes3Dex = new File(sTestOrigDir, "build/apk/classes3.dex");
-
-        assertTrue(classes2Dex.isFile());
-        assertTrue(classes3Dex.isFile());
+    public void multipleDexTest() throws BrutException {
+        compareBinaryFolder("smali_classes2");
+        compareBinaryFolder("smali_classes3");
+        assertTrue(new File(sTestOrigDir, "build/apk/classes2.dex").isFile());
+        assertTrue(new File(sTestOrigDir, "build/apk/classes3.dex").isFile());
     }
 
     @Test
-    public void singleDexTest() throws BrutException, IOException {
-        compareBinaryFolder("/smali", false);
-
-        File classesDex = new File(sTestOrigDir, "build/apk/classes.dex");
-        assertTrue(classesDex.isFile());
+    public void singleDexTest() throws BrutException {
+        compareBinaryFolder("smali");
+        assertTrue(new File(sTestOrigDir, "build/apk/classes.dex").isFile());
     }
 
     @Test
-    public void unknownFolderTest() throws BrutException, IOException {
-        compareUnknownFiles();
+    public void unknownFolderTest() throws BrutException {
+        compareBinaryFolder("unknown");
     }
 
     @Test
-    public void confirmPlatformManifestValuesTest() throws IOException, SAXException, ParserConfigurationException {
-        Document doc = loadDocument(new File(sTestNewDir + "/AndroidManifest.xml"));
+    public void confirmPlatformManifestValuesTest() throws BrutException {
+        Document doc = loadDocument(new File(sTestNewDir, "AndroidManifest.xml"));
         Node application = doc.getElementsByTagName("manifest").item(0);
-        NamedNodeMap attr = application.getAttributes();
+        NamedNodeMap attrs = application.getAttributes();
 
-        Node platformBuildVersionNameAttr = attr.getNamedItem("platformBuildVersionName");
+        Node platformBuildVersionNameAttr = attrs.getNamedItem("platformBuildVersionName");
         assertEquals("6.0-2438415", platformBuildVersionNameAttr.getNodeValue());
 
-        Node platformBuildVersionCodeAttr = attr.getNamedItem("platformBuildVersionCode");
+        Node platformBuildVersionCodeAttr = attrs.getNamedItem("platformBuildVersionCode");
         assertEquals("23", platformBuildVersionCodeAttr.getNodeValue());
 
-        Node compileSdkVersionAttr = attr.getNamedItem("compileSdkVersion");
+        Node compileSdkVersionAttr = attrs.getNamedItem("compileSdkVersion");
         assertNull("compileSdkVersion should be stripped via aapt2", compileSdkVersionAttr);
 
-        Node compileSdkVersionCodenameAttr = attr.getNamedItem("compileSdkVersionCodename");
+        Node compileSdkVersionCodenameAttr = attrs.getNamedItem("compileSdkVersionCodename");
         assertNull("compileSdkVersionCodename should be stripped via aapt2", compileSdkVersionCodenameAttr);
     }
 }

@@ -18,51 +18,32 @@ package brut.androlib.aapt1;
 
 import brut.androlib.ApkBuilder;
 import brut.androlib.ApkDecoder;
-import brut.androlib.Config;
+import brut.androlib.BaseTest;
 import brut.androlib.TestUtils;
 import brut.directory.ExtFile;
 import brut.common.BrutException;
-import brut.util.OS;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
-import java.io.File;
-import java.util.logging.Logger;
+import org.junit.*;
+import static org.junit.Assert.*;
 
-import static org.junit.Assert.assertTrue;
-
-public class EmptyResourcesArscTest {
-    private static final Logger LOGGER = Logger.getLogger(EmptyResourcesArscTest.class.getName());
-
-    private static ExtFile sTmpDir;
-    private static ExtFile sTestOrigDir;
-    private static ExtFile sTestNewDir;
+public class EmptyResourcesArscTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        TestUtils.cleanFrameworkFile();
-        sTmpDir = new ExtFile(OS.createTempDirectory());
         sTestOrigDir = new ExtFile(sTmpDir, "issue1730-orig");
         sTestNewDir = new ExtFile(sTmpDir, "issue1730-new");
+
         LOGGER.info("Unpacking issue1730.apk...");
         TestUtils.copyResourceDir(EmptyResourcesArscTest.class, "aapt1/issue1730", sTestOrigDir);
 
-        ExtFile testApk = new ExtFile(sTestOrigDir, "issue1730.apk");
+        sConfig.setAaptVersion(1);
 
         LOGGER.info("Decoding issue1730.apk...");
-        ApkDecoder apkDecoder = new ApkDecoder(testApk);
-        apkDecoder.decode(sTestNewDir);
+        ExtFile testApk = new ExtFile(sTestOrigDir, "issue1730.apk");
+        new ApkDecoder(testApk, sConfig).decode(sTestNewDir);
 
         LOGGER.info("Building issue1730.apk...");
-        Config config = Config.getDefaultConfig();
-        config.aaptVersion = 1;
-        new ApkBuilder(sTestNewDir, config).build(testApk);
-    }
-
-    @AfterClass
-    public static void afterClass() throws BrutException {
-        OS.rmdir(sTmpDir);
+        new ApkBuilder(sTestNewDir, sConfig).build(testApk);
     }
 
     @Test

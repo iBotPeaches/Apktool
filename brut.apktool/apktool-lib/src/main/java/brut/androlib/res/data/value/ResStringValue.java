@@ -16,6 +16,7 @@
  */
 package brut.androlib.res.data.value;
 
+import brut.androlib.Config;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.data.ResResource;
 import brut.androlib.res.xml.ResXmlEncoders;
@@ -27,12 +28,12 @@ import java.util.regex.Pattern;
 public class ResStringValue extends ResScalarValue {
     private static final Pattern ALL_DIGITS = Pattern.compile("\\d{9,}");
 
-    public ResStringValue(String value, int rawValue) {
-        this(value, rawValue, "string");
+    public ResStringValue(String value, int rawValue, Config config) {
+        this(value, rawValue, "string", config);
     }
 
-    public ResStringValue(String value, int rawValue, String type) {
-        super(type, rawValue, value);
+    public ResStringValue(String value, int rawValue, String type, Config config) {
+        super(type, rawValue, value, config);
     }
 
     @Override

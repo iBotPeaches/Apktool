@@ -16,52 +16,43 @@
  */
 package brut.androlib.aapt2;
 
-import brut.androlib.*;
-import brut.androlib.Config;
+import brut.androlib.ApkBuilder;
+import brut.androlib.ApkDecoder;
+import brut.androlib.BaseTest;
+import brut.androlib.TestUtils;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
-import brut.util.OS;
-import org.custommonkey.xmlunit.XMLUnit;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
 import org.xml.sax.SAXException;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 
+import org.junit.*;
+import static org.junit.Assert.*;
+
+import org.custommonkey.xmlunit.XMLUnit;
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
-import static org.junit.Assert.assertTrue;
 
 public class DebuggableFalseChangeToTrueTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        TestUtils.cleanFrameworkFile();
-        sTmpDir = new ExtFile(OS.createTempDirectory());
         sTestOrigDir = new ExtFile(sTmpDir, "issue2328-debuggable-false-orig");
-        sTestNewDir = new ExtFile(sTmpDir, "issue2328-debuggable-flase-new");
-        LOGGER.info("Unpacking issue2328-debuggable-flase...");
+        sTestNewDir = new ExtFile(sTmpDir, "issue2328-debuggable-false-new");
+
+        LOGGER.info("Unpacking issue2328-debuggable-false...");
         TestUtils.copyResourceDir(DebuggableFalseChangeToTrueTest.class, "aapt2/issue2328/debuggable-false", sTestOrigDir);
 
-        LOGGER.info("Building issue2328-debuggable-flase.apk...");
-        Config config = Config.getDefaultConfig();
-        config.debugMode = true;
-        config.verbose = true;
+        sConfig.setDebugMode(true);
+        sConfig.setVerbose(true);
 
-        ExtFile testApk = new ExtFile(sTmpDir, "issue2328-debuggable-flase.apk");
-        new ApkBuilder(sTestOrigDir, config).build(testApk);
+        LOGGER.info("Building issue2328-debuggable-false.apk...");
+        ExtFile testApk = new ExtFile(sTmpDir, "issue2328-debuggable-false.apk");
+        new ApkBuilder(sTestOrigDir, sConfig).build(testApk);
 
-        LOGGER.info("Decoding issue2328-debuggable-flase.apk...");
-        ApkDecoder apkDecoder = new ApkDecoder(testApk);
-        apkDecoder.decode(sTestNewDir);
-    }
-
-    @AfterClass
-    public static void afterClass() throws BrutException {
-        OS.rmdir(sTmpDir);
+        LOGGER.info("Decoding issue2328-debuggable-false.apk...");
+        new ApkDecoder(testApk, sConfig).decode(sTestNewDir);
     }
 
     @Test
@@ -71,14 +62,12 @@ public class DebuggableFalseChangeToTrueTest extends BaseTest {
 
     @Test
     public void DebugIsTruePriorToBeingFalseTest() throws IOException, SAXException {
-        String apk = "issue2328-debuggable-flase-new";
-
         String expected = TestUtils.replaceNewlines("<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"no\"?>" +
             "<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\" " +
             "package=\"com.ibotpeaches.issue2328\" platformBuildVersionCode=\"20\" " +
             "platformBuildVersionName=\"4.4W.2-1537038\">    <application android:debuggable=\"true\"/></manifest>");
 
-        byte[] encoded = Files.readAllBytes(Paths.get(sTmpDir + File.separator + apk + File.separator + "AndroidManifest.xml"));
+        byte[] encoded = Files.readAllBytes(new File(sTestNewDir, "AndroidManifest.xml").toPath());
         String obtained = TestUtils.replaceNewlines(new String(encoded));
 
         XMLUnit.setIgnoreWhitespace(true);

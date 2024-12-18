@@ -16,15 +16,16 @@
  */
 package brut.androlib.apk;
 
-import brut.androlib.exceptions.AndrolibException;
-import org.junit.Test;
+import brut.androlib.BaseTest;
+import brut.common.BrutException;
 
+import org.junit.*;
 import static org.junit.Assert.*;
 
-public class ConsistentPropertyTest {
+public class ConsistentPropertyTest extends BaseTest {
 
     @Test
-    public void testAssertingAllKnownApkInfoProperties() throws AndrolibException {
+    public void testAssertingAllKnownApkInfoProperties() throws BrutException {
         ApkInfo apkInfo = ApkInfo.load(
             getClass().getResourceAsStream("/apk/basic.yml"));
 

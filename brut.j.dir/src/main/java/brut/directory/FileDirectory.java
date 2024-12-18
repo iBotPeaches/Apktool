@@ -16,6 +16,8 @@
  */
 package brut.directory;
 
+import brut.util.OS;
+
 import java.io.*;
 import java.net.URLDecoder;
 import java.nio.file.Files;
@@ -59,8 +61,7 @@ public class FileDirectory extends AbstractDirectory {
     @Override
     protected AbstractDirectory createDirLocal(String name) throws DirectoryException {
         File dir = new File(generatePath(name));
-        //noinspection ResultOfMethodCallIgnored
-        dir.mkdir();
+        OS.mkdir(dir);
         return new FileDirectory(dir);
     }
 
@@ -97,8 +98,7 @@ public class FileDirectory extends AbstractDirectory {
     @Override
     protected void removeFileLocal(String name) {
         File file = new File(generatePath(name));
-        //noinspection ResultOfMethodCallIgnored
-        file.delete();
+        OS.rmfile(file);
     }
 
     private String generatePath(String name) {

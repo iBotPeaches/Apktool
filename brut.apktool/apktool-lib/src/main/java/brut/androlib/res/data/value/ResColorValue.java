@@ -16,10 +16,12 @@
  */
 package brut.androlib.res.data.value;
 
+import brut.androlib.Config;
+
 public class ResColorValue extends ResIntValue {
 
-    public ResColorValue(int value, String rawValue) {
-        super(value, rawValue, "color");
+    public ResColorValue(int value, String rawValue, Config config) {
+        super(value, rawValue, "color", config);
     }
 
     @Override

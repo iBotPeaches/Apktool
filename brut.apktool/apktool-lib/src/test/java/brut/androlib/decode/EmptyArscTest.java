@@ -21,45 +21,27 @@ import brut.androlib.BaseTest;
 import brut.androlib.TestUtils;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
-import brut.util.OS;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 import java.io.File;
-import java.io.IOException;
 
-import static org.junit.Assert.assertTrue;
+import org.junit.*;
+import static org.junit.Assert.*;
 
 public class EmptyArscTest extends BaseTest {
+    private static final String TEST_APK = "test.apk";
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        TestUtils.cleanFrameworkFile();
-        sTmpDir = new ExtFile(OS.createTempDirectory());
-        TestUtils.copyResourceDir(EmptyArscTest.class, "decode/issue2701/", sTmpDir);
-    }
-
-    @AfterClass
-    public static void afterClass() throws BrutException {
-        OS.rmdir(sTmpDir);
+        TestUtils.copyResourceDir(EmptyArscTest.class, "decode/issue2701", sTmpDir);
     }
 
     @Test
-    public void decodeWithEmptyArscFile() throws BrutException, IOException {
-        String apk = "test.apk";
+    public void decodeWithEmptyArscFile() throws BrutException {
+        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
+        ExtFile testDir = new ExtFile(testApk + ".out");
+        new ApkDecoder(testApk, sConfig).decode(testDir);
 
-        // decode test.apk
-        ApkDecoder apkDecoder = new ApkDecoder(new ExtFile(sTmpDir + File.separator + apk));
-        sTestOrigDir = new ExtFile(sTmpDir + File.separator + apk + ".out");
-
-        File outDir = new File(sTmpDir + File.separator + apk + ".out");
-        apkDecoder.decode(outDir);
-
-        File publicXmlFile =  new File(sTestOrigDir,"res/values/public.xml");
-        assertTrue(publicXmlFile.isFile());
-
-        File androidManifestXmlFile =  new File(sTestOrigDir,"AndroidManifest.xml");
-        assertTrue(androidManifestXmlFile.isFile());
+        assertTrue(new File(testDir, "res/values/public.xml").isFile());
+        assertTrue(new File(testDir, "AndroidManifest.xml").isFile());
     }
 }

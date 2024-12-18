@@ -17,12 +17,13 @@
 package brut.androlib.res.data.value;
 
 import android.util.TypedValue;
+import brut.androlib.Config;
 import brut.androlib.exceptions.AndrolibException;
 
 public class ResFractionValue extends ResIntValue {
 
-    public ResFractionValue(int value, String rawValue) {
-        super(value, rawValue, "fraction");
+    public ResFractionValue(int value, String rawValue, Config config) {
+        super(value, rawValue, "fraction", config);
     }
 
     @Override

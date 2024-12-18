@@ -697,7 +697,7 @@ public class AXmlResourceParser implements XmlResourceParser {
                     String type = stringBlockValue.substring(0, slashPos);
                     value = type + "/" + resourceMapValue;
                 }
-            } else if (! stringBlockValue.equals(resourceMapValue)) {
+            } else if (!stringBlockValue.equals(resourceMapValue)) {
                 value = resourceMapValue;
             }
         }

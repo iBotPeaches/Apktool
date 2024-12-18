@@ -21,39 +21,26 @@ import brut.androlib.BaseTest;
 import brut.androlib.TestUtils;
 import brut.directory.ExtFile;
 import brut.common.BrutException;
-import brut.util.OS;
+
 import java.io.File;
-import java.io.IOException;
 
 import org.junit.*;
 import static org.junit.Assert.*;
 
 public class ProtectedApkTest extends BaseTest {
+    private static final String TEST_APK = "protected-v1.apk";
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        TestUtils.cleanFrameworkFile();
-        sTmpDir = new ExtFile(OS.createTempDirectory());
-        TestUtils.copyResourceDir(ProtectedApkTest.class, "decode/protected-chunks/", sTmpDir);
-    }
-
-    @AfterClass
-    public static void afterClass() throws BrutException {
-        OS.rmdir(sTmpDir);
+        TestUtils.copyResourceDir(ProtectedApkTest.class, "decode/protected-chunks", sTmpDir);
     }
 
     @Test
-    public void checkIfDecodeWorksWithoutCrash() throws BrutException, IOException {
-        String apk = "protected-v1.apk";
+    public void checkIfDecodeWorksWithoutCrash() throws BrutException {
+        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
+        ExtFile testDir = new ExtFile(testApk + ".out");
+        new ApkDecoder(testApk, sConfig).decode(testDir);
 
-        // decode protected-v1.apk
-        ApkDecoder apkDecoder = new ApkDecoder(new ExtFile(sTmpDir + File.separator + apk));
-        sTestOrigDir = new ExtFile(sTmpDir + File.separator + apk + ".out");
-
-        File outDir = new File(sTmpDir + File.separator + apk + ".out");
-        apkDecoder.decode(outDir);
-
-        File stringsXml =  new File(sTestOrigDir,"res/values/strings.xml");
-        assertTrue(stringsXml.isFile());
+        assertTrue(new File(testDir, "res/values/strings.xml").isFile());
     }
 }

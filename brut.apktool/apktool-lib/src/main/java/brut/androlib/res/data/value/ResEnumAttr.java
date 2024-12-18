@@ -16,6 +16,7 @@
  */
 package brut.androlib.res.data.value;
 
+import brut.androlib.Config;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.data.ResResSpec;
 import brut.androlib.res.data.ResResource;
@@ -33,9 +34,9 @@ public class ResEnumAttr extends ResAttr {
     private final Duo<ResReferenceValue, ResScalarValue>[] mItems;
     private final Map<Integer, String> mItemsCache;
 
-    ResEnumAttr(ResReferenceValue parent, int type, Integer min, Integer max,
-                Boolean l10n, Duo<ResReferenceValue, ResScalarValue>[] items) {
-        super(parent, type, min, max, l10n);
+    ResEnumAttr(ResReferenceValue parent, int type, Integer min, Integer max, Boolean l10n,
+                Duo<ResReferenceValue, ResScalarValue>[] items, Config config) {
+        super(parent, type, min, max, l10n, config);
         mItems = items;
         mItemsCache = new HashMap<>();
     }
@@ -59,7 +60,7 @@ public class ResEnumAttr extends ResAttr {
 
             // #2836 - Support skipping items if the resource cannot be identified.
             ResResSpec m1Referent = duo.m1.getReferent();
-            if (m1Referent == null && shouldRemoveUnknownRes()) {
+            if (m1Referent == null && mConfig.getDecodeResolveMode() == Config.DECODE_RES_RESOLVE_REMOVE) {
                 LOGGER.fine(String.format("null enum reference: m1=0x%08x(%s), m2=0x%08x(%s)",
                     duo.m1.getRawIntValue(), duo.m1.getType(), duo.m2.getRawIntValue(), duo.m2.getType()));
                 continue;

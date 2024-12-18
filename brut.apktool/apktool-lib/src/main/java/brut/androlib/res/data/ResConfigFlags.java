@@ -680,7 +680,7 @@ public class ResConfigFlags {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final ResConfigFlags other = (ResConfigFlags) obj;
+        ResConfigFlags other = (ResConfigFlags) obj;
         return mQualifiers.equals(other.mQualifiers);
     }
 

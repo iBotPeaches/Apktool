@@ -16,11 +16,13 @@
  */
 package brut.androlib.res.data.value;
 
+import brut.androlib.Config;
+
 public class ResFloatValue extends ResScalarValue {
     private final float mValue;
 
-    public ResFloatValue(float value, int rawIntValue, String rawValue) {
-        super("float", rawIntValue, rawValue);
+    public ResFloatValue(float value, int rawIntValue, String rawValue, Config config) {
+        super("float", rawIntValue, rawValue, config);
         mValue = value;
     }
 

@@ -16,6 +16,7 @@
  */
 package brut.androlib.res.data.value;
 
+import brut.androlib.Config;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.data.ResResource;
 import brut.androlib.res.xml.ResValuesXmlSerializable;
@@ -27,24 +28,25 @@ import java.io.IOException;
 public class ResBagValue extends ResValue implements ResValuesXmlSerializable {
     protected final ResReferenceValue mParent;
 
-    public ResBagValue(ResReferenceValue parent) {
+    public ResBagValue(ResReferenceValue parent, Config config) {
+        super(config);
         mParent = parent;
     }
 
     @Override
     public void serializeToResValuesXml(XmlSerializer serializer,
-                                        ResResource res) throws IOException, AndrolibException {
+                                        ResResource res) throws AndrolibException, IOException {
         String type = res.getResSpec().getType().getName();
         if ("style".equals(type)) {
-            new ResStyleValue(mParent, new Duo[0], null).serializeToResValuesXml(serializer, res);
+            new ResStyleValue(mParent, new Duo[0], null, mConfig).serializeToResValuesXml(serializer, res);
             return;
         }
         if ("array".equals(type)) {
-            new ResArrayValue(mParent, new Duo[0]).serializeToResValuesXml(serializer, res);
+            new ResArrayValue(mParent, new Duo[0], mConfig).serializeToResValuesXml(serializer, res);
             return;
         }
         if ("plurals".equals(type)) {
-            new ResPluralsValue(mParent, new Duo[0]).serializeToResValuesXml(serializer, res);
+            new ResPluralsValue(mParent, new Duo[0], mConfig).serializeToResValuesXml(serializer, res);
             return;
         }
 

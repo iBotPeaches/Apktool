@@ -21,48 +21,27 @@ import brut.androlib.BaseTest;
 import brut.androlib.TestUtils;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
-import brut.util.OS;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 import java.io.File;
-import java.io.IOException;
 
-import static org.junit.Assert.assertTrue;
+import org.junit.*;
+import static org.junit.Assert.*;
 
 public class VectorDrawableTest extends BaseTest {
+    private static final String TEST_APK = "issue1456.apk";
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        TestUtils.cleanFrameworkFile();
-        sTmpDir = new ExtFile(OS.createTempDirectory());
-        TestUtils.copyResourceDir(VectorDrawableTest.class, "decode/issue1456/", sTmpDir);
-    }
-
-    @AfterClass
-    public static void afterClass() throws BrutException {
-        OS.rmdir(sTmpDir);
+        TestUtils.copyResourceDir(VectorDrawableTest.class, "decode/issue1456", sTmpDir);
     }
 
     @Test
-    public void checkIfDrawableFileDecodesProperly() throws BrutException, IOException {
-        String apk = "issue1456.apk";
+    public void checkIfDrawableFileDecodesProperly() throws BrutException {
+        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
+        ExtFile testDir = new ExtFile(testApk + ".out");
+        new ApkDecoder(testApk, sConfig).decode(testDir);
 
-        // decode issue1456.apk
-        ApkDecoder apkDecoder = new ApkDecoder(new ExtFile(sTmpDir + File.separator + apk));
-        sTestOrigDir = new ExtFile(sTmpDir + File.separator + apk + ".out");
-
-        File outDir = new File(sTmpDir + File.separator + apk + ".out");
-        apkDecoder.decode(outDir);
-
-        checkFileExists("res/drawable/ic_arrow_drop_down_black_24dp.xml");
-        checkFileExists("res/drawable/ic_android_black_24dp.xml");
-    }
-
-    private void checkFileExists(String path) {
-        File f =  new File(sTestOrigDir, path);
-
-        assertTrue(f.isFile());
+        assertTrue(new File(testDir, "res/drawable/ic_arrow_drop_down_black_24dp.xml").isFile());
+        assertTrue(new File(testDir, "res/drawable/ic_android_black_24dp.xml").isFile());
     }
 }

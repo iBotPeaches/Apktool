@@ -16,31 +16,19 @@
  */
 package brut.androlib;
 
-import brut.androlib.exceptions.AndrolibException;
-import brut.androlib.res.Framework;
-import brut.androlib.res.xml.ResXmlUtils;
 import brut.common.BrutException;
 import brut.directory.DirUtils;
 import brut.directory.Directory;
 import brut.directory.FileDirectory;
 import brut.util.OS;
-import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-import java.io.*;
+import java.io.File;
+import java.io.InputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.file.Files;
-import java.util.HashMap;
-import java.util.Map;
 
 public final class TestUtils {
 
@@ -48,40 +36,8 @@ public final class TestUtils {
         // Private constructor for utility class
     }
 
-    public static Map<String, String> parseStringsXml(File file) throws BrutException {
-        try {
-            Document doc = getDocumentFromFile(file);
-            XPath xPath = XPathFactory.newInstance().newXPath();
-            String expression = "/resources/string[@name]";
-            NodeList nodes = (NodeList) xPath.evaluate(expression, doc, XPathConstants.NODESET);
-
-            Map<String, String> map = new HashMap<>();
-
-            for (int i = 0; i < nodes.getLength(); i++) {
-                Node node = nodes.item(i);
-                NamedNodeMap attrs = node.getAttributes();
-                Node nameAttr = attrs.getNamedItem("name");
-                map.put(nameAttr.getNodeValue(), node.getTextContent());
-            }
-
-            return map;
-        } catch (XPathExpressionException ex) {
-            throw new BrutException(ex);
-        }
-    }
-
-    public static Document getDocumentFromFile(File file) throws BrutException {
-        try {
-            return ResXmlUtils.loadDocument(file);
-        } catch (IOException | SAXException | ParserConfigurationException ex) {
-            throw new BrutException(ex);
-        }
-    }
-
     public static void copyResourceDir(Class<?> clz, String dirPath, File out) throws BrutException {
-        if (!out.exists()) {
-            out.mkdirs();
-        }
+        OS.mkdir(out);
         copyResourceDir(clz, dirPath, new FileDirectory(out));
     }
 
@@ -116,14 +72,6 @@ public final class TestUtils {
         }
     }
 
-    public static void cleanFrameworkFile() throws BrutException {
-        File framework = new File(getFrameworkDirectory(), "1.apk");
-
-        if (Files.exists(framework.toPath())) {
-            OS.rmfile(framework.getAbsolutePath());
-        }
-    }
-
     public static byte[] readHeaderOfFile(File file, int size) throws IOException {
         byte[] buffer = new byte[size];
 
@@ -134,12 +82,6 @@ public final class TestUtils {
         }
 
         return buffer;
-    }
-
-    static File getFrameworkDirectory() throws AndrolibException {
-        Config config = Config.getDefaultConfig();
-        Framework framework = new Framework(config);
-        return framework.getFrameworkDirectory();
     }
 
     public static String replaceNewlines(String value) {

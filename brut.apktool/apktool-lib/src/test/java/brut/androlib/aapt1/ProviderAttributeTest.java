@@ -16,59 +16,45 @@
  */
 package brut.androlib.aapt1;
 
-import brut.androlib.*;
+import brut.androlib.ApkBuilder;
+import brut.androlib.ApkDecoder;
+import brut.androlib.BaseTest;
+import brut.androlib.TestUtils;
 import brut.directory.ExtFile;
 import brut.common.BrutException;
-import brut.util.OS;
-import org.custommonkey.xmlunit.XMLUnit;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
 import org.xml.sax.SAXException;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 
+import org.junit.*;
+import static org.junit.Assert.*;
+
+import org.custommonkey.xmlunit.XMLUnit;
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
-import static org.junit.Assert.assertTrue;
 
 public class ProviderAttributeTest extends BaseTest {
+    private static final String TEST_APK = "issue636.apk";
 
     @BeforeClass
-    public static void beforeClass() throws BrutException {
-        TestUtils.cleanFrameworkFile();
-        sTmpDir = new ExtFile(OS.createTempDirectory());
-        TestUtils.copyResourceDir(ProviderAttributeTest.class, "aapt1/issue636/", sTmpDir);
-    }
-
-    @AfterClass
-    public static void afterClass() throws BrutException {
-        OS.rmdir(sTmpDir);
+    public static void beforeClass() throws Exception {
+        TestUtils.copyResourceDir(ProviderAttributeTest.class, "aapt1/issue636", sTmpDir);
     }
 
     @Test
     public void isProviderStringReplacementWorking() throws BrutException, IOException, SAXException {
-        String apk = "issue636.apk";
+        sConfig.setAaptVersion(1);
 
-        // decode issue636.apk
-        ApkDecoder apkDecoder = new ApkDecoder(new ExtFile(sTmpDir + File.separator + apk));
-        File outDir = new File(sTmpDir + File.separator + apk + ".out");
-        apkDecoder.decode(outDir);
+        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
+        ExtFile testDir = new ExtFile(testApk + ".out");
+        new ApkDecoder(testApk, sConfig).decode(testDir);
 
-        // build issue636
-        ExtFile testApk = new ExtFile(sTmpDir, apk + ".out");
-        Config config = Config.getDefaultConfig();
-        config.aaptVersion = 1;
-        new ApkBuilder(testApk, config).build(null);
-        String newApk = apk + ".out" + File.separator + "dist" + File.separator + apk;
-        assertTrue(fileExists(newApk));
+        new ApkBuilder(testDir, sConfig).build(null);
 
-        // decode issues636 again
-        apkDecoder = new ApkDecoder(new ExtFile(sTmpDir + File.separator + newApk));
-        outDir = new File(sTmpDir + File.separator + apk + ".out.two");
-        apkDecoder.decode(outDir);
+        ExtFile newApk = new ExtFile(testDir, "dist/" + testApk.getName());
+        ExtFile newDir = new ExtFile(testApk + ".out.new");
+        new ApkDecoder(newApk, sConfig).decode(newDir);
 
         String expected = TestUtils.replaceNewlines("<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"no\"?>\n" +
                 "<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\" android:compileSdkVersion=\"23\" android:compileSdkVersionCodename=\"6.0-2438415\" package=\"com.ibotpeaches.issue636\" platformBuildVersionCode=\"22\" platformBuildVersionName=\"5.1-1756733\">\n" +
@@ -78,8 +64,7 @@ public class ProviderAttributeTest extends BaseTest {
                 "    </application>\n" +
                 "</manifest>");
 
-
-        byte[] encoded = Files.readAllBytes(Paths.get(sTmpDir + File.separator + apk + ".out.two" + File.separator + "AndroidManifest.xml"));
+        byte[] encoded = Files.readAllBytes(new File(newDir, "AndroidManifest.xml").toPath());
         String obtained = TestUtils.replaceNewlines(new String(encoded));
 
         XMLUnit.setIgnoreWhitespace(true);
@@ -87,9 +72,5 @@ public class ProviderAttributeTest extends BaseTest {
         XMLUnit.setCompareUnmatched(false);
 
         assertXMLEqual(expected, obtained);
-    }
-
-    private boolean fileExists(String filepath) {
-        return Files.exists(Paths.get(sTmpDir.getAbsolutePath() + File.separator + filepath));
     }
 }
