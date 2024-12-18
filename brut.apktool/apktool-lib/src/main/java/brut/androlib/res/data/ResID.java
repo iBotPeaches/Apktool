@@ -57,7 +57,7 @@ public class ResID {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final ResID other = (ResID) obj;
+        ResID other = (ResID) obj;
         return id == other.id;
     }
 }

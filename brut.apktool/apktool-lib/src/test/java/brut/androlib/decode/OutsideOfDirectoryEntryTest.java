@@ -21,44 +21,27 @@ import brut.androlib.BaseTest;
 import brut.androlib.TestUtils;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
-import brut.util.OS;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 import java.io.File;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import org.junit.*;
+import static org.junit.Assert.*;
 
 public class OutsideOfDirectoryEntryTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        TestUtils.cleanFrameworkFile();
-        sTmpDir = new ExtFile(OS.createTempDirectory());
-        TestUtils.copyResourceDir(OutsideOfDirectoryEntryTest.class, "decode/issue1589/", sTmpDir);
+        TestUtils.copyResourceDir(OutsideOfDirectoryEntryTest.class, "decode/issue1589", sTmpDir);
 
-        String apk = "issue1589.apk";
-
-        // decode issue1589.apk
-        ApkDecoder apkDecoder = new ApkDecoder(new ExtFile(sTmpDir + File.separator + apk));
-        sTestNewDir = new ExtFile(sTmpDir + File.separator + apk + ".out");
-
-        File outDir = new File(sTmpDir + File.separator + apk + ".out");
-        apkDecoder.decode(outDir);
-    }
-
-    @AfterClass
-    public static void afterClass() throws BrutException {
-        OS.rmdir(sTmpDir);
+        ExtFile testApk = new ExtFile(sTmpDir, "issue1589.apk");
+        ExtFile testDir = new ExtFile(testApk + ".out");
+        new ApkDecoder(testApk, sConfig).decode(testDir);
+        sTestNewDir = testDir;
     }
 
     @Test
     public void skippedDecodingOfInvalidFileTest() {
         assertTrue(sTestNewDir.isDirectory());
-
-        File testAssetFolder = new File(sTestNewDir, "assets");
-        assertFalse(testAssetFolder.isDirectory());
+        assertFalse(new File(sTestNewDir, "assets").isDirectory());
     }
 }

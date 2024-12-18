@@ -44,7 +44,7 @@ public class SmaliDecoder {
 
     public DexFile decode(File outDir) throws AndrolibException {
         try {
-            final BaksmaliOptions options = new BaksmaliOptions();
+            BaksmaliOptions options = new BaksmaliOptions();
 
             // options
             options.deodex = false;

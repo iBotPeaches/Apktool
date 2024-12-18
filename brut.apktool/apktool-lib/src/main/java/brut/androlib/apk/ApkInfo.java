@@ -55,14 +55,12 @@ public class ApkInfo implements YamlSerializable {
     public List<String> doNotCompress = new ArrayList<>();
 
     public ApkInfo() {
-        this(null);
+        version = ApktoolProperties.getVersion();
     }
 
     public ApkInfo(ExtFile apkFile) {
-        version = ApktoolProperties.getVersion();
-        if (apkFile != null) {
-            setApkFile(apkFile);
-        }
+        this();
+        setApkFile(apkFile);
     }
 
     public ExtFile getApkFile() {

@@ -16,6 +16,7 @@
  */
 package brut.androlib.res.data.value;
 
+import brut.androlib.Config;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.data.ResResource;
 import brut.androlib.res.xml.ResValuesXmlSerializable;
@@ -31,22 +32,22 @@ public class ResArrayValue extends ResBagValue implements ResValuesXmlSerializab
 
     private final ResScalarValue[] mItems;
 
-    ResArrayValue(ResReferenceValue parent, Duo<Integer, ResScalarValue>[] items) {
-        super(parent);
+    ResArrayValue(ResReferenceValue parent, Duo<Integer, ResScalarValue>[] items, Config config) {
+        super(parent, config);
         mItems = new ResScalarValue[items.length];
         for (int i = 0; i < items.length; i++) {
             mItems[i] = items[i].m2;
         }
     }
 
-    public ResArrayValue(ResReferenceValue parent, ResScalarValue[] items) {
-        super(parent);
+    public ResArrayValue(ResReferenceValue parent, ResScalarValue[] items, Config config) {
+        super(parent, config);
         mItems = items;
     }
 
     @Override
     public void serializeToResValuesXml(XmlSerializer serializer, ResResource res)
-            throws IOException, AndrolibException {
+            throws AndrolibException, IOException {
         String type = getType();
         type = (type == null ? "" : type + "-") + "array";
         serializer.startTag(null, type);

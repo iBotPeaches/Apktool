@@ -36,12 +36,12 @@ public class ResFileDecoder {
     private static final Logger LOGGER = Logger.getLogger(ResFileDecoder.class.getName());
 
     private static final String[] RAW_IMAGE_EXTENSIONS = {
-        "m4a", // apple
-        "qmg", // samsung
+            "m4a", // apple
+            "qmg", // samsung
     };
     private static final String[] RAW_9PATCH_IMAGE_EXTENSIONS = {
-        "qmg", // samsung
-        "spi", // samsung
+            "qmg", // samsung
+            "spi", // samsung
     };
 
     private final ResStreamDecoderContainer mDecoders;
@@ -151,7 +151,7 @@ public class ResFileDecoder {
             LOGGER.log(Level.SEVERE, String.format(
                 "Could not decode file, replacing by FALSE value: %s",
             inFileName), ex);
-            res.replace(new ResBoolValue(false, 0, null));
+            res.replace(new ResBoolValue(false, 0, null, null));
         }
     }
 

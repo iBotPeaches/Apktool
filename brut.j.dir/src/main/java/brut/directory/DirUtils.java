@@ -95,8 +95,7 @@ public final class DirUtils {
                 outFileName = BrutIO.sanitizePath(out, outFileName);
                 if (!outFileName.isEmpty()) {
                     File outFile = new File(out, outFileName);
-                    //noinspection ResultOfMethodCallIgnored
-                    outFile.getParentFile().mkdirs();
+                    OS.mkdir(outFile.getParentFile());
                     BrutIO.copyAndClose(in.getFileInput(inFileName), Files.newOutputStream(outFile.toPath()));
                 }
             } else {

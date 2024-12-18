@@ -17,9 +17,13 @@
 package brut.androlib;
 
 import brut.androlib.exceptions.AndrolibException;
+import brut.common.BrutException;
+import brut.util.AaptManager;
 import brut.util.OSDetection;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.logging.Logger;
 
 public final class Config {
@@ -42,118 +46,322 @@ public final class Config {
     public static final short DECODE_RES_RESOLVE_DUMMY = 0x0001;
     public static final short DECODE_RES_RESOLVE_RETAIN = 0x0002;
 
-    private static Config sInstance;
+    private static final String DEFAULT_FRAMEWORK_DIRECTORY;
 
-    // Build options
-    public boolean forceBuildAll = false;
-    public boolean forceDeleteFramework = false;
-    public boolean debugMode = false;
-    public boolean netSecConf = false;
-    public boolean verbose = false;
-    public boolean copyOriginalFiles = false;
-    public boolean updateFiles = false;
-    public boolean noCrunch = false;
-    public boolean noApk = false;
-
-    // Decode options
-    public short decodeSources = DECODE_SOURCES_SMALI;
-    public short decodeResources = DECODE_RESOURCES_FULL;
-    public short forceDecodeManifest = FORCE_DECODE_MANIFEST_NONE;
-    public short decodeAssets = DECODE_ASSETS_FULL;
-    public short decodeResolveMode = DECODE_RES_RESOLVE_REMOVE;
-    public int apiLevel = 0;
-    public boolean analysisMode = false;
-    public boolean forceDelete = false;
-    public boolean keepBrokenResources = false;
-    public boolean baksmaliDebugMode = true;
-
-    // Common options
-    public int jobs = Math.min(Runtime.getRuntime().availableProcessors(), 8);
-    public String frameworkDirectory = null;
-    public String frameworkTag = null;
-    public File aaptBinary = null;
-    public int aaptVersion = 2; // default to v2
-
-    // Utility functions
-    public boolean isDecodeResolveModeUsingDummies() {
-        return decodeResolveMode == DECODE_RES_RESOLVE_DUMMY;
-    }
-
-    public boolean isDecodeResolveModeRemoving() {
-        return decodeResolveMode == DECODE_RES_RESOLVE_REMOVE;
-    }
-
-    private Config() {
-        sInstance = this;
-    }
-
-    public static Config getInstance() {
-        if (sInstance == null) {
-            sInstance = new Config();
-        }
-        return sInstance;
-    }
-
-    private void setDefaultFrameworkDirectory() {
-        File parentPath = new File(System.getProperty("user.home"));
-        String path;
+    static {
+        File parent = new File(System.getProperty("user.home"));
+        Path path;
         if (OSDetection.isMacOSX()) {
-            path = parentPath.getAbsolutePath() + String.format("%1$sLibrary%1$sapktool%1$sframework", File.separatorChar);
+            path = Paths.get(parent.getAbsolutePath(), "Library", "apktool", "framework");
         } else if (OSDetection.isWindows()) {
-            path = parentPath.getAbsolutePath() + String.format("%1$sAppData%1$sLocal%1$sapktool%1$sframework", File.separatorChar);
+            path = Paths.get(parent.getAbsolutePath(), "AppData", "Local", "apktool", "framework");
         } else {
             String xdgDataFolder = System.getenv("XDG_DATA_HOME");
             if (xdgDataFolder != null) {
-                path = xdgDataFolder + String.format("%1$sapktool%1$sframework", File.separatorChar);
+                path = Paths.get(xdgDataFolder, "apktool", "framework");
             } else {
-                path = parentPath.getAbsolutePath() + String.format("%1$s.local%1$sshare%1$sapktool%1$sframework", File.separatorChar);
+                path = Paths.get(parent.getAbsolutePath(), ".local", "share", "apktool", "framework");
             }
         }
-        frameworkDirectory = path;
+        DEFAULT_FRAMEWORK_DIRECTORY = path.toString();
     }
 
-    public void setDecodeSources(short mode) throws AndrolibException {
-        if (mode != DECODE_SOURCES_NONE && mode != DECODE_SOURCES_SMALI && mode != DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES) {
-            throw new AndrolibException("Invalid decode sources mode: " + mode);
-        }
-        if (decodeSources == DECODE_SOURCES_NONE && mode == DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES) {
-            LOGGER.info("--only-main-classes cannot be paired with -s/--no-src. Ignoring.");
-            return;
-        }
-        decodeSources = mode;
+    // Build options
+    private boolean mForceBuildAll;
+    private boolean mForceDeleteFramework;
+    private boolean mDebugMode;
+    private boolean mNetSecConf;
+    private boolean mVerbose;
+    private boolean mCopyOriginalFiles;
+    private boolean mUpdateFiles;
+    private boolean mNoCrunch;
+    private boolean mNoApk;
+
+    // Decode options
+    private short mDecodeSources;
+    private short mDecodeResources;
+    private short mForceDecodeManifest;
+    private short mDecodeAssets;
+    private short mDecodeResolveMode;
+    private int mApiLevel;
+    private boolean mAnalysisMode;
+    private boolean mForceDelete;
+    private boolean mKeepBrokenResources;
+    private boolean mBaksmaliDebugMode;
+
+    // Common options
+    private int mJobs;
+    private String mFrameworkDirectory;
+    private String mFrameworkTag;
+    private File mAaptBinary;
+    private int mAaptVersion;
+
+    public Config() {
+        mForceBuildAll = false;
+        mForceDeleteFramework = false;
+        mDebugMode = false;
+        mNetSecConf = false;
+        mVerbose = false;
+        mCopyOriginalFiles = false;
+        mUpdateFiles = false;
+        mNoCrunch = false;
+        mNoApk = false;
+
+        mDecodeSources = DECODE_SOURCES_SMALI;
+        mDecodeResources = DECODE_RESOURCES_FULL;
+        mForceDecodeManifest = FORCE_DECODE_MANIFEST_NONE;
+        mDecodeAssets = DECODE_ASSETS_FULL;
+        mDecodeResolveMode = DECODE_RES_RESOLVE_REMOVE;
+        mApiLevel = 0;
+        mAnalysisMode = false;
+        mForceDelete = false;
+        mKeepBrokenResources = false;
+        mBaksmaliDebugMode = true;
+
+        mJobs = Math.min(Runtime.getRuntime().availableProcessors(), 8);
+        mFrameworkDirectory = DEFAULT_FRAMEWORK_DIRECTORY;
+        mFrameworkTag = null;
+        mAaptBinary = null;
+        mAaptVersion = 2;
     }
 
-    public void setDecodeResolveMode(short mode) throws AndrolibException {
-        if (mode != DECODE_RES_RESOLVE_REMOVE && mode != DECODE_RES_RESOLVE_DUMMY && mode != DECODE_RES_RESOLVE_RETAIN) {
-            throw new AndrolibException("Invalid decode resources mode");
-        }
-        decodeResolveMode = mode;
+    // Build options
+
+    public boolean isForceBuildAll() {
+        return mForceBuildAll;
     }
 
-    public void setDecodeResources(short mode) throws AndrolibException {
-        if (mode != DECODE_RESOURCES_NONE && mode != DECODE_RESOURCES_FULL) {
-            throw new AndrolibException("Invalid decode resources mode");
-        }
-        decodeResources = mode;
+    public void setForceBuildAll(boolean forceBuildAll) {
+        mForceBuildAll = forceBuildAll;
     }
 
-    public void setForceDecodeManifest(short mode) throws AndrolibException {
-        if (mode != FORCE_DECODE_MANIFEST_NONE && mode != FORCE_DECODE_MANIFEST_FULL) {
-            throw new AndrolibException("Invalid force decode manifest mode");
-        }
-        forceDecodeManifest = mode;
+    public boolean isForceDeleteFramework() {
+        return mForceDeleteFramework;
     }
 
-    public void setDecodeAssets(short mode) throws AndrolibException {
-        if (mode != DECODE_ASSETS_NONE && mode != DECODE_ASSETS_FULL) {
-            throw new AndrolibException("Invalid decode asset mode");
-        }
-        decodeAssets = mode;
+    public void setForceDeleteFramework(boolean forceDeleteFramework) {
+        mForceDeleteFramework = forceDeleteFramework;
     }
 
-    public static Config getDefaultConfig() {
-        Config config = new Config();
-        config.setDefaultFrameworkDirectory();
-        return config;
+    public boolean isDebugMode() {
+        return mDebugMode;
+    }
+
+    public void setDebugMode(boolean debugMode) {
+        mDebugMode = debugMode;
+    }
+
+    public boolean isNetSecConf() {
+        return mNetSecConf;
+    }
+
+    public void setNetSecConf(boolean netSecConf) {
+        mNetSecConf = netSecConf;
+    }
+
+    public boolean isVerbose() {
+        return mVerbose;
+    }
+
+    public void setVerbose(boolean verbose) {
+        mVerbose = verbose;
+    }
+
+    public boolean isCopyOriginalFiles() {
+        return mCopyOriginalFiles;
+    }
+
+    public void setCopyOriginalFiles(boolean copyOriginalFiles) {
+        mCopyOriginalFiles = copyOriginalFiles;
+    }
+
+    public boolean isUpdateFiles() {
+        return mUpdateFiles;
+    }
+
+    public void setUpdateFiles(boolean updateFiles) {
+        mUpdateFiles = updateFiles;
+    }
+
+    public boolean isNoCrunch() {
+        return mNoCrunch;
+    }
+
+    public void setNoCrunch(boolean noCrunch) {
+        mNoCrunch = noCrunch;
+    }
+
+    public boolean isNoApk() {
+        return mNoApk;
+    }
+
+    public void setNoApk(boolean noApk) {
+        mNoApk = noApk;
+    }
+
+    // Decode options
+
+    public short getDecodeSources() {
+        return mDecodeSources;
+    }
+
+    public void setDecodeSources(short decodeSources) throws AndrolibException {
+        switch (decodeSources) {
+            case DECODE_SOURCES_NONE:
+            case DECODE_SOURCES_SMALI:
+            case DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES:
+                mDecodeSources = decodeSources;
+                break;
+            default:
+                throw new AndrolibException("Invalid decode sources mode: " + decodeSources);
+        }
+    }
+
+    public short getDecodeResources() {
+        return mDecodeResources;
+    }
+
+    public void setDecodeResources(short decodeResources) throws AndrolibException {
+        switch (decodeResources) {
+            case DECODE_RESOURCES_NONE:
+            case DECODE_RESOURCES_FULL:
+                mDecodeResources = decodeResources;
+                break;
+            default:
+                throw new AndrolibException("Invalid decode resources mode: " + decodeResources);
+        }
+    }
+
+    public short getForceDecodeManifest() {
+        return mForceDecodeManifest;
+    }
+
+    public void setForceDecodeManifest(short forceDecodeManifest) throws AndrolibException {
+        switch (forceDecodeManifest) {
+            case FORCE_DECODE_MANIFEST_NONE:
+            case FORCE_DECODE_MANIFEST_FULL:
+                mForceDecodeManifest = forceDecodeManifest;
+                break;
+            default:
+                throw new AndrolibException("Invalid force decode manifest mode: " + forceDecodeManifest);
+        }
+    }
+
+    public short getDecodeAssets() {
+        return mDecodeAssets;
+    }
+
+    public void setDecodeAssets(short decodeAssets) throws AndrolibException {
+        switch (decodeAssets) {
+            case DECODE_ASSETS_NONE:
+            case DECODE_ASSETS_FULL:
+                mDecodeAssets = decodeAssets;
+                break;
+            default:
+                throw new AndrolibException("Invalid decode asset mode: " + decodeAssets);
+        }
+    }
+
+    public short getDecodeResolveMode() {
+        return mDecodeResolveMode;
+    }
+
+    public void setDecodeResolveMode(short decodeResolveMode) throws AndrolibException {
+        switch (decodeResolveMode) {
+            case DECODE_RES_RESOLVE_REMOVE:
+            case DECODE_RES_RESOLVE_DUMMY:
+            case DECODE_RES_RESOLVE_RETAIN:
+                mDecodeResolveMode = decodeResolveMode;
+                break;
+            default:
+                throw new AndrolibException("Invalid decode resolve mode: " + decodeResolveMode);
+        }
+    }
+
+    public int getApiLevel() {
+        return mApiLevel;
+    }
+
+    public void setApiLevel(int apiLevel) {
+        mApiLevel = apiLevel;
+    }
+
+    public boolean isAnalysisMode() {
+        return mAnalysisMode;
+    }
+
+    public void setAnalysisMode(boolean analysisMode) {
+        mAnalysisMode = analysisMode;
+    }
+
+    public boolean isForceDelete() {
+        return mForceDelete;
+    }
+
+    public void setForceDelete(boolean forceDelete) {
+        mForceDelete = forceDelete;
+    }
+
+    public boolean isKeepBrokenResources() {
+        return mKeepBrokenResources;
+    }
+
+    public void setKeepBrokenResources(boolean keepBrokenResources) {
+        mKeepBrokenResources = keepBrokenResources;
+    }
+
+    public boolean isBaksmaliDebugMode() {
+        return mBaksmaliDebugMode;
+    }
+
+    public void setBaksmaliDebugMode(boolean baksmaliDebugMode) {
+        mBaksmaliDebugMode = baksmaliDebugMode;
+    }
+
+    // Common options
+
+    public int getJobs() {
+        return mJobs;
+    }
+
+    public void setJobs(int jobs) {
+        mJobs = jobs;
+    }
+
+    public String getFrameworkDirectory() {
+        return mFrameworkDirectory;
+    }
+
+    public void setFrameworkDirectory(String frameworkDirectory) {
+        mFrameworkDirectory = frameworkDirectory;
+    }
+
+    public String getFrameworkTag() {
+        return mFrameworkTag;
+    }
+
+    public void setFrameworkTag(String frameworkTag) {
+        mFrameworkTag = frameworkTag;
+    }
+
+    public File getAaptBinary() {
+        return mAaptBinary;
+    }
+
+    public void setAaptBinary(File aaptBinary) throws AndrolibException {
+        try {
+            mAaptBinary = aaptBinary;
+            mAaptVersion = AaptManager.getAaptVersion(aaptBinary);
+        } catch (BrutException ex) {
+            throw new AndrolibException(ex);
+        }
+    }
+
+    public int getAaptVersion() {
+        return mAaptVersion;
+    }
+
+    public void setAaptVersion(int aaptVersion) {
+        mAaptVersion = aaptVersion;
     }
 }

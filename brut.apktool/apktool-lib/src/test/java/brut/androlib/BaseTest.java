@@ -16,60 +16,91 @@
  */
 package brut.androlib;
 
-import brut.androlib.apk.ApkInfo;
+import brut.androlib.Config;
+import brut.androlib.res.Framework;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
-import brut.directory.FileDirectory;
-import org.custommonkey.xmlunit.*;
+import brut.util.OS;
+import brut.xml.XmlUtils;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.*;
-import java.nio.file.Files;
-import java.util.Map;
-import java.util.Set;
+import javax.xml.xpath.XPathExpressionException;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
 import java.util.logging.Logger;
 
-import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
+import org.junit.*;
 import static org.junit.Assert.*;
+
+import org.custommonkey.xmlunit.*;
+import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 
 public class BaseTest {
     protected static final Logger LOGGER = Logger.getLogger(BaseTest.class.getName());
 
-    private static final String ACCESS_EXTERNAL_DTD = "http://javax.xml.XMLConstants/property/accessExternalDTD";
-    private static final String ACCESS_EXTERNAL_SCHEMA = "http://javax.xml.XMLConstants/property/accessExternalSchema";
-    private static final String FEATURE_LOAD_DTD = "http://apache.org/xml/features/nonvalidating/load-external-dtd";
-    private static final String FEATURE_DISABLE_DOCTYPE_DECL = "http://apache.org/xml/features/disallow-doctype-decl";
-
-    protected static ExtFile sTmpDir;
+    protected static Config sConfig;
+    protected static File sTmpDir;
     protected static ExtFile sTestOrigDir;
     protected static ExtFile sTestNewDir;
 
-    protected void compareBinaryFolder(String path, boolean res) throws BrutException, IOException {
-        boolean exists = true;
+    private static void cleanFrameworkFile() throws BrutException {
+        File apkFile = new File(new Framework(sConfig).getDirectory(), "1.apk");
+        if (apkFile.isFile()) {
+            OS.rmfile(apkFile.getAbsolutePath());
+        }
+    }
 
-        String prefixPath = "";
-        if (res) {
-            prefixPath = File.separatorChar + "res" + File.separatorChar;
+    @BeforeClass
+    public static void beforeEachClass() throws Exception {
+        sConfig = new Config();
+        cleanFrameworkFile();
+
+        sTmpDir = OS.createTempDirectory();
+    }
+
+    @AfterClass
+    public static void afterEachClass() throws Exception {
+        if (sTestOrigDir != null) {
+            sTestOrigDir.close();
+            sTestOrigDir = null;
         }
 
-        String location = prefixPath + path;
+        if (sTestNewDir != null) {
+            sTestNewDir.close();
+            sTestNewDir = null;
+        }
 
-        FileDirectory fileDirectory = new FileDirectory(sTestOrigDir, location);
+        OS.rmdir(sTmpDir);
+        sTmpDir = null;
 
-        Set<String> files = fileDirectory.getFiles(true);
-        for (String fileName : files) {
+        cleanFrameworkFile();
+        sConfig = null;
+    }
 
-            File control = new File((sTestOrigDir + location), fileName);
-            File test =  new File((sTestNewDir + location), fileName);
+    @Before
+    public void beforeEachTest() throws Exception {
+        sConfig = new Config();
+    }
 
-            if (! test.isFile() || ! control.isFile()) {
+    protected void compareBinaryFolder(String path) throws BrutException {
+        compareBinaryFolder(sTestOrigDir, sTestNewDir, path);
+    }
+
+    protected void compareBinaryFolder(File controlDir, File testDir, String path) throws BrutException {
+        ExtFile controlBase = new ExtFile(controlDir, path);
+        File testBase = new File(testDir, path);
+
+        boolean exists = true;
+
+        for (String fileName : controlBase.getDirectory().getFiles(true)) {
+            File control = new File(controlBase, fileName);
+            File test = new File(testBase, fileName);
+
+            if (!control.isFile() || !test.isFile()) {
                 exists = false;
             }
         }
@@ -77,45 +108,27 @@ public class BaseTest {
         assertTrue(exists);
     }
 
-    protected void compareResFolder(String path) throws BrutException, IOException {
-        compareBinaryFolder(path, true);
-    }
-
-    protected void compareLibsFolder(String path) throws BrutException, IOException {
-        compareBinaryFolder(File.separatorChar + path, false);
-    }
-
-    protected void compareAssetsFolder(String path) throws BrutException, IOException {
-        compareBinaryFolder(File.separatorChar + "assets" + File.separatorChar + path, false);
-    }
-
-    protected void compareUnknownFiles() throws BrutException, IOException {
-        compareBinaryFolder(File.separatorChar + "unknown", false);
-    }
-
     protected void compareValuesFiles(String path) throws BrutException {
-        compareXmlFiles("res/" + path, new ElementNameAndAttributeQualifier("name"));
+        compareValuesFiles(sTestOrigDir, sTestNewDir, path);
+    }
+
+    protected void compareValuesFiles(File controlDir, File testDir, String path) throws BrutException {
+        compareXmlFiles(controlDir, testDir, "res/" + path, new ElementNameAndAttributeQualifier("name"));
     }
 
     protected void compareXmlFiles(String path) throws BrutException {
-        compareXmlFiles(path, null);
+        compareXmlFiles(sTestOrigDir, sTestNewDir, path);
     }
 
-    protected  void checkFolderExists(String path) {
-        File f =  new File(sTestNewDir, path);
-
-        assertTrue(f.isDirectory());
+    protected void compareXmlFiles(File controlDir, File testDir, String path) throws BrutException {
+        compareXmlFiles(controlDir, testDir, path, null);
     }
 
-    protected boolean isTransparent(int pixel) {
-        return pixel >> 24 == 0x00;
-    }
-
-    private void compareXmlFiles(String path, ElementQualifier qualifier) throws BrutException {
-        DetailedDiff diff;
+    private void compareXmlFiles(File controlDir, File testDir, String path, ElementQualifier qualifier)
+            throws BrutException {
         try {
-            Reader control = new FileReader(new File(sTestOrigDir, path));
-            Reader test = new FileReader(new File(sTestNewDir, path));
+            Reader control = new FileReader(new File(controlDir, path));
+            Reader test = new FileReader(new File(testDir, path));
 
             XMLUnit.setEnableXXEProtection(true);
 
@@ -123,63 +136,34 @@ public class BaseTest {
                 XMLUnit.setIgnoreWhitespace(true);
                 XMLUnit.setIgnoreAttributeOrder(true);
                 XMLUnit.setCompareUnmatched(false);
+
                 assertXMLEqual(control, test);
                 return;
             }
 
-            diff = new DetailedDiff(new Diff(control, test));
-        } catch (SAXException | IOException ex) {
+            DetailedDiff diff = new DetailedDiff(new Diff(control, test));
+            diff.overrideElementQualifier(qualifier);
+
+            assertTrue(path + ": " + diff.getAllDifferences().toString(), diff.similar());
+        } catch (IOException | SAXException ex) {
             throw new BrutException(ex);
         }
-
-        diff.overrideElementQualifier(qualifier);
-        assertTrue(path + ": " + diff.getAllDifferences().toString(), diff.similar());
     }
 
-    protected static Document loadDocument(File file)
-            throws IOException, SAXException, ParserConfigurationException {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setFeature(FEATURE_DISABLE_DOCTYPE_DECL, true);
-        factory.setFeature(FEATURE_LOAD_DTD, false);
-
+    protected static Document loadDocument(File file) throws BrutException {
         try {
-            factory.setAttribute(ACCESS_EXTERNAL_DTD, " ");
-            factory.setAttribute(ACCESS_EXTERNAL_SCHEMA, " ");
-        } catch (IllegalArgumentException ex) {
-            LOGGER.warning("JAXP 1.5 Support is required to validate XML");
-        }
-
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        // Not using the parse(File) method on purpose, so that we can control when
-        // to close it. Somehow parse(File) does not seem to close the file in all cases.
-        try (InputStream in = Files.newInputStream(file.toPath())) {
-            return builder.parse(in);
+            return XmlUtils.loadDocument(file);
+        } catch (IOException | SAXException | ParserConfigurationException ex) {
+            throw new BrutException(ex);
         }
     }
 
-    protected static int getStringEntryCount(Document doc, String key) {
-        int count = 0;
-        Element resources = doc.getDocumentElement();
-        for (int i = 0; i < resources.getChildNodes().getLength(); i++) {
-            if (resources.getChildNodes().item(i).getNodeName().equals(key)) {
-                count++;
-            }
+    protected static <T> T evaluateXPath(Document doc, String expression, Class<T> returnType)
+            throws BrutException {
+        try {
+            return XmlUtils.evaluateXPath(doc, expression, returnType);
+        } catch (XPathExpressionException ex) {
+            throw new BrutException(ex);
         }
-        return count;
-    }
-
-    protected static boolean resourceNameContains(Element element, String name) {
-        if (element.hasAttribute("name") && element.getAttribute("name").contains(name)) {
-            return true;
-        }
-        NodeList children = element.getChildNodes();
-        for (int i = 0; i < children.getLength(); i++) {
-            Node child = children.item(i);
-            if (child.getNodeType() == Node.ELEMENT_NODE
-                    && resourceNameContains((Element) child, name)) {
-                return true;
-            }
-        }
-        return false;
     }
 }

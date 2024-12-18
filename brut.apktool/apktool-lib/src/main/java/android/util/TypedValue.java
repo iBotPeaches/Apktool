@@ -217,8 +217,9 @@ public class TypedValue {
 
     private static final float MANTISSA_MULT = 1.0f / (1 << TypedValue.COMPLEX_MANTISSA_SHIFT);
     private static final float[] RADIX_MULTS = {
-        MANTISSA_MULT, 1.0f / (1 << 7) * MANTISSA_MULT,
-            1.0f / (1 << 15) * MANTISSA_MULT, 1.0f / (1 << 23) * MANTISSA_MULT };
+            MANTISSA_MULT, 1.0f / (1 << 7) * MANTISSA_MULT,
+            1.0f / (1 << 15) * MANTISSA_MULT, 1.0f / (1 << 23) * MANTISSA_MULT
+    };
 
     /**
      * Retrieve the base value from a complex data integer. This uses the

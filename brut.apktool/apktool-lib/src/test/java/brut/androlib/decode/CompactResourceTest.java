@@ -16,52 +16,41 @@
  */
 package brut.androlib.decode;
 
-import brut.androlib.*;
-import brut.directory.ExtFile;
+import brut.androlib.ApkBuilder;
+import brut.androlib.ApkDecoder;
+import brut.androlib.BaseTest;
+import brut.androlib.TestUtils;
 import brut.common.BrutException;
-import brut.util.OS;
+import brut.directory.ExtFile;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+
 import java.io.File;
-import java.io.IOException;
 
 import org.junit.*;
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.ParserConfigurationException;
-
 import static org.junit.Assert.*;
 
 public class CompactResourceTest extends BaseTest {
+    private static final String TEST_APK = "issue3366.apk";
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        TestUtils.cleanFrameworkFile();
-        sTmpDir = new ExtFile(OS.createTempDirectory());
-        TestUtils.copyResourceDir(CompactResourceTest.class, "decode/issue3366/", sTmpDir);
-    }
-
-    @AfterClass
-    public static void afterClass() throws BrutException {
-        OS.rmdir(sTmpDir);
+        TestUtils.copyResourceDir(CompactResourceTest.class, "decode/issue3366", sTmpDir);
     }
 
     @Test
-    public void checkIfDecodeSucceeds() throws BrutException, IOException, ParserConfigurationException, SAXException {
-        String apk = "issue3366.apk";
-        ExtFile testApk = new ExtFile(sTmpDir, apk);
+    public void checkIfDecodeSucceeds() throws BrutException {
+        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
+        ExtFile testDir = new ExtFile(testApk + ".out");
+        new ApkDecoder(testApk, sConfig).decode(testDir);
 
-        // decode issue3366.apk
-        ApkDecoder apkDecoder = new ApkDecoder(testApk);
-        sTestOrigDir = new ExtFile(sTmpDir + File.separator + apk + ".out");
+        // verify string entry count
+        Document doc = loadDocument(new File(testDir, "res/values/strings.xml"));
+        String expression = "/resources/string[@name]";
+        NodeList nodes = evaluateXPath(doc, expression, NodeList.class);
 
-        File outDir = new File(sTmpDir + File.separator + apk + ".out");
-        apkDecoder.decode(outDir);
+        assertEquals(1002, nodes.getLength());
 
-        Document doc = loadDocument(new File(sTestOrigDir + "/res/values/strings.xml"));
-        assertEquals(1002, getStringEntryCount(doc, "string"));
-
-        Config config = Config.getDefaultConfig();
-        LOGGER.info("Building duplicatedex.apk...");
-        new ApkBuilder(sTestOrigDir, config).build(testApk);
+        new ApkBuilder(testDir, sConfig).build(null);
     }
 }

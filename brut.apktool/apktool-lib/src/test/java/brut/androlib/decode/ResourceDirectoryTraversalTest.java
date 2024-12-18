@@ -18,45 +18,31 @@ package brut.androlib.decode;
 
 import brut.androlib.ApkDecoder;
 import brut.androlib.BaseTest;
-import brut.androlib.Config;
 import brut.androlib.TestUtils;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
-import brut.util.OS;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 import java.io.File;
-import java.io.IOException;
 
-import static org.junit.Assert.assertTrue;
+import org.junit.*;
+import static org.junit.Assert.*;
 
 public class ResourceDirectoryTraversalTest extends BaseTest {
+    private static final String TEST_APK = "GHSA-2hqv-2xv4-5h5w.apk";
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        TestUtils.cleanFrameworkFile();
-        sTmpDir = new ExtFile(OS.createTempDirectory());
-        TestUtils.copyResourceDir(ResourceDirectoryTraversalTest.class, "decode/arbitrary-write/", sTmpDir);
-    }
-
-    @AfterClass
-    public static void afterClass() throws BrutException {
-        OS.rmdir(sTmpDir);
+        TestUtils.copyResourceDir(ResourceDirectoryTraversalTest.class, "decode/arbitrary-write", sTmpDir);
     }
 
     @Test
-    public void checkIfMaliciousRawFileIsDisassembledProperly() throws BrutException, IOException {
-        String apk = "GHSA-2hqv-2xv4-5h5w.apk";
+    public void checkIfMaliciousRawFileIsDisassembledProperly() throws BrutException {
+        sConfig.setForceDelete(true);
 
-        Config config = Config.getDefaultConfig();
-        config.forceDelete = true;
-        ApkDecoder apkDecoder = new ApkDecoder(new ExtFile(sTmpDir + File.separator + apk), config);
-        File outDir = new File(sTmpDir + File.separator + apk + ".out");
-        apkDecoder.decode(outDir);
+        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
+        ExtFile testDir = new ExtFile(testApk + ".out");
+        new ApkDecoder(testApk, sConfig).decode(testDir);
 
-        File pocTestFile =  new File(outDir,"res/raw/poc");
-        assertTrue(pocTestFile.exists());
+        assertTrue(new File(testDir, "res/raw/poc").exists());
     }
 }

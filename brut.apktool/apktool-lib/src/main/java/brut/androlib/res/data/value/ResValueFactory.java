@@ -17,6 +17,7 @@
 package brut.androlib.res.data.value;
 
 import android.util.TypedValue;
+import brut.androlib.Config;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.data.ResPackage;
 import brut.androlib.res.data.ResTypeSpec;
@@ -24,42 +25,44 @@ import brut.util.Duo;
 
 public class ResValueFactory {
     private final ResPackage mPackage;
+    private final Config mConfig;
 
     public ResValueFactory(ResPackage pkg) {
         mPackage = pkg;
+        mConfig = pkg.getConfig();
     }
 
     public ResScalarValue factory(int type, int value, String rawValue) throws AndrolibException {
         switch (type) {
             case TypedValue.TYPE_NULL:
                 if (value == TypedValue.DATA_NULL_EMPTY) {
-                    return new ResEmptyValue(value, rawValue, type);
+                    return new ResEmptyValue(value, rawValue, type, mConfig);
                 }
-                return new ResReferenceValue(mPackage, 0, null);
+                return new ResReferenceValue(mPackage, 0, null, mConfig);
             case TypedValue.TYPE_REFERENCE:
                 return newReference(value, null);
             case TypedValue.TYPE_ATTRIBUTE:
             case TypedValue.TYPE_DYNAMIC_ATTRIBUTE:
                 return newReference(value, rawValue, true);
             case TypedValue.TYPE_STRING:
-                return new ResStringValue(rawValue, value);
+                return new ResStringValue(rawValue, value, mConfig);
             case TypedValue.TYPE_FLOAT:
-                return new ResFloatValue(Float.intBitsToFloat(value), value, rawValue);
+                return new ResFloatValue(Float.intBitsToFloat(value), value, rawValue, mConfig);
             case TypedValue.TYPE_DIMENSION:
-                return new ResDimenValue(value, rawValue);
+                return new ResDimenValue(value, rawValue, mConfig);
             case TypedValue.TYPE_FRACTION:
-                return new ResFractionValue(value, rawValue);
+                return new ResFractionValue(value, rawValue, mConfig);
             case TypedValue.TYPE_INT_BOOLEAN:
-                return new ResBoolValue(value != 0, value, rawValue);
+                return new ResBoolValue(value != 0, value, rawValue, mConfig);
             case TypedValue.TYPE_DYNAMIC_REFERENCE:
                 return newReference(value, rawValue);
         }
 
         if (type >= TypedValue.TYPE_FIRST_COLOR_INT && type <= TypedValue.TYPE_LAST_COLOR_INT) {
-            return new ResColorValue(value, rawValue);
+            return new ResColorValue(value, rawValue, mConfig);
         }
         if (type >= TypedValue.TYPE_FIRST_INT && type <= TypedValue.TYPE_LAST_INT) {
-            return new ResIntValue(value, rawValue, type);
+            return new ResIntValue(value, rawValue, type, mConfig);
         }
 
         throw new AndrolibException("Invalid value type: " + type);
@@ -67,15 +70,15 @@ public class ResValueFactory {
 
     public ResIntBasedValue factory(String value, int rawValue) {
         if (value == null) {
-            return new ResFileValue("", rawValue);
+            return new ResFileValue("", rawValue, mConfig);
         }
         if (value.startsWith("res/")) {
-            return new ResFileValue(value, rawValue);
+            return new ResFileValue(value, rawValue, mConfig);
         }
         if (value.startsWith("r/") || value.startsWith("R/")) { //AndroResGuard
-            return new ResFileValue(value, rawValue);
+            return new ResFileValue(value, rawValue, mConfig);
         }
-        return new ResStringValue(value, rawValue);
+        return new ResStringValue(value, rawValue, mConfig);
     }
 
     public ResBagValue bagFactory(int parent, Duo<Integer, ResScalarValue>[] items, ResTypeSpec resTypeSpec)
@@ -83,7 +86,7 @@ public class ResValueFactory {
         ResReferenceValue parentVal = newReference(parent, null);
 
         if (items.length == 0) {
-            return new ResBagValue(parentVal);
+            return new ResBagValue(parentVal, mConfig);
         }
         String resTypeName = resTypeSpec.getName();
 
@@ -92,12 +95,12 @@ public class ResValueFactory {
             case ResTypeSpec.RES_TYPE_NAME_ATTR_PRIVATE:
                 return ResAttr.factory(parentVal, items, this, mPackage);
             case ResTypeSpec.RES_TYPE_NAME_ARRAY:
-                return new ResArrayValue(parentVal, items);
+                return new ResArrayValue(parentVal, items, mConfig);
             case ResTypeSpec.RES_TYPE_NAME_PLURALS:
-                return new ResPluralsValue(parentVal, items);
+                return new ResPluralsValue(parentVal, items, mConfig);
             default:
                 if (resTypeName.startsWith(ResTypeSpec.RES_TYPE_NAME_STYLES)) {
-                    return new ResStyleValue(parentVal, items, this);
+                    return new ResStyleValue(parentVal, items, this, mConfig);
                 }
                 throw new AndrolibException("unsupported res type name for bags. Found: " + resTypeName);
         }
@@ -108,6 +111,6 @@ public class ResValueFactory {
     }
 
     public ResReferenceValue newReference(int resID, String rawValue, boolean theme) {
-        return new ResReferenceValue(mPackage, resID, rawValue, theme);
+        return new ResReferenceValue(mPackage, resID, rawValue, theme, mConfig);
     }
 }

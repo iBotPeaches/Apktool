@@ -25,15 +25,15 @@ public final class OSDetection {
     }
 
     public static boolean isWindows() {
-        return (OS.contains("win"));
+        return OS.contains("win");
     }
 
     public static boolean isMacOSX() {
-        return (OS.contains("mac"));
+        return OS.contains("mac");
     }
 
     public static boolean isUnix() {
-        return (OS.contains("nix") || OS.contains("nux") || OS.contains("aix") || (OS.contains("sunos")));
+        return OS.contains("nix") || OS.contains("nux") || OS.contains("aix") || OS.contains("sunos");
     }
 
     public static boolean is64Bit() {

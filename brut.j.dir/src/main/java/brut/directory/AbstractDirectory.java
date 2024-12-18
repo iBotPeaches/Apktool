@@ -102,7 +102,7 @@ public abstract class AbstractDirectory implements Directory {
         if (subpath.dir != null) {
             return subpath.dir.getFileInput(subpath.path);
         }
-        if (! getFiles().contains(subpath.path)) {
+        if (!getFiles().contains(subpath.path)) {
             throw new PathNotExist(path);
         }
         return getFileInputLocal(subpath.path);
@@ -131,7 +131,7 @@ public abstract class AbstractDirectory implements Directory {
         if (subpath.dir != null) {
             return subpath.dir.getDir(subpath.path);
         }
-        if (! getAbstractDirs().containsKey(subpath.path)) {
+        if (!getAbstractDirs().containsKey(subpath.path)) {
             throw new PathNotExist(path);
         }
         return getAbstractDirs().get(subpath.path);
@@ -171,7 +171,7 @@ public abstract class AbstractDirectory implements Directory {
         if (subpath.dir != null) {
             return subpath.dir.removeFile(subpath.path);
         }
-        if (! getFiles().contains(subpath.path)) {
+        if (!getFiles().contains(subpath.path)) {
             return false;
         }
         removeFileLocal(subpath.path);
@@ -237,7 +237,6 @@ public abstract class AbstractDirectory implements Directory {
 
 
     public void close() throws IOException {
-
     }
 
     private SubPath getSubPath(String path) throws PathNotExist {
@@ -245,7 +244,7 @@ public abstract class AbstractDirectory implements Directory {
         if (parsed.dir == null) {
             return new SubPath(null, parsed.subpath);
         }
-        if (! getAbstractDirs().containsKey(parsed.dir)) {
+        if (!getAbstractDirs().containsKey(parsed.dir)) {
             throw new PathNotExist(path);
         }
         return new SubPath(getAbstractDirs().get(parsed.dir), parsed.subpath);

@@ -20,7 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 
-public class ExtFile extends File {
+public class ExtFile extends File implements AutoCloseable {
     private Directory mDirectory;
 
     public ExtFile(File file) {
@@ -54,9 +54,11 @@ public class ExtFile extends File {
         return mDirectory;
     }
 
+    @Override
     public void close() throws IOException {
         if (mDirectory != null) {
             mDirectory.close();
+            mDirectory = null;
         }
     }
 

@@ -16,14 +16,15 @@
  */
 package brut.androlib.apk;
 
-import org.junit.Test;
+import brut.androlib.BaseTest;
 
+import org.junit.*;
 import static org.junit.Assert.*;
 
-public class YamlLineTest {
+public class YamlLineTest extends BaseTest {
 
     @Test
-    public void testEmptyLine()  {
+    public void testEmptyLine() {
         YamlLine line = new YamlLine("");
         assertEquals(0, line.indent);
         assertTrue(line.isEmpty);
@@ -34,7 +35,7 @@ public class YamlLineTest {
     }
 
     @Test
-    public void testComment()  {
+    public void testComment() {
         YamlLine line = new YamlLine("!ApkInfo.class");
         assertTrue(line.isComment);
 
@@ -52,7 +53,7 @@ public class YamlLineTest {
     }
 
     @Test
-    public void testKeyLine()  {
+    public void testKeyLine() {
         YamlLine line = new YamlLine("name:");
         assertFalse(line.isComment);
         assertEquals(0, line.indent);

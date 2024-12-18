@@ -42,16 +42,16 @@ public final class Jar {
         return file;
     }
 
-    public static File extractToTmp(Class<?> clz, String resourcePath) throws BrutException {
-        return extractToTmp(clz, resourcePath, "brut_util_Jar_");
+    public static File extractToTmp(Class<?> clz, String name) throws BrutException {
+        return extractToTmp(clz, name, "brut_util_Jar_");
     }
 
-    public static File extractToTmp(Class<?> clz, String resourcePath, String tmpPrefix) throws BrutException {
+    public static File extractToTmp(Class<?> clz, String name, String tmpPrefix) throws BrutException {
         InputStream in = null;
         try {
-            in = clz.getResourceAsStream(resourcePath);
+            in = clz.getResourceAsStream(name);
             if (in == null) {
-                throw new FileNotFoundException(resourcePath);
+                throw new FileNotFoundException(name);
             }
             long suffix = ThreadLocalRandom.current().nextLong();
             suffix = suffix > Long.MIN_VALUE ? Math.abs(suffix) : 0;
@@ -62,7 +62,7 @@ public final class Jar {
 
             return fileOut;
         } catch (IOException ex) {
-            throw new BrutException("Could not extract resource: " + resourcePath, ex);
+            throw new BrutException("Could not extract resource: " + name, ex);
         } finally {
             IOUtils.closeQuietly(in);
         }

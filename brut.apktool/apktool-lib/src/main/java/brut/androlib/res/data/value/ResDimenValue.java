@@ -17,12 +17,13 @@
 package brut.androlib.res.data.value;
 
 import android.util.TypedValue;
+import brut.androlib.Config;
 import brut.androlib.exceptions.AndrolibException;
 
 public class ResDimenValue extends ResIntValue {
 
-    public ResDimenValue(int value, String rawValue) {
-        super(value, rawValue, "dimen");
+    public ResDimenValue(int value, String rawValue, Config config) {
+        super(value, rawValue, "dimen", config);
     }
 
     @Override

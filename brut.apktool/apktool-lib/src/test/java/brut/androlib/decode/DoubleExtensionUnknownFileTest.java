@@ -22,45 +22,29 @@ import brut.androlib.TestUtils;
 import brut.androlib.apk.ApkInfo;
 import brut.directory.ExtFile;
 import brut.common.BrutException;
-import brut.util.OS;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
-import java.io.File;
-import java.io.IOException;
-
-import static org.junit.Assert.assertTrue;
+import org.junit.*;
+import static org.junit.Assert.*;
 
 public class DoubleExtensionUnknownFileTest extends BaseTest {
+    private static final String TEST_APK = "issue1244.apk";
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        TestUtils.cleanFrameworkFile();
-        sTmpDir = new ExtFile(OS.createTempDirectory());
-        TestUtils.copyResourceDir(DoubleExtensionUnknownFileTest.class, "decode/issue1244/", sTmpDir);
-    }
-
-    @AfterClass
-    public static void afterClass() throws BrutException {
-        OS.rmdir(sTmpDir);
+        TestUtils.copyResourceDir(DoubleExtensionUnknownFileTest.class, "decode/issue1244", sTmpDir);
     }
 
     @Test
-    public void multipleExtensionUnknownFileTest() throws BrutException, IOException {
-        String apk = "issue1244.apk";
+    public void multipleExtensionUnknownFileTest() throws BrutException {
+        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
+        ExtFile testDir = new ExtFile(testApk + ".out");
+        new ApkDecoder(testApk, sConfig).decode(testDir);
 
-        // decode issue1244.apk
-        ApkDecoder apkDecoder = new ApkDecoder(new ExtFile(sTmpDir + File.separator + apk));
-        ExtFile decodedApk = new ExtFile(sTmpDir + File.separator + apk + ".out");
-        File outDir = new File(sTmpDir + File.separator + apk + ".out");
-        apkDecoder.decode(outDir);
-
-        ApkInfo apkInfo = ApkInfo.load(decodedApk);
-        for (String string : apkInfo.doNotCompress) {
-            if (StringUtils.countMatches(string, ".") > 1) {
-                assertTrue(string.equals("assets/bin/Data/sharedassets1.assets.split0"));
+        ApkInfo testInfo = ApkInfo.load(testDir);
+        for (String path : testInfo.doNotCompress) {
+            if (StringUtils.countMatches(path, ".") > 1) {
+                assertTrue(path.equals("assets/bin/Data/sharedassets1.assets.split0"));
             }
         }
     }

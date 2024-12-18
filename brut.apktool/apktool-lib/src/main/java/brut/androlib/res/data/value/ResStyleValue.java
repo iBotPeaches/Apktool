@@ -16,6 +16,7 @@
  */
 package brut.androlib.res.data.value;
 
+import brut.androlib.Config;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.data.ResResSpec;
 import brut.androlib.res.data.ResResource;
@@ -33,18 +34,18 @@ public class ResStyleValue extends ResBagValue implements ResValuesXmlSerializab
 
     private final Duo<ResReferenceValue, ResScalarValue>[] mItems;
 
-    ResStyleValue(ResReferenceValue parent, Duo<Integer, ResScalarValue>[] items, ResValueFactory factory) {
-        super(parent);
+    ResStyleValue(ResReferenceValue parent, Duo<Integer, ResScalarValue>[] items,
+                 ResValueFactory factory, Config config) {
+        super(parent, config);
         mItems = new Duo[items.length];
         for (int i = 0; i < items.length; i++) {
-            mItems[i] = new Duo<>(
-                factory.newReference(items[i].m1, null), items[i].m2);
+            mItems[i] = new Duo<>(factory.newReference(items[i].m1, null), items[i].m2);
         }
     }
 
     @Override
     public void serializeToResValuesXml(XmlSerializer serializer,
-                                        ResResource res) throws IOException, AndrolibException {
+                                        ResResource res) throws AndrolibException, IOException {
         serializer.startTag(null, "style");
         serializer.attribute(null, "name", res.getResSpec().getName());
         if (!mParent.isNull() && !mParent.referentIsNull()) {
@@ -78,7 +79,7 @@ public class ResStyleValue extends ResBagValue implements ResValuesXmlSerializab
             }
 
             // #3400 - Skip duplicate values, commonly seen are duplicate key-pairs on styles.
-            if (!isAnalysisMode() && processedNames.contains(name)) {
+            if (!mConfig.isAnalysisMode() && processedNames.contains(name)) {
                 continue;
             }
 

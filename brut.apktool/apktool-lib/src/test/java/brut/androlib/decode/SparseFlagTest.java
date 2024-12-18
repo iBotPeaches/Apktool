@@ -16,69 +16,52 @@
  */
 package brut.androlib.decode;
 
-import brut.androlib.*;
+import brut.androlib.ApkBuilder;
+import brut.androlib.ApkDecoder;
+import brut.androlib.BaseTest;
+import brut.androlib.TestUtils;
 import brut.androlib.apk.ApkInfo;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
-import brut.util.OS;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
-import java.io.File;
-import java.io.IOException;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import org.junit.*;
+import static org.junit.Assert.*;
 
 public class SparseFlagTest extends BaseTest {
 
-    @Before
-    public void beforeClass() throws Exception {
-        TestUtils.cleanFrameworkFile();
-        sTmpDir = new ExtFile(OS.createTempDirectory());
-        sTestOrigDir = new ExtFile(sTmpDir, "sparse-orig");
-        sTestNewDir = new ExtFile(sTmpDir, "sparse-new");
+    @BeforeClass
+    public static void beforeClass() throws Exception {
         LOGGER.info("Unpacking sparse.apk && not-sparse.apk...");
-        TestUtils.copyResourceDir(SparseFlagTest.class, "decode/sparse", sTestOrigDir);
-    }
-
-    @After
-    public void afterClass() throws BrutException {
-        OS.rmdir(sTmpDir);
+        TestUtils.copyResourceDir(SparseFlagTest.class, "decode/sparse", sTmpDir);
     }
 
     @Test
-    public void decodeWithExpectationOfSparseResources() throws BrutException, IOException {
-        ExtFile testApk = new ExtFile(sTestOrigDir, "sparse.apk");
+    public void decodeWithExpectationOfSparseResources() throws BrutException {
+        sConfig.setFrameworkTag("issue-3298");
 
         LOGGER.info("Decoding sparse.apk...");
-        Config config = Config.getDefaultConfig();
-        config.frameworkTag = "issue-3298";
-
-        ApkDecoder apkDecoder = new ApkDecoder(testApk, config);
-        ApkInfo apkInfo = apkDecoder.decode(sTestNewDir);
+        ExtFile testApk = new ExtFile(sTmpDir, "sparse.apk");
+        ExtFile testDir = new ExtFile(testApk + ".out");
+        ApkInfo apkInfo = new ApkDecoder(testApk, sConfig).decode(testDir);
 
         assertTrue("Expecting sparse resources", apkInfo.sparseResources);
 
         LOGGER.info("Building sparse.apk...");
-        new ApkBuilder(sTestNewDir, config).build(testApk);
+        new ApkBuilder(testDir, sConfig).build(null);
     }
 
     @Test
-    public void decodeWithExpectationOfNoSparseResources() throws BrutException, IOException {
-        ExtFile testApk = new ExtFile(sTestOrigDir, "not-sparse.apk");
+    public void decodeWithExpectationOfNoSparseResources() throws BrutException {
+        sConfig.setFrameworkTag("issue-3298");
 
         LOGGER.info("Decoding not-sparse.apk...");
-        Config config = Config.getDefaultConfig();
-        config.frameworkTag = "issue-3298";
-
-        ApkDecoder apkDecoder = new ApkDecoder(testApk, config);
-        ApkInfo apkInfo = apkDecoder.decode(sTestNewDir);
+        ExtFile testApk = new ExtFile(sTmpDir, "not-sparse.apk");
+        ExtFile testDir = new ExtFile(testApk + ".out");
+        ApkInfo apkInfo = new ApkDecoder(testApk, sConfig).decode(testDir);
 
         assertFalse("Expecting not-sparse resources", apkInfo.sparseResources);
 
         LOGGER.info("Building not-sparse.apk...");
-        new ApkBuilder(sTestNewDir, config).build(testApk);
+        new ApkBuilder(testDir, sConfig).build(null);
     }
 }

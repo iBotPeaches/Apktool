@@ -17,19 +17,20 @@
 package brut.androlib.res.data.value;
 
 import android.util.TypedValue;
+import brut.androlib.Config;
 import brut.androlib.exceptions.AndrolibException;
 
 public class ResIntValue extends ResScalarValue {
     protected final int mValue;
     private int mType;
 
-    public ResIntValue(int value, String rawValue, int type) {
-        this(value, rawValue, "integer");
+    public ResIntValue(int value, String rawValue, int type, Config config) {
+        this(value, rawValue, "integer", config);
         mType = type;
     }
 
-    public ResIntValue(int value, String rawValue, String type) {
-        super(type, value, rawValue);
+    public ResIntValue(int value, String rawValue, String type, Config config) {
+        super(type, value, rawValue, config);
         mValue = value;
     }
 

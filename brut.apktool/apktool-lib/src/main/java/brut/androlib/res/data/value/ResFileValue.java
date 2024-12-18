@@ -16,13 +16,14 @@
  */
 package brut.androlib.res.data.value;
 
+import brut.androlib.Config;
 import brut.androlib.exceptions.AndrolibException;
 
 public class ResFileValue extends ResIntBasedValue {
     private final String mPath;
 
-    public ResFileValue(String path, int rawIntValue) {
-        super(rawIntValue);
+    public ResFileValue(String path, int rawIntValue, Config config) {
+        super(rawIntValue, config);
         mPath = path;
     }
 

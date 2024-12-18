@@ -126,22 +126,19 @@ public class Res9patchStreamDecoder implements ResStreamDecoder {
         }
     }
 
-    private NinePatchData getNinePatch(byte[] data) throws AndrolibException,
-        IOException {
+    private NinePatchData getNinePatch(byte[] data) throws AndrolibException, IOException {
         ExtDataInput in = ExtDataInputStream.bigEndian(new ByteArrayInputStream(data));
         find9patchChunk(in, NP_CHUNK_TYPE);
         return NinePatchData.decode(in);
     }
 
-    private OpticalInset getOpticalInset(byte[] data) throws AndrolibException,
-        IOException {
+    private OpticalInset getOpticalInset(byte[] data) throws AndrolibException, IOException {
         ExtDataInput in = ExtDataInputStream.bigEndian(new ByteArrayInputStream(data));
         find9patchChunk(in, OI_CHUNK_TYPE);
         return OpticalInset.decode(in);
     }
 
-    private void find9patchChunk(DataInput in, int magic) throws AndrolibException,
-        IOException {
+    private void find9patchChunk(DataInput in, int magic) throws AndrolibException, IOException {
         in.skipBytes(8);
         while (true) {
             int size;

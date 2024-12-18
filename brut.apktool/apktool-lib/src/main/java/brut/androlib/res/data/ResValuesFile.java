@@ -63,7 +63,7 @@ public class ResValuesFile {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final ResValuesFile other = (ResValuesFile) obj;
+        ResValuesFile other = (ResValuesFile) obj;
         if (!Objects.equals(mType, other.mType)) {
             return false;
         }
