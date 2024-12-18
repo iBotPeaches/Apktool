@@ -153,9 +153,12 @@ public class Framework {
             if (dir.exists() && !dir.isDirectory()) {
                 throw new AndrolibException("Framework path is not a directory: " + dir);
             }
-            if (dir.getParentFile() == null || !dir.getParentFile().isDirectory()) {
-                throw new AndrolibException("Framework path's parent is not a directory: " + dir.getParentFile());
+
+            File parent = dir.getParentFile();
+            if (parent != null && parent.exists() && !parent.isDirectory()) {
+                throw new AndrolibException("Framework path's parent is not a directory: " + parent);
             }
+
             if (!dir.exists() && !dir.mkdirs()) {
                 throw new AndrolibException("Could not create framework directory: " + dir);
             }
