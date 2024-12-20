@@ -333,7 +333,8 @@ public final class Config {
     }
 
     public void setFrameworkDirectory(String frameworkDirectory) {
-        mFrameworkDirectory = frameworkDirectory;
+        mFrameworkDirectory = frameworkDirectory != null
+            ? frameworkDirectory : DEFAULT_FRAMEWORK_DIRECTORY;
     }
 
     public String getFrameworkTag() {
