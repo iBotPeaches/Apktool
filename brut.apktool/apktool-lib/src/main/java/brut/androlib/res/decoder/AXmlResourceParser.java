@@ -439,8 +439,7 @@ public class AXmlResourceParser implements XmlResourceParser {
 
         try {
             String stringBlockValue = valueRaw != -1
-                ? ResXmlEncoders.escapeXmlChars(mStringBlock.getString(valueRaw))
-                : null;
+                ? ResXmlEncoders.escapeXmlChars(mStringBlock.getString(valueRaw)) : null;
             String resourceMapValue = null;
 
             // Ensure we only track down obfuscated values for reference/attribute type values. Otherwise, we might

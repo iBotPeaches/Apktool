@@ -41,9 +41,8 @@ public class SmaliBuilder {
 
     public void build(File dexFile) throws AndrolibException {
         try {
-            DexBuilder dexBuilder = mApiLevel > 0
-                ? new DexBuilder(Opcodes.forApi(mApiLevel))
-                : new DexBuilder(Opcodes.getDefault());
+            DexBuilder dexBuilder = new DexBuilder(
+                mApiLevel > 0 ? Opcodes.forApi(mApiLevel) : Opcodes.getDefault());
 
             for (String fileName : mSmaliDir.getDirectory().getFiles(true)) {
                 buildFile(fileName, dexBuilder);
