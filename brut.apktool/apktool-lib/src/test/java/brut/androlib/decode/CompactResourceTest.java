@@ -44,11 +44,9 @@ public class CompactResourceTest extends BaseTest {
         ExtFile testDir = new ExtFile(testApk + ".out");
         new ApkDecoder(testApk, sConfig).decode(testDir);
 
-        // verify string entry count
         Document doc = loadDocument(new File(testDir, "res/values/strings.xml"));
         String expression = "/resources/string[@name]";
         NodeList nodes = evaluateXPath(doc, expression, NodeList.class);
-
         assertEquals(1002, nodes.getLength());
 
         new ApkBuilder(testDir, sConfig).build(null);

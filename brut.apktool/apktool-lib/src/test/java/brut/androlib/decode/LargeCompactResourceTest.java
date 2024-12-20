@@ -47,7 +47,7 @@ public class LargeCompactResourceTest extends BaseTest {
         Document doc = loadDocument(new File(testDir, "res/values/strings.xml"));
         String expression = "/resources/string[contains(@name, 'APKTOOL')]";
         NodeList nodes = evaluateXPath(doc, expression, NodeList.class);
-        assertFalse(nodes.getLength() > 0);
+        assertEquals(0, nodes.getLength());
 
         new ApkBuilder(testDir, sConfig).build(null);
     }
