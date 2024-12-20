@@ -18,9 +18,9 @@ package brut.androlib.encoders;
 
 import brut.androlib.BaseTest;
 import brut.androlib.res.xml.ResXmlEncoders;
-import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.*;
+import static org.junit.Assert.*;
 
 public class PositionalEnumerationTest extends BaseTest {
 

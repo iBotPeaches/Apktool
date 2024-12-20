@@ -16,49 +16,42 @@
  */
 package brut.androlib.aapt1;
 
-import brut.androlib.*;
+import brut.androlib.ApkBuilder;
+import brut.androlib.ApkDecoder;
+import brut.androlib.BaseTest;
+import brut.androlib.TestUtils;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
-import brut.util.OS;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.*;
+import static org.junit.Assert.*;
 
 public class DefaultBaksmaliVariableTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        sTmpDir = new ExtFile(OS.createTempDirectory());
         sTestOrigDir = new ExtFile(sTmpDir, "testjar-orig");
         sTestNewDir = new ExtFile(sTmpDir, "testjar-new");
+
         LOGGER.info("Unpacking testjar...");
-        TestUtils.copyResourceDir(DefaultBaksmaliVariableTest.class, "aapt1/issue1481/", sTestOrigDir);
+        TestUtils.copyResourceDir(DefaultBaksmaliVariableTest.class, "aapt1/issue1481", sTestOrigDir);
+
+        sConfig.setAaptVersion(1);
 
         LOGGER.info("Building issue1481.jar...");
         ExtFile testJar = new ExtFile(sTmpDir, "issue1481.jar");
-        Config config = Config.getDefaultConfig();
-        config.aaptVersion = 1;
-        new ApkBuilder(sTestOrigDir, config).build(testJar);
+        new ApkBuilder(sTestOrigDir, sConfig).build(testJar);
 
         LOGGER.info("Decoding issue1481.jar...");
-        ApkDecoder apkDecoder = new ApkDecoder(testJar);
-        apkDecoder.decode(sTestNewDir);
-    }
-
-    @AfterClass
-    public static void afterClass() throws BrutException {
-        OS.rmdir(sTmpDir);
+        new ApkDecoder(testJar, sConfig).decode(sTestNewDir);
     }
 
     @Test
-    public void confirmBaksmaliParamsAreTheSame() throws BrutException, IOException {
+    public void confirmBaksmaliParamsAreTheSame() throws IOException {
         String expected = TestUtils.replaceNewlines(".class public final Lcom/ibotpeaches/issue1481/BuildConfig;\n" +
                 ".super Ljava/lang/Object;\n" +
                 ".source \"BuildConfig.java\"\n" +
@@ -105,10 +98,9 @@ public class DefaultBaksmaliVariableTest extends BaseTest {
                 "    return-void\n" +
                 ".end method");
 
-        byte[] encoded = Files.readAllBytes(Paths.get(sTestNewDir + File.separator + "smali" + File.separator
-        + "com" + File.separator + "ibotpeaches" + File.separator + "issue1481" + File.separator + "BuildConfig.smali"));
-
+        byte[] encoded = Files.readAllBytes(new File(sTestNewDir, "smali/com/ibotpeaches/issue1481/BuildConfig.smali").toPath());
         String obtained = TestUtils.replaceNewlines(new String(encoded));
+
         assertEquals(expected, obtained);
     }
 }

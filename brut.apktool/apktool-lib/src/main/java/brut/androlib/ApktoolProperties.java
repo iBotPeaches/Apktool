@@ -16,75 +16,70 @@
  */
 package brut.androlib;
 
+import org.apache.commons.io.IOUtils;
+
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-public class ApktoolProperties {
+public final class ApktoolProperties extends Properties {
     private static final Logger LOGGER = Logger.getLogger(ApktoolProperties.class.getName());
 
-    private static Properties sProps;
+    private static volatile ApktoolProperties sInstance;
 
-    public static String get(String key) {
-        return get().getProperty(key);
-    }
-
-    public static Properties get() {
-        if (sProps == null) {
-            loadProps();
+    private static String get(String key, String defaultValue) {
+        if (sInstance == null) {
+            sInstance = new ApktoolProperties();
         }
-        return sProps;
+        return sInstance.getProperty(key, defaultValue);
     }
 
     public static String getVersion() {
-        return get("application.version");
+        return get("application.version", "(unknown)");
     }
 
-    private static void loadProps() {
-        InputStream in = ApktoolProperties.class.getResourceAsStream("/apktool.properties");
-        sProps = new Properties();
+    public static String getSmaliVersion() {
+        return get("smali.version", "(unknown)");
+    }
+
+    public static String getBaksmaliVersion() {
+        return get("baksmali.version", "(unknown)");
+    }
+
+    private ApktoolProperties() {
+        load(this, getClass(), "/apktool.properties");
+
+        Properties smaliProps = new Properties();
+        load(smaliProps, com.android.tools.smali.smali.Main.class, "/smali.properties");
+        String smaliVersion = smaliProps.getProperty("application.version", "");
+        if (!smaliVersion.isEmpty()) {
+            put("smali.version", smaliVersion);
+        }
+
+        Properties baksmaliProps = new Properties();
+        load(baksmaliProps, com.android.tools.smali.baksmali.Main.class, "/baksmali.properties");
+        String baksmaliVersion = baksmaliProps.getProperty("application.version", "");
+        if (!baksmaliVersion.isEmpty()) {
+            put("baksmali.version", baksmaliVersion);
+        }
+    }
+
+    private static void load(Properties props, Class<?> clz, String name) {
+        InputStream in = null;
         try {
-            sProps.load(in);
-            in.close();
-        } catch (NullPointerException | IOException ex) {
-            LOGGER.warning("Could not load properties.");
+            in = clz.getResourceAsStream(name);
+            if (in == null) {
+                throw new FileNotFoundException(name);
+            }
+            props.load(in);
+        } catch (NoClassDefFoundError ex) {
+            LOGGER.warning("Could not find " + clz.getName());
+        } catch (IOException ex) {
+            LOGGER.warning("Could not load " + name);
+        } finally {
+            IOUtils.closeQuietly(in);
         }
-
-        InputStream templateStream = null;
-        try {
-            templateStream = com.android.tools.smali.baksmali.Main.class.getResourceAsStream("/baksmali.properties");
-        } catch(NoClassDefFoundError ex) {
-            LOGGER.warning("Could not load baksmali properties.");
-        }
-        Properties properties = new Properties();
-        String version = "(unknown)";
-
-        if (templateStream != null) {
-            try {
-                properties.load(templateStream);
-                version = properties.getProperty("application.version");
-                templateStream.close();
-            } catch (IOException ignored) {}
-        }
-        sProps.put("baksmaliVersion", version);
-
-        templateStream = null;
-        try {
-            templateStream = com.android.tools.smali.smali.Main.class.getResourceAsStream("/smali.properties");
-        } catch(NoClassDefFoundError ex) {
-            LOGGER.warning("Could not load smali properties.");
-        }
-        properties = new Properties();
-        version = "(unknown)";
-
-        if (templateStream != null) {
-            try {
-                properties.load(templateStream);
-                version = properties.getProperty("application.version");
-                templateStream.close();
-            } catch (IOException ignored) {}
-        }
-        sProps.put("smaliVersion", version);
     }
 }

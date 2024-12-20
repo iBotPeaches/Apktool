@@ -16,22 +16,24 @@
  */
 package brut.androlib.aapt1;
 
-import brut.androlib.*;
+import brut.androlib.ApkBuilder;
+import brut.androlib.ApkDecoder;
+import brut.androlib.BaseTest;
+import brut.androlib.TestUtils;
 import brut.androlib.apk.ApkInfo;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
-import brut.util.OS;
 import brut.util.OSDetection;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.w3c.dom.Document;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.*;
 import static org.junit.Assert.*;
 import static org.junit.Assume.assumeTrue;
 
@@ -39,28 +41,20 @@ public class BuildAndDecodeTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        TestUtils.cleanFrameworkFile();
-
-        sTmpDir = new ExtFile(OS.createTempDirectory());
         sTestOrigDir = new ExtFile(sTmpDir, "testapp-orig");
         sTestNewDir = new ExtFile(sTmpDir, "testapp-new");
+
         LOGGER.info("Unpacking testapp...");
-        TestUtils.copyResourceDir(BuildAndDecodeTest.class, "aapt1/testapp/", sTestOrigDir);
+        TestUtils.copyResourceDir(BuildAndDecodeTest.class, "aapt1/testapp", sTestOrigDir);
+
+        sConfig.setAaptVersion(1);
 
         LOGGER.info("Building testapp.apk...");
         ExtFile testApk = new ExtFile(sTmpDir, "testapp.apk");
-        Config config = Config.getDefaultConfig();
-        config.aaptVersion = 1;
-        new ApkBuilder(sTestOrigDir, config).build(testApk);
+        new ApkBuilder(sTestOrigDir, sConfig).build(testApk);
 
         LOGGER.info("Decoding testapp.apk...");
-        ApkDecoder apkDecoder = new ApkDecoder(testApk);
-        apkDecoder.decode(sTestNewDir);
-    }
-
-    @AfterClass
-    public static void afterClass() throws BrutException {
-        OS.rmdir(sTmpDir);
+        new ApkDecoder(testApk, sConfig).decode(sTestNewDir);
     }
 
     @Test
@@ -166,20 +160,22 @@ public class BuildAndDecodeTest extends BaseTest {
 
     @Test
     public void valuesExtraLongExactLengthTest() throws BrutException {
-        Map<String, String> strs = TestUtils.parseStringsXml(new File(sTestNewDir, "res/values-en/strings.xml"));
+        Document doc = loadDocument(new File(sTestNewDir, "res/values-en/strings.xml"));
 
         // long_string6 should be exactly 0x8888 chars of "a"
         // the valuesExtraLongTest() should handle this
         // but such an edge case, want a specific test
-        String aaaa = strs.get("long_string6");
-        assertEquals(0x8888, aaaa.length());
+        String expression = "/resources/string[@name='long_string6']/text()";
+        String str = evaluateXPath(doc, expression, String.class);
+        assertEquals(0x8888, str.length());
     }
 
     @Test
-    public void storedMp3FilesAreNotCompressedTest() throws BrutException {
-        ExtFile extFile = new ExtFile(sTmpDir, "testapp.apk");
-        Integer built = extFile.getDirectory().getCompressionLevel("res/raw/rain.mp3");
-        assertEquals(Integer.valueOf(0), built);
+    public void storedMp3FilesAreNotCompressedTest() throws BrutException, IOException {
+        ExtFile testApk = new ExtFile(sTmpDir, "testapp.apk");
+        Integer compLevel = testApk.getDirectory().getCompressionLevel("res/raw/rain.mp3");
+        testApk.close();
+        assertEquals(Integer.valueOf(0), compLevel);
     }
 
     @Test
@@ -303,7 +299,7 @@ public class BuildAndDecodeTest extends BaseTest {
 
     @Test
     public void twoLetterNotHandledAsBcpTest() {
-        checkFolderExists("res/values-fr");
+        assertTrue(new File(sTestNewDir, "res/values-fr").isDirectory());
     }
 
     @Test
@@ -347,60 +343,59 @@ public class BuildAndDecodeTest extends BaseTest {
 
     @Test
     public void fontTest() throws BrutException {
-        File fontXml = new File((sTestNewDir + "/res/font"), "lobster.xml");
-        File fontFile = new File((sTestNewDir + "/res/font"), "lobster_regular.otf");
+        File fontXml = new File(sTestNewDir, "res/font/lobster.xml");
+        File fontFile = new File(sTestNewDir, "res/font/lobster_regular.otf");
 
         // Per #1662, ensure font file is not encoded.
         assertTrue(fontXml.isFile());
         compareXmlFiles("/res/font/lobster.xml");
 
         // If we properly skipped decoding the font (otf) file, this file should not exist
-        assertFalse((new File((sTestNewDir + "/res/values"), "fonts.xml")).isFile());
+        assertFalse(new File(sTestNewDir, "res/values/fonts.xml").isFile());
         assertTrue(fontFile.isFile());
     }
 
     @Test
-    public void drawableNoDpiTest() throws BrutException, IOException {
-        compareResFolder("drawable-nodpi");
+    public void drawableNoDpiTest() throws BrutException {
+        compareBinaryFolder("res/drawable-nodpi");
     }
 
     @Test
-    public void drawableAnyDpiTest() throws BrutException, IOException {
-        compareResFolder("drawable-anydpi");
+    public void drawableAnyDpiTest() throws BrutException {
+        compareBinaryFolder("res/drawable-anydpi");
     }
 
     @Test
-    public void drawableNumberedDpiTest() throws BrutException, IOException {
-        compareResFolder("drawable-534dpi");
+    public void drawableNumberedDpiTest() throws BrutException {
+        compareBinaryFolder("res/drawable-534dpi");
     }
 
     @Test
-    public void drawableLdpiTest() throws BrutException, IOException {
-        compareResFolder("drawable-ldpi");
+    public void drawableLdpiTest() throws BrutException {
+        compareBinaryFolder("res/drawable-ldpi");
     }
 
     @Test
-    public void drawableMdpiTest() throws BrutException, IOException {
-        compareResFolder("drawable-mdpi");
+    public void drawableMdpiTest() throws BrutException {
+        compareBinaryFolder("res/drawable-mdpi");
     }
 
     @Test
-    public void drawableTvdpiTest() throws BrutException, IOException {
-        compareResFolder("drawable-tvdpi");
+    public void drawableTvdpiTest() throws BrutException {
+        compareBinaryFolder("res/drawable-tvdpi");
     }
 
     @Test
-    public void drawableXhdpiTest() throws BrutException, IOException {
-        compareResFolder("drawable-xhdpi");
+    public void drawableXhdpiTest() throws BrutException {
+        compareBinaryFolder("res/drawable-xhdpi");
     }
 
     @Test
     public void ninePatchImageColorTest() throws IOException {
-        char slash = File.separatorChar;
-        String location = slash + "res" + slash + "drawable-xhdpi" + slash;
+        String fileName = "res/drawable-xhdpi/9patch.9.png";
 
-        File control = new File((sTestOrigDir + location), "9patch.9.png");
-        File test =  new File((sTestNewDir + location), "9patch.9.png");
+        File control = new File(sTestOrigDir, fileName);
+        File test = new File(sTestNewDir, fileName);
 
         BufferedImage controlImage = ImageIO.read(control);
         BufferedImage testImage = ImageIO.read(test);
@@ -417,11 +412,10 @@ public class BuildAndDecodeTest extends BaseTest {
 
     @Test
     public void issue1508Test() throws IOException {
-        char slash = File.separatorChar;
-        String location = slash + "res" + slash + "drawable-xhdpi" + slash;
+        String fileName = "res/drawable-xhdpi/btn_zoom_up_normal.9.png";
 
-        File control = new File((sTestOrigDir + location), "btn_zoom_up_normal.9.png");
-        File test = new File((sTestNewDir + location), "btn_zoom_up_normal.9.png");
+        File control = new File(sTestOrigDir, fileName);
+        File test = new File(sTestNewDir, fileName);
 
         BufferedImage controlImage = ImageIO.read(control);
         BufferedImage testImage = ImageIO.read(test);
@@ -438,21 +432,20 @@ public class BuildAndDecodeTest extends BaseTest {
 
     @Test
     public void issue1511Test() throws IOException {
-        char slash = File.separatorChar;
-        String location = slash + "res" + slash + "drawable-xxhdpi" + slash;
+        String fileName = "res/drawable-xxhdpi/textfield_activated_holo_dark.9.png";
 
-        File control = new File((sTestOrigDir + location), "textfield_activated_holo_dark.9.png");
-        File test = new File((sTestNewDir + location), "textfield_activated_holo_dark.9.png");
+        File control = new File(sTestOrigDir, fileName);
+        File test = new File(sTestNewDir, fileName);
 
         BufferedImage controlImage = ImageIO.read(control);
         BufferedImage testImage = ImageIO.read(test);
 
         // Check entire image as we cannot mess this up
-        final int w = controlImage.getWidth(),
-                  h = controlImage.getHeight();
+        int w = controlImage.getWidth();
+        int h = controlImage.getHeight();
 
-        final int[] controlImageGrid = controlImage.getRGB(0, 0, w, h, null, 0, w);
-        final int[] testImageGrid = testImage.getRGB(0, 0, w, h, null, 0, w);
+        int[] controlImageGrid = controlImage.getRGB(0, 0, w, h, null, 0, w);
+        int[] testImageGrid = testImage.getRGB(0, 0, w, h, null, 0, w);
 
         for (int i = 0; i < controlImageGrid.length; i++) {
             assertEquals("Image lost Optical Bounds at i = " + i, controlImageGrid[i], testImageGrid[i]);
@@ -461,20 +454,25 @@ public class BuildAndDecodeTest extends BaseTest {
 
     @Test
     public void robust9patchTest() throws IOException {
-        String[] ninePatches = {"ic_notification_overlay.9.png", "status_background.9.png",
-                "search_bg_transparent.9.png", "screenshot_panel.9.png", "recents_lower_gradient.9.png"};
-
-        char slash = File.separatorChar;
-        String location = slash + "res" + slash + "drawable-xxhdpi" + slash;
+        String[] ninePatches = {
+                "ic_notification_overlay.9.png",
+                "status_background.9.png",
+                "search_bg_transparent.9.png",
+                "screenshot_panel.9.png",
+                "recents_lower_gradient.9.png",
+        };
 
         for (String ninePatch : ninePatches) {
-            File control = new File((sTestOrigDir + location), ninePatch);
-            File test = new File((sTestNewDir + location), ninePatch);
+            String fileName = "res/drawable-xxhdpi/" + ninePatch;
+
+            File control = new File(sTestOrigDir, fileName);
+            File test = new File(sTestNewDir, fileName);
 
             BufferedImage controlImage = ImageIO.read(control);
             BufferedImage testImage = ImageIO.read(test);
 
-            int w = controlImage.getWidth(), h = controlImage.getHeight();
+            int w = controlImage.getWidth();
+            int h = controlImage.getHeight();
 
             // Check the entire horizontal line
             for (int i = 1; i < w; i++) {
@@ -498,85 +496,82 @@ public class BuildAndDecodeTest extends BaseTest {
         }
     }
 
+    private static boolean isTransparent(int pixel) {
+        return pixel >> 24 == 0x00;
+    }
+
     @Test
     public void confirmZeroByteFileExtensionIsNotStored() throws BrutException {
-        ApkInfo apkInfo = ApkInfo.load(sTestNewDir);
-
-        for (String item : apkInfo.doNotCompress) {
-            assertNotEquals("jpg", item);
+        ApkInfo testInfo = ApkInfo.load(sTestNewDir);
+        for (String path : testInfo.doNotCompress) {
+            assertNotEquals("jpg", path);
         }
     }
 
     @Test
     public void confirmZeroByteFileIsStored() throws BrutException {
-        ApkInfo apkInfo = ApkInfo.load(sTestNewDir);
-        assertTrue(apkInfo.doNotCompress.contains("assets/0byte_file.jpg"));
+        ApkInfo testInfo = ApkInfo.load(sTestNewDir);
+        assertTrue(testInfo.doNotCompress.contains("assets/0byte_file.jpg"));
     }
 
     @Test
-    public void drawableXxhdpiTest() throws BrutException, IOException {
-        compareResFolder("drawable-xxhdpi");
+    public void drawableXxhdpiTest() throws BrutException {
+        compareBinaryFolder("res/drawable-xxhdpi");
     }
 
     @Test
-    public void drawableQualifierXxhdpiTest() throws BrutException, IOException {
-        compareResFolder("drawable-xxhdpi-v4");
+    public void drawableQualifierXxhdpiTest() throws BrutException {
+        compareBinaryFolder("res/drawable-xxhdpi-v4");
     }
 
     @Test
-    public void drawableXxxhdpiTest() throws BrutException, IOException {
-        compareResFolder("drawable-xxxhdpi");
+    public void drawableXxxhdpiTest() throws BrutException {
+        compareBinaryFolder("res/drawable-xxxhdpi");
     }
 
     @Test
-    public void resRawTest() throws BrutException, IOException {
-        compareResFolder("raw");
+    public void resRawTest() throws BrutException {
+        compareBinaryFolder("res/raw");
     }
 
     @Test
-    public void libsTest() throws BrutException, IOException {
-        compareLibsFolder("libs");
-        compareLibsFolder("lib");
+    public void libsTest() throws BrutException {
+        compareBinaryFolder("libs");
+        compareBinaryFolder("lib");
     }
 
     @Test
-    public void unknownFolderTest() throws BrutException, IOException {
-        compareUnknownFiles();
+    public void unknownFolderTest() throws BrutException {
+        compareBinaryFolder("unknown");
     }
 
     @Test
-    public void fileAssetTest() throws BrutException, IOException {
-        compareAssetsFolder("txt");
+    public void fileAssetTest() throws BrutException {
+        compareBinaryFolder("assets/txt");
     }
 
     @Test
-    public void unicodeAssetTest() throws BrutException, IOException {
-        assumeTrue(! OSDetection.isWindows());
-        compareAssetsFolder("unicode-txt");
+    public void unicodeAssetTest() throws BrutException {
+        assumeTrue(!OSDetection.isWindows());
+        compareBinaryFolder("assets/unicode-txt");
     }
 
     @Test
-    public void multipleDexTest() throws BrutException, IOException {
-        compareBinaryFolder("/smali_classes2", false);
-        compareBinaryFolder("/smali_classes3", false);
-
-        File classes2Dex = new File(sTestOrigDir, "build/apk/classes2.dex");
-        File classes3Dex = new File(sTestOrigDir, "build/apk/classes3.dex");
-
-        assertTrue(classes2Dex.isFile());
-        assertTrue(classes3Dex.isFile());
+    public void multipleDexTest() throws BrutException {
+        compareBinaryFolder("smali_classes2");
+        compareBinaryFolder("smali_classes3");
+        assertTrue(new File(sTestOrigDir, "build/apk/classes2.dex").isFile());
+        assertTrue(new File(sTestOrigDir, "build/apk/classes3.dex").isFile());
     }
 
     @Test
-    public void singleDexTest() throws BrutException, IOException {
-        compareBinaryFolder("/smali", false);
-
-        File classesDex = new File(sTestOrigDir, "build/apk/classes.dex");
-        assertTrue(classesDex.isFile());
+    public void singleDexTest() throws BrutException {
+        compareBinaryFolder("smali");
+        assertTrue(new File(sTestOrigDir, "build/apk/classes.dex").isFile());
     }
 
     @Test
     public void confirmKotlinFolderPersistsTest() {
-        checkFolderExists("/kotlin");
+        assertTrue(new File(sTestNewDir, "kotlin").isDirectory());
     }
 }

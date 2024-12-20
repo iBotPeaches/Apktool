@@ -22,39 +22,25 @@ import brut.androlib.Config;
 import brut.androlib.TestUtils;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
-import brut.util.OS;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
-import java.io.File;
-import java.io.IOException;
+import org.junit.*;
+import static org.junit.Assert.*;
 
 public class ParentDirectoryTraversalTest extends BaseTest {
+    private static final String apk = "issue1498.apk";
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        TestUtils.cleanFrameworkFile();
-        sTmpDir = new ExtFile(OS.createTempDirectory());
-        TestUtils.copyResourceDir(ParentDirectoryTraversalTest.class, "decode/issue1498/", sTmpDir);
-    }
-
-    @AfterClass
-    public static void afterClass() throws BrutException {
-        OS.rmdir(sTmpDir);
+        TestUtils.copyResourceDir(ParentDirectoryTraversalTest.class, "decode/issue1498", sTmpDir);
     }
 
     @Test
-    public void checkIfDrawableFileDecodesProperly() throws BrutException, IOException {
-        String apk = "issue1498.apk";
+    public void checkIfDrawableFileDecodesProperly() throws BrutException {
+        sConfig.setForceDelete(true);
+        sConfig.setDecodeResources(Config.DECODE_RESOURCES_NONE);
 
-        Config config = Config.getDefaultConfig();
-        config.forceDelete = true;
-        config.decodeResources = Config.DECODE_RESOURCES_NONE;
-        // decode issue1498.apk
-        ApkDecoder apkDecoder = new ApkDecoder(new ExtFile(sTmpDir + File.separator + apk), config);
-        File outDir = new File(sTmpDir + File.separator + apk + ".out");
-        // this should not raise an exception:
-        apkDecoder.decode(outDir);
+        ExtFile testApk = new ExtFile(sTmpDir, apk);
+        ExtFile testDir = new ExtFile(testApk + ".out");
+        new ApkDecoder(testApk, sConfig).decode(testDir);
     }
 }

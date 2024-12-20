@@ -24,38 +24,26 @@ import brut.common.RootUnknownFileException;
 import brut.common.TraversalUnknownFileException;
 import brut.directory.ExtFile;
 import brut.util.BrutIO;
-import brut.util.OS;
 import brut.util.OSDetection;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.junit.*;
+import static org.junit.Assert.*;
 
 public class UnknownDirectoryTraversalTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        sTmpDir = new ExtFile(OS.createTempDirectory());
         TestUtils.copyResourceDir(UnknownDirectoryTraversalTest.class, "util/traversal", sTmpDir);
-    }
-
-    @AfterClass
-    public static void afterClass() throws BrutException {
-        OS.rmdir(sTmpDir);
     }
 
     @Test
     public void validFileTest() throws BrutException, IOException {
         String validFileName = BrutIO.sanitizePath(sTmpDir, "file");
         assertEquals(validFileName, "file");
-
-        File validFile = new File(sTmpDir, validFileName);
-        assertTrue(validFile.isFile());
+        assertTrue(new File(sTmpDir, validFileName).isFile());
     }
 
     @Test(expected = TraversalUnknownFileException.class)
@@ -76,19 +64,14 @@ public class UnknownDirectoryTraversalTest extends BaseTest {
 
     @Test(expected = TraversalUnknownFileException.class)
     public void invalidBackwardPathOnWindows() throws BrutException, IOException {
-        String invalidPath;
-        if (! OSDetection.isWindows()) {
-            invalidPath = "../../app";
-        } else {
-            invalidPath = "..\\..\\app.exe";
-        }
-
+        String invalidPath = OSDetection.isWindows() ? "..\\..\\app.exe" : "../../app";
         BrutIO.sanitizePath(sTmpDir, invalidPath);
     }
 
     @Test
     public void validDirectoryFileTest() throws BrutException, IOException {
-        String validFileName = BrutIO.sanitizePath(sTmpDir, "dir" + File.separator + "file");
-        assertEquals("dir" + File.separator + "file", validFileName);
+        String fileName = "dir" + File.separator + "file";
+        String validFileName = BrutIO.sanitizePath(sTmpDir, fileName);
+        assertEquals(fileName, validFileName);
     }
 }

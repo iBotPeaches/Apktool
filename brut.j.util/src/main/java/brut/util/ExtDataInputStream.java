@@ -102,8 +102,7 @@ public class ExtDataInputStream extends FilterInputStream implements ExtDataInpu
             // an expected max position and if we are past it, we return early during processing.
             if (position() >= maxPosition) {
                 LOGGER.warning(String.format("Bad string block: string entry is at %d, past end at %d",
-                    position(), maxPosition)
-                );
+                    position(), maxPosition));
                 return arr;
             }
 

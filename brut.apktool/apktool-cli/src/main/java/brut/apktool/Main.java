@@ -23,9 +23,7 @@ import brut.androlib.exceptions.InFileNotFoundException;
 import brut.androlib.exceptions.OutDirExistsException;
 import brut.androlib.res.Framework;
 import brut.common.BrutException;
-import brut.directory.DirectoryException;
 import brut.directory.ExtFile;
-import brut.util.AaptManager;
 import brut.util.OSDetection;
 import org.apache.commons.cli.*;
 
@@ -73,8 +71,8 @@ public class Main {
         try {
             commandLine = parser.parse(allOptions, args, false);
 
-            if (! OSDetection.is64Bit()) {
-                System.err.println("32 bit support is deprecated. Apktool will not support 32bit on v3.0.0.");
+            if (!OSDetection.is64Bit()) {
+                System.err.println("32-bit support is deprecated and will be removed in 3.0.0.");
             }
         } catch (ParseException ex) {
             System.err.println(ex.getMessage());
@@ -96,7 +94,7 @@ public class Main {
             setAdvanceMode();
         }
 
-        Config config = Config.getDefaultConfig();
+        Config config = new Config();
         initConfig(commandLine, config);
 
         boolean cmdFound = false;
@@ -145,16 +143,16 @@ public class Main {
 
     private static void initConfig(CommandLine cli, Config config) {
         if (cli.hasOption("p") || cli.hasOption("frame-path")) {
-            config.frameworkDirectory = cli.getOptionValue("p");
+            config.setFrameworkDirectory(cli.getOptionValue("p"));
         }
         if (cli.hasOption("t") || cli.hasOption("tag")) {
-            config.frameworkTag = cli.getOptionValue("t");
+            config.setFrameworkTag(cli.getOptionValue("t"));
         }
         if (cli.hasOption("api") || cli.hasOption("api-level")) {
-            config.apiLevel = Integer.parseInt(cli.getOptionValue("api"));
+            config.setApiLevel(Integer.parseInt(cli.getOptionValue("api")));
         }
         if (cli.hasOption("j") || cli.hasOption("jobs")) {
-            config.jobs = Integer.parseInt(cli.getOptionValue("j"));
+            config.setJobs(Integer.parseInt(cli.getOptionValue("j")));
         }
     }
 
@@ -166,17 +164,21 @@ public class Main {
             config.setDecodeSources(Config.DECODE_SOURCES_NONE);
         }
         if (cli.hasOption("only-main-classes")) {
-            config.setDecodeSources(Config.DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES);
+            if (cli.hasOption("s") || cli.hasOption("no-src")) {
+                System.err.println("--only-main-classes cannot be paired with -s/--no-src. Ignoring.");
+            } else {
+                config.setDecodeSources(Config.DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES);
+            }
         }
         if (cli.hasOption("d") || cli.hasOption("debug")) {
             System.err.println("SmaliDebugging has been removed in 2.1.0 onward. Please see: https://github.com/iBotPeaches/Apktool/issues/1061");
             System.exit(1);
         }
         if (cli.hasOption("b") || cli.hasOption("no-debug-info")) {
-            config.baksmaliDebugMode = false;
+            config.setBaksmaliDebugMode(false);
         }
         if (cli.hasOption("f") || cli.hasOption("force")) {
-            config.forceDelete = true;
+            config.setForceDelete(true);
         }
         if (cli.hasOption("r") || cli.hasOption("no-res")) {
             config.setDecodeResources(Config.DECODE_RESOURCES_NONE);
@@ -188,10 +190,10 @@ public class Main {
             config.setDecodeAssets(Config.DECODE_ASSETS_NONE);
         }
         if (cli.hasOption("k") || cli.hasOption("keep-broken-res")) {
-            config.keepBrokenResources = true;
+            config.setKeepBrokenResources(true);
         }
         if (cli.hasOption("m") || cli.hasOption("match-original")) {
-            config.analysisMode = true;
+            config.setAnalysisMode(true);
         }
         if (cli.hasOption("resm") || cli.hasOption("res-mode") || cli.hasOption("resolve-resources-mode")) {
             String mode = cli.getOptionValue("resm");
@@ -266,16 +268,16 @@ public class Main {
 
         // check for build options
         if (cli.hasOption("f") || cli.hasOption("force-all")) {
-            config.forceBuildAll = true;
+            config.setForceBuildAll(true);
         }
         if (cli.hasOption("d") || cli.hasOption("debug")) {
-            config.debugMode = true;
+            config.setDebugMode(true);
         }
         if (cli.hasOption("n") || cli.hasOption("net-sec-conf")) {
-            config.netSecConf = true;
+            config.setNetSecConf(true);
         }
         if (cli.hasOption("v") || cli.hasOption("verbose")) {
-            config.verbose = true;
+            config.setVerbose(true);
         }
         if (cli.hasOption("a") || cli.hasOption("aapt")) {
             if (cli.hasOption("use-aapt1") || cli.hasOption("use-aapt2")) {
@@ -284,8 +286,7 @@ public class Main {
             }
 
             try {
-                config.aaptBinary = new File(cli.getOptionValue("a"));
-                config.aaptVersion = AaptManager.getAaptVersion(config.aaptBinary);
+                config.setAaptBinary(new File(cli.getOptionValue("a")));
             } catch (BrutException ex) {
                 System.err.println(ex.getMessage());
                 System.exit(1);
@@ -296,29 +297,25 @@ public class Main {
                 System.exit(1);
             }
 
-            config.aaptVersion = 1;
+            config.setAaptVersion(1);
         }
         if (cli.hasOption("c") || cli.hasOption("copy-original")) {
-            config.copyOriginalFiles = true;
+            config.setCopyOriginalFiles(true);
         }
         if (cli.hasOption("nc") || cli.hasOption("no-crunch")) {
-            config.noCrunch = true;
+            config.setNoCrunch(true);
         }
         if (cli.hasOption("na") || cli.hasOption("no-apk")) {
-            config.noApk = true;
+            config.setNoApk(true);
         }
 
-        File outFile;
-        if (cli.hasOption("o") || cli.hasOption("output")) {
-            outFile = new File(cli.getOptionValue("o"));
-        } else {
-            outFile = null;
-        }
-
-        if (config.netSecConf && config.aaptVersion == 1) {
+        if (config.isNetSecConf() && config.getAaptVersion() == 1) {
             System.err.println("-n / --net-sec-conf is not supported with legacy aapt.");
             System.exit(1);
         }
+
+        File outFile = cli.hasOption("o") || cli.hasOption("output")
+            ? new File(cli.getOptionValue("o")) : null;
 
         ExtFile apkDir = new ExtFile(apkDirName);
         ApkBuilder builder = new ApkBuilder(apkDir, config);
@@ -327,11 +324,11 @@ public class Main {
 
     private static void cmdInstallFramework(CommandLine cli, Config config) throws AndrolibException {
         String apkName = getLastArg(cli);
-        new Framework(config).installFramework(new File(apkName));
+        new Framework(config).install(new File(apkName));
     }
 
     private static void cmdListFrameworks(CommandLine cli, Config config) throws AndrolibException {
-        new Framework(config).listFrameworkDirectory();
+        new Framework(config).listDirectory();
     }
 
     private static void cmdPublicizeResources(CommandLine cli, Config config) throws AndrolibException {
@@ -341,9 +338,9 @@ public class Main {
 
     private static void cmdEmptyFrameworkDirectory(CommandLine cli, Config config) throws AndrolibException {
         if (cli.hasOption("f") || cli.hasOption("force")) {
-            config.forceDeleteFramework = true;
+            config.setForceDeleteFramework(true);
         }
-        new Framework(config).emptyFrameworkDirectory();
+        new Framework(config).emptyDirectory();
     }
 
     private static String getLastArg(CommandLine cli) {
@@ -638,11 +635,11 @@ public class Main {
 
         // print out license info prior to formatter.
         System.out.println(
-                "Apktool " + ApktoolProperties.getVersion() + " - a tool for reengineering Android apk files\n" +
-                        "with smali v" + ApktoolProperties.get("smaliVersion") +
-                        " and baksmali v" + ApktoolProperties.get("baksmaliVersion") + "\n" +
-                        "Copyright 2010 Ryszard Wiśniewski <brut.alll@gmail.com>\n" +
-                        "Copyright 2010 Connor Tumbleson <connor.tumbleson@gmail.com>" );
+            "Apktool " + ApktoolProperties.getVersion() + " - a tool for reengineering Android apk files\n" +
+                    "with smali " + ApktoolProperties.getSmaliVersion() +
+                    " and baksmali " + ApktoolProperties.getBaksmaliVersion() + "\n" +
+                    "Copyright 2010 Ryszard Wiśniewski <brut.alll@gmail.com>\n" +
+                    "Copyright 2010 Connor Tumbleson <connor.tumbleson@gmail.com>");
         if (isAdvanceMode()) {
             System.out.println("Apache License 2.0 (https://www.apache.org/licenses/LICENSE-2.0)\n");
         }else {

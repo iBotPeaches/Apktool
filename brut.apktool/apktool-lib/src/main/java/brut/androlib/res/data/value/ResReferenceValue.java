@@ -16,6 +16,7 @@
  */
 package brut.androlib.res.data.value;
 
+import brut.androlib.Config;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.exceptions.UndefinedResObjectException;
 import brut.androlib.res.data.ResPackage;
@@ -25,12 +26,12 @@ public class ResReferenceValue extends ResIntValue {
     private final ResPackage mPackage;
     private final boolean mTheme;
 
-    public ResReferenceValue(ResPackage pkg, int value, String rawValue) {
-        this(pkg, value, rawValue, false);
+    public ResReferenceValue(ResPackage pkg, int value, String rawValue, Config config) {
+        this(pkg, value, rawValue, false, config);
     }
 
-    public ResReferenceValue(ResPackage pkg, int value, String rawValue, boolean theme) {
-        super(value, rawValue, "reference");
+    public ResReferenceValue(ResPackage pkg, int value, String rawValue, boolean theme, Config config) {
+        super(value, rawValue, "reference", config);
         mPackage = pkg;
         mTheme = theme;
     }
@@ -48,9 +49,9 @@ public class ResReferenceValue extends ResIntValue {
         boolean newId = spec.hasDefaultResource() && spec.getDefaultResource().getValue() instanceof ResIdValue;
 
         // generate the beginning to fix @android
-        String mStart = (mTheme ? '?' : '@') + (newId ? "+" : "");
+        String start = (mTheme ? '?' : '@') + (newId ? "+" : "");
 
-        return mStart + spec.getFullName(mPackage, mTheme && spec.getType().getName().equals("attr"));
+        return start + spec.getFullName(mPackage, mTheme && spec.getType().getName().equals("attr"));
     }
 
     public ResResSpec getReferent() throws AndrolibException {

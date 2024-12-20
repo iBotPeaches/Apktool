@@ -21,43 +21,27 @@ import brut.androlib.BaseTest;
 import brut.androlib.TestUtils;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
-import brut.util.OS;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 import java.io.File;
-import java.io.IOException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.junit.*;
+import static org.junit.Assert.*;
 
 public class Empty9PatchTest extends BaseTest {
+    private static final String TEST_APK = "empty9patch.apk";
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        TestUtils.cleanFrameworkFile();
-        sTmpDir = new ExtFile(OS.createTempDirectory());
-        TestUtils.copyResourceDir(Empty9PatchTest.class, "decode/empty9patch/", sTmpDir);
-    }
-
-    @AfterClass
-    public static void afterClass() throws BrutException {
-        OS.rmdir(sTmpDir);
+        TestUtils.copyResourceDir(Empty9PatchTest.class, "decode/empty9patch", sTmpDir);
     }
 
     @Test
-    public void decodeWithEmpty9PatchFile() throws BrutException, IOException {
-        String apk = "empty9patch.apk";
+    public void decodeWithEmpty9PatchFile() throws BrutException {
+        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
+        ExtFile testDir = new ExtFile(testApk + ".out");
+        new ApkDecoder(testApk, sConfig).decode(testDir);
 
-        // decode empty9patch.apk
-        ApkDecoder apkDecoder = new ApkDecoder(new ExtFile(sTmpDir + File.separator + apk));
-        sTestOrigDir = new ExtFile(sTmpDir + File.separator + apk + ".out");
-
-        File outDir = new File(sTmpDir + File.separator + apk + ".out");
-        apkDecoder.decode(outDir);
-
-        File aPng =  new File(sTestOrigDir,"res/drawable-xhdpi/empty.9.png");
+        File aPng = new File(testDir, "res/drawable-xhdpi/empty.9.png");
         assertTrue(aPng.isFile());
         assertEquals(0, aPng.length());
     }

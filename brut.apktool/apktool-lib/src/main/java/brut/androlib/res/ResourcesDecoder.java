@@ -42,15 +42,15 @@ public class ResourcesDecoder {
         "FFFFFFFFFFFFFFFFFFFFFF"
     );
 
-    private final Config mConfig;
     private final ApkInfo mApkInfo;
+    private final Config mConfig;
     private final ResTable mResTable;
     private final Map<String, String> mResFileMapping;
 
-    public ResourcesDecoder(Config config, ApkInfo apkInfo) {
-        mConfig = config;
+    public ResourcesDecoder(ApkInfo apkInfo, Config config) {
         mApkInfo = apkInfo;
-        mResTable = new ResTable(mConfig, mApkInfo);
+        mConfig = config;
+        mResTable = new ResTable(apkInfo, config);
         mResFileMapping = new HashMap<>();
     }
 
@@ -102,7 +102,7 @@ public class ResourcesDecoder {
 
         File manifest = new File(apkDir, "AndroidManifest.xml");
 
-        if (mApkInfo.hasResources() && !mConfig.analysisMode) {
+        if (mApkInfo.hasResources() && !mConfig.isAnalysisMode()) {
             // Remove versionName / versionCode (aapt API 16)
             //
             // check for a mismatch between resources.arsc package and the package listed in AndroidManifest
@@ -118,7 +118,7 @@ public class ResourcesDecoder {
         }
 
         // record feature flags
-        List<String> featureFlags = ResXmlUtils.pullManifestFeatureFlags(manifest);
+        String[] featureFlags = ResXmlUtils.pullManifestFeatureFlags(manifest);
         if (featureFlags != null) {
             for (String flag : featureFlags) {
                 mApkInfo.addFeatureFlag(flag, true);
@@ -157,7 +157,7 @@ public class ResourcesDecoder {
             return;
         }
 
-        mResTable.loadMainPkg(mApkInfo.getApkFile());
+        loadMainPkg();
 
         ResStreamDecoderContainer decoders = new ResStreamDecoderContainer();
         decoders.setDecoder("raw", new ResRawStreamDecoder());

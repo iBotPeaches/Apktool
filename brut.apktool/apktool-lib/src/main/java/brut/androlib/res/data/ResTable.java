@@ -26,10 +26,8 @@ import brut.androlib.res.Framework;
 import brut.androlib.res.data.value.ResValue;
 import brut.androlib.res.decoder.ARSCDecoder;
 import brut.androlib.res.xml.ResXmlUtils;
-import brut.directory.Directory;
 import brut.directory.DirectoryException;
 import brut.directory.ExtFile;
-import com.google.common.base.Strings;
 
 import java.io.*;
 import java.util.*;
@@ -38,8 +36,8 @@ import java.util.logging.Logger;
 public class ResTable {
     private static final Logger LOGGER = Logger.getLogger(ApkDecoder.class.getName());
 
-    private final Config mConfig;
     private final ApkInfo mApkInfo;
+    private final Config mConfig;
     private final Map<Integer, ResPackage> mPackagesById;
     private final Map<String, ResPackage> mPackagesByName;
     private final Set<ResPackage> mMainPackages;
@@ -50,25 +48,17 @@ public class ResTable {
     private int mPackageId;
     private boolean mMainPkgLoaded;
 
-    public ResTable() {
-        this(Config.getDefaultConfig(), new ApkInfo());
-    }
-
-    public ResTable(ExtFile apkFile) {
-        this(Config.getDefaultConfig(), new ApkInfo(apkFile));
-    }
-
-    public ResTable(Config config, ApkInfo apkInfo) {
-        mConfig = config;
+    public ResTable(ApkInfo apkInfo, Config config) {
         mApkInfo = apkInfo;
+        mConfig = config;
         mPackagesById = new HashMap<>();
         mPackagesByName = new HashMap<>();
         mMainPackages = new LinkedHashSet<>();
         mFramePackages = new LinkedHashSet<>();
     }
 
-    public boolean getAnalysisMode() {
-        return mConfig.analysisMode;
+    public ApkInfo getApkInfo() {
+        return mApkInfo;
     }
 
     public Config getConfig() {
@@ -84,7 +74,7 @@ public class ResTable {
         // own resource, so lie to the caller replacing with its own
         // packageId
         if (resID >> 24 == 0) {
-            int pkgId = (mPackageId == 0 ? 2 : mPackageId);
+            int pkgId = mPackageId == 0 ? 2 : mPackageId;
             resID = (0xFF000000 & (pkgId << 24)) | resID;
         }
         return getResSpec(new ResID(resID));
@@ -107,6 +97,7 @@ public class ResTable {
         if (pkg != null) {
             return pkg;
         }
+
         pkg = loadFrameworkPkg(id);
         addPackage(pkg, false);
         return pkg;
@@ -119,7 +110,7 @@ public class ResTable {
 
         for (int i = 0; i < pkgs.length; i++) {
             ResPackage resPackage = pkgs[i];
-            if (resPackage.getResSpecCount() > value && ! resPackage.getName().equals("android")) {
+            if (resPackage.getResSpecCount() > value && !resPackage.getName().equals("android")) {
                 value = resPackage.getResSpecCount();
                 id = resPackage.getId();
                 index = i;
@@ -127,12 +118,12 @@ public class ResTable {
         }
 
         // if id is still 0, we only have one pkgId which is "android" -> 1
-        return (id == 0) ? pkgs[0] : pkgs[index];
+        return pkgs[id == 0 ? 0 : index];
     }
 
-    public void loadMainPkg(ExtFile apkFile) throws AndrolibException {
+    public void loadMainPkg(File apkFile) throws AndrolibException {
         LOGGER.info("Loading resource table...");
-        ResPackage[] pkgs = loadResPackagesFromApk(apkFile, mConfig.keepBrokenResources);
+        ResPackage[] pkgs = loadResPackagesFromApk(apkFile, mConfig.isKeepBrokenResources());
         ResPackage pkg;
 
         switch (pkgs.length) {
@@ -150,24 +141,25 @@ public class ResTable {
                 pkg = selectPkgWithMostResSpecs(pkgs);
                 break;
         }
+
         addPackage(pkg, true);
         mMainPkgLoaded = true;
     }
 
     private ResPackage loadFrameworkPkg(int id) throws AndrolibException {
         Framework framework = new Framework(mConfig);
-        File frameworkApk = framework.getFrameworkApk(id, mConfig.frameworkTag);
+        File apkFile = framework.getApkFile(id, mConfig.getFrameworkTag());
 
-        LOGGER.info("Loading resource table from file: " + frameworkApk);
-        ResPackage[] pkgs = loadResPackagesFromApk(new ExtFile(frameworkApk), true);
+        LOGGER.info("Loading resource table from file: " + apkFile);
+        ResPackage[] pkgs = loadResPackagesFromApk(apkFile, true);
 
         ResPackage pkg;
         if (pkgs.length > 1) {
             pkg = selectPkgWithMostResSpecs(pkgs);
-        } else if (pkgs.length == 0) {
-            throw new AndrolibException("Arsc files with zero or multiple packages");
-        } else {
+        } else if (pkgs.length == 1) {
             pkg = pkgs[0];
+        } else {
+            throw new AndrolibException("Arsc files with zero packages");
         }
 
         if (pkg.getId() != id) {
@@ -176,14 +168,15 @@ public class ResTable {
         return pkg;
     }
 
-    private ResPackage[] loadResPackagesFromApk(ExtFile apkFile, boolean keepBrokenResources)
+    private ResPackage[] loadResPackagesFromApk(File apkFile, boolean keepBrokenResources)
             throws AndrolibException {
-        try {
-            Directory dir = apkFile.getDirectory();
-            try (BufferedInputStream in = new BufferedInputStream(dir.getFileInput("resources.arsc"))) {
-                ARSCDecoder decoder = new ARSCDecoder(in, this, false, keepBrokenResources);
-                return decoder.decode().getPackages();
-            }
+        try (
+            ExtFile inFile = new ExtFile(apkFile);
+            BufferedInputStream in = new BufferedInputStream(
+                inFile.getDirectory().getFileInput("resources.arsc"))
+        ) {
+            ARSCDecoder decoder = new ARSCDecoder(in, this, false, keepBrokenResources);
+            return decoder.decode().getPackages();
         } catch (DirectoryException | IOException ex) {
             throw new AndrolibException("Could not load resources.arsc from file: " + apkFile, ex);
         }
@@ -192,27 +185,29 @@ public class ResTable {
     public ResPackage getHighestSpecPackage() throws AndrolibException {
         int id = 0;
         int value = 0;
+
         for (ResPackage resPackage : mPackagesById.values()) {
             if (resPackage.getResSpecCount() > value && !resPackage.getName().equals("android")) {
-                value = resPackage.getResSpecCount();
                 id = resPackage.getId();
+                value = resPackage.getResSpecCount();
             }
         }
+
         // if id is still 0, we only have one pkgId which is "android" -> 1
-        return (id == 0) ? getPackage(1) : getPackage(id);
+        return getPackage(id == 0 ? 1 : id);
     }
 
     public ResPackage getCurrentResPackage() throws AndrolibException {
         ResPackage pkg = mPackagesById.get(mPackageId);
-
         if (pkg != null) {
             return pkg;
-        } else {
-            if (mMainPackages.size() == 1) {
-                return mMainPackages.iterator().next();
-            }
-            return getHighestSpecPackage();
         }
+
+        if (mMainPackages.size() == 1) {
+            return mMainPackages.iterator().next();
+        }
+
+        return getHighestSpecPackage();
     }
 
     public ResPackage getPackage(String name) throws AndrolibException {
@@ -220,6 +215,7 @@ public class ResTable {
         if (pkg == null) {
             throw new UndefinedResObjectException("package: name=" + name);
         }
+
         return pkg;
     }
 
@@ -239,6 +235,7 @@ public class ResTable {
 
         mPackagesById.put(id, pkg);
         mPackagesByName.put(name, pkg);
+
         if (main) {
             mMainPackages.add(pkg);
         } else {
@@ -310,9 +307,11 @@ public class ResTable {
     public void initApkInfo(ApkInfo apkInfo, File apkDir) throws AndrolibException {
         apkInfo.isFrameworkApk = isFrameworkApk();
         apkInfo.usesFramework = getUsesFramework();
+
         if (!mApkInfo.sdkInfo.isEmpty()) {
             updateSdkInfoFromResources(apkDir);
         }
+
         initPackageInfo();
         loadVersionName(apkDir);
     }
@@ -321,12 +320,15 @@ public class ResTable {
         UsesFramework info = new UsesFramework();
         Integer[] ids = new Integer[mFramePackages.size()];
         int i = 0;
+
         for (ResPackage pkg : mFramePackages) {
             ids[i++] = pkg.getId();
         }
+
         Arrays.sort(ids);
         info.ids = Arrays.asList(ids);
-        info.tag = mConfig.frameworkTag;
+        info.tag = mConfig.getFrameworkTag();
+
         return info;
     }
 
@@ -338,6 +340,7 @@ public class ResTable {
                 mApkInfo.setMinSdkVersion(refValue);
             }
         }
+
         String targetSdkVersion = mApkInfo.getTargetSdkVersion();
         if (targetSdkVersion != null) {
             String refValue = ResXmlUtils.pullValueFromIntegers(apkDir, targetSdkVersion);
@@ -345,6 +348,7 @@ public class ResTable {
                 mApkInfo.setTargetSdkVersion(refValue);
             }
         }
+
         String maxSdkVersion = mApkInfo.getMaxSdkVersion();
         if (maxSdkVersion != null) {
             String refValue = ResXmlUtils.pullValueFromIntegers(apkDir, maxSdkVersion);
@@ -355,21 +359,22 @@ public class ResTable {
     }
 
     private void initPackageInfo() throws AndrolibException {
-        String renamed = getPackageRenamed();
         String original = getPackageOriginal();
-
-        int id = getPackageId();
-        try {
-            id = getPackage(renamed).getId();
-        } catch (UndefinedResObjectException ignored) {}
-
-        if (Strings.isNullOrEmpty(original)) {
+        if (original == null || original.isEmpty()) {
             return;
         }
 
         // only put rename-manifest-package into apktool.yml, if the change will be required
+        String renamed = getPackageRenamed();
         if (renamed != null && !renamed.equals(original)) {
             mApkInfo.packageInfo.renameManifestPackage = renamed;
+        }
+
+        int id;
+        try {
+            id = getPackage(renamed).getId();
+        } catch (UndefinedResObjectException ex) {
+            id = getPackageId();
         }
         mApkInfo.packageInfo.forcedPackageId = String.valueOf(id);
     }

@@ -28,6 +28,7 @@ public class Duo<T1, T2> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public boolean equals(Object obj) {
         if (obj == null) {
             return false;
@@ -35,7 +36,7 @@ public class Duo<T1, T2> {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final Duo<T1, T2> other = (Duo<T1, T2>) obj;
+        Duo<T1, T2> other = (Duo<T1, T2>) obj;
         if (!Objects.equals(m1, other.m1)) {
             return false;
         }

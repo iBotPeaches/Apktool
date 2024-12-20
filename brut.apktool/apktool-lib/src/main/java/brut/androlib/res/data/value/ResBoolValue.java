@@ -16,11 +16,13 @@
  */
 package brut.androlib.res.data.value;
 
+import brut.androlib.Config;
+
 public class ResBoolValue extends ResScalarValue {
     private final boolean mValue;
 
-    public ResBoolValue(boolean value, int rawIntValue, String rawValue) {
-        super("bool", rawIntValue, rawValue);
+    public ResBoolValue(boolean value, int rawIntValue, String rawValue, Config config) {
+        super("bool", rawIntValue, rawValue, config);
         mValue = value;
     }
 

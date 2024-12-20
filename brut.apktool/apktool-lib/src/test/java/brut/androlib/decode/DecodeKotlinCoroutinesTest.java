@@ -16,85 +16,58 @@
  */
 package brut.androlib.decode;
 
-import brut.androlib.*;
-import brut.androlib.exceptions.AndrolibException;
+import brut.androlib.ApkBuilder;
+import brut.androlib.ApkDecoder;
+import brut.androlib.BaseTest;
+import brut.androlib.TestUtils;
 import brut.common.BrutException;
-import brut.directory.DirectoryException;
 import brut.directory.ExtFile;
-import brut.util.OS;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 
-import static org.junit.Assert.assertTrue;
+import org.junit.*;
+import static org.junit.Assert.*;
 
 public class DecodeKotlinCoroutinesTest extends BaseTest {
-    private static final String apk = "test-kotlin-coroutines.apk";
+    private static final String TEST_APK = "test-kotlin-coroutines.apk";
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        TestUtils.cleanFrameworkFile();
-        sTmpDir = new ExtFile(OS.createTempDirectory());
-        TestUtils.copyResourceDir(DecodeKotlinCoroutinesTest.class, "decode/kotlin-coroutines/", sTmpDir);
-    }
-
-    @AfterClass
-    public static void afterClass() throws BrutException {
-        OS.rmdir(sTmpDir);
+        TestUtils.copyResourceDir(DecodeKotlinCoroutinesTest.class, "decode/kotlin-coroutines", sTmpDir);
     }
 
 
     @Test
-    public void kotlinCoroutinesDecodeTest() throws IOException, AndrolibException, DirectoryException {
+    public void kotlinCoroutinesDecodeTest() throws BrutException {
+        sConfig.setForceDelete(true);
 
-        Config config = Config.getDefaultConfig();
-        config.forceDelete = true;
-        // decode kotlin coroutines
-        ApkDecoder apkDecoder = new ApkDecoder(new ExtFile(sTmpDir + File.separator + apk), config);
-        File outDir = new File(sTmpDir + File.separator + apk + ".out");
-        apkDecoder.decode(outDir);
-        File coroutinesExceptionHandler = new File(sTmpDir + File.separator + apk + ".out" + File.separator + "META-INF" + File.separator + "services", "kotlinx.coroutines.CoroutineExceptionHandler");
-        File coroutinesMainDispatcherHandler = new File(sTmpDir + File.separator + apk + ".out" + File.separator + "META-INF" + File.separator + "services", "kotlinx.coroutines.internal.MainDispatcherFactory");
+        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
+        ExtFile testDir = new ExtFile(testApk + ".out");
+        new ApkDecoder(testApk, sConfig).decode(testDir);
 
-        assert (coroutinesExceptionHandler.exists());
-        assert (coroutinesMainDispatcherHandler.exists());
+        assertTrue(new File(testDir, "META-INF/services/kotlinx.coroutines.CoroutineExceptionHandler").exists());
+        assertTrue(new File(testDir, "META-INF/services/kotlinx.coroutines.internal.MainDispatcherFactory").exists());
     }
 
     @Test
     public void kotlinCoroutinesEncodeAfterDecodeTest() throws BrutException, IOException {
+        sConfig.setForceDelete(true);
 
-        Config config = Config.getDefaultConfig();
-        config.forceDelete = true;
-        // decode kotlin coroutines
-        ApkDecoder apkDecoder = new ApkDecoder(new ExtFile(sTmpDir + File.separator + apk), config);
-        File outDir = new File(sTmpDir + File.separator + apk + ".out");
-        apkDecoder.decode(outDir);
+        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
+        ExtFile testDir = new ExtFile(testApk + ".out");
+        new ApkDecoder(testApk, sConfig).decode(testDir);
 
-        // build kotlin coroutines
-        ExtFile testApk = new ExtFile(sTmpDir, apk + ".out");
-        new ApkBuilder(testApk, config).build(null);
-        String newApk = apk + ".out" + File.separator + "dist" + File.separator + apk;
-        assertTrue(fileExists(newApk));
+        new ApkBuilder(testDir, sConfig).build(null);
 
-        // decode kotlin coroutines again
-        apkDecoder = new ApkDecoder(new ExtFile(sTmpDir + File.separator + newApk), config);
-        outDir = new File(sTmpDir + File.separator + apk + ".out.two");
-        apkDecoder.decode(outDir);
+        ExtFile newApk = new ExtFile(testDir, "dist/" + testApk.getName());
+        ExtFile newDir = new ExtFile(testApk + ".out.new");
+        new ApkDecoder(newApk, sConfig).decode(newDir);
 
-        Files.readAllBytes(Paths.get(sTmpDir + File.separator + apk + ".out.two" + File.separator + "AndroidManifest.xml"));
-        File coroutinesExceptionHandler = new File(sTmpDir + File.separator + apk + ".out.two" + File.separator + "META-INF" + File.separator + "services", "kotlinx.coroutines.CoroutineExceptionHandler");
-        File coroutinesMainDispatcherHandler = new File(sTmpDir + File.separator + apk + ".out.two" + File.separator + "META-INF" + File.separator + "services", "kotlinx.coroutines.internal.MainDispatcherFactory");
+        Files.readAllBytes(new File(newDir, "AndroidManifest.xml").toPath());
 
-        assert (coroutinesExceptionHandler.exists());
-        assert (coroutinesMainDispatcherHandler.exists());
-    }
-
-    private boolean fileExists(String filepath) {
-        return Files.exists(Paths.get(sTmpDir.getAbsolutePath() + File.separator + filepath));
+        assertTrue(new File(newDir, "META-INF/services/kotlinx.coroutines.CoroutineExceptionHandler").exists());
+        assertTrue(new File(newDir, "META-INF/services/kotlinx.coroutines.internal.MainDispatcherFactory").exists());
     }
 }
