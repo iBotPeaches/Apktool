@@ -20,33 +20,34 @@ import brut.androlib.Config;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.data.ResResource;
 import brut.androlib.res.xml.ResValuesXmlSerializable;
-import brut.util.Duo;
+import org.apache.commons.lang3.tuple.Pair;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
 
 public class ResBagValue extends ResValue implements ResValuesXmlSerializable {
     protected final ResReferenceValue mParent;
+    protected final Config mConfig;
 
-    public ResBagValue(ResReferenceValue parent, Config config) {
-        super(config);
+    public ResBagValue(ResReferenceValue parent) {
         mParent = parent;
+        mConfig = parent.getPackage().getConfig();
     }
 
     @Override
-    public void serializeToResValuesXml(XmlSerializer serializer,
-                                        ResResource res) throws AndrolibException, IOException {
+    public void serializeToResValuesXml(XmlSerializer serializer, ResResource res)
+            throws AndrolibException, IOException {
         String type = res.getResSpec().getType().getName();
         if ("style".equals(type)) {
-            new ResStyleValue(mParent, new Duo[0], null, mConfig).serializeToResValuesXml(serializer, res);
+            new ResStyleValue(mParent, Pair.emptyArray(), null).serializeToResValuesXml(serializer, res);
             return;
         }
         if ("array".equals(type)) {
-            new ResArrayValue(mParent, new Duo[0], mConfig).serializeToResValuesXml(serializer, res);
+            new ResArrayValue(mParent, Pair.emptyArray()).serializeToResValuesXml(serializer, res);
             return;
         }
         if ("plurals".equals(type)) {
-            new ResPluralsValue(mParent, new Duo[0], mConfig).serializeToResValuesXml(serializer, res);
+            new ResPluralsValue(mParent, Pair.emptyArray()).serializeToResValuesXml(serializer, res);
             return;
         }
 
@@ -54,9 +55,5 @@ public class ResBagValue extends ResValue implements ResValuesXmlSerializable {
         serializer.attribute(null, "type", type);
         serializer.attribute(null, "name", res.getResSpec().getName());
         serializer.endTag(null, "item");
-    }
-
-    public ResReferenceValue getParent() {
-        return mParent;
     }
 }

@@ -22,7 +22,8 @@ import brut.androlib.exceptions.UndefinedResObjectException;
 import brut.androlib.res.data.value.ResFileValue;
 import brut.androlib.res.data.value.ResValueFactory;
 import brut.androlib.res.xml.ResValuesXmlSerializable;
-import brut.util.Duo;
+import org.apache.commons.lang3.tuple.Pair;
+
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -57,14 +58,14 @@ public class ResPackage {
         return new ArrayList<>(mResSpecs.values());
     }
 
-    public boolean hasResSpec(ResID resID) {
-        return mResSpecs.containsKey(resID);
+    public boolean hasResSpec(ResID resId) {
+        return mResSpecs.containsKey(resId);
     }
 
-    public ResResSpec getResSpec(ResID resID) throws UndefinedResObjectException {
-        ResResSpec spec = mResSpecs.get(resID);
+    public ResResSpec getResSpec(ResID resId) throws UndefinedResObjectException {
+        ResResSpec spec = mResSpecs.get(resId);
         if (spec == null) {
-            throw new UndefinedResObjectException("resource spec: " + resID.toString());
+            throw new UndefinedResObjectException("resource spec: " + resId.toString());
         }
         return spec;
     }
@@ -90,7 +91,7 @@ public class ResPackage {
         return type;
     }
 
-    public Set<ResResource> listFiles() {
+    public Collection<ResResource> listFiles() {
         Set<ResResource> ret = new HashSet<>();
         for (ResResSpec spec : mResSpecs.values()) {
             for (ResResource res : spec.listResources()) {
@@ -103,13 +104,13 @@ public class ResPackage {
     }
 
     public Collection<ResValuesFile> listValuesFiles() {
-        Map<Duo<ResTypeSpec, ResType>, ResValuesFile> ret = new HashMap<>();
+        Map<Pair<ResTypeSpec, ResType>, ResValuesFile> ret = new HashMap<>();
         for (ResResSpec spec : mResSpecs.values()) {
             for (ResResource res : spec.listResources()) {
                 if (res.getValue() instanceof ResValuesXmlSerializable) {
                     ResTypeSpec type = res.getResSpec().getType();
                     ResType config = res.getConfig();
-                    Duo<ResTypeSpec, ResType> key = new Duo<>(type, config);
+                    Pair<ResTypeSpec, ResType> key = Pair.of(type, config);
                     ResValuesFile values = ret.get(key);
                     if (values == null) {
                         values = new ResValuesFile(this, type, config);
@@ -163,25 +164,20 @@ public class ResPackage {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
+        if (obj == this) {
+            return true;
         }
-        if (getClass() != obj.getClass()) {
-            return false;
+        if (obj instanceof ResPackage) {
+            ResPackage other = (ResPackage) obj;
+            return Objects.equals(mResTable, other.mResTable)
+                    && mId == other.mId;
         }
-        ResPackage other = (ResPackage) obj;
-        if (!Objects.equals(mResTable, other.mResTable)) {
-            return false;
-        }
-        return mId == other.mId;
+        return false;
     }
 
     @Override
     public int hashCode() {
-        int hash = 17;
-        hash = 31 * hash + (mResTable != null ? mResTable.hashCode() : 0);
-        hash = 31 * hash + mId;
-        return hash;
+        return Objects.hashCode(mResTable) ^ Integer.hashCode(mId);
     }
 
     public ResValueFactory getValueFactory() {

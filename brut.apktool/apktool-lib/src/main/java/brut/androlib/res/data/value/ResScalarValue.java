@@ -16,7 +16,6 @@
  */
 package brut.androlib.res.data.value;
 
-import brut.androlib.Config;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.data.ResResource;
 import brut.androlib.res.xml.ResValuesXmlSerializable;
@@ -31,8 +30,8 @@ public abstract class ResScalarValue extends ResIntBasedValue implements
     protected final String mType;
     protected final String mRawValue;
 
-    protected ResScalarValue(String type, int rawIntValue, String rawValue, Config config) {
-        super(rawIntValue, config);
+    protected ResScalarValue(String type, int rawIntValue, String rawValue) {
+        super(rawIntValue);
         mType = type;
         mRawValue = rawValue;
     }
@@ -66,8 +65,8 @@ public abstract class ResScalarValue extends ResIntBasedValue implements
     }
 
     @Override
-    public void serializeToResValuesXml(XmlSerializer serializer,
-                                        ResResource res) throws AndrolibException, IOException {
+    public void serializeToResValuesXml(XmlSerializer serializer, ResResource res)
+            throws AndrolibException, IOException {
         String type = res.getResSpec().getType().getName();
         boolean item = !"reference".equals(mType) && !type.equals(mType);
 

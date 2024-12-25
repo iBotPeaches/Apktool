@@ -18,6 +18,7 @@ package brut.androlib.res.data;
 
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.exceptions.UndefinedResObjectException;
+
 import java.util.*;
 
 public class ResType {

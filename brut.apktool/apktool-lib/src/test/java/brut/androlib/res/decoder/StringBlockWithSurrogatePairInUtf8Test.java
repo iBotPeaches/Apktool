@@ -17,6 +17,7 @@
 package brut.androlib.res.decoder;
 
 import brut.androlib.BaseTest;
+
 import java.nio.charset.StandardCharsets;
 
 import org.junit.*;

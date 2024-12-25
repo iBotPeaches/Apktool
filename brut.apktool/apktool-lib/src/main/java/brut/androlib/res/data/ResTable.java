@@ -69,19 +69,19 @@ public class ResTable {
         return mMainPkgLoaded;
     }
 
-    public ResResSpec getResSpec(int resID) throws AndrolibException {
+    public ResResSpec getResSpec(int resId) throws AndrolibException {
         // The pkgId is 0x00. That means a shared library is using its
         // own resource, so lie to the caller replacing with its own
         // packageId
-        if (resID >> 24 == 0) {
+        if (resId >> 24 == 0) {
             int pkgId = mPackageId == 0 ? 2 : mPackageId;
-            resID = (0xFF000000 & (pkgId << 24)) | resID;
+            resId = (0xFF000000 & (pkgId << 24)) | resId;
         }
-        return getResSpec(new ResID(resID));
+        return getResSpec(new ResID(resId));
     }
 
-    public ResResSpec getResSpec(ResID resID) throws AndrolibException {
-        return getPackage(resID.pkgId).getResSpec(resID);
+    public ResResSpec getResSpec(ResID resId) throws AndrolibException {
+        return getPackage(resId.getPackageId()).getResSpec(resId);
     }
 
     public Set<ResPackage> listMainPackages() {
@@ -319,8 +319,8 @@ public class ResTable {
     private UsesFramework getUsesFramework() {
         UsesFramework info = new UsesFramework();
         Integer[] ids = new Integer[mFramePackages.size()];
-        int i = 0;
 
+        int i = 0;
         for (ResPackage pkg : mFramePackages) {
             ids[i++] = pkg.getId();
         }

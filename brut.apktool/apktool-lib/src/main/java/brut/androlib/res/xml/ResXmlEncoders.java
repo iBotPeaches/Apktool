@@ -16,8 +16,8 @@
  */
 package brut.androlib.res.xml;
 
-import brut.util.Duo;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
@@ -141,23 +141,26 @@ public final class ResXmlEncoders {
     }
 
     public static boolean hasMultipleNonPositionalSubstitutions(String str) {
-        Duo<List<Integer>, List<Integer>> tuple = findSubstitutions(str, 4);
-        return !tuple.m1.isEmpty() && tuple.m1.size() + tuple.m2.size() > 1;
+        Pair<List<Integer>, List<Integer>> subs = findSubstitutions(str, 4);
+        List<Integer> nonPositional = subs.getLeft();
+        List<Integer> positional = subs.getRight();
+        return !nonPositional.isEmpty() && nonPositional.size() + positional.size() > 1;
     }
 
     public static String enumerateNonPositionalSubstitutionsIfRequired(String str) {
-        Duo<List<Integer>, List<Integer>> tuple = findSubstitutions(str, 4);
-        if (tuple.m1.isEmpty() || tuple.m1.size() + tuple.m2.size() < 2) {
+        Pair<List<Integer>, List<Integer>> subs = findSubstitutions(str, 4);
+        List<Integer> nonPositional = subs.getLeft();
+        List<Integer> positional = subs.getRight();
+        if (nonPositional.isEmpty() || nonPositional.size() + positional.size() < 2) {
             return str;
         }
-        List<Integer> subs = tuple.m1;
 
         StringBuilder out = new StringBuilder();
         int pos = 0;
         int count = 0;
-        for (Integer sub : subs) {
-            out.append(str, pos, ++sub).append(++count).append('$');
-            pos = sub;
+        for (int pos2 : nonPositional) {
+            out.append(str, pos, ++pos2).append(++count).append('$');
+            pos = pos2;
         }
         out.append(str.substring(pos));
 
@@ -165,11 +168,11 @@ public final class ResXmlEncoders {
     }
 
     /**
-     * It returns a tuple of:
+     * It returns a pair of:
      *   - a list of offsets of non-positional substitutions. non-pos is defined as any "%" which isn't "%%" nor "%\d+\$"
      *   - a list of offsets of positional substitutions
      */
-    private static Duo<List<Integer>, List<Integer>> findSubstitutions(String str, int nonPosMax) {
+    private static Pair<List<Integer>, List<Integer>> findSubstitutions(String str, int nonPosMax) {
         if (nonPosMax == -1) {
             nonPosMax = Integer.MAX_VALUE;
         }
@@ -179,7 +182,7 @@ public final class ResXmlEncoders {
         List<Integer> positional = new ArrayList<>();
 
         if (str == null) {
-            return new Duo<>(nonPositional, positional);
+            return Pair.of(nonPositional, positional);
         }
 
         int length = str.length();
@@ -208,7 +211,7 @@ public final class ResXmlEncoders {
             }
         }
 
-        return new Duo<>(nonPositional, positional);
+        return Pair.of(nonPositional, positional);
     }
 
     private static boolean isPrintableChar(char c) {

@@ -239,11 +239,14 @@ public class ResourcesDecoder {
             serial.startDocument(null, null);
             serial.startTag(null, "resources");
 
-            for (ResResSpec spec : pkg.listResSpecs()) {
+            List<ResResSpec> specs = pkg.listResSpecs();
+            specs.sort(Comparator.comparing(ResResSpec::getId));
+
+            for (ResResSpec spec : specs) {
                 serial.startTag(null, "public");
                 serial.attribute(null, "type", spec.getType().getName());
                 serial.attribute(null, "name", spec.getName());
-                serial.attribute(null, "id", String.format("0x%08x", spec.getId().id));
+                serial.attribute(null, "id", spec.getId().toString());
                 serial.endTag(null, "public");
             }
 

@@ -57,24 +57,19 @@ public class ResValuesFile {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
+        if (obj == this) {
+            return true;
         }
-        if (getClass() != obj.getClass()) {
-            return false;
+        if (obj instanceof ResValuesFile) {
+            ResValuesFile other = (ResValuesFile) obj;
+            return Objects.equals(mType, other.mType)
+                    && Objects.equals(mConfig, other.mConfig);
         }
-        ResValuesFile other = (ResValuesFile) obj;
-        if (!Objects.equals(mType, other.mType)) {
-            return false;
-        }
-        return Objects.equals(mConfig, other.mConfig);
+        return false;
     }
 
     @Override
     public int hashCode() {
-        int hash = 17;
-        hash = 31 * hash + (mType != null ? mType.hashCode() : 0);
-        hash = 31 * hash + (mConfig != null ? mConfig.hashCode() : 0);
-        return hash;
+        return Objects.hashCode(mType) ^ Objects.hashCode(mConfig);
     }
 }

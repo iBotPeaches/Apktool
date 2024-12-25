@@ -109,13 +109,10 @@ public class ApkInfo implements YamlSerializable {
 
     public String checkTargetSdkVersionBounds() {
         int target = mapSdkShorthandToVersion(getTargetSdkVersion());
+        int min = getMinSdkVersion() != null ? mapSdkShorthandToVersion(getMinSdkVersion()) : 0;
+        int max = getMaxSdkVersion() != null ? mapSdkShorthandToVersion(getMaxSdkVersion()) : target;
 
-        int min = (getMinSdkVersion() != null) ? mapSdkShorthandToVersion(getMinSdkVersion()) : 0;
-        int max = (getMaxSdkVersion() != null) ? mapSdkShorthandToVersion(getMaxSdkVersion()) : target;
-
-        target = Math.min(max, target);
-        target = Math.max(min, target);
-        return Integer.toString(target);
+        return Integer.toString(Math.max(min, Math.min(max, target)));
     }
 
     public String getMinSdkVersion() {

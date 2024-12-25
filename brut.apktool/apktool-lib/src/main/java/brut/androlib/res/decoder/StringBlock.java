@@ -147,6 +147,7 @@ public class StringBlock {
         if (text == null) {
             return null;
         }
+
         int[] style = getStyle(index);
         if (style == null) {
             return ResXmlEncoders.escapeXmlChars(text);
@@ -164,8 +165,7 @@ public class StringBlock {
         }
         spans.sort(null);
 
-        StyledString styledString = new StyledString(text, spans);
-        return styledString.toString();
+        return new StyledString(text, spans).toString();
     }
 
     /**
@@ -178,14 +178,14 @@ public class StringBlock {
         if (string == null) {
             return -1;
         }
-        for (int i = 0; i != mStringOffsets.length; i++) {
+        for (int i = 0; i < mStringOffsets.length; i++) {
             int offset = mStringOffsets[i];
             int length = getShort(mStrings, offset);
             if (length != string.length()) {
                 continue;
             }
             int j = 0;
-            for (; j != length; j++) {
+            for (; j < length; j++) {
                 offset += 2;
                 if (string.charAt(j) != getShort(mStrings, offset)) {
                     break;

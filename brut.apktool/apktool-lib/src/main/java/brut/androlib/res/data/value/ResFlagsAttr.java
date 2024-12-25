@@ -21,11 +21,12 @@ import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.data.ResResSpec;
 import brut.androlib.res.data.ResResource;
 import brut.androlib.res.data.arsc.FlagItem;
-import brut.util.Duo;
+import org.apache.commons.lang3.tuple.Pair;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.logging.Logger;
 
 public class ResFlagsAttr extends ResAttr {
@@ -36,18 +37,17 @@ public class ResFlagsAttr extends ResAttr {
     private FlagItem[] mFlags;
 
     ResFlagsAttr(ResReferenceValue parent, int type, Integer min, Integer max, Boolean l10n,
-                 Duo<ResReferenceValue, ResScalarValue>[] items, Config config) {
-        super(parent, type, min, max, l10n, config);
-
+                 Pair<ResReferenceValue, ResScalarValue>[] items) {
+        super(parent, type, min, max, l10n);
         mItems = new FlagItem[items.length];
         for (int i = 0; i < items.length; i++) {
-            mItems[i] = new FlagItem(items[i].m1, items[i].m2.getRawIntValue());
+            Pair<ResReferenceValue, ResScalarValue> item = items[i];
+            mItems[i] = new FlagItem(item.getLeft(), item.getRight().getRawIntValue());
         }
     }
 
     @Override
-    public String convertToResXmlFormat(ResScalarValue value)
-            throws AndrolibException {
+    public String convertToResXmlFormat(ResScalarValue value) throws AndrolibException {
         if (value instanceof ResReferenceValue) {
             return value.encodeAsResXml();
         }
@@ -80,7 +80,8 @@ public class ResFlagsAttr extends ResAttr {
     }
 
     @Override
-    protected void serializeBody(XmlSerializer serializer, ResResource res) throws AndrolibException, IOException {
+    protected void serializeBody(XmlSerializer serializer, ResResource res)
+            throws AndrolibException, IOException {
         for (FlagItem item : mItems) {
             ResResSpec referent = item.ref.getReferent();
 
@@ -98,8 +99,8 @@ public class ResFlagsAttr extends ResAttr {
     }
 
     private boolean isSubpartOf(int flag, int[] flags) {
-        for (int j : flags) {
-            if ((j & flag) == flag) {
+        for (int f : flags) {
+            if ((f & flag) == flag) {
                 return true;
             }
         }
@@ -107,14 +108,14 @@ public class ResFlagsAttr extends ResAttr {
     }
 
     private String renderFlags(FlagItem[] flags) throws AndrolibException {
-        StringBuilder ret = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         for (FlagItem flag : flags) {
-            ret.append("|").append(flag.getValue());
+            sb.append("|").append(flag.getValue());
         }
-        if (ret.length() == 0) {
-            return ret.toString();
+        if (sb.length() == 0) {
+            return sb.toString();
         }
-        return ret.substring(1);
+        return sb.substring(1);
     }
 
     private void loadFlags() {
@@ -138,6 +139,6 @@ public class ResFlagsAttr extends ResAttr {
         mZeroFlags = Arrays.copyOf(zeroFlags, zeroFlagsCount);
         mFlags = Arrays.copyOf(flags, flagsCount);
 
-        Arrays.sort(mFlags, (o1, o2) -> Integer.compare(Integer.bitCount(o2.flag), Integer.bitCount(o1.flag)));
+        Arrays.sort(mFlags, Comparator.comparingInt((FlagItem item) -> Integer.bitCount(item.flag)).reversed());
     }
 }

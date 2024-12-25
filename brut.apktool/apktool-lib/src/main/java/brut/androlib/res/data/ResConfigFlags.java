@@ -178,86 +178,72 @@ public class ResConfigFlags {
     // but it would be hard right now and this feature is very rarely used.
     private static int sErrCounter = 0;
 
-    public final short mcc;
-    public final short mnc;
-
-    public final char[] language;
-    public final char[] region;
-
-    public final byte orientation;
-    public final byte touchscreen;
-    public final int density;
-
-    public final byte keyboard;
-    public final byte navigation;
-    public final byte inputFlags;
-    public final byte grammaticalInflection;
-
-    public final short screenWidth;
-    public final short screenHeight;
-
-    public final short sdkVersion;
-
-    public final byte screenLayout;
-    public final byte uiMode;
-    public final short smallestScreenWidthDp;
-
-    public final short screenWidthDp;
-    public final short screenHeightDp;
-
-    private final char[] localeScript;
-    private final char[] localeVariant;
-
-    private final byte screenLayout2;
-    private final byte colorMode;
-
-    private final char[] localeNumberingSystem;
-
-    public final boolean isInvalid;
+    private final short mMcc;
+    private final short mMnc;
+    private final char[] mLanguage;
+    private final char[] mRegion;
+    private final byte mOrientation;
+    private final byte mTouchscreen;
+    private final int mDensity;
+    private final byte mKeyboard;
+    private final byte mNavigation;
+    private final byte mInputFlags;
+    private final byte mGrammaticalInflection;
+    private final short mScreenWidth;
+    private final short mScreenHeight;
+    private final short mSdkVersion;
+    private final byte mScreenLayout;
+    private final byte mUiMode;
+    private final short mSmallestScreenWidthDp;
+    private final short mScreenWidthDp;
+    private final short mScreenHeightDp;
+    private final char[] mLocaleScript;
+    private final char[] mLocaleVariant;
+    private final byte mScreenLayout2;
+    private final byte mColorMode;
+    private final char[] mLocaleNumberingSystem;
+    private final int mSize;
+    private final boolean mIsInvalid;
 
     private final String mQualifiers;
 
-    private final int size;
-
     public ResConfigFlags() {
-        mcc = 0;
-        mnc = 0;
-        language = new char[] { '\00', '\00' };
-        region = new char[] { '\00', '\00' };
-        orientation = ORIENTATION_ANY;
-        touchscreen = TOUCHSCREEN_ANY;
-        density = DENSITY_DEFAULT;
-        keyboard = KEYBOARD_ANY;
-        navigation = NAVIGATION_ANY;
-        inputFlags = KEYSHIDDEN_ANY | NAVHIDDEN_ANY;
-        grammaticalInflection = GRAMMATICAL_GENDER_ANY;
-        screenWidth = 0;
-        screenHeight = 0;
-        sdkVersion = 0;
-        screenLayout = SCREENLONG_ANY | SCREENSIZE_ANY;
-        uiMode = UI_MODE_TYPE_ANY | UI_MODE_NIGHT_ANY;
-        smallestScreenWidthDp = 0;
-        screenWidthDp = 0;
-        screenHeightDp = 0;
-        localeScript = null;
-        localeVariant = null;
-        screenLayout2 = 0;
-        colorMode = COLOR_WIDE_UNDEFINED;
-        localeNumberingSystem = null;
-        isInvalid = false;
+        mMcc = 0;
+        mMnc = 0;
+        mLanguage = new char[] { '\00', '\00' };
+        mRegion = new char[] { '\00', '\00' };
+        mOrientation = ORIENTATION_ANY;
+        mTouchscreen = TOUCHSCREEN_ANY;
+        mDensity = DENSITY_DEFAULT;
+        mKeyboard = KEYBOARD_ANY;
+        mNavigation = NAVIGATION_ANY;
+        mInputFlags = KEYSHIDDEN_ANY | NAVHIDDEN_ANY;
+        mGrammaticalInflection = GRAMMATICAL_GENDER_ANY;
+        mScreenWidth = 0;
+        mScreenHeight = 0;
+        mSdkVersion = 0;
+        mScreenLayout = SCREENLONG_ANY | SCREENSIZE_ANY;
+        mUiMode = UI_MODE_TYPE_ANY | UI_MODE_NIGHT_ANY;
+        mSmallestScreenWidthDp = 0;
+        mScreenWidthDp = 0;
+        mScreenHeightDp = 0;
+        mLocaleScript = null;
+        mLocaleVariant = null;
+        mScreenLayout2 = 0;
+        mColorMode = COLOR_WIDE_UNDEFINED;
+        mLocaleNumberingSystem = null;
+        mSize = 0;
+        mIsInvalid = false;
         mQualifiers = "";
-        size = 0;
     }
 
-    public ResConfigFlags(short mcc, short mnc, char[] language,
-                          char[] region, byte orientation,
-                          byte touchscreen, int density, byte keyboard, byte navigation,
-                          byte inputFlags, byte grammaticalInflection, short screenWidth, short screenHeight,
-                          short sdkVersion, byte screenLayout, byte uiMode,
-                          short smallestScreenWidthDp, short screenWidthDp,
-                          short screenHeightDp, char[] localeScript, char[] localeVariant,
+    public ResConfigFlags(short mcc, short mnc, char[] language, char[] region, byte orientation,
+                          byte touchscreen, int density, byte keyboard, byte navigation, byte inputFlags,
+                          byte grammaticalInflection, short screenWidth, short screenHeight,
+                          short sdkVersion, byte screenLayout, byte uiMode, short smallestScreenWidthDp,
+                          short screenWidthDp, short screenHeightDp, char[] localeScript, char[] localeVariant,
                           byte screenLayout2, byte colorMode, char[] localeNumberingSystem,
-                          boolean isInvalid, int size) {
+                          int size, boolean isInvalid) {
         if (orientation < 0 || orientation > 3) {
             LOGGER.warning("Invalid orientation value: " + orientation);
             orientation = 0;
@@ -283,337 +269,323 @@ public class ResConfigFlags {
             navigation = 0;
             isInvalid = true;
         }
-
-        if (localeScript != null && localeScript.length != 0) {
-            if (localeScript[0] == '\00') {
-                localeScript = null;
-            }
-        } else {
+        if (localeScript != null && (localeScript.length == 0 || localeScript[0] == '\00')) {
             localeScript = null;
         }
-
-        if (localeVariant != null && localeVariant.length != 0) {
-            if (localeVariant[0] == '\00') {
-                localeVariant = null;
-            }
-        } else {
+        if (localeVariant != null && (localeVariant.length == 0 || localeVariant[0] == '\00')) {
             localeVariant = null;
         }
 
-        this.mcc = mcc;
-        this.mnc = mnc;
-        this.language = language;
-        this.region = region;
-        this.orientation = orientation;
-        this.touchscreen = touchscreen;
-        this.density = density;
-        this.keyboard = keyboard;
-        this.navigation = navigation;
-        this.inputFlags = inputFlags;
-        this.grammaticalInflection = grammaticalInflection;
-        this.screenWidth = screenWidth;
-        this.screenHeight = screenHeight;
-        this.sdkVersion = sdkVersion;
-        this.screenLayout = screenLayout;
-        this.uiMode = uiMode;
-        this.smallestScreenWidthDp = smallestScreenWidthDp;
-        this.screenWidthDp = screenWidthDp;
-        this.screenHeightDp = screenHeightDp;
-        this.localeScript = localeScript;
-        this.localeVariant = localeVariant;
-        this.screenLayout2 = screenLayout2;
-        this.colorMode = colorMode;
-        this.localeNumberingSystem = localeNumberingSystem;
-        this.isInvalid = isInvalid;
-        this.size = size;
+        mMcc = mcc;
+        mMnc = mnc;
+        mLanguage = language;
+        mRegion = region;
+        mOrientation = orientation;
+        mTouchscreen = touchscreen;
+        mDensity = density;
+        mKeyboard = keyboard;
+        mNavigation = navigation;
+        mInputFlags = inputFlags;
+        mGrammaticalInflection = grammaticalInflection;
+        mScreenWidth = screenWidth;
+        mScreenHeight = screenHeight;
+        mSdkVersion = sdkVersion;
+        mScreenLayout = screenLayout;
+        mUiMode = uiMode;
+        mSmallestScreenWidthDp = smallestScreenWidthDp;
+        mScreenWidthDp = screenWidthDp;
+        mScreenHeightDp = screenHeightDp;
+        mLocaleScript = localeScript;
+        mLocaleVariant = localeVariant;
+        mScreenLayout2 = screenLayout2;
+        mColorMode = colorMode;
+        mLocaleNumberingSystem = localeNumberingSystem;
+        mSize = size;
+        mIsInvalid = isInvalid;
         mQualifiers = generateQualifiers();
     }
 
-    public String getQualifiers() {
-        return mQualifiers;
-    }
-
     private String generateQualifiers() {
-        StringBuilder ret = new StringBuilder();
-        if (mcc != 0) {
-            ret.append("-mcc").append(String.format("%03d", mcc));
-            if (mnc != MNC_ZERO) {
-                if (mnc != 0) {
-                    ret.append("-mnc");
-                    if (size <= 32) {
-                        if (mnc > 0 && mnc < 10) {
-                            ret.append(String.format("%02d", mnc));
+        StringBuilder sb = new StringBuilder();
+        if (mMcc != 0) {
+            sb.append("-mcc").append(String.format("%03d", mMcc));
+            if (mMnc != MNC_ZERO) {
+                if (mMnc != 0) {
+                    sb.append("-mnc");
+                    if (mSize <= 32) {
+                        if (mMnc > 0 && mMnc < 10) {
+                            sb.append(String.format("%02d", mMnc));
                         } else {
-                            ret.append(String.format("%03d", mnc));
+                            sb.append(String.format("%03d", mMnc));
                         }
                     } else {
-                        ret.append(mnc);
+                        sb.append(mMnc);
                     }
                 }
             } else {
-                ret.append("-mnc00");
+                sb.append("-mnc00");
             }
         } else {
-            if (mnc != 0) {
-                ret.append("-mnc").append(mnc);
+            if (mMnc != 0) {
+                sb.append("-mnc").append(mMnc);
             }
         }
-        ret.append(getLocaleString());
+        sb.append(getLocaleString());
 
-        switch (grammaticalInflection) {
+        switch (mGrammaticalInflection) {
             case GRAMMATICAL_GENDER_NEUTER:
-                ret.append("-neuter");
+                sb.append("-neuter");
                 break;
             case GRAMMATICAL_GENDER_FEMININE:
-                ret.append("-feminine");
+                sb.append("-feminine");
                 break;
             case GRAMMATICAL_GENDER_MASCULINE:
-                ret.append("-masculine");
+                sb.append("-masculine");
                 break;
         }
 
-        switch (screenLayout & MASK_LAYOUTDIR) {
+        switch (mScreenLayout & MASK_LAYOUTDIR) {
             case SCREENLAYOUT_LAYOUTDIR_RTL:
-                ret.append("-ldrtl");
+                sb.append("-ldrtl");
                 break;
             case SCREENLAYOUT_LAYOUTDIR_LTR:
-                ret.append("-ldltr");
+                sb.append("-ldltr");
                 break;
         }
-        if (smallestScreenWidthDp != 0) {
-            ret.append("-sw").append(smallestScreenWidthDp).append("dp");
+        if (mSmallestScreenWidthDp != 0) {
+            sb.append("-sw").append(mSmallestScreenWidthDp).append("dp");
         }
-        if (screenWidthDp != 0) {
-            ret.append("-w").append(screenWidthDp).append("dp");
+        if (mScreenWidthDp != 0) {
+            sb.append("-w").append(mScreenWidthDp).append("dp");
         }
-        if (screenHeightDp != 0) {
-            ret.append("-h").append(screenHeightDp).append("dp");
+        if (mScreenHeightDp != 0) {
+            sb.append("-h").append(mScreenHeightDp).append("dp");
         }
-        switch (screenLayout & MASK_SCREENSIZE) {
+        switch (mScreenLayout & MASK_SCREENSIZE) {
             case SCREENSIZE_SMALL:
-                ret.append("-small");
+                sb.append("-small");
                 break;
             case SCREENSIZE_NORMAL:
-                ret.append("-normal");
+                sb.append("-normal");
                 break;
             case SCREENSIZE_LARGE:
-                ret.append("-large");
+                sb.append("-large");
                 break;
             case SCREENSIZE_XLARGE:
-                ret.append("-xlarge");
+                sb.append("-xlarge");
                 break;
         }
-        switch (screenLayout & MASK_SCREENLONG) {
+        switch (mScreenLayout & MASK_SCREENLONG) {
             case SCREENLONG_YES:
-                ret.append("-long");
+                sb.append("-long");
                 break;
             case SCREENLONG_NO:
-                ret.append("-notlong");
+                sb.append("-notlong");
                 break;
         }
-        switch (screenLayout2 & MASK_SCREENROUND) {
+        switch (mScreenLayout2 & MASK_SCREENROUND) {
             case SCREENLAYOUT_ROUND_NO:
-                ret.append("-notround");
+                sb.append("-notround");
                 break;
             case SCREENLAYOUT_ROUND_YES:
-                ret.append("-round");
+                sb.append("-round");
                 break;
         }
-        switch (colorMode & COLOR_HDR_MASK) {
+        switch (mColorMode & COLOR_HDR_MASK) {
             case COLOR_HDR_YES:
-                ret.append("-highdr");
+                sb.append("-highdr");
                 break;
             case COLOR_HDR_NO:
-                ret.append("-lowdr");
+                sb.append("-lowdr");
                 break;
         }
-        switch (colorMode & COLOR_WIDE_MASK) {
+        switch (mColorMode & COLOR_WIDE_MASK) {
             case COLOR_WIDE_YES:
-                ret.append("-widecg");
+                sb.append("-widecg");
                 break;
             case COLOR_WIDE_NO:
-                ret.append("-nowidecg");
+                sb.append("-nowidecg");
                 break;
         }
-        switch (orientation) {
+        switch (mOrientation) {
             case ORIENTATION_PORT:
-                ret.append("-port");
+                sb.append("-port");
                 break;
             case ORIENTATION_LAND:
-                ret.append("-land");
+                sb.append("-land");
                 break;
             case ORIENTATION_SQUARE:
-                ret.append("-square");
+                sb.append("-square");
                 break;
         }
-        switch (uiMode & MASK_UI_MODE_TYPE) {
+        switch (mUiMode & MASK_UI_MODE_TYPE) {
             case UI_MODE_TYPE_CAR:
-                ret.append("-car");
+                sb.append("-car");
                 break;
             case UI_MODE_TYPE_DESK:
-                ret.append("-desk");
+                sb.append("-desk");
                 break;
             case UI_MODE_TYPE_TELEVISION:
-                ret.append("-television");
+                sb.append("-television");
                 break;
             case UI_MODE_TYPE_SMALLUI:
-                ret.append("-smallui");
+                sb.append("-smallui");
                 break;
             case UI_MODE_TYPE_MEDIUMUI:
-                ret.append("-mediumui");
+                sb.append("-mediumui");
                 break;
             case UI_MODE_TYPE_LARGEUI:
-                ret.append("-largeui");
+                sb.append("-largeui");
                 break;
             case UI_MODE_TYPE_GODZILLAUI:
-                ret.append("-godzillaui");
+                sb.append("-godzillaui");
                 break;
             case UI_MODE_TYPE_HUGEUI:
-                ret.append("-hugeui");
+                sb.append("-hugeui");
                 break;
             case UI_MODE_TYPE_APPLIANCE:
-                ret.append("-appliance");
+                sb.append("-appliance");
                 break;
             case UI_MODE_TYPE_WATCH:
-                ret.append("-watch");
+                sb.append("-watch");
                 break;
             case UI_MODE_TYPE_VR_HEADSET:
-                ret.append("-vrheadset");
+                sb.append("-vrheadset");
                 break;
         }
-        switch (uiMode & MASK_UI_MODE_NIGHT) {
+        switch (mUiMode & MASK_UI_MODE_NIGHT) {
             case UI_MODE_NIGHT_YES:
-                ret.append("-night");
+                sb.append("-night");
                 break;
             case UI_MODE_NIGHT_NO:
-                ret.append("-notnight");
+                sb.append("-notnight");
                 break;
         }
-        switch (density) {
+        switch (mDensity) {
             case DENSITY_DEFAULT:
                 break;
             case DENSITY_LOW:
-                ret.append("-ldpi");
+                sb.append("-ldpi");
                 break;
             case DENSITY_MEDIUM:
-                ret.append("-mdpi");
+                sb.append("-mdpi");
                 break;
             case DENSITY_HIGH:
-                ret.append("-hdpi");
+                sb.append("-hdpi");
                 break;
             case DENSITY_TV:
-                ret.append("-tvdpi");
+                sb.append("-tvdpi");
                 break;
             case DENSITY_XHIGH:
-                ret.append("-xhdpi");
+                sb.append("-xhdpi");
                 break;
             case DENSITY_XXHIGH:
-                ret.append("-xxhdpi");
+                sb.append("-xxhdpi");
                 break;
             case DENSITY_XXXHIGH:
-                ret.append("-xxxhdpi");
+                sb.append("-xxxhdpi");
                 break;
             case DENSITY_ANY:
-                ret.append("-anydpi");
+                sb.append("-anydpi");
                 break;
             case DENSITY_NONE:
-                ret.append("-nodpi");
+                sb.append("-nodpi");
                 break;
             default:
-                ret.append('-').append(density).append("dpi");
+                sb.append('-').append(mDensity).append("dpi");
         }
-        switch (touchscreen) {
+        switch (mTouchscreen) {
             case TOUCHSCREEN_NOTOUCH:
-                ret.append("-notouch");
+                sb.append("-notouch");
                 break;
             case TOUCHSCREEN_STYLUS:
-                ret.append("-stylus");
+                sb.append("-stylus");
                 break;
             case TOUCHSCREEN_FINGER:
-                ret.append("-finger");
+                sb.append("-finger");
                 break;
         }
-        switch (inputFlags & MASK_KEYSHIDDEN) {
+        switch (mInputFlags & MASK_KEYSHIDDEN) {
             case KEYSHIDDEN_NO:
-                ret.append("-keysexposed");
+                sb.append("-keysexposed");
                 break;
             case KEYSHIDDEN_YES:
-                ret.append("-keyshidden");
+                sb.append("-keyshidden");
                 break;
             case KEYSHIDDEN_SOFT:
-                ret.append("-keyssoft");
+                sb.append("-keyssoft");
                 break;
         }
-        switch (keyboard) {
+        switch (mKeyboard) {
             case KEYBOARD_NOKEYS:
-                ret.append("-nokeys");
+                sb.append("-nokeys");
                 break;
             case KEYBOARD_QWERTY:
-                ret.append("-qwerty");
+                sb.append("-qwerty");
                 break;
             case KEYBOARD_12KEY:
-                ret.append("-12key");
+                sb.append("-12key");
                 break;
         }
-        switch (inputFlags & MASK_NAVHIDDEN) {
+        switch (mInputFlags & MASK_NAVHIDDEN) {
             case NAVHIDDEN_NO:
-                ret.append("-navexposed");
+                sb.append("-navexposed");
                 break;
             case NAVHIDDEN_YES:
-                ret.append("-navhidden");
+                sb.append("-navhidden");
                 break;
         }
-        switch (navigation) {
+        switch (mNavigation) {
             case NAVIGATION_NONAV:
-                ret.append("-nonav");
+                sb.append("-nonav");
                 break;
             case NAVIGATION_DPAD:
-                ret.append("-dpad");
+                sb.append("-dpad");
                 break;
             case NAVIGATION_TRACKBALL:
-                ret.append("-trackball");
+                sb.append("-trackball");
                 break;
             case NAVIGATION_WHEEL:
-                ret.append("-wheel");
+                sb.append("-wheel");
                 break;
         }
-        if (screenWidth != 0 && screenHeight != 0) {
-            if (screenWidth > screenHeight) {
-                ret.append(String.format("-%dx%d", screenWidth, screenHeight));
+        if (mScreenWidth != 0 && mScreenHeight != 0) {
+            if (mScreenWidth > mScreenHeight) {
+                sb.append(String.format("-%dx%d", mScreenWidth, mScreenHeight));
             } else {
-                ret.append(String.format("-%dx%d", screenHeight, screenWidth));
+                sb.append(String.format("-%dx%d", mScreenHeight, mScreenWidth));
             }
         }
-        if (sdkVersion > 0 && sdkVersion >= getNaturalSdkVersionRequirement()) {
-            ret.append("-v").append(sdkVersion);
+        if (mSdkVersion > 0 && mSdkVersion >= getNaturalSdkVersionRequirement()) {
+            sb.append("-v").append(mSdkVersion);
         }
-        if (isInvalid) {
-            ret.append("-ERR").append(sErrCounter++);
+        if (mIsInvalid) {
+            sb.append("-ERR").append(sErrCounter++);
         }
 
-        return ret.toString();
+        return sb.toString();
     }
 
     private short getNaturalSdkVersionRequirement() {
-        if (grammaticalInflection != 0) {
+        if (mGrammaticalInflection != 0) {
             return SDK_UPSIDEDOWN_CAKE;
         }
-        if ((uiMode & MASK_UI_MODE_TYPE) == UI_MODE_TYPE_VR_HEADSET || (colorMode & COLOR_WIDE_MASK) != 0 || ((colorMode & COLOR_HDR_MASK) != 0)) {
+        if ((mUiMode & MASK_UI_MODE_TYPE) == UI_MODE_TYPE_VR_HEADSET || (mColorMode & COLOR_WIDE_MASK) != 0 || ((mColorMode & COLOR_HDR_MASK) != 0)) {
             return SDK_OREO;
         }
-        if ((screenLayout2 & MASK_SCREENROUND) != 0) {
+        if ((mScreenLayout2 & MASK_SCREENROUND) != 0) {
             return SDK_MNC;
         }
-        if (density == DENSITY_ANY) {
+        if (mDensity == DENSITY_ANY) {
             return SDK_LOLLIPOP;
         }
-        if (smallestScreenWidthDp != 0 || screenWidthDp != 0 || screenHeightDp != 0) {
+        if (mSmallestScreenWidthDp != 0 || mScreenWidthDp != 0 || mScreenHeightDp != 0) {
             return SDK_HONEYCOMB_MR2;
         }
-        if ((uiMode & (MASK_UI_MODE_TYPE | MASK_UI_MODE_NIGHT)) != UI_MODE_NIGHT_ANY) {
+        if ((mUiMode & (MASK_UI_MODE_TYPE | MASK_UI_MODE_NIGHT)) != UI_MODE_NIGHT_ANY) {
             return SDK_FROYO;
         }
-        if ((screenLayout & (MASK_SCREENSIZE | MASK_SCREENLONG)) != SCREENSIZE_ANY || density != DENSITY_DEFAULT) {
+        if ((mScreenLayout & (MASK_SCREENSIZE | MASK_SCREENLONG)) != SCREENSIZE_ANY || mDensity != DENSITY_DEFAULT) {
             return SDK_DONUT;
         }
         return 0;
@@ -621,44 +593,43 @@ public class ResConfigFlags {
 
     private String getLocaleString() {
         StringBuilder sb = new StringBuilder();
-
         // check for old style non BCP47 tags
         // allows values-xx-rXX, values-xx, values-xxx-rXX
         // denies values-xxx, anything else
-        if (localeVariant == null && localeScript == null && (region[0] != '\00' || language[0] != '\00') &&
-                region.length != 3) {
-            sb.append("-").append(language);
-            if (region[0] != '\00') {
-                sb.append("-r").append(region);
+        if (mLocaleScript == null && mLocaleVariant == null && (mRegion[0] != '\00' || mLanguage[0] != '\00')
+                && mRegion.length != 3) {
+            sb.append("-").append(mLanguage);
+            if (mRegion[0] != '\00') {
+                sb.append("-r").append(mRegion);
             }
         } else { // BCP47
-            if (language[0] == '\00' && region[0] == '\00') {
+            if (mLanguage[0] == '\00' && mRegion[0] == '\00') {
                 return sb.toString(); // early return, no language or region
             }
             sb.append("-b+");
-            if (language[0] != '\00') {
-                sb.append(language);
+            if (mLanguage[0] != '\00') {
+                sb.append(mLanguage);
             }
-            if (localeScript != null && localeScript.length == 4) {
-                sb.append("+").append(localeScript);
+            if (mLocaleScript != null && mLocaleScript.length == 4) {
+                sb.append("+").append(mLocaleScript);
             }
-            if ((region.length == 2 || region.length == 3) && region[0] != '\00') {
-                sb.append("+").append(region);
+            if ((mRegion.length == 2 || mRegion.length == 3) && mRegion[0] != '\00') {
+                sb.append("+").append(mRegion);
             }
-            if (localeVariant != null && localeVariant.length >= 5) {
-                sb.append("+").append(toUpper(localeVariant));
+            if (mLocaleVariant != null && mLocaleVariant.length >= 5) {
+                sb.append("+").append(toUpper(mLocaleVariant));
             }
 
             // If we have a numbering system - it isn't used in qualifiers for build tools, but AOSP understands it
             // So chances are - this may be valid, but aapt 1/2 will not like it.
-            if (localeNumberingSystem != null && localeNumberingSystem.length > 0) {
-                sb.append("+u+nu+").append(localeNumberingSystem);
+            if (mLocaleNumberingSystem != null && mLocaleNumberingSystem.length > 0) {
+                sb.append("+u+nu+").append(mLocaleNumberingSystem);
             }
         }
         return sb.toString();
     }
 
-    private String toUpper(char[] character) {
+    private static String toUpper(char[] character) {
         StringBuilder sb = new StringBuilder();
         for (char ch : character) {
             sb.append(Character.toUpperCase(ch));
@@ -666,6 +637,13 @@ public class ResConfigFlags {
         return sb.toString();
     }
 
+    public boolean isInvalid() {
+        return mIsInvalid;
+    }
+
+    public String getQualifiers() {
+        return mQualifiers;
+    }
 
     @Override
     public String toString() {
@@ -674,20 +652,18 @@ public class ResConfigFlags {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
+        if (obj == this) {
+            return true;
         }
-        if (getClass() != obj.getClass()) {
-            return false;
+        if (obj instanceof ResConfigFlags) {
+            ResConfigFlags other = (ResConfigFlags) obj;
+            return mQualifiers.equals(other.mQualifiers);
         }
-        ResConfigFlags other = (ResConfigFlags) obj;
-        return mQualifiers.equals(other.mQualifiers);
+        return false;
     }
 
     @Override
     public int hashCode() {
-        int hash = 17;
-        hash = 31 * hash + mQualifiers.hashCode();
-        return hash;
+        return mQualifiers.hashCode();
     }
 }

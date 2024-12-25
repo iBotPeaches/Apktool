@@ -151,7 +151,7 @@ public class ResFileDecoder {
             LOGGER.log(Level.SEVERE, String.format(
                 "Could not decode file, replacing by FALSE value: %s",
             inFileName), ex);
-            res.replace(new ResBoolValue(false, 0, null, null));
+            res.replace(new ResBoolValue(false, 0, null));
         }
     }
 

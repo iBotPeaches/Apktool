@@ -16,20 +16,19 @@
  */
 package brut.androlib.res.data.value;
 
-import brut.androlib.Config;
 import brut.androlib.exceptions.AndrolibException;
 
 public class ResEmptyValue extends ResScalarValue {
     protected final int mValue;
     protected int mType;
 
-    public ResEmptyValue(int value, String rawValue, int type, Config config) {
-        this(value, rawValue, "integer", config);
+    public ResEmptyValue(int value, String rawValue, int type) {
+        this(value, rawValue, "integer");
         mType = type;
     }
 
-    public ResEmptyValue(int value, String rawValue, String type, Config config) {
-        super(type, value, rawValue, config);
+    public ResEmptyValue(int value, String rawValue, String type) {
+        super(type, value, rawValue);
         if (value != 1) {
             throw new UnsupportedOperationException();
         }

@@ -89,16 +89,16 @@ public class StyledString {
         }
 
         @Override
-        public int compareTo(Span o) {
-            int res = Integer.compare(mFirstChar, o.mFirstChar);
+        public int compareTo(Span other) {
+            int res = Integer.compare(mFirstChar, other.mFirstChar);
             if (res != 0) {
                 return res;
             }
-            res = Integer.compare(mLastChar, o.mLastChar);
+            res = Integer.compare(mLastChar, other.mLastChar);
             if (res != 0) {
                 return -res;
             }
-            return -mTag.compareTo(o.mTag);
+            return -mTag.compareTo(other.mTag);
         }
     }
 

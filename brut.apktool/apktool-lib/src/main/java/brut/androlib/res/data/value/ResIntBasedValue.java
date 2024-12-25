@@ -16,13 +16,10 @@
  */
 package brut.androlib.res.data.value;
 
-import brut.androlib.Config;
-
 public class ResIntBasedValue extends ResValue {
     private final int mRawIntValue;
 
-    protected ResIntBasedValue(int rawIntValue, Config config) {
-        super(config);
+    protected ResIntBasedValue(int rawIntValue) {
         mRawIntValue = rawIntValue;
     }
 

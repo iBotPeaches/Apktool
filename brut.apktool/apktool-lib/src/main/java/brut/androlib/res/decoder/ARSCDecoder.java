@@ -23,8 +23,8 @@ import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.data.*;
 import brut.androlib.res.data.arsc.*;
 import brut.androlib.res.data.value.*;
-import brut.util.Duo;
 import brut.util.ExtDataInputStream;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.*;
 import java.math.BigInteger;
@@ -142,7 +142,8 @@ public class ARSCDecoder {
             }
         }
 
-        if (mConfig.getDecodeResolveMode() == Config.DECODE_RES_RESOLVE_DUMMY && mPkg != null && mPkg.getResSpecCount() > 0) {
+        if (mConfig.getDecodeResolveMode() == Config.DECODE_RES_RESOLVE_DUMMY
+                && mPkg != null && mPkg.getResSpecCount() > 0) {
             addMissingResSpecs();
         }
 
@@ -324,7 +325,7 @@ public class ARSCDecoder {
             }
         }
 
-        if (flags.isInvalid) {
+        if (flags.isInvalid()) {
             String resName = mTypeSpec.getName() + flags.getQualifiers();
             if (mKeepBroken) {
                 LOGGER.warning("Invalid config flags detected: " + resName);
@@ -333,7 +334,7 @@ public class ARSCDecoder {
             }
         }
 
-        mType = !flags.isInvalid || mKeepBroken ? mPkg.getOrCreateConfig(flags) : null;
+        mType = !flags.isInvalid() || mKeepBroken ? mPkg.getOrCreateConfig(flags) : null;
         int noEntry = isOffset16 ? NO_ENTRY_OFFSET16 : NO_ENTRY;
 
         // #3428 - In some applications the res entries are padded for alignment.
@@ -428,8 +429,7 @@ public class ARSCDecoder {
         ResValue value = entryData.value;
 
         if (mTypeSpec.isString() && value instanceof ResFileValue) {
-            value = new ResStringValue(value.toString(), ((ResFileValue) value).getRawIntValue(),
-                mConfig);
+            value = new ResStringValue(value.toString(), ((ResFileValue) value).getRawIntValue());
         }
         if (mType == null) {
             return;
@@ -461,11 +461,11 @@ public class ARSCDecoder {
     }
 
     private ResBagValue readComplexEntry() throws AndrolibException, IOException {
-        int parent = mIn.readInt();
+        int parentId = mIn.readInt();
         int count = mIn.readInt();
 
         ResValueFactory factory = mPkg.getValueFactory();
-        Duo<Integer, ResScalarValue>[] items = new Duo[count];
+        Pair<Integer, ResScalarValue>[] items = new Pair[count];
         ResIntBasedValue resValue;
         int resId;
 
@@ -480,13 +480,12 @@ public class ARSCDecoder {
             }
 
             if (!(resValue instanceof ResScalarValue)) {
-                resValue = new ResStringValue(resValue.toString(), resValue.getRawIntValue(),
-                    mConfig);
+                resValue = new ResStringValue(resValue.toString(), resValue.getRawIntValue());
             }
-            items[i] = new Duo<>(resId, (ResScalarValue) resValue);
+            items[i] = Pair.of(resId, (ResScalarValue) resValue);
         }
 
-        return factory.bagFactory(parent, items, mTypeSpec);
+        return factory.bagFactory(parentId, items, mTypeSpec);
     }
 
     private ResIntBasedValue readCompactValue(byte type, int data) throws AndrolibException {
@@ -639,7 +638,7 @@ public class ARSCDecoder {
                 inputFlags, grammaticalInflection, screenWidth, screenHeight, sdkVersion,
                 screenLayout, uiMode, smallestScreenWidthDp, screenWidthDp,
                 screenHeightDp, localeScript, localeVariant, screenLayout2,
-                colorMode, localeNumberingSystem, isInvalid, size);
+                colorMode, localeNumberingSystem, size, isInvalid);
     }
 
     private char[] unpackLanguageOrRegion(byte in0, byte in1, char base) {
@@ -682,7 +681,7 @@ public class ARSCDecoder {
             ResID id = new ResID(resId);
             ResResSpec spec = new ResResSpec(id, resName, mPkg, mResTypeSpecs.get(typeId));
 
-            // If we already have this resID don't add it again.
+            // If we already have this resId don't add it again.
             if (!mPkg.hasResSpec(id)) {
                 mPkg.addResSpec(spec);
                 spec.getType().addResSpec(spec);
@@ -690,7 +689,7 @@ public class ARSCDecoder {
 
                 // We are going to make dummy attributes a null reference (@null) now instead of a boolean false.
                 // This is because aapt2 is stricter when it comes to what we can put in an application.
-                ResValue value = new ResReferenceValue(mPkg, 0, "", mConfig);
+                ResValue value = new ResReferenceValue(mPkg, 0, "");
 
                 ResResource res = new ResResource(resType, spec, value);
                 resType.addResource(res);

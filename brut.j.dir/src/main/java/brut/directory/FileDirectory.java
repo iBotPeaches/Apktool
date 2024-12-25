@@ -110,7 +110,7 @@ public class FileDirectory extends AbstractDirectory {
         mDirs = new LinkedHashMap<>();
 
         File[] files = getDir().listFiles();
-        Arrays.sort(files, Comparator.comparing(f -> f.getName()));
+        Arrays.sort(files, Comparator.comparing(File::getName));
 
         for (File file : files) {
             if (file.isFile()) {

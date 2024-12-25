@@ -16,12 +16,11 @@
  */
 package brut.androlib.res.data.value;
 
-import brut.androlib.Config;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.data.ResResource;
 import brut.androlib.res.xml.ResValuesXmlSerializable;
 import brut.androlib.res.xml.ResXmlEncoders;
-import brut.util.Duo;
+import org.apache.commons.lang3.tuple.Pair;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
@@ -33,17 +32,17 @@ public class ResPluralsValue extends ResBagValue implements ResValuesXmlSerializ
 
     private final ResScalarValue[] mItems;
 
-    ResPluralsValue(ResReferenceValue parent, Duo<Integer, ResScalarValue>[] items, Config config) {
-        super(parent, config);
+    ResPluralsValue(ResReferenceValue parent, Pair<Integer, ResScalarValue>[] items) {
+        super(parent);
         mItems = new ResScalarValue[6];
-        for (Duo<Integer, ResScalarValue> item : items) {
-            mItems[item.m1 - BAG_KEY_PLURALS_START] = item.m2;
+        for (Pair<Integer, ResScalarValue> item : items) {
+            mItems[item.getLeft() - BAG_KEY_PLURALS_START] = item.getRight();
         }
     }
 
     @Override
-    public void serializeToResValuesXml(XmlSerializer serializer,
-                                        ResResource res) throws AndrolibException, IOException {
+    public void serializeToResValuesXml(XmlSerializer serializer, ResResource res)
+            throws AndrolibException, IOException {
         serializer.startTag(null, "plurals");
         serializer.attribute(null, "name", res.getResSpec().getName());
         for (int i = 0; i < mItems.length; i++) {

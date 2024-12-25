@@ -16,12 +16,8 @@
  */
 package brut.androlib.res.data.value;
 
-import brut.androlib.Config;
-
 public abstract class ResValue {
-    protected final Config mConfig;
 
-    protected ResValue(Config config) {
-        mConfig = config;
+    protected ResValue() {
     }
 }

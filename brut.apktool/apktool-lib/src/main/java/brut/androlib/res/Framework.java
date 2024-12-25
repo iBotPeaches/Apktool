@@ -63,7 +63,7 @@ public class Framework {
             publicizeResources(data, arsc.getFlagsOffsets());
 
             File outFile = new File(getDirectory(),
-                arsc.getOnePackage().getId() + (tag == null ? "" : '-' + tag) + ".apk");
+                arsc.getOnePackage().getId() + (tag != null ? "-" + tag : "") + ".apk");
 
             try (ZipOutputStream out = new ZipOutputStream(Files.newOutputStream(outFile.toPath()))) {
                 out.setMethod(ZipOutputStream.STORED);
