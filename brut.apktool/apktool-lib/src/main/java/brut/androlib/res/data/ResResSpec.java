@@ -40,9 +40,9 @@ public class ResResSpec {
     public ResResSpec(ResID id, String name, ResPackage pkg, ResTypeSpec type) {
         mId = id;
         if (name == null || name.isEmpty() || EMPTY_RESOURCE_NAMES.contains(name)) {
-            name = "APKTOOL_DUMMYVAL_" + id.toString();
+            name = "APKTOOL_DUMMYVAL_" + id;
         } else if (type.getResSpecUnsafe(name) != null) {
-            name = String.format("APKTOOL_DUPLICATE_%s_%s", type, id.toString());
+            name = String.format("APKTOOL_DUPLICATE_%s_%s", type, id);
         }
         mName = name;
         mPackage = pkg;
@@ -116,6 +116,6 @@ public class ResResSpec {
 
     @Override
     public String toString() {
-        return mId.toString() + " " + mType.toString() + "/" + mName;
+        return mId + " " + mType + "/" + mName;
     }
 }
