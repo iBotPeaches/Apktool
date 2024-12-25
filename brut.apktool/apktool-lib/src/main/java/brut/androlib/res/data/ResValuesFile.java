@@ -70,6 +70,6 @@ public class ResValuesFile {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(mType) ^ Objects.hashCode(mConfig);
+        return Objects.hash(mType, mConfig);
     }
 }

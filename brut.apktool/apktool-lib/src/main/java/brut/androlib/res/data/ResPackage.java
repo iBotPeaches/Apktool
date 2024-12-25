@@ -177,7 +177,7 @@ public class ResPackage {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(mResTable) ^ Integer.hashCode(mId);
+        return Objects.hash(mResTable, mId);
     }
 
     public ResValueFactory getValueFactory() {
