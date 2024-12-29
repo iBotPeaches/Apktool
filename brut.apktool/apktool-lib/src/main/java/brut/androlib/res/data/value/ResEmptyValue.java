@@ -29,8 +29,9 @@ public class ResEmptyValue extends ResScalarValue {
 
     public ResEmptyValue(int value, String rawValue, String type) {
         super(type, value, rawValue);
-        if (value != 1)
+        if (value != 1) {
             throw new UnsupportedOperationException();
+        }
         mValue = value;
     }
 

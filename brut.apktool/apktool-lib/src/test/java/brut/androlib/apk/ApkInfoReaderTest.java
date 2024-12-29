@@ -16,12 +16,13 @@
  */
 package brut.androlib.apk;
 
-import brut.androlib.exceptions.AndrolibException;
-import org.junit.Test;
+import brut.androlib.BaseTest;
+import brut.common.BrutException;
 
+import org.junit.*;
 import static org.junit.Assert.*;
 
-public class ApkInfoReaderTest {
+public class ApkInfoReaderTest extends BaseTest {
 
     private void checkStandard(ApkInfo apkInfo) {
         assertEquals("standard.apk", apkInfo.apkFileName);
@@ -48,7 +49,7 @@ public class ApkInfoReaderTest {
     }
 
     @Test
-    public void testStandard() throws AndrolibException {
+    public void testStandard() throws BrutException {
         ApkInfo apkInfo = ApkInfo.load(
             getClass().getResourceAsStream("/apk/standard.yml"));
         checkStandard(apkInfo);
@@ -56,7 +57,7 @@ public class ApkInfoReaderTest {
     }
 
     @Test
-    public void testUnknownFields() throws AndrolibException {
+    public void testUnknownFields() throws BrutException {
         ApkInfo apkInfo = ApkInfo.load(
             getClass().getResourceAsStream("/apk/unknown_fields.yml"));
         checkStandard(apkInfo);
@@ -64,7 +65,7 @@ public class ApkInfoReaderTest {
     }
 
     @Test
-    public void testSkipIncorrectIndent() throws AndrolibException {
+    public void testSkipIncorrectIndent() throws BrutException {
         ApkInfo apkInfo = ApkInfo.load(
             getClass().getResourceAsStream("/apk/skip_incorrect_indent.yml"));
         checkStandard(apkInfo);
@@ -72,7 +73,7 @@ public class ApkInfoReaderTest {
     }
 
     @Test
-    public void testFirstIncorrectIndent() throws AndrolibException {
+    public void testFirstIncorrectIndent() throws BrutException {
         ApkInfo apkInfo = ApkInfo.load(
             getClass().getResourceAsStream("/apk/first_incorrect_indent.yml"));
         checkStandard(apkInfo);
@@ -80,7 +81,7 @@ public class ApkInfoReaderTest {
     }
 
     @Test
-    public void testUnknownFiles() throws AndrolibException {
+    public void testUnknownFiles() throws BrutException {
         ApkInfo apkInfo = ApkInfo.load(
             getClass().getResourceAsStream("/apk/unknown_files.yml"));
         assertEquals("2.0.0", apkInfo.version);
@@ -104,7 +105,7 @@ public class ApkInfoReaderTest {
     }
 
     @Test
-    public void testUlist_with_indent() throws AndrolibException {
+    public void testUlist_with_indent() throws BrutException {
         ApkInfo apkInfo = ApkInfo.load(
             getClass().getResourceAsStream("/apk/list_with_indent.yml"));
         assertEquals("2.8.0", apkInfo.version);

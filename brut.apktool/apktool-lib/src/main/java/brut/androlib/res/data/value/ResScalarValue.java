@@ -65,8 +65,8 @@ public abstract class ResScalarValue extends ResIntBasedValue implements
     }
 
     @Override
-    public void serializeToResValuesXml(XmlSerializer serializer,
-                                        ResResource res) throws IOException, AndrolibException {
+    public void serializeToResValuesXml(XmlSerializer serializer, ResResource res)
+            throws AndrolibException, IOException {
         String type = res.getResSpec().getType().getName();
         boolean item = !"reference".equals(mType) && !type.equals(mType);
 

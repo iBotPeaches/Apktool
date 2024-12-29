@@ -21,16 +21,16 @@ import brut.androlib.TestUtils;
 import brut.androlib.res.decoder.Res9patchStreamDecoder;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
-import brut.util.OS;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.File;
 import java.nio.file.Files;
 
+import org.junit.*;
 import static org.junit.Assert.*;
 
 public class MissingDiv9PatchTest extends BaseTest {
@@ -38,14 +38,7 @@ public class MissingDiv9PatchTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        TestUtils.cleanFrameworkFile();
-        sTmpDir = new ExtFile(OS.createTempDirectory());
-        TestUtils.copyResourceDir(MissingDiv9PatchTest.class, "decode/issue1522/", sTmpDir);
-    }
-
-    @AfterClass
-    public static void afterClass() throws BrutException {
-        OS.rmdir(sTmpDir);
+        TestUtils.copyResourceDir(MissingDiv9PatchTest.class, "decode/issue1522", sTmpDir);
     }
 
     @Test

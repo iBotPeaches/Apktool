@@ -18,44 +18,29 @@ package brut.androlib.decode;
 
 import brut.androlib.ApkDecoder;
 import brut.androlib.BaseTest;
-import brut.androlib.Config;
 import brut.androlib.TestUtils;
 import brut.directory.ExtFile;
 import brut.common.BrutException;
-import brut.util.OS;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.*;
+import static org.junit.Assert.*;
 
 public class MinifiedArscTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        TestUtils.cleanFrameworkFile();
-        sTmpDir = new ExtFile(OS.createTempDirectory());
-        TestUtils.copyResourceDir(MinifiedArscTest.class, "decode/issue1157/", sTmpDir);
+        TestUtils.copyResourceDir(MinifiedArscTest.class, "decode/issue1157", sTmpDir);
 
-        String apk = "issue1157.apk";
-        sTestNewDir = new ExtFile(sTmpDir, "issue1157");
+        sConfig.setForceDelete(true);
 
-        Config config = Config.getDefaultConfig();
-        config.forceDelete = true;
-        // decode issue1157.apk
-        ApkDecoder apkDecoder = new ApkDecoder(new ExtFile(sTmpDir, apk), config);
-        // this should not raise an exception:
-        apkDecoder.decode(sTestNewDir);
-    }
+        ExtFile testApk = new ExtFile(sTmpDir, "issue1157.apk");
+        sTestNewDir = new ExtFile(testApk + ".out");
 
-    @AfterClass
-    public static void afterClass() throws BrutException {
-        OS.rmdir(sTmpDir);
+        new ApkDecoder(testApk, sConfig).decode(sTestNewDir);
     }
 
     @Test
@@ -66,8 +51,9 @@ public class MinifiedArscTest extends BaseTest {
                 "    <com.ibotpeaches.issue1157.MyCustomView n1:max=\"100\" n2:default_value=\"1.0\" n2:max_value=\"5.0\" n2:min_value=\"0.2\" xmlns:n2=\"http://schemas.android.com/apk/res-auto\" />\n" +
                 "</LinearLayout>");
 
-        byte[] encoded = Files.readAllBytes(Paths.get(sTestNewDir + File.separator + "res" + File.separator + "xml" + File.separator + "custom.xml"));
+        byte[] encoded = Files.readAllBytes(new File(sTestNewDir, "res/xml/custom.xml").toPath());
         String obtained = TestUtils.replaceNewlines(new String(encoded));
+
         assertEquals(expected, obtained);
     }
 }

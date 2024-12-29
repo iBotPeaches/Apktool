@@ -22,18 +22,17 @@ import brut.androlib.Config;
 import brut.androlib.TestUtils;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
-import brut.util.OS;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
+import org.junit.*;
 import static org.junit.Assert.*;
 
 public class ForceManifestDecodeNoResourcesTest extends BaseTest {
+    private static final String TEST_APK = "issue1680.apk";
+
     private static final byte[] XML_HEADER = {
             0x3C, // <
             0x3F, // ?
@@ -45,100 +44,74 @@ public class ForceManifestDecodeNoResourcesTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        TestUtils.cleanFrameworkFile();
-        sTmpDir = new ExtFile(OS.createTempDirectory());
-        TestUtils.copyResourceDir(ForceManifestDecodeNoResourcesTest.class, "decode/issue1680/", sTmpDir);
-    }
-
-    @AfterClass
-    public static void afterClass() throws BrutException {
-        OS.rmdir(sTmpDir);
+        TestUtils.copyResourceDir(ForceManifestDecodeNoResourcesTest.class, "decode/issue1680", sTmpDir);
     }
 
     @Test
     public void checkIfForceManifestWithNoResourcesWorks() throws BrutException, IOException {
-        String apk = "issue1680.apk";
-        String output = sTmpDir + File.separator + apk + ".out";
+        sConfig.setForceDelete(true);
+        sConfig.setDecodeResources(Config.DECODE_RESOURCES_NONE);
+        sConfig.setForceDecodeManifest(Config.FORCE_DECODE_MANIFEST_FULL);
 
-        // decode issue1680.apk
-        decodeFile(sTmpDir + File.separator + apk, Config.DECODE_RESOURCES_NONE,
-            Config.FORCE_DECODE_MANIFEST_FULL, output);
+        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
+        ExtFile testDir = new ExtFile(testApk + ".out");
+        new ApkDecoder(testApk, sConfig).decode(testDir);
 
-        // let's probe filetype of manifest, we should detect XML
-        File manifestFile = new File(output + File.separator + "AndroidManifest.xml");
-        byte[] magic = TestUtils.readHeaderOfFile(manifestFile, 6);
-        assertArrayEquals(XML_HEADER, magic);
+        // assert that manifest is XML
+        assertArrayEquals(XML_HEADER, TestUtils.readHeaderOfFile(new File(testDir, "AndroidManifest.xml"), 6));
 
-        // confirm resources.arsc still exists, as its raw
-        File resourcesArsc = new File(output + File.separator + "resources.arsc");
-        assertTrue(resourcesArsc.isFile());
+        // assert that resources.arsc exists
+        assertTrue(new File(testDir, "resources.arsc").isFile());
     }
 
     @Test
     public void checkIfForceManifestWorksWithNoChangeToResources() throws BrutException, IOException {
-        String apk = "issue1680.apk";
-        String output = sTmpDir + File.separator + apk + ".out";
+        sConfig.setForceDelete(true);
+        sConfig.setDecodeResources(Config.DECODE_RESOURCES_FULL);
+        sConfig.setForceDecodeManifest(Config.FORCE_DECODE_MANIFEST_FULL);
 
-        // decode issue1680.apk
-        decodeFile(sTmpDir + File.separator + apk, Config.DECODE_RESOURCES_FULL,
-            Config.FORCE_DECODE_MANIFEST_FULL, output);
+        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
+        ExtFile testDir = new ExtFile(testApk + ".out");
+        new ApkDecoder(testApk, sConfig).decode(testDir);
 
-        // let's probe filetype of manifest, we should detect XML
-        File manifestFile = new File(output + File.separator + "AndroidManifest.xml");
-        byte[] magic = TestUtils.readHeaderOfFile(manifestFile, 6);
-        assertArrayEquals(XML_HEADER, magic);
+        // assert that manifest is XML
+        assertArrayEquals(XML_HEADER, TestUtils.readHeaderOfFile(new File(testDir, "AndroidManifest.xml"), 6));
 
-        // confirm resources.arsc does not exist
-        File resourcesArsc = new File(output + File.separator + "resources.arsc");
-        assertFalse(resourcesArsc.isFile());
+        // assert that resources.arsc does not exist
+        assertFalse(new File(testDir, "resources.arsc").isFile());
     }
 
     @Test
     public void checkForceManifestToFalseWithResourcesEnabledIsIgnored() throws BrutException, IOException {
-        String apk = "issue1680.apk";
-        String output = sTmpDir + File.separator + apk + ".out";
+        sConfig.setForceDelete(true);
+        sConfig.setDecodeResources(Config.DECODE_RESOURCES_FULL);
+        sConfig.setForceDecodeManifest(Config.FORCE_DECODE_MANIFEST_NONE);
 
-        // decode issue1680.apk
-        decodeFile(sTmpDir + File.separator + apk, Config.DECODE_RESOURCES_FULL,
-            Config.FORCE_DECODE_MANIFEST_NONE, output);
+        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
+        ExtFile testDir = new ExtFile(testApk + ".out");
+        new ApkDecoder(testApk, sConfig).decode(testDir);
 
-        // lets probe filetype of manifest, we should detect XML
-        File manifestFile = new File(output + File.separator + "AndroidManifest.xml");
-        byte[] magic = TestUtils.readHeaderOfFile(manifestFile, 6);
-        assertArrayEquals(XML_HEADER, magic);
+        // assert that manifest is XML
+        assertArrayEquals(XML_HEADER, TestUtils.readHeaderOfFile(new File(testDir, "AndroidManifest.xml"), 6));
 
-        // confirm resources.arsc does not exist
-        File resourcesArsc = new File(output + File.separator + "resources.arsc");
-        assertFalse(resourcesArsc.isFile());
+        // assert that resources.arsc does not exist
+        assertFalse(new File(testDir, "resources.arsc").isFile());
     }
 
     @Test
     public void checkBothManifestAndResourcesSetToNone() throws BrutException, IOException {
-        String apk = "issue1680.apk";
-        String output = sTmpDir + File.separator + apk + ".out";
+        sConfig.setForceDelete(true);
+        sConfig.setDecodeResources(Config.DECODE_RESOURCES_NONE);
+        sConfig.setForceDecodeManifest(Config.FORCE_DECODE_MANIFEST_NONE);
 
-        // decode issue1680.apk
-        decodeFile(sTmpDir + File.separator + apk, Config.DECODE_RESOURCES_NONE,
-            Config.FORCE_DECODE_MANIFEST_NONE, output);
+        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
+        ExtFile testDir = new ExtFile(testApk + ".out");
+        new ApkDecoder(testApk, sConfig).decode(testDir);
 
-        // lets probe filetype of manifest, we should not detect XML
-        File manifestFile = new File(output + File.separator + "AndroidManifest.xml");
-        byte[] magic = TestUtils.readHeaderOfFile(manifestFile, 6);
-        assertFalse(Arrays.equals(XML_HEADER, magic));
+        // assert that manifest is not XML
+        assertFalse(Arrays.equals(XML_HEADER, TestUtils.readHeaderOfFile(new File(testDir, "AndroidManifest.xml"), 6)));
 
-        // confirm resources.arsc exists
-        File resourcesArsc = new File(output + File.separator + "resources.arsc");
-        assertTrue(resourcesArsc.isFile());
-    }
-
-    private void decodeFile(String apk, short decodeResources, short decodeManifest, String output)
-            throws BrutException, IOException {
-
-        Config config = Config.getDefaultConfig();
-        config.forceDelete = true;
-        config.decodeResources = decodeResources;
-        config.forceDecodeManifest = decodeManifest;
-        ApkDecoder apkDecoder = new ApkDecoder(new ExtFile(apk), config);
-        apkDecoder.decode(new File(output));
+        // assert that resources.arsc exists
+        assertTrue(new File(testDir, "resources.arsc").isFile());
     }
 }

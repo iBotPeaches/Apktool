@@ -16,48 +16,70 @@
  */
 package brut.androlib.res.data;
 
-public class ResID {
-    public final int pkgId;
-    public final int type;
-    public final int entry;
-    public final int id;
-
-    public ResID(int pkgId, int type, int entry) {
-        this(pkgId, type, entry, (pkgId << 24) + (type << 16) + entry);
-    }
+public class ResID extends Number implements Comparable<ResID> {
+    private final int mId;
 
     public ResID(int id) {
-        this((id >> 24) & 0xff, (id >> 16) & 0x000000ff, id & 0x0000ffff, id);
+        mId = id;
     }
 
-    public ResID(int pkgId, int type, int entry, int id) {
-        this.pkgId = (pkgId == 0) ? 2 : pkgId;
-        this.type = type;
-        this.entry = entry;
-        this.id = id;
+    public int getPackageId() {
+        int pkgId = (mId >> 24) & 0xff;
+        return pkgId == 0 ? 2 : pkgId;
+    }
+
+    public int getType() {
+        return (mId >> 16) & 0x000000ff;
+    }
+
+    public int getEntry() {
+        return mId & 0x0000ffff;
+    }
+
+    @Override
+    public int intValue() {
+        return mId;
+    }
+
+    @Override
+    public long longValue() {
+        return mId;
+    }
+
+    @Override
+    public float floatValue() {
+        return mId;
+    }
+
+    @Override
+    public double doubleValue() {
+        return mId;
     }
 
     @Override
     public String toString() {
-        return String.format("0x%08x", id);
+        return String.format("0x%08x", mId);
     }
 
     @Override
     public int hashCode() {
-        int hash = 17;
-        hash = 31 * hash + id;
-        return hash;
+        return Integer.hashCode(mId);
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
+        if (obj == this) {
+            return true;
         }
-        if (getClass() != obj.getClass()) {
-            return false;
+        if (obj instanceof ResID) {
+            ResID other = (ResID) obj;
+            return mId == other.mId;
         }
-        final ResID other = (ResID) obj;
-        return id == other.id;
+        return false;
+    }
+
+    @Override
+    public int compareTo(ResID other) {
+        return Integer.compare(mId, other.mId);
     }
 }

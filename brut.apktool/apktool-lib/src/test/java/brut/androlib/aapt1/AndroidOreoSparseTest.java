@@ -16,45 +16,36 @@
  */
 package brut.androlib.aapt1;
 
-import brut.androlib.*;
-import brut.androlib.Config;
+import brut.androlib.ApkBuilder;
+import brut.androlib.ApkDecoder;
+import brut.androlib.BaseTest;
+import brut.androlib.TestUtils;
 import brut.directory.ExtFile;
 import brut.common.BrutException;
-import brut.util.OS;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 import java.io.File;
 
-import static org.junit.Assert.assertTrue;
+import org.junit.*;
+import static org.junit.Assert.*;
 
 public class AndroidOreoSparseTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        TestUtils.cleanFrameworkFile();
-        sTmpDir = new ExtFile(OS.createTempDirectory());
         sTestOrigDir = new ExtFile(sTmpDir, "issue1594-orig");
         sTestNewDir = new ExtFile(sTmpDir, "issue1594-new");
+
         LOGGER.info("Unpacking sparse.apk...");
         TestUtils.copyResourceDir(AndroidOreoSparseTest.class, "aapt1/issue1594", sTestOrigDir);
 
-        ExtFile testApk = new ExtFile(sTestOrigDir, "sparse.apk");
+        sConfig.setAaptVersion(1);
 
         LOGGER.info("Decoding sparse.apk...");
-        ApkDecoder apkDecoder = new ApkDecoder(testApk);
-        apkDecoder.decode(sTestNewDir);
+        ExtFile testApk = new ExtFile(sTestOrigDir, "sparse.apk");
+        new ApkDecoder(testApk, sConfig).decode(sTestNewDir);
 
         LOGGER.info("Building sparse.apk...");
-        Config config = Config.getDefaultConfig();
-        config.aaptVersion = 1;
-        new ApkBuilder(sTestNewDir, config).build(testApk);
-    }
-
-    @AfterClass
-    public static void afterClass() throws BrutException {
-        OS.rmdir(sTmpDir);
+        new ApkBuilder(sTestNewDir, sConfig).build(testApk);
     }
 
     @Test
@@ -65,6 +56,6 @@ public class AndroidOreoSparseTest extends BaseTest {
 
     @Test
     public void ensureStringsOreoTest() {
-        assertTrue((new File(sTestNewDir, "res/values-v26/strings.xml").isFile()));
+        assertTrue(new File(sTestNewDir, "res/values-v26/strings.xml").isFile());
     }
 }

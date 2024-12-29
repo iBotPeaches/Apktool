@@ -957,7 +957,7 @@ public class MXSerializer implements XmlSerializer {
             } else {
                 if (ch == '&') {
                     if (!(i < text.length() - 3 && text.charAt(i+1) == 'l'
-                        && text.charAt(i+2) == 't' && text.charAt(i+3) == ';')) {
+                            && text.charAt(i+2) == 't' && text.charAt(i+3) == ';')) {
                         if (i > pos) {
                             write(text.substring(pos, i));
                         }

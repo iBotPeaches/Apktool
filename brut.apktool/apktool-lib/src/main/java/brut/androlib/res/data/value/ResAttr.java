@@ -20,7 +20,7 @@ import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.data.ResPackage;
 import brut.androlib.res.data.ResResource;
 import brut.androlib.res.xml.ResValuesXmlSerializable;
-import brut.util.Duo;
+import org.apache.commons.lang3.tuple.Pair;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
@@ -48,8 +48,8 @@ public class ResAttr extends ResBagValue implements ResValuesXmlSerializable {
     private final Integer mMax;
     private final Boolean mL10n;
 
-    ResAttr(ResReferenceValue parentVal, int type, Integer min, Integer max, Boolean l10n) {
-        super(parentVal);
+    ResAttr(ResReferenceValue parent, int type, Integer min, Integer max, Boolean l10n) {
+        super(parent);
         mType = type;
         mMin = min;
         mMax = max;
@@ -61,7 +61,8 @@ public class ResAttr extends ResBagValue implements ResValuesXmlSerializable {
     }
 
     @Override
-    public void serializeToResValuesXml(XmlSerializer serializer, ResResource res) throws IOException, AndrolibException {
+    public void serializeToResValuesXml(XmlSerializer serializer, ResResource res)
+            throws AndrolibException, IOException {
         String type = getTypeAsString();
 
         serializer.startTag(null, "attr");
@@ -82,40 +83,41 @@ public class ResAttr extends ResBagValue implements ResValuesXmlSerializable {
         serializer.endTag(null, "attr");
     }
 
-    public static ResAttr factory(ResReferenceValue parent,
-                                  Duo<Integer, ResScalarValue>[] items, ResValueFactory factory,
-                                  ResPackage pkg) throws AndrolibException {
+    public static ResAttr factory(ResReferenceValue parent, Pair<Integer, ResScalarValue>[] items,
+                                  ResValueFactory factory) throws AndrolibException {
         Integer min = null, max = null;
         Boolean l10n = null;
-        int i;
-        for (i = 1; i < items.length; i++) {
-            switch (items[i].m1) {
+        int i = 1;
+        for (; i < items.length; i++) {
+            Pair<Integer, ResScalarValue> item = items[i];
+            switch (item.getLeft()) {
                 case BAG_KEY_ATTR_MIN:
-                    min = (items[i].m2).getRawIntValue();
+                    min = item.getRight().getRawIntValue();
                     continue;
                 case BAG_KEY_ATTR_MAX:
-                    max = (items[i].m2).getRawIntValue();
+                    max = item.getRight().getRawIntValue();
                     continue;
                 case BAG_KEY_ATTR_L10N:
-                    l10n = (items[i].m2).getRawIntValue() != 0;
+                    l10n = item.getRight().getRawIntValue() != 0;
                     continue;
             }
             break;
         }
 
         // #2806 - Make sure we handle int-based values and not just ResIntValue
-        int rawValue = items[0].m2.getRawIntValue();
+        int rawValue = items[0].getRight().getRawIntValue();
         int scalarType = rawValue & 0xffff;
 
         if (i == items.length) {
             return new ResAttr(parent, scalarType, min, max, l10n);
         }
-        Duo<ResReferenceValue, ResScalarValue>[] attrItems = new Duo[items.length - i];
-        int j = 0;
-        for (; i < items.length; i++) {
-            int resId = items[i].m1;
+        ResPackage pkg = parent.getPackage();
+        Pair<ResReferenceValue, ResScalarValue>[] attrItems = new Pair[items.length - i];
+        for (int j = 0; i < items.length; i++, j++) {
+            Pair<Integer, ResScalarValue> item = items[i];
+            int resId = item.getLeft();
             pkg.addSynthesizedRes(resId);
-            attrItems[j++] = new Duo<>(factory.newReference(resId, null), items[i].m2);
+            attrItems[j] = Pair.of(factory.newReference(resId, null), item.getRight());
         }
         switch (rawValue & 0xff0000) {
             case TYPE_ENUM:
@@ -127,7 +129,9 @@ public class ResAttr extends ResBagValue implements ResValuesXmlSerializable {
         throw new AndrolibException("Could not decode attr value");
     }
 
-    protected void serializeBody(XmlSerializer serializer, ResResource res) throws IOException, AndrolibException {
+    protected void serializeBody(XmlSerializer serializer, ResResource res)
+            throws AndrolibException, IOException {
+        // stub
     }
 
     protected String getTypeAsString() {

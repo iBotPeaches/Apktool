@@ -34,11 +34,7 @@ import brut.directory.ZipUtils;
 import brut.util.AaptManager;
 import brut.util.BrutIO;
 import brut.util.OS;
-import org.apache.commons.io.FileUtils;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 import java.io.*;
 import java.nio.file.Files;
 import java.util.*;
@@ -57,10 +53,6 @@ public class ApkBuilder {
     private int mMinSdkVersion;
     private BackgroundWorker mWorker;
 
-    public ApkBuilder(ExtFile apkDir) {
-        this(apkDir, Config.getDefaultConfig());
-    }
-
     public ApkBuilder(ExtFile apkDir, Config config) {
         mApkDir = apkDir;
         mConfig = config;
@@ -68,8 +60,8 @@ public class ApkBuilder {
     }
 
     public void build(File outApk) throws AndrolibException {
-        if (mConfig.jobs > 1) {
-            mWorker = new BackgroundWorker(mConfig.jobs - 1);
+        if (mConfig.getJobs() > 1) {
+            mWorker = new BackgroundWorker(mConfig.getJobs() - 1);
         }
         try {
             mApkInfo = ApkInfo.load(mApkDir);
@@ -84,18 +76,17 @@ public class ApkBuilder {
                 if (outFileName == null) {
                     outFileName = "out.apk";
                 }
-                outApk = new File(mApkDir, "dist" + File.separator + outFileName);
+                outApk = new File(mApkDir, "dist/" + outFileName);
             }
 
-            File outDir = new File(mApkDir, "build" + File.separator + "apk");
-            //noinspection ResultOfMethodCallIgnored
-            outDir.mkdirs();
+            File outDir = new File(mApkDir, "build/apk");
+            OS.mkdir(outDir);
 
             File manifest = new File(mApkDir, "AndroidManifest.xml");
             File manifestOrig = new File(mApkDir, "AndroidManifest.xml.orig");
 
             LOGGER.info("Using Apktool " + ApktoolProperties.getVersion() + " on " + outApk.getName()
-                        + (mWorker != null ? " with " + mConfig.jobs + " threads" : ""));
+                        + (mWorker != null ? " with " + mConfig.getJobs() + " threads" : ""));
 
             buildSources(outDir);
             backupManifestFile(manifest, manifestOrig);
@@ -108,15 +99,13 @@ public class ApkBuilder {
                 }
             }
 
-            if (!mConfig.noApk) {
+            if (!mConfig.isNoApk()) {
                 if (outApk.exists()) {
-                    //noinspection ResultOfMethodCallIgnored
-                    outApk.delete();
+                    OS.rmfile(outApk);
                 } else {
                     File parentDir = outApk.getParentFile();
-                    if (parentDir != null && !parentDir.exists()) {
-                        //noinspection ResultOfMethodCallIgnored
-                        parentDir.mkdirs();
+                    if (parentDir != null) {
+                        OS.mkdir(parentDir);
                     }
                 }
 
@@ -146,12 +135,10 @@ public class ApkBuilder {
 
             // we copied the AndroidManifest.xml to AndroidManifest.xml.orig so we can edit it
             // lets restore the unedited one, to not change the original
-            if (manifest.isFile() && manifestOrig.isFile()) {
+            if (manifestOrig.isFile()) {
                 try {
-                    if (manifest.delete()) {
-                        FileUtils.moveFile(manifestOrig, manifest);
-                    }
-                } catch (IOException ex) {
+                    OS.mvfile(manifestOrig, manifest);
+                } catch (BrutException ex) {
                     throw new AndrolibException(ex);
                 }
             }
@@ -199,7 +186,7 @@ public class ApkBuilder {
         }
 
         File stored = new File(outDir, fileName);
-        if (!mConfig.forceBuildAll && !isModified(working, stored)) {
+        if (!mConfig.isForceBuildAll() && !isModified(working, stored)) {
             return true;
         }
 
@@ -235,17 +222,16 @@ public class ApkBuilder {
         }
 
         File dex = new File(outDir, fileName);
-        if (!mConfig.forceBuildAll) {
+        if (!mConfig.isForceBuildAll()) {
             LOGGER.info("Checking whether sources have changed...");
             if (!isModified(smaliDir, dex)) {
                 return;
             }
         }
-        //noinspection ResultOfMethodCallIgnored
-        dex.delete();
+        OS.rmfile(dex);
 
         LOGGER.info("Smaling " + dirName + " folder into " + fileName + "...");
-        int apiLevel = mConfig.apiLevel > 0 ? mConfig.apiLevel : mMinSdkVersion;
+        int apiLevel = mConfig.getApiLevel() > 0 ? mConfig.getApiLevel() : mMinSdkVersion;
         SmaliBuilder builder = new SmaliBuilder(smaliDir, apiLevel);
         builder.build(dex);
     }
@@ -260,15 +246,12 @@ public class ApkBuilder {
             return;
         }
 
-        if (manifestOrig.exists()) {
-            //noinspection ResultOfMethodCallIgnored
-            manifestOrig.delete();
-        }
+        OS.rmfile(manifestOrig);
 
         try {
-            FileUtils.copyFile(manifest, manifestOrig);
+            OS.cpfile(manifest, manifestOrig);
             ResXmlUtils.fixingPublicAttrsInProviderAttributes(manifest);
-        } catch (IOException ex) {
+        } catch (BrutException ex) {
             throw new AndrolibException(ex);
         }
     }
@@ -290,7 +273,7 @@ public class ApkBuilder {
     }
 
     private void copyResourcesRaw(File outDir, File manifest) throws AndrolibException {
-        if (!mConfig.forceBuildAll) {
+        if (!mConfig.isForceBuildAll()) {
             LOGGER.info("Checking whether resources have changed...");
             if (!isModified(manifest, new File(outDir, "AndroidManifest.xml"))
                     && !isModified(new File(mApkDir, "resources.arsc"), new File(outDir, "resources.arsc"))
@@ -314,43 +297,38 @@ public class ApkBuilder {
 
     private void buildResourcesFull(File outDir, File manifest) throws AndrolibException {
         File resourcesFile = new File(outDir.getParentFile(), "resources.zip");
-        if (!mConfig.forceBuildAll) {
+        if (!mConfig.isForceBuildAll()) {
             LOGGER.info("Checking whether resources have changed...");
             if (!isModified(manifest, new File(outDir, "AndroidManifest.xml"))
                     && !isModified(newFiles(mApkDir, ApkInfo.RESOURCES_DIRNAMES),
                         newFiles(outDir, ApkInfo.RESOURCES_DIRNAMES))
-                    && (mConfig.aaptVersion == 1 || resourcesFile.isFile())) {
+                    && (mConfig.getAaptVersion() == 1 || resourcesFile.isFile())) {
                 return;
             }
         }
-        //noinspection ResultOfMethodCallIgnored
-        resourcesFile.delete();
+        OS.rmfile(resourcesFile);
 
-        try {
-            if (mConfig.debugMode) {
-                if (mConfig.aaptVersion == 2) {
-                    LOGGER.info("Setting 'debuggable' attribute to 'true' in AndroidManifest.xml");
-                    ResXmlUtils.setApplicationDebugTagTrue(manifest);
-                } else {
-                    ResXmlUtils.removeApplicationDebugTag(manifest);
+        if (mConfig.isDebugMode()) {
+            if (mConfig.getAaptVersion() == 2) {
+                LOGGER.info("Setting 'debuggable' attribute to 'true' in AndroidManifest.xml");
+                ResXmlUtils.setApplicationDebugTagTrue(manifest);
+            } else {
+                ResXmlUtils.removeApplicationDebugTag(manifest);
+            }
+        }
+
+        if (mConfig.isNetSecConf()) {
+            String targetSdkVersion = mApkInfo.getTargetSdkVersion();
+            if (targetSdkVersion != null) {
+                if (Integer.parseInt(targetSdkVersion) < ResConfigFlags.SDK_NOUGAT) {
+                    LOGGER.warning("Target SDK version is lower than 24! Network Security Configuration might be ignored!");
                 }
             }
 
-            if (mConfig.netSecConf) {
-                String targetSdkVersion = mApkInfo.getTargetSdkVersion();
-                if (targetSdkVersion != null) {
-                    if (Integer.parseInt(targetSdkVersion) < ResConfigFlags.SDK_NOUGAT) {
-                        LOGGER.warning("Target SDK version is lower than 24! Network Security Configuration might be ignored!");
-                    }
-                }
-
-                File netSecConfOrig = new File(mApkDir, "res/xml/network_security_config.xml");
-                ResXmlUtils.modNetworkSecurityConfig(netSecConfOrig);
-                ResXmlUtils.setNetworkSecurityConfig(manifest);
-                LOGGER.info("Added permissive network security config in manifest");
-            }
-        } catch (IOException | ParserConfigurationException | TransformerException | SAXException ex) {
-            throw new AndrolibException(ex);
+            File netSecConfOrig = new File(mApkDir, "res/xml/network_security_config.xml");
+            ResXmlUtils.modNetworkSecurityConfig(netSecConfOrig);
+            ResXmlUtils.setNetworkSecurityConfig(manifest);
+            LOGGER.info("Added permissive network security config in manifest");
         }
 
         ExtFile tmpFile;
@@ -359,8 +337,7 @@ public class ApkBuilder {
         } catch (IOException ex) {
             throw new AndrolibException(ex);
         }
-        //noinspection ResultOfMethodCallIgnored
-        tmpFile.delete();
+        OS.rmfile(tmpFile);
 
         File resDir = new File(mApkDir, "res");
         File ninePatch = new File(mApkDir, "9patch");
@@ -368,10 +345,10 @@ public class ApkBuilder {
             ninePatch = null;
         }
 
-        LOGGER.info("Building resources with " + AaptManager.getAaptName(mConfig.aaptVersion) + "...");
+        LOGGER.info("Building resources with " + AaptManager.getAaptName(mConfig.getAaptVersion()) + "...");
 
         try {
-            AaptInvoker invoker = new AaptInvoker(mConfig, mApkInfo);
+            AaptInvoker invoker = new AaptInvoker(mApkInfo, mConfig);
             invoker.invoke(tmpFile, manifest, resDir, ninePatch, null, getIncludeFiles());
 
             Directory tmpDir = tmpFile.getDirectory();
@@ -381,13 +358,12 @@ public class ApkBuilder {
         } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
         } finally {
-            //noinspection ResultOfMethodCallIgnored
-            tmpFile.delete();
+            OS.rmfile(tmpFile);
         }
     }
 
     private void buildManifest(File outDir, File manifest) throws AndrolibException {
-        if (!mConfig.forceBuildAll) {
+        if (!mConfig.isForceBuildAll()) {
             LOGGER.info("Checking whether AndroidManifest.xml has changed...");
             if (!isModified(manifest, new File(outDir, "AndroidManifest.xml"))) {
                 return;
@@ -400,18 +376,17 @@ public class ApkBuilder {
         } catch (IOException ex) {
             throw new AndrolibException(ex);
         }
-        //noinspection ResultOfMethodCallIgnored
-        tmpFile.delete();
+        OS.rmfile(tmpFile);
 
         File ninePatch = new File(mApkDir, "9patch");
         if (!ninePatch.isDirectory()) {
             ninePatch = null;
         }
 
-        LOGGER.info("Building AndroidManifest.xml with " + AaptManager.getAaptName(mConfig.aaptVersion) + "...");
+        LOGGER.info("Building AndroidManifest.xml with " + AaptManager.getAaptName(mConfig.getAaptVersion()) + "...");
 
         try {
-            AaptInvoker invoker = new AaptInvoker(mConfig, mApkInfo);
+            AaptInvoker invoker = new AaptInvoker(mApkInfo, mConfig);
             invoker.invoke(tmpFile, manifest, null, ninePatch, null, getIncludeFiles());
 
             Directory tmpDir = tmpFile.getDirectory();
@@ -422,8 +397,7 @@ public class ApkBuilder {
             LOGGER.warning("Parse AndroidManifest.xml failed, treat it as raw file.");
             copyManifestRaw(outDir);
         } finally {
-            //noinspection ResultOfMethodCallIgnored
-            tmpFile.delete();
+            OS.rmfile(tmpFile);
         }
     }
 
@@ -439,7 +413,7 @@ public class ApkBuilder {
     }
 
     private void copyOriginalFiles(File outDir) throws AndrolibException {
-        if (!mConfig.copyOriginalFiles) {
+        if (!mConfig.isCopyOriginalFiles()) {
             return;
         }
 
@@ -508,7 +482,7 @@ public class ApkBuilder {
         File[] files = new File[ids.size()];
         int i = 0;
         for (int id : ids) {
-            files[i++] = framework.getFrameworkApk(id, tag);
+            files[i++] = framework.getApkFile(id, tag);
         }
         return files;
     }

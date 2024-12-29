@@ -21,52 +21,37 @@ import brut.androlib.BaseTest;
 import brut.androlib.TestUtils;
 import brut.directory.ExtFile;
 import brut.common.BrutException;
-import brut.util.OS;
-import org.apache.commons.io.FileUtils;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 
-import static org.junit.Assert.assertTrue;
+import org.junit.*;
+import static org.junit.Assert.*;
 
 public class DecodeKotlinTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        TestUtils.cleanFrameworkFile();
-        sTmpDir = new ExtFile(OS.createTempDirectory());
-        TestUtils.copyResourceDir(DecodeKotlinTest.class, "decode/testkotlin/", sTmpDir);
+        TestUtils.copyResourceDir(DecodeKotlinTest.class, "decode/testkotlin", sTmpDir);
 
-        String apk = "testkotlin.apk";
-
-        // decode testkotlin.apk
-        ApkDecoder apkDecoder = new ApkDecoder(new ExtFile(sTmpDir + File.separator + apk));
-        sTestNewDir = new ExtFile(sTmpDir + File.separator + apk + ".out");
-
-        File outDir = new File(sTmpDir + File.separator + apk + ".out");
-        apkDecoder.decode(outDir);
-    }
-
-    @AfterClass
-    public static void afterClass() throws BrutException {
-        OS.rmdir(sTmpDir);
+        ExtFile testApk = new ExtFile(sTmpDir, "testkotlin.apk");
+        ExtFile testDir = new ExtFile(testApk + ".out");
+        new ApkDecoder(testApk, sConfig).decode(testDir);
+        sTestNewDir = testDir;
     }
 
     @Test
     public void kotlinFolderExistsTest() {
         assertTrue(sTestNewDir.isDirectory());
-
-        File testKotlinFolder = new File(sTestNewDir, "kotlin");
-        assertTrue(testKotlinFolder.isDirectory());
+        assertTrue(new File(sTestNewDir, "kotlin").isDirectory());
     }
 
     @Test
     public void kotlinDecodeTest() throws IOException {
-        File kotlinActivity = new File(sTestNewDir, "smali/org/example/kotlin/mixed/KotlinActivity.smali");
+        File smaliFile = new File(sTestNewDir, "smali/org/example/kotlin/mixed/KotlinActivity.smali");
+        String smali = new String(Files.readAllBytes(smaliFile.toPath()));
 
-        assertTrue(FileUtils.readFileToString(kotlinActivity, "UTF-8").contains("KotlinActivity.kt"));
+        assertTrue(smali.contains("KotlinActivity.kt"));
     }
 }

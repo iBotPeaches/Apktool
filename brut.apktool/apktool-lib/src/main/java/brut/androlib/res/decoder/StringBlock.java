@@ -147,6 +147,7 @@ public class StringBlock {
         if (text == null) {
             return null;
         }
+
         int[] style = getStyle(index);
         if (style == null) {
             return ResXmlEncoders.escapeXmlChars(text);
@@ -164,8 +165,7 @@ public class StringBlock {
         }
         spans.sort(null);
 
-        StyledString styledString = new StyledString(text, spans);
-        return styledString.toString();
+        return new StyledString(text, spans).toString();
     }
 
     /**
@@ -178,14 +178,14 @@ public class StringBlock {
         if (string == null) {
             return -1;
         }
-        for (int i = 0; i != mStringOffsets.length; i++) {
+        for (int i = 0; i < mStringOffsets.length; i++) {
             int offset = mStringOffsets[i];
             int length = getShort(mStrings, offset);
             if (length != string.length()) {
                 continue;
             }
             int j = 0;
-            for (; j != length; j++) {
+            for (; j < length; j++) {
                 offset += 2;
                 if (string.charAt(j) != getShort(mStrings, offset)) {
                     break;
@@ -235,7 +235,7 @@ public class StringBlock {
     @VisibleForTesting
     String decodeString(int offset, int length) {
         try {
-            final ByteBuffer wrappedBuffer = ByteBuffer.wrap(mStrings, offset, length);
+            ByteBuffer wrappedBuffer = ByteBuffer.wrap(mStrings, offset, length);
             return (mIsUtf8 ? UTF8_DECODER : UTF16LE_DECODER).decode(wrappedBuffer).toString();
         } catch (CharacterCodingException ex) {
             if (!mIsUtf8) {
@@ -250,7 +250,7 @@ public class StringBlock {
         }
 
         try {
-            final ByteBuffer wrappedBufferRetry = ByteBuffer.wrap(mStrings, offset, length);
+            ByteBuffer wrappedBufferRetry = ByteBuffer.wrap(mStrings, offset, length);
             // in some places, Android uses 3-byte UTF-8 sequences instead of 4-bytes.
             // If decoding failed, we try to use CESU-8 decoder, which is closer to what Android actually uses.
             return CESU8_DECODER.decode(wrappedBufferRetry).toString();
@@ -292,7 +292,7 @@ public class StringBlock {
         if ((val & 0x8000) != 0) {
             int high = (array[offset + 3] & 0xFF) << 8;
             int low = (array[offset + 2] & 0xFF);
-            int len_value =  ((val & 0x7FFF) << 16) + (high + low);
+            int len_value = ((val & 0x7FFF) << 16) + (high + low);
             return new int[] { 4, len_value * 2 };
 
         }

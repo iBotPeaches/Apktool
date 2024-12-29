@@ -55,14 +55,12 @@ public class ApkInfo implements YamlSerializable {
     public List<String> doNotCompress = new ArrayList<>();
 
     public ApkInfo() {
-        this(null);
+        version = ApktoolProperties.getVersion();
     }
 
     public ApkInfo(ExtFile apkFile) {
-        version = ApktoolProperties.getVersion();
-        if (apkFile != null) {
-            setApkFile(apkFile);
-        }
+        this();
+        setApkFile(apkFile);
     }
 
     public ExtFile getApkFile() {
@@ -111,13 +109,10 @@ public class ApkInfo implements YamlSerializable {
 
     public String checkTargetSdkVersionBounds() {
         int target = mapSdkShorthandToVersion(getTargetSdkVersion());
+        int min = getMinSdkVersion() != null ? mapSdkShorthandToVersion(getMinSdkVersion()) : 0;
+        int max = getMaxSdkVersion() != null ? mapSdkShorthandToVersion(getMaxSdkVersion()) : target;
 
-        int min = (getMinSdkVersion() != null) ? mapSdkShorthandToVersion(getMinSdkVersion()) : 0;
-        int max = (getMaxSdkVersion() != null) ? mapSdkShorthandToVersion(getMaxSdkVersion()) : target;
-
-        target = Math.min(max, target);
-        target = Math.max(min, target);
-        return Integer.toString(target);
+        return Integer.toString(Math.max(min, Math.min(max, target)));
     }
 
     public String getMinSdkVersion() {

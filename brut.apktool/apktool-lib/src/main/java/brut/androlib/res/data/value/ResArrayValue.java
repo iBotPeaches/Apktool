@@ -19,8 +19,8 @@ package brut.androlib.res.data.value;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.data.ResResource;
 import brut.androlib.res.xml.ResValuesXmlSerializable;
-import brut.util.Duo;
 import com.google.common.collect.Sets;
+import org.apache.commons.lang3.tuple.Pair;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
@@ -31,11 +31,11 @@ public class ResArrayValue extends ResBagValue implements ResValuesXmlSerializab
 
     private final ResScalarValue[] mItems;
 
-    ResArrayValue(ResReferenceValue parent, Duo<Integer, ResScalarValue>[] items) {
+    ResArrayValue(ResReferenceValue parent, Pair<Integer, ResScalarValue>[] items) {
         super(parent);
         mItems = new ResScalarValue[items.length];
         for (int i = 0; i < items.length; i++) {
-            mItems[i] = items[i].m2;
+            mItems[i] = items[i].getRight();
         }
     }
 
@@ -46,9 +46,9 @@ public class ResArrayValue extends ResBagValue implements ResValuesXmlSerializab
 
     @Override
     public void serializeToResValuesXml(XmlSerializer serializer, ResResource res)
-            throws IOException, AndrolibException {
+            throws AndrolibException, IOException {
         String type = getType();
-        type = (type == null ? "" : type + "-") + "array";
+        type = (type != null ? type + "-" : "") + "array";
         serializer.startTag(null, type);
         serializer.attribute(null, "name", res.getResSpec().getName());
 
@@ -61,9 +61,9 @@ public class ResArrayValue extends ResBagValue implements ResValuesXmlSerializab
         }
 
         // add <item>'s
-        for (ResScalarValue mItem : mItems) {
+        for (ResScalarValue item : mItems) {
             serializer.startTag(null, "item");
-            serializer.text(mItem.encodeAsResXmlNonEscapedItemValue());
+            serializer.text(item.encodeAsResXmlNonEscapedItemValue());
             serializer.endTag(null, "item");
         }
         serializer.endTag(null, type);
@@ -74,16 +74,16 @@ public class ResArrayValue extends ResBagValue implements ResValuesXmlSerializab
             return null;
         }
         String type = mItems[0].getType();
-        for (ResScalarValue mItem : mItems) {
-            if (mItem.encodeAsResXmlItemValue().startsWith("@string")) {
+        for (ResScalarValue item : mItems) {
+            if (item.encodeAsResXmlItemValue().startsWith("@string")) {
                 return "string";
-            } else if (mItem.encodeAsResXmlItemValue().startsWith("@drawable")) {
+            } else if (item.encodeAsResXmlItemValue().startsWith("@drawable")) {
                 return null;
-            } else if (mItem.encodeAsResXmlItemValue().startsWith("@integer")) {
+            } else if (item.encodeAsResXmlItemValue().startsWith("@integer")) {
                 return "integer";
             } else if (!"string".equals(type) && !"integer".equals(type)) {
                 return null;
-            } else if (!type.equals(mItem.getType())) {
+            } else if (!type.equals(item.getType())) {
                 return null;
             }
         }

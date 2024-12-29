@@ -16,57 +16,42 @@
  */
 package brut.androlib.aapt1;
 
-import brut.androlib.*;
-import brut.androlib.Config;
+import brut.androlib.ApkBuilder;
+import brut.androlib.ApkDecoder;
+import brut.androlib.BaseTest;
+import brut.androlib.TestUtils;
 import brut.directory.ExtFile;
 import brut.common.BrutException;
-import brut.util.OS;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 import java.io.File;
-import java.io.IOException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
+import org.junit.*;
+import static org.junit.Assert.*;
 
 public class UnknownCompressionTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        TestUtils.cleanFrameworkFile();
-        sTmpDir = new ExtFile(OS.createTempDirectory());
-        TestUtils.copyResourceDir(UnknownCompressionTest.class, "aapt1/unknown_compression/", sTmpDir);
+        TestUtils.copyResourceDir(UnknownCompressionTest.class, "aapt1/unknown_compression", sTmpDir);
 
-        String apk = "deflated_unknowns.apk";
-        Config config = Config.getDefaultConfig();
-        config.frameworkDirectory = sTmpDir.getAbsolutePath();
-        config.aaptVersion = 1;
+        sConfig.setFrameworkDirectory(sTmpDir.getAbsolutePath());
+        sConfig.setAaptVersion(1);
 
-        sTestOrigDir = new ExtFile(sTmpDir, apk);
+        LOGGER.info("Building deflated_unknowns.apk...");
+        sTestOrigDir = new ExtFile(sTmpDir, "deflated_unknowns.apk");
+        ExtFile testDir = new ExtFile(sTestOrigDir + ".out");
+        new ApkDecoder(sTestOrigDir, sConfig).decode(testDir);
 
-        // decode deflated_unknowns.apk
-        // need new ExtFile because closed in decode()
-        ApkDecoder apkDecoder = new ApkDecoder(new ExtFile(sTestOrigDir));
-        File outDir = new File(sTestOrigDir.getAbsolutePath() + ".out");
-        apkDecoder.decode(outDir);
-
-        // build deflated_unknowns
-        ExtFile clientApkFolder = new ExtFile(sTestOrigDir.getAbsolutePath() + ".out");
-        new ApkBuilder(clientApkFolder, config).build(null);
-        sTestNewDir = new ExtFile(clientApkFolder, "dist" + File.separator + apk);
-    }
-
-    @AfterClass
-    public static void afterClass() throws BrutException {
-        OS.rmdir(sTmpDir);
+        LOGGER.info("Decoding deflated_unknowns.apk...");
+        new ApkBuilder(testDir, sConfig).build(null);
+        sTestNewDir = new ExtFile(testDir, "dist/" + sTestOrigDir.getName());
     }
 
     @Test
-    public void pkmExtensionDeflatedTest() throws BrutException, IOException {
-        Integer control = sTestOrigDir.getDirectory().getCompressionLevel("assets/bin/Data/test.pkm");
-        Integer rebuilt = sTestNewDir.getDirectory().getCompressionLevel("assets/bin/Data/test.pkm");
+    public void pkmExtensionDeflatedTest() throws BrutException {
+        String fileName = "assets/bin/Data/test.pkm";
+        Integer control = sTestOrigDir.getDirectory().getCompressionLevel(fileName);
+        Integer rebuilt = sTestNewDir.getDirectory().getCompressionLevel(fileName);
 
         // Check that control = rebuilt (both deflated)
         // Add extra check for checking not equal to 0, just in case control gets broken
@@ -75,9 +60,10 @@ public class UnknownCompressionTest extends BaseTest {
     }
 
     @Test
-    public void doubleExtensionStoredTest() throws BrutException, IOException {
-        Integer control = sTestOrigDir.getDirectory().getCompressionLevel("assets/bin/Data/two.extension.file");
-        Integer rebuilt = sTestNewDir.getDirectory().getCompressionLevel("assets/bin/Data/two.extension.file");
+    public void doubleExtensionStoredTest() throws BrutException {
+        String fileName = "assets/bin/Data/two.extension.file";
+        Integer control = sTestOrigDir.getDirectory().getCompressionLevel(fileName);
+        Integer rebuilt = sTestNewDir.getDirectory().getCompressionLevel(fileName);
 
         // Check that control = rebuilt (both stored)
         // Add extra check for checking = 0 to enforce check for stored just in case control breaks
@@ -86,18 +72,20 @@ public class UnknownCompressionTest extends BaseTest {
     }
 
     @Test
-    public void confirmJsonFileIsDeflatedTest() throws BrutException, IOException {
-        Integer control = sTestOrigDir.getDirectory().getCompressionLevel("test.json");
-        Integer rebuilt = sTestNewDir.getDirectory().getCompressionLevel("test.json");
+    public void confirmJsonFileIsDeflatedTest() throws BrutException {
+        String fileName = "test.json";
+        Integer control = sTestOrigDir.getDirectory().getCompressionLevel(fileName);
+        Integer rebuilt = sTestNewDir.getDirectory().getCompressionLevel(fileName);
 
         assertEquals(control, rebuilt);
         assertEquals(Integer.valueOf(8), rebuilt);
     }
 
     @Test
-    public void confirmPngFileIsStoredTest() throws BrutException, IOException {
-        Integer control = sTestOrigDir.getDirectory().getCompressionLevel("950x150.png");
-        Integer rebuilt = sTestNewDir.getDirectory().getCompressionLevel("950x150.png");
+    public void confirmPngFileIsStoredTest() throws BrutException {
+        String fileName = "950x150.png";
+        Integer control = sTestOrigDir.getDirectory().getCompressionLevel(fileName);
+        Integer rebuilt = sTestNewDir.getDirectory().getCompressionLevel(fileName);
 
         assertNotSame(control, rebuilt);
         assertEquals(Integer.valueOf(0), rebuilt);

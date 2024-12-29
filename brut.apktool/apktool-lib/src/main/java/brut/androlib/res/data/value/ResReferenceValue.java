@@ -37,20 +37,19 @@ public class ResReferenceValue extends ResIntValue {
 
     @Override
     protected String encodeAsResXml() throws AndrolibException {
-        if (isNull()) {
-            return "@null";
-        }
-
-        ResResSpec spec = getReferent();
+        ResResSpec spec = !isNull() ? getReferent() : null;
         if (spec == null) {
             return "@null";
         }
-        boolean newId = spec.hasDefaultResource() && spec.getDefaultResource().getValue() instanceof ResIdValue;
 
-        // generate the beginning to fix @android
-        String mStart = (mTheme ? '?' : '@') + (newId ? "+" : "");
+        String prefix = mTheme ? "?" : "@";
+        boolean excludeType = mTheme && spec.getType().getName().equals("attr");
 
-        return mStart + spec.getFullName(mPackage, mTheme && spec.getType().getName().equals("attr"));
+        return prefix + spec.getFullName(mPackage, excludeType);
+    }
+
+    public ResPackage getPackage() {
+        return mPackage;
     }
 
     public ResResSpec getReferent() throws AndrolibException {

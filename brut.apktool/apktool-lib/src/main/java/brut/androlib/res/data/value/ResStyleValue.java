@@ -20,7 +20,7 @@ import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.data.ResResSpec;
 import brut.androlib.res.data.ResResource;
 import brut.androlib.res.xml.ResValuesXmlSerializable;
-import brut.util.Duo;
+import org.apache.commons.lang3.tuple.Pair;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
@@ -31,20 +31,20 @@ import java.util.logging.Logger;
 public class ResStyleValue extends ResBagValue implements ResValuesXmlSerializable {
     private static final Logger LOGGER = Logger.getLogger(ResStyleValue.class.getName());
 
-    private final Duo<ResReferenceValue, ResScalarValue>[] mItems;
+    private final Pair<ResReferenceValue, ResScalarValue>[] mItems;
 
-    ResStyleValue(ResReferenceValue parent, Duo<Integer, ResScalarValue>[] items, ResValueFactory factory) {
+    ResStyleValue(ResReferenceValue parent, Pair<Integer, ResScalarValue>[] items, ResValueFactory factory) {
         super(parent);
-        mItems = new Duo[items.length];
+        mItems = new Pair[items.length];
         for (int i = 0; i < items.length; i++) {
-            mItems[i] = new Duo<>(
-                factory.newReference(items[i].m1, null), items[i].m2);
+            Pair<Integer, ResScalarValue> item = items[i];
+            mItems[i] = Pair.of(factory.newReference(item.getLeft(), null), item.getRight());
         }
     }
 
     @Override
-    public void serializeToResValuesXml(XmlSerializer serializer,
-                                        ResResource res) throws IOException, AndrolibException {
+    public void serializeToResValuesXml(XmlSerializer serializer, ResResource res)
+            throws AndrolibException, IOException {
         serializer.startTag(null, "style");
         serializer.attribute(null, "name", res.getResSpec().getName());
         if (!mParent.isNull() && !mParent.referentIsNull()) {
@@ -54,12 +54,14 @@ public class ResStyleValue extends ResBagValue implements ResValuesXmlSerializab
         }
 
         Set<String> processedNames = new HashSet<>();
-        for (Duo<ResReferenceValue, ResScalarValue> mItem : mItems) {
-            ResResSpec spec = mItem.m1.getReferent();
+        for (Pair<ResReferenceValue, ResScalarValue> item : mItems) {
+            ResReferenceValue ref = item.getLeft();
+            ResScalarValue val = item.getRight();
+            ResResSpec spec = ref.getReferent();
 
             if (spec == null) {
-                LOGGER.fine(String.format("null style reference: m1=0x%08x(%s), m2=0x%08x(%s)",
-                    mItem.m1.getRawIntValue(), mItem.m1.getType(), mItem.m2.getRawIntValue(), mItem.m2.getType()));
+                LOGGER.fine(String.format("null style reference: ref=0x%08x(%s), val=0x%08x(%s)",
+                    ref.getRawIntValue(), ref.getType(), val.getRawIntValue(), val.getType()));
                 continue;
             }
 
@@ -71,19 +73,19 @@ public class ResStyleValue extends ResBagValue implements ResValuesXmlSerializab
                 continue;
             } else if (resource instanceof ResAttr) {
                 ResAttr attr = (ResAttr) resource;
-                value = attr.convertToResXmlFormat(mItem.m2);
+                value = attr.convertToResXmlFormat(val);
                 name = spec.getFullName(res.getResSpec().getPackage(), true);
             } else {
                 name = "@" + spec.getFullName(res.getResSpec().getPackage(), false);
             }
 
             // #3400 - Skip duplicate values, commonly seen are duplicate key-pairs on styles.
-            if (!isAnalysisMode() && processedNames.contains(name)) {
+            if (!mConfig.isAnalysisMode() && processedNames.contains(name)) {
                 continue;
             }
 
             if (value == null) {
-                value = mItem.m2.encodeAsResXmlValue();
+                value = val.encodeAsResXmlValue();
             }
 
             if (value == null) {

@@ -16,43 +16,38 @@
  */
 package brut.androlib.aapt1;
 
-import brut.androlib.*;
+import brut.androlib.ApkBuilder;
+import brut.androlib.ApkDecoder;
+import brut.androlib.BaseTest;
+import brut.androlib.TestUtils;
 import brut.directory.ExtFile;
 import brut.common.BrutException;
-import brut.util.OS;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.*;
+import static org.junit.Assert.*;
 
 public class ExternalEntityTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        sTestOrigDir = new ExtFile(OS.createTempDirectory());
-        TestUtils.copyResourceDir(ExternalEntityTest.class, "decode/doctype/", sTestOrigDir);
+        sTestOrigDir = new ExtFile(sTmpDir, "doctype-orig");
+        sTestNewDir = new ExtFile(sTmpDir, "doctype-new");
+
+        LOGGER.info("Unpacking doctype...");
+        TestUtils.copyResourceDir(ExternalEntityTest.class, "aapt1/doctype", sTestOrigDir);
+
+        sConfig.setAaptVersion(1);
 
         LOGGER.info("Building doctype.apk...");
-        ExtFile testApk = new ExtFile(sTestOrigDir, "doctype.apk");
-        Config config = Config.getDefaultConfig();
-        config.aaptVersion = 1;
-        new ApkBuilder(sTestOrigDir, config).build(testApk);
+        ExtFile testApk = new ExtFile(sTmpDir, "doctype.apk");
+        new ApkBuilder(sTestOrigDir, sConfig).build(testApk);
 
         LOGGER.info("Decoding doctype.apk...");
-        ApkDecoder apkDecoder = new ApkDecoder(testApk);
-        File outDir = new File(sTestOrigDir + File.separator + "output");
-        apkDecoder.decode(outDir);
-    }
-
-    @AfterClass
-    public static void afterClass() throws BrutException {
-        OS.rmdir(sTestOrigDir);
+        new ApkDecoder(testApk, sConfig).decode(sTestNewDir);
     }
 
     @Test
@@ -63,8 +58,9 @@ public class ExternalEntityTest extends BaseTest {
                 "xmlns:android=\"http://schemas.android.com/apk/res/android\">    <supports-screens android:anyDensity=\"true\" android:smallScreens=\"true\" " +
                 "android:normalScreens=\"true\" android:largeScreens=\"true\" android:resizeable=\"true\" android:xlargeScreens=\"true\" /></manifest>");
 
-        byte[] encoded = Files.readAllBytes(Paths.get(sTestOrigDir + File.separator + "output" + File.separator + "AndroidManifest.xml"));
+        byte[] encoded = Files.readAllBytes(new File(sTestNewDir, "AndroidManifest.xml").toPath());
         String obtained = TestUtils.replaceNewlines(new String(encoded));
+
         assertEquals(expected, obtained);
     }
 }

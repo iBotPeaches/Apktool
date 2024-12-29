@@ -311,7 +311,7 @@ public class AXmlResourceParser implements XmlResourceParser {
         // we can resolve it to the default namespace. This may prove to be too aggressive as we scope the entire
         // system namespace, but it is better than not resolving it at all.
         ResID resId = new ResID(getAttributeNameResource(index));
-        if (namespace == -1 && resId.pkgId == 1) {
+        if (namespace == -1 && resId.getPackageId() == 1) {
             return ANDROID_RES_NS;
         }
 
@@ -324,7 +324,7 @@ public class AXmlResourceParser implements XmlResourceParser {
         String value = mStringBlock.getString(namespace);
 
         if (value == null || value.isEmpty()) {
-            if (resId.pkgId == PRIVATE_PKG_ID) {
+            if (resId.getPackageId() == PRIVATE_PKG_ID) {
                 return getNonDefaultNamespaceUri(offset);
             } else {
                 return ANDROID_RES_NS;
@@ -439,8 +439,7 @@ public class AXmlResourceParser implements XmlResourceParser {
 
         try {
             String stringBlockValue = valueRaw != -1
-                ? ResXmlEncoders.escapeXmlChars(mStringBlock.getString(valueRaw))
-                : null;
+                ? ResXmlEncoders.escapeXmlChars(mStringBlock.getString(valueRaw)) : null;
             String resourceMapValue = null;
 
             // Ensure we only track down obfuscated values for reference/attribute type values. Otherwise, we might
@@ -674,12 +673,14 @@ public class AXmlResourceParser implements XmlResourceParser {
         if (name == -1) {
             return -1;
         }
-        int uri = (namespace != null) ? mStringBlock.find(namespace) : -1;
-        for (int o = 0; o != mAttributes.length; o += ATTRIBUTE_LENGTH) {
-            if (name == mAttributes[o + ATTRIBUTE_IX_NAME]
-                    && (uri == -1 || uri == mAttributes[o + ATTRIBUTE_IX_NAMESPACE_URI])) {
-                return o / ATTRIBUTE_LENGTH;
+        int uri = namespace != null ? mStringBlock.find(namespace) : -1;
+        int offset = 0;
+        while (offset < mAttributes.length) {
+            if (name == mAttributes[offset + ATTRIBUTE_IX_NAME]
+                    && (uri == -1 || uri == mAttributes[offset + ATTRIBUTE_IX_NAMESPACE_URI])) {
+                return offset / ATTRIBUTE_LENGTH;
             }
+            offset += ATTRIBUTE_LENGTH;
         }
         return -1;
     }
@@ -697,7 +698,7 @@ public class AXmlResourceParser implements XmlResourceParser {
                     String type = stringBlockValue.substring(0, slashPos);
                     value = type + "/" + resourceMapValue;
                 }
-            } else if (! stringBlockValue.equals(resourceMapValue)) {
+            } else if (!stringBlockValue.equals(resourceMapValue)) {
                 value = resourceMapValue;
             }
         }

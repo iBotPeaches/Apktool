@@ -20,7 +20,7 @@ import android.util.TypedValue;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.data.ResPackage;
 import brut.androlib.res.data.ResTypeSpec;
-import brut.util.Duo;
+import org.apache.commons.lang3.tuple.Pair;
 
 public class ResValueFactory {
     private final ResPackage mPackage;
@@ -78,36 +78,36 @@ public class ResValueFactory {
         return new ResStringValue(value, rawValue);
     }
 
-    public ResBagValue bagFactory(int parent, Duo<Integer, ResScalarValue>[] items, ResTypeSpec resTypeSpec)
+    public ResBagValue bagFactory(int parentId, Pair<Integer, ResScalarValue>[] items, ResTypeSpec resTypeSpec)
             throws AndrolibException {
-        ResReferenceValue parentVal = newReference(parent, null);
+        ResReferenceValue parent = newReference(parentId, null);
 
         if (items.length == 0) {
-            return new ResBagValue(parentVal);
+            return new ResBagValue(parent);
         }
         String resTypeName = resTypeSpec.getName();
 
         switch (resTypeName) {
             case ResTypeSpec.RES_TYPE_NAME_ATTR:
             case ResTypeSpec.RES_TYPE_NAME_ATTR_PRIVATE:
-                return ResAttr.factory(parentVal, items, this, mPackage);
+                return ResAttr.factory(parent, items, this);
             case ResTypeSpec.RES_TYPE_NAME_ARRAY:
-                return new ResArrayValue(parentVal, items);
+                return new ResArrayValue(parent, items);
             case ResTypeSpec.RES_TYPE_NAME_PLURALS:
-                return new ResPluralsValue(parentVal, items);
+                return new ResPluralsValue(parent, items);
             default:
                 if (resTypeName.startsWith(ResTypeSpec.RES_TYPE_NAME_STYLES)) {
-                    return new ResStyleValue(parentVal, items, this);
+                    return new ResStyleValue(parent, items, this);
                 }
                 throw new AndrolibException("unsupported res type name for bags. Found: " + resTypeName);
         }
     }
 
-    public ResReferenceValue newReference(int resID, String rawValue) {
-        return newReference(resID, rawValue, false);
+    public ResReferenceValue newReference(int resId, String rawValue) {
+        return newReference(resId, rawValue, false);
     }
 
-    public ResReferenceValue newReference(int resID, String rawValue, boolean theme) {
-        return new ResReferenceValue(mPackage, resID, rawValue, theme);
+    public ResReferenceValue newReference(int resId, String rawValue, boolean theme) {
+        return new ResReferenceValue(mPackage, resId, rawValue, theme);
     }
 }

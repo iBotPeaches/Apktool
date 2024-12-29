@@ -22,55 +22,38 @@ import brut.androlib.Config;
 import brut.androlib.TestUtils;
 import brut.directory.ExtFile;
 import brut.common.BrutException;
-import brut.util.OS;
+
 import java.io.File;
-import java.io.IOException;
 
 import org.junit.*;
 import static org.junit.Assert.*;
 
 public class AndResGuardTest extends BaseTest {
+    private static final String TEST_APK = "issue1170.apk";
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        TestUtils.cleanFrameworkFile();
-        sTmpDir = new ExtFile(OS.createTempDirectory());
-        TestUtils.copyResourceDir(AndResGuardTest.class, "decode/issue1170/", sTmpDir);
-    }
-
-    @AfterClass
-    public static void afterClass() throws BrutException {
-        OS.rmdir(sTmpDir);
+        TestUtils.copyResourceDir(AndResGuardTest.class, "decode/issue1170", sTmpDir);
     }
 
     @Test
-    public void checkifAndResDecodeRemapsRFolder() throws BrutException, IOException {
-        String apk = "issue1170.apk";
+    public void checkifAndResDecodeRemapsRFolder() throws BrutException {
+        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
+        ExtFile testDir = new ExtFile(testApk + ".out");
+        new ApkDecoder(testApk, sConfig).decode(testDir);
 
-        // decode issue1170.apk
-        ApkDecoder apkDecoder = new ApkDecoder(new ExtFile(sTmpDir + File.separator + apk));
-        sTestOrigDir = new ExtFile(sTmpDir + File.separator + apk + ".out");
-
-        File outDir = new File(sTmpDir + File.separator + apk + ".out");
-        apkDecoder.decode(outDir);
-
-        File aPng =  new File(sTestOrigDir,"res/mipmap-hdpi-v4/a.png");
-        assertTrue(aPng.isFile());
+        assertTrue(new File(testDir, "res/mipmap-hdpi-v4/a.png").isFile());
     }
 
     @Test
-    public void checkIfAndResDecodeRemapsRFolderInRawMode() throws BrutException, IOException {
+    public void checkIfAndResDecodeRemapsRFolderInRawMode() throws BrutException {
+        sConfig.setForceDelete(true);
+        sConfig.setDecodeResources(Config.DECODE_RESOURCES_NONE);
 
-        Config config = Config.getDefaultConfig();
-        config.forceDelete = true;
-        config.decodeResources = Config.DECODE_RESOURCES_NONE;
-        String apk = "issue1170.apk";
-        ApkDecoder apkDecoder = new ApkDecoder(new ExtFile(sTmpDir + File.separator + apk), config);
-        sTestOrigDir = new ExtFile(sTmpDir + File.separator + apk + ".raw.out");
-        File outDir = new File(sTmpDir + File.separator + apk + ".raw.out");
-        apkDecoder.decode(outDir);
+        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
+        ExtFile testDir = new ExtFile(testApk + ".raw.out");
+        new ApkDecoder(testApk, sConfig).decode(testDir);
 
-        File aPng =  new File(sTestOrigDir,"r/a/a.png");
-        assertTrue(aPng.isFile());
+        assertTrue(new File(testDir, "r/a/a.png").isFile());
     }
 }

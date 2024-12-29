@@ -16,50 +16,38 @@
  */
 package brut.androlib.res.src;
 
-import brut.androlib.*;
-import brut.androlib.aapt2.BuildAndDecodeTest;
-import brut.androlib.Config;
+import brut.androlib.ApkBuilder;
+import brut.androlib.ApkDecoder;
+import brut.androlib.BaseTest;
+import brut.androlib.TestUtils;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
-import brut.util.OS;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.*;
+import static org.junit.Assert.*;
 
 public class DexStaticFieldValueTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        TestUtils.cleanFrameworkFile();
-
-        sTmpDir = new ExtFile(OS.createTempDirectory());
         sTestOrigDir = new ExtFile(sTmpDir, "issue2543-orig");
         sTestNewDir = new ExtFile(sTmpDir, "issue2543-new");
-        LOGGER.info("Unpacking issue2543...");
-        TestUtils.copyResourceDir(BuildAndDecodeTest.class, "decode/issue2543/", sTestOrigDir);
 
-        Config config = Config.getDefaultConfig();
+        LOGGER.info("Unpacking issue2543...");
+        TestUtils.copyResourceDir(DexStaticFieldValueTest.class, "decode/issue2543", sTestOrigDir);
+
+        sConfig.setBaksmaliDebugMode(false);
 
         LOGGER.info("Building issue2543.apk...");
-        File testApk = new File(sTmpDir, "issue2543.apk");
-        new ApkBuilder(sTestOrigDir, config).build(testApk);
+        ExtFile testApk = new ExtFile(sTmpDir, "issue2543.apk");
+        new ApkBuilder(sTestOrigDir, sConfig).build(testApk);
 
         LOGGER.info("Decoding issue2543.apk...");
-        config.baksmaliDebugMode = false;
-        ApkDecoder apkDecoder = new ApkDecoder(new ExtFile(testApk), config);
-        apkDecoder.decode(sTestNewDir);
-    }
-
-    @AfterClass
-    public static void afterClass() throws BrutException {
-        OS.rmdir(sTmpDir);
+        new ApkDecoder(testApk, sConfig).decode(sTestNewDir);
     }
 
     @Test
@@ -82,10 +70,9 @@ public class DexStaticFieldValueTest extends BaseTest {
                         + "    return-void\n"
                         + ".end method");
 
-        byte[] encoded = Files.readAllBytes(Paths.get(sTestNewDir + File.separator + "smali" + File.separator
-            + "HelloWorld.smali"));
-
+        byte[] encoded = Files.readAllBytes(new File(sTestNewDir, "smali/HelloWorld.smali").toPath());
         String obtained = TestUtils.replaceNewlines(new String(encoded));
+
         assertEquals(expected, obtained);
     }
 }

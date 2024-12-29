@@ -16,52 +16,39 @@
  */
 package brut.androlib.decode;
 
-import brut.androlib.*;
-import brut.directory.ExtFile;
+import brut.androlib.ApkBuilder;
+import brut.androlib.ApkDecoder;
+import brut.androlib.BaseTest;
+import brut.androlib.TestUtils;
 import brut.common.BrutException;
-import brut.util.OS;
+import brut.directory.ExtFile;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+
 import java.io.File;
-import java.io.IOException;
 
 import org.junit.*;
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.ParserConfigurationException;
-
 import static org.junit.Assert.*;
 
 public class LargeCompactResourceTest extends BaseTest {
+    private static final String TEST_APK = "issue3705.apk";
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        TestUtils.cleanFrameworkFile();
-        sTmpDir = new ExtFile(OS.createTempDirectory());
-        TestUtils.copyResourceDir(CompactResourceTest.class, "decode/issue3705/", sTmpDir);
-    }
-
-    @AfterClass
-    public static void afterClass() throws BrutException {
-        OS.rmdir(sTmpDir);
+        TestUtils.copyResourceDir(CompactResourceTest.class, "decode/issue3705", sTmpDir);
     }
 
     @Test
-    public void checkIfDecodeSucceeds() throws BrutException, IOException, ParserConfigurationException, SAXException {
-        String apk = "issue3705.apk";
-        ExtFile testApk = new ExtFile(sTmpDir, apk);
+    public void checkIfDecodeSucceeds() throws BrutException {
+        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
+        ExtFile testDir = new ExtFile(testApk + ".out");
+        new ApkDecoder(testApk, sConfig).decode(testDir);
 
-        // decode issue3705.apk
-        ApkDecoder apkDecoder = new ApkDecoder(testApk);
-        sTestOrigDir = new ExtFile(sTmpDir + File.separator + apk + ".out");
+        Document doc = loadDocument(new File(testDir, "res/values/strings.xml"));
+        String expression = "/resources/string[contains(@name, 'APKTOOL')]";
+        NodeList nodes = evaluateXPath(doc, expression, NodeList.class);
+        assertEquals(0, nodes.getLength());
 
-        File outDir = new File(sTmpDir + File.separator + apk + ".out");
-        apkDecoder.decode(outDir);
-
-        Document doc = loadDocument(new File(sTestOrigDir + "/res/values/strings.xml"));
-        assertFalse(resourceNameContains(doc.getDocumentElement(), "APKTOOL"));
-
-        Config config = Config.getDefaultConfig();
-        LOGGER.info("Building issue3705.apk...");
-        new ApkBuilder(sTestOrigDir, config).build(testApk);
+        new ApkBuilder(testDir, sConfig).build(null);
     }
 }

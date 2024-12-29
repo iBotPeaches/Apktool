@@ -16,33 +16,21 @@
  */
 package brut.androlib.apk;
 
-import brut.androlib.exceptions.AndrolibException;
+import brut.androlib.BaseTest;
+import brut.common.BrutException;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-
-import java.io.*;
+import java.io.File;
+import java.io.InputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 
+import org.junit.*;
+import org.junit.rules.TemporaryFolder;
 import static org.junit.Assert.*;
 
-public class ApkInfoSerializationTest {
+public class ApkInfoSerializationTest extends BaseTest {
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
-
-    @Test
-    public void checkApkInfoSerialization() throws IOException, AndrolibException {
-        ApkInfo control = ApkInfo.load(
-            getClass().getResourceAsStream("/apk/unknown_files.yml"));
-        check(control);
-
-        File savedApkInfo = folder.newFile("saved.yml");
-        control.save(savedApkInfo);
-        try (InputStream in = Files.newInputStream(savedApkInfo.toPath())) {
-            check(ApkInfo.load(in));
-        }
-    }
 
     private void check(ApkInfo apkInfo) {
         assertEquals("2.0.0", apkInfo.version);
@@ -63,5 +51,18 @@ public class ApkInfoSerializationTest {
         assertEquals("png", apkInfo.doNotCompress.get(2));
         assertEquals("mp3", apkInfo.doNotCompress.get(3));
         assertEquals("stored.file", apkInfo.doNotCompress.get(4));
+    }
+
+    @Test
+    public void checkApkInfoSerialization() throws BrutException, IOException {
+        ApkInfo control = ApkInfo.load(
+            getClass().getResourceAsStream("/apk/unknown_files.yml"));
+        check(control);
+
+        File savedApkInfo = folder.newFile("saved.yml");
+        control.save(savedApkInfo);
+        try (InputStream in = Files.newInputStream(savedApkInfo.toPath())) {
+            check(ApkInfo.load(in));
+        }
     }
 }
