@@ -810,7 +810,6 @@ public class AXmlResourceParser implements XmlResourceParser {
                 continue;
             }
 
-
             if (chunkType == ARSCHeader.RES_XML_START_ELEMENT_TYPE) {
                 mNamespaceIndex = mIn.readInt();
                 mNameIndex = mIn.readInt();

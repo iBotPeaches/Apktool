@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
 
 public class ApkInfo implements YamlSerializable {
     public static final String[] RESOURCES_DIRNAMES = { "res", "r", "R" };
-    public static final String[] RAW_DIRNAMES = { "assets", "lib", "libs", "kotlin", "META-INF/services" };
+    public static final String[] RAW_DIRNAMES = { "assets", "lib" };
 
     public static final Pattern ORIGINAL_FILENAMES_PATTERN = Pattern.compile(
         "AndroidManifest\\.xml|META-INF/[^/]+\\.(RSA|SF|MF)|stamp-cert-sha256");

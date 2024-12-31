@@ -536,7 +536,6 @@ public class BuildAndDecodeTest extends BaseTest {
 
     @Test
     public void libsTest() throws BrutException {
-        compareBinaryFolder("libs");
         compareBinaryFolder("lib");
     }
 
@@ -568,10 +567,5 @@ public class BuildAndDecodeTest extends BaseTest {
     public void singleDexTest() throws BrutException {
         compareBinaryFolder("smali");
         assertTrue(new File(sTestOrigDir, "build/apk/classes.dex").isFile());
-    }
-
-    @Test
-    public void confirmKotlinFolderPersistsTest() {
-        assertTrue(new File(sTestNewDir, "kotlin").isDirectory());
     }
 }
