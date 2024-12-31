@@ -167,7 +167,6 @@ public class ZipRODirectory extends AbstractDirectory {
         return mZipFile;
     }
 
-
     public void close() throws IOException {
         mZipFile.close();
     }
