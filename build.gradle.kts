@@ -1,6 +1,6 @@
 import java.io.ByteArrayOutputStream
 
-val version = "2.10.1"
+val version = "2.11.1"
 val suffix = "SNAPSHOT"
 
 // Strings embedded into the build.
