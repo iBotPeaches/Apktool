@@ -235,8 +235,8 @@ public abstract class AbstractDirectory implements Directory {
         return dirs;
     }
 
-
     public void close() throws IOException {
+        // stub
     }
 
     private SubPath getSubPath(String path) throws PathNotExist {
