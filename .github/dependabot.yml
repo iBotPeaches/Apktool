@@ -1,0 +1,17 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    target-branch: docs
+    directory: /
+    schedule:
+      interval: weekly
+      time: "04:00"
+      timezone: "America/New_York"
+
+  - package-ecosystem: npm
+    target-branch: docs
+    directory: /
+    schedule:
+      interval: weekly
+      time: "04:00"
+      timezone: "America/New_York"
