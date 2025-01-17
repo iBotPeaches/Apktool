@@ -11,6 +11,7 @@ versionInfo:
   versionName: '1.0'
 featureFlags:
   brut.feature.flag: true
+  brut.activity.flag: true
 doNotCompress:
 - assets/0byte_file.jpg
 sparseResources: false

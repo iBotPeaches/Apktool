@@ -17,6 +17,7 @@
 package brut.androlib;
 
 import brut.androlib.Config;
+import brut.androlib.apk.ApkInfo;
 import brut.androlib.res.Framework;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
@@ -46,6 +47,7 @@ public class BaseTest {
     protected static File sTmpDir;
     protected static ExtFile sTestOrigDir;
     protected static ExtFile sTestNewDir;
+    protected static ApkInfo sTestApkInfo;
 
     private static void cleanFrameworkFile() throws BrutException {
         File apkFile = new File(new Framework(sConfig).getDirectory(), "1.apk");
