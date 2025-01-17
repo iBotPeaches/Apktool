@@ -49,7 +49,7 @@ public class BuildAndDecodeTest extends BaseTest {
         new ApkBuilder(sTestOrigDir, sConfig).build(testApk);
 
         LOGGER.info("Decoding testapp.apk...");
-        new ApkDecoder(testApk, sConfig).decode(sTestNewDir);
+        sTestApkInfo = new ApkDecoder(testApk, sConfig).decode(sTestNewDir);
     }
 
     @Test
@@ -157,6 +157,15 @@ public class BuildAndDecodeTest extends BaseTest {
     @Test
     public void unknownFolderTest() throws BrutException {
         compareBinaryFolder("unknown");
+    }
+
+    @Test
+    public void featureFlagTest() {
+        assertNotNull(sTestApkInfo.featureFlags);
+        assertTrue(sTestApkInfo.featureFlags.containsKey("brut.feature.flag"));
+        // assertTrue(sTestApkInfo.featureFlags.containsKey("brut.activity.flag"));
+        assertEquals(true, sTestApkInfo.featureFlags.get("brut.feature.flag"));
+        // assertEquals(true, sTestApkInfo.featureFlags.get("brut.activity.flag"));
     }
 
     @Test
