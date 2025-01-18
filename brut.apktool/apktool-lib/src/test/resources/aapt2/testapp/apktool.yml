@@ -10,8 +10,8 @@ versionInfo:
   versionCode: '1'
   versionName: '1.0'
 featureFlags:
-  brut.feature.flag: true
-  brut.activity.flag: true
+  brut.feature.permission: true
+  brut.feature.activity: true
 doNotCompress:
 - assets/0byte_file.jpg
 sparseResources: false
