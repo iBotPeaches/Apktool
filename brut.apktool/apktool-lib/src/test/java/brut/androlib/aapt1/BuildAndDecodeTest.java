@@ -172,10 +172,10 @@ public class BuildAndDecodeTest extends BaseTest {
 
     @Test
     public void storedMp3FilesAreNotCompressedTest() throws BrutException, IOException {
-        ExtFile testApk = new ExtFile(sTmpDir, "testapp.apk");
-        Integer compLevel = testApk.getDirectory().getCompressionLevel("res/raw/rain.mp3");
-        testApk.close();
-        assertEquals(Integer.valueOf(0), compLevel);
+        try (ExtFile testApk = new ExtFile(sTmpDir, "testapp.apk")) {
+            Integer compLevel = testApk.getDirectory().getCompressionLevel("res/raw/rain.mp3");
+            assertEquals(Integer.valueOf(0), compLevel);
+        }
     }
 
     @Test
@@ -503,9 +503,7 @@ public class BuildAndDecodeTest extends BaseTest {
     @Test
     public void confirmZeroByteFileExtensionIsNotStored() throws BrutException {
         ApkInfo testInfo = ApkInfo.load(sTestNewDir);
-        for (String path : testInfo.doNotCompress) {
-            assertNotEquals("jpg", path);
-        }
+        assertFalse(testInfo.doNotCompress.contains("jpg"));
     }
 
     @Test

@@ -49,7 +49,7 @@ public class BuildAndDecodeTest extends BaseTest {
         new ApkBuilder(sTestOrigDir, sConfig).build(testApk);
 
         LOGGER.info("Decoding testapp.apk...");
-        sTestApkInfo = new ApkDecoder(testApk, sConfig).decode(sTestNewDir);
+        new ApkDecoder(testApk, sConfig).decode(sTestNewDir);
     }
 
     @Test
@@ -87,6 +87,13 @@ public class BuildAndDecodeTest extends BaseTest {
     public void valuesBcp47LanguageScriptRegionVariantTest() throws BrutException {
         compareValuesFiles("values-b+ast+Latn+IT+AREVELA/strings.xml");
         compareValuesFiles("values-b+ast+Hant+IT+ARABEXT/strings.xml");
+    }
+
+    @Test
+    public void confirmFeatureFlagsRecorded() throws BrutException {
+        ApkInfo testInfo = ApkInfo.load(sTestNewDir);
+        assertTrue(testInfo.featureFlags.get("brut.feature.permission"));
+        assertTrue(testInfo.featureFlags.get("brut.feature.activity"));
     }
 
     @Test
@@ -157,15 +164,6 @@ public class BuildAndDecodeTest extends BaseTest {
     @Test
     public void unknownFolderTest() throws BrutException {
         compareBinaryFolder("unknown");
-    }
-
-    @Test
-    public void featureFlagTest() {
-        assertNotNull(sTestApkInfo.featureFlags);
-        assertTrue(sTestApkInfo.featureFlags.containsKey("brut.feature.flag"));
-        // assertTrue(sTestApkInfo.featureFlags.containsKey("brut.activity.flag"));
-        assertEquals(true, sTestApkInfo.featureFlags.get("brut.feature.flag"));
-        // assertEquals(true, sTestApkInfo.featureFlags.get("brut.activity.flag"));
     }
 
     @Test

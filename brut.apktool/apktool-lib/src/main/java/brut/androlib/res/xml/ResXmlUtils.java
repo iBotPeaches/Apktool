@@ -257,7 +257,7 @@ public final class ResXmlUtils {
     public static String[] pullManifestFeatureFlags(File file) {
         try {
             Document doc = XmlUtils.loadDocument(file, true);
-            String expression = "/manifest/permission/@android:featureFlag";
+            String expression = "/manifest//@android:featureFlag";
             NodeList nodes = XmlUtils.evaluateXPath(doc, expression, NodeList.class);
 
             String[] featureFlags = new String[nodes.getLength()];
