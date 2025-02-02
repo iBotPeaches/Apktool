@@ -18,7 +18,6 @@ package brut.androlib.res.decoder;
 
 import android.util.TypedValue;
 import brut.androlib.Config;
-import brut.androlib.apk.ApkInfo;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.data.*;
 import brut.androlib.res.data.arsc.*;
@@ -304,7 +303,7 @@ public class ARSCDecoder {
 
         ResConfigFlags flags = readConfigFlags();
 
-        mIn.mark(mHeader.chunkSize + mHeader.headerSize);
+        mIn.mark(mHeader.chunkSize);
         mHeader.checkForUnreadHeader(mIn);
 
         boolean isOffset16 = (typeFlags & TABLE_TYPE_FLAG_OFFSET16) != 0;
@@ -341,8 +340,7 @@ public class ARSCDecoder {
 
         // #3428 - In some applications the res entries are padded for alignment, but in #3778 it made
         // sense to align to the start of the entries to handle all cases.
-        mIn.jump(entriesStartAligned);
-
+        mIn.jumpTo(entriesStartAligned);
         for (int i : entryOffsetMap.keySet()) {
             mResId = (mResId & 0xffff0000) | i;
             int offset = entryOffsetMap.get(i);
@@ -352,7 +350,7 @@ public class ARSCDecoder {
             }
 
             // As seen in some recent APKs - there are more entries reported than can fit in the chunk.
-            if (mIn.position() == mHeader.endPosition) {
+            if (mIn.position() >= mHeader.endPosition) {
                 int remainingEntries = entryCount - i;
                 LOGGER.warning(String.format("End of chunk hit. Skipping remaining entries (%d) in type: %s",
                     remainingEntries, mTypeSpec.getName()
@@ -365,11 +363,11 @@ public class ARSCDecoder {
             if (entryStart < mIn.position()) {
                 mIn.reset();
             }
-            mIn.jump(entryStart);
+            mIn.jumpTo(entryStart);
 
             EntryData entryData = readEntryData();
             if (entryData != null) {
-                readEntry(entryData);
+                parseEntryData(entryData);
             } else {
                 mMissingResSpecMap.put(mResId, typeId);
             }
@@ -430,7 +428,7 @@ public class ARSCDecoder {
         return entryData;
     }
 
-    private void readEntry(EntryData entryData) throws AndrolibException {
+    private void parseEntryData(EntryData entryData) throws AndrolibException {
         int specNamesId = entryData.specNamesId;
         ResValue value = entryData.value;
 
