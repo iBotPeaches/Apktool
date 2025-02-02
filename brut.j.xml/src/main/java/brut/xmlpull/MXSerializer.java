@@ -204,6 +204,9 @@ public class MXSerializer implements XmlSerializer {
     }
 
     private void write(String str) throws IOException {
+        if (str == null) {
+            str = "";
+        }
         write(str, 0, str.length());
     }
 
