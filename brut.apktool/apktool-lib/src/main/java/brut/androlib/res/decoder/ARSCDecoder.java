@@ -300,9 +300,11 @@ public class ARSCDecoder {
         mIn.skipBytes(2); // reserved
         int entryCount = mIn.readInt();
         int entriesStart = mIn.readInt();
+        long entriesStartAligned = mHeader.startPosition + entriesStart;
 
         ResConfigFlags flags = readConfigFlags();
 
+        mIn.mark(mHeader.chunkSize + mHeader.headerSize);
         mHeader.checkForUnreadHeader(mIn);
 
         boolean isOffset16 = (typeFlags & TABLE_TYPE_FLAG_OFFSET16) != 0;
@@ -337,12 +339,9 @@ public class ARSCDecoder {
         mType = !flags.isInvalid() || mKeepBroken ? mPkg.getOrCreateConfig(flags) : null;
         int noEntry = isOffset16 ? NO_ENTRY_OFFSET16 : NO_ENTRY;
 
-        // #3428 - In some applications the res entries are padded for alignment.
-        long entriesStartAligned = mHeader.startPosition + entriesStart;
-        if (mIn.position() < entriesStartAligned) {
-            long bytesSkipped = mIn.skip(entriesStartAligned - mIn.position());
-            LOGGER.fine(String.format("Skipping: %d byte(s) to align with ResTable_entry start.", bytesSkipped));
-        }
+        // #3428 - In some applications the res entries are padded for alignment, but in #3778 it made
+        // sense to align to the start of the entries to handle all cases.
+        mIn.jump(entriesStartAligned);
 
         for (int i : entryOffsetMap.keySet()) {
             mResId = (mResId & 0xffff0000) | i;
@@ -361,6 +360,13 @@ public class ARSCDecoder {
                 break;
             }
 
+            // #3778 - In some applications the res entries are unordered and might have to jump backwards.
+            long entryStart = entriesStartAligned + offset;
+            if (entryStart < mIn.position()) {
+                mIn.reset();
+            }
+            mIn.jump(entryStart);
+
             EntryData entryData = readEntryData();
             if (entryData != null) {
                 readEntry(entryData);
@@ -370,9 +376,9 @@ public class ARSCDecoder {
         }
 
         // skip "TYPE 8 chunks" and/or padding data at the end of this chunk
-        if (mIn.position() < mHeader.endPosition) {
+        if (mHeader.endPosition > mIn.position()) {
             long bytesSkipped = mIn.skip(mHeader.endPosition - mIn.position());
-            LOGGER.warning("Unknown data detected. Skipping: " + bytesSkipped + " byte(s)");
+            LOGGER.warning("Unknown data detected at end of type chunk. Skipping: " + bytesSkipped + " byte(s)");
         }
 
         return mType;
