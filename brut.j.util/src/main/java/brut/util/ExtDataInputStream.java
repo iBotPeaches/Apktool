@@ -50,6 +50,19 @@ public class ExtDataInputStream extends FilterInputStream implements ExtDataInpu
         mCountIn = countIn;
     }
 
+    public void jumpTo(long expectedPosition) throws IOException {
+        long position = this.position();
+        if (position > expectedPosition) {
+            throw new IOException(String.format("Jumping backwards from %d to %d", position, expectedPosition));
+        }
+        if (position < expectedPosition) {
+            long skipped = skip(expectedPosition - position);
+            if (skipped != expectedPosition - position) {
+                throw new IOException(String.format("Jump failed: expected %d, got %d", expectedPosition - position, skipped));
+            }
+        }
+    }
+
     // ExtDataInput
 
     @Override

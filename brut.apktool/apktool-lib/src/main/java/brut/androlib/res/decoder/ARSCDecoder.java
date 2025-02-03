@@ -18,7 +18,6 @@ package brut.androlib.res.decoder;
 
 import android.util.TypedValue;
 import brut.androlib.Config;
-import brut.androlib.apk.ApkInfo;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.data.*;
 import brut.androlib.res.data.arsc.*;
@@ -300,9 +299,11 @@ public class ARSCDecoder {
         mIn.skipBytes(2); // reserved
         int entryCount = mIn.readInt();
         int entriesStart = mIn.readInt();
+        long entriesStartAligned = mHeader.startPosition + entriesStart;
 
         ResConfigFlags flags = readConfigFlags();
 
+        mIn.mark(mHeader.chunkSize);
         mHeader.checkForUnreadHeader(mIn);
 
         boolean isOffset16 = (typeFlags & TABLE_TYPE_FLAG_OFFSET16) != 0;
@@ -314,12 +315,14 @@ public class ARSCDecoder {
             mResTable.setSparseResources(true);
         }
 
+        // #3372 - The offsets that are 16bit should be stored as real offsets (* 4u).
         HashMap<Integer, Integer> entryOffsetMap = new LinkedHashMap<>();
         for (int i = 0; i < entryCount; i++) {
             if (isSparse) {
-                entryOffsetMap.put(mIn.readUnsignedShort(), mIn.readUnsignedShort());
+                entryOffsetMap.put(mIn.readUnsignedShort(), mIn.readUnsignedShort() * 4);
             } else if (isOffset16) {
-                entryOffsetMap.put(i, mIn.readUnsignedShort());
+                int offset = mIn.readUnsignedShort();
+                entryOffsetMap.put(i, offset == NO_ENTRY_OFFSET16 ? NO_ENTRY : offset * 4);
             } else {
                 entryOffsetMap.put(i, mIn.readInt());
             }
@@ -335,25 +338,20 @@ public class ARSCDecoder {
         }
 
         mType = !flags.isInvalid() || mKeepBroken ? mPkg.getOrCreateConfig(flags) : null;
-        int noEntry = isOffset16 ? NO_ENTRY_OFFSET16 : NO_ENTRY;
 
-        // #3428 - In some applications the res entries are padded for alignment.
-        long entriesStartAligned = mHeader.startPosition + entriesStart;
-        if (mIn.position() < entriesStartAligned) {
-            long bytesSkipped = mIn.skip(entriesStartAligned - mIn.position());
-            LOGGER.fine(String.format("Skipping: %d byte(s) to align with ResTable_entry start.", bytesSkipped));
-        }
-
+        // #3428 - In some applications the res entries are padded for alignment, but in #3778 it made
+        // sense to align to the start of the entries to handle all cases.
+        mIn.jumpTo(entriesStartAligned);
         for (int i : entryOffsetMap.keySet()) {
             mResId = (mResId & 0xffff0000) | i;
             int offset = entryOffsetMap.get(i);
-            if (offset == noEntry) {
+            if (offset == NO_ENTRY) {
                 mMissingResSpecMap.put(mResId, typeId);
                 continue;
             }
 
             // As seen in some recent APKs - there are more entries reported than can fit in the chunk.
-            if (mIn.position() == mHeader.endPosition) {
+            if (mIn.position() >= mHeader.endPosition) {
                 int remainingEntries = entryCount - i;
                 LOGGER.warning(String.format("End of chunk hit. Skipping remaining entries (%d) in type: %s",
                     remainingEntries, mTypeSpec.getName()
@@ -361,18 +359,25 @@ public class ARSCDecoder {
                 break;
             }
 
+            // #3778 - In some applications the res entries are unordered and might have to jump backwards.
+            long entryStart = entriesStartAligned + offset;
+            if (entryStart < mIn.position()) {
+                mIn.reset();
+            }
+            mIn.jumpTo(entryStart);
+
             EntryData entryData = readEntryData();
             if (entryData != null) {
-                readEntry(entryData);
+                parseEntryData(entryData);
             } else {
                 mMissingResSpecMap.put(mResId, typeId);
             }
         }
 
         // skip "TYPE 8 chunks" and/or padding data at the end of this chunk
-        if (mIn.position() < mHeader.endPosition) {
+        if (mHeader.endPosition > mIn.position()) {
             long bytesSkipped = mIn.skip(mHeader.endPosition - mIn.position());
-            LOGGER.warning("Unknown data detected. Skipping: " + bytesSkipped + " byte(s)");
+            LOGGER.warning("Unknown data detected at end of type chunk. Skipping: " + bytesSkipped + " byte(s)");
         }
 
         return mType;
@@ -424,7 +429,7 @@ public class ARSCDecoder {
         return entryData;
     }
 
-    private void readEntry(EntryData entryData) throws AndrolibException {
+    private void parseEntryData(EntryData entryData) throws AndrolibException {
         int specNamesId = entryData.specNamesId;
         ResValue value = entryData.value;
 
