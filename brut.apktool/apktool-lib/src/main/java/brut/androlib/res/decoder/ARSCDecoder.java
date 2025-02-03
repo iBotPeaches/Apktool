@@ -315,12 +315,14 @@ public class ARSCDecoder {
             mResTable.setSparseResources(true);
         }
 
+        // #3372 - The offsets that are 16bit should be stored as real offsets (* 4u).
         HashMap<Integer, Integer> entryOffsetMap = new LinkedHashMap<>();
         for (int i = 0; i < entryCount; i++) {
             if (isSparse) {
-                entryOffsetMap.put(mIn.readUnsignedShort(), mIn.readUnsignedShort());
+                entryOffsetMap.put(mIn.readUnsignedShort(), mIn.readUnsignedShort() * 4);
             } else if (isOffset16) {
-                entryOffsetMap.put(i, mIn.readUnsignedShort());
+                int offset = mIn.readUnsignedShort();
+                entryOffsetMap.put(i, offset == NO_ENTRY_OFFSET16 ? NO_ENTRY : offset * 4);
             } else {
                 entryOffsetMap.put(i, mIn.readInt());
             }
@@ -336,7 +338,6 @@ public class ARSCDecoder {
         }
 
         mType = !flags.isInvalid() || mKeepBroken ? mPkg.getOrCreateConfig(flags) : null;
-        int noEntry = isOffset16 ? NO_ENTRY_OFFSET16 : NO_ENTRY;
 
         // #3428 - In some applications the res entries are padded for alignment, but in #3778 it made
         // sense to align to the start of the entries to handle all cases.
@@ -344,7 +345,7 @@ public class ARSCDecoder {
         for (int i : entryOffsetMap.keySet()) {
             mResId = (mResId & 0xffff0000) | i;
             int offset = entryOffsetMap.get(i);
-            if (offset == noEntry) {
+            if (offset == NO_ENTRY) {
                 mMissingResSpecMap.put(mResId, typeId);
                 continue;
             }
