@@ -350,6 +350,13 @@ public class ARSCDecoder {
                 continue;
             }
 
+            // #3778 - In some applications the res entries are unordered and might have to jump backwards.
+            long entryStart = entriesStartAligned + offset;
+            if (entryStart < mIn.position()) {
+                mIn.reset();
+            }
+            mIn.jumpTo(entryStart);
+
             // As seen in some recent APKs - there are more entries reported than can fit in the chunk.
             if (mIn.position() >= mHeader.endPosition) {
                 int remainingEntries = entryCount - i;
@@ -358,13 +365,6 @@ public class ARSCDecoder {
                 ));
                 break;
             }
-
-            // #3778 - In some applications the res entries are unordered and might have to jump backwards.
-            long entryStart = entriesStartAligned + offset;
-            if (entryStart < mIn.position()) {
-                mIn.reset();
-            }
-            mIn.jumpTo(entryStart);
 
             EntryData entryData = readEntryData();
             if (entryData != null) {
