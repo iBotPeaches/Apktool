@@ -143,21 +143,21 @@ public final class ResXmlUtils {
                 changed = true;
             }
 
-            Element baseConfig = (Element) doc.getElementsByTagName("base-config").item(0);
+            Element baseConfig = (Element) root.getElementsByTagName("base-config").item(0);
             if (baseConfig == null) {
                 baseConfig = doc.createElement("base-config");
                 root.appendChild(baseConfig);
                 changed = true;
             }
 
-            Element trustAnchors = (Element) doc.getElementsByTagName("trust-anchors").item(0);
+            Element trustAnchors = (Element) baseConfig.getElementsByTagName("trust-anchors").item(0);
             if (trustAnchors == null) {
                 trustAnchors = doc.createElement("trust-anchors");
                 baseConfig.appendChild(trustAnchors);
                 changed = true;
             }
 
-            NodeList certificates = doc.getElementsByTagName("certificates");
+            NodeList certificates = trustAnchors.getElementsByTagName("certificates");
             boolean hasSystemCert = false;
             boolean hasUserCert = false;
             for (int i = 0; i < certificates.getLength(); i++) {
