@@ -65,12 +65,12 @@ public class NetworkConfigTest extends BaseTest {
         Document doc = loadDocument(new File(sTestNewDir, "res/xml/network_security_config.xml"));
 
         // Check if 'system' certificate exists
-        String systemCertExpr = "//certificates[@src='system']";
+        String systemCertExpr = "//base-config//certificates[@src='system']";
         NodeList systemCertNodes = evaluateXPath(doc, systemCertExpr, NodeList.class);
         assertTrue(systemCertNodes.getLength() > 0);
 
         // Check if 'user' certificate exists
-        String userCertExpr = "//certificates[@src='user']";
+        String userCertExpr = "//base-config//certificates[@src='user']";
         NodeList userCertNodes = evaluateXPath(doc, userCertExpr, NodeList.class);
         assertTrue(userCertNodes.getLength() > 0);
     }
