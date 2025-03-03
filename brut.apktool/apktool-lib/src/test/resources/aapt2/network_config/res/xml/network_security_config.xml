@@ -5,5 +5,8 @@
         <pin-set>
             <pin digest="SHA-256">OEJax6JVAMiUP7wzOiLPU7KW38Cdx3afNZOYR2iOFZ4=</pin>
         </pin-set>
+        <trust-anchors>
+            <certificates src="user" />
+        </trust-anchors>
     </domain-config>
 </network-security-config>
