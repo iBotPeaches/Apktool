@@ -17,13 +17,6 @@ public class ResXmlEncodersTest extends BaseTest {
         assertEquals("&lt;![CDATA[foo]]&gt;", ResXmlEncoders.escapeXmlChars("<![CDATA[foo]]>"));
     }
 
-    private static void assertRoundtrips(String value) throws Throwable {
-        String escaped = ResXmlEncoders.escapeXmlChars(value);
-        Document doc = XmlUtils.loadDocumentContent("<root>" + escaped + "</root>", false);
-        Node node = doc.getElementsByTagName("root").item(0);
-        assertEquals(value, node.getTextContent());
-    }
-
     @Test
     public void escapeXmlCharsRoundtrip() throws Throwable {
         assertRoundtrips("foo");
@@ -32,5 +25,12 @@ public class ResXmlEncodersTest extends BaseTest {
         assertRoundtrips("foo&bar");
         assertRoundtrips("<foo>");
         assertRoundtrips("<![CDATA[foo]]>");
+    }
+
+    private static void assertRoundtrips(String value) throws Throwable {
+        String escaped = ResXmlEncoders.escapeXmlChars(value);
+        Document doc = XmlUtils.loadDocumentContent("<root>" + escaped + "</root>", false);
+        Node node = doc.getElementsByTagName("root").item(0);
+        assertEquals(value, node.getTextContent());
     }
 }

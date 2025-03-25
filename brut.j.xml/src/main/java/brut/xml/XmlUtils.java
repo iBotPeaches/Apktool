@@ -83,7 +83,7 @@ public final class XmlUtils {
     }
 
     public static Document loadDocumentContent(String content, boolean nsAware)
-        throws IOException, SAXException, ParserConfigurationException {
+            throws IOException, SAXException, ParserConfigurationException {
         DocumentBuilder builder = newDocumentBuilder(nsAware);
         try (InputStream in = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8))) {
             return builder.parse(in);
