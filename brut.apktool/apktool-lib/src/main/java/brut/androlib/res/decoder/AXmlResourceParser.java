@@ -448,7 +448,7 @@ public class AXmlResourceParser implements XmlResourceParser {
                     || valueType == TypedValue.TYPE_DYNAMIC_REFERENCE
                     || valueType == TypedValue.TYPE_ATTRIBUTE
                     || valueType == TypedValue.TYPE_DYNAMIC_ATTRIBUTE) {
-                resourceMapValue = decodeFromResourceId(valueData);
+                resourceMapValue = ResXmlEncoders.escapeXmlChars(decodeFromResourceId(valueData));
             }
             String value = getPreferredString(stringBlockValue, resourceMapValue);
 
