@@ -55,28 +55,60 @@ public class ResFlagsAttr extends ResAttr {
             return super.convertToResXmlFormat(value);
         }
         loadFlags();
-        int intVal = ((ResIntValue) value).getValue();
 
+        int intVal = ((ResIntValue) value).getValue();
         if (intVal == 0) {
             return renderFlags(mZeroFlags);
         }
 
-        FlagItem[] flagItems = new FlagItem[mFlags.length];
-        int[] flags = new int[mFlags.length];
+        FlagItem[] flags = new FlagItem[mFlags.length];
         int flagsCount = 0;
-        for (FlagItem flagItem : mFlags) {
-            int flag = flagItem.flag;
+        int flagsCache = 0;
 
-            if ((intVal & flag) != flag) {
+        for (FlagItem item : mFlags) {
+            int flag = item.flag;
+
+            if ((intVal & flag) != flag || (flagsCache & flag) == flag) {
                 continue;
             }
 
-            if (!isSubpartOf(flag, flags)) {
-                flags[flagsCount] = flag;
-                flagItems[flagsCount++] = flagItem;
+            flags[flagsCount++] = item;
+            flagsCache |= flag;
+
+            if (intVal == flagsCache) {
+                break;
             }
         }
-        return renderFlags(Arrays.copyOf(flagItems, flagsCount));
+
+        if (flagsCount == 0) {
+            throw new AndrolibException(String.format("invalid flags in value: 0x%08x", intVal));
+        }
+
+        // Filter out redundant flags
+        FlagItem[] filtered = new FlagItem[flagsCount];;
+        int filteredCount = 0;
+
+        for (int i = 0; i < flagsCount; i++) {
+            int flag = flags[i].flag;
+            int mask = 0;
+
+            for (int j = 0; j < flagsCount; j++) {
+                if (j != i) {
+                    mask |= flags[j].flag;
+                }
+            }
+
+            // Keep only if it adds at least one unique bit
+            if ((flag & ~mask) != 0) {
+                filtered[filteredCount++] = flags[i];
+            }
+        }
+
+        if (filteredCount != flagsCount) {
+            filtered = Arrays.copyOf(filtered, filteredCount);
+        }
+
+        return renderFlags(filtered);
     }
 
     @Override
@@ -96,15 +128,6 @@ public class ResFlagsAttr extends ResAttr {
             serializer.attribute(null, "value", String.format("0x%08x", item.flag));
             serializer.endTag(null, "flag");
         }
-    }
-
-    private boolean isSubpartOf(int flag, int[] flags) {
-        for (int f : flags) {
-            if ((f & flag) == flag) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private String renderFlags(FlagItem[] flags) throws AndrolibException {
@@ -139,6 +162,8 @@ public class ResFlagsAttr extends ResAttr {
         mZeroFlags = Arrays.copyOf(zeroFlags, zeroFlagsCount);
         mFlags = Arrays.copyOf(flags, flagsCount);
 
-        Arrays.sort(mFlags, Comparator.comparingInt((FlagItem item) -> Integer.bitCount(item.flag)).reversed());
+        Arrays.sort(mFlags,
+            Comparator.comparingInt((FlagItem item) -> Integer.bitCount(item.flag)).reversed()
+            .thenComparingInt((FlagItem item) -> item.flag));
     }
 }
