@@ -63,19 +63,19 @@ public class ResFlagsAttr extends ResAttr {
 
         FlagItem[] flags = new FlagItem[mFlags.length];
         int flagsCount = 0;
-        int flagsCache = 0;
+        int flagsInt = 0;
 
         for (FlagItem item : mFlags) {
             int flag = item.flag;
 
-            if ((intVal & flag) != flag || (flagsCache & flag) == flag) {
+            if ((intVal & flag) != flag || (flagsInt & flag) == flag) {
                 continue;
             }
 
             flags[flagsCount++] = item;
-            flagsCache |= flag;
+            flagsInt |= flag;
 
-            if (intVal == flagsCache) {
+            if (intVal == flagsInt) {
                 break;
             }
         }
@@ -89,18 +89,20 @@ public class ResFlagsAttr extends ResAttr {
         int filteredCount = 0;
 
         for (int i = 0; i < flagsCount; i++) {
-            int flag = flags[i].flag;
             int mask = 0;
 
+            // Combine the other flags
             for (int j = 0; j < flagsCount; j++) {
-                if (j != i) {
+                if (j != i && flags[j] != null) {
                     mask |= flags[j].flag;
                 }
             }
 
             // Keep only if it adds at least one unique bit
-            if ((flag & ~mask) != 0) {
+            if ((flags[i].flag & ~mask) != 0) {
                 filtered[filteredCount++] = flags[i];
+            } else {
+                flags[i] = null;
             }
         }
 
