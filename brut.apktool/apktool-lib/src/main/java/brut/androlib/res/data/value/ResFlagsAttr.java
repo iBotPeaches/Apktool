@@ -85,32 +85,40 @@ public class ResFlagsAttr extends ResAttr {
         }
 
         // Filter out redundant flags
-        FlagItem[] filtered = new FlagItem[flagsCount];;
-        int filteredCount = 0;
+        if (flagsCount > 2) {
+            FlagItem[] filtered = new FlagItem[flagsCount];
+            int filteredCount = 0;
 
-        for (int i = 0; i < flagsCount; i++) {
-            int mask = 0;
+            for (int i = 0; i < flagsCount; i++) {
+                FlagItem item = flags[i];
+                int mask = 0;
 
-            // Combine the other flags
-            for (int j = 0; j < flagsCount; j++) {
-                if (j != i && flags[j] != null) {
-                    mask |= flags[j].flag;
+                // Combine the other flags
+                for (int j = 0; j < flagsCount; j++) {
+                    FlagItem other = flags[j];
+
+                    if (j != i && other != null) {
+                        mask |= other.flag;
+                    }
+                }
+
+                // Keep only if it adds at least one unique bit
+                if ((item.flag & ~mask) != 0) {
+                    filtered[filteredCount++] = item;
+                } else {
+                    flags[i] = null;
                 }
             }
 
-            // Keep only if it adds at least one unique bit
-            if ((flags[i].flag & ~mask) != 0) {
-                filtered[filteredCount++] = flags[i];
-            } else {
-                flags[i] = null;
-            }
+            flags = filtered;
+            flagsCount = filteredCount;
         }
 
-        if (filteredCount != flagsCount) {
-            filtered = Arrays.copyOf(filtered, filteredCount);
+        if (flagsCount != flags.length) {
+            flags = Arrays.copyOf(flags, flagsCount);
         }
 
-        return renderFlags(filtered);
+        return renderFlags(flags);
     }
 
     @Override
