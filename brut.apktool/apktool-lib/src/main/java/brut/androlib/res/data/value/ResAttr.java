@@ -135,34 +135,34 @@ public class ResAttr extends ResBagValue implements ResValuesXmlSerializable {
     }
 
     protected String getTypeAsString() {
-        String s = "";
+        StringBuilder sb = new StringBuilder();
         if ((mType & TYPE_REFERENCE) != 0) {
-            s += "|reference";
+            sb.append("|reference");
         }
         if ((mType & TYPE_STRING) != 0) {
-            s += "|string";
+            sb.append("|string");
         }
         if ((mType & TYPE_INT) != 0) {
-            s += "|integer";
+            sb.append("|integer");
         }
         if ((mType & TYPE_BOOL) != 0) {
-            s += "|boolean";
+            sb.append("|boolean");
         }
         if ((mType & TYPE_COLOR) != 0) {
-            s += "|color";
+            sb.append("|color");
         }
         if ((mType & TYPE_FLOAT) != 0) {
-            s += "|float";
+            sb.append("|float");
         }
         if ((mType & TYPE_DIMEN) != 0) {
-            s += "|dimension";
+            sb.append("|dimension");
         }
         if ((mType & TYPE_FRACTION) != 0) {
-            s += "|fraction";
+            sb.append("|fraction");
         }
-        if (s.isEmpty()) {
+        if (sb.length() == 0) {
             return null;
         }
-        return s.substring(1);
+        return sb.substring(1);
     }
 }
