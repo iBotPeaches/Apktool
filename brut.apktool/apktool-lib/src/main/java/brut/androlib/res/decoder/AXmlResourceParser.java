@@ -799,6 +799,8 @@ public class AXmlResourceParser implements XmlResourceParser {
                     int uri = mIn.readInt();
                     mNamespaces.push(prefix, uri);
                 } else {
+                    // #3838 - Some applications have a bogus element prior to the START_ELEMENT event. This breaks parsing &
+                    // until we have a robust chunk parser to handle this, this skip will suffice for now.
                     if (!mHasEncounteredStartElement) {
                         LOGGER.warning(String.format("Skipping end namespace event at %d, element has not been encountered.", arscHeader.endPosition));
                         mIn.jumpTo(arscHeader.endPosition);
