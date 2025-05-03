@@ -51,6 +51,9 @@ public final class XmlPullUtils {
 
         while (true) {
             int event = in.nextToken();
+            if (event == -1) {
+                break;
+            }
             if (event == XmlPullParser.START_DOCUMENT) {
                 out.startDocument(in.getInputEncoding(), standalone);
                 continue;
