@@ -167,7 +167,7 @@ public class ARSCDecoder {
         mHeader.checkForUnreadHeader(mIn);
 
         LOGGER.warning("Skipping unknown chunk data of size " + mHeader.chunkSize);
-        mHeader.skipChunk(mIn);
+        mIn.jumpTo(mHeader.endPosition);
     }
 
     private ResPackage readTablePackage() throws AndrolibException, IOException {
