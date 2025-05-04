@@ -99,8 +99,4 @@ public class ARSCHeader {
             }
         }
     }
-
-    public void skipChunk(ExtDataInput in) throws IOException {
-        in.skipBytes(chunkSize - headerSize);
-    }
 }

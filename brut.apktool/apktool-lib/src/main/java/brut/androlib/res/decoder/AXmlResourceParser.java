@@ -66,6 +66,7 @@ public class AXmlResourceParser implements XmlResourceParser {
     private final NamespaceStack mNamespaces;
 
     private boolean mIsOperational;
+    private boolean mHasEncounteredStartElement;
     private ExtDataInputStream mIn;
     private StringBlock mStringBlock;
     private int[] mResourceIds;
@@ -109,6 +110,7 @@ public class AXmlResourceParser implements XmlResourceParser {
             return;
         }
         mIsOperational = false;
+        mHasEncounteredStartElement = false;
         mIn = null;
         mStringBlock = null;
         mResourceIds = null;
@@ -754,6 +756,7 @@ public class AXmlResourceParser implements XmlResourceParser {
 
             int chunkType;
             int headerSize = 0;
+            long position = mIn.position();
             if (event == START_DOCUMENT) {
                 // Fake event, see CHUNK_XML_START_TAG handler.
                 chunkType = ARSCHeader.RES_XML_START_ELEMENT_TYPE;
@@ -771,10 +774,11 @@ public class AXmlResourceParser implements XmlResourceParser {
                 continue;
             }
 
+            ARSCHeader arscHeader;
             if (chunkType < ARSCHeader.RES_XML_FIRST_CHUNK_TYPE || chunkType > ARSCHeader.RES_XML_LAST_CHUNK_TYPE) {
-                int chunkSize = mIn.readInt();
-                mIn.skipBytes(chunkSize - 8);
-                LOGGER.warning(String.format("Unknown chunk type at: (0x%08x) skipping...", mIn.position()));
+                arscHeader = new ARSCHeader((short) chunkType, headerSize, mIn.readInt(), position);
+                mIn.jumpTo(arscHeader.endPosition);
+                LOGGER.warning(String.format("Chunk type %s is not supported, skipping...", arscHeader.type));
                 break;
             }
 
@@ -785,7 +789,7 @@ public class AXmlResourceParser implements XmlResourceParser {
             }
 
             // Read remainder of ResXMLTree_node
-            mIn.skipInt(); // chunkSize
+            arscHeader = new ARSCHeader((short) chunkType, headerSize, mIn.readInt(), position);
             mLineNumber = mIn.readInt();
             mIn.skipInt(); // Optional XML Comment
 
@@ -795,6 +799,14 @@ public class AXmlResourceParser implements XmlResourceParser {
                     int uri = mIn.readInt();
                     mNamespaces.push(prefix, uri);
                 } else {
+                    // #3838 - Some applications have a bogus element prior to the START_ELEMENT event. This breaks parsing &
+                    // until we have a robust chunk parser to handle this, this skip will suffice for now.
+                    if (!mHasEncounteredStartElement) {
+                        LOGGER.warning(String.format("Skipping end namespace event at %d, element has not been encountered.", arscHeader.endPosition));
+                        mIn.jumpTo(arscHeader.endPosition);
+                        break;
+                    }
+
                     mIn.skipInt(); // prefix
                     mIn.skipInt(); // uri
                     mNamespaces.pop();
@@ -804,13 +816,14 @@ public class AXmlResourceParser implements XmlResourceParser {
                 // are packed with a larger header of unknown data.
                 if (headerSize > 0x10) {
                     int bytesToSkip = headerSize - 0x10;
-                    LOGGER.warning(String.format("AXML header larger than 0x10 bytes, skipping %d bytes.", bytesToSkip));
+                    LOGGER.warning(String.format("AXML START/END namespace header larger than 0x10 bytes, skipping %d bytes.", bytesToSkip));
                     mIn.skipBytes(bytesToSkip);
                 }
                 continue;
             }
 
             if (chunkType == ARSCHeader.RES_XML_START_ELEMENT_TYPE) {
+                mHasEncounteredStartElement = true;
                 mNamespaceIndex = mIn.readInt();
                 mNameIndex = mIn.readInt();
                 mIn.skipShort(); // attributeStart
