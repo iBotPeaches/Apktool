@@ -437,7 +437,7 @@ public class BuildAndDecodeApkTest extends BaseTest {
 
     @Test
     public void drawableXhdpiTest() throws BrutException {
-        //compareBinaryFolder("res/drawable-xhdpi");
+        compareBinaryFolder("res/drawable-xhdpi");
     }
 
     @Test
