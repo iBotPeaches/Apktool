@@ -55,7 +55,7 @@ public class DebuggableFalseChangeToTrueTest extends BaseTest {
     }
 
     @Test
-    public void DebugIsTruePriorToBeingFalseTest() throws IOException, SAXException {
+    public void debugIsTruePriorToBeingFalseTest() throws IOException, SAXException {
         String expected = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
                 + "<manifest package=\"com.ibotpeaches.issue2328\" platformBuildVersionCode=\"20\" platformBuildVersionName=\"4.4W.2-1537038\"\n"
                 + "  xmlns:android=\"http://schemas.android.com/apk/res/android\">\n"
