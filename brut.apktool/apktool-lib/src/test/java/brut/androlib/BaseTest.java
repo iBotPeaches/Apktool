@@ -35,7 +35,6 @@ import java.util.logging.Logger;
 
 import org.junit.*;
 import static org.junit.Assert.*;
-
 import org.custommonkey.xmlunit.*;
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 
@@ -46,6 +45,12 @@ public class BaseTest {
     protected static File sTmpDir;
     protected static ExtFile sTestOrigDir;
     protected static ExtFile sTestNewDir;
+
+    static {
+        XMLUnit.setEnableXXEProtection(true);
+        XMLUnit.setIgnoreAttributeOrder(true);
+        XMLUnit.setIgnoreWhitespace(true);
+    }
 
     private static void cleanFrameworkFile() throws BrutException {
         File apkFile = new File(new Framework(sConfig).getDirectory(), "1.apk");
@@ -117,7 +122,7 @@ public class BaseTest {
     }
 
     protected void compareXmlFiles(String path) throws BrutException {
-        compareXmlFiles(sTestOrigDir, sTestNewDir, path);
+        compareXmlFiles(sTestOrigDir, sTestNewDir, path, null);
     }
 
     protected void compareXmlFiles(File controlDir, File testDir, String path) throws BrutException {
@@ -130,13 +135,7 @@ public class BaseTest {
             Reader control = new FileReader(new File(controlDir, path));
             Reader test = new FileReader(new File(testDir, path));
 
-            XMLUnit.setEnableXXEProtection(true);
-
             if (qualifier == null) {
-                XMLUnit.setIgnoreWhitespace(true);
-                XMLUnit.setIgnoreAttributeOrder(true);
-                XMLUnit.setCompareUnmatched(false);
-
                 assertXMLEqual(control, test);
                 return;
             }

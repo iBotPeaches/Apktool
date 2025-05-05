@@ -33,8 +33,6 @@ import java.nio.file.Files;
 
 import org.junit.*;
 import static org.junit.Assert.*;
-
-import org.custommonkey.xmlunit.XMLUnit;
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 
 public class NoNetworkConfigTest extends BaseTest {
@@ -65,16 +63,19 @@ public class NoNetworkConfigTest extends BaseTest {
     @Test
     public void netSecConfGeneric() throws IOException, SAXException {
         LOGGER.info("Comparing network security configuration file...");
-        String expected = TestUtils.replaceNewlines("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" +
-            "<network-security-config><base-config><trust-anchors><certificates src=\"system\"/><certificates src=\"us" +
-            "er\"/></trust-anchors></base-config></network-security-config>");
 
-        byte[] encoded = Files.readAllBytes(new File(sTestNewDir, "res/xml/network_security_config.xml").toPath());
-        String obtained = TestUtils.replaceNewlines(new String(encoded));
+        String expected = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+                + "<network-security-config>\n"
+                + "    <base-config>\n"
+                + "        <trust-anchors>\n"
+                + "            <certificates src=\"system\"/>\n"
+                + "            <certificates src=\"user\"/>\n"
+                + "        </trust-anchors>\n"
+                + "    </base-config>\n"
+                + "</network-security-config>";
 
-        XMLUnit.setIgnoreWhitespace(true);
-        XMLUnit.setIgnoreAttributeOrder(true);
-        XMLUnit.setCompareUnmatched(false);
+        File xml = new File(sTestNewDir, "res/xml/network_security_config.xml");
+        String obtained = new String(Files.readAllBytes(xml.toPath()));
 
         assertXMLEqual(expected, obtained);
     }

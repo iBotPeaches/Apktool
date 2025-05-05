@@ -51,8 +51,8 @@ public class ARSCDecoder {
     private final List<FlagsOffset> mFlagsOffsets;
     private final boolean mKeepBroken;
     private final Config mConfig;
-    private final HashMap<Integer, Integer> mMissingResSpecMap;
-    private final HashMap<Integer, ResTypeSpec> mResTypeSpecs;
+    private final Map<Integer, Integer> mMissingResSpecMap;
+    private final Map<Integer, ResTypeSpec> mResTypeSpecs;
 
     private ARSCHeader mHeader;
     private StringBlock mTableStrings;
@@ -173,18 +173,6 @@ public class ARSCDecoder {
     private ResPackage readTablePackage() throws AndrolibException, IOException {
         checkChunkType(ARSCHeader.XML_TYPE_PACKAGE);
         int id = mIn.readInt();
-
-        if (id == 0) {
-            // This means we are dealing with a Library Package, we should just temporarily
-            // set the packageId to the next available id . This will be set at runtime regardless, but
-            // for Apktool's use we need a non-zero packageId.
-            // AOSP indicates 0x02 is next, as 0x01 is system and 0x7F is private.
-            id = 2;
-            if (mResTable.getPackageOriginal() == null && mResTable.getPackageRenamed() == null) {
-                mResTable.setSharedLibrary(true);
-            }
-        }
-
         String name = mIn.readNullEndedString(128, true);
         mIn.skipInt(); // typeStrings
         mIn.skipInt(); // lastPublicType
@@ -207,6 +195,12 @@ public class ARSCDecoder {
         mTypeNames = StringBlock.readWithChunk(mIn);
         mSpecNames = StringBlock.readWithChunk(mIn);
 
+        if (id == 0 && mResTable.isMainPkgLoaded()) {
+            // The package ID is 0x00. That means that a shared library is being loaded,
+            // so we change it to the reference package ID defined in the dynamic reference table.
+            id = mResTable.getDynamicRefPackageId(name);
+        }
+
         mResId = id << 24;
         mPkg = new ResPackage(mResTable, id, name);
 
@@ -217,15 +211,15 @@ public class ARSCDecoder {
         checkChunkType(ARSCHeader.XML_TYPE_LIBRARY);
         int libraryCount = mIn.readInt();
 
-        int packageId;
-        String packageName;
-
         mHeader.checkForUnreadHeader(mIn);
 
         for (int i = 0; i < libraryCount; i++) {
-            packageId = mIn.readInt();
-            packageName = mIn.readNullEndedString(128, true);
-            LOGGER.info(String.format("Decoding Shared Library (%s), pkgId: %d", packageName, packageId));
+            int id = mIn.readInt();
+            String name = mIn.readNullEndedString(128, true);
+
+            mResTable.addDynamicRefPackage(id, name);
+
+            LOGGER.fine(String.format("Shared library id: %d, name: \"%s\"", id, name));
         }
     }
 
@@ -246,7 +240,7 @@ public class ARSCDecoder {
 
         mHeader.checkForUnreadHeader(mIn);
 
-        LOGGER.fine(String.format("Overlay name: \"%s\", actor: \"%s\")", name, actor));
+        LOGGER.fine(String.format("Overlay name: \"%s\", actor: \"%s\"", name, actor));
     }
 
     private void readOverlayPolicySpec() throws AndrolibException, IOException {
@@ -293,7 +287,7 @@ public class ARSCDecoder {
             addTypeSpec(mTypeSpec);
             mPkg.addType(mTypeSpec);
         }
-        mResId = (0xff000000 & mResId) | mTypeSpec.getId() << 16;
+        mResId = (0xFF000000 & mResId) | mTypeSpec.getId() << 16;
 
         int typeFlags = mIn.readByte();
         mIn.skipBytes(2); // reserved
@@ -343,7 +337,7 @@ public class ARSCDecoder {
         // sense to align to the start of the entries to handle all cases.
         mIn.jumpTo(entriesStartAligned);
         for (int i : entryOffsetMap.keySet()) {
-            mResId = (mResId & 0xffff0000) | i;
+            mResId = (mResId & 0xFFFF0000) | i;
             int offset = entryOffsetMap.get(i);
             if (offset == NO_ENTRY) {
                 mMissingResSpecMap.put(mResId, typeId);
@@ -471,12 +465,10 @@ public class ARSCDecoder {
 
         ResValueFactory factory = mPkg.getValueFactory();
         Pair<Integer, ResScalarValue>[] items = new Pair[count];
-        ResIntBasedValue resValue;
-        int resId;
 
         for (int i = 0; i < count; i++) {
-            resId = mIn.readInt();
-            resValue = readValue();
+            int resId = mIn.readInt();
+            ResIntBasedValue resValue = readValue();
 
             // #2824 - In some applications the res entries are duplicated with the 2nd being malformed.
             // AOSP skips this, so we will do the same.

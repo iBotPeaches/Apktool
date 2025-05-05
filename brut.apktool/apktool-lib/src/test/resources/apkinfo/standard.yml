@@ -1,0 +1,19 @@
+!!brut.androlib.meta.MetaInfo
+apkFileName: standard.apk
+doNotCompress:
+- arsc
+packageInfo:
+  forcedPackageId: '127'
+  renameManifestPackage: null
+sdkInfo:
+  minSdkVersion: '25'
+  targetSdkVersion: '30'
+sparseResources: false
+usesFramework:
+  ids:
+  - 1
+  tag: null
+version: 2.8.1
+versionInfo:
+  versionCode: null
+  versionName: null

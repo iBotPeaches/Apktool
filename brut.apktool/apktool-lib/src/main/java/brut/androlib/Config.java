@@ -93,6 +93,7 @@ public final class Config {
     private int mJobs;
     private String mFrameworkDirectory;
     private String mFrameworkTag;
+    private String[] mLibraryFiles;
     private File mAaptBinary;
     private int mAaptVersion;
 
@@ -121,6 +122,7 @@ public final class Config {
         mJobs = Math.min(Runtime.getRuntime().availableProcessors(), 8);
         mFrameworkDirectory = DEFAULT_FRAMEWORK_DIRECTORY;
         mFrameworkTag = null;
+        mLibraryFiles = null;
         mAaptBinary = null;
         mAaptVersion = 2;
     }
@@ -343,6 +345,14 @@ public final class Config {
 
     public void setFrameworkTag(String frameworkTag) {
         mFrameworkTag = frameworkTag;
+    }
+
+    public String[] getLibraryFiles() {
+        return mLibraryFiles;
+    }
+
+    public void setLibraryFiles(String[] libraryFiles) {
+        mLibraryFiles = libraryFiles;
     }
 
     public File getAaptBinary() {

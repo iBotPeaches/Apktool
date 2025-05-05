@@ -467,24 +467,43 @@ public class ApkBuilder {
     }
 
     private File[] getIncludeFiles() throws AndrolibException {
+        List<File> files = new ArrayList<>();
+
         UsesFramework usesFramework = mApkInfo.usesFramework;
-        if (usesFramework == null) {
-            return null;
+        if (usesFramework != null) {
+            List<Integer> ids = usesFramework.ids;
+            if (ids != null) {
+                Framework framework = new Framework(mConfig);
+                String tag = usesFramework.tag;
+                for (Integer id : ids) {
+                    files.add(framework.getApkFile(id, tag));
+                }
+            }
         }
 
-        List<Integer> ids = usesFramework.ids;
-        if (ids == null || ids.isEmpty()) {
-            return null;
+        List<String> usesLibrary = mApkInfo.usesLibrary;
+        if (usesLibrary != null) {
+            String[] libFiles = mConfig.getLibraryFiles();
+            for (String name : usesLibrary) {
+                File apkFile = null;
+                if (libFiles != null) {
+                    for (String libName : libFiles) {
+                        String[] parts = libName.split(":", 2);
+                        if (parts.length == 2 && name.equals(parts[0])) {
+                            apkFile = new File(parts[1]);
+                            break;
+                        }
+                    }
+                }
+                if (apkFile == null) {
+                    LOGGER.warning("Shared library was not provided: " + name);
+                } else {
+                    files.add(apkFile);
+                }
+            }
         }
 
-        Framework framework = new Framework(mConfig);
-        String tag = usesFramework.tag;
-        File[] files = new File[ids.size()];
-        int i = 0;
-        for (int id : ids) {
-            files[i++] = framework.getApkFile(id, tag);
-        }
-        return files;
+        return files.toArray(new File[0]);
     }
 
     private boolean isModified(File working, File stored) {

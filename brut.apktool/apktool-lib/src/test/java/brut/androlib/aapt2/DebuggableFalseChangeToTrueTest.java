@@ -30,8 +30,6 @@ import java.nio.file.Files;
 
 import org.junit.*;
 import static org.junit.Assert.*;
-
-import org.custommonkey.xmlunit.XMLUnit;
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 
 public class DebuggableFalseChangeToTrueTest extends BaseTest {
@@ -62,17 +60,14 @@ public class DebuggableFalseChangeToTrueTest extends BaseTest {
 
     @Test
     public void DebugIsTruePriorToBeingFalseTest() throws IOException, SAXException {
-        String expected = TestUtils.replaceNewlines("<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"no\"?>" +
-            "<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\" " +
-            "package=\"com.ibotpeaches.issue2328\" platformBuildVersionCode=\"20\" " +
-            "platformBuildVersionName=\"4.4W.2-1537038\">    <application android:debuggable=\"true\"/></manifest>");
+        String expected = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+                + "<manifest package=\"com.ibotpeaches.issue2328\" platformBuildVersionCode=\"20\" platformBuildVersionName=\"4.4W.2-1537038\"\n"
+                + "  xmlns:android=\"http://schemas.android.com/apk/res/android\">\n"
+                + "    <application android:debuggable=\"true\"/>\n"
+                + "</manifest>";
 
-        byte[] encoded = Files.readAllBytes(new File(sTestNewDir, "AndroidManifest.xml").toPath());
-        String obtained = TestUtils.replaceNewlines(new String(encoded));
-
-        XMLUnit.setIgnoreWhitespace(true);
-        XMLUnit.setIgnoreAttributeOrder(true);
-        XMLUnit.setCompareUnmatched(false);
+        File xml = new File(sTestNewDir, "AndroidManifest.xml");
+        String obtained = new String(Files.readAllBytes(xml.toPath()));
 
         assertXMLEqual(expected, obtained);
     }

@@ -41,8 +41,8 @@ public class ApkDecoder {
 
     // extensions of files that are often packed uncompressed
     private static final Pattern NO_COMPRESS_EXT_PATTERN = Pattern.compile(
-        "dex|arsc|so|jpg|jpeg|png|gif|wav|mp2|mp3|ogg|aac|mpg|mpeg|mid|midi|smf|jet|" +
-        "rtttl|imy|xmf|mp4|m4a|m4v|3gp|3gpp|3g2|3gpp2|amr|awb|wma|wmv|webm|webp|mkv");
+        "dex|arsc|so|jpg|jpeg|png|gif|wav|mp2|mp3|ogg|aac|mpg|mpeg|mid|midi|smf|jet|"
+            + "rtttl|imy|xmf|mp4|m4a|m4v|3gp|3gpp|3g2|3gpp2|amr|awb|wma|wmv|webm|webp|mkv");
 
     private final ExtFile mApkFile;
     private final Config mConfig;

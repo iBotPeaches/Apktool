@@ -52,27 +52,26 @@ public class DexStaticFieldValueTest extends BaseTest {
 
     @Test
     public void disassembleDexFileToKeepDefaultParameters() throws IOException {
-        String expected = TestUtils.replaceNewlines(
-                ".class public LHelloWorld;\n"
-                        + ".super Ljava/lang/Object;\n"
-                        + "\n"
-                        + "\n"
-                        + "# static fields\n"
-                        + ".field private static b:Z = false\n"
-                        + "\n"
-                        + ".field private static c:Z = true\n"
-                        + "\n"
-                        + "\n"
-                        + "# direct methods\n"
-                        + ".method public static main([Ljava/lang/String;)V\n"
-                        + "    .locals 1\n"
-                        + "\n"
-                        + "    return-void\n"
-                        + ".end method");
+        String expected = ".class public LHelloWorld;\n"
+                + ".super Ljava/lang/Object;\n"
+                + "\n"
+                + "\n"
+                + "# static fields\n"
+                + ".field private static b:Z = false\n"
+                + "\n"
+                + ".field private static c:Z = true\n"
+                + "\n"
+                + "\n"
+                + "# direct methods\n"
+                + ".method public static main([Ljava/lang/String;)V\n"
+                + "    .locals 1\n"
+                + "\n"
+                + "    return-void\n"
+                + ".end method";
 
-        byte[] encoded = Files.readAllBytes(new File(sTestNewDir, "smali/HelloWorld.smali").toPath());
-        String obtained = TestUtils.replaceNewlines(new String(encoded));
+        File smali = new File(sTestNewDir, "smali/HelloWorld.smali");
+        String obtained = new String(Files.readAllBytes(smali.toPath()));
 
-        assertEquals(expected, obtained);
+        assertEquals(TestUtils.replaceNewlines(expected), TestUtils.replaceNewlines(obtained));
     }
 }

@@ -1,6 +1,5 @@
 version: 2.3.2
 apkFileName: testapp.apk
-isFrameworkApk: false
 usesFramework:
   ids:
   - 1
@@ -12,6 +11,10 @@ versionInfo:
 featureFlags:
   brut.feature.permission: true
   brut.feature.activity: true
+sparseResources: false
 doNotCompress:
 - assets/0byte_file.jpg
-sparseResources: false
+- arsc
+- png
+- mp3
+- stored.file
