@@ -31,7 +31,6 @@ public class ConsistentPropertyTest extends BaseTest {
 
         assertEquals("2.8.0", apkInfo.version);
         assertEquals("basic.apk", apkInfo.apkFileName);
-        assertFalse(apkInfo.isFrameworkApk);
         assertEquals(1, apkInfo.usesFramework.ids.size());
         assertEquals("tag", apkInfo.usesFramework.tag);
         assertEquals("4", apkInfo.getMinSdkVersion());
@@ -41,7 +40,6 @@ public class ConsistentPropertyTest extends BaseTest {
         assertEquals("com.test.basic", apkInfo.packageInfo.renameManifestPackage);
         assertEquals("71", apkInfo.versionInfo.versionCode);
         assertEquals("1.0.70", apkInfo.versionInfo.versionName);
-        assertFalse(apkInfo.sharedLibrary);
         assertTrue(apkInfo.sparseResources);
         assertEquals(2, apkInfo.doNotCompress.size());
     }

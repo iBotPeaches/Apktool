@@ -28,7 +28,6 @@ public class ApkInfoReaderTest extends BaseTest {
         assertEquals("standard.apk", apkInfo.apkFileName);
         assertEquals(1, apkInfo.doNotCompress.size());
         assertEquals("arsc", apkInfo.doNotCompress.iterator().next());
-        assertFalse(apkInfo.isFrameworkApk);
         assertNotNull(apkInfo.packageInfo);
         assertEquals("127", apkInfo.packageInfo.forcedPackageId);
         assertNull(apkInfo.packageInfo.renameManifestPackage);
@@ -36,7 +35,6 @@ public class ApkInfoReaderTest extends BaseTest {
         assertEquals(2, apkInfo.sdkInfo.size());
         assertEquals("25", apkInfo.sdkInfo.get("minSdkVersion"));
         assertEquals("30", apkInfo.sdkInfo.get("targetSdkVersion"));
-        assertFalse(apkInfo.sharedLibrary);
         assertFalse(apkInfo.sparseResources);
         assertNotNull(apkInfo.usesFramework);
         assertNotNull(apkInfo.usesFramework.ids);
@@ -86,7 +84,6 @@ public class ApkInfoReaderTest extends BaseTest {
             getClass().getResourceAsStream("/apk/unknown_files.yml"));
         assertEquals("2.0.0", apkInfo.version);
         assertEquals("testapp.apk", apkInfo.apkFileName);
-        assertFalse(apkInfo.isFrameworkApk);
         assertNotNull(apkInfo.usesFramework);
         assertEquals(1, apkInfo.usesFramework.ids.size());
         assertEquals(1, (long) apkInfo.usesFramework.ids.get(0));
@@ -110,7 +107,6 @@ public class ApkInfoReaderTest extends BaseTest {
             getClass().getResourceAsStream("/apk/list_with_indent.yml"));
         assertEquals("2.8.0", apkInfo.version);
         assertEquals("basic.apk", apkInfo.apkFileName);
-        assertFalse(apkInfo.isFrameworkApk);
         assertNotNull(apkInfo.usesFramework);
         assertEquals(1, apkInfo.usesFramework.ids.size());
         assertEquals(1, (long) apkInfo.usesFramework.ids.get(0));
@@ -123,7 +119,6 @@ public class ApkInfoReaderTest extends BaseTest {
         assertEquals("4", apkInfo.sdkInfo.get("minSdkVersion"));
         assertEquals("30", apkInfo.sdkInfo.get("maxSdkVersion"));
         assertEquals("22", apkInfo.sdkInfo.get("targetSdkVersion"));
-        assertFalse(apkInfo.sharedLibrary);
         assertTrue(apkInfo.sparseResources);
         assertNotNull(apkInfo.versionInfo);
         assertEquals("71", apkInfo.versionInfo.versionCode);

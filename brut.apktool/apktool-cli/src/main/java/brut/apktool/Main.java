@@ -148,6 +148,9 @@ public class Main {
         if (cli.hasOption("t") || cli.hasOption("tag")) {
             config.setFrameworkTag(cli.getOptionValue("t"));
         }
+        if (cli.hasOption("l") || cli.hasOption("lib")) {
+            config.setLibraryFiles(cli.getOptionValues("l"));
+        }
         if (cli.hasOption("api") || cli.hasOption("api-level")) {
             config.setApiLevel(Integer.parseInt(cli.getOptionValue("api")));
         }
@@ -365,9 +368,9 @@ public class Main {
 
         Option jobsOption = Option.builder("j")
                 .longOpt("jobs")
+                .desc("Sets the number of threads to use.")
                 .hasArg()
                 .type(Integer.class)
-                .desc("Sets the number of threads to use.")
                 .build();
 
         Option noSrcOption = Option.builder("s")
@@ -408,7 +411,7 @@ public class Main {
         Option apiLevelOption = Option.builder("api")
                 .longOpt("api-level")
                 .desc("The numeric api-level of the file to generate, e.g. 14 for ICS.")
-                .hasArg(true)
+                .hasArg()
                 .argName("API")
                 .build();
 
@@ -435,22 +438,30 @@ public class Main {
         Option frameTagOption = Option.builder("t")
                 .longOpt("frame-tag")
                 .desc("Use framework files tagged by <tag>.")
-                .hasArg(true)
+                .hasArg()
                 .argName("tag")
                 .build();
 
         Option frameDirOption = Option.builder("p")
                 .longOpt("frame-path")
                 .desc("Use framework files located in <dir>.")
-                .hasArg(true)
+                .hasArg()
                 .argName("dir")
                 .build();
 
         Option frameIfDirOption = Option.builder("p")
                 .longOpt("frame-path")
                 .desc("Store framework files into <dir>.")
-                .hasArg(true)
+                .hasArg()
                 .argName("dir")
+                .build();
+
+        Option libOption = Option.builder("l")
+                .longOpt("lib")
+                .desc("Use dynamic library from specified location. Format is: <package>:<loc>\n"
+                        + "            Can be specified multiple times.")
+                .hasArg()
+                .argName("loc")
                 .build();
 
         Option keepResOption = Option.builder("k")
@@ -469,15 +480,15 @@ public class Main {
         Option resolveResModeOption = Option.builder("resm")
                 .longOpt("resource-mode")
                 .desc("Sets the resolve resources mode. Possible values are: 'remove' (default), 'dummy' or 'keep'.")
-                .hasArg(true)
+                .hasArg()
                 .argName("mode")
                 .build();
 
         Option aaptOption = Option.builder("a")
                 .longOpt("aapt")
-                .hasArg(true)
-                .argName("loc")
                 .desc("Load aapt from specified location.")
+                .hasArg()
+                .argName("loc")
                 .build();
 
         Option aapt1Option = Option.builder()
@@ -508,21 +519,21 @@ public class Main {
         Option tagOption = Option.builder("t")
                 .longOpt("tag")
                 .desc("Tag frameworks using <tag>.")
-                .hasArg(true)
+                .hasArg()
                 .argName("tag")
                 .build();
 
         Option outputBuiOption = Option.builder("o")
                 .longOpt("output")
                 .desc("The name of apk that gets written. (default: dist/name.apk)")
-                .hasArg(true)
+                .hasArg()
                 .argName("file")
                 .build();
 
         Option outputDecOption = Option.builder("o")
                 .longOpt("output")
                 .desc("The name of folder that gets written. (default: apk.out)")
-                .hasArg(true)
+                .hasArg()
                 .argName("dir")
                 .build();
 
@@ -565,6 +576,7 @@ public class Main {
         decodeOptions.addOption(frameTagOption);
         decodeOptions.addOption(outputDecOption);
         decodeOptions.addOption(frameDirOption);
+        decodeOptions.addOption(libOption);
         decodeOptions.addOption(forceDecOption);
         decodeOptions.addOption(noSrcOption);
         decodeOptions.addOption(noResOption);
@@ -572,6 +584,7 @@ public class Main {
         // add basic build options
         buildOptions.addOption(outputBuiOption);
         buildOptions.addOption(frameDirOption);
+        buildOptions.addOption(libOption);
         buildOptions.addOption(forceBuiOption);
 
         // add basic framework options
@@ -634,12 +647,12 @@ public class Main {
         formatter.setWidth(120);
 
         // print out license info prior to formatter.
-        System.out.println(
-            "Apktool " + ApktoolProperties.getVersion() + " - a tool for reengineering Android apk files\n" +
-                    "with smali " + ApktoolProperties.getSmaliVersion() +
-                    " and baksmali " + ApktoolProperties.getBaksmaliVersion() + "\n" +
-                    "Copyright 2010 Ryszard Wiśniewski <brut.alll@gmail.com>\n" +
-                    "Copyright 2010 Connor Tumbleson <connor.tumbleson@gmail.com>");
+        System.out.println("Apktool " + ApktoolProperties.getVersion()
+                + " - a tool for reengineering Android apk files\n"
+                + "with smali " + ApktoolProperties.getSmaliVersion()
+                + " and baksmali " + ApktoolProperties.getBaksmaliVersion() + "\n"
+                + "Copyright 2010 Ryszard Wiśniewski <brut.alll@gmail.com>\n"
+                + "Copyright 2010 Connor Tumbleson <connor.tumbleson@gmail.com>");
         if (isAdvanceMode()) {
             System.out.println("Apache License 2.0 (https://www.apache.org/licenses/LICENSE-2.0)\n");
         }else {

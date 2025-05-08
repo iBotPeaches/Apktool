@@ -3,7 +3,6 @@ apkFileName: basic.apk
 doNotCompress:
     - arsc
     - png
-isFrameworkApk: false
 packageInfo:
     forcedPackageId: '127'
     renameManifestPackage: 'com.test.basic'
@@ -11,7 +10,6 @@ sdkInfo:
     minSdkVersion: '4'
     maxSdkVersion: '30'
     targetSdkVersion: '22'
-sharedLibrary: false
 sparseResources: true
 usesFramework:
     ids:

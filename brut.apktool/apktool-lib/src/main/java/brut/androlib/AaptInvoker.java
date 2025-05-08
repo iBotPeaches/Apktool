@@ -120,14 +120,17 @@ public class AaptInvoker {
         cmd.add("-o");
         cmd.add(apkFile.getAbsolutePath());
 
-        if (mApkInfo.packageInfo.forcedPackageId != null && !mApkInfo.packageInfo.forcedPackageId.equals("1")
-                && !mApkInfo.sharedLibrary) {
-            cmd.add("--allow-reserved-package-id");
-            cmd.add("--package-id");
-            cmd.add(mApkInfo.packageInfo.forcedPackageId);
-        }
-        if (mApkInfo.sharedLibrary) {
-            cmd.add("--shared-lib");
+        if (mApkInfo.packageInfo.forcedPackageId != null) {
+            int pkgId = Integer.parseInt(mApkInfo.packageInfo.forcedPackageId);
+            if (pkgId == 0) {
+                cmd.add("--shared-lib");
+            } else if (pkgId > 1) {
+                cmd.add("--package-id");
+                cmd.add(mApkInfo.packageInfo.forcedPackageId);
+                if (pkgId < 0x7f) {
+                    cmd.add("--allow-reserved-package-id");
+                }
+            }
         }
         if (mApkInfo.getMinSdkVersion() != null) {
             cmd.add("--min-sdk-version");
@@ -168,9 +171,6 @@ public class AaptInvoker {
         }
         if (mApkInfo.compactEntries) {
             cmd.add("--enable-compact-entries");
-        }
-        if (mApkInfo.isFrameworkApk) {
-            cmd.add("-x");
         }
         if (!mApkInfo.featureFlags.isEmpty()) {
             List<String> featureFlags = new ArrayList<>();
@@ -232,14 +232,19 @@ public class AaptInvoker {
         if (mConfig.isNoCrunch()) {
             cmd.add("--no-crunch");
         }
-        // force package id so that some frameworks build with correct id
-        // disable if user adds own aapt (can't know if they have this feature)
-        if (mApkInfo.packageInfo.forcedPackageId != null && !mApkInfo.sharedLibrary && !customAapt) {
-            cmd.add("--forced-package-id");
-            cmd.add(mApkInfo.packageInfo.forcedPackageId);
-        }
-        if (mApkInfo.sharedLibrary) {
-            cmd.add("--shared-lib");
+        if (mApkInfo.packageInfo.forcedPackageId != null) {
+            int pkgId = Integer.parseInt(mApkInfo.packageInfo.forcedPackageId);
+            if (pkgId == 0) {
+                cmd.add("--shared-lib");
+            } else if (pkgId > 0) {
+                if (!customAapt) { // custom aapt might not have this option
+                    cmd.add("--forced-package-id");
+                    cmd.add(mApkInfo.packageInfo.forcedPackageId);
+                }
+                if (pkgId < 0x7f) {
+                    cmd.add("-x");
+                }
+            }
         }
         if (mApkInfo.getMinSdkVersion() != null) {
             cmd.add("--min-sdk-version");
@@ -277,9 +282,6 @@ public class AaptInvoker {
         cmd.add("-F");
         cmd.add(apkFile.getAbsolutePath());
 
-        if (mApkInfo.isFrameworkApk) {
-            cmd.add("-x");
-        }
         if (include != null) {
             for (File file : include) {
                 cmd.add("-I");

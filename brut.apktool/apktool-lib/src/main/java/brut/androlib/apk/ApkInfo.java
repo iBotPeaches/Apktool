@@ -35,21 +35,20 @@ public class ApkInfo implements YamlSerializable {
         "AndroidManifest\\.xml|META-INF/[^/]+\\.(RSA|SF|MF)|stamp-cert-sha256");
 
     public static final Pattern STANDARD_FILENAMES_PATTERN = Pattern.compile(
-        "[^/]+\\.dex|resources\\.arsc|(" + String.join("|", RESOURCES_DIRNAMES) + "|" +
-        String.join("|", RAW_DIRNAMES) + ")/.*|" + ORIGINAL_FILENAMES_PATTERN.pattern());
+        "[^/]+\\.dex|resources\\.arsc|(" + String.join("|", RESOURCES_DIRNAMES) + "|"
+            + String.join("|", RAW_DIRNAMES) + ")/.*|" + ORIGINAL_FILENAMES_PATTERN.pattern());
 
     // only set when loaded from a file (not a stream)
     private transient ExtFile mApkFile;
 
     public String version;
     public String apkFileName;
-    public boolean isFrameworkApk;
     public UsesFramework usesFramework;
+    public List<String> usesLibrary = new ArrayList<>();
     public Map<String, String> sdkInfo = new LinkedHashMap<>();
     public PackageInfo packageInfo = new PackageInfo();
     public VersionInfo versionInfo = new VersionInfo();
     public Map<String, Boolean> featureFlags = new LinkedHashMap<>();
-    public boolean sharedLibrary;
     public boolean sparseResources;
     public boolean compactEntries;
     public List<String> doNotCompress = new ArrayList<>();
@@ -227,13 +226,14 @@ public class ApkInfo implements YamlSerializable {
                 apkFileName = line.getValue();
                 break;
             }
-            case "isFrameworkApk": {
-                isFrameworkApk = line.getValueBool();
-                break;
-            }
             case "usesFramework": {
                 usesFramework = new UsesFramework();
                 reader.readObject(usesFramework);
+                break;
+            }
+            case "usesLibrary": {
+                usesLibrary.clear();
+                reader.readStringList(usesLibrary);
                 break;
             }
             case "sdkInfo": {
@@ -256,10 +256,6 @@ public class ApkInfo implements YamlSerializable {
                 reader.readBoolMap(featureFlags);
                 break;
             }
-            case "sharedLibrary": {
-                sharedLibrary = line.getValueBool();
-                break;
-            }
             case "sparseResources": {
                 sparseResources = line.getValueBool();
                 break;
@@ -280,15 +276,16 @@ public class ApkInfo implements YamlSerializable {
     public void write(YamlWriter writer) {
         writer.writeString("version", version);
         writer.writeString("apkFileName", apkFileName);
-        writer.writeBool("isFrameworkApk", isFrameworkApk);
         writer.writeObject("usesFramework", usesFramework);
+        if (!usesLibrary.isEmpty()) {
+            writer.writeList("usesLibrary", usesLibrary);
+        }
         writer.writeMap("sdkInfo", sdkInfo);
         writer.writeObject("packageInfo", packageInfo);
         writer.writeObject("versionInfo", versionInfo);
         if (!featureFlags.isEmpty()) {
             writer.writeMap("featureFlags", featureFlags);
         }
-        writer.writeBool("sharedLibrary", sharedLibrary);
         writer.writeBool("sparseResources", sparseResources);
         writer.writeBool("compactEntries", compactEntries);
         if (!doNotCompress.isEmpty()) {
