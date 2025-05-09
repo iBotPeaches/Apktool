@@ -17,9 +17,9 @@
 package brut.androlib.res;
 
 import brut.androlib.Config;
-import brut.androlib.apk.ApkInfo;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.exceptions.CantFindFrameworkResException;
+import brut.androlib.meta.ApkInfo;
 import brut.androlib.res.decoder.ARSCDecoder;
 import brut.androlib.res.data.ResTable;
 import brut.androlib.res.data.arsc.ARSCData;
@@ -169,12 +169,12 @@ public class Framework {
         return mDirectory;
     }
 
-    public File getApkFile(int id, String frameTag) throws AndrolibException {
+    public File getApkFile(int id, String tag) throws AndrolibException {
         File dir = getDirectory();
         File apk;
 
-        if (frameTag != null) {
-            apk = new File(dir, id + "-" + frameTag + ".apk");
+        if (tag != null) {
+            apk = new File(dir, id + "-" + tag + ".apk");
             if (apk.exists()) {
                 return apk;
             }

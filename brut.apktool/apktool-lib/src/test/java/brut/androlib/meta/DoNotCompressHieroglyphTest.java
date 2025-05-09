@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib.apk;
+package brut.androlib.meta;
 
 import brut.androlib.BaseTest;
 import brut.common.BrutException;
@@ -22,12 +22,15 @@ import brut.common.BrutException;
 import org.junit.*;
 import static org.junit.Assert.*;
 
-public class MaliciousYamlTest extends BaseTest {
+public class DoNotCompressHieroglyphTest extends BaseTest {
 
     @Test
-    public void testMaliciousYaml() throws BrutException {
-        ApkInfo apkInfo = ApkInfo.load(
-            getClass().getResourceAsStream("/apk/cve20220476.yml"));
-        assertEquals("2.6.1-ddc4bb-SNAPSHOT", apkInfo.version);
+    public void testHieroglyph() throws BrutException {
+        ApkInfo apkInfo = ApkInfo.load(getClass().getResourceAsStream("/meta/donotcompress_with_hieroglyph.yml"));
+        assertEquals("2.0.0", apkInfo.getVersion());
+        assertEquals("testapp.apk", apkInfo.getApkFileName());
+        assertEquals(2, apkInfo.getDoNotCompress().size());
+        assertEquals("assets/AllAssetBundles/Andriod/tx_1001_冰原1", apkInfo.getDoNotCompress().get(0));
+        assertEquals("assets/AllAssetBundles/Andriod/tx_1001_冰原1.manifest", apkInfo.getDoNotCompress().get(1));
     }
 }

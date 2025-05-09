@@ -71,7 +71,7 @@ public class ResEnumAttr extends ResAttr {
             serializer.startTag(null, "enum");
             serializer.attribute(null, "name", referent != null
                 ? referent.getName() : String.format("APKTOOL_MISSING_0x%08x", ref.getRawIntValue()));
-            serializer.attribute(null, "value", String.valueOf(val.getRawIntValue()));
+            serializer.attribute(null, "value", Integer.toString(val.getRawIntValue()));
             serializer.endTag(null, "enum");
         }
     }

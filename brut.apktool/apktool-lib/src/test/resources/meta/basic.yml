@@ -8,8 +8,8 @@ packageInfo:
     renameManifestPackage: 'com.test.basic'
 sdkInfo:
     minSdkVersion: '4'
-    maxSdkVersion: '30'
     targetSdkVersion: '22'
+    maxSdkVersion: '30'
 sparseResources: true
 usesFramework:
     ids:

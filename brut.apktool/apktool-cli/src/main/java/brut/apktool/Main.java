@@ -258,7 +258,7 @@ public class Main {
         } catch (CantFindFrameworkResException ex) {
             System.err
                     .println("Could not find framework resources for package of id: "
-                            + ex.getPkgId()
+                            + ex.getPackageId()
                             + ". You must install proper "
                             + "framework files, see project website for more info.");
             System.exit(1);
@@ -458,7 +458,7 @@ public class Main {
 
         Option libOption = Option.builder("l")
                 .longOpt("lib")
-                .desc("Use dynamic library from specified location. Format is: <package>:<loc>\n"
+                .desc("Use shared library from specified location. Format is: <package>:<loc>\n"
                         + "            Can be specified multiple times.")
                 .hasArg()
                 .argName("loc")

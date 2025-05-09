@@ -58,7 +58,7 @@ public class ARSCDecoder {
     private StringBlock mTableStrings;
     private StringBlock mTypeNames;
     private StringBlock mSpecNames;
-    private ResPackage mPkg;
+    private ResPackage mPackage;
     private ResTypeSpec mTypeSpec;
     private ResType mType;
     private int mResId;
@@ -142,7 +142,7 @@ public class ARSCDecoder {
         }
 
         if (mConfig.getDecodeResolveMode() == Config.DECODE_RES_RESOLVE_DUMMY
-                && mPkg != null && mPkg.getResSpecCount() > 0) {
+                && mPackage != null && mPackage.getResSpecCount() > 0) {
             addMissingResSpecs();
         }
 
@@ -195,16 +195,16 @@ public class ARSCDecoder {
         mTypeNames = StringBlock.readWithChunk(mIn);
         mSpecNames = StringBlock.readWithChunk(mIn);
 
-        if (id == 0 && mResTable.isMainPkgLoaded()) {
+        if (id == 0 && mResTable.isMainPackageLoaded()) {
             // The package ID is 0x00. That means that a shared library is being loaded,
             // so we change it to the reference package ID defined in the dynamic reference table.
             id = mResTable.getDynamicRefPackageId(name);
         }
 
         mResId = id << 24;
-        mPkg = new ResPackage(mResTable, id, name);
+        mPackage = new ResPackage(mResTable, id, name);
 
-        return mPkg;
+        return mPackage;
     }
 
     private void readLibraryType() throws AndrolibException, IOException {
@@ -270,7 +270,7 @@ public class ARSCDecoder {
 
         mIn.skipBytes(entryCount * 4); // flags
         mTypeSpec = new ResTypeSpec(mTypeNames.getString(id - 1), id);
-        mPkg.addType(mTypeSpec);
+        mPackage.addType(mTypeSpec);
 
         return mTypeSpec;
     }
@@ -285,9 +285,9 @@ public class ARSCDecoder {
         } else {
             mTypeSpec = new ResTypeSpec(mTypeNames.getString(typeId - 1), typeId);
             addTypeSpec(mTypeSpec);
-            mPkg.addType(mTypeSpec);
+            mPackage.addType(mTypeSpec);
         }
-        mResId = (0xFF000000 & mResId) | mTypeSpec.getId() << 16;
+        mResId = (mResId & 0xFF000000) | mTypeSpec.getId() << 16;
 
         int typeFlags = mIn.readByte();
         mIn.skipBytes(2); // reserved
@@ -303,10 +303,9 @@ public class ARSCDecoder {
         boolean isOffset16 = (typeFlags & TABLE_TYPE_FLAG_OFFSET16) != 0;
         boolean isSparse = (typeFlags & TABLE_TYPE_FLAG_SPARSE) != 0;
 
-        // Be sure we don't poison mResTable by marking the application as sparse
-        // Only flag the ResTable as sparse if the main package is not loaded.
-        if (isSparse && !mResTable.isMainPkgLoaded()) {
-            mResTable.setSparseResources(true);
+        // Only flag the application as sparse if the main package is not loaded yet.
+        if (isSparse && !mResTable.isMainPackageLoaded()) {
+            mResTable.getApkInfo().setSparseResources(true);
         }
 
         // #3372 - The offsets that are 16bit should be stored as real offsets (* 4u).
@@ -331,7 +330,7 @@ public class ARSCDecoder {
             }
         }
 
-        mType = !flags.isInvalid() || mKeepBroken ? mPkg.getOrCreateConfig(flags) : null;
+        mType = !flags.isInvalid() || mKeepBroken ? mPackage.getOrCreateConfig(flags) : null;
 
         // #3428 - In some applications the res entries are padded for alignment, but in #3778 it made
         // sense to align to the start of the entries to handle all cases.
@@ -389,10 +388,9 @@ public class ARSCDecoder {
             return null;
         }
 
-        // Be sure we don't poison mResTable by marking the application as compact
-        // Only flag the ResTable as compact if the main package is not loaded.
-        if (isCompact && !mResTable.isMainPkgLoaded()) {
-            mResTable.setCompactEntries(true);
+        // Only flag the application as compact if the main package is not loaded yet.
+        if (isCompact && !mResTable.isMainPackageLoaded()) {
+            mResTable.getApkInfo().setCompactEntries(true);
         }
 
         // #3366 - In a compactly packed entry, the key index is the size & type is higher 8 bits on flags.
@@ -436,11 +434,11 @@ public class ARSCDecoder {
 
         ResID resId = new ResID(mResId);
         ResResSpec spec;
-        if (mPkg.hasResSpec(resId)) {
-            spec = mPkg.getResSpec(resId);
+        if (mPackage.hasResSpec(resId)) {
+            spec = mPackage.getResSpec(resId);
         } else {
-            spec = new ResResSpec(resId, mSpecNames.getString(specNamesId), mPkg, mTypeSpec);
-            mPkg.addResSpec(spec);
+            spec = new ResResSpec(resId, mSpecNames.getString(specNamesId), mPackage, mTypeSpec);
+            mPackage.addResSpec(spec);
             mTypeSpec.addResSpec(spec);
         }
         ResResource res = new ResResource(mType, spec, value);
@@ -463,7 +461,7 @@ public class ARSCDecoder {
         int parentId = mIn.readInt();
         int count = mIn.readInt();
 
-        ResValueFactory factory = mPkg.getValueFactory();
+        ResValueFactory factory = mPackage.getValueFactory();
         Pair<Integer, ResScalarValue>[] items = new Pair[count];
 
         for (int i = 0; i < count; i++) {
@@ -487,8 +485,8 @@ public class ARSCDecoder {
 
     private ResIntBasedValue readCompactValue(byte type, int data) throws AndrolibException {
         return type == TypedValue.TYPE_STRING
-            ? mPkg.getValueFactory().factory(mTableStrings.getHTML(data), data)
-            : mPkg.getValueFactory().factory(type, data, null);
+            ? mPackage.getValueFactory().factory(mTableStrings.getHTML(data), data)
+            : mPackage.getValueFactory().factory(type, data, null);
     }
 
     private ResIntBasedValue readValue() throws AndrolibException, IOException {
@@ -502,8 +500,8 @@ public class ARSCDecoder {
         int data = mIn.readInt();
 
         return type == TypedValue.TYPE_STRING
-            ? mPkg.getValueFactory().factory(mTableStrings.getHTML(data), data)
-            : mPkg.getValueFactory().factory(type, data, null);
+            ? mPackage.getValueFactory().factory(mTableStrings.getHTML(data), data)
+            : mPackage.getValueFactory().factory(type, data, null);
     }
 
     private ResConfigFlags readConfigFlags() throws AndrolibException, IOException {
@@ -676,17 +674,17 @@ public class ARSCDecoder {
             int typeId = mMissingResSpecMap.get(resId);
             String resName = "APKTOOL_DUMMY_" + Integer.toHexString(resId);
             ResID id = new ResID(resId);
-            ResResSpec spec = new ResResSpec(id, resName, mPkg, mResTypeSpecs.get(typeId));
+            ResResSpec spec = new ResResSpec(id, resName, mPackage, mResTypeSpecs.get(typeId));
 
             // If we already have this resId don't add it again.
-            if (!mPkg.hasResSpec(id)) {
-                mPkg.addResSpec(spec);
+            if (!mPackage.hasResSpec(id)) {
+                mPackage.addResSpec(spec);
                 spec.getType().addResSpec(spec);
-                ResType resType = mPkg.getOrCreateConfig(new ResConfigFlags());
+                ResType resType = mPackage.getOrCreateConfig(new ResConfigFlags());
 
                 // We are going to make dummy attributes a null reference (@null) now instead of a boolean false.
                 // This is because aapt2 is stricter when it comes to what we can put in an application.
-                ResValue value = new ResReferenceValue(mPkg, 0, "");
+                ResValue value = new ResReferenceValue(mPackage, 0, "");
 
                 ResResource res = new ResResource(resType, spec, value);
                 resType.addResource(res);
