@@ -88,14 +88,14 @@ public class ResConfigFlags {
 
     public static final int MNC_ZERO = -1;
 
-    public static final short MASK_LAYOUTDIR = 0xc0;
+    public static final short MASK_LAYOUTDIR = 0xC0;
     public static final short SCREENLAYOUT_LAYOUTDIR_ANY = 0x00;
     public static final short SCREENLAYOUT_LAYOUTDIR_LTR = 0x40;
     public static final short SCREENLAYOUT_LAYOUTDIR_RTL = 0x80;
     public static final short SCREENLAYOUT_LAYOUTDIR_SHIFT = 0x06;
 
-    public static final short MASK_SCREENROUND = 0x03;
-    public static final short SCREENLAYOUT_ROUND_ANY = 0;
+    public static final short MASK_SCREENROUND = 0x3;
+    public static final short SCREENLAYOUT_ROUND_ANY = 0x0;
     public static final short SCREENLAYOUT_ROUND_NO = 0x1;
     public static final short SCREENLAYOUT_ROUND_YES = 0x2;
 
@@ -121,12 +121,12 @@ public class ResConfigFlags {
     public static final byte KEYSHIDDEN_YES = 0x2;
     public static final byte KEYSHIDDEN_SOFT = 0x3;
 
-    public static final byte MASK_NAVHIDDEN = 0xc;
+    public static final byte MASK_NAVHIDDEN = 0xC;
     public static final byte NAVHIDDEN_ANY = 0x0;
     public static final byte NAVHIDDEN_NO = 0x4;
     public static final byte NAVHIDDEN_YES = 0x8;
 
-    public static final byte MASK_SCREENSIZE = 0x0f;
+    public static final byte MASK_SCREENSIZE = 0x0F;
     public static final byte SCREENSIZE_ANY = 0x00;
     public static final byte SCREENSIZE_SMALL = 0x01;
     public static final byte SCREENSIZE_NORMAL = 0x02;
@@ -138,7 +138,7 @@ public class ResConfigFlags {
     public static final byte SCREENLONG_NO = 0x10;
     public static final byte SCREENLONG_YES = 0x20;
 
-    public static final byte MASK_UI_MODE_TYPE = 0x0f;
+    public static final byte MASK_UI_MODE_TYPE = 0x0F;
     public static final byte UI_MODE_TYPE_ANY = 0x00;
     public static final byte UI_MODE_TYPE_NORMAL = 0x01;
     public static final byte UI_MODE_TYPE_DESK = 0x02;
@@ -147,32 +147,27 @@ public class ResConfigFlags {
     public static final byte UI_MODE_TYPE_APPLIANCE = 0x05;
     public static final byte UI_MODE_TYPE_WATCH = 0x06;
     public static final byte UI_MODE_TYPE_VR_HEADSET = 0x07;
-
-    // start - miui
-    public static final byte UI_MODE_TYPE_GODZILLAUI = 0x0b;
-    public static final byte UI_MODE_TYPE_SMALLUI = 0x0c;
-    public static final byte UI_MODE_TYPE_MEDIUMUI = 0x0d;
-    public static final byte UI_MODE_TYPE_LARGEUI = 0x0e;
-    public static final byte UI_MODE_TYPE_HUGEUI = 0x0f;
-    // end - miui
+    public static final byte UI_MODE_TYPE_GODZILLAUI = 0x0B; // MIUI
+    public static final byte UI_MODE_TYPE_SMALLUI = 0x0C; // MIUI
+    public static final byte UI_MODE_TYPE_MEDIUMUI = 0x0D; // MIUI
+    public static final byte UI_MODE_TYPE_LARGEUI = 0x0E; // MIUI
+    public static final byte UI_MODE_TYPE_HUGEUI = 0x0F; // MIUI
 
     public static final byte MASK_UI_MODE_NIGHT = 0x30;
     public static final byte UI_MODE_NIGHT_ANY = 0x00;
     public static final byte UI_MODE_NIGHT_NO = 0x10;
     public static final byte UI_MODE_NIGHT_YES = 0x20;
 
-    public static final byte COLOR_HDR_MASK = 0xC;
-    public static final byte COLOR_HDR_NO = 0x4;
-    public static final byte COLOR_HDR_SHIFT = 0x2;
-    public static final byte COLOR_HDR_UNDEFINED = 0x0;
-    public static final byte COLOR_HDR_YES = 0x8;
+    public static final byte MASK_COLOR_MODE_HDR = 0xC;
+    public static final byte COLOR_MODE_HDR_UNDEFINED = 0x0;
+    public static final byte COLOR_MODE_HDR_SHIFT = 0x2;
+    public static final byte COLOR_MODE_HDR_NO = 0x4;
+    public static final byte COLOR_MODE_HDR_YES = 0x8;
 
-    public static final byte COLOR_UNDEFINED = 0x0;
-
-    public static final byte COLOR_WIDE_UNDEFINED = 0x0;
-    public static final byte COLOR_WIDE_NO = 0x1;
-    public static final byte COLOR_WIDE_YES = 0x2;
-    public static final byte COLOR_WIDE_MASK = 0x3;
+    public static final byte MASK_COLOR_MODE_WIDE = 0x3;
+    public static final byte COLOR_MODE_WIDE_UNDEFINED = 0x0;
+    public static final byte COLOR_MODE_WIDE_NO = 0x1;
+    public static final byte COLOR_MODE_WIDE_YES = 0x2;
 
     // TODO: Dirty static hack. This counter should be a part of ResPackage,
     // but it would be hard right now and this feature is very rarely used.
@@ -230,7 +225,7 @@ public class ResConfigFlags {
         mLocaleScript = null;
         mLocaleVariant = null;
         mScreenLayout2 = 0;
-        mColorMode = COLOR_WIDE_UNDEFINED;
+        mColorMode = COLOR_MODE_WIDE_UNDEFINED;
         mLocaleNumberingSystem = null;
         mSize = 0;
         mIsInvalid = false;
@@ -391,19 +386,19 @@ public class ResConfigFlags {
                 sb.append("-round");
                 break;
         }
-        switch (mColorMode & COLOR_HDR_MASK) {
-            case COLOR_HDR_YES:
+        switch (mColorMode & MASK_COLOR_MODE_HDR) {
+            case COLOR_MODE_HDR_YES:
                 sb.append("-highdr");
                 break;
-            case COLOR_HDR_NO:
+            case COLOR_MODE_HDR_NO:
                 sb.append("-lowdr");
                 break;
         }
-        switch (mColorMode & COLOR_WIDE_MASK) {
-            case COLOR_WIDE_YES:
+        switch (mColorMode & MASK_COLOR_MODE_WIDE) {
+            case COLOR_MODE_WIDE_YES:
                 sb.append("-widecg");
                 break;
-            case COLOR_WIDE_NO:
+            case COLOR_MODE_WIDE_NO:
                 sb.append("-nowidecg");
                 break;
         }
@@ -570,7 +565,8 @@ public class ResConfigFlags {
         if (mGrammaticalInflection != 0) {
             return SDK_UPSIDEDOWN_CAKE;
         }
-        if ((mUiMode & MASK_UI_MODE_TYPE) == UI_MODE_TYPE_VR_HEADSET || (mColorMode & COLOR_WIDE_MASK) != 0 || ((mColorMode & COLOR_HDR_MASK) != 0)) {
+        if ((mUiMode & MASK_UI_MODE_TYPE) == UI_MODE_TYPE_VR_HEADSET
+                || (mColorMode & MASK_COLOR_MODE_WIDE) != 0 || ((mColorMode & MASK_COLOR_MODE_HDR) != 0)) {
             return SDK_OREO;
         }
         if ((mScreenLayout2 & MASK_SCREENROUND) != 0) {

@@ -1103,7 +1103,7 @@ public class MXSerializer implements XmlSerializer {
                 retval.append("\\\\");
                 break;
             default:
-                if (ch < 0x20 || ch > 0x7e) {
+                if (ch < 0x20 || ch > 0x7E) {
                     String str = "0000" + Integer.toString(ch, 16);
                     retval.append("\\u").append(str.substring(str.length() - 4));
                 } else {

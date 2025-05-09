@@ -16,9 +16,9 @@
  */
 package brut.androlib;
 
-import brut.androlib.apk.ApkInfo;
-import brut.directory.ExtFile;
+import brut.androlib.meta.ApkInfo;
 import brut.common.BrutException;
+import brut.directory.ExtFile;
 import org.apache.commons.lang3.StringUtils;
 
 import org.junit.*;
@@ -39,7 +39,7 @@ public class DoubleExtensionUnknownFileTest extends BaseTest {
         new ApkDecoder(testApk, sConfig).decode(testDir);
 
         ApkInfo testInfo = ApkInfo.load(testDir);
-        for (String path : testInfo.doNotCompress) {
+        for (String path : testInfo.getDoNotCompress()) {
             if (StringUtils.countMatches(path, ".") > 1) {
                 assertTrue(path.equals("assets/bin/Data/sharedassets1.assets.split0"));
             }

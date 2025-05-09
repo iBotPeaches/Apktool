@@ -14,12 +14,19 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib.apk;
+package brut.androlib.meta;
 
-import brut.androlib.exceptions.AndrolibException;
+import brut.androlib.BaseTest;
+import brut.common.BrutException;
 
-public interface YamlSerializable {
-    void readItem(YamlReader reader) throws AndrolibException;
+import org.junit.*;
+import static org.junit.Assert.*;
 
-    void write(YamlWriter writer);
+public class MaliciousYamlTest extends BaseTest {
+
+    @Test
+    public void testMaliciousYaml() throws BrutException {
+        ApkInfo apkInfo = ApkInfo.load(getClass().getResourceAsStream("/meta/cve20220476.yml"));
+        assertEquals("2.6.1-ddc4bb-SNAPSHOT", apkInfo.getVersion());
+    }
 }

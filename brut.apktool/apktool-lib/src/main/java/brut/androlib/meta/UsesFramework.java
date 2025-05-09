@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib.apk;
+package brut.androlib.meta;
 
 import brut.androlib.exceptions.AndrolibException;
 
@@ -22,20 +22,34 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UsesFramework implements YamlSerializable {
-    public List<Integer> ids;
-    public String tag;
+    public final List<Integer> mIds;
+    public String mTag;
+
+    public UsesFramework() {
+        mIds = new ArrayList<>();
+        clear();
+    }
+
+    public void clear() {
+        mIds.clear();
+        mTag = null;
+    }
+
+    public boolean isEmpty() {
+        return mIds.isEmpty() && mTag == null;
+    }
 
     @Override
     public void readItem(YamlReader reader) throws AndrolibException {
         YamlLine line = reader.getLine();
         switch (line.getKey()) {
             case "ids": {
-                ids = new ArrayList<>();
-                reader.readIntList(ids);
+                mIds.clear();
+                reader.readIntList(mIds);
                 break;
             }
             case "tag": {
-                tag = line.getValue();
+                mTag = line.getValue();
                 break;
             }
         }
@@ -43,7 +57,23 @@ public class UsesFramework implements YamlSerializable {
 
     @Override
     public void write(YamlWriter writer) {
-        writer.writeList("ids", ids);
-        writer.writeString("tag", tag);
+        if (!mIds.isEmpty()) {
+            writer.writeList("ids", mIds);
+        }
+        if (mTag != null) {
+            writer.writeString("tag", mTag);
+        }
+    }
+
+    public List<Integer> getIds() {
+        return mIds;
+    }
+
+    public String getTag() {
+        return mTag;
+    }
+
+    public void setTag(String tag) {
+        mTag = tag;
     }
 }

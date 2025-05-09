@@ -16,7 +16,7 @@
  */
 package brut.androlib;
 
-import brut.androlib.apk.ApkInfo;
+import brut.androlib.meta.ApkInfo;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
 
@@ -40,7 +40,7 @@ public class SparseFlagTest extends BaseTest {
         ExtFile testDir = new ExtFile(testApk + ".out");
         ApkInfo apkInfo = new ApkDecoder(testApk, sConfig).decode(testDir);
 
-        assertTrue("Expecting sparse resources", apkInfo.sparseResources);
+        assertTrue("Expecting sparse resources", apkInfo.isSparseResources());
 
         LOGGER.info("Building sparse.apk...");
         new ApkBuilder(testDir, sConfig).build(null);
@@ -55,7 +55,7 @@ public class SparseFlagTest extends BaseTest {
         ExtFile testDir = new ExtFile(testApk + ".out");
         ApkInfo apkInfo = new ApkDecoder(testApk, sConfig).decode(testDir);
 
-        assertFalse("Expecting not-sparse resources", apkInfo.sparseResources);
+        assertFalse("Expecting not-sparse resources", apkInfo.isSparseResources());
 
         LOGGER.info("Building not-sparse.apk...");
         new ApkBuilder(testDir, sConfig).build(null);

@@ -14,22 +14,35 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib.apk;
+package brut.androlib.meta;
 
 public class VersionInfo implements YamlSerializable {
-    public String versionCode;
-    public String versionName;
+    public String mVersionCode;
+    public String mVersionName;
+
+    public VersionInfo() {
+        clear();
+    }
+
+    public void clear() {
+        mVersionCode = null;
+        mVersionName = null;
+    }
+
+    public boolean isEmpty() {
+        return mVersionCode == null && mVersionName == null;
+    }
 
     @Override
     public void readItem(YamlReader reader) {
         YamlLine line = reader.getLine();
         switch (line.getKey()) {
             case "versionCode": {
-                versionCode = line.getValue();
+                mVersionCode = line.getValue();
                 break;
             }
             case "versionName": {
-                versionName = line.getValue();
+                mVersionName = line.getValue();
                 break;
             }
         }
@@ -37,7 +50,27 @@ public class VersionInfo implements YamlSerializable {
 
     @Override
     public void write(YamlWriter writer) {
-        writer.writeString("versionCode", versionCode);
-        writer.writeString("versionName", versionName);
+        if (mVersionCode != null) {
+            writer.writeString("versionCode", mVersionCode);
+        }
+        if (mVersionName != null) {
+            writer.writeString("versionName", mVersionName);
+        }
+    }
+
+    public String getVersionCode() {
+        return mVersionCode;
+    }
+
+    public void setVersionCode(String versionCode) {
+        mVersionCode = versionCode;
+    }
+
+    public String getVersionName() {
+        return mVersionName;
+    }
+
+    public void setVersionName(String versionName) {
+        mVersionName = versionName;
     }
 }

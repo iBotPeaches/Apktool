@@ -16,7 +16,7 @@
  */
 package brut.androlib;
 
-import brut.androlib.apk.ApkInfo;
+import brut.androlib.meta.ApkInfo;
 import brut.androlib.res.ResourcesDecoder;
 import brut.androlib.res.data.ResTable;
 import brut.common.BrutException;
@@ -74,7 +74,7 @@ public class NonStandardPkgIdTest extends BaseTest {
 
     @Test
     public void confirmResourcesAreFromPkgId8() throws BrutException {
-        assertEquals(0x80, sResTable.getPackageId());
+        assertEquals(0x80, sResTable.getMainPackage().getId());
 
         assertEquals(0x80, sResTable.getResSpec(0x80020000).getPackage().getId());
         assertEquals(0x80, sResTable.getResSpec(0x80020001).getPackage().getId());
