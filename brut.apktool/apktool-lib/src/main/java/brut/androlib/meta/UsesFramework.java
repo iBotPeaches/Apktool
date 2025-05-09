@@ -22,8 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UsesFramework implements YamlSerializable {
-    public final List<Integer> mIds;
-    public String mTag;
+    private final List<Integer> mIds;
+    private String mTag;
 
     public UsesFramework() {
         mIds = new ArrayList<>();
