@@ -19,13 +19,13 @@ package brut.androlib;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.exceptions.InFileNotFoundException;
 import brut.androlib.exceptions.OutDirExistsException;
-import brut.androlib.apk.ApkInfo;
+import brut.androlib.meta.ApkInfo;
 import brut.androlib.res.ResourcesDecoder;
 import brut.androlib.src.SmaliDecoder;
-import brut.directory.Directory;
-import brut.directory.ExtFile;
 import brut.common.BrutException;
+import brut.directory.Directory;
 import brut.directory.DirectoryException;
+import brut.directory.ExtFile;
 import brut.util.OS;
 import com.android.tools.smali.dexlib2.iface.DexFile;
 import org.apache.commons.io.FilenameUtils;
@@ -304,11 +304,9 @@ public class ApkDecoder {
     }
 
     private void writeApkInfo(File outDir) throws AndrolibException {
-        mResDecoder.updateApkInfo(outDir);
-
         // in case we have no resources, we should store the minSdk we pulled from the source opcode api level
         if (!mApkInfo.hasResources() && mMinSdkVersion > 0) {
-            mApkInfo.setMinSdkVersion(Integer.toString(mMinSdkVersion));
+            mApkInfo.getSdkInfo().setMinSdkVersion(Integer.toString(mMinSdkVersion));
         }
 
         // record uncompressed files
@@ -344,22 +342,16 @@ public class ApkDecoder {
             }
 
             // update apk info
-            int doNotCompressSize = uncompressedExts.size() + uncompressedFiles.size();
-            if (doNotCompressSize > 0) {
-                List<String> doNotCompress = new ArrayList<>(doNotCompressSize);
-                if (!uncompressedExts.isEmpty()) {
-                    List<String> uncompressedExtsList = new ArrayList<>(uncompressedExts);
-                    uncompressedExtsList.sort(null);
-                    doNotCompress.addAll(uncompressedExtsList);
-                }
-                if (!uncompressedFiles.isEmpty()) {
-                    List<String> uncompressedFilesList = new ArrayList<>(uncompressedFiles);
-                    uncompressedFilesList.sort(null);
-                    doNotCompress.addAll(uncompressedFilesList);
-                }
-                if (!doNotCompress.isEmpty()) {
-                    mApkInfo.doNotCompress = doNotCompress;
-                }
+            List<String> doNotCompress = mApkInfo.getDoNotCompress();
+            if (!uncompressedExts.isEmpty()) {
+                List<String> uncompressedExtsList = new ArrayList<>(uncompressedExts);
+                uncompressedExtsList.sort(null);
+                doNotCompress.addAll(uncompressedExtsList);
+            }
+            if (!uncompressedFiles.isEmpty()) {
+                List<String> uncompressedFilesList = new ArrayList<>(uncompressedFiles);
+                uncompressedFilesList.sort(null);
+                doNotCompress.addAll(uncompressedFilesList);
             }
         } catch (DirectoryException ex) {
             throw new AndrolibException(ex);

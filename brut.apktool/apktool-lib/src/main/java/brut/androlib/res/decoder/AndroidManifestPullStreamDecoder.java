@@ -19,7 +19,10 @@ package brut.androlib.res.decoder;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.exceptions.AXmlDecodingException;
 import brut.androlib.exceptions.RawXmlEncounteredException;
-import brut.androlib.res.data.ResTable;
+import brut.androlib.meta.ApkInfo;
+import brut.androlib.meta.PackageInfo;
+import brut.androlib.meta.SdkInfo;
+import brut.androlib.meta.VersionInfo;
 import brut.xmlpull.XmlPullUtils;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -30,10 +33,12 @@ import java.io.*;
 public class AndroidManifestPullStreamDecoder implements ResStreamDecoder {
     private final AXmlResourceParser mParser;
     private final XmlSerializer mSerial;
+    private final EventHandler mEventHandler;
 
     public AndroidManifestPullStreamDecoder(AXmlResourceParser parser, XmlSerializer serial) {
         mParser = parser;
         mSerial = serial;
+        mEventHandler = new EventHandler();
     }
 
     @Override
@@ -41,7 +46,7 @@ public class AndroidManifestPullStreamDecoder implements ResStreamDecoder {
         try {
             mParser.setInput(in, null);
             mSerial.setOutput(out, null);
-            XmlPullUtils.copy(mParser, mSerial, new EventHandler(mParser.getResTable()));
+            XmlPullUtils.copy(mParser, mSerial, mEventHandler);
         } catch (XmlPullParserException ex) {
             throw new AXmlDecodingException("Could not decode XML", ex);
         } catch (IOException ex) {
@@ -49,13 +54,13 @@ public class AndroidManifestPullStreamDecoder implements ResStreamDecoder {
         }
     }
 
-    private static class EventHandler implements XmlPullUtils.EventHandler {
-        private final ResTable mResTable;
+    private class EventHandler implements XmlPullUtils.EventHandler {
+        private final ApkInfo mApkInfo;
         private final boolean mHideSdkInfo;
 
-        public EventHandler(ResTable resTable) {
-            mResTable = resTable;
-            mHideSdkInfo = !resTable.getConfig().isAnalysisMode();
+        public EventHandler() {
+            mApkInfo = mParser.getResTable().getApkInfo();
+            mHideSdkInfo = !mParser.getResTable().getConfig().isAnalysisMode();
         }
 
         @Override
@@ -88,6 +93,9 @@ public class AndroidManifestPullStreamDecoder implements ResStreamDecoder {
         }
 
         private void parseManifest(XmlPullParser in) {
+            PackageInfo packageInfo = mApkInfo.getPackageInfo();
+            VersionInfo versionInfo = mApkInfo.getVersionInfo();
+
             for (int i = 0; i < in.getAttributeCount(); i++) {
                 String ns = in.getAttributeNamespace(i);
                 String name = in.getAttributeName(i);
@@ -98,15 +106,15 @@ public class AndroidManifestPullStreamDecoder implements ResStreamDecoder {
                 }
                 if (ns.isEmpty()) {
                     if (name.equals("package")) {
-                        mResTable.setPackageRenamed(value);
+                        packageInfo.setRenameManifestPackage(value);
                     }
                 } else if (ns.equals(AXmlResourceParser.ANDROID_RES_NS)) {
                     switch (name) {
                         case "versionCode":
-                            mResTable.setVersionCode(value);
+                            versionInfo.setVersionCode(value);
                             break;
                         case "versionName":
-                            mResTable.setVersionName(value);
+                            versionInfo.setVersionName(value);
                             break;
                     }
                 }
@@ -114,6 +122,8 @@ public class AndroidManifestPullStreamDecoder implements ResStreamDecoder {
         }
 
         private void parseUsesSdk(XmlPullParser in) {
+            SdkInfo sdkInfo = mApkInfo.getSdkInfo();
+
             for (int i = 0; i < in.getAttributeCount(); i++) {
                 String ns = in.getAttributeNamespace(i);
                 String name = in.getAttributeName(i);
@@ -125,10 +135,13 @@ public class AndroidManifestPullStreamDecoder implements ResStreamDecoder {
                 if (ns.equals(AXmlResourceParser.ANDROID_RES_NS)) {
                     switch (name) {
                         case "minSdkVersion":
+                            sdkInfo.setMinSdkVersion(value);
+                            break;
                         case "targetSdkVersion":
+                            sdkInfo.setTargetSdkVersion(value);
+                            break;
                         case "maxSdkVersion":
-                        case "compileSdkVersion":
-                            mResTable.addSdkInfo(name, value);
+                            sdkInfo.setMaxSdkVersion(value);
                             break;
                     }
                 }

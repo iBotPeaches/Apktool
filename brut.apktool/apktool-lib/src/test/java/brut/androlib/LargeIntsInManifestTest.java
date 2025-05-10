@@ -16,8 +16,8 @@
  */
 package brut.androlib;
 
-import brut.directory.ExtFile;
 import brut.common.BrutException;
+import brut.directory.ExtFile;
 
 import java.io.File;
 import java.io.IOException;

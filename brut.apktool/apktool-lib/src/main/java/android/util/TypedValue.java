@@ -87,37 +87,37 @@ public class TypedValue {
      * Identifies the start of integer values that were specified as color
      * constants (starting with '#').
      */
-    public static final int TYPE_FIRST_COLOR_INT = 0x1c;
+    public static final int TYPE_FIRST_COLOR_INT = 0x1C;
 
     /**
      * The <var>data</var> field holds a color that was originally specified as
      * #aarrggbb.
      */
-    public static final int TYPE_INT_COLOR_ARGB8 = 0x1c;
+    public static final int TYPE_INT_COLOR_ARGB8 = 0x1C;
     /**
      * The <var>data</var> field holds a color that was originally specified as
      * #rrggbb.
      */
-    public static final int TYPE_INT_COLOR_RGB8 = 0x1d;
+    public static final int TYPE_INT_COLOR_RGB8 = 0x1D;
     /**
      * The <var>data</var> field holds a color that was originally specified as
      * #argb.
      */
-    public static final int TYPE_INT_COLOR_ARGB4 = 0x1e;
+    public static final int TYPE_INT_COLOR_ARGB4 = 0x1E;
     /**
      * The <var>data</var> field holds a color that was originally specified as
      * #rgb.
      */
-    public static final int TYPE_INT_COLOR_RGB4 = 0x1f;
+    public static final int TYPE_INT_COLOR_RGB4 = 0x1F;
 
     /**
      * Identifies the end of integer values that were specified as color
      * constants.
      */
-    public static final int TYPE_LAST_COLOR_INT = 0x1f;
+    public static final int TYPE_LAST_COLOR_INT = 0x1F;
 
     /** Identifies the end of plain integer values. */
-    public static final int TYPE_LAST_INT = 0x1f;
+    public static final int TYPE_LAST_INT = 0x1F;
 
     /* ------------------------------------------------------------ */
 
@@ -128,7 +128,7 @@ public class TypedValue {
      * {@link #COMPLEX_UNIT_SHIFT}). This gives us 16 possible types, as defined
      * below.
      */
-    public static final int COMPLEX_UNIT_MASK = 0xf;
+    public static final int COMPLEX_UNIT_MASK = 0xF;
 
     /** {@link #TYPE_DIMENSION} complex unit: Value is raw pixels. */
     public static final int COMPLEX_UNIT_PX = 0;
@@ -180,7 +180,7 @@ public class TypedValue {
      * {@link #COMPLEX_MANTISSA_SHIFT}). This gives us 23 bits of precision; the
      * top bit is the sign.
      */
-    public static final int COMPLEX_MANTISSA_MASK = 0xffffff;
+    public static final int COMPLEX_MANTISSA_MASK = 0xFFFFFF;
 
     /* ------------------------------------------------------------ */
 
@@ -205,7 +205,7 @@ public class TypedValue {
      * If density is equal to this value, then there is no density
      * associated with the resource and it should not be scaled.
      */
-    public static final int DENSITY_NONE = 0xffff;
+    public static final int DENSITY_NONE = 0xFFFF;
 
     /* ------------------------------------------------------------ */
 
@@ -288,12 +288,10 @@ public class TypedValue {
                     res = res.substring(2);
                     break;
                 case TYPE_INT_COLOR_ARGB4:// #AARRGGBB->#ARGB
-                    res = String.valueOf(vals[0]) + vals[2] +
-                        vals[4] + vals[6];
+                    res = new String(new char[] { vals[0], vals[2], vals[4], vals[6] });
                     break;
                 case TYPE_INT_COLOR_RGB4:// #FFRRGGBB->#RGB
-                    res = String.valueOf(vals[2]) + vals[4] +
-                        vals[6];
+                    res = new String(new char[] { vals[2], vals[4], vals[6] });
                     break;
             }
             return "#" + res;

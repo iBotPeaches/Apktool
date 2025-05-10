@@ -33,7 +33,7 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 public class MissingDiv9PatchTest extends BaseTest {
-    private static final int NP_COLOR = 0xff000000;
+    private static final int NP_COLOR = 0xFF000000;
 
     @BeforeClass
     public static void beforeClass() throws Exception {

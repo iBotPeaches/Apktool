@@ -16,9 +16,9 @@
  */
 package brut.androlib;
 
-import brut.androlib.apk.ApkInfo;
-import brut.directory.ExtFile;
+import brut.androlib.meta.ApkInfo;
 import brut.common.BrutException;
+import brut.directory.ExtFile;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -38,6 +38,6 @@ public class ReferenceVersionCodeTest extends BaseTest {
         new ApkDecoder(testApk, sConfig).decode(testDir);
 
         ApkInfo testInfo = ApkInfo.load(testDir);
-        assertEquals("v1.0.0", testInfo.versionInfo.versionName);
+        assertEquals("v1.0.0", testInfo.getVersionInfo().getVersionName());
     }
 }

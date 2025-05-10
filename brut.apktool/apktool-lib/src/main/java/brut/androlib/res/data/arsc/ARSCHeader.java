@@ -48,7 +48,7 @@ public class ARSCHeader {
     public static final short RES_XML_START_ELEMENT_TYPE = 0x0102;
     public static final short RES_XML_END_ELEMENT_TYPE = 0x0103;
     public static final short RES_XML_CDATA_TYPE = 0x0104;
-    public static final short RES_XML_LAST_CHUNK_TYPE = 0x017f;
+    public static final short RES_XML_LAST_CHUNK_TYPE = 0x017F;
     public static final short RES_XML_RESOURCE_MAP_TYPE = 0x0180;
 
     public final short type;

@@ -456,7 +456,7 @@ public class AXmlResourceParser implements XmlResourceParser {
 
             // try to decode from resource table
             int attrResId = getAttributeNameResource(index);
-            ResScalarValue resValue = mResTable.getCurrentResPackage()
+            ResScalarValue resValue = mResTable.getCurrentPackage()
                 .getValueFactory().factory(valueType, valueData, value);
 
             String decoded = null;

@@ -30,6 +30,6 @@ public class ResFloatValue extends ResScalarValue {
 
     @Override
     protected String encodeAsResXml() {
-        return String.valueOf(mValue);
+        return Float.toString(mValue);
     }
 }

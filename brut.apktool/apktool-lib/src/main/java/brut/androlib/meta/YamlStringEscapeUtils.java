@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib.apk;
+package brut.androlib.meta;
 
 import org.apache.commons.text.StringEscapeUtils;
 import org.apache.commons.text.translate.CharSequenceTranslator;
@@ -75,7 +75,7 @@ public final class YamlStringEscapeUtils {
                 writer.write("\\u" + CharSequenceTranslator.hex(ch));
             } else if (ch > 0x7E && ch != 0x85 && ch < 0xA0) {
                 writer.write("\\u00" + CharSequenceTranslator.hex(ch));
-            } else if (ch < 32) {
+            } else if (ch < 0x20) {
                 switch (ch) {
                     case '\t' :
                         writer.write('\\');
@@ -90,7 +90,7 @@ public final class YamlStringEscapeUtils {
                         writer.write('r');
                         break;
                     default :
-                        if (ch > 0xf) {
+                        if (ch > 0x0F) {
                             writer.write("\\u00" + CharSequenceTranslator.hex(ch));
                         } else {
                             writer.write("\\u000" + CharSequenceTranslator.hex(ch));

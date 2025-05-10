@@ -16,8 +16,9 @@
  */
 package brut.androlib;
 
-import brut.directory.ExtFile;
 import brut.common.BrutException;
+import brut.directory.ExtFile;
+import org.xml.sax.SAXException;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,6 +26,7 @@ import java.nio.file.Files;
 
 import org.junit.*;
 import static org.junit.Assert.*;
+import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 
 public class ExternalEntityTest extends BaseTest {
 
@@ -45,9 +47,9 @@ public class ExternalEntityTest extends BaseTest {
     }
 
     @Test
-    public void doctypeTest() throws IOException {
+    public void doctypeTest() throws IOException, SAXException {
         String expected = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
-                + "<manifest android:versionCode=\"1\" android:versionName=\"1.0\" hardwareAccelerated=\"true\" package=\"com.ibotpeaches.doctype\" platformBuildVersionCode=\"24\" platformBuildVersionName=\"6.0-2456767\"\n"
+                + "<manifest hardwareAccelerated=\"true\" package=\"com.ibotpeaches.doctype\" platformBuildVersionCode=\"24\" platformBuildVersionName=\"6.0-2456767\"\n"
                 + "  xmlns:android=\"http://schemas.android.com/apk/res/android\">\n"
                 + "    <supports-screens android:anyDensity=\"true\" android:smallScreens=\"true\" android:normalScreens=\"true\" android:largeScreens=\"true\" android:resizeable=\"true\" android:xlargeScreens=\"true\" />\n"
                 + "</manifest>";
@@ -55,6 +57,6 @@ public class ExternalEntityTest extends BaseTest {
         File xml = new File(sTestNewDir, "AndroidManifest.xml");
         String obtained = new String(Files.readAllBytes(xml.toPath()));
 
-        assertEquals(TestUtils.replaceNewlines(expected), TestUtils.replaceNewlines(obtained));
+        assertXMLEqual(expected, obtained);
     }
 }

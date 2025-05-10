@@ -16,7 +16,7 @@
  */
 package brut.androlib;
 
-import brut.androlib.apk.ApkInfo;
+import brut.androlib.meta.ApkInfo;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
 
@@ -38,6 +38,6 @@ public class MissingVersionManifestTest extends BaseTest {
         new ApkDecoder(testApk, sConfig).decode(testDir);
 
         ApkInfo testInfo = ApkInfo.load(testDir);
-        assertNull(testInfo.versionInfo.versionName);
+        assertNull(testInfo.getVersionInfo().getVersionName());
     }
 }

@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib.apk;
+package brut.androlib.meta;
 
 import brut.androlib.BaseTest;
 import brut.common.BrutException;
@@ -33,29 +33,28 @@ public class ApkInfoSerializationTest extends BaseTest {
     public TemporaryFolder folder = new TemporaryFolder();
 
     private void check(ApkInfo apkInfo) {
-        assertEquals("2.0.0", apkInfo.version);
-        assertEquals("testapp.apk", apkInfo.apkFileName);
-        assertNotNull(apkInfo.usesFramework);
-        assertEquals(1, apkInfo.usesFramework.ids.size());
-        assertEquals(1, (long) apkInfo.usesFramework.ids.get(0));
-        assertNotNull(apkInfo.packageInfo);
-        assertEquals("127", apkInfo.packageInfo.forcedPackageId);
-        assertNotNull(apkInfo.versionInfo);
-        assertEquals("1", apkInfo.versionInfo.versionCode);
-        assertEquals("1.0", apkInfo.versionInfo.versionName);
-        assertNotNull(apkInfo.doNotCompress);
-        assertEquals(5, apkInfo.doNotCompress.size());
-        assertEquals("assets/0byte_file.jpg", apkInfo.doNotCompress.get(0));
-        assertEquals("arsc", apkInfo.doNotCompress.get(1));
-        assertEquals("png", apkInfo.doNotCompress.get(2));
-        assertEquals("mp3", apkInfo.doNotCompress.get(3));
-        assertEquals("stored.file", apkInfo.doNotCompress.get(4));
+        assertEquals("2.0.0", apkInfo.getVersion());
+        assertEquals("testapp.apk", apkInfo.getApkFileName());
+        assertNotNull(apkInfo.getUsesFramework());
+        assertEquals(1, apkInfo.getUsesFramework().getIds().size());
+        assertEquals(1, (long) apkInfo.getUsesFramework().getIds().get(0));
+        assertNotNull(apkInfo.getPackageInfo());
+        assertEquals("127", apkInfo.getPackageInfo().getForcedPackageId());
+        assertNotNull(apkInfo.getVersionInfo());
+        assertEquals("1", apkInfo.getVersionInfo().getVersionCode());
+        assertEquals("1.0", apkInfo.getVersionInfo().getVersionName());
+        assertNotNull(apkInfo.getDoNotCompress());
+        assertEquals(5, apkInfo.getDoNotCompress().size());
+        assertEquals("assets/0byte_file.jpg", apkInfo.getDoNotCompress().get(0));
+        assertEquals("arsc", apkInfo.getDoNotCompress().get(1));
+        assertEquals("png", apkInfo.getDoNotCompress().get(2));
+        assertEquals("mp3", apkInfo.getDoNotCompress().get(3));
+        assertEquals("stored.file", apkInfo.getDoNotCompress().get(4));
     }
 
     @Test
     public void checkApkInfoSerialization() throws BrutException, IOException {
-        ApkInfo control = ApkInfo.load(
-            getClass().getResourceAsStream("/apk/unknown_files.yml"));
+        ApkInfo control = ApkInfo.load(getClass().getResourceAsStream("/meta/unknown_files.yml"));
         check(control);
 
         File savedApkInfo = folder.newFile("saved.yml");

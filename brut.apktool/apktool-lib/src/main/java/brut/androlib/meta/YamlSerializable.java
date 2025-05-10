@@ -14,21 +14,12 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib.exceptions;
+package brut.androlib.meta;
 
-public class CantFindFrameworkResException extends AndrolibException {
-    private final int mPackageId;
+import brut.androlib.exceptions.AndrolibException;
 
-    public CantFindFrameworkResException(int pkgId) {
-        mPackageId = pkgId;
-    }
+public interface YamlSerializable {
+    void readItem(YamlReader reader) throws AndrolibException;
 
-    public int getPackageId() {
-        return mPackageId;
-    }
-
-    @Override
-    public String getMessage() {
-        return String.format("Could not find framework resources for package of id: %d", mPackageId);
-    }
+    void write(YamlWriter writer);
 }

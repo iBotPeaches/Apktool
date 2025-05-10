@@ -16,7 +16,7 @@
  */
 package brut.androlib;
 
-import brut.androlib.apk.ApkInfo;
+import brut.androlib.meta.ApkInfo;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
 import brut.util.OSDetection;
@@ -61,20 +61,20 @@ public class BuildAndDecodeApkTest extends BaseTest {
     @Test
     public void confirmFeatureFlagsRecorded() throws BrutException {
         ApkInfo testInfo = ApkInfo.load(sTestNewDir);
-        assertTrue(testInfo.featureFlags.get("brut.feature.permission"));
-        assertTrue(testInfo.featureFlags.get("brut.feature.activity"));
+        assertTrue(testInfo.getFeatureFlags().get("brut.feature.permission"));
+        assertTrue(testInfo.getFeatureFlags().get("brut.feature.activity"));
     }
 
     @Test
     public void confirmZeroByteFileExtensionIsNotStored() throws BrutException {
         ApkInfo testInfo = ApkInfo.load(sTestNewDir);
-        assertFalse(testInfo.doNotCompress.contains("jpg"));
+        assertFalse(testInfo.getDoNotCompress().contains("jpg"));
     }
 
     @Test
     public void confirmZeroByteFileIsStored() throws BrutException {
         ApkInfo testInfo = ApkInfo.load(sTestNewDir);
-        assertTrue(testInfo.doNotCompress.contains("assets/0byte_file.jpg"));
+        assertTrue(testInfo.getDoNotCompress().contains("assets/0byte_file.jpg"));
     }
 
     @Test
@@ -547,7 +547,7 @@ public class BuildAndDecodeApkTest extends BaseTest {
     }
 
     private static boolean isTransparent(int pixel) {
-        return pixel >> 24 == 0x00;
+        return pixel >> 24 == 0;
     }
 
     @Test
