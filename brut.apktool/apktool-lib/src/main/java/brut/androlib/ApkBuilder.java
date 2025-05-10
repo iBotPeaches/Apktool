@@ -69,7 +69,7 @@ public class ApkBuilder {
 
             String minSdkVersion = mApkInfo.getSdkInfo().getMinSdkVersion();
             if (minSdkVersion != null) {
-                mMinSdkVersion = SdkInfo.codenameToSdkInt(minSdkVersion);
+                mMinSdkVersion = SdkInfo.parseSdkInt(minSdkVersion);
             }
 
             if (outApk == null) {
@@ -321,7 +321,7 @@ public class ApkBuilder {
         if (mConfig.isNetSecConf()) {
             String targetSdkVersion = mApkInfo.getSdkInfo().getTargetSdkVersion();
             if (targetSdkVersion != null) {
-                if (Integer.parseInt(targetSdkVersion) < ResConfigFlags.SDK_NOUGAT) {
+                if (SdkInfo.parseSdkInt(targetSdkVersion) < ResConfigFlags.SDK_NOUGAT) {
                     LOGGER.warning("Target SDK version is lower than 24! Network Security Configuration might be ignored!");
                 }
             }

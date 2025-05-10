@@ -82,9 +82,9 @@ public class SdkInfo implements YamlSerializable {
     }
 
     public String getTargetSdkVersionBounded() {
-        int target = codenameToSdkInt(mTargetSdkVersion);
-        int min = mMinSdkVersion != null ? codenameToSdkInt(mMinSdkVersion) : 0;
-        int max = mMaxSdkVersion != null ? codenameToSdkInt(mMaxSdkVersion) : target;
+        int target = parseSdkInt(mTargetSdkVersion);
+        int min = mMinSdkVersion != null ? parseSdkInt(mMinSdkVersion) : 0;
+        int max = mMaxSdkVersion != null ? parseSdkInt(mMaxSdkVersion) : target;
         return Integer.toString(Math.max(min, Math.min(max, target)));
     }
 
@@ -100,7 +100,7 @@ public class SdkInfo implements YamlSerializable {
         mMaxSdkVersion = maxSdkVersion;
     }
 
-    public static int codenameToSdkInt(String sdkVersion) {
+    public static int parseSdkInt(String sdkVersion) {
         switch (sdkVersion.toUpperCase()) {
             case "M":
                 return ResConfigFlags.SDK_MNC;
