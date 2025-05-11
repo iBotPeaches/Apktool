@@ -270,12 +270,7 @@ public class ResConfigFlags {
             sb.append("-mcc").append(String.format("%03d", mMcc));
         }
         if (mMnc != 0) {
-            sb.append("-mnc");
-            if (mMnc != MNC_ZERO) {
-                sb.append(String.format("%02d", mMnc));
-            } else {
-                sb.append("00");
-            }
+            sb.append("-mnc").append(String.format("%02d", mMnc == MNC_ZERO ? 0 : mMnc));
         }
         if (!mLanguage.isEmpty()) {
             if (mLocaleScript.isEmpty() && (mRegion.isEmpty() || mRegion.length() == 2)
@@ -613,7 +608,7 @@ public class ResConfigFlags {
                 break;
         }
         if (mScreenWidth != 0 && mScreenHeight != 0) {
-            sb.append(String.format("-%dx%d", mScreenWidth, mScreenHeight));
+            sb.append('-').append(mScreenWidth).append('x').append(mScreenHeight);
         }
         if (mSdkVersion != 0 && mSdkVersion >= getNaturalSdkVersionRequirement()) {
             sb.append("-v").append(mSdkVersion);
