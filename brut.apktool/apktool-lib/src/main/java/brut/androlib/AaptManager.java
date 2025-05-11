@@ -14,9 +14,13 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.util;
+package brut.androlib;
 
+import brut.androlib.exceptions.AndrolibException;
 import brut.common.BrutException;
+import brut.util.Jar;
+import brut.util.OS;
+import brut.util.OSDetection;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -37,11 +41,12 @@ public final class AaptManager {
         }
     }
 
-    public static File getAaptBinary(int version) throws BrutException {
+    public static File getAaptBinary(int version) throws AndrolibException {
         String aaptName = getAaptName(version);
 
         if (!OSDetection.is64Bit() && OSDetection.isMacOSX()) {
-            throw new BrutException(aaptName + " binary is not available for 32-bit platform: " + OSDetection.returnOS());
+            throw new AndrolibException(
+                aaptName + " binary is not available for 32-bit platform: " + OSDetection.returnOS());
         }
 
         StringBuilder aaptPath = new StringBuilder("/prebuilt/");
@@ -52,7 +57,7 @@ public final class AaptManager {
         } else if (OSDetection.isWindows()) {
             aaptPath.append("windows");
         } else {
-            throw new BrutException("Could not identify platform: " + OSDetection.returnOS());
+            throw new AndrolibException("Could not identify platform: " + OSDetection.returnOS());
         }
         aaptPath.append("/");
         aaptPath.append(aaptName);
@@ -63,12 +68,17 @@ public final class AaptManager {
             aaptPath.append(".exe");
         }
 
-        File aaptBinary = Jar.getResourceAsFile(AaptManager.class, aaptPath.toString());
+        File aaptBinary;
+        try {
+            aaptBinary = Jar.getResourceAsFile(AaptManager.class, aaptPath.toString());
+        } catch (BrutException ex) {
+            throw new AndrolibException(ex);
+        }
         setAaptBinaryExecutable(aaptBinary);
         return aaptBinary;
     }
 
-    public static int getAaptVersion(File aaptBinary) throws BrutException {
+    public static int getAaptVersion(File aaptBinary) throws AndrolibException {
         setAaptBinaryExecutable(aaptBinary);
 
         List<String> cmd = new ArrayList<>();
@@ -77,13 +87,13 @@ public final class AaptManager {
 
         String versionStr = OS.execAndReturn(cmd.toArray(new String[0]));
         if (versionStr == null) {
-            throw new BrutException("Could not execute aapt binary at location: " + aaptBinary.getPath());
+            throw new AndrolibException("Could not execute aapt binary at location: " + aaptBinary.getPath());
         }
 
         return getAaptVersionFromString(versionStr);
     }
 
-    public static int getAaptVersionFromString(String versionStr) throws BrutException {
+    public static int getAaptVersionFromString(String versionStr) throws AndrolibException {
         if (versionStr.startsWith("Android Asset Packaging Tool (aapt) 2:")) {
             return 2;
         } else if (versionStr.startsWith("Android Asset Packaging Tool (aapt) 2.")) {
@@ -92,15 +102,15 @@ public final class AaptManager {
             return 1;
         }
 
-        throw new BrutException("aapt version could not be identified: " + versionStr);
+        throw new AndrolibException("aapt version could not be identified: " + versionStr);
     }
 
-    private static void setAaptBinaryExecutable(File aaptBinary) throws BrutException {
+    private static void setAaptBinaryExecutable(File aaptBinary) throws AndrolibException {
         if (!aaptBinary.isFile() || !aaptBinary.canRead()) {
-            throw new BrutException("Could not read aapt binary: " + aaptBinary.getPath());
+            throw new AndrolibException("Could not read aapt binary: " + aaptBinary.getPath());
         }
         if (!aaptBinary.setExecutable(true)) {
-            throw new BrutException("Could not set aapt binary as executable: " + aaptBinary.getPath());
+            throw new AndrolibException("Could not set aapt binary as executable: " + aaptBinary.getPath());
         }
     }
 }

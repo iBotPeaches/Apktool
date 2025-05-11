@@ -14,11 +14,10 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib.util;
+package brut.androlib;
 
 import brut.androlib.BaseTest;
-import brut.common.BrutException;
-import brut.util.AaptManager;
+import brut.androlib.exceptions.AndrolibException;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -26,7 +25,7 @@ import static org.junit.Assert.*;
 public class AaptVersionTest extends BaseTest {
 
     @Test
-    public void testAapt2Iterations() throws BrutException {
+    public void testAapt2Iterations() throws AndrolibException {
         assertEquals(2, AaptManager.getAaptVersionFromString("Android Asset Packaging Tool (aapt) 2:17"));
         assertEquals(2, AaptManager.getAaptVersionFromString("Android Asset Packaging Tool (aapt) 2.17"));
         assertEquals(1, AaptManager.getAaptVersionFromString("Android Asset Packaging Tool, v0.9"));

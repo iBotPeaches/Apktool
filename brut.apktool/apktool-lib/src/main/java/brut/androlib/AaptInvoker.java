@@ -19,7 +19,6 @@ package brut.androlib;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.meta.ApkInfo;
 import brut.common.BrutException;
-import brut.util.AaptManager;
 import brut.util.OS;
 
 import java.io.*;
@@ -50,7 +49,7 @@ public class AaptInvoker {
             try {
                 aaptPath = AaptManager.getAaptBinary(mConfig.getAaptVersion()).getPath();
                 customAapt = false;
-            } catch (BrutException ex) {
+            } catch (AndrolibException ex) {
                 aaptPath = AaptManager.getAaptName(mConfig.getAaptVersion());
                 customAapt = true;
                 LOGGER.warning(aaptPath + ": " + ex.getMessage() + " (defaulting to $PATH binary)");

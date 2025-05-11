@@ -14,12 +14,10 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib.meta;
-
-import brut.androlib.exceptions.AndrolibException;
+package brut.yaml;
 
 public interface YamlSerializable {
-    void readItem(YamlReader reader) throws AndrolibException;
+    void readItem(YamlReader reader);
 
     void write(YamlWriter writer);
 }

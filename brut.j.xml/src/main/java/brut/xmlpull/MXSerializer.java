@@ -18,8 +18,13 @@ package brut.xmlpull;
 
 import org.xmlpull.v1.XmlSerializer;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * Implementation of XmlSerializer interface from XmlPull V1 API. This

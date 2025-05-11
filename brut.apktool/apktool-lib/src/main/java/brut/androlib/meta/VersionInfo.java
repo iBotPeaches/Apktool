@@ -16,6 +16,8 @@
  */
 package brut.androlib.meta;
 
+import brut.yaml.*;
+
 public class VersionInfo implements YamlSerializable {
     private String mVersionCode;
     private String mVersionName;

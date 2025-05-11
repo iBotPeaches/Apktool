@@ -16,6 +16,8 @@
  */
 package brut.androlib.meta;
 
+import brut.yaml.*;
+
 public class PackageInfo implements YamlSerializable {
     private String mForcedPackageId;
     private String mRenameManifestPackage;

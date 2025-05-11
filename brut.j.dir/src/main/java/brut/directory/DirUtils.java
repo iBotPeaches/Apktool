@@ -23,7 +23,8 @@ import brut.common.TraversalUnknownFileException;
 import brut.util.BrutIO;
 import brut.util.OS;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.util.logging.Logger;

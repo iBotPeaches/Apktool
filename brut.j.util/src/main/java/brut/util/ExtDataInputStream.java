@@ -77,25 +77,9 @@ public class ExtDataInputStream extends FilterInputStream implements ExtDataInpu
     }
 
     @Override
-    public void skipCheckByte(byte expected) throws IOException {
-        byte got = readByte();
-        if (got != expected) {
-            throw new IOException(String.format("Expected: 0x%08x, got: 0x%08x", expected, got));
-        }
-    }
-
-    @Override
     public void skipShort() throws IOException {
         //noinspection ResultOfMethodCallIgnored
         readShort();
-    }
-
-    @Override
-    public void skipCheckShort(short expected) throws IOException {
-        short got = readShort();
-        if (got != expected) {
-            throw new IOException(String.format("Expected: 0x%08x, got: 0x%08x", expected, got));
-        }
     }
 
     @Override

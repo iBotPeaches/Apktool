@@ -21,33 +21,34 @@ import brut.util.ExtDataInput;
 import java.io.IOException;
 
 public class NinePatchData {
-    public final int padLeft, padRight, padTop, padBottom;
+    public final int paddingLeft, paddingRight, paddingTop, paddingBottom;
     public final int[] xDivs, yDivs;
 
-    public NinePatchData(int padLeft, int padRight, int padTop, int padBottom, int[] xDivs, int[] yDivs) {
-        this.padLeft = padLeft;
-        this.padRight = padRight;
-        this.padTop = padTop;
-        this.padBottom = padBottom;
+    public NinePatchData(int paddingLeft, int paddingRight, int paddingTop, int paddingBottom,
+                         int[] xDivs, int[] yDivs) {
+        this.paddingLeft = paddingLeft;
+        this.paddingRight = paddingRight;
+        this.paddingTop = paddingTop;
+        this.paddingBottom = paddingBottom;
         this.xDivs = xDivs;
         this.yDivs = yDivs;
     }
 
     public static NinePatchData decode(ExtDataInput in) throws IOException {
         in.skipByte(); // wasDeserialized
-        byte numXDivs = in.readByte();
-        byte numYDivs = in.readByte();
+        int numXDivs = in.readUnsignedByte();
+        int numYDivs = in.readUnsignedByte();
         in.skipByte(); // numColors
         in.skipInt(); // xDivsOffset
         in.skipInt(); // yDivsOffset
-        int padLeft = in.readInt();
-        int padRight = in.readInt();
-        int padTop = in.readInt();
-        int padBottom = in.readInt();
+        int paddingLeft = in.readInt();
+        int paddingRight = in.readInt();
+        int paddingTop = in.readInt();
+        int paddingBottom = in.readInt();
         in.skipInt(); // colorsOffset
         int[] xDivs = in.readIntArray(numXDivs);
         int[] yDivs = in.readIntArray(numYDivs);
 
-        return new NinePatchData(padLeft, padRight, padTop, padBottom, xDivs, yDivs);
+        return new NinePatchData(paddingLeft, paddingRight, paddingTop, paddingBottom, xDivs, yDivs);
     }
 }

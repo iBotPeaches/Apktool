@@ -14,11 +14,19 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib.meta;
+package brut.yaml;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.Closeable;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public class YamlWriter implements Closeable {
     private static final String QUOTE = "'";

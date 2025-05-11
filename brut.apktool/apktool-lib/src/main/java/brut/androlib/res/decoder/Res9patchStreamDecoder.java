@@ -68,8 +68,8 @@ public class Res9patchStreamDecoder implements ResStreamDecoder {
             }
 
             NinePatchData np = getNinePatch(data);
-            drawHLine(im2, h + 1, np.padLeft + 1, w - np.padRight);
-            drawVLine(im2, w + 1, np.padTop + 1, h - np.padBottom);
+            drawHLine(im2, h + 1, np.paddingLeft + 1, w - np.paddingRight);
+            drawVLine(im2, w + 1, np.paddingTop + 1, h - np.paddingBottom);
 
             int[] xDivs = np.xDivs;
             if (xDivs.length == 0) {

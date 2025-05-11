@@ -17,6 +17,7 @@
 package brut.androlib.meta;
 
 import brut.androlib.BaseTest;
+import brut.yaml.YamlLine;
 
 import org.junit.*;
 import static org.junit.Assert.*;

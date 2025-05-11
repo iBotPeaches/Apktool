@@ -17,6 +17,7 @@
 package brut.androlib.meta;
 
 import brut.androlib.res.data.ResConfigFlags;
+import brut.yaml.*;
 
 public class SdkInfo implements YamlSerializable {
     private String mMinSdkVersion;

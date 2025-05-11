@@ -20,6 +20,7 @@ import brut.androlib.ApktoolProperties;
 import brut.androlib.exceptions.AndrolibException;
 import brut.directory.DirectoryException;
 import brut.directory.ExtFile;
+import brut.yaml.*;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -71,7 +72,7 @@ public class ApkInfo implements YamlSerializable {
         setApkFile(apkFile);
     }
 
-    public static ApkInfo load(InputStream in) throws AndrolibException {
+    public static ApkInfo load(InputStream in) {
         YamlReader reader = new YamlReader(in);
         ApkInfo apkInfo = new ApkInfo();
         reader.readRoot(apkInfo);
@@ -99,7 +100,7 @@ public class ApkInfo implements YamlSerializable {
     }
 
     @Override
-    public void readItem(YamlReader reader) throws AndrolibException {
+    public void readItem(YamlReader reader) {
         YamlLine line = reader.getLine();
         switch (line.getKey()) {
             case "version": {

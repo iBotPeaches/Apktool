@@ -17,8 +17,6 @@
 package brut.androlib;
 
 import brut.androlib.exceptions.AndrolibException;
-import brut.common.BrutException;
-import brut.util.AaptManager;
 import brut.util.OSDetection;
 
 import java.io.File;
@@ -360,12 +358,8 @@ public final class Config {
     }
 
     public void setAaptBinary(File aaptBinary) throws AndrolibException {
-        try {
-            mAaptBinary = aaptBinary;
-            mAaptVersion = AaptManager.getAaptVersion(aaptBinary);
-        } catch (BrutException ex) {
-            throw new AndrolibException(ex);
-        }
+        mAaptBinary = aaptBinary;
+        mAaptVersion = AaptManager.getAaptVersion(aaptBinary);
     }
 
     public int getAaptVersion() {

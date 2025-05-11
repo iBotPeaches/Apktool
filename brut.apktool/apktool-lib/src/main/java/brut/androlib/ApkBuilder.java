@@ -32,7 +32,7 @@ import brut.directory.Directory;
 import brut.directory.DirectoryException;
 import brut.directory.ExtFile;
 import brut.directory.ZipUtils;
-import brut.util.AaptManager;
+import brut.util.BackgroundWorker;
 import brut.util.BrutIO;
 import brut.util.OS;
 

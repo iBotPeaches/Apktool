@@ -14,15 +14,16 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib.meta;
-
-import brut.androlib.exceptions.AndrolibException;
+package brut.yaml;
 
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
 
 public class YamlReader {
-    private ArrayList<YamlLine> mLines;
+    private List<YamlLine> mLines;
     private int mCurrent;
 
     public YamlReader(InputStream in) {
@@ -88,18 +89,18 @@ public class YamlReader {
         }
     }
 
-    interface Checker {
+    protected interface Checker {
         boolean check(YamlLine line);
     }
 
-    interface Updater<T> {
-        void update(T items, YamlReader reader) throws AndrolibException;
+    protected interface Updater<T> {
+        void update(T items, YamlReader reader);
     }
 
     /**
     * Read root object from start to end
     */
-    public <T extends YamlSerializable> void readRoot(T obj) throws AndrolibException {
+    public <T extends YamlSerializable> void readRoot(T obj) {
         if (isEnd()) {
             return;
         }
@@ -125,9 +126,7 @@ public class YamlReader {
      * The object data should be placed on the next line
      * and have indent.
      */
-    public <T> void readObject(T obj,
-                            Checker check,
-                            Updater<T> updater) throws AndrolibException {
+    protected <T> void readObject(T obj, Checker check, Updater<T> updater) {
         if (isEnd()) {
             return;
         }
@@ -156,10 +155,8 @@ public class YamlReader {
         }
     }
 
-    <T extends YamlSerializable> void readObject(T obj) throws AndrolibException {
-        readObject(obj,
-            line -> line.hasColon,
-            YamlSerializable::readItem);
+    public <T extends YamlSerializable> void readObject(T obj) {
+        readObject(obj, line -> line.hasColon, YamlSerializable::readItem);
     }
 
     /**
@@ -167,8 +164,7 @@ public class YamlReader {
      * The list data should be placed on the next line.
      * Data should have same indent. May by same with name.
      */
-    public <T> void readList(List<T> list,
-                                Updater<List<T>> updater) throws AndrolibException {
+    protected <T> void readList(List<T> list, Updater<List<T>> updater) {
         if (isEnd()) {
             return;
         }
@@ -194,26 +190,24 @@ public class YamlReader {
         }
     }
 
-    public void readStringList(List<String> list) throws AndrolibException {
+    public void readStringList(List<String> list) {
         readList(list, (items, reader) -> items.add(reader.getLine().getValue()));
     }
 
-    public void readIntList(List<Integer> list) throws AndrolibException {
+    public void readIntList(List<Integer> list) {
         readList(list, (items, reader) -> items.add(reader.getLine().getValueInt()));
     }
 
-    public void readStringMap(Map<String, String> map) throws AndrolibException {
-        readObject(map,
-            line -> line.hasColon,
+    public void readStringMap(Map<String, String> map) {
+        readObject(map, line -> line.hasColon,
             (items, reader) -> {
                 YamlLine line = reader.getLine();
                 items.put(line.getKey(), line.getValue());
             });
     }
 
-    public void readBoolMap(Map<String, Boolean> map) throws AndrolibException {
-        readObject(map,
-            line -> line.hasColon,
+    public void readBoolMap(Map<String, Boolean> map) {
+        readObject(map, line -> line.hasColon,
             (items, reader) -> {
                 YamlLine line = reader.getLine();
                 items.put(line.getKey(), line.getValueBool());

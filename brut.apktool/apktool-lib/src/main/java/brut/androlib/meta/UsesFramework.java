@@ -16,7 +16,7 @@
  */
 package brut.androlib.meta;
 
-import brut.androlib.exceptions.AndrolibException;
+import brut.yaml.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +40,7 @@ public class UsesFramework implements YamlSerializable {
     }
 
     @Override
-    public void readItem(YamlReader reader) throws AndrolibException {
+    public void readItem(YamlReader reader) {
         YamlLine line = reader.getLine();
         switch (line.getKey()) {
             case "ids": {

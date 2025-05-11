@@ -34,13 +34,13 @@ import java.util.logging.Logger;
 public class ARSCDecoder {
     private static final Logger LOGGER = Logger.getLogger(ARSCDecoder.class.getName());
 
-    private static final short ENTRY_FLAG_COMPLEX = 0x0001;
-    private static final short ENTRY_FLAG_PUBLIC = 0x0002;
-    private static final short ENTRY_FLAG_WEAK = 0x0004;
-    private static final short ENTRY_FLAG_COMPACT = 0x0008;
+    private static final int ENTRY_FLAG_COMPLEX = 0x0001;
+    private static final int ENTRY_FLAG_PUBLIC = 0x0002;
+    private static final int ENTRY_FLAG_WEAK = 0x0004;
+    private static final int ENTRY_FLAG_COMPACT = 0x0008;
 
-    private static final short TABLE_TYPE_FLAG_SPARSE = 0x01;
-    private static final short TABLE_TYPE_FLAG_OFFSET16 = 0x02;
+    private static final int TABLE_TYPE_FLAG_SPARSE = 0x01;
+    private static final int TABLE_TYPE_FLAG_OFFSET16 = 0x02;
 
     private static final int KNOWN_CONFIG_BYTES = 64;
 
@@ -154,6 +154,7 @@ public class ARSCDecoder {
 
     private void readStringPoolChunk() throws AndrolibException, IOException {
         checkChunkType(ARSCHeader.RES_STRING_POOL_TYPE);
+
         mTableStrings = StringBlock.readWithoutChunk(mIn, mHeader.startPosition, mHeader.headerSize, mHeader.chunkSize);
     }
 
@@ -294,7 +295,7 @@ public class ARSCDecoder {
         }
         mResId = (mResId & 0xFF000000) | mTypeSpec.getId() << 16;
 
-        int typeFlags = mIn.readByte();
+        int typeFlags = mIn.readUnsignedByte();
         mIn.skipShort(); // reserved
         int entryCount = mIn.readInt();
         int entriesStart = mIn.readInt();
@@ -383,7 +384,7 @@ public class ARSCDecoder {
 
     private EntryData readEntryData() throws AndrolibException, IOException {
         int size = mIn.readUnsignedShort();
-        short flags = mIn.readShort();
+        int flags = mIn.readUnsignedShort();
 
         boolean isComplex = (flags & ENTRY_FLAG_COMPLEX) != 0;
         boolean isCompact = (flags & ENTRY_FLAG_COMPACT) != 0;
@@ -402,7 +403,7 @@ public class ARSCDecoder {
         // We assume a size of 8 bytes for compact entries and the specNamesId is the data itself encoded.
         ResValue value;
         if (isCompact) {
-            byte type = (byte) ((flags >> 8) & 0xFF);
+            int type = (flags >> 8) & 0xFF;
             value = readCompactValue(type, specNamesId);
 
             // To keep code below happy - we know if compact then the size has the key index encoded.
@@ -488,20 +489,20 @@ public class ARSCDecoder {
         return factory.bagFactory(parentId, items, mTypeSpec);
     }
 
-    private ResIntBasedValue readCompactValue(byte type, int data) throws AndrolibException {
+    private ResIntBasedValue readCompactValue(int type, int data) throws AndrolibException {
         return type == TypedValue.TYPE_STRING
             ? mPackage.getValueFactory().factory(mTableStrings.getHTML(data), data)
             : mPackage.getValueFactory().factory(type, data, null);
     }
 
     private ResIntBasedValue readValue() throws AndrolibException, IOException {
-        short size = mIn.readShort();
+        int size = mIn.readUnsignedShort();
         if (size < 8) {
             return null;
         }
 
-        mIn.skipCheckByte((byte) 0); // zero
-        byte type = mIn.readByte();
+        mIn.skipByte(); // reserved0
+        int type = mIn.readUnsignedByte();
         int data = mIn.readInt();
 
         return type == TypedValue.TYPE_STRING

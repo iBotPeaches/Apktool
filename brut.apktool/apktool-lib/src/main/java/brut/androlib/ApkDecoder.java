@@ -26,6 +26,7 @@ import brut.common.BrutException;
 import brut.directory.Directory;
 import brut.directory.DirectoryException;
 import brut.directory.ExtFile;
+import brut.util.BackgroundWorker;
 import brut.util.OS;
 import com.android.tools.smali.dexlib2.iface.DexFile;
 import org.apache.commons.io.FilenameUtils;

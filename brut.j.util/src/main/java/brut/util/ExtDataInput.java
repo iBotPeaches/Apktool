@@ -24,11 +24,7 @@ public interface ExtDataInput extends DataInput {
 
     public void skipByte() throws IOException;
 
-    public void skipCheckByte(byte expected) throws IOException;
-
     public void skipShort() throws IOException;
-
-    public void skipCheckShort(short expected) throws IOException;
 
     public void skipInt() throws IOException;
 
