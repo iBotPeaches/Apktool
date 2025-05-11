@@ -327,6 +327,7 @@ public class ApkBuilder {
             }
 
             File netSecConfOrig = new File(mApkDir, "res/xml/network_security_config.xml");
+            OS.mkdir(netSecConfOrig.getParentFile());
             ResXmlUtils.modNetworkSecurityConfig(netSecConfOrig);
             ResXmlUtils.setNetworkSecurityConfig(manifest);
             LOGGER.info("Added permissive network security config in manifest");

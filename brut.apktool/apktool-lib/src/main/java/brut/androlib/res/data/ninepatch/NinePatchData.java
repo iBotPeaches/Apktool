@@ -34,16 +34,17 @@ public class NinePatchData {
     }
 
     public static NinePatchData decode(ExtDataInput in) throws IOException {
-        in.skipBytes(1); // wasDeserialized
+        in.skipByte(); // wasDeserialized
         byte numXDivs = in.readByte();
         byte numYDivs = in.readByte();
-        in.skipBytes(1); // numColors
-        in.skipBytes(8); // xDivs/yDivs offset
+        in.skipByte(); // numColors
+        in.skipInt(); // xDivsOffset
+        in.skipInt(); // yDivsOffset
         int padLeft = in.readInt();
         int padRight = in.readInt();
         int padTop = in.readInt();
         int padBottom = in.readInt();
-        in.skipBytes(4); // colorsOffset
+        in.skipInt(); // colorsOffset
         int[] xDivs = in.readIntArray(numXDivs);
         int[] yDivs = in.readIntArray(numYDivs);
 

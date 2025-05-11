@@ -71,15 +71,23 @@ public class ExtDataInputStream extends FilterInputStream implements ExtDataInpu
     }
 
     @Override
-    public void skipShort() throws IOException {
+    public void skipByte() throws IOException {
         //noinspection ResultOfMethodCallIgnored
-        readShort();
+        readByte();
     }
 
     @Override
-    public void skipInt() throws IOException {
+    public void skipCheckByte(byte expected) throws IOException {
+        byte got = readByte();
+        if (got != expected) {
+            throw new IOException(String.format("Expected: 0x%08x, got: 0x%08x", expected, got));
+        }
+    }
+
+    @Override
+    public void skipShort() throws IOException {
         //noinspection ResultOfMethodCallIgnored
-        readInt();
+        readShort();
     }
 
     @Override
@@ -91,11 +99,16 @@ public class ExtDataInputStream extends FilterInputStream implements ExtDataInpu
     }
 
     @Override
-    public void skipCheckByte(byte expected) throws IOException {
-        byte got = readByte();
-        if (got != expected) {
-            throw new IOException(String.format("Expected: 0x%08x, got: 0x%08x", expected, got));
-        }
+    public void skipInt() throws IOException {
+        //noinspection ResultOfMethodCallIgnored
+        readInt();
+    }
+
+    @Override
+    public byte[] readBytes(int len) throws IOException {
+        byte[] buf = new byte[len];
+        readFully(buf);
+        return buf;
     }
 
     @Override
@@ -125,19 +138,37 @@ public class ExtDataInputStream extends FilterInputStream implements ExtDataInpu
     }
 
     @Override
-    public String readNullEndedString(int len, boolean fixed) throws IOException {
-        StringBuilder str = new StringBuilder(16);
-        while (len-- != 0) {
-            short ch = readShort();
+    public String readAscii(int len) throws IOException {
+        char[] buf = new char[len];
+        int pos = 0;
+        while (len-- > 0) {
+            char ch = (char) readUnsignedByte();
             if (ch == 0) {
                 break;
             }
-            str.append((char) ch);
+            buf[pos++] = ch;
         }
-        if (fixed) {
+        if (len > 0) {
+            skipBytes(len);
+        }
+        return new String(buf, 0, pos);
+    }
+
+    @Override
+    public String readUtf16(int len) throws IOException {
+        char[] buf = new char[len];
+        int pos = 0;
+        while (len-- > 0) {
+            char ch = readChar();
+            if (ch == 0) {
+                break;
+            }
+            buf[pos++] = ch;
+        }
+        if (len > 0) {
             skipBytes(len * 2);
         }
-        return str.toString();
+        return new String(buf, 0, pos);
     }
 
     // DataInput

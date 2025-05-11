@@ -32,16 +32,7 @@ public class ARSCHeader {
     public static final short RES_TABLE_TYPE = 0x0002;
     public static final short RES_XML_TYPE = 0x0003;
 
-    // RES_TABLE_TYPE Chunks
-    public static final short XML_TYPE_PACKAGE = 0x0200;
-    public static final short XML_TYPE_TYPE = 0x0201;
-    public static final short XML_TYPE_SPEC_TYPE = 0x0202;
-    public static final short XML_TYPE_LIBRARY = 0x0203;
-    public static final short XML_TYPE_OVERLAY = 0x0204;
-    public static final short XML_TYPE_OVERLAY_POLICY = 0x0205;
-    public static final short XML_TYPE_STAGED_ALIAS = 0x0206;
-
-    // RES_XML_TYPE Chunks
+    // RES_XML_TYPE chunks types
     public static final short RES_XML_FIRST_CHUNK_TYPE = 0x0100;
     public static final short RES_XML_START_NAMESPACE_TYPE = 0x0100;
     public static final short RES_XML_END_NAMESPACE_TYPE = 0x0101;
@@ -50,6 +41,15 @@ public class ARSCHeader {
     public static final short RES_XML_CDATA_TYPE = 0x0104;
     public static final short RES_XML_LAST_CHUNK_TYPE = 0x017F;
     public static final short RES_XML_RESOURCE_MAP_TYPE = 0x0180;
+
+    // RES_TABLE_TYPE chunks types
+    public static final short RES_TABLE_PACKAGE_TYPE = 0x0200;
+    public static final short RES_TABLE_TYPE_TYPE = 0x0201;
+    public static final short RES_TABLE_TYPE_SPEC_TYPE = 0x0202;
+    public static final short RES_TABLE_LIBRARY_TYPE = 0x0203;
+    public static final short RES_TABLE_OVERLAYABLE_TYPE = 0x0204;
+    public static final short RES_TABLE_OVERLAYABLE_POLICY_TYPE = 0x0205;
+    public static final short RES_TABLE_STAGED_ALIAS_TYPE = 0x0206;
 
     public final short type;
     public final int headerSize;

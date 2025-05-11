@@ -834,12 +834,12 @@ public class AXmlResourceParser implements XmlResourceParser {
                 mStyleIndex = mIn.readShort();
                 mAttributes = mIn.readIntArray(attributeCount * ATTRIBUTE_LENGTH);
                 for (int i = ATTRIBUTE_IX_VALUE_TYPE; i < mAttributes.length; ) {
-                    mAttributes[i] = (mAttributes[i] >>> 24);
+                    mAttributes[i] >>>= 24;
                     i += ATTRIBUTE_LENGTH;
                 }
 
-                int byteAttrSizeRead = (attributeCount * ATTRIBUTE_LENGTH) * 4;
-                int byteAttrSizeReported = (attributeSize * attributeCount);
+                int byteAttrSizeRead = attributeCount * ATTRIBUTE_LENGTH * 4;
+                int byteAttrSizeReported = attributeSize * attributeCount;
 
                 // Check for misleading chunk sizes
                 if (byteAttrSizeRead < byteAttrSizeReported) {

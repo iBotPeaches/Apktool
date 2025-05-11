@@ -222,24 +222,24 @@ public class BuildAndDecodeApkTest extends BaseTest {
 
     @Test
     public void qualifiersTest() throws BrutException {
-        compareValuesFiles("values-mcc004-mnc4-en-rUS-ldrtl-sw100dp-w200dp-h300dp"
+        compareValuesFiles("values-mcc004-mnc04-en-rUS-ldrtl-sw100dp-w200dp-h300dp"
                 + "-long-round-highdr-land-desk-night-xhdpi-finger-keyssoft-12key"
                 + "-navhidden-dpad-v26/strings.xml");
     }
 
     @Test
     public void shortendedMncTest() throws BrutException {
-        compareValuesFiles("values-mcc001-mnc1/strings.xml");
+        compareValuesFiles("values-mcc001-mnc01/strings.xml");
     }
 
     @Test
     public void shortMncHtcTest() throws BrutException {
-        compareValuesFiles("values-mnc1/strings.xml");
+        compareValuesFiles("values-mnc01/strings.xml");
     }
 
     @Test
     public void shortMncv2Test() throws BrutException {
-        compareValuesFiles("values-mcc238-mnc6/strings.xml");
+        compareValuesFiles("values-mcc238-mnc06/strings.xml");
     }
 
     @Test
@@ -299,7 +299,7 @@ public class BuildAndDecodeApkTest extends BaseTest {
 
     @Test
     public void variantBcp47Test() throws BrutException {
-        compareValuesFiles("values-b+en+US+POSIX/strings.xml");
+        compareValuesFiles("values-b+en+US+posix/strings.xml");
     }
 
     @Test
@@ -309,8 +309,8 @@ public class BuildAndDecodeApkTest extends BaseTest {
 
     @Test
     public void valuesBcp47LanguageScriptRegionVariantTest() throws BrutException {
-        compareValuesFiles("values-b+ast+Latn+IT+AREVELA/strings.xml");
-        compareValuesFiles("values-b+ast+Hant+IT+ARABEXT/strings.xml");
+        compareValuesFiles("values-b+ast+Latn+IT+arevela/strings.xml");
+        compareValuesFiles("values-b+ast+Hant+IT+arabext/strings.xml");
     }
 
     @Test

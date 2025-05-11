@@ -261,7 +261,7 @@ public class StringBlock {
     }
 
     private static int getShort(byte[] array, int offset) {
-        return (array[offset + 1] & 0xFF) << 8 | array[offset] & 0xFF;
+        return ((array[offset + 1] & 0xFF) << 8) | (array[offset] & 0xFF);
     }
 
     private static int[] getUtf8(byte[] array, int offset) {
@@ -287,12 +287,12 @@ public class StringBlock {
     }
 
     private static int[] getUtf16(byte[] array, int offset) {
-        int val = (array[offset + 1] & 0xFF) << 8 | array[offset] & 0xFF;
+        int val = ((array[offset + 1] & 0xFF) << 8) | (array[offset] & 0xFF);
 
         if ((val & 0x8000) != 0) {
             int high = (array[offset + 3] & 0xFF) << 8;
-            int low = (array[offset + 2] & 0xFF);
-            int len_value = ((val & 0x7FFF) << 16) + (high + low);
+            int low = array[offset + 2] & 0xFF;
+            int len_value = ((val & 0x7FFF) << 16) + high + low;
             return new int[] { 4, len_value * 2 };
 
         }

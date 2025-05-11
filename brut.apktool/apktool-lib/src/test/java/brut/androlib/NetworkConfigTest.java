@@ -32,19 +32,19 @@ public class NetworkConfigTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        sTestOrigDir = new ExtFile(sTmpDir, "testapp-orig");
-        sTestNewDir = new ExtFile(sTmpDir, "testapp-new");
+        sTestOrigDir = new ExtFile(sTmpDir, "network_config-orig");
+        sTestNewDir = new ExtFile(sTmpDir, "network_config-new");
 
-        LOGGER.info("Unpacking testapp...");
-        TestUtils.copyResourceDir(NetworkConfigTest.class, "network_config", sTestOrigDir);
+        LOGGER.info("Unpacking network_config...");
+        TestUtils.copyResourceDir(NetworkConfigTest.class, "network_config/existing", sTestOrigDir);
 
         sConfig.setNetSecConf(true);
 
-        LOGGER.info("Building testapp.apk...");
-        ExtFile testApk = new ExtFile(sTmpDir, "testapp.apk");
+        LOGGER.info("Building network_config.apk...");
+        ExtFile testApk = new ExtFile(sTmpDir, "network_config.apk");
         new ApkBuilder(sTestOrigDir, sConfig).build(testApk);
 
-        LOGGER.info("Decoding testapp.apk...");
+        LOGGER.info("Decoding network_config.apk...");
         new ApkDecoder(testApk, sConfig).decode(sTestNewDir);
     }
 

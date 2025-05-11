@@ -22,17 +22,23 @@ import java.io.IOException;
 public interface ExtDataInput extends DataInput {
     public long position();
 
-    public void skipShort() throws IOException;
+    public void skipByte() throws IOException;
 
-    public void skipInt() throws IOException;
+    public void skipCheckByte(byte expected) throws IOException;
+
+    public void skipShort() throws IOException;
 
     public void skipCheckShort(short expected) throws IOException;
 
-    public void skipCheckByte(byte expected) throws IOException;
+    public void skipInt() throws IOException;
+
+    public byte[] readBytes(int len) throws IOException;
 
     public int[] readIntArray(int len) throws IOException;
 
     public int[] readSafeIntArray(int len, long maxPosition) throws IOException;
 
-    public String readNullEndedString(int len, boolean fixed) throws IOException;
+    public String readAscii(int len) throws IOException;
+
+    public String readUtf16(int len) throws IOException;
 }
