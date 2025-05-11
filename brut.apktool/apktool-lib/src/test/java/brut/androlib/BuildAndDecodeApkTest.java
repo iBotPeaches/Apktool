@@ -190,8 +190,9 @@ public class BuildAndDecodeApkTest extends BaseTest {
 
         // long_string_32767 should be exactly 0x7FFF chars of "a",
         // which is the longest allowed length for UTF-8 strings.
-        // the valuesExtraLongTest() should handle this
-        // but such an edge case, want a specific test
+        // String longer than that is replaced with "STRING_TOO_LARGE".
+        // valuesExtraLongTest covers this scenario, but we want a specific test
+        // for such an edge case.
         String expression = "/resources/string[@name='long_string_32767']/text()";
         String str = evaluateXPath(doc, expression, String.class);
         assertEquals(0x7FFF, str.length());
