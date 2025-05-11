@@ -163,7 +163,7 @@ public class ApkInfo implements YamlSerializable {
         writer.writeString("apkFileName", mApkFileName);
         if (!mUsesFramework.isEmpty()) {
             writer.writeObject("usesFramework", mUsesFramework);
-        };
+        }
         if (!mUsesLibrary.isEmpty()) {
             writer.writeList("usesLibrary", mUsesLibrary);
         }
