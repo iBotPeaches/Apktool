@@ -497,11 +497,11 @@ public class ResConfigFlags {
             case DENSITY_MEDIUM:
                 sb.append("-mdpi");
                 break;
-            case DENSITY_HIGH:
-                sb.append("-hdpi");
-                break;
             case DENSITY_TV:
                 sb.append("-tvdpi");
+                break;
+            case DENSITY_HIGH:
+                sb.append("-hdpi");
                 break;
             case DENSITY_XHIGH:
                 sb.append("-xhdpi");
