@@ -275,7 +275,7 @@ public class ResConfigFlags {
         if (!mLanguage.isEmpty()) {
             if (mLocaleScript.isEmpty() && (mRegion.isEmpty() || mRegion.length() == 2)
                     && mLocaleVariant.isEmpty()/* && mLocaleNumberingSystem.isEmpty()*/) {
-                // legacy BCP 47 format
+                // legacy format
                 sb.append("-").append(mLanguage);
                 if (!mRegion.isEmpty()) {
                     sb.append("-r").append(mRegion);
