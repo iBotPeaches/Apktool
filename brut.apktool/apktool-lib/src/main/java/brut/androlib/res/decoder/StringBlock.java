@@ -89,8 +89,7 @@ public class StringBlock {
             size = stylesOffset - stringsOffset;
         }
 
-        block.mStrings = new byte[size];
-        in.readFully(block.mStrings);
+        block.mStrings = in.readBytes(size);
 
         if (hasStyles) {
             size = chunkSize - stylesOffset;

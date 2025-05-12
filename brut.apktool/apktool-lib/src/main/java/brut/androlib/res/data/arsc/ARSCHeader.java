@@ -84,8 +84,7 @@ public class ARSCHeader {
         int actualHeaderSize = (int) (in.position() - startPosition);
         int exceedingSize = headerSize - actualHeaderSize;
         if (exceedingSize > 0) {
-            byte[] buf = new byte[exceedingSize];
-            in.readFully(buf);
+            byte[] buf = in.readBytes(exceedingSize);
             BigInteger exceedingBI = new BigInteger(1, buf);
 
             if (exceedingBI.equals(BigInteger.ZERO)) {
