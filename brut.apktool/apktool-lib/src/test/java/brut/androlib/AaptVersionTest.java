@@ -16,7 +16,6 @@
  */
 package brut.androlib;
 
-import brut.androlib.BaseTest;
 import brut.androlib.exceptions.AndrolibException;
 
 import org.junit.*;
