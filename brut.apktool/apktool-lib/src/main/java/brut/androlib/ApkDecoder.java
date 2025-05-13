@@ -116,8 +116,8 @@ public class ApkDecoder {
             case Config.DECODE_SOURCES_NONE:
                 copySourcesRaw(outDir, "classes.dex");
                 break;
-            case Config.DECODE_SOURCES_SMALI:
-            case Config.DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES:
+            case Config.DECODE_SOURCES_FULL:
+            case Config.DECODE_SOURCES_ONLY_MAIN_CLASSES:
                 decodeSourcesSmali(outDir, "classes.dex");
                 break;
         }
@@ -132,10 +132,10 @@ public class ApkDecoder {
                         case Config.DECODE_SOURCES_NONE:
                             copySourcesRaw(outDir, fileName);
                             break;
-                        case Config.DECODE_SOURCES_SMALI:
+                        case Config.DECODE_SOURCES_FULL:
                             decodeSourcesSmali(outDir, fileName);
                             break;
-                        case Config.DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES:
+                        case Config.DECODE_SOURCES_ONLY_MAIN_CLASSES:
                             if (fileName.startsWith("classes")) {
                                 decodeSourcesSmali(outDir, fileName);
                             } else {

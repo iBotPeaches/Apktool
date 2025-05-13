@@ -28,8 +28,8 @@ public final class Config {
     private static final Logger LOGGER = Logger.getLogger(Config.class.getName());
 
     public static final int DECODE_SOURCES_NONE = 0;
-    public static final int DECODE_SOURCES_SMALI = 1;
-    public static final int DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES = 2;
+    public static final int DECODE_SOURCES_FULL = 1;
+    public static final int DECODE_SOURCES_ONLY_MAIN_CLASSES = 2;
 
     public static final int DECODE_RESOURCES_NONE = 0;
     public static final int DECODE_RESOURCES_FULL = 1;
@@ -103,7 +103,7 @@ public final class Config {
         mNoCrunch = false;
         mNoApk = false;
 
-        mDecodeSources = DECODE_SOURCES_SMALI;
+        mDecodeSources = DECODE_SOURCES_FULL;
         mDecodeResources = DECODE_RESOURCES_FULL;
         mForceDecodeManifest = false;
         mDecodeAssets = DECODE_ASSETS_FULL;
@@ -205,8 +205,8 @@ public final class Config {
     public void setDecodeSources(int decodeSources) throws AndrolibException {
         switch (decodeSources) {
             case DECODE_SOURCES_NONE:
-            case DECODE_SOURCES_SMALI:
-            case DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES:
+            case DECODE_SOURCES_FULL:
+            case DECODE_SOURCES_ONLY_MAIN_CLASSES:
                 mDecodeSources = decodeSources;
                 break;
             default:

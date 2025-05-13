@@ -170,7 +170,7 @@ public class Main {
             if (cli.hasOption("s") || cli.hasOption("no-src")) {
                 System.err.println("--only-main-classes cannot be paired with -s/--no-src. Ignoring.");
             } else {
-                config.setDecodeSources(Config.DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES);
+                config.setDecodeSources(Config.DECODE_SOURCES_ONLY_MAIN_CLASSES);
             }
         }
         if (cli.hasOption("d") || cli.hasOption("debug")) {
