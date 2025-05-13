@@ -187,7 +187,7 @@ public class Main {
             config.setDecodeResources(Config.DECODE_RESOURCES_NONE);
         }
         if (cli.hasOption("force-manifest")) {
-            config.setForceDecodeManifest(Config.FORCE_DECODE_MANIFEST_FULL);
+            config.setForceDecodeManifest(true);
         }
         if (cli.hasOption("no-assets")) {
             config.setDecodeAssets(Config.DECODE_ASSETS_NONE);
@@ -210,15 +210,15 @@ public class Main {
             switch (mode) {
                 case "remove":
                 case "delete":
-                    config.setDecodeResolveMode(Config.DECODE_RES_RESOLVE_REMOVE);
+                    config.setDecodeResolve(Config.DECODE_RESOLVE_REMOVE);
                     break;
                 case "dummy":
                 case "dummies":
-                    config.setDecodeResolveMode(Config.DECODE_RES_RESOLVE_DUMMY);
+                    config.setDecodeResolve(Config.DECODE_RESOLVE_DUMMY);
                     break;
                 case "keep":
                 case "preserve":
-                    config.setDecodeResolveMode(Config.DECODE_RES_RESOLVE_RETAIN);
+                    config.setDecodeResolve(Config.DECODE_RESOLVE_RETAIN);
                     break;
                 default:
                     System.err.println("Unknown resolve resources mode: " + mode);

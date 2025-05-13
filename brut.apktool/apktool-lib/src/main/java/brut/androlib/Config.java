@@ -27,22 +27,19 @@ import java.util.logging.Logger;
 public final class Config {
     private static final Logger LOGGER = Logger.getLogger(Config.class.getName());
 
-    public static final short DECODE_SOURCES_NONE = 0x0000;
-    public static final short DECODE_SOURCES_SMALI = 0x0001;
-    public static final short DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES = 0x0010;
+    public static final int DECODE_SOURCES_NONE = 0;
+    public static final int DECODE_SOURCES_SMALI = 1;
+    public static final int DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES = 2;
 
-    public static final short DECODE_RESOURCES_NONE = 0x0100;
-    public static final short DECODE_RESOURCES_FULL = 0x0101;
+    public static final int DECODE_RESOURCES_NONE = 0;
+    public static final int DECODE_RESOURCES_FULL = 1;
 
-    public static final short FORCE_DECODE_MANIFEST_NONE = 0x0000;
-    public static final short FORCE_DECODE_MANIFEST_FULL = 0x0001;
+    public static final int DECODE_ASSETS_NONE = 0;
+    public static final int DECODE_ASSETS_FULL = 1;
 
-    public static final short DECODE_ASSETS_NONE = 0x0000;
-    public static final short DECODE_ASSETS_FULL = 0x0001;
-
-    public static final short DECODE_RES_RESOLVE_REMOVE = 0x0000;
-    public static final short DECODE_RES_RESOLVE_DUMMY = 0x0001;
-    public static final short DECODE_RES_RESOLVE_RETAIN = 0x0002;
+    public static final int DECODE_RESOLVE_REMOVE = 0;
+    public static final int DECODE_RESOLVE_DUMMY = 1;
+    public static final int DECODE_RESOLVE_RETAIN = 2;
 
     private static final String DEFAULT_FRAMEWORK_DIRECTORY;
 
@@ -76,11 +73,11 @@ public final class Config {
     private boolean mNoApk;
 
     // Decode options
-    private short mDecodeSources;
-    private short mDecodeResources;
-    private short mForceDecodeManifest;
-    private short mDecodeAssets;
-    private short mDecodeResolveMode;
+    private int mDecodeSources;
+    private int mDecodeResources;
+    private boolean mForceDecodeManifest;
+    private int mDecodeAssets;
+    private int mDecodeResolve;
     private int mApiLevel;
     private boolean mAnalysisMode;
     private boolean mForceDelete;
@@ -108,9 +105,9 @@ public final class Config {
 
         mDecodeSources = DECODE_SOURCES_SMALI;
         mDecodeResources = DECODE_RESOURCES_FULL;
-        mForceDecodeManifest = FORCE_DECODE_MANIFEST_NONE;
+        mForceDecodeManifest = false;
         mDecodeAssets = DECODE_ASSETS_FULL;
-        mDecodeResolveMode = DECODE_RES_RESOLVE_REMOVE;
+        mDecodeResolve = DECODE_RESOLVE_REMOVE;
         mApiLevel = 0;
         mAnalysisMode = false;
         mForceDelete = false;
@@ -201,11 +198,11 @@ public final class Config {
 
     // Decode options
 
-    public short getDecodeSources() {
+    public int getDecodeSources() {
         return mDecodeSources;
     }
 
-    public void setDecodeSources(short decodeSources) throws AndrolibException {
+    public void setDecodeSources(int decodeSources) throws AndrolibException {
         switch (decodeSources) {
             case DECODE_SOURCES_NONE:
             case DECODE_SOURCES_SMALI:
@@ -217,11 +214,11 @@ public final class Config {
         }
     }
 
-    public short getDecodeResources() {
+    public int getDecodeResources() {
         return mDecodeResources;
     }
 
-    public void setDecodeResources(short decodeResources) throws AndrolibException {
+    public void setDecodeResources(int decodeResources) throws AndrolibException {
         switch (decodeResources) {
             case DECODE_RESOURCES_NONE:
             case DECODE_RESOURCES_FULL:
@@ -232,26 +229,19 @@ public final class Config {
         }
     }
 
-    public short getForceDecodeManifest() {
+    public boolean isForceDecodeManifest() {
         return mForceDecodeManifest;
     }
 
-    public void setForceDecodeManifest(short forceDecodeManifest) throws AndrolibException {
-        switch (forceDecodeManifest) {
-            case FORCE_DECODE_MANIFEST_NONE:
-            case FORCE_DECODE_MANIFEST_FULL:
-                mForceDecodeManifest = forceDecodeManifest;
-                break;
-            default:
-                throw new AndrolibException("Invalid force decode manifest mode: " + forceDecodeManifest);
-        }
+    public void setForceDecodeManifest(boolean forceDecodeManifest) {
+        mForceDecodeManifest = forceDecodeManifest;
     }
 
-    public short getDecodeAssets() {
+    public int getDecodeAssets() {
         return mDecodeAssets;
     }
 
-    public void setDecodeAssets(short decodeAssets) throws AndrolibException {
+    public void setDecodeAssets(int decodeAssets) throws AndrolibException {
         switch (decodeAssets) {
             case DECODE_ASSETS_NONE:
             case DECODE_ASSETS_FULL:
@@ -262,19 +252,19 @@ public final class Config {
         }
     }
 
-    public short getDecodeResolveMode() {
-        return mDecodeResolveMode;
+    public int getDecodeResolve() {
+        return mDecodeResolve;
     }
 
-    public void setDecodeResolveMode(short decodeResolveMode) throws AndrolibException {
-        switch (decodeResolveMode) {
-            case DECODE_RES_RESOLVE_REMOVE:
-            case DECODE_RES_RESOLVE_DUMMY:
-            case DECODE_RES_RESOLVE_RETAIN:
-                mDecodeResolveMode = decodeResolveMode;
+    public void setDecodeResolve(int decodeResolve) throws AndrolibException {
+        switch (decodeResolve) {
+            case DECODE_RESOLVE_REMOVE:
+            case DECODE_RESOLVE_DUMMY:
+            case DECODE_RESOLVE_RETAIN:
+                mDecodeResolve = decodeResolve;
                 break;
             default:
-                throw new AndrolibException("Invalid decode resolve mode: " + decodeResolveMode);
+                throw new AndrolibException("Invalid decode resolve mode: " + decodeResolve);
         }
     }
 

@@ -144,7 +144,7 @@ public class ARSCDecoder {
             }
         }
 
-        if (mConfig.getDecodeResolveMode() == Config.DECODE_RES_RESOLVE_DUMMY
+        if (mConfig.getDecodeResolve() == Config.DECODE_RESOLVE_DUMMY
                 && mPackage != null && mPackage.getResSpecCount() > 0) {
             addMissingResSpecs();
         }

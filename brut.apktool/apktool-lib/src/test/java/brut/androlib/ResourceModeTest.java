@@ -35,7 +35,7 @@ public class ResourceModeTest extends BaseTest {
 
     @Test
     public void checkDecodingModeAsRemove() throws BrutException {
-        sConfig.setDecodeResolveMode(Config.DECODE_RES_RESOLVE_REMOVE);
+        sConfig.setDecodeResolve(Config.DECODE_RESOLVE_REMOVE);
 
         ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
         ExtFile testDir = new ExtFile(testApk + ".out.remove");
@@ -59,7 +59,7 @@ public class ResourceModeTest extends BaseTest {
 
     @Test
     public void checkDecodingModeAsDummies() throws BrutException {
-        sConfig.setDecodeResolveMode(Config.DECODE_RES_RESOLVE_DUMMY);
+        sConfig.setDecodeResolve(Config.DECODE_RESOLVE_DUMMY);
 
         ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
         ExtFile testDir = new ExtFile(testApk + ".out.dummies");
@@ -83,7 +83,7 @@ public class ResourceModeTest extends BaseTest {
 
     @Test
     public void checkDecodingModeAsLeave() throws BrutException {
-        sConfig.setDecodeResolveMode(Config.DECODE_RES_RESOLVE_RETAIN);
+        sConfig.setDecodeResolve(Config.DECODE_RESOLVE_RETAIN);
 
         ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
         ExtFile testDir = new ExtFile(testApk + ".out.leave");

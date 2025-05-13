@@ -233,7 +233,7 @@ public class ApkDecoder {
         }
 
         if (mConfig.getDecodeResources() == Config.DECODE_RESOURCES_FULL
-                || mConfig.getForceDecodeManifest() == Config.FORCE_DECODE_MANIFEST_FULL) {
+                || mConfig.isForceDecodeManifest()) {
             mResDecoder.decodeManifest(outDir);
         } else {
             copyManifestRaw(outDir);

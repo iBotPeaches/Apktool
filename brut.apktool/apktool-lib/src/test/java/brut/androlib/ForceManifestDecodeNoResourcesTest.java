@@ -47,7 +47,7 @@ public class ForceManifestDecodeNoResourcesTest extends BaseTest {
     public void checkIfForceManifestWithNoResourcesWorks() throws BrutException, IOException {
         sConfig.setForceDelete(true);
         sConfig.setDecodeResources(Config.DECODE_RESOURCES_NONE);
-        sConfig.setForceDecodeManifest(Config.FORCE_DECODE_MANIFEST_FULL);
+        sConfig.setForceDecodeManifest(true);
 
         ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
         ExtFile testDir = new ExtFile(testApk + ".out");
@@ -64,7 +64,7 @@ public class ForceManifestDecodeNoResourcesTest extends BaseTest {
     public void checkIfForceManifestWorksWithNoChangeToResources() throws BrutException, IOException {
         sConfig.setForceDelete(true);
         sConfig.setDecodeResources(Config.DECODE_RESOURCES_FULL);
-        sConfig.setForceDecodeManifest(Config.FORCE_DECODE_MANIFEST_FULL);
+        sConfig.setForceDecodeManifest(true);
 
         ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
         ExtFile testDir = new ExtFile(testApk + ".out");
@@ -81,7 +81,7 @@ public class ForceManifestDecodeNoResourcesTest extends BaseTest {
     public void checkForceManifestToFalseWithResourcesEnabledIsIgnored() throws BrutException, IOException {
         sConfig.setForceDelete(true);
         sConfig.setDecodeResources(Config.DECODE_RESOURCES_FULL);
-        sConfig.setForceDecodeManifest(Config.FORCE_DECODE_MANIFEST_NONE);
+        sConfig.setForceDecodeManifest(false);
 
         ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
         ExtFile testDir = new ExtFile(testApk + ".out");
@@ -98,7 +98,7 @@ public class ForceManifestDecodeNoResourcesTest extends BaseTest {
     public void checkBothManifestAndResourcesSetToNone() throws BrutException, IOException {
         sConfig.setForceDelete(true);
         sConfig.setDecodeResources(Config.DECODE_RESOURCES_NONE);
-        sConfig.setForceDecodeManifest(Config.FORCE_DECODE_MANIFEST_NONE);
+        sConfig.setForceDecodeManifest(false);
 
         ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
         ExtFile testDir = new ExtFile(testApk + ".out");

@@ -62,7 +62,7 @@ public class ResEnumAttr extends ResAttr {
 
             // #2836 - Support skipping items if the resource cannot be identified.
             ResResSpec referent = ref.getReferent();
-            if (referent == null && mConfig.getDecodeResolveMode() == Config.DECODE_RES_RESOLVE_REMOVE) {
+            if (referent == null && mConfig.getDecodeResolve() == Config.DECODE_RESOLVE_REMOVE) {
                 LOGGER.fine(String.format("null enum reference: ref=0x%08x(%s), val=0x%08x(%s)",
                     ref.getRawIntValue(), ref.getType(), val.getRawIntValue(), val.getType()));
                 continue;
