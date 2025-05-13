@@ -34,8 +34,8 @@ public class SkipAssetTest extends BaseTest {
 
     @Test
     public void checkIfEnablingSkipAssetWorks() throws BrutException {
-        sConfig.setForceDelete(true);
-        sConfig.setDecodeAssets(Config.DECODE_ASSETS_NONE);
+        sConfig.setForced(true);
+        sConfig.setDecodeAssets(Config.DecodeAssets.NONE);
 
         ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
         ExtFile testDir = new ExtFile(testApk + ".out");
@@ -47,8 +47,8 @@ public class SkipAssetTest extends BaseTest {
 
     @Test
     public void checkControl() throws BrutException {
-        sConfig.setForceDelete(true);
-        sConfig.setDecodeAssets(Config.DECODE_ASSETS_FULL);
+        sConfig.setForced(true);
+        sConfig.setDecodeAssets(Config.DecodeAssets.FULL);
 
         ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
         ExtFile testDir = new ExtFile(testApk + ".out");

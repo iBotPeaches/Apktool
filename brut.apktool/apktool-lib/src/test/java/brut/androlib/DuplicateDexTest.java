@@ -45,8 +45,8 @@ public class DuplicateDexTest extends BaseTest {
 
     @Test
     public void decodeUsingOnlyMainClassesMode() throws BrutException {
-        sConfig.setForceDelete(true);
-        sConfig.setDecodeSources(Config.DECODE_SOURCES_ONLY_MAIN_CLASSES);
+        sConfig.setForced(true);
+        sConfig.setDecodeSources(Config.DecodeSources.ONLY_MAIN_CLASSES);
 
         LOGGER.info("Decoding " + TEST_APK + "...");
         ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);

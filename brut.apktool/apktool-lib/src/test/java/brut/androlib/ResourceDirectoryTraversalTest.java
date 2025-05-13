@@ -34,7 +34,7 @@ public class ResourceDirectoryTraversalTest extends BaseTest {
 
     @Test
     public void checkIfMaliciousRawFileIsDisassembledProperly() throws BrutException {
-        sConfig.setForceDelete(true);
+        sConfig.setForced(true);
 
         ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
         ExtFile testDir = new ExtFile(testApk + ".out");

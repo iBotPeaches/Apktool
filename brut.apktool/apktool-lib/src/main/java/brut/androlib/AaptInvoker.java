@@ -222,9 +222,6 @@ public class AaptInvoker {
         if (mConfig.isVerbose()) { // output aapt verbose
             cmd.add("-v");
         }
-        if (mConfig.isUpdateFiles()) {
-            cmd.add("-u");
-        }
         if (mConfig.isDebugMode()) { // inject debuggable="true" into manifest
             cmd.add("--debug-mode");
         }

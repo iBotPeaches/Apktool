@@ -29,6 +29,7 @@ import brut.util.OS;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
@@ -98,30 +99,19 @@ public class Framework {
         }
     }
 
-    public void listDirectory() throws AndrolibException {
-        File dir = getDirectory();
-        if (dir == null) {
-            LOGGER.severe("No framework directory found. Nothing to list.");
-            return;
-        }
-
-        for (File file : dir.listFiles()) {
-            if (file.isFile() && file.getName().endsWith(".apk")) {
-                LOGGER.info(file.getName());
-            }
-        }
-    }
-
     public void publicizeResources(File arscFile) throws AndrolibException {
         byte[] data = new byte[(int) arscFile.length()];
 
-        try (
-            InputStream in = Files.newInputStream(arscFile.toPath());
-            OutputStream out = Files.newOutputStream(arscFile.toPath())
-        ) {
+        try (InputStream in = Files.newInputStream(arscFile.toPath())) {
             //noinspection ResultOfMethodCallIgnored
             in.read(data);
-            publicizeResources(data);
+        } catch (IOException ex){
+            throw new AndrolibException(ex);
+        }
+
+        publicizeResources(data);
+
+        try (OutputStream out = Files.newOutputStream(arscFile.toPath())) {
             out.write(data);
         } catch (IOException ex){
             throw new AndrolibException(ex);
@@ -201,6 +191,24 @@ public class Framework {
         return getClass().getResourceAsStream("/prebuilt/android-framework.jar");
     }
 
+    public List<File> listDirectory() throws AndrolibException {
+        List<File> files = new ArrayList<>();
+
+        File dir = getDirectory();
+        if (dir == null) {
+            LOGGER.severe("No framework directory found. Nothing to list.");
+            return files;
+        }
+
+        for (File file : dir.listFiles()) {
+            if (file.isFile() && file.getName().endsWith(".apk")) {
+                files.add(file);
+            }
+        }
+
+        return files;
+    }
+
     public void emptyDirectory() throws AndrolibException {
         File dir = getDirectory();
         File apk = new File(dir, "1.apk");
@@ -212,7 +220,7 @@ public class Framework {
 
         File[] files = dir.listFiles();
 
-        if (apk.exists() && files.length > 1 && !mConfig.isForceDeleteFramework()) {
+        if (files.length > 1 && !mConfig.isForced()) {
             LOGGER.warning("More than default framework detected. Please run command with `--force` parameter to wipe framework directory.");
             return;
         }

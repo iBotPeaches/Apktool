@@ -72,12 +72,14 @@ public class ApkBuilder {
                 mMinSdkVersion = SdkInfo.parseSdkInt(minSdkVersion);
             }
 
-            if (outApk == null) {
-                String outFileName = mApkInfo.getApkFileName();
-                if (outFileName == null) {
-                    outFileName = "out.apk";
-                }
-                outApk = new File(mApkDir, "dist/" + outFileName);
+            String apkName = mApkInfo.getApkFileName();
+            if (apkName == null) {
+                apkName = "out.apk";
+            }
+            if (mConfig.isNoApk()) {
+                outApk = null;
+            } else if (outApk == null) {
+                outApk = new File(mApkDir, "dist/" + apkName);
             }
 
             File outDir = new File(mApkDir, "build/apk");
@@ -86,7 +88,7 @@ public class ApkBuilder {
             File manifest = new File(mApkDir, "AndroidManifest.xml");
             File manifestOrig = new File(mApkDir, "AndroidManifest.xml.orig");
 
-            LOGGER.info("Using Apktool " + ApktoolProperties.getVersion() + " on " + outApk.getName()
+            LOGGER.info("Using Apktool " + ApktoolProperties.getVersion() + " on " + apkName
                         + (mWorker != null ? " with " + mConfig.getJobs() + " threads" : ""));
 
             buildSources(outDir);
@@ -100,7 +102,7 @@ public class ApkBuilder {
                 }
             }
 
-            if (!mConfig.isNoApk()) {
+            if (outApk != null) {
                 if (outApk.exists()) {
                     OS.rmfile(outApk);
                 } else {
@@ -187,7 +189,7 @@ public class ApkBuilder {
         }
 
         File stored = new File(outDir, fileName);
-        if (!mConfig.isForceBuildAll() && !isModified(working, stored)) {
+        if (!mConfig.isForced() && !isModified(working, stored)) {
             return true;
         }
 
@@ -223,7 +225,7 @@ public class ApkBuilder {
         }
 
         File dex = new File(outDir, fileName);
-        if (!mConfig.isForceBuildAll()) {
+        if (!mConfig.isForced()) {
             LOGGER.info("Checking whether sources have changed...");
             if (!isModified(smaliDir, dex)) {
                 return;
@@ -232,8 +234,7 @@ public class ApkBuilder {
         OS.rmfile(dex);
 
         LOGGER.info("Smaling " + dirName + " folder into " + fileName + "...");
-        int apiLevel = mConfig.getApiLevel() > 0 ? mConfig.getApiLevel() : mMinSdkVersion;
-        SmaliBuilder builder = new SmaliBuilder(smaliDir, apiLevel);
+        SmaliBuilder builder = new SmaliBuilder(smaliDir, mMinSdkVersion);
         builder.build(dex);
     }
 
@@ -274,7 +275,7 @@ public class ApkBuilder {
     }
 
     private void copyResourcesRaw(File outDir, File manifest) throws AndrolibException {
-        if (!mConfig.isForceBuildAll()) {
+        if (!mConfig.isForced()) {
             LOGGER.info("Checking whether resources have changed...");
             if (!isModified(manifest, new File(outDir, "AndroidManifest.xml"))
                     && !isModified(new File(mApkDir, "resources.arsc"), new File(outDir, "resources.arsc"))
@@ -298,7 +299,7 @@ public class ApkBuilder {
 
     private void buildResourcesFull(File outDir, File manifest) throws AndrolibException {
         File resourcesFile = new File(outDir.getParentFile(), "resources.zip");
-        if (!mConfig.isForceBuildAll()) {
+        if (!mConfig.isForced()) {
             LOGGER.info("Checking whether resources have changed...");
             if (!isModified(manifest, new File(outDir, "AndroidManifest.xml"))
                     && !isModified(newFiles(mApkDir, ApkInfo.RESOURCES_DIRNAMES),
@@ -365,7 +366,7 @@ public class ApkBuilder {
     }
 
     private void buildManifest(File outDir, File manifest) throws AndrolibException {
-        if (!mConfig.isForceBuildAll()) {
+        if (!mConfig.isForced()) {
             LOGGER.info("Checking whether AndroidManifest.xml has changed...");
             if (!isModified(manifest, new File(outDir, "AndroidManifest.xml"))) {
                 return;

@@ -158,8 +158,8 @@ public final class XmlUtils {
             public Iterator<String> getPrefixes(String namespaceURI) {
                 String prefix = getPrefix(namespaceURI);
                 return prefix != null
-                        ? Collections.singleton(prefix).iterator()
-                        : Collections.emptyIterator();
+                    ? Collections.singleton(prefix).iterator()
+                    : Collections.emptyIterator();
             }
         });
 

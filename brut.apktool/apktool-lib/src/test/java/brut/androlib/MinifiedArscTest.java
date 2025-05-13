@@ -34,7 +34,7 @@ public class MinifiedArscTest extends BaseTest {
     public static void beforeClass() throws Exception {
         TestUtils.copyResourceDir(MinifiedArscTest.class, "issue1157", sTmpDir);
 
-        sConfig.setForceDelete(true);
+        sConfig.setForced(true);
 
         ExtFile testApk = new ExtFile(sTmpDir, "issue1157.apk");
         sTestNewDir = new ExtFile(testApk + ".out");

@@ -25,17 +25,17 @@ import java.io.File;
 import org.junit.*;
 import static org.junit.Assert.*;
 
-public class ResourceModeTest extends BaseTest {
+public class DecodeResolveTest extends BaseTest {
     private static final String TEST_APK = "issue2836.apk";
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        TestUtils.copyResourceDir(ResourceModeTest.class, "issue2836", sTmpDir);
+        TestUtils.copyResourceDir(DecodeResolveTest.class, "issue2836", sTmpDir);
     }
 
     @Test
-    public void checkDecodingModeAsRemove() throws BrutException {
-        sConfig.setDecodeResolve(Config.DECODE_RESOLVE_REMOVE);
+    public void decodeResolveRemoveTest() throws BrutException {
+        sConfig.setDecodeResolve(Config.DecodeResolve.REMOVE);
 
         ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
         ExtFile testDir = new ExtFile(testApk + ".out.remove");
@@ -58,8 +58,8 @@ public class ResourceModeTest extends BaseTest {
     }
 
     @Test
-    public void checkDecodingModeAsDummies() throws BrutException {
-        sConfig.setDecodeResolve(Config.DECODE_RESOLVE_DUMMY);
+    public void decodeResolveDummyTest() throws BrutException {
+        sConfig.setDecodeResolve(Config.DecodeResolve.DUMMY);
 
         ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
         ExtFile testDir = new ExtFile(testApk + ".out.dummies");
@@ -82,8 +82,8 @@ public class ResourceModeTest extends BaseTest {
     }
 
     @Test
-    public void checkDecodingModeAsLeave() throws BrutException {
-        sConfig.setDecodeResolve(Config.DECODE_RESOLVE_RETAIN);
+    public void decodeResolveKeepTest() throws BrutException {
+        sConfig.setDecodeResolve(Config.DecodeResolve.KEEP);
 
         ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
         ExtFile testDir = new ExtFile(testApk + ".out.leave");

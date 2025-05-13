@@ -26,7 +26,7 @@ import java.util.Arrays;
 import org.junit.*;
 import static org.junit.Assert.*;
 
-public class ForceManifestDecodeNoResourcesTest extends BaseTest {
+public class DecodeResourcesTest extends BaseTest {
     private static final String TEST_APK = "issue1680.apk";
 
     private static final byte[] XML_HEADER = {
@@ -40,65 +40,13 @@ public class ForceManifestDecodeNoResourcesTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        TestUtils.copyResourceDir(ForceManifestDecodeNoResourcesTest.class, "issue1680", sTmpDir);
+        TestUtils.copyResourceDir(DecodeResourcesTest.class, "issue1680", sTmpDir);
     }
 
     @Test
-    public void checkIfForceManifestWithNoResourcesWorks() throws BrutException, IOException {
-        sConfig.setForceDelete(true);
-        sConfig.setDecodeResources(Config.DECODE_RESOURCES_NONE);
-        sConfig.setForceDecodeManifest(true);
-
-        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
-        ExtFile testDir = new ExtFile(testApk + ".out");
-        new ApkDecoder(testApk, sConfig).decode(testDir);
-
-        // assert that manifest is XML
-        assertArrayEquals(XML_HEADER, TestUtils.readHeaderOfFile(new File(testDir, "AndroidManifest.xml"), 6));
-
-        // assert that resources.arsc exists
-        assertTrue(new File(testDir, "resources.arsc").isFile());
-    }
-
-    @Test
-    public void checkIfForceManifestWorksWithNoChangeToResources() throws BrutException, IOException {
-        sConfig.setForceDelete(true);
-        sConfig.setDecodeResources(Config.DECODE_RESOURCES_FULL);
-        sConfig.setForceDecodeManifest(true);
-
-        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
-        ExtFile testDir = new ExtFile(testApk + ".out");
-        new ApkDecoder(testApk, sConfig).decode(testDir);
-
-        // assert that manifest is XML
-        assertArrayEquals(XML_HEADER, TestUtils.readHeaderOfFile(new File(testDir, "AndroidManifest.xml"), 6));
-
-        // assert that resources.arsc does not exist
-        assertFalse(new File(testDir, "resources.arsc").isFile());
-    }
-
-    @Test
-    public void checkForceManifestToFalseWithResourcesEnabledIsIgnored() throws BrutException, IOException {
-        sConfig.setForceDelete(true);
-        sConfig.setDecodeResources(Config.DECODE_RESOURCES_FULL);
-        sConfig.setForceDecodeManifest(false);
-
-        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
-        ExtFile testDir = new ExtFile(testApk + ".out");
-        new ApkDecoder(testApk, sConfig).decode(testDir);
-
-        // assert that manifest is XML
-        assertArrayEquals(XML_HEADER, TestUtils.readHeaderOfFile(new File(testDir, "AndroidManifest.xml"), 6));
-
-        // assert that resources.arsc does not exist
-        assertFalse(new File(testDir, "resources.arsc").isFile());
-    }
-
-    @Test
-    public void checkBothManifestAndResourcesSetToNone() throws BrutException, IOException {
-        sConfig.setForceDelete(true);
-        sConfig.setDecodeResources(Config.DECODE_RESOURCES_NONE);
-        sConfig.setForceDecodeManifest(false);
+    public void decodeResourcesNoneTest() throws BrutException, IOException {
+        sConfig.setForced(true);
+        sConfig.setDecodeResources(Config.DecodeResources.NONE);
 
         ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
         ExtFile testDir = new ExtFile(testApk + ".out");
@@ -106,6 +54,38 @@ public class ForceManifestDecodeNoResourcesTest extends BaseTest {
 
         // assert that manifest is not XML
         assertFalse(Arrays.equals(XML_HEADER, TestUtils.readHeaderOfFile(new File(testDir, "AndroidManifest.xml"), 6)));
+
+        // assert that resources.arsc exists
+        assertTrue(new File(testDir, "resources.arsc").isFile());
+    }
+
+    @Test
+    public void decodeResourcesFullTest() throws BrutException, IOException {
+        sConfig.setForced(true);
+        sConfig.setDecodeResources(Config.DecodeResources.FULL);
+
+        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
+        ExtFile testDir = new ExtFile(testApk + ".out");
+        new ApkDecoder(testApk, sConfig).decode(testDir);
+
+        // assert that manifest is XML
+        assertArrayEquals(XML_HEADER, TestUtils.readHeaderOfFile(new File(testDir, "AndroidManifest.xml"), 6));
+
+        // assert that resources.arsc does not exist
+        assertFalse(new File(testDir, "resources.arsc").isFile());
+    }
+
+    @Test
+    public void decodeResourcesOnlyManifestTest() throws BrutException, IOException {
+        sConfig.setForced(true);
+        sConfig.setDecodeResources(Config.DecodeResources.ONLY_MANIFEST);
+
+        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
+        ExtFile testDir = new ExtFile(testApk + ".out");
+        new ApkDecoder(testApk, sConfig).decode(testDir);
+
+        // assert that manifest is XML
+        assertArrayEquals(XML_HEADER, TestUtils.readHeaderOfFile(new File(testDir, "AndroidManifest.xml"), 6));
 
         // assert that resources.arsc exists
         assertTrue(new File(testDir, "resources.arsc").isFile());
