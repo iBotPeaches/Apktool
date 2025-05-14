@@ -17,8 +17,9 @@
 package brut.androlib;
 
 import brut.androlib.exceptions.AndrolibException;
-import brut.androlib.apk.ApkInfo;
-import brut.androlib.apk.UsesFramework;
+import brut.androlib.meta.ApkInfo;
+import brut.androlib.meta.SdkInfo;
+import brut.androlib.meta.UsesFramework;
 import brut.androlib.res.Framework;
 import brut.androlib.res.data.ResConfigFlags;
 import brut.androlib.res.xml.ResXmlUtils;
@@ -31,7 +32,7 @@ import brut.directory.Directory;
 import brut.directory.DirectoryException;
 import brut.directory.ExtFile;
 import brut.directory.ZipUtils;
-import brut.util.AaptManager;
+import brut.util.BackgroundWorker;
 import brut.util.BrutIO;
 import brut.util.OS;
 
@@ -66,17 +67,19 @@ public class ApkBuilder {
         try {
             mApkInfo = ApkInfo.load(mApkDir);
 
-            String minSdkVersion = mApkInfo.getMinSdkVersion();
+            String minSdkVersion = mApkInfo.getSdkInfo().getMinSdkVersion();
             if (minSdkVersion != null) {
-                mMinSdkVersion = mApkInfo.getMinSdkVersionFromAndroidCodename(minSdkVersion);
+                mMinSdkVersion = SdkInfo.parseSdkInt(minSdkVersion);
             }
 
-            if (outApk == null) {
-                String outFileName = mApkInfo.apkFileName;
-                if (outFileName == null) {
-                    outFileName = "out.apk";
-                }
-                outApk = new File(mApkDir, "dist/" + outFileName);
+            String apkName = mApkInfo.getApkFileName();
+            if (apkName == null) {
+                apkName = "out.apk";
+            }
+            if (mConfig.isNoApk()) {
+                outApk = null;
+            } else if (outApk == null) {
+                outApk = new File(mApkDir, "dist/" + apkName);
             }
 
             File outDir = new File(mApkDir, "build/apk");
@@ -85,7 +88,7 @@ public class ApkBuilder {
             File manifest = new File(mApkDir, "AndroidManifest.xml");
             File manifestOrig = new File(mApkDir, "AndroidManifest.xml.orig");
 
-            LOGGER.info("Using Apktool " + ApktoolProperties.getVersion() + " on " + outApk.getName()
+            LOGGER.info("Using Apktool " + ApktoolProperties.getVersion() + " on " + apkName
                         + (mWorker != null ? " with " + mConfig.getJobs() + " threads" : ""));
 
             buildSources(outDir);
@@ -99,7 +102,7 @@ public class ApkBuilder {
                 }
             }
 
-            if (!mConfig.isNoApk()) {
+            if (outApk != null) {
                 if (outApk.exists()) {
                     OS.rmfile(outApk);
                 } else {
@@ -116,7 +119,7 @@ public class ApkBuilder {
                 try (ZipOutputStream out = new ZipOutputStream(Files.newOutputStream(outApk.toPath()))) {
                     // zip aapt output files
                     try {
-                        ZipUtils.zipDir(outDir, out, mApkInfo.doNotCompress);
+                        ZipUtils.zipDir(outDir, out, mApkInfo.getDoNotCompress());
                     } catch (IOException ex) {
                         throw new AndrolibException(ex);
                     }
@@ -186,7 +189,7 @@ public class ApkBuilder {
         }
 
         File stored = new File(outDir, fileName);
-        if (!mConfig.isForceBuildAll() && !isModified(working, stored)) {
+        if (!mConfig.isForced() && !isModified(working, stored)) {
             return true;
         }
 
@@ -222,7 +225,7 @@ public class ApkBuilder {
         }
 
         File dex = new File(outDir, fileName);
-        if (!mConfig.isForceBuildAll()) {
+        if (!mConfig.isForced()) {
             LOGGER.info("Checking whether sources have changed...");
             if (!isModified(smaliDir, dex)) {
                 return;
@@ -231,8 +234,7 @@ public class ApkBuilder {
         OS.rmfile(dex);
 
         LOGGER.info("Smaling " + dirName + " folder into " + fileName + "...");
-        int apiLevel = mConfig.getApiLevel() > 0 ? mConfig.getApiLevel() : mMinSdkVersion;
-        SmaliBuilder builder = new SmaliBuilder(smaliDir, apiLevel);
+        SmaliBuilder builder = new SmaliBuilder(smaliDir, mMinSdkVersion);
         builder.build(dex);
     }
 
@@ -273,7 +275,7 @@ public class ApkBuilder {
     }
 
     private void copyResourcesRaw(File outDir, File manifest) throws AndrolibException {
-        if (!mConfig.isForceBuildAll()) {
+        if (!mConfig.isForced()) {
             LOGGER.info("Checking whether resources have changed...");
             if (!isModified(manifest, new File(outDir, "AndroidManifest.xml"))
                     && !isModified(new File(mApkDir, "resources.arsc"), new File(outDir, "resources.arsc"))
@@ -297,7 +299,7 @@ public class ApkBuilder {
 
     private void buildResourcesFull(File outDir, File manifest) throws AndrolibException {
         File resourcesFile = new File(outDir.getParentFile(), "resources.zip");
-        if (!mConfig.isForceBuildAll()) {
+        if (!mConfig.isForced()) {
             LOGGER.info("Checking whether resources have changed...");
             if (!isModified(manifest, new File(outDir, "AndroidManifest.xml"))
                     && !isModified(newFiles(mApkDir, ApkInfo.RESOURCES_DIRNAMES),
@@ -318,14 +320,15 @@ public class ApkBuilder {
         }
 
         if (mConfig.isNetSecConf()) {
-            String targetSdkVersion = mApkInfo.getTargetSdkVersion();
+            String targetSdkVersion = mApkInfo.getSdkInfo().getTargetSdkVersion();
             if (targetSdkVersion != null) {
-                if (Integer.parseInt(targetSdkVersion) < ResConfigFlags.SDK_NOUGAT) {
+                if (SdkInfo.parseSdkInt(targetSdkVersion) < ResConfigFlags.SDK_NOUGAT) {
                     LOGGER.warning("Target SDK version is lower than 24! Network Security Configuration might be ignored!");
                 }
             }
 
             File netSecConfOrig = new File(mApkDir, "res/xml/network_security_config.xml");
+            OS.mkdir(netSecConfOrig.getParentFile());
             ResXmlUtils.modNetworkSecurityConfig(netSecConfOrig);
             ResXmlUtils.setNetworkSecurityConfig(manifest);
             LOGGER.info("Added permissive network security config in manifest");
@@ -363,7 +366,7 @@ public class ApkBuilder {
     }
 
     private void buildManifest(File outDir, File manifest) throws AndrolibException {
-        if (!mConfig.isForceBuildAll()) {
+        if (!mConfig.isForced()) {
             LOGGER.info("Checking whether AndroidManifest.xml has changed...");
             if (!isModified(manifest, new File(outDir, "AndroidManifest.xml"))) {
                 return;
@@ -445,7 +448,7 @@ public class ApkBuilder {
 
             LOGGER.info("Importing " + dirName + "...");
             try {
-                ZipUtils.zipDir(mApkDir, dirName, out, mApkInfo.doNotCompress);
+                ZipUtils.zipDir(mApkDir, dirName, out, mApkInfo.getDoNotCompress());
             } catch (IOException ex) {
                 throw new AndrolibException(ex);
             }
@@ -460,7 +463,7 @@ public class ApkBuilder {
 
         LOGGER.info("Importing unknown files...");
         try {
-            ZipUtils.zipDir(unknownDir, out, mApkInfo.doNotCompress);
+            ZipUtils.zipDir(unknownDir, out, mApkInfo.getDoNotCompress());
         } catch (IOException ex) {
             throw new AndrolibException(ex);
         }
@@ -469,26 +472,24 @@ public class ApkBuilder {
     private File[] getIncludeFiles() throws AndrolibException {
         List<File> files = new ArrayList<>();
 
-        UsesFramework usesFramework = mApkInfo.usesFramework;
-        if (usesFramework != null) {
-            List<Integer> ids = usesFramework.ids;
-            if (ids != null) {
-                Framework framework = new Framework(mConfig);
-                String tag = usesFramework.tag;
-                for (Integer id : ids) {
-                    files.add(framework.getApkFile(id, tag));
-                }
+        UsesFramework usesFramework = mApkInfo.getUsesFramework();
+        List<Integer> frameworkIds = usesFramework.getIds();
+        if (!frameworkIds.isEmpty()) {
+            Framework framework = new Framework(mConfig);
+            String tag = usesFramework.getTag();
+            for (Integer id : frameworkIds) {
+                files.add(framework.getApkFile(id, tag));
             }
         }
 
-        List<String> usesLibrary = mApkInfo.usesLibrary;
-        if (usesLibrary != null) {
+        List<String> usesLibrary = mApkInfo.getUsesLibrary();
+        if (!usesLibrary.isEmpty()) {
             String[] libFiles = mConfig.getLibraryFiles();
             for (String name : usesLibrary) {
                 File apkFile = null;
                 if (libFiles != null) {
-                    for (String libName : libFiles) {
-                        String[] parts = libName.split(":", 2);
+                    for (String libEntry : libFiles) {
+                        String[] parts = libEntry.split(":", 2);
                         if (parts.length == 2 && name.equals(parts[0])) {
                             apkFile = new File(parts[1]);
                             break;

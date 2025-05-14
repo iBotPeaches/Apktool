@@ -62,7 +62,7 @@ public class ResEnumAttr extends ResAttr {
 
             // #2836 - Support skipping items if the resource cannot be identified.
             ResResSpec referent = ref.getReferent();
-            if (referent == null && mConfig.getDecodeResolveMode() == Config.DECODE_RES_RESOLVE_REMOVE) {
+            if (referent == null && mConfig.getDecodeResolve() == Config.DecodeResolve.REMOVE) {
                 LOGGER.fine(String.format("null enum reference: ref=0x%08x(%s), val=0x%08x(%s)",
                     ref.getRawIntValue(), ref.getType(), val.getRawIntValue(), val.getType()));
                 continue;
@@ -71,7 +71,7 @@ public class ResEnumAttr extends ResAttr {
             serializer.startTag(null, "enum");
             serializer.attribute(null, "name", referent != null
                 ? referent.getName() : String.format("APKTOOL_MISSING_0x%08x", ref.getRawIntValue()));
-            serializer.attribute(null, "value", String.valueOf(val.getRawIntValue()));
+            serializer.attribute(null, "value", Integer.toString(val.getRawIntValue()));
             serializer.endTag(null, "enum");
         }
     }

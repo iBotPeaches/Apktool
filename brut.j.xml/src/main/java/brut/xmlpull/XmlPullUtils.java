@@ -20,7 +20,7 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlSerializer;
 
-import java.io.*;
+import java.io.IOException;
 
 public final class XmlPullUtils {
     private static final String PROPERTY_XMLDECL_STANDALONE

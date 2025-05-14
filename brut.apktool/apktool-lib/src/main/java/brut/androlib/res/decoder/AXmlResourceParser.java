@@ -456,7 +456,7 @@ public class AXmlResourceParser implements XmlResourceParser {
 
             // try to decode from resource table
             int attrResId = getAttributeNameResource(index);
-            ResScalarValue resValue = mResTable.getCurrentResPackage()
+            ResScalarValue resValue = mResTable.getCurrentPackage()
                 .getValueFactory().factory(valueType, valueData, value);
 
             String decoded = null;
@@ -761,8 +761,8 @@ public class AXmlResourceParser implements XmlResourceParser {
                 // Fake event, see CHUNK_XML_START_TAG handler.
                 chunkType = ARSCHeader.RES_XML_START_ELEMENT_TYPE;
             } else {
-                chunkType = mIn.readShort();
-                headerSize = mIn.readShort();
+                chunkType = mIn.readUnsignedShort();
+                headerSize = mIn.readUnsignedShort();
             }
 
             if (chunkType == ARSCHeader.RES_XML_RESOURCE_MAP_TYPE) {
@@ -827,19 +827,19 @@ public class AXmlResourceParser implements XmlResourceParser {
                 mNamespaceIndex = mIn.readInt();
                 mNameIndex = mIn.readInt();
                 mIn.skipShort(); // attributeStart
-                int attributeSize = mIn.readShort();
-                int attributeCount = mIn.readShort();
-                mIdIndex = mIn.readShort();
-                mClassIndex = mIn.readShort();
-                mStyleIndex = mIn.readShort();
+                int attributeSize = mIn.readUnsignedShort();
+                int attributeCount = mIn.readUnsignedShort();
+                mIdIndex = mIn.readUnsignedShort();
+                mClassIndex = mIn.readUnsignedShort();
+                mStyleIndex = mIn.readUnsignedShort();
                 mAttributes = mIn.readIntArray(attributeCount * ATTRIBUTE_LENGTH);
                 for (int i = ATTRIBUTE_IX_VALUE_TYPE; i < mAttributes.length; ) {
-                    mAttributes[i] = (mAttributes[i] >>> 24);
+                    mAttributes[i] >>>= 24;
                     i += ATTRIBUTE_LENGTH;
                 }
 
-                int byteAttrSizeRead = (attributeCount * ATTRIBUTE_LENGTH) * 4;
-                int byteAttrSizeReported = (attributeSize * attributeCount);
+                int byteAttrSizeRead = attributeCount * ATTRIBUTE_LENGTH * 4;
+                int byteAttrSizeReported = attributeSize * attributeCount;
 
                 // Check for misleading chunk sizes
                 if (byteAttrSizeRead < byteAttrSizeReported) {

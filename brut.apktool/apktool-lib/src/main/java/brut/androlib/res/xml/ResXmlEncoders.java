@@ -64,10 +64,11 @@ public final class ResXmlEncoders {
                     out.append("\\n");
                     continue;
                 default:
-                    if (!isPrintableChar(c)) {
-                        out.append(String.format("\\u%04x", (int) c));
-                        continue;
+                    if (isPrintableChar(c)) {
+                        break;
                     }
+                    out.append(String.format("\\u%04x", (int) c));
+                    continue;
             }
             out.append(c);
         }
@@ -124,15 +125,15 @@ public final class ResXmlEncoders {
                         }
                         break;
                     default:
-                        if (!isPrintableChar(c)) {
-
-                            // let's not write trailing \u0000 if we are at end of string
-                            if ((out.length() + 1) == str.length() && c == '\u0000') {
-                                continue;
-                            }
-                            out.append(String.format("\\u%04x", (int) c));
+                        if (isPrintableChar(c)) {
+                            break;
+                        }
+                        // let's not write trailing \u0000 if we are at end of string
+                        if ((out.length() + 1) == str.length() && c == '\u0000') {
                             continue;
                         }
+                        out.append(String.format("\\u%04x", (int) c));
+                        continue;
                 }
             }
             out.append(c);

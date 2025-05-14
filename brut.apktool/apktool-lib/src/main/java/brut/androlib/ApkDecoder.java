@@ -19,13 +19,14 @@ package brut.androlib;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.exceptions.InFileNotFoundException;
 import brut.androlib.exceptions.OutDirExistsException;
-import brut.androlib.apk.ApkInfo;
+import brut.androlib.meta.ApkInfo;
 import brut.androlib.res.ResourcesDecoder;
 import brut.androlib.src.SmaliDecoder;
-import brut.directory.Directory;
-import brut.directory.ExtFile;
 import brut.common.BrutException;
+import brut.directory.Directory;
 import brut.directory.DirectoryException;
+import brut.directory.ExtFile;
+import brut.util.BackgroundWorker;
 import brut.util.OS;
 import com.android.tools.smali.dexlib2.iface.DexFile;
 import org.apache.commons.io.FilenameUtils;
@@ -60,7 +61,7 @@ public class ApkDecoder {
     }
 
     public ApkInfo decode(File outDir) throws AndrolibException {
-        if (!mConfig.isForceDelete() && outDir.exists()) {
+        if (!mConfig.isForced() && outDir.exists()) {
             throw new OutDirExistsException();
         }
         if (!mApkFile.isFile() || !mApkFile.canRead()) {
@@ -112,11 +113,11 @@ public class ApkDecoder {
         }
 
         switch (mConfig.getDecodeSources()) {
-            case Config.DECODE_SOURCES_NONE:
+            case NONE:
                 copySourcesRaw(outDir, "classes.dex");
                 break;
-            case Config.DECODE_SOURCES_SMALI:
-            case Config.DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES:
+            case FULL:
+            case ONLY_MAIN_CLASSES:
                 decodeSourcesSmali(outDir, "classes.dex");
                 break;
         }
@@ -128,13 +129,13 @@ public class ApkDecoder {
             for (String fileName : in.getFiles(true)) {
                 if (fileName.endsWith(".dex") && !fileName.equals("classes.dex")) {
                     switch (mConfig.getDecodeSources()) {
-                        case Config.DECODE_SOURCES_NONE:
+                        case NONE:
                             copySourcesRaw(outDir, fileName);
                             break;
-                        case Config.DECODE_SOURCES_SMALI:
+                        case FULL:
                             decodeSourcesSmali(outDir, fileName);
                             break;
-                        case Config.DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES:
+                        case ONLY_MAIN_CLASSES:
                             if (fileName.startsWith("classes")) {
                                 decodeSourcesSmali(outDir, fileName);
                             } else {
@@ -189,7 +190,7 @@ public class ApkDecoder {
 
         LOGGER.info("Baksmaling " + fileName + "...");
         SmaliDecoder decoder = new SmaliDecoder(mApkFile, fileName,
-            mConfig.isBaksmaliDebugMode(), mConfig.getApiLevel());
+            mConfig.isBaksmaliDebugMode(), mConfig.getBaksmaliApiLevel());
         DexFile dexFile = decoder.decode(smaliDir);
 
         // record minSdkVersion for jars
@@ -205,10 +206,11 @@ public class ApkDecoder {
         }
 
         switch (mConfig.getDecodeResources()) {
-            case Config.DECODE_RESOURCES_NONE:
+            case NONE:
+            case ONLY_MANIFEST:
                 copyResourcesRaw(outDir);
                 break;
-            case Config.DECODE_RESOURCES_FULL:
+            case FULL:
                 mResDecoder.decodeResources(outDir);
                 break;
         }
@@ -231,11 +233,14 @@ public class ApkDecoder {
             return;
         }
 
-        if (mConfig.getDecodeResources() == Config.DECODE_RESOURCES_FULL
-                || mConfig.getForceDecodeManifest() == Config.FORCE_DECODE_MANIFEST_FULL) {
-            mResDecoder.decodeManifest(outDir);
-        } else {
-            copyManifestRaw(outDir);
+        switch (mConfig.getDecodeResources()) {
+            case NONE:
+                copyManifestRaw(outDir);
+                break;
+            case FULL:
+            case ONLY_MANIFEST:
+                mResDecoder.decodeManifest(outDir);
+                break;
         }
     }
 
@@ -255,7 +260,7 @@ public class ApkDecoder {
             Directory in = mApkFile.getDirectory();
 
             for (String dirName : ApkInfo.RAW_DIRNAMES) {
-                if ((mConfig.getDecodeAssets() == Config.DECODE_ASSETS_FULL || !dirName.equals("assets"))
+                if ((mConfig.getDecodeAssets() == Config.DecodeAssets.FULL || !dirName.equals("assets"))
                         && in.containsDir(dirName)) {
                     LOGGER.info("Copying " + dirName + "...");
                     for (String fileName : in.getDir(dirName).getFiles(true)) {
@@ -304,11 +309,9 @@ public class ApkDecoder {
     }
 
     private void writeApkInfo(File outDir) throws AndrolibException {
-        mResDecoder.updateApkInfo(outDir);
-
         // in case we have no resources, we should store the minSdk we pulled from the source opcode api level
         if (!mApkInfo.hasResources() && mMinSdkVersion > 0) {
-            mApkInfo.setMinSdkVersion(Integer.toString(mMinSdkVersion));
+            mApkInfo.getSdkInfo().setMinSdkVersion(Integer.toString(mMinSdkVersion));
         }
 
         // record uncompressed files
@@ -344,22 +347,16 @@ public class ApkDecoder {
             }
 
             // update apk info
-            int doNotCompressSize = uncompressedExts.size() + uncompressedFiles.size();
-            if (doNotCompressSize > 0) {
-                List<String> doNotCompress = new ArrayList<>(doNotCompressSize);
-                if (!uncompressedExts.isEmpty()) {
-                    List<String> uncompressedExtsList = new ArrayList<>(uncompressedExts);
-                    uncompressedExtsList.sort(null);
-                    doNotCompress.addAll(uncompressedExtsList);
-                }
-                if (!uncompressedFiles.isEmpty()) {
-                    List<String> uncompressedFilesList = new ArrayList<>(uncompressedFiles);
-                    uncompressedFilesList.sort(null);
-                    doNotCompress.addAll(uncompressedFilesList);
-                }
-                if (!doNotCompress.isEmpty()) {
-                    mApkInfo.doNotCompress = doNotCompress;
-                }
+            List<String> doNotCompress = mApkInfo.getDoNotCompress();
+            if (!uncompressedExts.isEmpty()) {
+                List<String> uncompressedExtsList = new ArrayList<>(uncompressedExts);
+                uncompressedExtsList.sort(null);
+                doNotCompress.addAll(uncompressedExtsList);
+            }
+            if (!uncompressedFiles.isEmpty()) {
+                List<String> uncompressedFilesList = new ArrayList<>(uncompressedFiles);
+                uncompressedFilesList.sort(null);
+                doNotCompress.addAll(uncompressedFilesList);
             }
         } catch (DirectoryException ex) {
             throw new AndrolibException(ex);

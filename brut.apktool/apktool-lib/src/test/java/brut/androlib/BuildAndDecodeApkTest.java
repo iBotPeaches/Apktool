@@ -16,7 +16,7 @@
  */
 package brut.androlib;
 
-import brut.androlib.apk.ApkInfo;
+import brut.androlib.meta.ApkInfo;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
 import brut.util.OSDetection;
@@ -61,20 +61,20 @@ public class BuildAndDecodeApkTest extends BaseTest {
     @Test
     public void confirmFeatureFlagsRecorded() throws BrutException {
         ApkInfo testInfo = ApkInfo.load(sTestNewDir);
-        assertTrue(testInfo.featureFlags.get("brut.feature.permission"));
-        assertTrue(testInfo.featureFlags.get("brut.feature.activity"));
+        assertTrue(testInfo.getFeatureFlags().get("brut.feature.permission"));
+        assertTrue(testInfo.getFeatureFlags().get("brut.feature.activity"));
     }
 
     @Test
     public void confirmZeroByteFileExtensionIsNotStored() throws BrutException {
         ApkInfo testInfo = ApkInfo.load(sTestNewDir);
-        assertFalse(testInfo.doNotCompress.contains("jpg"));
+        assertFalse(testInfo.getDoNotCompress().contains("jpg"));
     }
 
     @Test
     public void confirmZeroByteFileIsStored() throws BrutException {
         ApkInfo testInfo = ApkInfo.load(sTestNewDir);
-        assertTrue(testInfo.doNotCompress.contains("assets/0byte_file.jpg"));
+        assertTrue(testInfo.getDoNotCompress().contains("assets/0byte_file.jpg"));
     }
 
     @Test
@@ -190,8 +190,9 @@ public class BuildAndDecodeApkTest extends BaseTest {
 
         // long_string_32767 should be exactly 0x7FFF chars of "a",
         // which is the longest allowed length for UTF-8 strings.
-        // the valuesExtraLongTest() should handle this
-        // but such an edge case, want a specific test
+        // String longer than that is replaced with "STRING_TOO_LARGE".
+        // valuesExtraLongTest covers this scenario, but we want a specific test
+        // for such an edge case.
         String expression = "/resources/string[@name='long_string_32767']/text()";
         String str = evaluateXPath(doc, expression, String.class);
         assertEquals(0x7FFF, str.length());
@@ -222,24 +223,24 @@ public class BuildAndDecodeApkTest extends BaseTest {
 
     @Test
     public void qualifiersTest() throws BrutException {
-        compareValuesFiles("values-mcc004-mnc4-en-rUS-ldrtl-sw100dp-w200dp-h300dp"
+        compareValuesFiles("values-mcc004-mnc04-en-rUS-ldrtl-sw100dp-w200dp-h300dp"
                 + "-long-round-highdr-land-desk-night-xhdpi-finger-keyssoft-12key"
                 + "-navhidden-dpad-v26/strings.xml");
     }
 
     @Test
     public void shortendedMncTest() throws BrutException {
-        compareValuesFiles("values-mcc001-mnc1/strings.xml");
+        compareValuesFiles("values-mcc001-mnc01/strings.xml");
     }
 
     @Test
     public void shortMncHtcTest() throws BrutException {
-        compareValuesFiles("values-mnc1/strings.xml");
+        compareValuesFiles("values-mnc01/strings.xml");
     }
 
     @Test
     public void shortMncv2Test() throws BrutException {
-        compareValuesFiles("values-mcc238-mnc6/strings.xml");
+        compareValuesFiles("values-mcc238-mnc06/strings.xml");
     }
 
     @Test
@@ -299,7 +300,7 @@ public class BuildAndDecodeApkTest extends BaseTest {
 
     @Test
     public void variantBcp47Test() throws BrutException {
-        compareValuesFiles("values-b+en+US+POSIX/strings.xml");
+        compareValuesFiles("values-b+en+US+posix/strings.xml");
     }
 
     @Test
@@ -309,8 +310,8 @@ public class BuildAndDecodeApkTest extends BaseTest {
 
     @Test
     public void valuesBcp47LanguageScriptRegionVariantTest() throws BrutException {
-        compareValuesFiles("values-b+ast+Latn+IT+AREVELA/strings.xml");
-        compareValuesFiles("values-b+ast+Hant+IT+ARABEXT/strings.xml");
+        compareValuesFiles("values-b+ast+Latn+IT+arevela/strings.xml");
+        compareValuesFiles("values-b+ast+Hant+IT+arabext/strings.xml");
     }
 
     @Test
@@ -547,7 +548,7 @@ public class BuildAndDecodeApkTest extends BaseTest {
     }
 
     private static boolean isTransparent(int pixel) {
-        return pixel >> 24 == 0x00;
+        return pixel >> 24 == 0;
     }
 
     @Test

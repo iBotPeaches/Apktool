@@ -38,7 +38,7 @@ public class ResAttr extends ResBagValue implements ResValuesXmlSerializable {
     private static final int TYPE_FLOAT = 0x20;
     private static final int TYPE_DIMEN = 0x40;
     private static final int TYPE_FRACTION = 0x80;
-    private static final int TYPE_ANY_STRING = 0xee;
+    private static final int TYPE_ANY_STRING = 0xEE;
 
     private static final int TYPE_ENUM = 0x00010000;
     private static final int TYPE_FLAGS = 0x00020000;
@@ -106,7 +106,7 @@ public class ResAttr extends ResBagValue implements ResValuesXmlSerializable {
 
         // #2806 - Make sure we handle int-based values and not just ResIntValue
         int rawValue = items[0].getRight().getRawIntValue();
-        int scalarType = rawValue & 0xffff;
+        int scalarType = rawValue & 0xFFFF;
 
         if (i == items.length) {
             return new ResAttr(parent, scalarType, min, max, l10n);
@@ -119,7 +119,7 @@ public class ResAttr extends ResBagValue implements ResValuesXmlSerializable {
             pkg.addSynthesizedRes(resId);
             attrItems[j] = Pair.of(factory.newReference(resId, null), item.getRight());
         }
-        switch (rawValue & 0xff0000) {
+        switch (rawValue & 0xFF0000) {
             case TYPE_ENUM:
                 return new ResEnumAttr(parent, scalarType, min, max, l10n, attrItems);
             case TYPE_FLAGS:

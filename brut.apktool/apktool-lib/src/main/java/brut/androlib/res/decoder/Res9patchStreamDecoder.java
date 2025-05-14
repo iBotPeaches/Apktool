@@ -31,10 +31,10 @@ import java.awt.image.WritableRaster;
 import java.io.*;
 
 public class Res9patchStreamDecoder implements ResStreamDecoder {
-    private static final int NP_CHUNK_TYPE = 0x6e705463; // npTc
-    private static final int OI_CHUNK_TYPE = 0x6e704c62; // npLb
-    private static final int NP_COLOR = 0xff000000;
-    private static final int OI_COLOR = 0xffff0000;
+    private static final int NP_CHUNK_TYPE = 0x6E705463; // npTc
+    private static final int OI_CHUNK_TYPE = 0x6E704C62; // npLb
+    private static final int NP_COLOR = 0xFF000000;
+    private static final int OI_COLOR = 0xFFFF0000;
 
     @Override
     public void decode(InputStream in, OutputStream out) throws AndrolibException {
@@ -68,8 +68,8 @@ public class Res9patchStreamDecoder implements ResStreamDecoder {
             }
 
             NinePatchData np = getNinePatch(data);
-            drawHLine(im2, h + 1, np.padLeft + 1, w - np.padRight);
-            drawVLine(im2, w + 1, np.padTop + 1, h - np.padBottom);
+            drawHLine(im2, h + 1, np.paddingLeft + 1, w - np.paddingRight);
+            drawVLine(im2, w + 1, np.paddingTop + 1, h - np.paddingBottom);
 
             int[] xDivs = np.xDivs;
             if (xDivs.length == 0) {

@@ -31,7 +31,7 @@ public class ResBagValue extends ResValue implements ResValuesXmlSerializable {
 
     public ResBagValue(ResReferenceValue parent) {
         mParent = parent;
-        mConfig = parent.getPackage().getConfig();
+        mConfig = parent.getPackage().getResTable().getConfig();
     }
 
     @Override

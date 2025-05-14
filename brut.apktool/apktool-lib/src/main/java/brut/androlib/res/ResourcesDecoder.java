@@ -17,8 +17,11 @@
 package brut.androlib.res;
 
 import brut.androlib.Config;
-import brut.androlib.apk.ApkInfo;
 import brut.androlib.exceptions.AndrolibException;
+import brut.androlib.meta.ApkInfo;
+import brut.androlib.meta.PackageInfo;
+import brut.androlib.meta.SdkInfo;
+import brut.androlib.meta.VersionInfo;
 import brut.androlib.res.data.*;
 import brut.androlib.res.decoder.*;
 import brut.androlib.res.xml.ResValuesXmlSerializable;
@@ -66,98 +69,12 @@ public class ResourcesDecoder {
         return mResFileMapping;
     }
 
-    public void loadMainPkg() throws AndrolibException {
-        mResTable.loadMainPkg(mApkInfo.getApkFile());
-    }
-
-    public void decodeManifest(File apkDir) throws AndrolibException {
-        if (!mApkInfo.hasManifest()) {
-            return;
-        }
-
-        AXmlResourceParser axmlParser = new AndroidManifestResourceParser(mResTable);
-        XmlSerializer xmlSerializer = newXmlSerializer();
-        ResStreamDecoder fileDecoder = new AndroidManifestPullStreamDecoder(axmlParser, xmlSerializer);
-
-        Directory inDir, outDir;
-        try {
-            inDir = mApkInfo.getApkFile().getDirectory();
-            outDir = new ExtFile(apkDir).getDirectory();
-
-            if (mApkInfo.hasResources()) {
-                LOGGER.info("Decoding AndroidManifest.xml with resources...");
-            } else {
-                LOGGER.info("Decoding AndroidManifest.xml with only framework resources...");
-            }
-
-            try (
-                InputStream in = inDir.getFileInput("AndroidManifest.xml");
-                OutputStream out = outDir.getFileOutput("AndroidManifest.xml")
-            ) {
-                fileDecoder.decode(in, out);
-            }
-        } catch (DirectoryException | IOException ex) {
-            throw new AndrolibException(ex);
-        }
-
-        File manifest = new File(apkDir, "AndroidManifest.xml");
-
-        if (mApkInfo.hasResources() && !mConfig.isAnalysisMode()) {
-            // Remove versionName / versionCode (aapt API 16)
-            //
-            // check for a mismatch between resources.arsc package and the package listed in AndroidManifest
-            // also remove the android::versionCode / versionName from manifest for rebuild
-            // this is a required change to prevent aapt warning about conflicting versions
-            // it will be passed as a parameter to aapt like "--min-sdk-version" via apktool.yml
-            adjustPackageManifest(manifest);
-
-            ResXmlUtils.removeManifestVersions(manifest);
-
-            // update apk info
-            mApkInfo.packageInfo.forcedPackageId = String.valueOf(mResTable.getPackageId());
-        }
-
-        // record feature flags
-        String[] featureFlags = ResXmlUtils.pullManifestFeatureFlags(manifest);
-        if (featureFlags != null) {
-            for (String flag : featureFlags) {
-                mApkInfo.addFeatureFlag(flag, true);
-            }
-        }
-    }
-
-    public void updateApkInfo(File apkDir) throws AndrolibException {
-        mResTable.initApkInfo(mApkInfo, apkDir);
-    }
-
-    private void adjustPackageManifest(File manifest) throws AndrolibException {
-        // compare resources.arsc package name to the one present in AndroidManifest
-        ResPackage resPackage = mResTable.getCurrentResPackage();
-        String pkgOriginal = resPackage.getName();
-        String pkgRenamed = mResTable.getPackageRenamed();
-
-        mResTable.setPackageId(resPackage.getId());
-        mResTable.setPackageOriginal(pkgOriginal);
-
-        // 1) Check if pkgOriginal is null (empty resources.arsc)
-        // 2) Check if pkgRenamed is null
-        // 3) Check if pkgOriginal === mPackageRenamed
-        // 4) Check if pkgOriginal is ignored via IGNORED_PACKAGES
-        if (pkgOriginal == null || pkgRenamed == null || pkgOriginal.equals(pkgRenamed)
-                || IGNORED_PACKAGES.contains(pkgOriginal)) {
-            LOGGER.info("Regular manifest package...");
-        } else {
-            LOGGER.info("Renamed manifest package found! Replacing " + pkgRenamed + " with " + pkgOriginal);
-            ResXmlUtils.renameManifestPackage(manifest, pkgOriginal);
-        }
-    }
-
     public void decodeResources(File apkDir) throws AndrolibException {
         if (!mApkInfo.hasResources()) {
             return;
         }
 
-        loadMainPkg();
+        mResTable.loadMainPackage();
 
         ResStreamDecoderContainer decoders = new ResStreamDecoderContainer();
         decoders.setDecoder("raw", new ResRawStreamDecoder());
@@ -177,19 +94,19 @@ public class ResourcesDecoder {
             throw new AndrolibException(ex);
         }
 
-        for (ResPackage pkg : mResTable.listMainPackages()) {
-            LOGGER.info("Decoding file-resources...");
-            for (ResResource res : pkg.listFiles()) {
-                fileDecoder.decode(res, inDir, outDir, mResFileMapping);
-            }
+        ResPackage pkg = mResTable.getMainPackage();
 
-            LOGGER.info("Decoding values */* XMLs...");
-            for (ResValuesFile valuesFile : pkg.listValuesFiles()) {
-                generateValuesFile(valuesFile, outDir, xmlSerializer);
-            }
-
-            generatePublicXml(pkg, outDir, xmlSerializer);
+        LOGGER.info("Decoding file-resources...");
+        for (ResResource res : pkg.listFiles()) {
+            fileDecoder.decode(res, inDir, outDir, mResFileMapping);
         }
+
+        LOGGER.info("Decoding values */* XMLs...");
+        for (ResValuesFile valuesFile : pkg.listValuesFiles()) {
+            generateValuesFile(valuesFile, outDir, xmlSerializer);
+        }
+
+        generatePublicXml(pkg, outDir, xmlSerializer);
 
         AndrolibException decodeError = axmlParser.getFirstError();
         if (decodeError != null) {
@@ -255,6 +172,115 @@ public class ResourcesDecoder {
             serial.flush();
         } catch (DirectoryException | IOException ex) {
             throw new AndrolibException("Could not generate public.xml file", ex);
+        }
+    }
+
+    public void decodeManifest(File apkDir) throws AndrolibException {
+        if (!mApkInfo.hasManifest()) {
+            return;
+        }
+
+        AXmlResourceParser axmlParser = new AndroidManifestResourceParser(mResTable);
+        XmlSerializer xmlSerializer = newXmlSerializer();
+        ResStreamDecoder fileDecoder = new AndroidManifestPullStreamDecoder(axmlParser, xmlSerializer);
+
+        Directory inDir, outDir;
+        try {
+            inDir = mApkInfo.getApkFile().getDirectory();
+            outDir = new ExtFile(apkDir).getDirectory();
+
+            if (mResTable.isMainPackageLoaded()) {
+                LOGGER.info("Decoding AndroidManifest.xml with resources...");
+            } else {
+                LOGGER.info("Decoding AndroidManifest.xml with only framework resources...");
+            }
+
+            try (
+                InputStream in = inDir.getFileInput("AndroidManifest.xml");
+                OutputStream out = outDir.getFileOutput("AndroidManifest.xml")
+            ) {
+                fileDecoder.decode(in, out);
+            }
+        } catch (DirectoryException | IOException ex) {
+            throw new AndrolibException(ex);
+        }
+
+        File manifest = new File(apkDir, "AndroidManifest.xml");
+
+        if (mResTable.isMainPackageLoaded()) {
+            mResTable.updateApkInfo();
+
+            // resolve sdkInfo from resources
+            SdkInfo sdkInfo = mApkInfo.getSdkInfo();
+            if (!sdkInfo.isEmpty()) {
+                String minSdkVersion = sdkInfo.getMinSdkVersion();
+                if (minSdkVersion != null) {
+                    String refValue = ResXmlUtils.pullValueFromIntegers(apkDir, minSdkVersion);
+                    if (refValue != null) {
+                        sdkInfo.setMinSdkVersion(refValue);
+                    }
+                }
+                String targetSdkVersion = sdkInfo.getTargetSdkVersion();
+                if (targetSdkVersion != null) {
+                    String refValue = ResXmlUtils.pullValueFromIntegers(apkDir, targetSdkVersion);
+                    if (refValue != null) {
+                        sdkInfo.setTargetSdkVersion(refValue);
+                    }
+                }
+                String maxSdkVersion = sdkInfo.getMaxSdkVersion();
+                if (maxSdkVersion != null) {
+                    String refValue = ResXmlUtils.pullValueFromIntegers(apkDir, maxSdkVersion);
+                    if (refValue != null) {
+                        sdkInfo.setMaxSdkVersion(refValue);
+                    }
+                }
+            }
+
+            // resolve versionInfo from resources
+            VersionInfo versionInfo = mApkInfo.getVersionInfo();
+            if (!versionInfo.isEmpty()) {
+                String versionName = versionInfo.getVersionName();
+                if (versionName != null) {
+                    String refValue = ResXmlUtils.pullValueFromStrings(apkDir, versionName);
+                    if (refValue != null) {
+                        versionInfo.setVersionName(refValue);
+                    }
+                }
+            }
+
+            if (!mConfig.isAnalysisMode()) {
+                // check if manifest package has to be renamed to main resource package
+                PackageInfo packageInfo = mApkInfo.getPackageInfo();
+                String manifestPackage = packageInfo.getRenameManifestPackage();
+                String mainResPackage = mResTable.getMainPackage().getName();
+
+                if (mainResPackage != null && !mainResPackage.equals(manifestPackage)
+                        && !IGNORED_PACKAGES.contains(mainResPackage)) {
+                    LOGGER.info("Renaming manifest package from " + manifestPackage + " to " + mainResPackage + "...");
+                    ResXmlUtils.renameManifestPackage(manifest, mainResPackage);
+                } else {
+                    // renaming not needed: main resource package is null/identical/ignored
+                    packageInfo.setRenameManifestPackage(null);
+                }
+            }
+        } else {
+            // renaming not possible: manifest decoded without resources
+            mApkInfo.getPackageInfo().setRenameManifestPackage(null);
+        }
+
+        if (!mConfig.isAnalysisMode()) {
+            // remove versionCode and versionName,
+            // it will be passed as a parameter to aapt via apktool.yml
+            ResXmlUtils.removeManifestVersions(manifest);
+        }
+
+        // record feature flags
+        String[] flags = ResXmlUtils.pullManifestFeatureFlags(manifest);
+        if (flags != null) {
+            Map<String, Boolean> featureFlags = mApkInfo.getFeatureFlags();
+            for (String flag : flags) {
+                featureFlags.put(flag, true);
+            }
         }
     }
 }

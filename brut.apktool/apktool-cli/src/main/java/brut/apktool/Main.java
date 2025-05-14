@@ -28,27 +28,275 @@ import brut.util.OSDetection;
 import org.apache.commons.cli.*;
 
 import java.io.*;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.*;
 
 /**
- * Main entry point of the apktool.
+ * Main entry point of apktool.
  */
 public class Main {
     private enum Verbosity { NORMAL, VERBOSE, QUIET }
 
-    private static final Options normalOptions = new Options();
+    private static final Option verboseOption = Option.builder("v")
+            .longOpt("verbose")
+            .desc("Increase output verbosity.")
+            .build();
+
+    private static final Option quietOption = Option.builder("q")
+            .longOpt("quiet")
+            .desc("Suppress normal output.")
+            .build();
+
+    private static final Option jobsOption = Option.builder("j")
+            .longOpt("jobs")
+            .desc("Set the number of jobs to execute in parallel to <num>.")
+            .hasArg()
+            .argName("num")
+            .type(Integer.class)
+            .build();
+
+    private static final Option frameDirOption = Option.builder("p")
+            .longOpt("frame-path")
+            .desc("Use framework files located in <dir>.")
+            .hasArg()
+            .argName("dir")
+            .build();
+
+    private static final Option frameTagOption = Option.builder("t")
+            .longOpt("frame-tag")
+            .desc("Use framework files tagged with <tag>.")
+            .hasArg()
+            .argName("tag")
+            .build();
+
+    private static final Option libOption = Option.builder("l")
+            .longOpt("lib")
+            .desc("Use shared library <package> located in <file>.\n"
+                    + "            Can be specified multiple times.")
+            .hasArg()
+            .argName("package:file")
+            .build();
+
+    private static final Option decodeForceOption = Option.builder("f")
+            .longOpt("force")
+            .desc("Force delete destination directory.")
+            .build();
+
+    private static final Option decodeNoSrcOption = Option.builder("s")
+            .longOpt("no-src")
+            .desc("Do not decode sources.")
+            .build();
+
+    private static final Option decodeOnlyMainClassesOption = Option.builder()
+            .longOpt("only-main-classes")
+            .desc("Only disassemble the main dex classes (classes[0-9]*.dex) in the root.")
+            .build();
+
+    private static final Option decodeNoDebugInfoOption = Option.builder("b")
+            .longOpt("no-debug-info")
+            .desc("Do not write out debug info (.local, .param, .line, etc.)")
+            .build();
+
+    private static final Option decodeApiLevelOption = Option.builder("api")
+            .longOpt("api-level")
+            .desc("Force the API level to use for baksmali to <api>.")
+            .hasArg()
+            .argName("api")
+            .build();
+
+    private static final Option decodeNoResOption = Option.builder("r")
+            .longOpt("no-res")
+            .desc("Do not decode resources.")
+            .build();
+
+    private static final Option decodeOnlyManifestOption = Option.builder()
+            .longOpt("only-manifest")
+            .desc("Only decode AndroidManifest.xml without resources.")
+            .build();
+
+    private static final Option decodeResResolveModeOption = Option.builder("resm")
+            .longOpt("res-resolve-mode")
+            .desc("Set the resolve mode for resources to <mode>.\n"
+                    + "            Possible values are: 'remove' (default), 'dummy' or 'keep'.")
+            .hasArg()
+            .argName("mode")
+            .build();
+
+    private static final Option decodeKeepBrokenResOption = Option.builder("k")
+            .longOpt("keep-broken-res")
+            .desc("Use if there was an error and some resources were dropped, e.g.\n"
+                    + "            \"Invalid config flags detected. Dropping resources\", but you\n"
+                    + "            want to decode them anyway, even with errors. You will have to\n"
+                    + "            fix them manually before building.")
+            .build();
+
+    private static final Option decodeMatchOriginalOption = Option.builder("m")
+            .longOpt("match-original")
+            .desc("Keep files closest to original as possible (prevents rebuild).")
+            .build();
+
+    private static final Option decodeNoAssetOption = Option.builder()
+            .longOpt("no-assets")
+            .desc("Do not decode assets.")
+            .build();
+
+    private static final Option decodeOutputOption = Option.builder("o")
+            .longOpt("output")
+            .desc("Output decoded files to <dir>. (default: apk.out)")
+            .hasArg()
+            .argName("dir")
+            .build();
+
+    private static final Option buildForceOption = Option.builder("f")
+            .longOpt("force")
+            .desc("Skip changes detection and build all files.")
+            .build();
+
+    private static final Option buildDebugOption = Option.builder("d")
+            .longOpt("debug")
+            .desc("Set android:debuggable to \"true\" in AndroidManifest.xml for the built apk.")
+            .build();
+
+    private static final Option buildNetSecConfOption = Option.builder("n")
+            .longOpt("net-sec-conf")
+            .desc("Add a generic network security configuration file to the built apk.")
+            .build();
+
+    private static final Option buildCopyOriginalOption = Option.builder("c")
+            .longOpt("copy-original")
+            .desc("Copy original AndroidManifest.xml and META-INF. See project page for more info.")
+            .build();
+
+    private static final Option buildNoCrunchOption = Option.builder("nc")
+            .longOpt("no-crunch")
+            .desc("Disable crunching of resource files during the build step.")
+            .build();
+
+    private static final Option buildNoApkOption = Option.builder("na")
+            .longOpt("no-apk")
+            .desc("Disable repacking of the built files into a new apk.")
+            .build();
+
+    private static final Option buildAaptOption = Option.builder("a")
+            .longOpt("aapt")
+            .desc("Load aapt located in <file>.")
+            .hasArg()
+            .argName("file")
+            .build();
+
+    private static final Option buildUseAapt1Option = Option.builder()
+            .longOpt("use-aapt1")
+            .desc("Use aapt1 binary instead of aapt2 during the build step.")
+            .build();
+
+    private static final Option buildOutputOption = Option.builder("o")
+            .longOpt("output")
+            .desc("Output the built apk to <file>. (default: dist/name.apk)")
+            .hasArg()
+            .argName("file")
+            .build();
+
+    private static final Option frameFrameTagOption = Option.builder("t")
+            .longOpt("frame-tag")
+            .desc("Tag frameworks with <tag>.")
+            .hasArg()
+            .argName("tag")
+            .build();
+
+    private static final Option frameFrameDirOption = Option.builder("p")
+            .longOpt("frame-path")
+            .desc("Store framework files into <dir>.")
+            .hasArg()
+            .argName("dir")
+            .build();
+
+    private static final Option frameForceOption = Option.builder("f")
+            .longOpt("force")
+            .desc("Force delete all framework files.")
+            .build();
+
     private static final Options decodeOptions = new Options();
     private static final Options buildOptions = new Options();
-    private static final Options frameOptions = new Options();
-    private static final Options allOptions = new Options();
-    private static final Options emptyOptions = new Options();
-    private static final Options emptyFrameworkOptions = new Options();
-    private static final Options listFrameworkOptions = new Options();
+    private static final Options installFrameworkOptions = new Options();
+    private static final Options emptyFrameworkDirOptions = new Options();
+    private static final Options listFrameworksOptions = new Options();
+    private static final Options publicizeResourcesOptions = new Options();
 
-    private static boolean advanceMode = false;
+    private static final Config config = new Config();
+    private static Options loadedOptions = null;
+    private static boolean advancedMode = false;
+
+    private static void loadOptions(Options options, boolean advanced) {
+        loadedOptions = options;
+        advancedMode = advanced;
+
+        if (options == null || options == decodeOptions) {
+            decodeOptions.addOption(decodeForceOption);
+            decodeOptions.addOption(decodeNoResOption);
+            decodeOptions.addOption(decodeNoSrcOption);
+            decodeOptions.addOption(decodeOutputOption);
+            decodeOptions.addOption(frameDirOption);
+            decodeOptions.addOption(frameTagOption);
+            decodeOptions.addOption(libOption);
+            if (advanced) {
+                decodeOptions.addOption(decodeApiLevelOption);
+                decodeOptions.addOption(decodeKeepBrokenResOption);
+                decodeOptions.addOption(decodeMatchOriginalOption);
+                decodeOptions.addOption(decodeNoAssetOption);
+                decodeOptions.addOption(decodeNoDebugInfoOption);
+                decodeOptions.addOption(decodeOnlyMainClassesOption);
+                decodeOptions.addOption(decodeOnlyManifestOption);
+                decodeOptions.addOption(decodeResResolveModeOption);
+                decodeOptions.addOption(jobsOption);
+                decodeOptions.addOption(quietOption);
+                decodeOptions.addOption(verboseOption);
+            }
+        }
+
+        if (options == null || options == buildOptions) {
+            buildOptions.addOption(buildForceOption);
+            buildOptions.addOption(buildOutputOption);
+            buildOptions.addOption(frameDirOption);
+            buildOptions.addOption(libOption);
+            if (advanced) {
+                buildOptions.addOption(buildAaptOption);
+                buildOptions.addOption(buildCopyOriginalOption);
+                buildOptions.addOption(buildDebugOption);
+                buildOptions.addOption(buildNetSecConfOption);
+                buildOptions.addOption(buildNoApkOption);
+                buildOptions.addOption(buildNoCrunchOption);
+                buildOptions.addOption(buildUseAapt1Option);
+                buildOptions.addOption(jobsOption);
+                buildOptions.addOption(quietOption);
+                buildOptions.addOption(verboseOption);
+            }
+        }
+
+        if (options == null || options == installFrameworkOptions) {
+            installFrameworkOptions.addOption(frameFrameDirOption);
+            installFrameworkOptions.addOption(frameFrameTagOption);
+            if (advanced) {
+                installFrameworkOptions.addOption(quietOption);
+                installFrameworkOptions.addOption(verboseOption);
+            }
+        }
+
+        if (options == null || options == emptyFrameworkDirOptions) {
+            emptyFrameworkDirOptions.addOption(frameForceOption);
+            emptyFrameworkDirOptions.addOption(frameFrameDirOption);
+            if (advanced) {
+                emptyFrameworkDirOptions.addOption(quietOption);
+                emptyFrameworkDirOptions.addOption(verboseOption);
+            }
+        }
+
+        if (options == null || options == listFrameworksOptions) {
+            listFrameworksOptions.addOption(frameFrameDirOption);
+        }
+    }
 
     public static void main(String[] args) throws BrutException {
-
         // headless
         System.setProperty("java.awt.headless", "true");
 
@@ -58,187 +306,208 @@ public class Main {
         System.setProperty("jdk.nio.zipfs.allowDotZipEntry", "true");
         System.setProperty("jdk.util.zip.disableZip64ExtraFieldValidation", "true");
 
-        // set verbosity default
-        Verbosity verbosity = Verbosity.NORMAL;
+        if (!OSDetection.is64Bit()) {
+            System.err.println("32-bit support is deprecated and will be removed in 3.0.0.");
+        }
 
-        // cli parser
-        CommandLineParser parser = new DefaultParser();
-        CommandLine commandLine;
-
-        // load options
-        _options();
-
-        try {
-            commandLine = parser.parse(allOptions, args, false);
-
-            if (!OSDetection.is64Bit()) {
-                System.err.println("32-bit support is deprecated and will be removed in 3.0.0.");
-            }
-        } catch (ParseException ex) {
-            System.err.println(ex.getMessage());
-            usage();
-            System.exit(1);
+        if (args.length == 0) {
+            loadOptions(null, false);
+            printUsage();
             return;
         }
 
-        // check for verbose / quiet
-        if (commandLine.hasOption("-v") || commandLine.hasOption("--verbose")) {
+        String cmdName = args[0];
+        String[] cmdArgs = Arrays.copyOfRange(args, 1, args.length);
+
+        switch (cmdName) {
+            case "d":
+            case "decode":
+                cmdDecode(cmdArgs);
+                break;
+            case "b":
+            case "build":
+                cmdBuild(cmdArgs);
+                break;
+            case "if":
+            case "install-framework":
+                cmdInstallFramework(cmdArgs);
+                break;
+            case "efd":
+            case "empty-framework-dir":
+                cmdEmptyFrameworkDir(cmdArgs);
+                break;
+            case "lf":
+            case "list-frameworks":
+                cmdListFrameworks(cmdArgs);
+                break;
+            case "pr":
+            case "publicize-resources":
+                cmdPublicizeResources(cmdArgs);
+                break;
+            case "h":
+            case "help":
+                loadOptions(null, true);
+                printUsage();
+                break;
+            case "v":
+            case "version":
+                printVersion();
+                break;
+            default:
+                System.err.println("Unrecognized command: " + cmdName);
+                loadOptions(null, false);
+                printUsage();
+                System.exit(1);
+        }
+    }
+
+    private static CommandLine parseOptions(Options options, String[] args) {
+        loadOptions(options, true);
+
+        CommandLine cli;
+        try {
+            cli = new DefaultParser().parse(options, args, false);
+        } catch (ParseException ex) {
+            System.err.println(ex.getMessage());
+            printUsage();
+            System.exit(1);
+            return null;
+        }
+
+        // check for verbose/quiet
+        Verbosity verbosity = Verbosity.NORMAL;
+        if (cli.hasOption(verboseOption)) {
+            config.setVerbose(true);
             verbosity = Verbosity.VERBOSE;
-        } else if (commandLine.hasOption("-q") || commandLine.hasOption("--quiet")) {
-            verbosity = Verbosity.QUIET;
+        }
+        if (cli.hasOption(quietOption)) {
+            if (cli.hasOption(verboseOption)) {
+                printOptionConflict(quietOption, verboseOption);
+            } else {
+                verbosity = Verbosity.QUIET;
+            }
         }
         setupLogging(verbosity);
 
-        // check for advance mode
-        if (commandLine.hasOption("advance") || commandLine.hasOption("advanced")) {
-            setAdvanceMode();
-        }
-
-        Config config = new Config();
-        initConfig(commandLine, config);
-
-        boolean cmdFound = false;
-        for (String opt : commandLine.getArgs()) {
-            switch (opt) {
-                case "d":
-                case "decode":
-                    cmdDecode(commandLine, config);
-                    cmdFound = true;
-                    break;
-                case "b":
-                case "build":
-                    cmdBuild(commandLine, config);
-                    cmdFound = true;
-                    break;
-                case "if":
-                case "install-framework":
-                    cmdInstallFramework(commandLine, config);
-                    cmdFound = true;
-                    break;
-                case "empty-framework-dir":
-                    cmdEmptyFrameworkDirectory(commandLine, config);
-                    cmdFound = true;
-                    break;
-                case "list-frameworks":
-                    cmdListFrameworks(commandLine, config);
-                    cmdFound = true;
-                    break;
-                case "publicize-resources":
-                    cmdPublicizeResources(commandLine, config);
-                    cmdFound = true;
-                    break;
-            }
-        }
-
-        // if no commands ran, run the version / usage check.
-        if (!cmdFound) {
-            if (commandLine.hasOption("version")) {
-                _version();
-                System.exit(0);
-            } else {
-                usage();
-            }
-        }
+        return cli;
     }
 
-    private static void initConfig(CommandLine cli, Config config) {
-        if (cli.hasOption("p") || cli.hasOption("frame-path")) {
-            config.setFrameworkDirectory(cli.getOptionValue("p"));
+    private static void cmdDecode(String[] args) throws AndrolibException {
+        CommandLine cli = parseOptions(decodeOptions, args);
+        List<String> argList = cli.getArgList();
+        String apkName;
+        switch (argList.size()) {
+            case 0:
+                System.err.println("Input apk file was not specified.");
+                System.exit(1);
+                return;
+            case 1:
+                apkName = argList.get(0);
+                break;
+            default:
+                System.err.println("Invalid arguments.");
+                printUsage();
+                System.exit(1);
+                return;
         }
-        if (cli.hasOption("t") || cli.hasOption("tag")) {
-            config.setFrameworkTag(cli.getOptionValue("t"));
-        }
-        if (cli.hasOption("l") || cli.hasOption("lib")) {
-            config.setLibraryFiles(cli.getOptionValues("l"));
-        }
-        if (cli.hasOption("api") || cli.hasOption("api-level")) {
-            config.setApiLevel(Integer.parseInt(cli.getOptionValue("api")));
-        }
-        if (cli.hasOption("j") || cli.hasOption("jobs")) {
-            config.setJobs(Integer.parseInt(cli.getOptionValue("j")));
-        }
-    }
 
-    private static void cmdDecode(CommandLine cli, Config config) throws AndrolibException {
-        String apkName = getLastArg(cli);
-
-        // check decode options
-        if (cli.hasOption("s") || cli.hasOption("no-src")) {
-            config.setDecodeSources(Config.DECODE_SOURCES_NONE);
+        if (cli.hasOption(jobsOption)) {
+            config.setJobs(Integer.parseInt(cli.getOptionValue(jobsOption)));
         }
-        if (cli.hasOption("only-main-classes")) {
-            if (cli.hasOption("s") || cli.hasOption("no-src")) {
-                System.err.println("--only-main-classes cannot be paired with -s/--no-src. Ignoring.");
+        if (cli.hasOption(frameDirOption)) {
+            config.setFrameworkDirectory(cli.getOptionValue(frameDirOption));
+        }
+        if (cli.hasOption(frameTagOption)) {
+            config.setFrameworkTag(cli.getOptionValue(frameTagOption));
+        }
+        if (cli.hasOption(libOption)) {
+            config.setLibraryFiles(cli.getOptionValues(libOption));
+        }
+        if (cli.hasOption(decodeForceOption)) {
+            config.setForced(true);
+        }
+        if (cli.hasOption(decodeNoSrcOption)) {
+            config.setDecodeSources(Config.DecodeSources.NONE);
+        }
+        if (cli.hasOption(decodeOnlyMainClassesOption)) {
+            if (cli.hasOption(decodeNoSrcOption)) {
+                printOptionConflict(decodeOnlyMainClassesOption, decodeNoSrcOption);
             } else {
-                config.setDecodeSources(Config.DECODE_SOURCES_SMALI_ONLY_MAIN_CLASSES);
+                config.setDecodeSources(Config.DecodeSources.ONLY_MAIN_CLASSES);
             }
         }
-        if (cli.hasOption("d") || cli.hasOption("debug")) {
-            System.err.println("SmaliDebugging has been removed in 2.1.0 onward. Please see: https://github.com/iBotPeaches/Apktool/issues/1061");
-            System.exit(1);
+        if (cli.hasOption(decodeNoDebugInfoOption)) {
+            if (cli.hasOption(decodeNoSrcOption)) {
+                printOptionConflict(decodeNoDebugInfoOption, decodeNoSrcOption);
+            } else {
+                config.setBaksmaliDebugMode(false);
+            }
         }
-        if (cli.hasOption("b") || cli.hasOption("no-debug-info")) {
-            config.setBaksmaliDebugMode(false);
+        if (cli.hasOption(decodeApiLevelOption)) {
+            if (cli.hasOption(decodeNoSrcOption)) {
+                printOptionConflict(decodeApiLevelOption, decodeNoSrcOption);
+            } else {
+                config.setBaksmaliApiLevel(Integer.parseInt(cli.getOptionValue(decodeApiLevelOption)));
+            }
         }
-        if (cli.hasOption("f") || cli.hasOption("force")) {
-            config.setForceDelete(true);
+        if (cli.hasOption(decodeNoResOption)) {
+            config.setDecodeResources(Config.DecodeResources.NONE);
         }
-        if (cli.hasOption("r") || cli.hasOption("no-res")) {
-            config.setDecodeResources(Config.DECODE_RESOURCES_NONE);
+        if (cli.hasOption(decodeOnlyManifestOption)) {
+            if (cli.hasOption(decodeNoResOption)) {
+                printOptionConflict(decodeOnlyManifestOption, decodeNoResOption);
+            } else {
+                config.setDecodeResources(Config.DecodeResources.ONLY_MANIFEST);
+            }
         }
-        if (cli.hasOption("force-manifest")) {
-            config.setForceDecodeManifest(Config.FORCE_DECODE_MANIFEST_FULL);
+        if (cli.hasOption(decodeResResolveModeOption)) {
+            if (cli.hasOption(decodeNoResOption)) {
+                printOptionConflict(decodeResResolveModeOption, decodeNoResOption);
+            } else if (cli.hasOption(decodeOnlyManifestOption)) {
+                printOptionConflict(decodeResResolveModeOption, decodeOnlyManifestOption);
+            } else {
+                String mode = cli.getOptionValue(decodeResResolveModeOption);
+                switch (mode) {
+                    case "remove":
+                        config.setDecodeResolve(Config.DecodeResolve.REMOVE);
+                        break;
+                    case "dummy":
+                        config.setDecodeResolve(Config.DecodeResolve.DUMMY);
+                        break;
+                    case "keep":
+                        config.setDecodeResolve(Config.DecodeResolve.KEEP);
+                        break;
+                    default:
+                        System.err.println("Unknown resolve resources mode: " + mode);
+                        System.err.println("Expect: 'remove', 'dummy' or 'keep'.");
+                        System.exit(1);
+                        return;
+                }
+            }
         }
-        if (cli.hasOption("no-assets")) {
-            config.setDecodeAssets(Config.DECODE_ASSETS_NONE);
+        if (cli.hasOption(decodeKeepBrokenResOption)) {
+            if (cli.hasOption(decodeNoResOption)) {
+                printOptionConflict(decodeKeepBrokenResOption, decodeNoResOption);
+            } else if (cli.hasOption(decodeOnlyManifestOption)) {
+                printOptionConflict(decodeKeepBrokenResOption, decodeOnlyManifestOption);
+            } else {
+                config.setKeepBrokenResources(true);
+            }
         }
-        if (cli.hasOption("k") || cli.hasOption("keep-broken-res")) {
-            config.setKeepBrokenResources(true);
-        }
-        if (cli.hasOption("m") || cli.hasOption("match-original")) {
+        if (cli.hasOption(decodeMatchOriginalOption)) {
             config.setAnalysisMode(true);
         }
-        if (cli.hasOption("resm") || cli.hasOption("res-mode") || cli.hasOption("resolve-resources-mode")) {
-            String mode = cli.getOptionValue("resm");
-            if (mode == null) {
-                mode = cli.getOptionValue("res-mode");
-            }
-            if (mode == null) {
-                mode = cli.getOptionValue("resolve-resources-mode");
-            }
-
-            switch (mode) {
-                case "remove":
-                case "delete":
-                    config.setDecodeResolveMode(Config.DECODE_RES_RESOLVE_REMOVE);
-                    break;
-                case "dummy":
-                case "dummies":
-                    config.setDecodeResolveMode(Config.DECODE_RES_RESOLVE_DUMMY);
-                    break;
-                case "keep":
-                case "preserve":
-                    config.setDecodeResolveMode(Config.DECODE_RES_RESOLVE_RETAIN);
-                    break;
-                default:
-                    System.err.println("Unknown resolve resources mode: " + mode);
-                    System.err.println("Expect: 'remove', 'dummy' or 'keep'.");
-                    System.exit(1);
-            }
+        if (cli.hasOption(decodeNoAssetOption)) {
+            config.setDecodeAssets(Config.DecodeAssets.NONE);
         }
 
         File outDir;
-        if (cli.hasOption("o") || cli.hasOption("output")) {
-            outDir = new File(cli.getOptionValue("o"));
+        if (cli.hasOption(decodeOutputOption)) {
+            outDir = new File(cli.getOptionValue(decodeOutputOption));
         } else {
-            // make out folder manually using name of apk
-            String outName = apkName;
-            outName = outName.endsWith(".apk") ? outName.substring(0,
-                    outName.length() - 4).trim() : outName + ".out";
-
-            // make file from path
-            outName = new File(outName).getName();
-            outDir = new File(outName);
+            outDir = new File(apkName.endsWith(".apk")
+                ? apkName.substring(0, apkName.length() - 4).trim()
+                : apkName + ".out");
         }
 
         ExtFile apkFile = new ExtFile(apkName);
@@ -246,434 +515,253 @@ public class Main {
         try {
             decoder.decode(outDir);
         } catch (OutDirExistsException ex) {
-            System.err
-                    .println("Destination directory ("
-                            + outDir.getAbsolutePath()
-                            + ") "
-                            + "already exists. Use -f switch if you want to overwrite it.");
+            System.err.println("Destination directory (" + outDir.getAbsolutePath()
+                    + ") already exists. Use -f switch if you want to overwrite it.");
             System.exit(1);
         } catch (InFileNotFoundException ex) {
-            System.err.println("Input file (" + apkFile.getAbsolutePath() + ") " + "was not found or was not readable.");
+            System.err.println("Input file (" + apkFile.getAbsolutePath() + ") was not found or was not readable.");
             System.exit(1);
         } catch (CantFindFrameworkResException ex) {
-            System.err
-                    .println("Could not find framework resources for package of id: "
-                            + ex.getPkgId()
-                            + ". You must install proper "
-                            + "framework files, see project website for more info.");
+            System.err.println("Could not find framework resources for package of id: " + ex.getPackageId()
+                    + ". You must install proper framework files, see project website for more info.");
             System.exit(1);
         }
     }
 
-    private static void cmdBuild(CommandLine cli, Config config) throws AndrolibException {
-        String[] args = cli.getArgs();
-        String apkDirName = args.length < 2 ? "." : args[1];
-
-        // check for build options
-        if (cli.hasOption("f") || cli.hasOption("force-all")) {
-            config.setForceBuildAll(true);
+    private static void cmdBuild(String[] args) throws AndrolibException {
+        CommandLine cli = parseOptions(buildOptions, args);
+        List<String> argList = cli.getArgList();
+        String apkDirName;
+        switch (argList.size()) {
+            case 0:
+                apkDirName = "."; // current directory
+                break;
+            case 1:
+                apkDirName = argList.get(0);
+                break;
+            default:
+                System.err.println("Invalid arguments.");
+                printUsage();
+                System.exit(1);
+                return;
         }
-        if (cli.hasOption("d") || cli.hasOption("debug")) {
+
+        if (cli.hasOption(jobsOption)) {
+            config.setJobs(Integer.parseInt(cli.getOptionValue(jobsOption)));
+        }
+        if (cli.hasOption(frameDirOption)) {
+            config.setFrameworkDirectory(cli.getOptionValue(frameDirOption));
+        }
+        if (cli.hasOption(libOption)) {
+            config.setLibraryFiles(cli.getOptionValues(libOption));
+        }
+        if (cli.hasOption(buildForceOption)) {
+            config.setForced(true);
+        }
+        if (cli.hasOption(buildDebugOption)) {
             config.setDebugMode(true);
         }
-        if (cli.hasOption("n") || cli.hasOption("net-sec-conf")) {
+        if (cli.hasOption(buildNetSecConfOption)) {
             config.setNetSecConf(true);
         }
-        if (cli.hasOption("v") || cli.hasOption("verbose")) {
-            config.setVerbose(true);
+        if (cli.hasOption(buildCopyOriginalOption)) {
+            config.setCopyOriginalFiles(true);
         }
-        if (cli.hasOption("a") || cli.hasOption("aapt")) {
-            if (cli.hasOption("use-aapt1") || cli.hasOption("use-aapt2")) {
-                System.err.println("You can only use one of -a/--aapt or --use-aapt1 or --use-aapt2.");
-                System.exit(1);
-            }
-
+        if (cli.hasOption(buildNoCrunchOption)) {
+            config.setNoCrunch(true);
+        }
+        if (cli.hasOption(buildNoApkOption)) {
+            config.setNoApk(true);
+        }
+        if (cli.hasOption(buildAaptOption)) {
             try {
-                config.setAaptBinary(new File(cli.getOptionValue("a")));
+                config.setAaptBinary(new File(cli.getOptionValue(buildAaptOption)));
             } catch (BrutException ex) {
                 System.err.println(ex.getMessage());
                 System.exit(1);
             }
-        } else if (cli.hasOption("use-aapt1")) {
-            if (cli.hasOption("use-aapt2")) {
-                System.err.println("You can only use one of --use-aapt1 or --use-aapt2.");
-                System.exit(1);
+        }
+        if (cli.hasOption(buildUseAapt1Option)) {
+            if (cli.hasOption(buildAaptOption)) {
+                printOptionConflict(buildUseAapt1Option, buildAaptOption);
+            } else {
+                config.setAaptVersion(1);
             }
-
-            config.setAaptVersion(1);
-        }
-        if (cli.hasOption("c") || cli.hasOption("copy-original")) {
-            config.setCopyOriginalFiles(true);
-        }
-        if (cli.hasOption("nc") || cli.hasOption("no-crunch")) {
-            config.setNoCrunch(true);
-        }
-        if (cli.hasOption("na") || cli.hasOption("no-apk")) {
-            config.setNoApk(true);
         }
 
-        if (config.isNetSecConf() && config.getAaptVersion() == 1) {
-            System.err.println("-n / --net-sec-conf is not supported with legacy aapt.");
-            System.exit(1);
+        File outFile = null;
+        if (cli.hasOption(buildOutputOption)) {
+            if (cli.hasOption(buildNoApkOption)) {
+                printOptionConflict(buildOutputOption, buildNoApkOption);
+            } else {
+                outFile = new File(cli.getOptionValue(buildOutputOption));
+            }
         }
-
-        File outFile = cli.hasOption("o") || cli.hasOption("output")
-            ? new File(cli.getOptionValue("o")) : null;
 
         ExtFile apkDir = new ExtFile(apkDirName);
         ApkBuilder builder = new ApkBuilder(apkDir, config);
         builder.build(outFile);
     }
 
-    private static void cmdInstallFramework(CommandLine cli, Config config) throws AndrolibException {
-        String apkName = getLastArg(cli);
+    private static void cmdInstallFramework(String[] args) throws AndrolibException {
+        CommandLine cli = parseOptions(installFrameworkOptions, args);
+        List<String> argList = cli.getArgList();
+        String apkName;
+        switch (argList.size()) {
+            case 0:
+                System.err.println("Input apk file was not specified.");
+                System.exit(1);
+                return;
+            case 1:
+                apkName = argList.get(0);
+                break;
+            default:
+                System.err.println("Invalid arguments.");
+                printUsage();
+                System.exit(1);
+                return;
+        }
+
+        if (cli.hasOption(frameFrameDirOption)) {
+            config.setFrameworkDirectory(cli.getOptionValue(frameFrameDirOption));
+        }
+        if (cli.hasOption(frameFrameTagOption)) {
+            config.setFrameworkTag(cli.getOptionValue(frameFrameTagOption));
+        }
+
         new Framework(config).install(new File(apkName));
     }
 
-    private static void cmdListFrameworks(CommandLine cli, Config config) throws AndrolibException {
-        new Framework(config).listDirectory();
-    }
-
-    private static void cmdPublicizeResources(CommandLine cli, Config config) throws AndrolibException {
-        String apkName = getLastArg(cli);
-        new Framework(config).publicizeResources(new File(apkName));
-    }
-
-    private static void cmdEmptyFrameworkDirectory(CommandLine cli, Config config) throws AndrolibException {
-        if (cli.hasOption("f") || cli.hasOption("force")) {
-            config.setForceDeleteFramework(true);
+    private static void cmdEmptyFrameworkDir(String[] args) throws AndrolibException {
+        CommandLine cli = parseOptions(emptyFrameworkDirOptions, args);
+        List<String> argList = cli.getArgList();
+        if (!argList.isEmpty()) {
+            System.err.println("Invalid arguments.");
+            printUsage();
+            System.exit(1);
+            return;
         }
+
+        if (cli.hasOption(frameFrameDirOption)) {
+            config.setFrameworkDirectory(cli.getOptionValue(frameFrameDirOption));
+        }
+        if (cli.hasOption(frameForceOption)) {
+            config.setForced(true);
+        }
+
         new Framework(config).emptyDirectory();
     }
 
-    private static String getLastArg(CommandLine cli) {
-        int paraCount = cli.getArgList().size();
-        return cli.getArgList().get(paraCount - 1);
-    }
-
-    private static void _version() {
-        System.out.println(ApktoolProperties.getVersion());
-    }
-
-    private static void _options() {
-        Option versionOption = Option.builder("version")
-                .longOpt("version")
-                .desc("Print the version.")
-                .build();
-
-        Option advanceOption = Option.builder("advance")
-                .longOpt("advanced")
-                .desc("Print advanced information.")
-                .build();
-
-        Option jobsOption = Option.builder("j")
-                .longOpt("jobs")
-                .desc("Sets the number of threads to use.")
-                .hasArg()
-                .type(Integer.class)
-                .build();
-
-        Option noSrcOption = Option.builder("s")
-                .longOpt("no-src")
-                .desc("Do not decode sources.")
-                .build();
-
-        Option onlyMainClassesOption = Option.builder()
-                .longOpt("only-main-classes")
-                .desc("Only disassemble the main dex classes (classes[0-9]*.dex) in the root.")
-                .build();
-
-        Option noResOption = Option.builder("r")
-                .longOpt("no-res")
-                .desc("Do not decode resources.")
-                .build();
-
-        Option forceManOption = Option.builder()
-                .longOpt("force-manifest")
-                .desc("Decode the APK's compiled manifest, even if decoding of resources is set to \"false\".")
-                .build();
-
-        Option noAssetOption = Option.builder()
-                .longOpt("no-assets")
-                .desc("Do not decode assets.")
-                .build();
-
-        Option debugDecOption = Option.builder("d")
-                .longOpt("debug")
-                .desc("REMOVED (DOES NOT WORK): Decode in debug mode.")
-                .build();
-
-        Option analysisOption = Option.builder("m")
-                .longOpt("match-original")
-                .desc("Keep files closest to original as possible (prevents rebuild).")
-                .build();
-
-        Option apiLevelOption = Option.builder("api")
-                .longOpt("api-level")
-                .desc("The numeric api-level of the file to generate, e.g. 14 for ICS.")
-                .hasArg()
-                .argName("API")
-                .build();
-
-        Option debugBuiOption = Option.builder("d")
-                .longOpt("debug")
-                .desc("Set android:debuggable to \"true\" in the APK's compiled manifest.")
-                .build();
-
-        Option netSecConfOption = Option.builder("n")
-                .longOpt("net-sec-conf")
-                .desc("Add a generic Network Security Configuration file in the output APK")
-                .build();
-
-        Option noDbgOption = Option.builder("b")
-                .longOpt("no-debug-info")
-                .desc("Do not write out debug info (.local, .param, .line, etc.)")
-                .build();
-
-        Option forceDecOption = Option.builder("f")
-                .longOpt("force")
-                .desc("Force delete destination directory.")
-                .build();
-
-        Option frameTagOption = Option.builder("t")
-                .longOpt("frame-tag")
-                .desc("Use framework files tagged by <tag>.")
-                .hasArg()
-                .argName("tag")
-                .build();
-
-        Option frameDirOption = Option.builder("p")
-                .longOpt("frame-path")
-                .desc("Use framework files located in <dir>.")
-                .hasArg()
-                .argName("dir")
-                .build();
-
-        Option frameIfDirOption = Option.builder("p")
-                .longOpt("frame-path")
-                .desc("Store framework files into <dir>.")
-                .hasArg()
-                .argName("dir")
-                .build();
-
-        Option libOption = Option.builder("l")
-                .longOpt("lib")
-                .desc("Use dynamic library from specified location. Format is: <package>:<loc>\n"
-                        + "            Can be specified multiple times.")
-                .hasArg()
-                .argName("loc")
-                .build();
-
-        Option keepResOption = Option.builder("k")
-                .longOpt("keep-broken-res")
-                .desc("Use if there was an error and some resources were dropped, e.g.\n"
-                        + "            \"Invalid config flags detected. Dropping resources\", but you\n"
-                        + "            want to decode them anyway, even with errors. You will have to\n"
-                        + "            fix them manually before building.")
-                .build();
-
-        Option forceBuiOption = Option.builder("f")
-                .longOpt("force-all")
-                .desc("Skip changes detection and build all files.")
-                .build();
-
-        Option resolveResModeOption = Option.builder("resm")
-                .longOpt("resource-mode")
-                .desc("Sets the resolve resources mode. Possible values are: 'remove' (default), 'dummy' or 'keep'.")
-                .hasArg()
-                .argName("mode")
-                .build();
-
-        Option aaptOption = Option.builder("a")
-                .longOpt("aapt")
-                .desc("Load aapt from specified location.")
-                .hasArg()
-                .argName("loc")
-                .build();
-
-        Option aapt1Option = Option.builder()
-                .longOpt("use-aapt1")
-                .desc("Use aapt binary instead of aapt2 during the build step.")
-                .build();
-
-        Option aapt2Option = Option.builder()
-                .longOpt("use-aapt2")
-                .desc("Use aapt2 binary instead of aapt during the build step. (default)")
-                .build();
-
-        Option originalOption = Option.builder("c")
-                .longOpt("copy-original")
-                .desc("Copy original AndroidManifest.xml and META-INF. See project page for more info.")
-                .build();
-
-        Option noCrunchOption = Option.builder("nc")
-                .longOpt("no-crunch")
-                .desc("Disable crunching of resource files during the build step.")
-                .build();
-
-        Option noApkOption = Option.builder("na")
-                .longOpt("no-apk")
-                .desc("Disable repacking of the built files into a new apk.")
-                .build();
-
-        Option tagOption = Option.builder("t")
-                .longOpt("tag")
-                .desc("Tag frameworks using <tag>.")
-                .hasArg()
-                .argName("tag")
-                .build();
-
-        Option outputBuiOption = Option.builder("o")
-                .longOpt("output")
-                .desc("The name of apk that gets written. (default: dist/name.apk)")
-                .hasArg()
-                .argName("file")
-                .build();
-
-        Option outputDecOption = Option.builder("o")
-                .longOpt("output")
-                .desc("The name of folder that gets written. (default: apk.out)")
-                .hasArg()
-                .argName("dir")
-                .build();
-
-        Option quietOption = Option.builder("q")
-                .longOpt("quiet")
-                .build();
-
-        Option verboseOption = Option.builder("v")
-                .longOpt("verbose")
-                .build();
-
-        // check for advance mode
-        if (isAdvanceMode()) {
-            decodeOptions.addOption(jobsOption);
-            decodeOptions.addOption(noDbgOption);
-            decodeOptions.addOption(keepResOption);
-            decodeOptions.addOption(analysisOption);
-            decodeOptions.addOption(onlyMainClassesOption);
-            decodeOptions.addOption(apiLevelOption);
-            decodeOptions.addOption(noAssetOption);
-            decodeOptions.addOption(forceManOption);
-            decodeOptions.addOption(resolveResModeOption);
-
-            buildOptions.addOption(jobsOption);
-            buildOptions.addOption(apiLevelOption);
-            buildOptions.addOption(debugBuiOption);
-            buildOptions.addOption(netSecConfOption);
-            buildOptions.addOption(aaptOption);
-            buildOptions.addOption(originalOption);
-            buildOptions.addOption(aapt1Option);
-            buildOptions.addOption(noCrunchOption);
-            buildOptions.addOption(noApkOption);
+    private static void cmdListFrameworks(String[] args) throws AndrolibException {
+        CommandLine cli = parseOptions(listFrameworksOptions, args);
+        List<String> argList = cli.getArgList();
+        if (!argList.isEmpty()) {
+            System.err.println("Invalid arguments.");
+            printUsage();
+            System.exit(1);
+            return;
         }
 
-        // add global options
-        normalOptions.addOption(versionOption);
-        normalOptions.addOption(advanceOption);
-
-        // add basic decode options
-        decodeOptions.addOption(frameTagOption);
-        decodeOptions.addOption(outputDecOption);
-        decodeOptions.addOption(frameDirOption);
-        decodeOptions.addOption(libOption);
-        decodeOptions.addOption(forceDecOption);
-        decodeOptions.addOption(noSrcOption);
-        decodeOptions.addOption(noResOption);
-
-        // add basic build options
-        buildOptions.addOption(outputBuiOption);
-        buildOptions.addOption(frameDirOption);
-        buildOptions.addOption(libOption);
-        buildOptions.addOption(forceBuiOption);
-
-        // add basic framework options
-        frameOptions.addOption(tagOption);
-        frameOptions.addOption(frameIfDirOption);
-
-        // add empty framework options
-        emptyFrameworkOptions.addOption(forceDecOption);
-        emptyFrameworkOptions.addOption(frameIfDirOption);
-
-        // add list framework options
-        listFrameworkOptions.addOption(frameIfDirOption);
-
-        // add all, loop existing cats then manually add advance
-        for (Option op : normalOptions.getOptions()) {
-            allOptions.addOption(op);
+        if (cli.hasOption(frameFrameDirOption)) {
+            config.setFrameworkDirectory(cli.getOptionValue(frameFrameDirOption));
         }
-        for (Option op : decodeOptions.getOptions()) {
-            allOptions.addOption(op);
-        }
-        for (Option op : buildOptions.getOptions()) {
-            allOptions.addOption(op);
-        }
-        for (Option op : frameOptions.getOptions()) {
-            allOptions.addOption(op);
-        }
-        allOptions.addOption(jobsOption);
-        allOptions.addOption(apiLevelOption);
-        allOptions.addOption(analysisOption);
-        allOptions.addOption(debugDecOption);
-        allOptions.addOption(noDbgOption);
-        allOptions.addOption(forceManOption);
-        allOptions.addOption(resolveResModeOption);
-        allOptions.addOption(noAssetOption);
-        allOptions.addOption(keepResOption);
-        allOptions.addOption(debugBuiOption);
-        allOptions.addOption(netSecConfOption);
-        allOptions.addOption(aaptOption);
-        allOptions.addOption(originalOption);
-        allOptions.addOption(verboseOption);
-        allOptions.addOption(quietOption);
-        allOptions.addOption(aapt1Option);
-        allOptions.addOption(aapt2Option);
-        allOptions.addOption(noCrunchOption);
-        allOptions.addOption(noApkOption);
-        allOptions.addOption(onlyMainClassesOption);
-    }
 
-    private static String verbosityHelp() {
-        if (isAdvanceMode()) {
-            return "[-q|--quiet OR -v|--verbose] ";
-        } else {
-            return "";
+        for (File file : new Framework(config).listDirectory()) {
+            System.out.println(file.getName());
         }
     }
 
-    private static void usage() {
-        _options();
+    private static void cmdPublicizeResources(String[] args) throws AndrolibException {
+        CommandLine cli = parseOptions(publicizeResourcesOptions, args);
+        List<String> argList = cli.getArgList();
+        String arscName;
+        switch (argList.size()) {
+            case 0:
+                System.err.println("Input arsc file was not specified.");
+                System.exit(1);
+                return;
+            case 1:
+                arscName = argList.get(0);
+                break;
+            default:
+                System.err.println("Invalid arguments.");
+                printUsage();
+                System.exit(1);
+                return;
+        }
+
+        new Framework(config).publicizeResources(new File(arscName));
+    }
+
+    private static void printOptionConflict(Option option, Option conflict) {
+        System.err.println("Ignoring " + formatOption(option) + " (cannot be used with " + formatOption(conflict) + ")");
+    }
+
+    private static String formatOption(Option option) {
+        StringBuilder sb = new StringBuilder();
+        String shortName = option.getOpt();
+        if (shortName != null) {
+            sb.append('-').append(shortName);
+        }
+        String longName = option.getLongOpt();
+        if (longName != null) {
+            if (sb.length() > 0) {
+                sb.append('/');
+            }
+            sb.append("--").append(longName);
+        }
+        return sb.toString();
+    }
+
+    private static void printUsage() {
+        // print header
+        System.out.println("Apktool " + ApktoolProperties.getVersion() + " - a tool for reengineering Android apk files");
+        System.out.println("with smali " + ApktoolProperties.getSmaliVersion() + " and baksmali " + ApktoolProperties.getBaksmaliVersion());
+        System.out.println("Copyright 2010 Ryszard Wiśniewski <brut.alll@gmail.com>");
+        System.out.println("Copyright 2010 Connor Tumbleson <connor.tumbleson@gmail.com>");
+        if (advancedMode) {
+            System.out.println("Apache License 2.0 (https://www.apache.org/licenses/LICENSE-2.0)");
+        }
+
+        // print usages
         HelpFormatter formatter = new HelpFormatter();
         formatter.setWidth(120);
-
-        // print out license info prior to formatter.
-        System.out.println("Apktool " + ApktoolProperties.getVersion()
-                + " - a tool for reengineering Android apk files\n"
-                + "with smali " + ApktoolProperties.getSmaliVersion()
-                + " and baksmali " + ApktoolProperties.getBaksmaliVersion() + "\n"
-                + "Copyright 2010 Ryszard Wiśniewski <brut.alll@gmail.com>\n"
-                + "Copyright 2010 Connor Tumbleson <connor.tumbleson@gmail.com>");
-        if (isAdvanceMode()) {
-            System.out.println("Apache License 2.0 (https://www.apache.org/licenses/LICENSE-2.0)\n");
-        }else {
+        System.out.println();
+        if (loadedOptions == null || loadedOptions == decodeOptions) {
+            formatter.printHelp("apktool d|decode [options] <apk-file>", decodeOptions);
             System.out.println();
         }
-
-        // 4 usage outputs (general, frameworks, decode, build)
-        formatter.printHelp("apktool " + verbosityHelp(), normalOptions);
-        formatter.printHelp("apktool " + verbosityHelp() + "if|install-framework [options] <framework.apk>", frameOptions);
-        formatter.printHelp("apktool " + verbosityHelp() + "d[ecode] [options] <file_apk>", decodeOptions);
-        formatter.printHelp("apktool " + verbosityHelp() + "b[uild] [options] <app_path>", buildOptions);
-        if (isAdvanceMode()) {
-            formatter.printHelp("apktool " + verbosityHelp() + "publicize-resources <file_path>", emptyOptions);
-            formatter.printHelp("apktool " + verbosityHelp() + "empty-framework-dir [options]", emptyFrameworkOptions);
-            formatter.printHelp("apktool " + verbosityHelp() + "list-frameworks [options]", listFrameworkOptions);
+        if (loadedOptions == null || loadedOptions == buildOptions) {
+            formatter.printHelp("apktool b|build [options] <apk-dir>", buildOptions);
+            System.out.println();
         }
-        System.out.println();
+        if (loadedOptions == null || loadedOptions == installFrameworkOptions) {
+            formatter.printHelp("apktool if|install-framework [options] <apk-file>", installFrameworkOptions);
+            System.out.println();
+        }
+        if ((advancedMode && loadedOptions == null) || loadedOptions == emptyFrameworkDirOptions) {
+            formatter.printHelp("apktool efd|empty-framework-dir [options]", emptyFrameworkDirOptions);
+            System.out.println();
+        }
+        if ((advancedMode && loadedOptions == null) || loadedOptions == listFrameworksOptions) {
+            formatter.printHelp("apktool lf|list-frameworks [options]", listFrameworksOptions);
+            System.out.println();
+        }
+        if ((advancedMode && loadedOptions == null) || loadedOptions == publicizeResourcesOptions) {
+            formatter.printHelp("apktool pr|publicize-resources <arsc-file>", publicizeResourcesOptions);
+        }
+        if (loadedOptions == null) {
+            formatter.printHelp("apktool h|help", new Options());
+            formatter.printHelp("apktool v|version", new Options());
+        }
 
-        // print out more information
-        System.out.println("For additional info, see: https://apktool.org \n"
-            + "For smali/baksmali info, see: https://github.com/google/smali");
+        // print footer
+        System.out.println("For additional info, see: https://apktool.org");
+        System.out.println("For smali/baksmali info, see: https://github.com/google/smali");
+    }
+
+    private static void printVersion() {
+        System.out.println(ApktoolProperties.getVersion());
     }
 
     private static void setupLogging(final Verbosity verbosity) {
@@ -703,16 +791,11 @@ public class Main {
 
                 try {
                     String message = getFormatter().format(record);
-                    if (record.getLevel().intValue() >= Level.WARNING.intValue()) {
+                    int level = record.getLevel().intValue();
+                    if (level >= Level.WARNING.intValue()) {
                         System.err.write(message.getBytes());
-                    } else {
-                        if (record.getLevel().intValue() >= Level.INFO.intValue()) {
-                            System.out.write(message.getBytes());
-                        } else {
-                            if (verbosity == Verbosity.VERBOSE) {
-                                System.out.write(message.getBytes());
-                            }
-                        }
+                    } else if (level >= Level.INFO.intValue() || verbosity == Verbosity.VERBOSE) {
+                        System.out.write(message.getBytes());
                     }
                 } catch (Exception ex) {
                     reportError(null, ex, ErrorManager.FORMAT_FAILURE);
@@ -731,13 +814,5 @@ public class Main {
             handler.setLevel(Level.ALL);
             logger.setLevel(Level.ALL);
         }
-    }
-
-    private static boolean isAdvanceMode() {
-        return advanceMode;
-    }
-
-    private static void setAdvanceMode() {
-        Main.advanceMode = true;
     }
 }
