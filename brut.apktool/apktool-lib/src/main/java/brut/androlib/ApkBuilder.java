@@ -102,38 +102,9 @@ public class ApkBuilder {
                 }
             }
 
+            copyOriginalFiles(outDir);
             if (outApk != null) {
-                if (outApk.exists()) {
-                    OS.rmfile(outApk);
-                } else {
-                    File parentDir = outApk.getParentFile();
-                    if (parentDir != null) {
-                        OS.mkdir(parentDir);
-                    }
-                }
-
-                copyOriginalFiles(outDir);
-
-                LOGGER.info("Building apk file...");
-
-                try (ZipOutputStream out = new ZipOutputStream(Files.newOutputStream(outApk.toPath()))) {
-                    // zip aapt output files
-                    try {
-                        ZipUtils.zipDir(outDir, out, mApkInfo.getDoNotCompress());
-                    } catch (IOException ex) {
-                        throw new AndrolibException(ex);
-                    }
-
-                    // zip remaining standard files
-                    importRawFiles(out);
-
-                    // zip unknown files
-                    importUnknownFiles(out);
-                } catch (IOException ex) {
-                    throw new AndrolibException(ex);
-                }
-
-                LOGGER.info("Built apk into: " + outApk.getPath());
+                buildApkFile(outDir, outApk);
             }
 
             // we copied the AndroidManifest.xml to AndroidManifest.xml.orig so we can edit it
@@ -349,7 +320,6 @@ public class ApkBuilder {
         }
 
         LOGGER.info("Building resources with " + AaptManager.getAaptName(mConfig.getAaptVersion()) + "...");
-
         try {
             AaptInvoker invoker = new AaptInvoker(mApkInfo, mConfig);
             invoker.invoke(tmpFile, manifest, resDir, ninePatch, null, getIncludeFiles());
@@ -387,7 +357,6 @@ public class ApkBuilder {
         }
 
         LOGGER.info("Building AndroidManifest.xml with " + AaptManager.getAaptName(mConfig.getAaptVersion()) + "...");
-
         try {
             AaptInvoker invoker = new AaptInvoker(mApkInfo, mConfig);
             invoker.invoke(tmpFile, manifest, null, ninePatch, null, getIncludeFiles());
@@ -439,34 +408,43 @@ public class ApkBuilder {
         }
     }
 
-    private void importRawFiles(ZipOutputStream out) throws AndrolibException {
-        for (String dirName : ApkInfo.RAW_DIRNAMES) {
-            File rawDir = new File(mApkDir, dirName);
-            if (!rawDir.isDirectory()) {
-                continue;
-            }
-
-            LOGGER.info("Importing " + dirName + "...");
-            try {
-                ZipUtils.zipDir(mApkDir, dirName, out, mApkInfo.getDoNotCompress());
-            } catch (IOException ex) {
-                throw new AndrolibException(ex);
+    private void buildApkFile(File outDir, File outApk) throws AndrolibException {
+        if (outApk.exists()) {
+            OS.rmfile(outApk);
+        } else {
+            File parentDir = outApk.getParentFile();
+            if (parentDir != null) {
+                OS.mkdir(parentDir);
             }
         }
-    }
 
-    private void importUnknownFiles(ZipOutputStream out) throws AndrolibException {
-        File unknownDir = new File(mApkDir, "unknown");
-        if (!unknownDir.isDirectory()) {
-            return;
-        }
+        // convert to set for fast lookup
+        Set<String> doNotCompress = new HashSet<>(mApkInfo.getDoNotCompress());
 
-        LOGGER.info("Importing unknown files...");
-        try {
-            ZipUtils.zipDir(unknownDir, out, mApkInfo.getDoNotCompress());
+        LOGGER.info("Building apk file...");
+        try (ZipOutputStream out = new ZipOutputStream(Files.newOutputStream(outApk.toPath()))) {
+            // zip aapt output files
+            ZipUtils.zipDir(outDir, out, doNotCompress);
+
+            // zip standard raw files
+            for (String dirName : ApkInfo.RAW_DIRNAMES) {
+                File rawDir = new File(mApkDir, dirName);
+                if (rawDir.isDirectory()) {
+                    LOGGER.info("Importing " + dirName + "...");
+                    ZipUtils.zipDir(mApkDir, dirName, out, doNotCompress);
+                }
+            }
+
+            // zip unknown files
+            File unknownDir = new File(mApkDir, "unknown");
+            if (unknownDir.isDirectory()) {
+                LOGGER.info("Importing unknown files...");
+                ZipUtils.zipDir(unknownDir, out, doNotCompress);
+            }
         } catch (IOException ex) {
             throw new AndrolibException(ex);
         }
+        LOGGER.info("Built apk into: " + outApk.getPath());
     }
 
     private File[] getIncludeFiles() throws AndrolibException {
