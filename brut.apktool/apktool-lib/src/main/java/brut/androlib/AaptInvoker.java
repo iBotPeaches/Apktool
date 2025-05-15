@@ -145,6 +145,9 @@ public class AaptInvoker {
 
             cmd.add("--rename-instrumentation-target-package");
             cmd.add(mApkInfo.getPackageInfo().getRenameManifestPackage());
+
+            cmd.add("--rename-resources-package");
+            cmd.add(mApkInfo.getPackageInfo().getRenameManifestPackage());
         }
         if (mApkInfo.getVersionInfo().getVersionCode() != null) {
             cmd.add("--version-code");
