@@ -19,12 +19,12 @@ package brut.androlib.res.decoder;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.exceptions.CantFind9PatchChunkException;
 import brut.androlib.exceptions.RawXmlEncounteredException;
+import brut.androlib.meta.ApkInfo;
 import brut.androlib.res.data.ResResource;
 import brut.androlib.res.data.value.ResBoolValue;
 import brut.androlib.res.data.value.ResFileValue;
 import brut.directory.Directory;
 import brut.directory.DirectoryException;
-import brut.directory.DirUtils;
 import brut.util.BrutIO;
 
 import java.io.*;
@@ -52,10 +52,8 @@ public class ResFileDecoder {
 
     public void decode(ResResource res, Directory inDir, Directory outDir, Map<String, String> resFileMapping)
             throws AndrolibException {
-
-        ResFileValue fileValue = (ResFileValue) res.getValue();
-        String inFilePath = fileValue.toString();
-        String inFileName = fileValue.getStrippedPath();
+        String inFilePath = ((ResFileValue) res.getValue()).toString();
+        String inFileName = stripResFilePath(inFilePath);
         String typeName = res.getResSpec().getType().getName();
         String outResName = res.getFilePath();
 
@@ -104,7 +102,7 @@ public class ResFileDecoder {
                     // check for raw 9patch images
                     for (String extension : RAW_9PATCH_IMAGE_EXTENSIONS) {
                         if (inFileName.toLowerCase().endsWith("." + extension)) {
-                            copyRaw(inDir, outDir, inFilePath, outFileName);
+                            decode(inDir, inFilePath, outDir, outFileName, "raw");
                             return;
                         }
                     }
@@ -130,7 +128,7 @@ public class ResFileDecoder {
                 // check for raw image
                 for (String extension : RAW_IMAGE_EXTENSIONS) {
                     if (inFileName.toLowerCase().endsWith("." + extension)) {
-                        copyRaw(inDir, outDir, inFilePath, outFileName);
+                        decode(inDir, inFilePath, outDir, outFileName, "raw");
                         return;
                     }
                 }
@@ -167,12 +165,13 @@ public class ResFileDecoder {
         }
     }
 
-    public void copyRaw(Directory inDir, Directory outDir, String inFileName,
-                        String outFileName) throws AndrolibException {
-        try {
-            DirUtils.copyToDir(inDir, outDir, inFileName, outFileName);
-        } catch (DirectoryException ex) {
-            throw new AndrolibException(ex);
+    private String stripResFilePath(String path) throws AndrolibException {
+        for (String dirName : ApkInfo.RESOURCES_DIRNAMES) {
+            String prefix = dirName + "/";
+            if (path.startsWith(prefix)) {
+                return path.substring(prefix.length());
+            }
         }
+        throw new AndrolibException("File path does not start with \"res/\": " + path);
     }
 }
