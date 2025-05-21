@@ -205,7 +205,10 @@ public class ApkBuilder {
         OS.rmfile(dex);
 
         LOGGER.info("Smaling " + dirName + " folder into " + fileName + "...");
-        SmaliBuilder builder = new SmaliBuilder(smaliDir, mMinSdkVersion);
+        // limit opcode api level to 29 or below (dex version up to 039)
+        int apiLevel = Math.min(29, mConfig.getBaksmaliApiLevel() > 0
+            ? mConfig.getBaksmaliApiLevel() : mMinSdkVersion);
+        SmaliBuilder builder = new SmaliBuilder(smaliDir, apiLevel);
         builder.build(dex);
     }
 

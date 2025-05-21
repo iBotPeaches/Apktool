@@ -190,6 +190,13 @@ public class Main {
             .desc("Use aapt1 binary instead of aapt2 during the build step.")
             .build();
 
+    private static final Option buildApiLevelOption = Option.builder("api")
+            .longOpt("api-level")
+            .desc("Force the API level to use for smali to <api>.")
+            .hasArg()
+            .argName("api")
+            .build();
+
     private static final Option buildOutputOption = Option.builder("o")
             .longOpt("output")
             .desc("Output the built apk to <file>. (default: dist/name.apk)")
@@ -261,6 +268,7 @@ public class Main {
             buildOptions.addOption(libOption);
             if (advanced) {
                 buildOptions.addOption(buildAaptOption);
+                buildOptions.addOption(buildApiLevelOption);
                 buildOptions.addOption(buildCopyOriginalOption);
                 buildOptions.addOption(buildDebugOption);
                 buildOptions.addOption(buildNetSecConfOption);
@@ -587,6 +595,9 @@ public class Main {
             } else {
                 config.setAaptVersion(1);
             }
+        }
+        if (cli.hasOption(buildApiLevelOption)) {
+            config.setBaksmaliApiLevel(Integer.parseInt(cli.getOptionValue(buildApiLevelOption)));
         }
 
         File outFile = null;
