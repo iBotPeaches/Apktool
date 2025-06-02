@@ -36,7 +36,7 @@ public final class OS {
     private static final Logger LOGGER = Logger.getLogger("");
 
     private OS() {
-        // Private constructor for utility class
+        // Private constructor for utility class.
     }
 
     public static void mkdir(String dir) {
@@ -167,10 +167,10 @@ public final class OS {
             executor.shutdownNow();
 
             if (!executor.awaitTermination(5, TimeUnit.SECONDS)) {
-                System.err.println("Stream collector did not terminate.");
+                LOGGER.warning("Stream collector did not terminate.");
             }
             return collector.get();
-        } catch (IOException | InterruptedException ex) {
+        } catch (IOException | InterruptedException ignored) {
             return null;
         }
     }
@@ -235,7 +235,8 @@ public final class OS {
                 while ((line = reader.readLine()) != null) {
                     mBuffer.append(line).append('\n');
                 }
-            } catch (IOException ignored) {}
+            } catch (IOException ignored) {
+            }
         }
 
         public String get() {

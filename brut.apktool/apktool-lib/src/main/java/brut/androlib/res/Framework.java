@@ -18,17 +18,21 @@ package brut.androlib.res;
 
 import brut.androlib.Config;
 import brut.androlib.exceptions.AndrolibException;
-import brut.androlib.exceptions.CantFindFrameworkResException;
+import brut.androlib.exceptions.FrameworkNotFoundException;
 import brut.androlib.meta.ApkInfo;
-import brut.androlib.res.decoder.ARSCDecoder;
-import brut.androlib.res.data.ResTable;
-import brut.androlib.res.data.arsc.ARSCData;
-import brut.androlib.res.data.arsc.FlagsOffset;
+import brut.androlib.res.decoder.BinaryResourceParser;
+import brut.androlib.res.decoder.data.FlagsOffset;
+import brut.androlib.res.table.ResPackage;
+import brut.androlib.res.table.ResTable;
 import brut.util.BrutIO;
 import brut.util.OS;
+import brut.util.OSDetection;
+import com.google.common.primitives.Ints;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.zip.CRC32;
@@ -39,6 +43,26 @@ import java.util.zip.ZipOutputStream;
 public class Framework {
     private static final Logger LOGGER = Logger.getLogger(Framework.class.getName());
 
+    private static final File DEFAULT_DIRECTORY;
+
+    static {
+        String userHome = System.getProperty("user.home");
+        Path defDir;
+        if (OSDetection.isMacOSX()) {
+            defDir = Paths.get(userHome, "Library", "apktool", "framework");
+        } else if (OSDetection.isWindows()) {
+            defDir = Paths.get(userHome, "AppData", "Local", "apktool", "framework");
+        } else {
+            String xdgDataHome = System.getenv("XDG_DATA_HOME");
+            if (xdgDataHome != null) {
+                defDir = Paths.get(xdgDataHome, "apktool", "framework");
+            } else {
+                defDir = Paths.get(userHome, ".local", "share", "apktool", "framework");
+            }
+        }
+        DEFAULT_DIRECTORY = defDir.toFile();
+    }
+
     private final Config mConfig;
     private File mDirectory;
 
@@ -46,25 +70,19 @@ public class Framework {
         mConfig = config;
     }
 
-    public void install(File frameFile) throws AndrolibException {
-        install(frameFile, mConfig.getFrameworkTag());
-    }
-
-    public void install(File frameFile, String tag) throws AndrolibException {
-        try (ZipFile zip = new ZipFile(frameFile)) {
+    public void install(File apkFile) throws AndrolibException {
+        try (ZipFile zip = new ZipFile(apkFile)) {
             ZipEntry entry = zip.getEntry("resources.arsc");
             if (entry == null) {
                 throw new AndrolibException("Could not find resources.arsc file");
             }
 
             byte[] data = BrutIO.readAndClose(zip.getInputStream(entry));
-            ResTable resTable = new ResTable(new ApkInfo(), mConfig);
-            ARSCDecoder decoder = new ARSCDecoder(new ByteArrayInputStream(data), resTable, true, true);
-            ARSCData arsc = decoder.decode();
-            publicizeResources(data, arsc.getFlagsOffsets());
+            BinaryResourceParser parser = parseResources(data);
+            publicizeResources(data, parser.getFlagsOffsets());
 
-            File outFile = new File(getDirectory(),
-                arsc.getOnePackage().getId() + (tag != null ? "-" + tag : "") + ".apk");
+            ResPackage pkg = selectMainPackage(parser.getPackages());
+            File outFile = new File(getDirectory(), pkg.getId() + getApkSuffix());
 
             try (ZipOutputStream out = new ZipOutputStream(Files.newOutputStream(outFile.toPath()))) {
                 out.setMethod(ZipOutputStream.STORED);
@@ -78,7 +96,7 @@ public class Framework {
                 out.write(data);
                 out.closeEntry();
 
-                // write fake AndroidManifest.xml file to support original aapt
+                // Write fake AndroidManifest.xml file to support original aapt.
                 entry = zip.getEntry("AndroidManifest.xml");
                 if (entry != null) {
                     byte[] manifest = BrutIO.readAndClose(zip.getInputStream(entry));
@@ -99,36 +117,48 @@ public class Framework {
         }
     }
 
-    public void publicizeResources(File arscFile) throws AndrolibException {
-        byte[] data = new byte[(int) arscFile.length()];
+    private BinaryResourceParser parseResources(byte[] data) throws AndrolibException {
+        ResTable table = new ResTable(new ApkInfo(), mConfig);
+        BinaryResourceParser parser = new BinaryResourceParser(table, true, true);
+        parser.parse(new ByteArrayInputStream(data));
+        return parser;
+    }
 
-        try (InputStream in = Files.newInputStream(arscFile.toPath())) {
-            //noinspection ResultOfMethodCallIgnored
-            in.read(data);
-        } catch (IOException ex){
-            throw new AndrolibException(ex);
-        }
+    private ResPackage selectMainPackage(List<ResPackage> pkgs) throws AndrolibException {
+        switch (pkgs.size()) {
+            case 0:
+                throw new AndrolibException("Arsc file contains zero packages");
+            case 1:
+                return pkgs.get(0);
+            default: {
+                ResPackage pkg = selectPackageWithMostEntrySpecs(pkgs);
+                LOGGER.info("Arsc file contains multiple packages. Using package "
+                        + pkg.getName() + " as default.");
 
-        publicizeResources(data);
-
-        try (OutputStream out = Files.newOutputStream(arscFile.toPath())) {
-            out.write(data);
-        } catch (IOException ex){
-            throw new AndrolibException(ex);
+                return pkg;
+            }
         }
     }
 
-    private void publicizeResources(byte[] data) throws AndrolibException {
-        ResTable resTable = new ResTable(new ApkInfo(), mConfig);
-        ARSCDecoder decoder = new ARSCDecoder(new ByteArrayInputStream(data), resTable, true, true);
-        ARSCData arsc = decoder.decode();
-        publicizeResources(data, arsc.getFlagsOffsets());
+    private ResPackage selectPackageWithMostEntrySpecs(List<ResPackage> pkgs) {
+        ResPackage ret = pkgs.get(0);
+        int count = 0;
+
+        for (ResPackage pkg : pkgs) {
+            if (pkg.getEntrySpecCount() > count) {
+                count = pkg.getEntrySpecCount();
+                ret = pkg;
+            }
+        }
+
+        return ret;
     }
 
-    public void publicizeResources(byte[] data, FlagsOffset[] flagsOffsets) {
+    private void publicizeResources(byte[] data, List<FlagsOffset> flagsOffsets) {
         for (FlagsOffset flags : flagsOffsets) {
-            int offset = flags.offset + 3;
+            int offset = ((int) flags.offset) + 3;
             int end = offset + 4 * flags.count;
+
             while (offset < end) {
                 data[offset] |= (byte) 0x40;
                 offset += 4;
@@ -138,7 +168,8 @@ public class Framework {
 
     public File getDirectory() throws AndrolibException {
         if (mDirectory == null) {
-            File dir = new File(mConfig.getFrameworkDirectory());
+            String path = mConfig.getFrameworkDirectory();
+            File dir = (path != null && !path.isEmpty()) ? new File(path) : DEFAULT_DIRECTORY;
 
             if (dir.exists() && !dir.isDirectory()) {
                 throw new AndrolibException("Framework path is not a directory: " + dir);
@@ -159,77 +190,99 @@ public class Framework {
         return mDirectory;
     }
 
+    public File getApkFile(int id) throws AndrolibException {
+        return getApkFile(id, mConfig.getFrameworkTag());
+    }
+
     public File getApkFile(int id, String tag) throws AndrolibException {
         File dir = getDirectory();
-        File apk;
-
-        if (tag != null) {
-            apk = new File(dir, id + "-" + tag + ".apk");
-            if (apk.exists()) {
-                return apk;
-            }
+        File apkFile = new File(dir, id + getApkSuffix(tag));
+        if (apkFile.exists()) {
+            return apkFile;
         }
 
-        apk = new File(dir, id + ".apk");
-        if (apk.exists()) {
-            return apk;
+        // Fall back to the untagged framework.
+        apkFile = new File(dir, id + getApkSuffix(null));
+        if (apkFile.exists()) {
+            return apkFile;
         }
 
+        // If the default framework is requested but is missing, extract the built-in one.
         if (id == 1) {
             try {
-                BrutIO.copyAndClose(getAndroidFrameworkAsStream(), Files.newOutputStream(apk.toPath()));
+                BrutIO.copyAndClose(getAndroidFrameworkAsStream(), Files.newOutputStream(apkFile.toPath()));
             } catch (IOException ex) {
                 throw new AndrolibException(ex);
             }
-            return apk;
+            return apkFile;
         }
 
-        throw new CantFindFrameworkResException(id);
+        throw new FrameworkNotFoundException(id);
+    }
+
+    private String getApkSuffix() {
+        return getApkSuffix(mConfig.getFrameworkTag());
+    }
+
+    private String getApkSuffix(String tag) {
+        return ((tag != null && !tag.isEmpty()) ? "-" + tag : "") + ".apk";
     }
 
     private InputStream getAndroidFrameworkAsStream() {
         return getClass().getResourceAsStream("/prebuilt/android-framework.jar");
     }
 
-    public List<File> listDirectory() throws AndrolibException {
-        List<File> files = new ArrayList<>();
-
-        File dir = getDirectory();
-        if (dir == null) {
-            LOGGER.severe("No framework directory found. Nothing to list.");
-            return files;
+    public void cleanDirectory() throws AndrolibException {
+        for (File apkFile : listDirectory()) {
+            LOGGER.info("Removing framework file: " + apkFile.getName());
+            OS.rmfile(apkFile);
         }
-
-        for (File file : dir.listFiles()) {
-            if (file.isFile() && file.getName().endsWith(".apk")) {
-                files.add(file);
-            }
-        }
-
-        return files;
     }
 
-    public void emptyDirectory() throws AndrolibException {
-        File dir = getDirectory();
-        File apk = new File(dir, "1.apk");
+    public List<File> listDirectory() throws AndrolibException {
+        boolean ignoreTag = mConfig.isForced();
+        String suffix = ignoreTag ? getApkSuffix(null) : getApkSuffix();
+        List<File> apkFiles = new ArrayList<>();
 
-        if (!apk.exists()) {
-            LOGGER.warning("Could not empty framework directory, no file found at: " + apk);
-            return;
-        }
-
-        File[] files = dir.listFiles();
-
-        if (files.length > 1 && !mConfig.isForced()) {
-            LOGGER.warning("More than default framework detected. Please run command with `--force` parameter to wipe framework directory.");
-            return;
-        }
-
-        for (File file : files) {
-            if (file.isFile() && file.getName().endsWith(".apk")) {
-                LOGGER.info("Removing framework file: " + file.getName());
-                OS.rmfile(file);
+        for (File file : getDirectory().listFiles()) {
+            if (file.isFile() && isValidApkName(file.getName(), suffix, ignoreTag)) {
+                apkFiles.add(file);
             }
+        }
+
+        return apkFiles;
+    }
+
+    private boolean isValidApkName(String fileName, String suffix, boolean ignoreTag) {
+        if (!fileName.endsWith(suffix)) {
+            return false;
+        }
+        if (ignoreTag) {
+            return true;
+        }
+
+        String baseName = fileName.substring(0, fileName.length() - suffix.length());
+        Integer id = Ints.tryParse(baseName);
+        return id != null && id > 0;
+    }
+
+    public void publicizeResources(File arscFile) throws AndrolibException {
+        byte[] data = new byte[(int) arscFile.length()];
+
+        try (InputStream in = Files.newInputStream(arscFile.toPath())) {
+            //noinspection ResultOfMethodCallIgnored
+            in.read(data);
+        } catch (IOException ex) {
+            throw new AndrolibException(ex);
+        }
+
+        BinaryResourceParser parser = parseResources(data);
+        publicizeResources(data, parser.getFlagsOffsets());
+
+        try (OutputStream out = Files.newOutputStream(arscFile.toPath())) {
+            out.write(data);
+        } catch (IOException ex) {
+            throw new AndrolibException(ex);
         }
     }
 }

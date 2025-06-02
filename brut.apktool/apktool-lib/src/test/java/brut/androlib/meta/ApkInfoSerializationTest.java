@@ -38,8 +38,8 @@ public class ApkInfoSerializationTest extends BaseTest {
         assertNotNull(apkInfo.getUsesFramework());
         assertEquals(1, apkInfo.getUsesFramework().getIds().size());
         assertEquals(1, (long) apkInfo.getUsesFramework().getIds().get(0));
-        assertNotNull(apkInfo.getPackageInfo());
-        assertEquals("127", apkInfo.getPackageInfo().getForcedPackageId());
+        assertNotNull(apkInfo.getResourcesInfo());
+        assertEquals("127", apkInfo.getResourcesInfo().getPackageId());
         assertNotNull(apkInfo.getVersionInfo());
         assertEquals("1", apkInfo.getVersionInfo().getVersionCode());
         assertEquals("1.0", apkInfo.getVersionInfo().getVersionName());

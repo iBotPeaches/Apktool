@@ -16,7 +16,6 @@
  */
 package brut.androlib.res.xml;
 
-import brut.androlib.exceptions.AndrolibException;
 import brut.xml.XmlUtils;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
@@ -26,38 +25,11 @@ import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPathExpressionException;
 import java.io.*;
 import java.util.*;
-import java.util.logging.Logger;
 
 public final class ResXmlUtils {
-    private static final Logger LOGGER = Logger.getLogger(ResXmlUtils.class.getName());
 
     private ResXmlUtils() {
-        // Private constructor for utility class
-    }
-
-    /**
-     * Removes "debuggable" attribute for application.
-     *
-     * @param file File for AndroidManifest.xml
-     */
-    public static void removeApplicationDebugTag(File file) {
-        try {
-            Document doc = XmlUtils.loadDocument(file);
-            Node application = doc.getElementsByTagName("application").item(0);
-            NamedNodeMap attrs = application.getAttributes();
-            boolean changed = false;
-
-            Node debugAttr = attrs.getNamedItem("android:debuggable");
-            if (debugAttr != null) {
-                attrs.removeNamedItem("android:debuggable");
-                changed = true;
-            }
-
-            if (changed) {
-                XmlUtils.saveDocument(doc, file);
-            }
-        } catch (IOException | SAXException | ParserConfigurationException | TransformerException ignored) {
-        }
+        // Private constructor for utility class.
     }
 
     /**
@@ -223,32 +195,6 @@ public final class ResXmlUtils {
     }
 
     /**
-     * Replaces package value with passed packageOriginal string
-     *
-     * @param file File for AndroidManifest.xml
-     * @param packageOriginal Package name to replace
-     */
-    public static void renameManifestPackage(File file, String packageOriginal) {
-        try {
-            Document doc = XmlUtils.loadDocument(file);
-            Node manifest = doc.getFirstChild();
-            NamedNodeMap attrs = manifest.getAttributes();
-            boolean changed = false;
-
-            Node packageAttr = attrs.getNamedItem("package");
-            if (!packageAttr.getNodeValue().equals(packageOriginal)) {
-                packageAttr.setNodeValue(packageOriginal);
-                changed = true;
-            }
-
-            if (changed) {
-                XmlUtils.saveDocument(doc, file);
-            }
-        } catch (IOException | SAXException | ParserConfigurationException | TransformerException ignored) {
-        }
-    }
-
-    /**
      * Finds all feature flags set on permissions in AndroidManifest.xml.
      *
      * @param file File for AndroidManifest.xml
@@ -355,6 +301,7 @@ public final class ResXmlUtils {
     }
 
     /**
+     * Finds key in a values XML file and returns text value.
      *
      * @param file File to pull the value from
      * @param type Resource type
@@ -362,7 +309,7 @@ public final class ResXmlUtils {
      * @return String|null
      */
     private static String pullValueFromXml(File file, String type, String key) {
-        if (!file.isFile() || key == null || !key.contains("@")) {
+        if (!file.isFile() || key == null || key.indexOf('@') == -1) {
             return null;
         }
 

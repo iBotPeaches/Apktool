@@ -38,7 +38,7 @@ public class DebuggableTrueRetainedTest extends BaseTest {
         LOGGER.info("Unpacking issue2328-debuggable-true...");
         TestUtils.copyResourceDir(DebuggableTrueRetainedTest.class, "issue2328/debuggable-true", sTestOrigDir);
 
-        sConfig.setDebugMode(true);
+        sConfig.setDebuggable(true);
         sConfig.setVerbose(true);
 
         LOGGER.info("Building issue2328-debuggable-true.apk...");

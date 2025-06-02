@@ -3,15 +3,15 @@ apkFileName: testapp.apk
 usesFramework:
   ids:
   - 1
-packageInfo:
-  forcedPackageId: '127'
 versionInfo:
   versionCode: '1'
   versionName: '1.0'
+resourcesInfo:
+  packageId: '127'
+  sparseResources: false
 featureFlags:
   brut.feature.permission: true
   brut.feature.activity: true
-sparseResources: false
 doNotCompress:
 - assets/0byte_file.jpg
 - arsc

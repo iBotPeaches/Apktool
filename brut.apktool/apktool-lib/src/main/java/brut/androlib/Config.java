@@ -16,38 +16,13 @@
  */
 package brut.androlib;
 
-import brut.androlib.exceptions.AndrolibException;
-import brut.util.OSDetection;
-
-import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
-public final class Config {
+public class Config {
     public enum DecodeSources { NONE, FULL, ONLY_MAIN_CLASSES }
     public enum DecodeResources { NONE, FULL, ONLY_MANIFEST }
-    public enum DecodeAssets { NONE, FULL }
     public enum DecodeResolve { REMOVE, DUMMY, KEEP }
+    public enum DecodeAssets { NONE, FULL }
 
-    private static final String DEFAULT_FRAMEWORK_DIRECTORY;
-
-    static {
-        File parent = new File(System.getProperty("user.home"));
-        Path path;
-        if (OSDetection.isMacOSX()) {
-            path = Paths.get(parent.getAbsolutePath(), "Library", "apktool", "framework");
-        } else if (OSDetection.isWindows()) {
-            path = Paths.get(parent.getAbsolutePath(), "AppData", "Local", "apktool", "framework");
-        } else {
-            String xdgDataFolder = System.getenv("XDG_DATA_HOME");
-            if (xdgDataFolder != null) {
-                path = Paths.get(xdgDataFolder, "apktool", "framework");
-            } else {
-                path = Paths.get(parent.getAbsolutePath(), ".local", "share", "apktool", "framework");
-            }
-        }
-        DEFAULT_FRAMEWORK_DIRECTORY = path.toString();
-    }
+    private final String mVersion;
 
     // Common options
     private int mJobs;
@@ -60,26 +35,26 @@ public final class Config {
     // Decode options
     private DecodeSources mDecodeSources;
     private boolean mBaksmaliDebugMode;
-    private int mBaksmaliApiLevel;
     private DecodeResources mDecodeResources;
     private DecodeResolve mDecodeResolve;
-    private boolean mAnalysisMode;
     private boolean mKeepBrokenResources;
+    private boolean mAnalysisMode;
     private DecodeAssets mDecodeAssets;
 
     // Build options
-    private boolean mDebugMode;
-    private boolean mNetSecConf;
-    private boolean mCopyOriginalFiles;
-    private boolean mNoCrunch;
     private boolean mNoApk;
-    private File mAaptBinary;
-    private int mAaptVersion;
+    private boolean mNoCrunch;
+    private boolean mCopyOriginal;
+    private boolean mDebuggable;
+    private boolean mNetSecConf;
+    private String mAaptBinary;
 
-    public Config() {
+    public Config(String version) {
+        mVersion = version;
+
         // Common options
         mJobs = Math.min(Runtime.getRuntime().availableProcessors(), 8);
-        mFrameworkDirectory = DEFAULT_FRAMEWORK_DIRECTORY;
+        mFrameworkDirectory = null;
         mFrameworkTag = null;
         mLibraryFiles = null;
         mForced = false;
@@ -88,21 +63,23 @@ public final class Config {
         // Decode options
         mDecodeSources = DecodeSources.FULL;
         mBaksmaliDebugMode = true;
-        mBaksmaliApiLevel = 0;
         mDecodeResources = DecodeResources.FULL;
         mDecodeResolve = DecodeResolve.REMOVE;
-        mAnalysisMode = false;
         mKeepBrokenResources = false;
+        mAnalysisMode = false;
         mDecodeAssets = DecodeAssets.FULL;
 
         // Build options
-        mDebugMode = false;
-        mNetSecConf = false;
-        mCopyOriginalFiles = false;
-        mNoCrunch = false;
         mNoApk = false;
+        mNoCrunch = false;
+        mCopyOriginal = false;
+        mDebuggable = false;
+        mNetSecConf = false;
         mAaptBinary = null;
-        mAaptVersion = 2;
+    }
+
+    public String getVersion() {
+        return mVersion;
     }
 
     // Common options
@@ -120,9 +97,6 @@ public final class Config {
     }
 
     public void setFrameworkDirectory(String frameworkDirectory) {
-        if (frameworkDirectory == null || frameworkDirectory.isEmpty()) {
-            frameworkDirectory = DEFAULT_FRAMEWORK_DIRECTORY;
-        }
         mFrameworkDirectory = frameworkDirectory;
     }
 
@@ -131,9 +105,6 @@ public final class Config {
     }
 
     public void setFrameworkTag(String frameworkTag) {
-        if (frameworkTag == null || frameworkTag.isEmpty()) {
-            frameworkTag = null;
-        }
         mFrameworkTag = frameworkTag;
     }
 
@@ -180,14 +151,6 @@ public final class Config {
         mBaksmaliDebugMode = baksmaliDebugMode;
     }
 
-    public int getBaksmaliApiLevel() {
-        return mBaksmaliApiLevel;
-    }
-
-    public void setBaksmaliApiLevel(int baksmaliApiLevel) {
-        mBaksmaliApiLevel = baksmaliApiLevel;
-    }
-
     public DecodeResources getDecodeResources() {
         return mDecodeResources;
     }
@@ -195,15 +158,6 @@ public final class Config {
     public void setDecodeResources(DecodeResources decodeResources) {
         assert decodeResources != null;
         mDecodeResources = decodeResources;
-    }
-
-    public DecodeAssets getDecodeAssets() {
-        return mDecodeAssets;
-    }
-
-    public void setDecodeAssets(DecodeAssets decodeAssets) {
-        assert decodeAssets != null;
-        mDecodeAssets = decodeAssets;
     }
 
     public DecodeResolve getDecodeResolve() {
@@ -231,30 +185,23 @@ public final class Config {
         mAnalysisMode = analysisMode;
     }
 
+    public DecodeAssets getDecodeAssets() {
+        return mDecodeAssets;
+    }
+
+    public void setDecodeAssets(DecodeAssets decodeAssets) {
+        assert decodeAssets != null;
+        mDecodeAssets = decodeAssets;
+    }
+
     // Build options
 
-    public boolean isDebugMode() {
-        return mDebugMode;
+    public boolean isNoApk() {
+        return mNoApk;
     }
 
-    public void setDebugMode(boolean debugMode) {
-        mDebugMode = debugMode;
-    }
-
-    public boolean isNetSecConf() {
-        return mNetSecConf;
-    }
-
-    public void setNetSecConf(boolean netSecConf) {
-        mNetSecConf = netSecConf;
-    }
-
-    public boolean isCopyOriginalFiles() {
-        return mCopyOriginalFiles;
-    }
-
-    public void setCopyOriginalFiles(boolean copyOriginalFiles) {
-        mCopyOriginalFiles = copyOriginalFiles;
+    public void setNoApk(boolean noApk) {
+        mNoApk = noApk;
     }
 
     public boolean isNoCrunch() {
@@ -265,28 +212,35 @@ public final class Config {
         mNoCrunch = noCrunch;
     }
 
-    public boolean isNoApk() {
-        return mNoApk;
+    public boolean isCopyOriginal() {
+        return mCopyOriginal;
     }
 
-    public void setNoApk(boolean noApk) {
-        mNoApk = noApk;
+    public void setCopyOriginal(boolean copyOriginal) {
+        mCopyOriginal = copyOriginal;
     }
 
-    public File getAaptBinary() {
+    public boolean isDebuggable() {
+        return mDebuggable;
+    }
+
+    public void setDebuggable(boolean debuggable) {
+        mDebuggable = debuggable;
+    }
+
+    public boolean isNetSecConf() {
+        return mNetSecConf;
+    }
+
+    public void setNetSecConf(boolean netSecConf) {
+        mNetSecConf = netSecConf;
+    }
+
+    public String getAaptBinary() {
         return mAaptBinary;
     }
 
-    public void setAaptBinary(File aaptBinary) throws AndrolibException {
+    public void setAaptBinary(String aaptBinary) {
         mAaptBinary = aaptBinary;
-        mAaptVersion = AaptManager.getAaptVersion(aaptBinary);
-    }
-
-    public int getAaptVersion() {
-        return mAaptVersion;
-    }
-
-    public void setAaptVersion(int aaptVersion) {
-        mAaptVersion = aaptVersion;
     }
 }

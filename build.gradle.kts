@@ -1,6 +1,6 @@
 import java.io.ByteArrayOutputStream
 
-val version = "2.11.2"
+val version = "3.0.0"
 val suffix = "SNAPSHOT"
 
 // Strings embedded into the build.
@@ -58,13 +58,6 @@ plugins {
     `java-library`
     `maven-publish`
     signing
-}
-
-tasks.withType<JavaCompile> {
-    options.compilerArgs.add("-Xlint:-options")
-    options.compilerArgs.add("--release 8")
-
-    options.encoding = "UTF-8"
 }
 
 allprojects {
@@ -162,9 +155,16 @@ subprojects {
 }
 
 task("release") {
-  // Used for official releases.
+    // Used for official releases.
 }
 
 tasks.wrapper {
     distributionType = Wrapper.DistributionType.ALL
+}
+
+tasks.withType<JavaCompile> {
+    options.compilerArgs.add("-Xlint:-options")
+    options.compilerArgs.add("--release 8")
+
+    options.encoding = "UTF-8"
 }

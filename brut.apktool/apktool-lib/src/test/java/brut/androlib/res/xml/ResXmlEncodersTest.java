@@ -25,6 +25,7 @@ import org.junit.*;
 import static org.junit.Assert.assertEquals;
 
 public class ResXmlEncodersTest extends BaseTest {
+
     @Test
     public void escapeXmlCharsEscapeExpected() {
         assertEquals("foo", ResXmlEncoders.escapeXmlChars("foo"));

@@ -24,11 +24,8 @@ import java.io.DataInputStream;
 import java.io.FilterInputStream;
 import java.io.InputStream;
 import java.io.IOException;
-import java.util.logging.Logger;
 
 public class ExtDataInputStream extends FilterInputStream implements ExtDataInput {
-    private static final Logger LOGGER = Logger.getLogger(ExtDataInputStream.class.getName());
-
     private final DataInput mDelegate;
     private final CountingInputStream mCountIn;
 
@@ -50,24 +47,28 @@ public class ExtDataInputStream extends FilterInputStream implements ExtDataInpu
         mCountIn = countIn;
     }
 
-    public void jumpTo(long expectedPosition) throws IOException {
-        long position = this.position();
-        if (position > expectedPosition) {
-            throw new IOException(String.format("Jumping backwards from %d to %d", position, expectedPosition));
-        }
-        if (position < expectedPosition) {
-            long skipped = skip(expectedPosition - position);
-            if (skipped != expectedPosition - position) {
-                throw new IOException(String.format("Jump failed: expected %d, got %d", expectedPosition - position, skipped));
-            }
-        }
-    }
-
     // ExtDataInput
 
     @Override
     public long position() {
         return mCountIn.getCount();
+    }
+
+    @Override
+    public void jumpTo(long pos) throws IOException {
+        long oldPos = position();
+        if (oldPos == pos) {
+            return;
+        }
+        if (oldPos > pos) {
+            throw new IOException(String.format(
+                "Illegal backwards jump from %d to %d", oldPos, pos));
+        }
+        long skipped = skip(pos - oldPos);
+        if (skipped != pos - oldPos) {
+            throw new IOException(String.format(
+                "Jump failed: expected=%d, got=%d", pos - oldPos, skipped));
+        }
     }
 
     @Override
@@ -99,23 +100,6 @@ public class ExtDataInputStream extends FilterInputStream implements ExtDataInpu
     public int[] readIntArray(int len) throws IOException {
         int[] arr = new int[len];
         for (int i = 0; i < len; i++) {
-            arr[i] = readInt();
-        }
-        return arr;
-    }
-
-    @Override
-    public int[] readSafeIntArray(int len, long maxPosition) throws IOException {
-        int[] arr = new int[len];
-        for (int i = 0; i < len; i++) {
-            // #3236 - In some applications we have more strings than fit into the block. This function takes
-            // an expected max position and if we are past it, we return early during processing.
-            if (position() >= maxPosition) {
-                LOGGER.warning(String.format("Bad string block: string entry is at %d, past end at %d",
-                    position(), maxPosition));
-                return arr;
-            }
-
             arr[i] = readInt();
         }
         return arr;

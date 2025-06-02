@@ -26,7 +26,7 @@ import java.io.Writer;
 public final class YamlStringEscapeUtils {
 
     private YamlStringEscapeUtils() {
-        // Private constructor for utility class
+        // Private constructor for utility class.
     }
 
     public static String escapeString(String str) {

@@ -1,14 +1,15 @@
+val gitRevision: String by rootProject.extra
 val apktoolVersion: String by rootProject.extra
+val r8: Configuration by configurations.creating
 
 plugins {
     application
 }
 
-val r8: Configuration by configurations.creating
-
 dependencies {
-    implementation(libs.commons.cli)
     implementation(project(":brut.apktool:apktool-lib"))
+    implementation(libs.commons.cli)
+    implementation(libs.commons.io)
     r8(libs.r8)
 }
 
@@ -16,6 +17,17 @@ application {
     mainClass.set("brut.apktool.Main")
 
     tasks.run.get().workingDir = file(System.getProperty("user.dir"))
+}
+
+tasks {
+    processResources {
+        from("src/main/resources") {
+            include("apktool.properties")
+            expand("version" to apktoolVersion, "gitrev" to gitRevision)
+            duplicatesStrategy = DuplicatesStrategy.INCLUDE
+        }
+        includeEmptyDirs = false
+    }
 }
 
 tasks.withType<AbstractArchiveTask>().configureEach {

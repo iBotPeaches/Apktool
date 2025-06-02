@@ -371,8 +371,8 @@ public class BuildAndDecodeApkTest extends BaseTest {
         compareXmlFiles("res/layout/issue1157.xml");
     }
 
-    @Test(expected = AssertionError.class)
-    public void xmlFillParentBecomesMatchTest() throws BrutException {
+    @Test
+    public void xmlExpectMatchParentTest() throws BrutException {
         compareXmlFiles("res/layout/issue1274.xml");
     }
 

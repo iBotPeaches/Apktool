@@ -55,7 +55,7 @@ public final class XmlUtils {
     private static final String FEATURE_LOAD_EXTERNAL_DTD = "http://apache.org/xml/features/nonvalidating/load-external-dtd";
 
     private XmlUtils() {
-        // Private constructor for utility class
+        // Private constructor for utility class.
     }
 
     private static DocumentBuilder newDocumentBuilder(boolean nsAware)
@@ -69,7 +69,7 @@ public final class XmlUtils {
         try {
             factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
             factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
-        } catch (IllegalArgumentException ex) {
+        } catch (IllegalArgumentException ignored) {
             LOGGER.warning("JAXP 1.5 Support is required to validate XML");
         }
 
@@ -114,7 +114,7 @@ public final class XmlUtils {
         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
 
         byte[] xmlDecl = "<?xml version=\"1.0\" encoding=\"utf-8\"?>".getBytes(StandardCharsets.US_ASCII);
-        byte[] newLine = System.getProperty("line.separator").getBytes(StandardCharsets.US_ASCII);
+        byte[] newLine = System.lineSeparator().getBytes(StandardCharsets.US_ASCII);
 
         try (OutputStream out = Files.newOutputStream(file.toPath())) {
             out.write(xmlDecl);

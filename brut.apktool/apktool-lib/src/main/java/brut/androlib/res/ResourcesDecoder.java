@@ -19,18 +19,19 @@ package brut.androlib.res;
 import brut.androlib.Config;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.meta.ApkInfo;
-import brut.androlib.meta.PackageInfo;
+import brut.androlib.meta.ResourcesInfo;
 import brut.androlib.meta.SdkInfo;
 import brut.androlib.meta.VersionInfo;
-import brut.androlib.res.data.*;
 import brut.androlib.res.decoder.*;
-import brut.androlib.res.xml.ResValuesXmlSerializable;
+import brut.androlib.res.decoder.data.*;
+import brut.androlib.res.table.*;
+import brut.androlib.res.table.value.ResFileReference;
 import brut.androlib.res.xml.ResXmlUtils;
+import brut.androlib.res.xml.ValuesXmlSerializable;
 import brut.directory.Directory;
 import brut.directory.DirectoryException;
 import brut.directory.ExtFile;
 import brut.xmlpull.MXSerializer;
-import com.google.common.collect.Sets;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.*;
@@ -40,29 +41,20 @@ import java.util.logging.Logger;
 public class ResourcesDecoder {
     private static final Logger LOGGER = Logger.getLogger(ResourcesDecoder.class.getName());
 
-    private static final Set<String> IGNORED_PACKAGES = Sets.newHashSet(
-        "android", "com.htc", "com.lge", "com.lge.internal", "yi", "flyme", "air.com.adobe.appentry",
-        "FFFFFFFFFFFFFFFFFFFFFF"
-    );
-
     private final ApkInfo mApkInfo;
     private final Config mConfig;
-    private final ResTable mResTable;
+    private final ResTable mTable;
     private final Map<String, String> mResFileMapping;
 
     public ResourcesDecoder(ApkInfo apkInfo, Config config) {
         mApkInfo = apkInfo;
         mConfig = config;
-        mResTable = new ResTable(apkInfo, config);
+        mTable = new ResTable(apkInfo, config);
         mResFileMapping = new HashMap<>();
     }
 
-    public ResTable getResTable() throws AndrolibException {
-        if (!mApkInfo.hasManifest() && !mApkInfo.hasResources()) {
-            throw new AndrolibException(
-                "Apk doesn't contain either AndroidManifest.xml file or resources.arsc file");
-        }
-        return mResTable;
+    public ResTable getTable() {
+        return mTable;
     }
 
     public Map<String, String> getResFileMapping() {
@@ -74,43 +66,59 @@ public class ResourcesDecoder {
             return;
         }
 
-        mResTable.loadMainPackage();
+        mTable.loadMainPackage();
 
-        ResStreamDecoderContainer decoders = new ResStreamDecoderContainer();
-        decoders.setDecoder("raw", new ResRawStreamDecoder());
-        decoders.setDecoder("9patch", new Res9patchStreamDecoder());
+        Map<ResFileDecoder.Type, ResStreamDecoder> decoders = new HashMap<>();
+        decoders.put(ResFileDecoder.Type.UNKNOWN, new ResRawStreamDecoder());
+        decoders.put(ResFileDecoder.Type.PNG_9PATCH, new ResNinePatchStreamDecoder());
 
-        AXmlResourceParser axmlParser = new AXmlResourceParser(mResTable);
-        XmlSerializer xmlSerializer = newXmlSerializer();
-        decoders.setDecoder("xml", new ResXmlPullStreamDecoder(axmlParser, xmlSerializer));
+        BinaryXmlResourceParser parser = new BinaryXmlResourceParser(mTable);
+        XmlSerializer serial = newXmlSerializer();
+        decoders.put(ResFileDecoder.Type.BINARY_XML, new ResXmlPullStreamDecoder(parser, serial));
 
         ResFileDecoder fileDecoder = new ResFileDecoder(decoders);
         Directory inDir, outDir;
 
         try {
             inDir = mApkInfo.getApkFile().getDirectory();
-            outDir = new ExtFile(apkDir).getDirectory().createDir("res");
+            outDir = new ExtFile(apkDir).getDirectory();
         } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
         }
 
-        ResPackage pkg = mResTable.getMainPackage();
+        ResPackage pkg = mTable.getMainPackage();
 
         LOGGER.info("Decoding file-resources...");
-        for (ResResource res : pkg.listFiles()) {
-            fileDecoder.decode(res, inDir, outDir, mResFileMapping);
+        for (ResEntry entry : pkg.listEntries()) {
+            if (entry.getValue() instanceof ResFileReference) {
+                fileDecoder.decode(entry, inDir, outDir, mResFileMapping);
+            }
         }
 
         LOGGER.info("Decoding values */* XMLs...");
-        for (ResValuesFile valuesFile : pkg.listValuesFiles()) {
-            generateValuesFile(valuesFile, outDir, xmlSerializer);
+        Map<ResType, List<ResEntry>> valuesEntries = new HashMap<>();
+        // ResFileDecoder may have replaced some values, so we loop again.
+        for (ResEntry entry : pkg.listEntries()) {
+            if (entry.getValue() instanceof ValuesXmlSerializable
+                    && !pkg.isSynthesizedEntry(entry.getId())) {
+                ResType type = entry.getType();
+                List<ResEntry> entries = valuesEntries.get(type);
+                if (entries == null) {
+                    entries = new ArrayList<>();
+                    valuesEntries.put(type, entries);
+                }
+                entries.add(entry);
+            }
+        }
+        for (Map.Entry<ResType, List<ResEntry>> entry : valuesEntries.entrySet()) {
+            generateValuesXml(pkg, entry.getKey(), entry.getValue(), outDir, serial);
         }
 
-        generatePublicXml(pkg, outDir, xmlSerializer);
+        generatePublicXml(pkg, outDir, serial);
 
-        AndrolibException decodeError = axmlParser.getFirstError();
-        if (decodeError != null) {
-            throw decodeError;
+        AndrolibException ex = parser.getFirstError();
+        if (ex != null) {
+            throw ex;
         }
     }
 
@@ -120,48 +128,53 @@ public class ResourcesDecoder {
             serial.setFeature(MXSerializer.FEATURE_ATTR_VALUE_NO_ESCAPE, true);
             serial.setProperty(MXSerializer.PROPERTY_DEFAULT_ENCODING, "utf-8");
             serial.setProperty(MXSerializer.PROPERTY_INDENTATION, "    ");
-            serial.setProperty(MXSerializer.PROPERTY_LINE_SEPARATOR, System.getProperty("line.separator"));
+            serial.setProperty(MXSerializer.PROPERTY_LINE_SEPARATOR, System.lineSeparator());
             return serial;
         } catch (IllegalArgumentException | IllegalStateException ex) {
             throw new AndrolibException(ex);
         }
     }
 
-    private void generateValuesFile(ResValuesFile valuesFile, Directory resDir, XmlSerializer serial)
-            throws AndrolibException {
-        try (OutputStream out = resDir.getFileOutput(valuesFile.getPath())) {
+    private void generateValuesXml(ResPackage pkg, ResType type, List<ResEntry> entries, Directory outDir,
+                                   XmlSerializer serial) throws AndrolibException {
+        String path = "res/values" + type.getConfig().getQualifiers() + "/"
+                + type.getName() + (type.getName().endsWith("s") ? "" : "s") + ".xml";
+
+        entries.sort(Comparator.comparing(ResEntry::getId));
+
+        try (OutputStream out = outDir.getFileOutput(path)) {
             serial.setOutput(out, null);
             serial.startDocument(null, null);
             serial.startTag(null, "resources");
 
-            for (ResResource res : valuesFile.listResources()) {
-                if (valuesFile.isSynthesized(res)) {
-                    continue;
-                }
-                ((ResValuesXmlSerializable) res.getValue()).serializeToResValuesXml(serial, res);
+            for (ResEntry entry : entries) {
+                // We already verified the value, cast directly.
+                ((ValuesXmlSerializable) entry.getValue()).serializeToValuesXml(serial, entry);
             }
 
             serial.endTag(null, "resources");
             serial.endDocument();
             serial.flush();
         } catch (DirectoryException | IOException ex) {
-            throw new AndrolibException("Could not generate: " + valuesFile.getPath(), ex);
+            throw new AndrolibException("Could not generate: " + path, ex);
         }
     }
 
-    private void generatePublicXml(ResPackage pkg, Directory resDir, XmlSerializer serial)
+    private void generatePublicXml(ResPackage pkg, Directory outDir, XmlSerializer serial)
             throws AndrolibException {
-        try (OutputStream out = resDir.getFileOutput("values/public.xml")) {
+        String path = "res/values/public.xml";
+
+        List<ResEntrySpec> specs = new ArrayList<>(pkg.listEntrySpecs());
+        specs.sort(Comparator.comparing(ResEntrySpec::getId));
+
+        try (OutputStream out = outDir.getFileOutput(path)) {
             serial.setOutput(out, null);
             serial.startDocument(null, null);
             serial.startTag(null, "resources");
 
-            List<ResResSpec> specs = pkg.listResSpecs();
-            specs.sort(Comparator.comparing(ResResSpec::getId));
-
-            for (ResResSpec spec : specs) {
+            for (ResEntrySpec spec : specs) {
                 serial.startTag(null, "public");
-                serial.attribute(null, "type", spec.getType().getName());
+                serial.attribute(null, "type", spec.getTypeName());
                 serial.attribute(null, "name", spec.getName());
                 serial.attribute(null, "id", spec.getId().toString());
                 serial.endTag(null, "public");
@@ -171,7 +184,7 @@ public class ResourcesDecoder {
             serial.endDocument();
             serial.flush();
         } catch (DirectoryException | IOException ex) {
-            throw new AndrolibException("Could not generate public.xml file", ex);
+            throw new AndrolibException("Could not generate: " + path, ex);
         }
     }
 
@@ -180,26 +193,23 @@ public class ResourcesDecoder {
             return;
         }
 
-        AXmlResourceParser axmlParser = new AndroidManifestResourceParser(mResTable);
-        XmlSerializer xmlSerializer = newXmlSerializer();
-        ResStreamDecoder fileDecoder = new AndroidManifestPullStreamDecoder(axmlParser, xmlSerializer);
+        BinaryXmlResourceParser parser = new AndroidManifestResourceParser(mTable);
+        XmlSerializer serial = newXmlSerializer();
+        ResStreamDecoder decoder = new AndroidManifestPullStreamDecoder(parser, serial);
 
         Directory inDir, outDir;
         try {
             inDir = mApkInfo.getApkFile().getDirectory();
             outDir = new ExtFile(apkDir).getDirectory();
 
-            if (mResTable.isMainPackageLoaded()) {
-                LOGGER.info("Decoding AndroidManifest.xml with resources...");
-            } else {
-                LOGGER.info("Decoding AndroidManifest.xml with only framework resources...");
-            }
+            LOGGER.info("Decoding AndroidManifest.xml with "
+                    + (mTable.isMainPackageLoaded() ? "resources" : "only framework resources") + "...");
 
             try (
                 InputStream in = inDir.getFileInput("AndroidManifest.xml");
                 OutputStream out = outDir.getFileOutput("AndroidManifest.xml")
             ) {
-                fileDecoder.decode(in, out);
+                decoder.decode(in, out);
             }
         } catch (DirectoryException | IOException ex) {
             throw new AndrolibException(ex);
@@ -207,10 +217,23 @@ public class ResourcesDecoder {
 
         File manifest = new File(apkDir, "AndroidManifest.xml");
 
-        if (mResTable.isMainPackageLoaded()) {
-            mResTable.updateApkInfo();
+        if (mTable.isMainPackageLoaded()) {
+            mTable.updateApkInfo();
 
-            // resolve sdkInfo from resources
+            // We temporarily filled packageName in ResourcesInfo with the package
+            // from AndroidManifest.xml. Check if resources package has to be renamed
+            // to manifest package, clear it otherwise.
+            ResourcesInfo resourcesInfo = mApkInfo.getResourcesInfo();
+            String manifestPackage = resourcesInfo.getPackageName();
+            String resourcesPackage = mTable.getMainPackage().getName();
+            if (resourcesPackage != null && !resourcesPackage.equals(manifestPackage)) {
+                resourcesInfo.setPackageName(resourcesPackage);
+            } else {
+                // Renaming not needed: resources package is null or identical.
+                resourcesInfo.setPackageName(null);
+            }
+
+            // Resolve sdkInfo from resources.
             SdkInfo sdkInfo = mApkInfo.getSdkInfo();
             if (!sdkInfo.isEmpty()) {
                 String minSdkVersion = sdkInfo.getMinSdkVersion();
@@ -236,7 +259,7 @@ public class ResourcesDecoder {
                 }
             }
 
-            // resolve versionInfo from resources
+            // Resolve versionInfo from resources.
             VersionInfo versionInfo = mApkInfo.getVersionInfo();
             if (!versionInfo.isEmpty()) {
                 String versionName = versionInfo.getVersionName();
@@ -247,34 +270,18 @@ public class ResourcesDecoder {
                     }
                 }
             }
-
-            if (!mConfig.isAnalysisMode()) {
-                // check if manifest package has to be renamed to main resource package
-                PackageInfo packageInfo = mApkInfo.getPackageInfo();
-                String manifestPackage = packageInfo.getRenameManifestPackage();
-                String mainResPackage = mResTable.getMainPackage().getName();
-
-                if (mainResPackage != null && !mainResPackage.equals(manifestPackage)
-                        && !IGNORED_PACKAGES.contains(mainResPackage)) {
-                    LOGGER.info("Renaming manifest package from " + manifestPackage + " to " + mainResPackage + "...");
-                    ResXmlUtils.renameManifestPackage(manifest, mainResPackage);
-                } else {
-                    // renaming not needed: main resource package is null/identical/ignored
-                    packageInfo.setRenameManifestPackage(null);
-                }
-            }
         } else {
-            // renaming not possible: manifest decoded without resources
-            mApkInfo.getPackageInfo().setRenameManifestPackage(null);
+            // Renaming not possible: manifest decoded without resources.
+            mApkInfo.getResourcesInfo().setPackageName(null);
         }
 
         if (!mConfig.isAnalysisMode()) {
-            // remove versionCode and versionName,
-            // it will be passed as a parameter to aapt via apktool.yml
+            // Remove versionCode and versionName, it will be passed to aapt as a parameter
+            // via apktool.yml.
             ResXmlUtils.removeManifestVersions(manifest);
         }
 
-        // record feature flags
+        // Record feature flags.
         String[] flags = ResXmlUtils.pullManifestFeatureFlags(manifest);
         if (flags != null) {
             Map<String, Boolean> featureFlags = mApkInfo.getFeatureFlags();

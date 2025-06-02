@@ -16,7 +16,7 @@
  */
 package brut.androlib.meta;
 
-import brut.androlib.res.data.ResConfigFlags;
+import brut.androlib.res.table.ResConfig;
 import brut.yaml.*;
 
 public class SdkInfo implements YamlSerializable {
@@ -104,34 +104,34 @@ public class SdkInfo implements YamlSerializable {
     public static int parseSdkInt(String sdkVersion) {
         switch (sdkVersion.toUpperCase()) {
             case "M":
-                return ResConfigFlags.SDK_MNC;
+                return ResConfig.SDK_MNC;
             case "N":
-                return ResConfigFlags.SDK_NOUGAT;
+                return ResConfig.SDK_NOUGAT;
             case "O":
-                return ResConfigFlags.SDK_OREO;
+                return ResConfig.SDK_OREO;
             case "P":
-                return ResConfigFlags.SDK_P;
+                return ResConfig.SDK_P;
             case "Q":
-                return ResConfigFlags.SDK_Q;
+                return ResConfig.SDK_Q;
             case "R":
-                return ResConfigFlags.SDK_R;
+                return ResConfig.SDK_R;
             case "S":
-                return ResConfigFlags.SDK_S;
+                return ResConfig.SDK_S;
             case "SV2":
-                return ResConfigFlags.SDK_S_V2;
+                return ResConfig.SDK_S_V2;
             case "T":
             case "TIRAMISU":
-                return ResConfigFlags.SDK_TIRAMISU;
+                return ResConfig.SDK_TIRAMISU;
             case "UPSIDEDOWNCAKE":
             case "UPSIDE_DOWN_CAKE":
-                return ResConfigFlags.SDK_UPSIDEDOWN_CAKE;
+                return ResConfig.SDK_UPSIDEDOWN_CAKE;
             case "VANILLAICECREAM":
             case "VANILLA_ICE_CREAM":
-                return ResConfigFlags.SDK_VANILLA_ICE_CREAM;
+                return ResConfig.SDK_VANILLA_ICE_CREAM;
             case "BAKLAVA":
-                return ResConfigFlags.SDK_BAKLAVA;
+                return ResConfig.SDK_BAKLAVA;
             case "SDK_CUR_DEVELOPMENT":
-                return ResConfigFlags.SDK_DEVELOPMENT;
+                return ResConfig.SDK_DEVELOPMENT;
             default:
                 return Integer.parseInt(sdkVersion);
         }

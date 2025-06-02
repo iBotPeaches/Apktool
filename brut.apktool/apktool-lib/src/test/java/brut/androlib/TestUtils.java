@@ -17,8 +17,8 @@
 package brut.androlib;
 
 import brut.common.BrutException;
-import brut.directory.DirUtils;
 import brut.directory.Directory;
+import brut.directory.ExtFile;
 import brut.directory.FileDirectory;
 import brut.util.OS;
 
@@ -49,7 +49,7 @@ public final class TestUtils {
         URL dirURL = clz.getClassLoader().getResource(dirPath);
         if (dirURL != null && dirURL.getProtocol().equals("file")) {
             try {
-                DirUtils.copyToDir(new FileDirectory(dirURL.getFile()), out);
+                new FileDirectory(dirURL.getFile()).copyToDir(out);
             } catch (UnsupportedEncodingException ex) {
                 throw new BrutException(ex);
             }
@@ -64,8 +64,8 @@ public final class TestUtils {
         if (dirURL.getProtocol().equals("jar")) {
             String jarPath;
             try {
-                jarPath = URLDecoder.decode(dirURL.getPath().substring(5, dirURL.getPath().indexOf("!")), "UTF-8");
-                DirUtils.copyToDir(new FileDirectory(jarPath), out);
+                jarPath = URLDecoder.decode(dirURL.getPath().substring(5, dirURL.getPath().indexOf('!')), "UTF-8");
+                new FileDirectory(jarPath).copyToDir(out);
             } catch (UnsupportedEncodingException ex) {
                 throw new BrutException(ex);
             }

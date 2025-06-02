@@ -34,11 +34,11 @@ public class ConsistentPropertyTest extends BaseTest {
         assertEquals("4", apkInfo.getSdkInfo().getMinSdkVersion());
         assertEquals("22", apkInfo.getSdkInfo().getTargetSdkVersion());
         assertEquals("30", apkInfo.getSdkInfo().getMaxSdkVersion());
-        assertEquals("127", apkInfo.getPackageInfo().getForcedPackageId());
-        assertEquals("com.test.basic", apkInfo.getPackageInfo().getRenameManifestPackage());
+        assertEquals("127", apkInfo.getResourcesInfo().getPackageId());
+        assertEquals("com.test.basic", apkInfo.getResourcesInfo().getPackageName());
+        assertTrue(apkInfo.getResourcesInfo().isSparseResources());
         assertEquals("71", apkInfo.getVersionInfo().getVersionCode());
         assertEquals("1.0.70", apkInfo.getVersionInfo().getVersionName());
-        assertTrue(apkInfo.isSparseResources());
         assertEquals(2, apkInfo.getDoNotCompress().size());
     }
 }

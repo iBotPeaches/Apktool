@@ -25,9 +25,9 @@ public class AaptVersionTest extends BaseTest {
 
     @Test
     public void testAapt2Iterations() throws AndrolibException {
-        assertEquals(2, AaptManager.getAaptVersionFromString("Android Asset Packaging Tool (aapt) 2:17"));
-        assertEquals(2, AaptManager.getAaptVersionFromString("Android Asset Packaging Tool (aapt) 2.17"));
-        assertEquals(1, AaptManager.getAaptVersionFromString("Android Asset Packaging Tool, v0.9"));
-        assertEquals(1, AaptManager.getAaptVersionFromString("Android Asset Packaging Tool, v0.2-2679779"));
+        assertEquals(2, AaptManager.getVersionFromString("Android Asset Packaging Tool (aapt) 2:17"));
+        assertEquals(2, AaptManager.getVersionFromString("Android Asset Packaging Tool (aapt) 2.17"));
+        assertEquals(1, AaptManager.getVersionFromString("Android Asset Packaging Tool, v0.9"));
+        assertEquals(1, AaptManager.getVersionFromString("Android Asset Packaging Tool, v0.2-2679779"));
     }
 }

@@ -18,7 +18,8 @@ package brut.androlib;
 
 import brut.androlib.meta.ApkInfo;
 import brut.androlib.res.ResourcesDecoder;
-import brut.androlib.res.data.ResTable;
+import brut.androlib.res.table.ResId;
+import brut.androlib.res.table.ResTable;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
 import brut.util.OS;
@@ -27,7 +28,7 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 public class NonStandardPkgIdTest extends BaseTest {
-    private static ResTable sResTable;
+    private static ResTable sTable;
 
     @BeforeClass
     public static void beforeClass() throws Exception {
@@ -49,12 +50,12 @@ public class NonStandardPkgIdTest extends BaseTest {
         OS.mkdir(sTestNewDir);
         resDecoder.decodeResources(sTestNewDir);
         resDecoder.decodeManifest(sTestNewDir);
-        sResTable = resDecoder.getResTable();
+        sTable = resDecoder.getTable();
     }
 
     @AfterClass
     public static void afterClass() throws Exception {
-        sResTable.getApkInfo().getApkFile().close();
+        sTable.getApkInfo().getApkFile().close();
     }
 
     @Test
@@ -74,10 +75,10 @@ public class NonStandardPkgIdTest extends BaseTest {
 
     @Test
     public void confirmResourcesAreFromPkgId8() throws BrutException {
-        assertEquals(0x80, sResTable.getMainPackage().getId());
+        assertEquals(0x80, sTable.getMainPackage().getId());
 
-        assertEquals(0x80, sResTable.getResSpec(0x80020000).getPackage().getId());
-        assertEquals(0x80, sResTable.getResSpec(0x80020001).getPackage().getId());
-        assertEquals(0x80, sResTable.getResSpec(0x80030000).getPackage().getId());
+        assertEquals(0x80, sTable.getEntrySpec(ResId.of(0x80020000)).getPackage().getId());
+        assertEquals(0x80, sTable.getEntrySpec(ResId.of(0x80020001)).getPackage().getId());
+        assertEquals(0x80, sTable.getEntrySpec(ResId.of(0x80030000)).getPackage().getId());
     }
 }

@@ -20,21 +20,21 @@ import java.io.DataInput;
 import java.io.IOException;
 
 public interface ExtDataInput extends DataInput {
-    public long position();
+    long position();
 
-    public void skipByte() throws IOException;
+    void jumpTo(long pos) throws IOException;
 
-    public void skipShort() throws IOException;
+    void skipByte() throws IOException;
 
-    public void skipInt() throws IOException;
+    void skipShort() throws IOException;
 
-    public byte[] readBytes(int len) throws IOException;
+    void skipInt() throws IOException;
 
-    public int[] readIntArray(int len) throws IOException;
+    byte[] readBytes(int len) throws IOException;
 
-    public int[] readSafeIntArray(int len, long maxPosition) throws IOException;
+    int[] readIntArray(int len) throws IOException;
 
-    public String readAscii(int len) throws IOException;
+    String readAscii(int len) throws IOException;
 
-    public String readUtf16(int len) throws IOException;
+    String readUtf16(int len) throws IOException;
 }

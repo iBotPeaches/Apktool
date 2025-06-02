@@ -814,7 +814,7 @@ public class MXSerializer implements XmlSerializer {
         }
         write("<!DOCTYPE");
         write(text);
-        write(">");
+        write('>');
     }
 
     @Override
@@ -865,7 +865,7 @@ public class MXSerializer implements XmlSerializer {
             String prefix = namespacePrefix[i];
             String uri = namespaceUri[i];
 
-            // Some applications as seen in #2664 have duplicated namespaces.
+            // #2664 - Some apps have duplicated namespaces.
             // AOSP doesn't care, but the parser does. So we filter them writer.
             if (uniqueNamespaces.contains(prefix + uri)) {
                 continue;
@@ -964,8 +964,8 @@ public class MXSerializer implements XmlSerializer {
                 }
             } else {
                 if (ch == '&') {
-                    if (!(i < text.length() - 3 && text.charAt(i+1) == 'l'
-                            && text.charAt(i+2) == 't' && text.charAt(i+3) == ';')) {
+                    if (!(i < text.length() - 3 && text.charAt(i + 1) == 'l'
+                            && text.charAt(i + 2) == 't' && text.charAt(i + 3) == ';')) {
                         if (i > pos) {
                             write(text.substring(pos, i));
                         }
@@ -987,7 +987,7 @@ public class MXSerializer implements XmlSerializer {
                 } else if (ch < 32) {
                     // in XML 1.0 only legal character are #x9 | #xA | #xD
                     if (ch == 9 || ch == 10 || ch == 13) {
-                        // pass through
+                        // fallthrough
                     } else {
                         if (TRACE_ESCAPING) {
                             System.err.println(getClass().getName() + " DEBUG TEXT value.len=" + text.length()
@@ -1041,7 +1041,7 @@ public class MXSerializer implements XmlSerializer {
                 } else if (ch < 32) {
                     // in XML 1.0 only legal character are #x9 | #xA | #xD
                     if (ch == 9 || ch == 10 || ch == 13) {
-                        // pass through
+                        // fallthrough
                     } else {
                         if (TRACE_ESCAPING) {
                             System.err.println(getClass().getName() + " DEBUG TEXT value.len=" + len + " "
@@ -1067,11 +1067,11 @@ public class MXSerializer implements XmlSerializer {
             return "null";
         }
         StringBuffer retval = new StringBuffer(str.length() + 16);
-        retval.append("'");
+        retval.append('\'');
         for (int i = 0; i < str.length(); i++) {
             addPrintable(retval, str.charAt(i));
         }
-        retval.append("'");
+        retval.append('\'');
         return retval.toString();
     }
 

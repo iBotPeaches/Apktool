@@ -17,9 +17,10 @@
 package brut.androlib;
 
 import brut.androlib.meta.ApkInfo;
-import brut.androlib.res.data.ResTable;
-import brut.androlib.res.data.value.ResArrayValue;
-import brut.androlib.res.data.value.ResValue;
+import brut.androlib.res.table.ResId;
+import brut.androlib.res.table.ResTable;
+import brut.androlib.res.table.value.ResArray;
+import brut.androlib.res.table.value.ResValue;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
 
@@ -27,7 +28,7 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 public class DecodeArrayTest extends BaseTest {
-    private static ResTable sResTable;
+    private static ResTable sTable;
 
     @BeforeClass
     public static void beforeClass() throws Exception {
@@ -36,24 +37,24 @@ public class DecodeArrayTest extends BaseTest {
         LOGGER.info("Decoding issue1994.apk...");
         ExtFile testApk = new ExtFile(sTmpDir, "issue1994.apk");
         ApkInfo testInfo = new ApkInfo(testApk);
-        sResTable = new ResTable(testInfo, sConfig);
-        sResTable.loadMainPackage();
+        sTable = new ResTable(testInfo, sConfig);
+        sTable.loadMainPackage();
     }
 
     @AfterClass
     public static void afterClass() throws Exception {
-        sResTable.getApkInfo().getApkFile().close();
+        sTable.getApkInfo().getApkFile().close();
     }
 
     @Test
     public void decodeStringArray() throws BrutException {
-        ResValue value = sResTable.getResSpec(0x7F020001).getDefaultResource().getValue();
-        assertTrue("Not a ResArrayValue. Found: " + value.getClass(), value instanceof ResArrayValue);
+        ResValue value = sTable.getDefaultEntry(ResId.of(0x7F020001)).getValue();
+        assertTrue("Not a ResArray. Found: " + value.getClass(), value instanceof ResArray);
     }
 
     @Test
     public void decodeArray() throws BrutException {
-        ResValue value = sResTable.getResSpec(0x7F020000).getDefaultResource().getValue();
-        assertTrue("Not a ResArrayValue. Found: " + value.getClass(), value instanceof ResArrayValue);
+        ResValue value = sTable.getDefaultEntry(ResId.of(0x7F020000)).getValue();
+        assertTrue("Not a ResArray. Found: " + value.getClass(), value instanceof ResArray);
     }
 }
