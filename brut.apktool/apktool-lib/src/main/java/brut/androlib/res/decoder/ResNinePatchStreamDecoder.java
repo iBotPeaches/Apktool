@@ -45,7 +45,7 @@ public class ResNinePatchStreamDecoder implements ResStreamDecoder {
 
             BufferedImage im2 = new BufferedImage(w + 2, h + 2, BufferedImage.TYPE_INT_ARGB);
             if (im.getType() == BufferedImage.TYPE_CUSTOM) {
-                //TODO: Ensure this is gray + alpha case?
+                // TODO: Ensure this is gray + alpha case?
                 Raster srcRaster = im.getRaster();
                 WritableRaster dstRaster = im2.getRaster();
                 int[] gray = null, alpha = null;

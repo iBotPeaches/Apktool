@@ -220,9 +220,9 @@ public class ResourcesDecoder {
         if (mTable.isMainPackageLoaded()) {
             mTable.updateApkInfo();
 
-            // We temporarily filled packageName in ResourcesInfo with the package
-            // from AndroidManifest.xml. Check if resources package has to be renamed
-            // to manifest package, clear it otherwise.
+            // We temporarily filled packageName in ResourcesInfo with the package from
+            // AndroidManifest.xml. Check if actual resources package differs from the
+            // manifest package and update packageName, otherwise clear packageName.
             ResourcesInfo resourcesInfo = mApkInfo.getResourcesInfo();
             String manifestPackage = resourcesInfo.getPackageName();
             String resourcesPackage = mTable.getMainPackage().getName();
