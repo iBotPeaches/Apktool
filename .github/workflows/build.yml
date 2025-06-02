@@ -26,7 +26,7 @@ jobs:
     runs-on: macos-latest
     strategy:
       matrix:
-        file: [ aapt_64, aapt2_64 ]
+        file: [ aapt2_64 ]
     steps:
       - uses: actions/checkout@v4
       - name: Verify Executable
@@ -38,7 +38,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        file: [ aapt, aapt_64, aapt2, aapt2_64 ]
+        file: [ aapt2, aapt2_64 ]
     steps:
       - uses: actions/checkout@v4
       - name: Verify Executable
@@ -50,7 +50,7 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        file: [ aapt.exe, aapt_64.exe, aapt2.exe, aapt2_64.exe ]
+        file: [ aapt2.exe, aapt2_64.exe ]
     steps:
       - uses: actions/checkout@v4
       - name: Verify Executable
