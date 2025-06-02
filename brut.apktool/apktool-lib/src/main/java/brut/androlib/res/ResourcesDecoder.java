@@ -87,18 +87,15 @@ public class ResourcesDecoder {
         }
 
         ResPackage pkg = mTable.getMainPackage();
+        Map<ResType, List<ResEntry>> valuesEntries = new HashMap<>();
 
         LOGGER.info("Decoding file-resources...");
         for (ResEntry entry : pkg.listEntries()) {
             if (entry.getValue() instanceof ResFileReference) {
                 fileDecoder.decode(entry, inDir, outDir, mResFileMapping);
             }
-        }
-
-        LOGGER.info("Decoding values */* XMLs...");
-        Map<ResType, List<ResEntry>> valuesEntries = new HashMap<>();
-        // ResFileDecoder may have replaced some values, so we loop again.
-        for (ResEntry entry : pkg.listEntries()) {
+            // ResFileDecoder may have replaced an invalid file reference,
+            // so we use "if" here rather than "else if".
             if (entry.getValue() instanceof ValuesXmlSerializable
                     && !pkg.isSynthesizedEntry(entry.getId())) {
                 ResType type = entry.getType();
@@ -110,6 +107,8 @@ public class ResourcesDecoder {
                 entries.add(entry);
             }
         }
+
+        LOGGER.info("Decoding values */* XMLs...");
         for (Map.Entry<ResType, List<ResEntry>> entry : valuesEntries.entrySet()) {
             generateValuesXml(pkg, entry.getKey(), entry.getValue(), outDir, serial);
         }

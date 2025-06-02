@@ -627,7 +627,7 @@ public class BinaryResourceParser {
     private ResValue readMapEntry() throws IOException {
         String typeName = mType.getName();
         // ResTable_map_entry
-        ResId parentId = ResId.of(mIn.readInt());
+        int parentId = mIn.readInt();
         int count = mIn.readInt();
 
         // Some apps store ID resource values generated for enum/flag items in attribute
@@ -636,7 +636,7 @@ public class BinaryResourceParser {
             return new ResCustom("id");
         }
 
-        ResReference parent = new ResReference(mPackage, parentId, ResReference.Type.RESOURCE);
+        ResReference parent = new ResReference(mPackage, ResId.of(parentId), ResReference.Type.RESOURCE);
         ResBag.RawItem[] rawItems = new ResBag.RawItem[count];
         int rawItemsCount = 0;
 
