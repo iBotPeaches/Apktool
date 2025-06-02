@@ -176,8 +176,8 @@ public class ResFlags extends ResAttribute {
             } else {
                 // #2836 - Support skipping items if the resource cannot be identified.
                 if (removeUnresolved) {
-                    LOGGER.warning(
-                        String.format("null flag reference: key=%s, value=%s", key, value));
+                    LOGGER.warning(String.format(
+                        "null flag reference: key=%s, value=%s", key, value));
                     continue;
                 }
 

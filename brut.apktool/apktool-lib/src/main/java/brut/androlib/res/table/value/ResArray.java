@@ -103,6 +103,8 @@ public class ResArray extends ResBag implements ValuesXmlSerializable {
 
                 itemType = spec.getTypeName();
             } else if (value instanceof ValuesXmlSerializable) {
+                // Since only string and integer arrays are supported,
+                // it's safe to check against the format.
                 itemType = ((ValuesXmlSerializable) value).getFormat();
             } else {
                 LOGGER.warning("Unexpected array value: " + value);
