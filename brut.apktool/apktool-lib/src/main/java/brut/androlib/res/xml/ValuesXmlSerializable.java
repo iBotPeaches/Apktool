@@ -25,8 +25,4 @@ import java.io.IOException;
 public interface ValuesXmlSerializable {
     void serializeToValuesXml(XmlSerializer serial, ResEntry entry)
             throws AndrolibException, IOException;
-
-    default String getFormat() {
-        throw new UnsupportedOperationException();
-    }
 }

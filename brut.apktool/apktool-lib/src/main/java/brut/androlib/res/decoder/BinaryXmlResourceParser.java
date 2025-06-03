@@ -73,7 +73,7 @@ public class BinaryXmlResourceParser implements XmlResourceParser {
     private boolean mDecreaseDepth;
     private AndrolibException mFirstError;
 
-    // All values are essentially indices, e.g. mNameIndex is an index of name in mStringPool.
+    // All values are essentially indices in the string pool.
     private int mEvent;
     private int mLineNumber;
     private int mNameIndex;
@@ -338,7 +338,7 @@ public class BinaryXmlResourceParser implements XmlResourceParser {
         if (prefix == null) {
             // If we are here. There is some clever obfuscation going on. Our reference points to the namespace are gone.
             // Normally we could take the index * attributeCount to get an offset.
-            // That would point to the URI in the ResStringPool table, but that is empty.
+            // That would point to the URI in the string pool, but that is empty.
             // We have the namespaces that can't be touched in the opening tag.
             // Though no known way to correlate them at this time.
             // So return the res-auto namespace.
@@ -367,7 +367,7 @@ public class BinaryXmlResourceParser implements XmlResourceParser {
         }
 
         String resourceMapValue;
-        String stringBlockValue = mStringPool.getString(name);
+        String stringPoolValue = mStringPool.getString(name);
         int nameId = getAttributeNameResource(index);
 
         try {
@@ -376,18 +376,18 @@ public class BinaryXmlResourceParser implements XmlResourceParser {
             resourceMapValue = null;
         }
 
-        // Android prefers the resource map value over what the String block has.
+        // Android prefers the resource map value over what the string pool has.
         // This can be seen quite often in obfuscated apps where values such as:
         // <item android:state_enabled="true" app:state_collapsed="false" app:state_collapsible="true">
-        // Are improperly decoded when trusting the String block.
+        // Are improperly decoded when trusting the string pool.
         // Leveraging the resource map allows us to get the proper value.
         // <item android:state_enabled="true" app:d2="false" app:d3="true">
         if (resourceMapValue != null) {
             return resourceMapValue;
         }
 
-        if (stringBlockValue != null) {
-            return stringBlockValue;
+        if (stringPoolValue != null) {
+            return stringPoolValue;
         }
 
         // If it was not found in either, then we have a bogus resource.
@@ -428,7 +428,7 @@ public class BinaryXmlResourceParser implements XmlResourceParser {
         int valueRaw = mAttributes[offset + ATTRIBUTE_IX_VALUE_STRING];
 
         try {
-            String stringBlockValue = valueRaw != -1
+            String stringPoolValue = valueRaw != -1
                 ? ResXmlEncoders.escapeXmlChars(mStringPool.getString(valueRaw)) : null;
             String resourceMapValue = null;
 
@@ -444,7 +444,7 @@ public class BinaryXmlResourceParser implements XmlResourceParser {
             // Try to decode from resource table.
             int nameId = getAttributeNameResource(index);
             ResItem value = ResItem.parse(mTable.getCurrentPackage(), valueType, valueData,
-                getPreferredString(stringBlockValue, resourceMapValue));
+                getPreferredString(stringPoolValue, resourceMapValue));
 
             String decoded = null;
             if (nameId != 0 && value instanceof ResPrimitive) {
@@ -683,20 +683,20 @@ public class BinaryXmlResourceParser implements XmlResourceParser {
         return -1;
     }
 
-    private static String getPreferredString(String stringBlockValue, String resourceMapValue) {
-        String value = stringBlockValue;
+    private static String getPreferredString(String stringPoolValue, String resourceMapValue) {
+        String value = stringPoolValue;
 
-        if (stringBlockValue != null && resourceMapValue != null) {
-            int slashPos = stringBlockValue.lastIndexOf('/');
-            int colonPos = stringBlockValue.lastIndexOf(':');
+        if (stringPoolValue != null && resourceMapValue != null) {
+            int slashPos = stringPoolValue.lastIndexOf('/');
+            int colonPos = stringPoolValue.lastIndexOf(':');
 
             // Handle a value with a format of "@yyy/xxx", but avoid "@yyy/zzz:xxx"
             if (slashPos != -1) {
                 if (colonPos == -1) {
-                    String type = stringBlockValue.substring(0, slashPos);
+                    String type = stringPoolValue.substring(0, slashPos);
                     value = type + "/" + resourceMapValue;
                 }
-            } else if (!stringBlockValue.equals(resourceMapValue)) {
+            } else if (!stringPoolValue.equals(resourceMapValue)) {
                 value = resourceMapValue;
             }
         }

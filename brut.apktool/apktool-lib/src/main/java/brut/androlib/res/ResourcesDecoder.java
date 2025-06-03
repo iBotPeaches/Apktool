@@ -96,8 +96,7 @@ public class ResourcesDecoder {
             }
             // ResFileDecoder may have replaced an invalid file reference,
             // so we use "if" here rather than "else if".
-            if (entry.getValue() instanceof ValuesXmlSerializable
-                    && !pkg.isSynthesizedEntry(entry.getId())) {
+            if (entry.getValue() instanceof ValuesXmlSerializable) {
                 ResType type = entry.getType();
                 List<ResEntry> entries = valuesEntries.get(type);
                 if (entries == null) {

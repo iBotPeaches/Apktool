@@ -21,18 +21,14 @@ import brut.androlib.res.table.ResEntry;
 import brut.androlib.res.table.ResEntrySpec;
 import brut.androlib.res.xml.ResXmlEncodable;
 import brut.androlib.res.xml.ValuesXmlSerializable;
-import com.google.common.collect.Sets;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
 import java.util.Objects;
-import java.util.Set;
 import java.util.logging.Logger;
 
 public class ResArray extends ResBag implements ValuesXmlSerializable {
     private static final Logger LOGGER = Logger.getLogger(ResArray.class.getName());
-
-    private static final Set<String> ALLOWED_ARRAY_TYPES = Sets.newHashSet("string", "integer");
 
     private final ResItem[] mItems;
 
@@ -54,21 +50,22 @@ public class ResArray extends ResBag implements ValuesXmlSerializable {
     @Override
     public void serializeToValuesXml(XmlSerializer serial, ResEntry entry)
             throws AndrolibException, IOException {
-        String tagName = resolveTagName();
-        serial.startTag(null, tagName);
-        serial.attribute(null, "name", entry.getName());
-
-        // Check if this string-array needs formatted="false".
-        if (tagName.equals("string-array")) {
-            for (ResItem value : mItems) {
-                // Only check strings, ignore references.
-                if (value instanceof ResString
-                        && ((ResString) value).hasMultipleNonPositionalSubstitutions()) {
-                    serial.attribute(null, "formatted", "false");
+        // Since only string and integer arrays are supported,
+        // it's safe to use the format as an array type.
+        String format = resolveFormat();
+        String type = null;
+        if (format != null) {
+            switch (format) {
+                case "string":
+                case "integer":
+                    type = format;
                     break;
-                }
             }
         }
+
+        String tagName = type != null ? type + "-array" : "array";
+        serial.startTag(null, tagName);
+        serial.attribute(null, "name", entry.getName());
 
         for (ResItem value : mItems) {
             String body;
@@ -89,38 +86,43 @@ public class ResArray extends ResBag implements ValuesXmlSerializable {
         serial.endTag(null, tagName);
     }
 
-    private String resolveTagName() throws AndrolibException {
-        String type = null;
+    private String resolveFormat() {
+        String format = null;
 
         for (ResItem value : mItems) {
-            String itemType = null;
+            String valueFormat = null;
 
             if (value instanceof ResReference) {
-                ResEntrySpec spec = ((ResReference) value).resolve();
-                if (spec == null) {
-                    continue;
+                // Try to get a more specific format from to the type of the
+                // referenced entry spec.
+                try {
+                    ResEntrySpec spec = ((ResReference) value).resolve();
+                    if (spec != null) {
+                        // Since only string and integer arrays are supported,
+                        // it's safe to compare with the referenecd type name.
+                        valueFormat = spec.getTypeName();
+                    }
+                } catch (AndrolibException ignored) {
                 }
-
-                itemType = spec.getTypeName();
-            } else if (value instanceof ValuesXmlSerializable) {
-                // Since only string and integer arrays are supported,
-                // it's safe to check against the format.
-                itemType = ((ValuesXmlSerializable) value).getFormat();
             } else {
-                LOGGER.warning("Unexpected array value: " + value);
+                valueFormat = value.getFormat();
+            }
+
+            // Ignore @null and @empty.
+            if (valueFormat == null) {
                 continue;
             }
 
-            if (itemType != null && ALLOWED_ARRAY_TYPES.contains(itemType)
-                    && (type == null || type.equals(itemType))) {
-                type = itemType;
-            } else {
-                type = null;
+            if (format == null) {
+                format = valueFormat;
+            } else if (!format.equals(valueFormat)) {
+                // The items don't share the same format.
+                format = null;
                 break;
             }
         }
 
-        return type != null ? type + "-array" : "array";
+        return format;
     }
 
     @Override

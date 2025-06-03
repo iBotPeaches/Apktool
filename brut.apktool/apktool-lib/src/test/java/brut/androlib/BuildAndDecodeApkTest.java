@@ -144,11 +144,6 @@ public class BuildAndDecodeApkTest extends BaseTest {
     }
 
     @Test
-    public void valuesIdsEmptyTest() throws BrutException {
-        compareXmlFiles("res/values/ids.xml");
-    }
-
-    @Test
     public void valuesIdsTest() throws BrutException {
         compareValuesFiles("values-mcc001/ids.xml");
     }

@@ -18,7 +18,6 @@ package brut.androlib.res.table;
 
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.exceptions.UndefinedResObjectException;
-import brut.androlib.meta.ApkInfo;
 import brut.androlib.res.table.value.ResValue;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -35,7 +34,6 @@ public class ResPackage {
     private final Map<Pair<Integer, ResConfig>, ResType> mTypes;
     private final Map<ResId, ResEntrySpec> mEntrySpecs;
     private final Map<Pair<ResId, ResConfig>, ResEntry> mEntries;
-    private final Set<ResId> mSynthesizedEntries;
 
     public ResPackage(ResTable table, int id, String name) {
         mTable = table;
@@ -45,7 +43,6 @@ public class ResPackage {
         mTypes = new HashMap<>();
         mEntrySpecs = new HashMap<>();
         mEntries = new HashMap<>();
-        mSynthesizedEntries = !table.getConfig().isAnalysisMode() ? new HashSet<>() : null;
     }
 
     public ResTable getTable() {
@@ -216,17 +213,6 @@ public class ResPackage {
 
     public Collection<ResEntry> listEntries() {
         return mEntries.values();
-    }
-
-    public boolean isSynthesizedEntry(ResId id) {
-        return mSynthesizedEntries != null && mSynthesizedEntries.contains(id);
-    }
-
-    public void addSynthesizedEntry(ResId id) {
-        if (mSynthesizedEntries != null) {
-            // Exclude the resource value from output.
-            mSynthesizedEntries.add(id);
-        }
     }
 
     @Override

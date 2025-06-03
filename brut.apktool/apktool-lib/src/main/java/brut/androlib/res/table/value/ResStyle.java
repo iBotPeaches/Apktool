@@ -51,8 +51,8 @@ public class ResStyle extends ResBag implements ValuesXmlSerializable {
         for (int i = 0; i < rawItems.length; i++) {
             RawItem rawItem = rawItems[i];
             // A reference to the XML attribute.
-            ResId keyId = ResId.of(rawItem.getKey());
-            ResReference key = new ResReference(pkg, keyId, ResReference.Type.RESOURCE);
+            int keyId = rawItem.getKey();
+            ResReference key = new ResReference(pkg, ResId.of(keyId));
             ResItem value = rawItem.getValue();
 
             items[i] = new Item(key, value);
@@ -94,7 +94,6 @@ public class ResStyle extends ResBag implements ValuesXmlSerializable {
         }
 
         Set<String> processedNames = new HashSet<>();
-
         for (Item item : mItems) {
             ResReference key = item.getKey();
             ResEntrySpec keySpec = key.resolve();

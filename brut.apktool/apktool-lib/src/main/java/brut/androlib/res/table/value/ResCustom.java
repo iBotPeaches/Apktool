@@ -27,31 +27,45 @@ import java.util.Objects;
 public class ResCustom extends ResValue implements ValuesXmlSerializable {
     private final String mType;
     private final String mValue;
+    private final boolean mAsItem;
 
     public ResCustom(String type) {
-        this(type, null);
+        this(type, null, false);
+    }
+
+    public ResCustom(String type, boolean asItem) {
+        this(type, null, asItem);
     }
 
     public ResCustom(String type, String value) {
+        this(type, value, false);
+    }
+
+    public ResCustom(String type, String value, boolean asItem) {
         mType = type;
         mValue = value;
+        mAsItem = asItem;
     }
 
     @Override
     public void serializeToValuesXml(XmlSerializer serial, ResEntry entry)
             throws AndrolibException, IOException {
-        serial.startTag(null, "item");
-        serial.attribute(null, "type", mType);
+        String tagName = mAsItem ? "item" : mType;
+        serial.startTag(null, tagName);
+        if (mAsItem) {
+            serial.attribute(null, "type", mType);
+        }
         serial.attribute(null, "name", entry.getName());
         if (mValue != null) {
             serial.text(mValue);
         }
-        serial.endTag(null, "item");
+        serial.endTag(null, tagName);
     }
 
     @Override
     public String toString() {
-        return String.format("ResCustom{type=%s, value=%s}", mType, mValue);
+        return String.format("ResCustom{type=%s, value=%s, asItem=%s}",
+            mType, mValue, mAsItem);
     }
 
     @Override
@@ -62,13 +76,14 @@ public class ResCustom extends ResValue implements ValuesXmlSerializable {
         if (obj instanceof ResCustom) {
             ResCustom other = (ResCustom) obj;
             return Objects.equals(mType, other.mType)
-                    && Objects.equals(mValue, other.mValue);
+                    && Objects.equals(mValue, other.mValue)
+                    && mAsItem == other.mAsItem;
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(mType, mValue);
+        return Objects.hash(mType, mValue, mAsItem);
     }
 }

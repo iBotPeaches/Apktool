@@ -22,7 +22,6 @@ import brut.androlib.res.table.ResEntry;
 import brut.androlib.res.xml.ResXmlEncodable;
 import brut.androlib.res.xml.ResXmlEncoders;
 import brut.androlib.res.xml.ValuesXmlSerializable;
-import com.google.common.collect.Sets;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
@@ -32,8 +31,6 @@ import java.util.logging.Logger;
 
 public class ResPrimitive extends ResItem implements ResXmlEncodable, ValuesXmlSerializable {
     private static final Logger LOGGER = Logger.getLogger(ResPrimitive.class.getName());
-
-    private static final Set<String> ALLOWED_ITEM_TYPES = Sets.newHashSet("dimen", "integer", "fraction");
 
     public static final ResPrimitive EMPTY = new ResPrimitive(TypedValue.TYPE_NULL, TypedValue.DATA_NULL_EMPTY);
     public static final ResPrimitive FALSE = new ResPrimitive(TypedValue.TYPE_INT_BOOLEAN, 0);
@@ -66,15 +63,15 @@ public class ResPrimitive extends ResItem implements ResXmlEncodable, ValuesXmlS
         String type = entry.getTypeName();
         boolean asItem = entry.getSpec().isDummy();
 
-        // AOSP specifies format explicitly for <item> tags of numeric types
-        // when the type doesn't match with the format.
-        // We use startsWith because type is sometimes shorter than format,
-        // e.g. bool/boolean and dimen/dimension. Just simpler than mapping.
+        // Specify format for <item> tags when the resource type doesn't
+        // directly support this primitive format.
         String format = getFormat();
-        boolean needsFormat = false;
-        if (!format.startsWith(type) && ALLOWED_ITEM_TYPES.contains(type)) {
-            asItem = true;
-            needsFormat = true;
+        Set<String> standardFormats = STANDARD_TYPE_FORMATS.get(type);
+        boolean needsFormat;
+        if (format != null && standardFormats != null && standardFormats.contains(format)) {
+            needsFormat = false;
+        } else {
+            needsFormat = asItem = true;
         }
 
         String tagName = asItem ? "item" : type;
@@ -109,7 +106,7 @@ public class ResPrimitive extends ResItem implements ResXmlEncodable, ValuesXmlS
                     return "integer";
                 }
                 if (mType == TypedValue.TYPE_NULL && mData == TypedValue.DATA_NULL_EMPTY) {
-                    return "";
+                    return null;
                 }
                 LOGGER.warning(String.format("Unexpected value type: 0x%02x", mType));
                 return null;

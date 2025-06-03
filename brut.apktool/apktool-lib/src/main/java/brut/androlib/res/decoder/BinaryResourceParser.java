@@ -634,7 +634,7 @@ public class BinaryResourceParser {
             return new ResCustom("id");
         }
 
-        ResReference parent = new ResReference(mPackage, ResId.of(parentId), ResReference.Type.RESOURCE);
+        ResReference parent = new ResReference(mPackage, ResId.of(parentId));
         ResBag.RawItem[] rawItems = new ResBag.RawItem[count];
         int rawItemsCount = 0;
 
@@ -677,11 +677,11 @@ public class BinaryResourceParser {
         String typeName = mType.getName();
         String rawValue = null;
 
-        // Android does not allow values (false) for ID resource values anymore even though
-        // it decodes as a boolean, which makes no sense.
-        // See: https://issuetracker.google.com/issues/80475496
-        // Replace with a placeholder value.
-        if (typeName.equals("id")) {
+        // ID resource values are either encoded as a boolean (false) or a resource reference.
+        // A boolean (false) is no longer allowed in XML, replace with a placeholder value.
+        // A resource reference is handled normally, unless it's @null.
+        if (typeName.equals("id") && (data == 0 || (type != TypedValue.TYPE_REFERENCE
+                && type != TypedValue.TYPE_DYNAMIC_REFERENCE))) {
             return new ResCustom("id");
         }
 
@@ -690,6 +690,7 @@ public class BinaryResourceParser {
             rawValue = mTableStrings.getHTML(data);
 
             // If a string is not allowed here, assume it's a file reference.
+            // ResFileDecoder will replace it if it's an invalid file reference.
             if (!inBag && rawValue != null && !rawValue.isEmpty() && !typeName.equals("string")) {
                 return new ResFileReference(rawValue);
             }

@@ -26,6 +26,7 @@ import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
 import java.util.Objects;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 public class ResString extends ResItem implements ResXmlEncodable, ValuesXmlSerializable {
@@ -37,6 +38,16 @@ public class ResString extends ResItem implements ResXmlEncodable, ValuesXmlSeri
         mValue = text;
     }
 
+    public boolean hasMultipleNonPositionalSubstitutions() {
+        return ResXmlEncoders.hasMultipleNonPositionalSubstitutions(mValue);
+    }
+
+    public String encodeAsResXmlItemValueUnescaped() {
+        return StringUtils.replaceEach(encodeAsResXmlValue(),
+            new String[] { "&amp;", "&lt;" },
+            new String[] { "&", "<" });
+    }
+
     @Override
     public String encodeAsResXmlValue() {
         return ResXmlEncoders.encodeAsXmlValue(mValue);
@@ -45,12 +56,6 @@ public class ResString extends ResItem implements ResXmlEncodable, ValuesXmlSeri
     @Override
     public String encodeAsResXmlItemValue() {
         return ResXmlEncoders.enumerateNonPositionalSubstitutionsIfRequired(encodeAsResXmlValue());
-    }
-
-    public String encodeAsResXmlItemValueUnescaped() {
-        return StringUtils.replaceEach(encodeAsResXmlValue(),
-            new String[] { "&amp;", "&lt;" },
-            new String[] { "&", "<" });
     }
 
     @Override
@@ -65,23 +70,20 @@ public class ResString extends ResItem implements ResXmlEncodable, ValuesXmlSeri
         return value;
     }
 
-    public boolean hasMultipleNonPositionalSubstitutions() {
-        return ResXmlEncoders.hasMultipleNonPositionalSubstitutions(mValue);
-    }
-
     @Override
     public void serializeToValuesXml(XmlSerializer serial, ResEntry entry)
             throws AndrolibException, IOException {
         String type = entry.getTypeName();
         boolean asItem = entry.getSpec().isDummy();
 
-        // Specify format explicitly for <item> tags when the type doesn't
-        // support the string format.
-        String format = getFormat();
-        boolean needsFormat = false;
-        if (!format.equals(type)) {
-            asItem = true;
-            needsFormat = true;
+        // Specify format for <item> tags when the resource type doesn't
+        // directly support the string format.
+        Set<String> standardFormats = STANDARD_TYPE_FORMATS.get(type);
+        boolean needsFormat;
+        if (standardFormats != null && standardFormats.contains("string")) {
+            needsFormat = false;
+        } else {
+            needsFormat = asItem = true;
         }
 
         String tagName = asItem ? "item" : type;

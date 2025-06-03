@@ -99,7 +99,7 @@ public class ResAttribute extends ResBag implements ValuesXmlSerializable {
             break;
         }
         if (i == n) {
-            // The attribute doesn't have any enum/flag symbols.
+            // The attribute doesn't have any symbols.
             return new ResAttribute(parent, type, min, max, l10n);
         }
 
@@ -108,17 +108,13 @@ public class ResAttribute extends ResBag implements ValuesXmlSerializable {
 
         for (int j = 0; i < n; i++, j++) {
             RawItem rawItem = rawItems[i];
-            // The name of the enum/flag symbol as a reference to a
-            // generated ID resource value.
-            ResId nameId = ResId.of(rawItem.getKey());
-            ResReference name = new ResReference(pkg, nameId, ResReference.Type.RESOURCE);
+            // The name of the symbol as a reference to a generated
+            // ID resource value.
+            int nameId = rawItem.getKey();
+            ResReference name = new ResReference(pkg, ResId.of(nameId));
             ResPrimitive value = (ResPrimitive) rawItem.getValue();
 
             symbols[j] = new Symbol(name, value);
-
-            // Exclude the generated ID resource values from output.
-            // This is optional, but makes ids.xml cleaner.
-            pkg.addSynthesizedEntry(nameId);
         }
 
         if ((type & TYPE_ENUM) != 0) {
@@ -199,7 +195,7 @@ public class ResAttribute extends ResBag implements ValuesXmlSerializable {
 
     public void serializeItemsToResValuesXml(XmlSerializer serial, ResEntry entry)
             throws AndrolibException, IOException {
-        // stub
+        // Stub for attribute types with symbols.
     }
 
     @Override

@@ -19,11 +19,29 @@ package brut.androlib.res.table.value;
 import android.util.TypedValue;
 import brut.androlib.res.table.ResId;
 import brut.androlib.res.table.ResPackage;
+import com.google.common.collect.Sets;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 public abstract class ResItem extends ResValue {
     private static final Logger LOGGER = Logger.getLogger(ResItem.class.getName());
+
+    protected static final Map<String, Set<String>> STANDARD_TYPE_FORMATS = new HashMap<>();
+
+    static {
+        STANDARD_TYPE_FORMATS.put("bool", Sets.newHashSet("boolean"));
+        STANDARD_TYPE_FORMATS.put("color", Sets.newHashSet("color"));
+        STANDARD_TYPE_FORMATS.put("dimen", Sets.newHashSet("float", "fraction", "dimension"));
+        STANDARD_TYPE_FORMATS.put("drawable", Sets.newHashSet("color"));
+        STANDARD_TYPE_FORMATS.put("fraction", Sets.newHashSet("float", "fraction", "dimension"));
+        STANDARD_TYPE_FORMATS.put("integer", Sets.newHashSet("integer"));
+        STANDARD_TYPE_FORMATS.put("string", Sets.newHashSet("string"));
+    }
+
+    public abstract String getFormat();
 
     public static ResItem parse(ResPackage pkg, int type, int data, String rawValue) {
         switch (type) {
@@ -32,7 +50,7 @@ public abstract class ResItem extends ResValue {
             case TypedValue.TYPE_REFERENCE:
             case TypedValue.TYPE_DYNAMIC_REFERENCE:
                 return data != 0 || rawValue != null
-                    ? new ResReference(pkg, ResId.of(data), rawValue, ResReference.Type.RESOURCE)
+                    ? new ResReference(pkg, ResId.of(data), rawValue)
                     : ResReference.NULL;
             case TypedValue.TYPE_ATTRIBUTE:
             case TypedValue.TYPE_DYNAMIC_ATTRIBUTE:

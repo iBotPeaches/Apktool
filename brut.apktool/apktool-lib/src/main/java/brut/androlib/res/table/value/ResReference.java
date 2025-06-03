@@ -39,6 +39,18 @@ public class ResReference extends ResItem implements ResXmlEncodable, ValuesXmlS
     private final String mName;
     private final Type mType;
 
+    public ResReference(ResPackage pkg, ResId id) {
+        this(pkg, id, null, Type.RESOURCE);
+    }
+
+    public ResReference(ResPackage pkg, String name) {
+        this(pkg, null, name, Type.RESOURCE);
+    }
+
+    public ResReference(ResPackage pkg, ResId id, String name) {
+        this(pkg, id, name, Type.RESOURCE);
+    }
+
     public ResReference(ResPackage pkg, ResId id, Type type) {
         this(pkg, id, null, type);
     }
