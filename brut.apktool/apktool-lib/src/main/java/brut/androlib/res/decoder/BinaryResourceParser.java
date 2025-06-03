@@ -248,9 +248,8 @@ public class BinaryResourceParser {
 
         // TypeIdOffset was added platform_frameworks_base/@f90f2f8dc36e7243b85e0b6a7fd5a590893c827e
         // which is only in split/new apps.
-        // short, short, int, int, char[128], int * 5
-        int splitHeaderSize = 2 + 2 + 4 + 4 + (2 * 128) + (4 * 5);
-        if (mChunkHeader.headerSize == splitHeaderSize) {
+        // sizeof(ResTable_package) = short + short + int + int + char[128] + int * 5 = 288
+        if (mChunkHeader.headerSize >= 288) {
             mTypeIdOffset = mIn.readInt();
 
             if (mTypeIdOffset > 0) {
@@ -369,7 +368,9 @@ public class BinaryResourceParser {
 
             int offset = entryOffsetMap.get(index);
             if (offset == NO_ENTRY) {
-                mMissingEntrySpecs.add(mEntryId);
+                if (!mPackage.hasEntrySpec(mEntryId)) {
+                    mMissingEntrySpecs.add(mEntryId);
+                }
                 continue;
             }
 
@@ -386,12 +387,13 @@ public class BinaryResourceParser {
             if (mIn.position() >= mChunkHeader.endPos) {
                 int remainingEntries = entryCount - index;
                 LOGGER.warning(String.format(
-                    "End of chunk hit. Skipping remaining entries (%d) in type: %s",
+                    "End of chunk hit. Skipping remaining %d entries in type: %s",
                     remainingEntries, mTypeSpec.getName()));
                 break;
             }
 
-            if (!readEntry()) {
+            ResValue value = readEntry();
+            if (value == null && !mPackage.hasEntrySpec(mEntryId)) {
                 mMissingEntrySpecs.add(mEntryId);
             }
         }
@@ -400,8 +402,7 @@ public class BinaryResourceParser {
         if (mChunkHeader.endPos > mIn.position()) {
             long bytesSkipped = mIn.skip(mChunkHeader.endPos - mIn.position());
             LOGGER.warning(String.format(
-                "Unknown data detected at end of type chunk. Skipping: %d byte(s)",
-                bytesSkipped));
+                "Skipping unknown %d bytes at end of type chunk.", bytesSkipped));
         }
     }
 
@@ -544,36 +545,36 @@ public class BinaryResourceParser {
         return flags;
     }
 
-    private String unpackLanguageOrRegion(byte[] value, char base) {
-        assert value.length == 2;
+    private String unpackLanguageOrRegion(byte[] in, char base) {
+        assert in.length == 2;
         // Return empty for "any" locale.
-        if (value[0] == 0) {
+        if (in[0] == 0) {
             return "";
         }
 
         // If high bit is set then we have a packed 3-letter code.
-        if ((value[0] & 0x80) != 0) {
-            value = new byte[] {
-                (byte) (base + (value[1] & 0x1F)),
-                (byte) (base + ((value[1] & 0xE0) >>> 5) + ((value[0] & 0x03) << 3)),
-                (byte) (base + ((value[0] & 0x7C) >>> 2))
+        if ((in[0] & 0x80) != 0) {
+            in = new byte[] {
+                (byte) (base + (in[1] & 0x1F)),
+                (byte) (base + ((in[1] & 0xE0) >>> 5) + ((in[0] & 0x03) << 3)),
+                (byte) (base + ((in[0] & 0x7C) >>> 2))
             };
         }
 
-        return new String(value, StandardCharsets.US_ASCII);
+        return new String(in, StandardCharsets.US_ASCII);
     }
 
-    private boolean readEntry() throws AndrolibException, IOException {
+    private ResValue readEntry() throws AndrolibException, IOException {
         // ResTable_entry
         int size = mIn.readUnsignedShort();
         int flags = mIn.readUnsignedShort();
+        int key = mIn.readInt();
 
         boolean isComplex = (flags & ENTRY_FLAG_COMPLEX) != 0;
         boolean isCompact = (flags & ENTRY_FLAG_COMPACT) != 0;
 
-        int keyIndex = mIn.readInt();
-        if (keyIndex == NO_ENTRY && !isCompact) {
-            return false;
+        if (key == NO_ENTRY && !isCompact) {
+            return null;
         }
 
         // Only flag the app as compact if the main package is not loaded yet.
@@ -582,29 +583,25 @@ public class BinaryResourceParser {
         }
 
         ResValue value;
-
         if (isComplex) {
             value = readMapEntry();
-        } else {
-            if (isCompact) {
-                // #3366 - In a compactly packed entry, the key index is the size & type is
-                // higher 8 bits on flags. We assume a size of 8 bytes for compact entries
-                // and the keyIndex is the data itself encoded.
-                int type = (flags >>> 8) & 0xFF;
-                value = parseValue(type, keyIndex, false);
+        } else if (isCompact) {
+            // In a compactly packed entry, the key index is the size & type is higher
+            // 8 bits on flags. We assume a size of 8 bytes for compact entries and the
+            // key index is the data itself encoded.
+            int type = (flags >>> 8) & 0xFF;
+            value = parseValue(type, key, false);
 
-                // To keep code below happy - we know if compact then the size has the key
-                // index encoded.
-                keyIndex = size;
-            } else {
-                value = readValue(false);
-            }
+            // If compact then the size has the key index encoded.
+            key = size;
+        } else {
+            value = readValue(false);
         }
 
         // #2824 - In some apps the res entries are duplicated with the 2nd being malformed.
         // AOSP skips this, so we will do the same.
         if (value == null) {
-            return false;
+            return null;
         }
 
         if (mType != null) {
@@ -614,14 +611,15 @@ public class BinaryResourceParser {
             if (mPackage.hasEntrySpec(mEntryId)) {
                 overwrite = mKeepBroken && mPackage.hasEntry(mEntryId, config);
             } else {
-                mPackage.addEntrySpec(mEntryId, mKeyStrings.getString(keyIndex));
+                mPackage.addEntrySpec(mEntryId, mKeyStrings.getString(key));
+                mMissingEntrySpecs.remove(mEntryId);
                 overwrite = false;
             }
 
             mPackage.addEntry(mEntryId, config, value, overwrite);
         }
 
-        return true;
+        return value;
     }
 
     private ResValue readMapEntry() throws IOException {
@@ -765,31 +763,30 @@ public class BinaryResourceParser {
         // has a specific distinction between the header and the body.
         int actualHeaderSize = (int) (mIn.position() - mChunkHeader.startPos);
         int exceedingSize = mChunkHeader.headerSize - actualHeaderSize;
-        if (exceedingSize > 0) {
-            byte[] buf = mIn.readBytes(exceedingSize);
-            BigInteger exceedingBI = new BigInteger(1, buf);
+        if (exceedingSize <= 0) {
+            return;
+        }
 
-            if (exceedingBI.equals(BigInteger.ZERO)) {
-                LOGGER.fine(String.format("Chunk header size (%d), read (%d), but exceeding bytes are all zero.",
-                    mChunkHeader.headerSize, actualHeaderSize));
-            } else {
-                LOGGER.warning(String.format("Chunk header size (%d), read (%d). Exceeding bytes: 0x%X.",
-                    mChunkHeader.headerSize, actualHeaderSize, exceedingBI));
-            }
+        byte[] buf = mIn.readBytes(exceedingSize);
+        BigInteger exceedingBI = new BigInteger(1, buf);
+
+        if (exceedingBI.equals(BigInteger.ZERO)) {
+            LOGGER.fine(String.format("Chunk header size (%d), read (%d), but exceeding bytes are all zero.",
+                mChunkHeader.headerSize, actualHeaderSize));
+        } else {
+            LOGGER.warning(String.format("Chunk header size (%d), read (%d). Exceeding bytes: %X",
+                mChunkHeader.headerSize, actualHeaderSize, exceedingBI));
         }
     }
 
     private void injectMissingEntrySpecs() throws AndrolibException {
-        if (mPackage == null || mPackage.getEntrySpecCount() == 0
-                || mTable.getConfig().getDecodeResolve() != Config.DecodeResolve.DUMMY) {
+        if (mPackage == null || mTable.getConfig().getDecodeResolve() != Config.DecodeResolve.DUMMY) {
             return;
         }
 
         for (ResId id : mMissingEntrySpecs) {
-            if (!mPackage.hasEntrySpec(id)) {
-                mPackage.addEntrySpec(id, ResEntrySpec.DUMMY_PREFIX + id);
-                mPackage.addEntry(id, ResConfig.DEFAULT, ResReference.NULL);
-            }
+            mPackage.addEntrySpec(id, ResEntrySpec.DUMMY_PREFIX + id);
+            mPackage.addEntry(id, ResConfig.DEFAULT, ResReference.NULL);
         }
     }
 }

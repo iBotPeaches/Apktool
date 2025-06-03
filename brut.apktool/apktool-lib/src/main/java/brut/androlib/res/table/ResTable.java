@@ -247,11 +247,7 @@ public class ResTable {
     }
 
     public void addDynamicRefPackage(int id, String name) {
-        if (id == 0) {
-            // Invalid dynamic ref package ID.
-            return;
-        }
-
+        assert id != 0;
         for (Map.Entry<Integer, String> entry : mDynamicRefTable.entrySet()) {
             if (id == entry.getKey()) {
                 if (name.equals(entry.getValue())) {
