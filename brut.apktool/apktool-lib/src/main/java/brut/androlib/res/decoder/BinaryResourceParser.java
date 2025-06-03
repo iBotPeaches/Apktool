@@ -771,10 +771,10 @@ public class BinaryResourceParser {
         BigInteger exceedingBI = new BigInteger(1, buf);
 
         if (exceedingBI.equals(BigInteger.ZERO)) {
-            LOGGER.fine(String.format("Chunk header size (%d), read (%d), but exceeding bytes are all zero.",
+            LOGGER.fine(String.format("Chunk header size: %d bytes, read: %d bytes, but exceeding bytes are all zero.",
                 mChunkHeader.headerSize, actualHeaderSize));
         } else {
-            LOGGER.warning(String.format("Chunk header size (%d), read (%d). Exceeding bytes: %X",
+            LOGGER.warning(String.format("Chunk header size: %d bytes, read: %d bytes. Exceeding bytes: %X",
                 mChunkHeader.headerSize, actualHeaderSize, exceedingBI));
         }
     }
