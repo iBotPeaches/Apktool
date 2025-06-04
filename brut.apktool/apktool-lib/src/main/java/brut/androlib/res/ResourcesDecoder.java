@@ -160,12 +160,8 @@ public class ResourcesDecoder {
 
     private void generatePublicXml(ResPackage pkg, Directory outDir, XmlSerializer serial)
             throws AndrolibException {
-        List<ResEntrySpec> specs = new ArrayList<>(pkg.listEntrySpecs());
-        if (specs.isEmpty()) {
-            return;
-        }
-
         String path = "res/values/public.xml";
+        List<ResEntrySpec> specs = new ArrayList<>(pkg.listEntrySpecs());
         specs.sort(Comparator.comparing(ResEntrySpec::getId));
 
         try (OutputStream out = outDir.getFileOutput(path)) {
