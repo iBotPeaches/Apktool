@@ -113,6 +113,7 @@ public class ResourcesDecoder {
         }
 
         generatePublicXml(pkg, outDir, serial);
+        generateOverlayableXml(outDir, serial);
 
         AndrolibException ex = parser.getFirstError();
         if (ex != null) {
@@ -133,12 +134,12 @@ public class ResourcesDecoder {
         }
     }
 
-    private void generateValuesXml(ResPackage pkg, ResType type, List<ResEntry> entries, Directory outDir,
-                                   XmlSerializer serial) throws AndrolibException {
+    private void generateValuesXml(ResPackage pkg, ResType type, List<ResEntry> entries,
+                                   Directory outDir, XmlSerializer serial) throws AndrolibException {
+        entries.sort(Comparator.comparing(ResEntry::getId));
+
         String path = "res/values" + type.getConfig().getQualifiers() + "/"
                 + type.getName() + (type.getName().endsWith("s") ? "" : "s") + ".xml";
-
-        entries.sort(Comparator.comparing(ResEntry::getId));
 
         try (OutputStream out = outDir.getFileOutput(path)) {
             serial.setOutput(out, null);
@@ -160,10 +161,10 @@ public class ResourcesDecoder {
 
     private void generatePublicXml(ResPackage pkg, Directory outDir, XmlSerializer serial)
             throws AndrolibException {
-        String path = "res/values/public.xml";
-
         List<ResEntrySpec> specs = new ArrayList<>(pkg.listEntrySpecs());
         specs.sort(Comparator.comparing(ResEntrySpec::getId));
+
+        String path = "res/values/public.xml";
 
         try (OutputStream out = outDir.getFileOutput(path)) {
             serial.setOutput(out, null);
@@ -176,6 +177,33 @@ public class ResourcesDecoder {
                 serial.attribute(null, "name", spec.getName());
                 serial.attribute(null, "id", spec.getId().toString());
                 serial.endTag(null, "public");
+            }
+
+            serial.endTag(null, "resources");
+            serial.endDocument();
+            serial.flush();
+        } catch (DirectoryException | IOException ex) {
+            throw new AndrolibException("Could not generate: " + path, ex);
+        }
+    }
+
+    private void generateOverlayableXml(Directory outDir, XmlSerializer serial)
+            throws AndrolibException {
+        List<ResOverlayable> overlayables = new ArrayList<>(mTable.listOverlayables());
+        if (overlayables.isEmpty()) {
+            return;
+        }
+        overlayables.sort(Comparator.comparing(ResOverlayable::getName));
+
+        String path = "res/values/overlayable.xml";
+
+        try (OutputStream out = outDir.getFileOutput(path)) {
+            serial.setOutput(out, null);
+            serial.startDocument(null, null);
+            serial.startTag(null, "resources");
+
+            for (ResOverlayable overlayable : overlayables) {
+                overlayable.serializeToXml(serial);
             }
 
             serial.endTag(null, "resources");

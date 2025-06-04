@@ -76,6 +76,7 @@ public class ResPackage {
             throw new AndrolibException(String.format(
                 "Repeated type spec: typeId=0x%02x, typeName=%s", typeId, typeName));
         }
+
         typeSpec = new ResTypeSpec(this, typeId, typeName);
         mTypeSpecs.put(typeId, typeSpec);
         return typeSpec;
@@ -111,6 +112,7 @@ public class ResPackage {
             // We can safely skip adding existing types.
             return type;
         }
+
         ResTypeSpec typeSpec = getTypeSpec(typeId);
         type = new ResType(typeSpec, config);
         mTypes.put(typeKey, type);
@@ -142,6 +144,7 @@ public class ResPackage {
         if (entrySpec != null) {
             throw new AndrolibException(String.format("Repeated entry spec: id=%s", id));
         }
+
         int typeId = id.getTypeId();
         ResTypeSpec typeSpec = getTypeSpec(typeId);
         entrySpec = new ResEntrySpec(typeSpec, id, name);
@@ -192,6 +195,7 @@ public class ResPackage {
                     "Repeated entry: id=%s, config=%s", id, config));
             }
         }
+
         ResEntrySpec entrySpec = getEntrySpec(id);
         int typeId = id.getTypeId();
         Pair<Integer, ResConfig> typeKey = Pair.of(typeId, config);
@@ -202,6 +206,7 @@ public class ResPackage {
             type = new ResType(typeSpec, config);
             mTypes.put(typeKey, type);
         }
+
         entry = new ResEntry(type, entrySpec, value);
         mEntries.put(entryKey, entry);
         return entry;

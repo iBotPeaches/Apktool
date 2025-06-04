@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <overlayable name="OverlayableResources1">
+        <policy type="public">
+            <item type="string" name="app_name" />
+        </policy>
+    </overlayable>
+    <overlayable name="OverlayableResources2" actor="overlay://theme">
+        <policy type="system">
+            <item type="color" name="test_color1" />
+        </policy>
+    </overlayable>
+    <overlayable name="OverlayableResources3">
+        <policy type="product|signature">
+            <item type="drawable" name="test_drawable1" />
+        </policy>
+    </overlayable>
+</resources>

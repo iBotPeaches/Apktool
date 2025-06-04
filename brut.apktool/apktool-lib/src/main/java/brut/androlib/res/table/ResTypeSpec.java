@@ -56,7 +56,7 @@ public class ResTypeSpec {
 
     @Override
     public String toString() {
-        return String.format("ResTypeSpec{package=%s, id=0x%02x, name=%s}",
+        return String.format("ResTypeSpec{pkg=%s, id=0x%02x, name=%s}",
             mPackage, mId, mName);
     }
 

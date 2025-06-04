@@ -164,6 +164,11 @@ public class BuildAndDecodeApkTest extends BaseTest {
     }
 
     @Test
+    public void valuesOverlayableTest() throws BrutException {
+        compareValuesFiles("values/overlayable.xml");
+    }
+
+    @Test
     public void valuesStringsTest() throws BrutException {
         compareValuesFiles("values/strings.xml");
         compareValuesFiles("values-mcc001/strings.xml");

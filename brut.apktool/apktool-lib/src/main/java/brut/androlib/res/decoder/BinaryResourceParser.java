@@ -77,6 +77,7 @@ public class BinaryResourceParser {
     private ResTypeSpec mTypeSpec;
     private ResType mType;
     private ResId mEntryId;
+    private ResOverlayable mOverlayable;
 
     public BinaryResourceParser(ResTable table, boolean keepBroken, boolean recordFlagsOffsets) {
         mTable = table;
@@ -136,6 +137,7 @@ public class BinaryResourceParser {
         mTypeSpec = null;
         mType = null;
         mEntryId = null;
+        mOverlayable = null;
     }
 
     private boolean readChunkHeader() throws IOException {
@@ -723,22 +725,32 @@ public class BinaryResourceParser {
 
         checkForUnreadHeader();
 
-        LOGGER.fine(String.format(
-            "Skipping overlayable name: \"%s\", actor: \"%s\"", name, actor));
+        mOverlayable = mTable.addOverlayable(name, actor);
     }
 
-    private void readOverlayablePolicy() throws AndrolibException, IOException {
+    private void readOverlayablePolicy() throws IOException {
         // ResTable_overlayable_policy_header
-        mIn.skipInt(); // policy_flags
-        int entry_count = mIn.readInt();
+        int flags = mIn.readInt();
+        int entryCount = mIn.readInt();
 
         checkForUnreadHeader();
 
-        for (int i = 0; i < entry_count; i++) {
+        ResId[] entries = new ResId[entryCount];
+        int entriesCount = 0;
+
+        for (int i = 0; i < entryCount; i++) {
             int id = mIn.readInt();
 
-            LOGGER.fine(String.format("Skipping overlayable policy: 0x%08x", id));
+            if (id != 0) {
+                entries[entriesCount++] = ResId.of(id);
+            }
         }
+
+        if (entriesCount < entries.length) {
+            entries = Arrays.copyOf(entries, entriesCount);
+        }
+
+        mOverlayable.addPolicy(flags, entries);
     }
 
     private void readStagedAlias() throws IOException {
@@ -772,10 +784,12 @@ public class BinaryResourceParser {
         BigInteger exceedingBI = new BigInteger(1, buf);
 
         if (exceedingBI.equals(BigInteger.ZERO)) {
-            LOGGER.fine(String.format("Chunk header size: %d bytes, read: %d bytes, but exceeding bytes are all zero.",
+            LOGGER.fine(String.format(
+                "Chunk header size: %d bytes, read: %d bytes, but exceeding bytes are all zero.",
                 mChunkHeader.headerSize, actualHeaderSize));
         } else {
-            LOGGER.warning(String.format("Chunk header size: %d bytes, read: %d bytes. Exceeding bytes: %X",
+            LOGGER.warning(String.format(
+                "Chunk header size: %d bytes, read: %d bytes. Exceeding bytes: %X",
                 mChunkHeader.headerSize, actualHeaderSize, exceedingBI));
         }
     }
