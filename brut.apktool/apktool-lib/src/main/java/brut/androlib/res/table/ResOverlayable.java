@@ -153,8 +153,7 @@ public class ResOverlayable {
             }
 
             if (entrySpec == null) {
-                LOGGER.warning(String.format(
-                    "Unresolved overlayable entry ID: %s, policy: %s", id, this));
+                LOGGER.warning("Unresolved overlayable entry ID: " + id);
                 continue;
             }
 

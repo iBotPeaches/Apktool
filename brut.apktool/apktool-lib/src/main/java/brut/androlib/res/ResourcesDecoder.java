@@ -136,10 +136,9 @@ public class ResourcesDecoder {
 
     private void generateValuesXml(ResPackage pkg, ResType type, List<ResEntry> entries,
                                    Directory outDir, XmlSerializer serial) throws AndrolibException {
-        entries.sort(Comparator.comparing(ResEntry::getId));
-
         String path = "res/values" + type.getConfig().getQualifiers() + "/"
                 + type.getName() + (type.getName().endsWith("s") ? "" : "s") + ".xml";
+        entries.sort(Comparator.comparing(ResEntry::getId));
 
         try (OutputStream out = outDir.getFileOutput(path)) {
             serial.setOutput(out, null);
@@ -162,9 +161,12 @@ public class ResourcesDecoder {
     private void generatePublicXml(ResPackage pkg, Directory outDir, XmlSerializer serial)
             throws AndrolibException {
         List<ResEntrySpec> specs = new ArrayList<>(pkg.listEntrySpecs());
-        specs.sort(Comparator.comparing(ResEntrySpec::getId));
+        if (specs.isEmpty()) {
+            return;
+        }
 
         String path = "res/values/public.xml";
+        specs.sort(Comparator.comparing(ResEntrySpec::getId));
 
         try (OutputStream out = outDir.getFileOutput(path)) {
             serial.setOutput(out, null);
@@ -193,9 +195,9 @@ public class ResourcesDecoder {
         if (overlayables.isEmpty()) {
             return;
         }
-        overlayables.sort(Comparator.comparing(ResOverlayable::getName));
 
         String path = "res/values/overlayable.xml";
+        overlayables.sort(Comparator.comparing(ResOverlayable::getName));
 
         try (OutputStream out = outDir.getFileOutput(path)) {
             serial.setOutput(out, null);
