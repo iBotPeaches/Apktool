@@ -23,7 +23,6 @@ import brut.androlib.meta.ResourcesInfo;
 import brut.androlib.meta.SdkInfo;
 import brut.androlib.meta.VersionInfo;
 import brut.androlib.res.decoder.*;
-import brut.androlib.res.decoder.data.*;
 import brut.androlib.res.table.*;
 import brut.androlib.res.table.value.ResFileReference;
 import brut.androlib.res.xml.ResXmlUtils;

@@ -160,7 +160,7 @@ public class ResFlags extends ResAttribute {
     }
 
     @Override
-    public void serializeItemsToResValuesXml(XmlSerializer serial, ResEntry entry)
+    public void serializeSymbolsToValuesXml(XmlSerializer serial, ResEntry entry)
             throws AndrolibException, IOException {
         Config config = entry.getPackage().getTable().getConfig();
         boolean removeUnresolved = config.getDecodeResolve() == Config.DecodeResolve.REMOVE;

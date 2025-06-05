@@ -20,6 +20,8 @@ import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.meta.ApkInfo;
 import brut.androlib.meta.SdkInfo;
 import brut.androlib.meta.UsesFramework;
+import brut.androlib.res.AaptInvoker;
+import brut.androlib.res.AaptManager;
 import brut.androlib.res.Framework;
 import brut.androlib.res.table.ResConfig;
 import brut.androlib.res.xml.ResXmlUtils;

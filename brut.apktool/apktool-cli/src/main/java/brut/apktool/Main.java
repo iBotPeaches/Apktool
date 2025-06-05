@@ -16,7 +16,6 @@
  */
 package brut.apktool;
 
-import brut.androlib.AaptManager;
 import brut.androlib.ApkBuilder;
 import brut.androlib.ApkDecoder;
 import brut.androlib.Config;
@@ -24,6 +23,7 @@ import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.exceptions.FrameworkNotFoundException;
 import brut.androlib.exceptions.InFileNotFoundException;
 import brut.androlib.exceptions.OutDirExistsException;
+import brut.androlib.res.AaptManager;
 import brut.androlib.res.Framework;
 import brut.directory.ExtFile;
 import brut.util.OSDetection;
