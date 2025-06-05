@@ -170,7 +170,7 @@ public class ResAttribute extends ResBag implements ValuesXmlSerializable {
         if (mL10n == L10N_SUGGESTED) {
             serial.attribute(null, "localization", "suggested");
         }
-        serializeItemsToResValuesXml(serial, entry);
+        serializeSymbolsToValuesXml(serial, entry);
         serial.endTag(null, "attr");
     }
 
@@ -193,7 +193,7 @@ public class ResAttribute extends ResBag implements ValuesXmlSerializable {
         return sb.toString();
     }
 
-    public void serializeItemsToResValuesXml(XmlSerializer serial, ResEntry entry)
+    public void serializeSymbolsToValuesXml(XmlSerializer serial, ResEntry entry)
             throws AndrolibException, IOException {
         // Stub for attribute types with symbols.
     }

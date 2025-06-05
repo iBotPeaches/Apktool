@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib;
+package brut.androlib.res;
 
 import brut.androlib.exceptions.AndrolibException;
 import brut.common.BrutException;
