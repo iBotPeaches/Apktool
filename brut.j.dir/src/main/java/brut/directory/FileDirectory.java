@@ -122,7 +122,8 @@ public class FileDirectory extends AbstractDirectory {
             } else {
                 try {
                     mDirs.put(file.getName(), new FileDirectory(file));
-                } catch (DirectoryException ignored) {}
+                } catch (DirectoryException ignored) {
+                }
             }
         }
     }

@@ -60,13 +60,6 @@ plugins {
     signing
 }
 
-tasks.withType<JavaCompile> {
-    options.compilerArgs.add("-Xlint:-options")
-    options.compilerArgs.add("--release 8")
-
-    options.encoding = "UTF-8"
-}
-
 allprojects {
     repositories {
         mavenCentral()
@@ -162,9 +155,16 @@ subprojects {
 }
 
 task("release") {
-  // Used for official releases.
+    // Used for official releases.
 }
 
 tasks.wrapper {
     distributionType = Wrapper.DistributionType.ALL
+}
+
+tasks.withType<JavaCompile> {
+    options.compilerArgs.add("-Xlint:-options")
+    options.compilerArgs.add("--release 8")
+
+    options.encoding = "UTF-8"
 }

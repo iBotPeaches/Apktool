@@ -80,7 +80,7 @@ public class YamlReader {
         if (isEnd()) {
             return false;
         }
-        while (true) {
+        for (;;) {
             mCurrent++;
             if (isCommentOrEmpty()) {
                 continue;
@@ -106,7 +106,7 @@ public class YamlReader {
         }
         int objIndent = 0;
         skipInsignificant();
-        while (true) {
+        for (;;) {
             if (isEnd()) {
                 return;
             }
@@ -171,7 +171,7 @@ public class YamlReader {
         int listIndent = getIndent();
         nextLine();
         int dataIndent = getIndent();
-        while (true) {
+        for (;;) {
             if (isEnd()) {
                 return;
             }

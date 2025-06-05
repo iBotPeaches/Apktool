@@ -18,6 +18,7 @@ package brut.androlib.res.decoder;
 
 import brut.androlib.BaseTest;
 import brut.androlib.TestUtils;
+import brut.androlib.res.decoder.data.NinePatchData;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
 
@@ -33,7 +34,6 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 public class MissingDiv9PatchTest extends BaseTest {
-    private static final int NP_COLOR = 0xFF000000;
 
     @BeforeClass
     public static void beforeClass() throws Exception {
@@ -46,7 +46,7 @@ public class MissingDiv9PatchTest extends BaseTest {
         byte[] data;
 
         try (InputStream in = Files.newInputStream(file.toPath())) {
-            Res9patchStreamDecoder decoder = new Res9patchStreamDecoder();
+            ResNinePatchStreamDecoder decoder = new ResNinePatchStreamDecoder();
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             decoder.decode(in, out);
             data = out.toByteArray();
@@ -57,7 +57,7 @@ public class MissingDiv9PatchTest extends BaseTest {
 
         // First and last pixel will be invisible, so lets check the first column and ensure its all black
         for (int y = 1; y < height; y++) {
-            assertEquals("y coordinate failed at: " + y, NP_COLOR, image.getRGB(0, y));
+            assertEquals("y coordinate failed at: " + y, NinePatchData.COLOR_TICK, image.getRGB(0, y));
         }
     }
 }

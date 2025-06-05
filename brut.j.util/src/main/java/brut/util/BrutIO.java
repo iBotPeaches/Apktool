@@ -16,22 +16,21 @@
  */
 package brut.util;
 
-import brut.common.BrutException;
-import brut.common.InvalidUnknownFileException;
-import brut.common.RootUnknownFileException;
-import brut.common.TraversalUnknownFileException;
 import org.apache.commons.io.IOUtils;
 
 import java.io.File;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.zip.CRC32;
 
 public final class BrutIO {
 
     private BrutIO() {
-        // Private constructor for utility class
+        // Private constructor for utility class.
     }
 
     public static byte[] readAndClose(InputStream in) throws IOException {
@@ -86,42 +85,27 @@ public final class BrutIO {
         return crc;
     }
 
-    public static String sanitizePath(File baseDir, String path)
-            throws InvalidUnknownFileException, RootUnknownFileException,
-                   TraversalUnknownFileException, IOException {
-        if (path.isEmpty()) {
-            throw new InvalidUnknownFileException("Invalid Unknown File");
+    public static String sanitizePath(File baseDir, String path) throws InvalidPathException, IOException {
+        if (path == null || path.isEmpty()) {
+            throw new InvalidPathException(path, "Path is null or empty.");
         }
 
-        if (new File(path).isAbsolute()) {
-            throw new RootUnknownFileException("Absolute Unknown Files is not allowed");
+        Path origPath = Paths.get(path);
+        if (origPath.isAbsolute()) {
+            throw new InvalidPathException(path, "Absolute paths are not allowed.");
         }
 
-        String canonicalDirPath = baseDir.getCanonicalPath() + File.separator;
-        String canonicalEntryPath = new File(baseDir, path).getCanonicalPath();
-
-        if (!canonicalEntryPath.startsWith(canonicalDirPath)) {
-            throw new TraversalUnknownFileException("Directory Traversal is not allowed");
+        Path basePath = Paths.get(baseDir.getCanonicalPath());
+        Path resolvedPath = basePath.resolve(origPath).normalize();
+        if (!resolvedPath.startsWith(basePath)) {
+            throw new InvalidPathException(path, "Path traverses outside the base directory");
         }
 
-        // https://stackoverflow.com/q/2375903/455008
-        return canonicalEntryPath.substring(canonicalDirPath.length());
+        return basePath.relativize(resolvedPath).toString();
     }
 
     public static boolean detectPossibleDirectoryTraversal(String path) {
-        return path.contains("../")
-                || path.contains("/..")
-                || path.contains("..\\")
-                || path.contains("\\..");
-    }
-
-    public static String adaptSeparatorToUnix(String path) {
-        char separator = File.separatorChar;
-
-        if (separator != '/') {
-            return path.replace(separator, '/');
-        }
-
-        return path;
+        return path.contains("../") || path.contains("/..")
+                || path.contains("..\\") || path.contains("\\..");
     }
 }

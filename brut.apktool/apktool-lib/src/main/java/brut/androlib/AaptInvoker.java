@@ -21,9 +21,11 @@ import brut.androlib.meta.ApkInfo;
 import brut.common.BrutException;
 import brut.util.OS;
 
-import java.io.*;
+import java.io.File;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 public class AaptInvoker {
@@ -39,35 +41,16 @@ public class AaptInvoker {
 
     public void invoke(File apkFile, File manifest, File resDir, File rawDir, File assetDir, File[] include)
             throws AndrolibException {
-        String aaptPath;
-        boolean customAapt;
-
-        if (mConfig.getAaptBinary() != null) {
-            aaptPath = mConfig.getAaptBinary().getPath();
-            customAapt = true;
-        } else {
+        String aaptPath = mConfig.getAaptBinary();
+        if (aaptPath == null || aaptPath.isEmpty()) {
             try {
-                aaptPath = AaptManager.getAaptBinary(mConfig.getAaptVersion()).getPath();
-                customAapt = false;
+                aaptPath = AaptManager.getBinaryFile().getPath();
             } catch (AndrolibException ex) {
-                aaptPath = AaptManager.getAaptName(mConfig.getAaptVersion());
-                customAapt = true;
+                aaptPath = AaptManager.getBinaryName();
                 LOGGER.warning(aaptPath + ": " + ex.getMessage() + " (defaulting to $PATH binary)");
             }
         }
 
-        switch (mConfig.getAaptVersion()) {
-            case 2:
-                invokeAapt2(apkFile, manifest, resDir, rawDir, assetDir, include, aaptPath, customAapt);
-                break;
-            default:
-                invokeAapt1(apkFile, manifest, resDir, rawDir, assetDir, include, aaptPath, customAapt);
-                break;
-        }
-    }
-
-    private void invokeAapt2(File apkFile, File manifest, File resDir, File rawDir, File assetDir, File[] include,
-                             String aaptPath, boolean customAapt) throws AndrolibException {
         List<String> cmd;
         File resourcesZip = null;
 
@@ -75,7 +58,7 @@ public class AaptInvoker {
             resourcesZip = Paths.get(resDir.getParent(), "build", "resources.zip").toFile();
 
             if (!resourcesZip.exists()) {
-                // Compile the files into flat arsc files
+                // Compile the files into flat arsc files.
                 cmd = new ArrayList<>();
                 cmd.add(aaptPath);
                 cmd.add("compile");
@@ -83,7 +66,7 @@ public class AaptInvoker {
                 cmd.add("--dir");
                 cmd.add(resDir.getAbsolutePath());
 
-                // Treats error that used to be valid in aapt1 as warnings in aapt2
+                // Treats error that used to be valid in aapt1 as warnings in aapt2.
                 cmd.add("--legacy");
 
                 cmd.add("-o");
@@ -111,7 +94,7 @@ public class AaptInvoker {
             return;
         }
 
-        // Link them into the final apk, reusing our old command after clearing for the aapt2 binary
+        // Link resources to the final apk.
         cmd = new ArrayList<>();
         cmd.add(aaptPath);
         cmd.add("link");
@@ -119,8 +102,27 @@ public class AaptInvoker {
         cmd.add("-o");
         cmd.add(apkFile.getAbsolutePath());
 
-        if (mApkInfo.getPackageInfo().getForcedPackageId() != null) {
-            int pkgId = Integer.parseInt(mApkInfo.getPackageInfo().getForcedPackageId());
+        cmd.add("--manifest");
+        cmd.add(manifest.getAbsolutePath());
+
+        if (mApkInfo.getSdkInfo().getMinSdkVersion() != null) {
+            cmd.add("--min-sdk-version");
+            cmd.add(mApkInfo.getSdkInfo().getMinSdkVersion());
+        }
+        if (mApkInfo.getSdkInfo().getTargetSdkVersion() != null) {
+            cmd.add("--target-sdk-version");
+            cmd.add(mApkInfo.getSdkInfo().getTargetSdkVersion());
+        }
+        if (mApkInfo.getVersionInfo().getVersionCode() != null) {
+            cmd.add("--version-code");
+            cmd.add(mApkInfo.getVersionInfo().getVersionCode());
+        }
+        if (mApkInfo.getVersionInfo().getVersionName() != null) {
+            cmd.add("--version-name");
+            cmd.add(mApkInfo.getVersionInfo().getVersionName());
+        }
+        if (mApkInfo.getResourcesInfo().getPackageId() != null) {
+            int pkgId = Integer.parseInt(mApkInfo.getResourcesInfo().getPackageId());
             if (pkgId == 0) {
                 cmd.add("--shared-lib");
             } else if (pkgId > 1) {
@@ -131,44 +133,14 @@ public class AaptInvoker {
                 }
             }
         }
-        if (mApkInfo.getSdkInfo().getMinSdkVersion() != null) {
-            cmd.add("--min-sdk-version");
-            cmd.add(mApkInfo.getSdkInfo().getMinSdkVersion());
+        if (mApkInfo.getResourcesInfo().getPackageName() != null) {
+            cmd.add("--rename-resources-package");
+            cmd.add(mApkInfo.getResourcesInfo().getPackageName());
         }
-        if (mApkInfo.getSdkInfo().getTargetSdkVersion() != null) {
-            cmd.add("--target-sdk-version");
-            cmd.add(mApkInfo.getSdkInfo().getTargetSdkVersion());
-        }
-        if (mApkInfo.getPackageInfo().getRenameManifestPackage() != null) {
-            cmd.add("--rename-manifest-package");
-            cmd.add(mApkInfo.getPackageInfo().getRenameManifestPackage());
-
-            cmd.add("--rename-instrumentation-target-package");
-            cmd.add(mApkInfo.getPackageInfo().getRenameManifestPackage());
-        }
-        if (mApkInfo.getVersionInfo().getVersionCode() != null) {
-            cmd.add("--version-code");
-            cmd.add(mApkInfo.getVersionInfo().getVersionCode());
-        }
-        if (mApkInfo.getVersionInfo().getVersionName() != null) {
-            cmd.add("--version-name");
-            cmd.add(mApkInfo.getVersionInfo().getVersionName());
-        }
-
-        // Disable automatic changes
-        cmd.add("--no-auto-version");
-        cmd.add("--no-version-vectors");
-        cmd.add("--no-version-transitions");
-        cmd.add("--no-resource-deduping");
-        cmd.add("--no-compile-sdk-metadata");
-
-        // #3427 - Ignore stricter parsing during aapt2
-        cmd.add("--warn-manifest-validation");
-
-        if (mApkInfo.isSparseResources()) {
+        if (mApkInfo.getResourcesInfo().isSparseResources()) {
             cmd.add("--enable-sparse-encoding");
         }
-        if (mApkInfo.isCompactEntries()) {
+        if (mApkInfo.getResourcesInfo().isCompactEntries()) {
             cmd.add("--enable-compact-entries");
         }
         if (!mApkInfo.getFeatureFlags().isEmpty()) {
@@ -179,23 +151,30 @@ public class AaptInvoker {
             cmd.add("--feature-flags");
             cmd.add(String.join(",", featureFlags));
         }
+
+        // Disable automatic changes.
+        cmd.add("--no-auto-version");
+        cmd.add("--no-version-vectors");
+        cmd.add("--no-version-transitions");
+        cmd.add("--no-resource-deduping");
+        cmd.add("--no-compile-sdk-metadata");
+
+        // #3427 - Ignore stricter parsing during aapt2.
+        cmd.add("--warn-manifest-validation");
+
+        if (rawDir != null) {
+            cmd.add("-R");
+            cmd.add(rawDir.getAbsolutePath());
+        }
+        if (assetDir != null) {
+            cmd.add("-A");
+            cmd.add(assetDir.getAbsolutePath());
+        }
         if (include != null) {
             for (File file : include) {
                 cmd.add("-I");
                 cmd.add(file.getPath());
             }
-        }
-
-        cmd.add("--manifest");
-        cmd.add(manifest.getAbsolutePath());
-
-        if (assetDir != null) {
-            cmd.add("-A");
-            cmd.add(assetDir.getAbsolutePath());
-        }
-        if (rawDir != null) {
-            cmd.add("-R");
-            cmd.add(rawDir.getAbsolutePath());
         }
         if (mConfig.isVerbose()) {
             cmd.add("-v");
@@ -207,98 +186,6 @@ public class AaptInvoker {
         try {
             OS.exec(cmd.toArray(new String[0]));
             LOGGER.fine("aapt2 link command ran: ");
-            LOGGER.fine(cmd.toString());
-        } catch (BrutException ex) {
-            throw new AndrolibException(ex);
-        }
-    }
-
-    private void invokeAapt1(File apkFile, File manifest, File resDir, File rawDir, File assetDir, File[] include,
-                             String aaptPath, boolean customAapt) throws AndrolibException {
-        List<String> cmd = new ArrayList<>();
-        cmd.add(aaptPath);
-        cmd.add("p");
-
-        if (mConfig.isVerbose()) { // output aapt verbose
-            cmd.add("-v");
-        }
-        if (mConfig.isDebugMode()) { // inject debuggable="true" into manifest
-            cmd.add("--debug-mode");
-        }
-        if (mConfig.isNoCrunch()) {
-            cmd.add("--no-crunch");
-        }
-        if (mApkInfo.getPackageInfo().getForcedPackageId() != null) {
-            int pkgId = Integer.parseInt(mApkInfo.getPackageInfo().getForcedPackageId());
-            if (pkgId == 0) {
-                cmd.add("--shared-lib");
-            } else if (pkgId > 0) {
-                if (!customAapt) { // custom aapt might not have this option
-                    cmd.add("--forced-package-id");
-                    cmd.add(Integer.toString(pkgId));
-                }
-                if (pkgId < 0x7F) {
-                    cmd.add("-x");
-                }
-            }
-        }
-        if (mApkInfo.getSdkInfo().getMinSdkVersion() != null) {
-            cmd.add("--min-sdk-version");
-            cmd.add(mApkInfo.getSdkInfo().getMinSdkVersion());
-        }
-        if (mApkInfo.getSdkInfo().getTargetSdkVersion() != null) {
-            cmd.add("--target-sdk-version");
-            cmd.add(mApkInfo.getSdkInfo().getTargetSdkVersionBounded());
-        }
-        if (mApkInfo.getSdkInfo().getMaxSdkVersion() != null) {
-            cmd.add("--max-sdk-version");
-            cmd.add(mApkInfo.getSdkInfo().getMaxSdkVersion());
-
-            // if we have max sdk version, set --max-res-version,
-            // so we can ignore anything over that during build.
-            cmd.add("--max-res-version");
-            cmd.add(mApkInfo.getSdkInfo().getMaxSdkVersion());
-        }
-        if (mApkInfo.getPackageInfo().getRenameManifestPackage() != null) {
-            cmd.add("--rename-manifest-package");
-            cmd.add(mApkInfo.getPackageInfo().getRenameManifestPackage());
-        }
-        if (mApkInfo.getVersionInfo().getVersionCode() != null) {
-            cmd.add("--version-code");
-            cmd.add(mApkInfo.getVersionInfo().getVersionCode());
-        }
-        if (mApkInfo.getVersionInfo().getVersionName() != null) {
-            cmd.add("--version-name");
-            cmd.add(mApkInfo.getVersionInfo().getVersionName());
-        }
-        cmd.add("--no-version-vectors");
-        cmd.add("-F");
-        cmd.add(apkFile.getAbsolutePath());
-
-        if (include != null) {
-            for (File file : include) {
-                cmd.add("-I");
-                cmd.add(file.getPath());
-            }
-        }
-        if (resDir != null) {
-            cmd.add("-S");
-            cmd.add(resDir.getAbsolutePath());
-        }
-        if (manifest != null) {
-            cmd.add("-M");
-            cmd.add(manifest.getAbsolutePath());
-        }
-        if (assetDir != null) {
-            cmd.add("-A");
-            cmd.add(assetDir.getAbsolutePath());
-        }
-        if (rawDir != null) {
-            cmd.add(rawDir.getAbsolutePath());
-        }
-        try {
-            OS.exec(cmd.toArray(new String[0]));
-            LOGGER.fine("command ran: ");
             LOGGER.fine(cmd.toString());
         } catch (BrutException ex) {
             throw new AndrolibException(ex);

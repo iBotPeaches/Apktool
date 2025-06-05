@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" android:appCategory="game" package="brut.apktool.testapp" platformBuildVersionCode="23" platformBuildVersionName="6.0-2438415">
-    <uses-feature android:glEsVersion="0x00020000" />
-    <uses-feature android:glEsVersion="0x00030002" />
+    <uses-feature android:glEsVersion="0x20000" />
+    <uses-feature android:glEsVersion="0x30002" />
     <application android:label="Issue2799 &amp; B" android:enableOnBackInvokedCallback="true" android:isAccessibilityTool="false">
         <service android:name=".MyAccessibilityService" android:foregroundServiceType="shortService">
             <meta-data

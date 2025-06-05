@@ -17,25 +17,24 @@
 package brut.androlib.res.decoder;
 
 import brut.androlib.exceptions.AndrolibException;
-import brut.androlib.exceptions.AXmlDecodingException;
+import brut.androlib.exceptions.BinaryXmlDecodingException;
 import brut.androlib.exceptions.RawXmlEncounteredException;
-import brut.androlib.meta.ApkInfo;
-import brut.androlib.meta.PackageInfo;
-import brut.androlib.meta.SdkInfo;
-import brut.androlib.meta.VersionInfo;
+import brut.androlib.meta.*;
 import brut.xmlpull.XmlPullUtils;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlSerializer;
 
-import java.io.*;
+import java.io.InputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 
 public class AndroidManifestPullStreamDecoder implements ResStreamDecoder {
-    private final AXmlResourceParser mParser;
+    private final BinaryXmlResourceParser mParser;
     private final XmlSerializer mSerial;
     private final EventHandler mEventHandler;
 
-    public AndroidManifestPullStreamDecoder(AXmlResourceParser parser, XmlSerializer serial) {
+    public AndroidManifestPullStreamDecoder(BinaryXmlResourceParser parser, XmlSerializer serial) {
         mParser = parser;
         mSerial = serial;
         mEventHandler = new EventHandler();
@@ -48,7 +47,7 @@ public class AndroidManifestPullStreamDecoder implements ResStreamDecoder {
             mSerial.setOutput(out, null);
             XmlPullUtils.copy(mParser, mSerial, mEventHandler);
         } catch (XmlPullParserException ex) {
-            throw new AXmlDecodingException("Could not decode XML", ex);
+            throw new BinaryXmlDecodingException("Could not decode XML", ex);
         } catch (IOException ex) {
             throw new RawXmlEncounteredException("Could not decode XML", ex);
         }
@@ -59,8 +58,8 @@ public class AndroidManifestPullStreamDecoder implements ResStreamDecoder {
         private final boolean mHideSdkInfo;
 
         public EventHandler() {
-            mApkInfo = mParser.getResTable().getApkInfo();
-            mHideSdkInfo = !mParser.getResTable().getConfig().isAnalysisMode();
+            mApkInfo = mParser.getTable().getApkInfo();
+            mHideSdkInfo = !mParser.getTable().getConfig().isAnalysisMode();
         }
 
         @Override
@@ -93,7 +92,7 @@ public class AndroidManifestPullStreamDecoder implements ResStreamDecoder {
         }
 
         private void parseManifest(XmlPullParser in) {
-            PackageInfo packageInfo = mApkInfo.getPackageInfo();
+            ResourcesInfo resourcesInfo = mApkInfo.getResourcesInfo();
             VersionInfo versionInfo = mApkInfo.getVersionInfo();
 
             for (int i = 0; i < in.getAttributeCount(); i++) {
@@ -106,9 +105,11 @@ public class AndroidManifestPullStreamDecoder implements ResStreamDecoder {
                 }
                 if (ns.isEmpty()) {
                     if (name.equals("package")) {
-                        packageInfo.setRenameManifestPackage(value);
+                        // This is temporary and will be compared to actual
+                        // resources package later.
+                        resourcesInfo.setPackageName(value);
                     }
-                } else if (ns.equals(AXmlResourceParser.ANDROID_RES_NS)) {
+                } else if (ns.equals(BinaryXmlResourceParser.ANDROID_RES_NS)) {
                     switch (name) {
                         case "versionCode":
                             versionInfo.setVersionCode(value);
@@ -132,7 +133,7 @@ public class AndroidManifestPullStreamDecoder implements ResStreamDecoder {
                 if (value.isEmpty()) {
                     continue;
                 }
-                if (ns.equals(AXmlResourceParser.ANDROID_RES_NS)) {
+                if (ns.equals(BinaryXmlResourceParser.ANDROID_RES_NS)) {
                     switch (name) {
                         case "minSdkVersion":
                             sdkInfo.setMinSdkVersion(value);

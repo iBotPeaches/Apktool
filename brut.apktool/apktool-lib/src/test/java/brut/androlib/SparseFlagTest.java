@@ -40,7 +40,7 @@ public class SparseFlagTest extends BaseTest {
         ExtFile testDir = new ExtFile(testApk + ".out");
         ApkInfo apkInfo = new ApkDecoder(testApk, sConfig).decode(testDir);
 
-        assertTrue("Expecting sparse resources", apkInfo.isSparseResources());
+        assertTrue("Expecting sparse resources", apkInfo.getResourcesInfo().isSparseResources());
 
         LOGGER.info("Building sparse.apk...");
         new ApkBuilder(testDir, sConfig).build(null);
@@ -55,7 +55,7 @@ public class SparseFlagTest extends BaseTest {
         ExtFile testDir = new ExtFile(testApk + ".out");
         ApkInfo apkInfo = new ApkDecoder(testApk, sConfig).decode(testDir);
 
-        assertFalse("Expecting not-sparse resources", apkInfo.isSparseResources());
+        assertFalse("Expecting not-sparse resources", apkInfo.getResourcesInfo().isSparseResources());
 
         LOGGER.info("Building not-sparse.apk...");
         new ApkBuilder(testDir, sConfig).build(null);

@@ -21,14 +21,12 @@ import brut.androlib.exceptions.InFileNotFoundException;
 import brut.androlib.exceptions.OutDirExistsException;
 import brut.androlib.meta.ApkInfo;
 import brut.androlib.res.ResourcesDecoder;
-import brut.androlib.src.SmaliDecoder;
-import brut.common.BrutException;
+import brut.androlib.smali.SmaliDecoder;
 import brut.directory.Directory;
 import brut.directory.DirectoryException;
 import brut.directory.ExtFile;
 import brut.util.BackgroundWorker;
 import brut.util.OS;
-import com.android.tools.smali.dexlib2.iface.DexFile;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.*;
@@ -40,14 +38,13 @@ import java.util.regex.Pattern;
 public class ApkDecoder {
     private static final Logger LOGGER = Logger.getLogger(ApkDecoder.class.getName());
 
-    // extensions of files that are often packed uncompressed
     private static final Pattern NO_COMPRESS_EXT_PATTERN = Pattern.compile(
         "dex|arsc|so|jpg|jpeg|png|gif|wav|mp2|mp3|ogg|aac|mpg|mpeg|mid|midi|smf|jet|"
             + "rtttl|imy|xmf|mp4|m4a|m4v|3gp|3gpp|3g2|3gpp2|amr|awb|wma|wmv|webm|webp|mkv");
 
     private final ExtFile mApkFile;
     private final Config mConfig;
-    private final AtomicReference<AndrolibException> mBuildError;
+    private final AtomicReference<AndrolibException> mFirstError;
 
     private ApkInfo mApkInfo;
     private ResourcesDecoder mResDecoder;
@@ -57,28 +54,29 @@ public class ApkDecoder {
     public ApkDecoder(ExtFile apkFile, Config config) {
         mApkFile = apkFile;
         mConfig = config;
-        mBuildError = new AtomicReference<>(null);
+        mFirstError = new AtomicReference<>(null);
     }
 
     public ApkInfo decode(File outDir) throws AndrolibException {
         if (!mConfig.isForced() && outDir.exists()) {
-            throw new OutDirExistsException();
+            throw new OutDirExistsException(outDir.getPath());
         }
         if (!mApkFile.isFile() || !mApkFile.canRead()) {
-            throw new InFileNotFoundException();
+            throw new InFileNotFoundException(mApkFile.getPath());
         }
         if (mConfig.getJobs() > 1) {
             mWorker = new BackgroundWorker(mConfig.getJobs() - 1);
         }
         try {
             mApkInfo = new ApkInfo(mApkFile);
+            mApkInfo.setVersion(mConfig.getVersion());
             mResDecoder = new ResourcesDecoder(mApkInfo, mConfig);
 
             OS.rmdir(outDir);
             OS.mkdir(outDir);
 
-            LOGGER.info("Using Apktool " + ApktoolProperties.getVersion() + " on " + mApkFile.getName()
-                        + (mWorker != null ? " with " + mConfig.getJobs() + " threads" : ""));
+            LOGGER.info("Using Apktool " + mConfig.getVersion() + " on " + mApkFile.getName()
+                    + (mWorker != null ? " with " + mConfig.getJobs() + " threads" : ""));
 
             decodeSources(outDir);
             decodeResources(outDir);
@@ -86,8 +84,8 @@ public class ApkDecoder {
 
             if (mWorker != null) {
                 mWorker.waitForFinish();
-                if (mBuildError.get() != null) {
-                    throw mBuildError.get();
+                if (mFirstError.get() != null) {
+                    throw mFirstError.get();
                 }
             }
 
@@ -103,7 +101,8 @@ public class ApkDecoder {
             }
             try {
                 mApkFile.close();
-            } catch (IOException ignored) {}
+            } catch (IOException ignored) {
+            }
         }
     }
 
@@ -125,24 +124,25 @@ public class ApkDecoder {
         try {
             Directory in = mApkFile.getDirectory();
 
-            // foreach unknown dex file in root, lets disassemble it
             for (String fileName : in.getFiles(true)) {
-                if (fileName.endsWith(".dex") && !fileName.equals("classes.dex")) {
-                    switch (mConfig.getDecodeSources()) {
-                        case NONE:
-                            copySourcesRaw(outDir, fileName);
-                            break;
-                        case FULL:
+                if (!fileName.endsWith(".dex") || fileName.equals("classes.dex")) {
+                    continue;
+                }
+
+                switch (mConfig.getDecodeSources()) {
+                    case NONE:
+                        copySourcesRaw(outDir, fileName);
+                        break;
+                    case FULL:
+                        decodeSourcesSmali(outDir, fileName);
+                        break;
+                    case ONLY_MAIN_CLASSES:
+                        if (fileName.startsWith("classes")) {
                             decodeSourcesSmali(outDir, fileName);
-                            break;
-                        case ONLY_MAIN_CLASSES:
-                            if (fileName.startsWith("classes")) {
-                                decodeSourcesSmali(outDir, fileName);
-                            } else {
-                                copySourcesRaw(outDir, fileName);
-                            }
-                            break;
-                    }
+                        } else {
+                            copySourcesRaw(outDir, fileName);
+                        }
+                        break;
                 }
             }
         } catch (DirectoryException ex) {
@@ -164,11 +164,11 @@ public class ApkDecoder {
     private void decodeSourcesSmali(File outDir, String fileName) throws AndrolibException {
         if (mWorker != null) {
             mWorker.submit(() -> {
-                if (mBuildError.get() == null) {
+                if (mFirstError.get() == null) {
                     try {
                         decodeSourcesSmaliJob(outDir, fileName);
                     } catch (AndrolibException ex) {
-                        mBuildError.compareAndSet(null, ex);
+                        mFirstError.compareAndSet(null, ex);
                     }
                 }
             });
@@ -182,19 +182,17 @@ public class ApkDecoder {
         if (fileName.equals("classes.dex")) {
             smaliDir = new File(outDir, "smali");
         } else {
-            smaliDir = new File(outDir, "smali_" + fileName.substring(0, fileName.indexOf(".")));
+            smaliDir = new File(outDir, "smali_" + fileName.substring(0, fileName.indexOf('.')));
         }
 
-        OS.rmdir(smaliDir);
         OS.mkdir(smaliDir);
 
         LOGGER.info("Baksmaling " + fileName + "...");
-        SmaliDecoder decoder = new SmaliDecoder(mApkFile, fileName,
-            mConfig.isBaksmaliDebugMode(), mConfig.getBaksmaliApiLevel());
-        DexFile dexFile = decoder.decode(smaliDir);
+        SmaliDecoder decoder = new SmaliDecoder(mApkFile, fileName, mConfig.isBaksmaliDebugMode());
+        decoder.decode(smaliDir);
 
-        // record minSdkVersion for jars
-        int minSdkVersion = dexFile.getOpcodes().api;
+        // Record minSdkVersion if there's no AndroidManifest.xml, i.e. JARs.
+        int minSdkVersion = decoder.getInferredApiLevel();
         if (mMinSdkVersion == 0 || mMinSdkVersion > minSdkVersion) {
             mMinSdkVersion = minSdkVersion;
         }
@@ -257,17 +255,21 @@ public class ApkDecoder {
 
     private void copyRawFiles(File outDir) throws AndrolibException {
         try {
+            Map<String, String> resFileMapping = mResDecoder.getResFileMapping();
             Directory in = mApkFile.getDirectory();
 
             for (String dirName : ApkInfo.RAW_DIRNAMES) {
-                if ((mConfig.getDecodeAssets() == Config.DecodeAssets.FULL || !dirName.equals("assets"))
-                        && in.containsDir(dirName)) {
-                    LOGGER.info("Copying " + dirName + "...");
-                    for (String fileName : in.getDir(dirName).getFiles(true)) {
-                        fileName = dirName + "/" + fileName;
-                        if (!ApkInfo.ORIGINAL_FILENAMES_PATTERN.matcher(fileName).matches()) {
-                            in.copyToDir(outDir, fileName);
-                        }
+                if (!in.containsDir(dirName) || (mConfig.getDecodeAssets() == Config.DecodeAssets.NONE
+                        && dirName.equals("assets"))) {
+                    continue;
+                }
+
+                LOGGER.info("Copying " + dirName + "...");
+                for (String fileName : in.getDir(dirName).getFiles(true)) {
+                    fileName = dirName + "/" + fileName;
+                    if (!ApkInfo.ORIGINAL_FILENAMES_PATTERN.matcher(fileName).matches()
+                            && !resFileMapping.containsKey(fileName)) {
+                        in.copyToDir(outDir, fileName);
                     }
                 }
             }
@@ -277,10 +279,11 @@ public class ApkDecoder {
     }
 
     private void copyOriginalFiles(File outDir) throws AndrolibException {
+        File originalDir = new File(outDir, "original");
+
         LOGGER.info("Copying original files...");
         try {
             Directory in = mApkFile.getDirectory();
-            File originalDir = new File(outDir, "original");
 
             for (String fileName : in.getFiles(true)) {
                 if (ApkInfo.ORIGINAL_FILENAMES_PATTERN.matcher(fileName).matches()) {
@@ -293,13 +296,16 @@ public class ApkDecoder {
     }
 
     private void copyUnknownFiles(File outDir) throws AndrolibException {
+        File unknownDir = new File(outDir, "unknown");
+
         LOGGER.info("Copying unknown files...");
         try {
+            Map<String, String> resFileMapping = mResDecoder.getResFileMapping();
             Directory in = mApkFile.getDirectory();
-            File unknownDir = new File(outDir, "unknown");
 
             for (String fileName : in.getFiles(true)) {
-                if (!ApkInfo.STANDARD_FILENAMES_PATTERN.matcher(fileName).matches()) {
+                if (!ApkInfo.STANDARD_FILENAMES_PATTERN.matcher(fileName).matches()
+                        && !resFileMapping.containsKey(fileName)) {
                     in.copyToDir(unknownDir, fileName);
                 }
             }
@@ -309,12 +315,12 @@ public class ApkDecoder {
     }
 
     private void writeApkInfo(File outDir) throws AndrolibException {
-        // in case we have no resources, we should store the minSdk we pulled from the source opcode api level
+        // In case we have no resources, we store the inferred dex opcode API level.
         if (!mApkInfo.hasResources() && mMinSdkVersion > 0) {
             mApkInfo.getSdkInfo().setMinSdkVersion(Integer.toString(mMinSdkVersion));
         }
 
-        // record uncompressed files
+        // Record uncompressed files.
         try {
             Map<String, String> resFileMapping = mResDecoder.getResFileMapping();
             Set<String> uncompressedExts = new HashSet<>();
@@ -334,7 +340,7 @@ public class ApkDecoder {
                 }
             }
 
-            // exclude files with an already recorded extenstion
+            // Exclude files with an already recorded extenstion.
             if (!uncompressedExts.isEmpty() && !uncompressedFiles.isEmpty()) {
                 Iterator<String> it = uncompressedFiles.iterator();
                 while (it.hasNext()) {
@@ -346,7 +352,7 @@ public class ApkDecoder {
                 }
             }
 
-            // update apk info
+            // Update apk info.
             List<String> doNotCompress = mApkInfo.getDoNotCompress();
             if (!uncompressedExts.isEmpty()) {
                 List<String> uncompressedExtsList = new ArrayList<>(uncompressedExts);
@@ -362,7 +368,7 @@ public class ApkDecoder {
             throw new AndrolibException(ex);
         }
 
-        // write apk info to file
+        // Serialize ApkInfo to file.
         mApkInfo.save(new File(outDir, "apktool.yml"));
     }
 }

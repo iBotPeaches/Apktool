@@ -31,7 +31,7 @@ public final class XmlPullUtils {
     }
 
     private XmlPullUtils() {
-        // Private constructor for utility class
+        // Private constructor for utility class.
     }
 
     public static void copy(XmlPullParser in, XmlSerializer out)
@@ -44,12 +44,12 @@ public final class XmlPullUtils {
         Boolean standalone = (Boolean) in.getProperty(PROPERTY_XMLDECL_STANDALONE);
 
         // Some parsers may have already consumed the event that starts the
-        // document, so we manually emit that event here for consistency
+        // document, so we manually emit that event here for consistency.
         if (in.getEventType() == XmlPullParser.START_DOCUMENT) {
             out.startDocument(in.getInputEncoding(), standalone);
         }
 
-        while (true) {
+        for (;;) {
             int event = in.nextToken();
             if (event == -1) {
                 break;

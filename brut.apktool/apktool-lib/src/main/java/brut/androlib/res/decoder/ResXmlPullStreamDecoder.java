@@ -17,19 +17,21 @@
 package brut.androlib.res.decoder;
 
 import brut.androlib.exceptions.AndrolibException;
-import brut.androlib.exceptions.AXmlDecodingException;
+import brut.androlib.exceptions.BinaryXmlDecodingException;
 import brut.androlib.exceptions.RawXmlEncounteredException;
 import brut.xmlpull.XmlPullUtils;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlSerializer;
 
-import java.io.*;
+import java.io.InputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 
 public class ResXmlPullStreamDecoder implements ResStreamDecoder {
-    private final AXmlResourceParser mParser;
+    private final BinaryXmlResourceParser mParser;
     private final XmlSerializer mSerial;
 
-    public ResXmlPullStreamDecoder(AXmlResourceParser parser, XmlSerializer serial) {
+    public ResXmlPullStreamDecoder(BinaryXmlResourceParser parser, XmlSerializer serial) {
         mParser = parser;
         mSerial = serial;
     }
@@ -41,7 +43,7 @@ public class ResXmlPullStreamDecoder implements ResStreamDecoder {
             mSerial.setOutput(out, null);
             XmlPullUtils.copy(mParser, mSerial);
         } catch (XmlPullParserException ex) {
-            throw new AXmlDecodingException("Could not decode XML", ex);
+            throw new BinaryXmlDecodingException("Could not decode XML", ex);
         } catch (IOException ex) {
             throw new RawXmlEncounteredException("Could not decode XML", ex);
         }

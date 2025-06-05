@@ -29,71 +29,71 @@ import java.util.List;
 public final class AaptManager {
 
     private AaptManager() {
-        // Private constructor for utility class
+        // Private constructor for utility class.
     }
 
-    public static String getAaptName(int version) {
-        switch (version) {
-            case 2:
-                return "aapt2";
-            default:
-                return "aapt";
-        }
+    public static String getBinaryName() {
+        return "aapt2";
     }
 
-    public static File getAaptBinary(int version) throws AndrolibException {
-        String aaptName = getAaptName(version);
+    public static File getBinaryFile() throws AndrolibException {
+        String binName = getBinaryName();
 
-        if (!OSDetection.is64Bit() && OSDetection.isMacOSX()) {
-            throw new AndrolibException(
-                aaptName + " binary is not available for 32-bit platform: " + OSDetection.returnOS());
+        if (!OSDetection.is64Bit()) {
+            throw new AndrolibException(binName + " binaries are not available for 32-bit platforms.");
         }
 
-        StringBuilder aaptPath = new StringBuilder("/prebuilt/");
+        StringBuilder binPath = new StringBuilder("/prebuilt/");
         if (OSDetection.isUnix()) {
-            aaptPath.append("linux");
+            binPath.append("linux");
         } else if (OSDetection.isMacOSX()) {
-            aaptPath.append("macosx");
+            binPath.append("macosx");
         } else if (OSDetection.isWindows()) {
-            aaptPath.append("windows");
+            binPath.append("windows");
         } else {
             throw new AndrolibException("Could not identify platform: " + OSDetection.returnOS());
         }
-        aaptPath.append("/");
-        aaptPath.append(aaptName);
-        if (OSDetection.is64Bit()) {
-            aaptPath.append("_64");
-        }
+        binPath.append('/');
+        binPath.append(binName);
         if (OSDetection.isWindows()) {
-            aaptPath.append(".exe");
+            binPath.append(".exe");
         }
 
-        File aaptBinary;
+        File binFile;
         try {
-            aaptBinary = Jar.getResourceAsFile(AaptManager.class, aaptPath.toString());
+            binFile = Jar.getResourceAsFile(AaptManager.class, binPath.toString());
         } catch (BrutException ex) {
             throw new AndrolibException(ex);
         }
-        setAaptBinaryExecutable(aaptBinary);
-        return aaptBinary;
+        setBinaryExecutable(binFile);
+        return binFile;
     }
 
-    public static int getAaptVersion(File aaptBinary) throws AndrolibException {
-        setAaptBinaryExecutable(aaptBinary);
+    private static void setBinaryExecutable(File binFile) throws AndrolibException {
+        if (!binFile.isFile() || !binFile.canRead()) {
+            throw new AndrolibException("Could not read aapt binary: " + binFile.getPath());
+        }
+        if (!binFile.setExecutable(true)) {
+            throw new AndrolibException("Could not set aapt binary as executable: " + binFile.getPath());
+        }
+    }
+
+    public static int getBinaryVersion(File binFile) throws AndrolibException {
+        setBinaryExecutable(binFile);
 
         List<String> cmd = new ArrayList<>();
-        cmd.add(aaptBinary.getPath());
+        cmd.add(binFile.getPath());
         cmd.add("version");
 
         String versionStr = OS.execAndReturn(cmd.toArray(new String[0]));
         if (versionStr == null) {
-            throw new AndrolibException("Could not execute aapt binary at location: " + aaptBinary.getPath());
+            throw new AndrolibException("Could not execute aapt binary at location: " + binFile.getPath());
         }
 
-        return getAaptVersionFromString(versionStr);
+        return getVersionFromString(versionStr);
     }
 
-    public static int getAaptVersionFromString(String versionStr) throws AndrolibException {
+    public static int getVersionFromString(String versionStr) throws AndrolibException {
         if (versionStr.startsWith("Android Asset Packaging Tool (aapt) 2:")) {
             return 2;
         } else if (versionStr.startsWith("Android Asset Packaging Tool (aapt) 2.")) {
@@ -102,15 +102,6 @@ public final class AaptManager {
             return 1;
         }
 
-        throw new AndrolibException("aapt version could not be identified: " + versionStr);
-    }
-
-    private static void setAaptBinaryExecutable(File aaptBinary) throws AndrolibException {
-        if (!aaptBinary.isFile() || !aaptBinary.canRead()) {
-            throw new AndrolibException("Could not read aapt binary: " + aaptBinary.getPath());
-        }
-        if (!aaptBinary.setExecutable(true)) {
-            throw new AndrolibException("Could not set aapt binary as executable: " + aaptBinary.getPath());
-        }
+        throw new AndrolibException("Could not identify aapt binary version: " + versionStr);
     }
 }

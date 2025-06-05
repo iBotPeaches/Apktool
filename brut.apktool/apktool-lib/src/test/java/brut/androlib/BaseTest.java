@@ -61,7 +61,7 @@ public class BaseTest {
 
     @BeforeClass
     public static void beforeEachClass() throws Exception {
-        sConfig = new Config();
+        sConfig = new Config("TEST");
         cleanFrameworkFile();
 
         sTmpDir = OS.createTempDirectory();
@@ -88,7 +88,7 @@ public class BaseTest {
 
     @Before
     public void beforeEachTest() throws Exception {
-        sConfig = new Config();
+        sConfig = new Config("TEST");
     }
 
     protected void compareBinaryFolder(String path) throws BrutException {

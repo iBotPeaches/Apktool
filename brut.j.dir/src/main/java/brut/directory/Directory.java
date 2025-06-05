@@ -54,11 +54,15 @@ public interface Directory {
 
     void copyToDir(Directory out, String fileName) throws DirectoryException;
 
+    void copyToDir(String inFileName, Directory out, String outFileName) throws DirectoryException;
+
     void copyToDir(File out) throws DirectoryException;
 
     void copyToDir(File out, String[] fileNames) throws DirectoryException;
 
     void copyToDir(File out, String fileName) throws DirectoryException;
+
+    void copyToDir(String inFileName, File out, String outFileName) throws DirectoryException;
 
     long getSize(String fileName) throws DirectoryException;
 

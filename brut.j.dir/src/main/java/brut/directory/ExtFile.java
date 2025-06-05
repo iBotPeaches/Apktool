@@ -66,7 +66,8 @@ public class ExtFile extends File implements AutoCloseable {
     public boolean delete() {
         try {
             close();
-        } catch (IOException ignored) {}
+        } catch (IOException ignored) {
+        }
 
         return super.delete();
     }

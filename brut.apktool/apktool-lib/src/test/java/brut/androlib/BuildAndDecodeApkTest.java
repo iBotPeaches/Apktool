@@ -144,11 +144,6 @@ public class BuildAndDecodeApkTest extends BaseTest {
     }
 
     @Test
-    public void valuesIdsEmptyTest() throws BrutException {
-        compareXmlFiles("res/values/ids.xml");
-    }
-
-    @Test
     public void valuesIdsTest() throws BrutException {
         compareValuesFiles("values-mcc001/ids.xml");
     }
@@ -166,6 +161,11 @@ public class BuildAndDecodeApkTest extends BaseTest {
     @Test
     public void valuesPluralsTest() throws BrutException {
         compareValuesFiles("values-mcc001/plurals.xml");
+    }
+
+    @Test
+    public void valuesOverlayableTest() throws BrutException {
+        compareValuesFiles("values/overlayable.xml");
     }
 
     @Test
@@ -371,8 +371,8 @@ public class BuildAndDecodeApkTest extends BaseTest {
         compareXmlFiles("res/layout/issue1157.xml");
     }
 
-    @Test(expected = AssertionError.class)
-    public void xmlFillParentBecomesMatchTest() throws BrutException {
+    @Test
+    public void xmlExpectMatchParentTest() throws BrutException {
         compareXmlFiles("res/layout/issue1274.xml");
     }
 

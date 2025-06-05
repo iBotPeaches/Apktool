@@ -57,7 +57,7 @@ public class YamlLine {
             value = line.substring(1).trim();
         } else {
             // value line
-            hasColon = line.contains(":");
+            hasColon = line.indexOf(':') != -1;
             if (isItem) {
                 // array item line has only the value
                 value = line.substring(1).trim();

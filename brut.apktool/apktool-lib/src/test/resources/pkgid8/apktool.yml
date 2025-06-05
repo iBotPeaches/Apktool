@@ -3,8 +3,8 @@ apkFileName: pkgid8.apk
 usesFramework:
   ids:
   - 1
-packageInfo:
-  forcedPackageId: '128'
+resourcesInfo:
+  packageId: '128'
 versionInfo:
   versionCode: '1'
   versionName: '1.0'

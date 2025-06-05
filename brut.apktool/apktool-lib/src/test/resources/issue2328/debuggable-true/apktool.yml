@@ -3,8 +3,8 @@ apkFileName: issue2328.apk
 usesFramework:
   ids:
   - 1
-packageInfo:
-  forcedPackageId: '127'
+resourcesInfo:
+  packageId: '127'
 versionInfo:
   versionCode: '1'
   versionName: '1.0'

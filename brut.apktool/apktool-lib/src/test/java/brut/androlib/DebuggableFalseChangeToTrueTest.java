@@ -38,7 +38,7 @@ public class DebuggableFalseChangeToTrueTest extends BaseTest {
         LOGGER.info("Unpacking issue2328-debuggable-false...");
         TestUtils.copyResourceDir(DebuggableFalseChangeToTrueTest.class, "issue2328/debuggable-false", sTestOrigDir);
 
-        sConfig.setDebugMode(true);
+        sConfig.setDebuggable(true);
         sConfig.setVerbose(true);
 
         LOGGER.info("Building issue2328-debuggable-false.apk...");

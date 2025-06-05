@@ -18,7 +18,7 @@ package brut.androlib.exceptions;
 
 public class InFileNotFoundException extends AndrolibException {
 
-    public InFileNotFoundException() {
-        super();
+    public InFileNotFoundException(String path) {
+        super("Input file (" + path + ") was not found or was not readable.");
     }
 }

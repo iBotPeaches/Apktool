@@ -38,7 +38,7 @@ public class DebuggableTrueAddedTest extends BaseTest {
         LOGGER.info("Unpacking issue2328-debuggable-missing...");
         TestUtils.copyResourceDir(DebuggableTrueAddedTest.class, "issue2328/debuggable-missing", sTestOrigDir);
 
-        sConfig.setDebugMode(true);
+        sConfig.setDebuggable(true);
         sConfig.setVerbose(true);
 
         LOGGER.info("Building issue2328-debuggable-missing.apk...");

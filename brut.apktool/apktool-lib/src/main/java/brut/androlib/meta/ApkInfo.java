@@ -16,15 +16,20 @@
  */
 package brut.androlib.meta;
 
-import brut.androlib.ApktoolProperties;
 import brut.androlib.exceptions.AndrolibException;
 import brut.directory.DirectoryException;
 import brut.directory.ExtFile;
 import brut.yaml.*;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.io.IOException;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 public class ApkInfo implements YamlSerializable {
@@ -43,27 +48,23 @@ public class ApkInfo implements YamlSerializable {
     private final UsesFramework mUsesFramework;
     private final List<String> mUsesLibrary;
     private final SdkInfo mSdkInfo;
-    private final PackageInfo mPackageInfo;
     private final VersionInfo mVersionInfo;
+    private final ResourcesInfo mResourcesInfo;
     private final Map<String, Boolean> mFeatureFlags;
-    private Boolean mSparseResources;
-    private Boolean mCompactEntries;
     private final List<String> mDoNotCompress;
 
-    // only set when loaded from a file (not a stream)
+    // Only set when loaded from a file (not a stream).
     private ExtFile mApkFile;
 
     public ApkInfo() {
-        mVersion = ApktoolProperties.getVersion();
+        mVersion = null;
         mApkFileName = null;
         mUsesFramework = new UsesFramework();
         mUsesLibrary = new ArrayList<>();
         mSdkInfo = new SdkInfo();
-        mPackageInfo = new PackageInfo();
         mVersionInfo = new VersionInfo();
+        mResourcesInfo = new ResourcesInfo();
         mFeatureFlags = new LinkedHashMap<>();
-        mSparseResources = null;
-        mCompactEntries = null;
         mDoNotCompress = new ArrayList<>();
     }
 
@@ -92,9 +93,7 @@ public class ApkInfo implements YamlSerializable {
     public void save(File file) throws AndrolibException {
         try (YamlWriter writer = new YamlWriter(Files.newOutputStream(file.toPath()))) {
             write(writer);
-        } catch (FileNotFoundException ex) {
-            throw new AndrolibException("File not found");
-        } catch (Exception ex) {
+        } catch (IOException ex) {
             throw new AndrolibException(ex);
         }
     }
@@ -126,27 +125,19 @@ public class ApkInfo implements YamlSerializable {
                 reader.readObject(mSdkInfo);
                 break;
             }
-            case "packageInfo": {
-                mPackageInfo.clear();
-                reader.readObject(mPackageInfo);
-                break;
-            }
             case "versionInfo": {
                 mVersionInfo.clear();
                 reader.readObject(mVersionInfo);
                 break;
             }
+            case "resourcesInfo": {
+                mResourcesInfo.clear();
+                reader.readObject(mResourcesInfo);
+                break;
+            }
             case "featureFlags": {
                 mFeatureFlags.clear();
                 reader.readBoolMap(mFeatureFlags);
-                break;
-            }
-            case "sparseResources": {
-                mSparseResources = line.getValueBool();
-                break;
-            }
-            case "compactEntries": {
-                mCompactEntries = line.getValueBool();
                 break;
             }
             case "doNotCompress": {
@@ -170,20 +161,14 @@ public class ApkInfo implements YamlSerializable {
         if (!mSdkInfo.isEmpty()) {
             writer.writeObject("sdkInfo", mSdkInfo);
         }
-        if (!mPackageInfo.isEmpty()) {
-            writer.writeObject("packageInfo", mPackageInfo);
-        }
         if (!mVersionInfo.isEmpty()) {
             writer.writeObject("versionInfo", mVersionInfo);
         }
+        if (!mResourcesInfo.isEmpty()) {
+            writer.writeObject("resourcesInfo", mResourcesInfo);
+        }
         if (!mFeatureFlags.isEmpty()) {
             writer.writeMap("featureFlags", mFeatureFlags);
-        }
-        if (mSparseResources != null) {
-            writer.writeBool("sparseResources", mSparseResources);
-        }
-        if (mCompactEntries != null) {
-            writer.writeBool("compactEntries", mCompactEntries);
         }
         if (!mDoNotCompress.isEmpty()) {
             writer.writeList("doNotCompress", mDoNotCompress);
@@ -218,32 +203,16 @@ public class ApkInfo implements YamlSerializable {
         return mSdkInfo;
     }
 
-    public PackageInfo getPackageInfo() {
-        return mPackageInfo;
-    }
-
     public VersionInfo getVersionInfo() {
         return mVersionInfo;
     }
 
+    public ResourcesInfo getResourcesInfo() {
+        return mResourcesInfo;
+    }
+
     public Map<String, Boolean> getFeatureFlags() {
         return mFeatureFlags;
-    }
-
-    public boolean isSparseResources() {
-        return mSparseResources != null ? mSparseResources : false;
-    }
-
-    public void setSparseResources(boolean sparseResources) {
-        mSparseResources = sparseResources;
-    }
-
-    public boolean isCompactEntries() {
-        return mCompactEntries != null ? mCompactEntries : false;
-    }
-
-    public void setCompactEntries(boolean compactEntries) {
-        mCompactEntries = compactEntries;
     }
 
     public List<String> getDoNotCompress() {

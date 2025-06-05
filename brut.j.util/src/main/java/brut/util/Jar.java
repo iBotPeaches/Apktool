@@ -32,7 +32,7 @@ public final class Jar {
     private static final Map<String, File> sExtracted = new HashMap<>();
 
     private Jar() {
-        // Private constructor for utility class
+        // Private constructor for utility class.
     }
 
     public static File getResourceAsFile(Class<?> clz, String name) throws BrutException {

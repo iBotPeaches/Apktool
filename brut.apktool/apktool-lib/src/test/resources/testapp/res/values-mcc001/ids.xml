@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <item type="id" name="test_id1" />
-    <item type="id" name="test_id2" />
+    <id name="test_id1" />
+    <id name="test_id2" />
+    <id name="test_id3">@id/test_id1</id>
+    <id name="test_id4">@id/test_id3</id>
 </resources>

@@ -17,14 +17,14 @@
 package brut.androlib.res.decoder;
 
 import android.util.TypedValue;
-import brut.androlib.res.data.ResTable;
+import brut.androlib.res.table.ResTable;
 
 import java.util.regex.Pattern;
 
 /**
- * AXmlResourceParser specifically for parsing encoded AndroidManifest.xml.
+ * BinaryXmlResourceParser specifically for parsing encoded AndroidManifest.xml.
  */
-public class AndroidManifestResourceParser extends AXmlResourceParser {
+public class AndroidManifestResourceParser extends BinaryXmlResourceParser {
     /**
      * Pattern for matching numeric string meta-data values. aapt automatically infers the
      * type for a manifest meta-data value based on the string in the unencoded XML. However,
@@ -34,32 +34,28 @@ public class AndroidManifestResourceParser extends AXmlResourceParser {
      */
     private static final Pattern PATTERN_NUMERIC_STRING = Pattern.compile("\\s?\\d+");
 
-    public AndroidManifestResourceParser(ResTable resTable) {
-        super(resTable);
+    public AndroidManifestResourceParser(ResTable table) {
+        super(table);
     }
 
     @Override
     public String getAttributeValue(int index) {
         String value = super.getAttributeValue(index);
-        if (value == null) {
+        if (value == null || value.isEmpty()) {
             return "";
         }
 
-        if (!isNumericStringMetadataAttributeValue(index, value)) {
-            return value;
-        }
-
-        // Patch the numeric string value by prefixing it with an escaped space.
+        // Patch the numeric string value in meta-data tags by prefixing it with an escaped space.
         // Otherwise, when the decoded app is rebuilt, aapt will incorrectly encode
         // the value as an int or float (depending on aapt version), breaking the original
         // app functionality.
-        return "\\ " + value.trim();
-    }
+        if ("meta-data".equals(getName())
+                && "value".equals(getAttributeName(index))
+                && getAttributeValueType(index) == TypedValue.TYPE_STRING
+                && PATTERN_NUMERIC_STRING.matcher(value).matches()) {
+            return "\\ " + value.trim();
+        }
 
-    private boolean isNumericStringMetadataAttributeValue(int index, String value) {
-        return "meta-data".equals(super.getName())
-                && "value".equals(super.getAttributeName(index))
-                && super.getAttributeValueType(index) == TypedValue.TYPE_STRING
-                && PATTERN_NUMERIC_STRING.matcher(value).matches();
+        return value;
     }
 }

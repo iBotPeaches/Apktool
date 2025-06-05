@@ -16,64 +16,74 @@
  */
 package brut.androlib.res.xml;
 
+import android.util.TypedValue;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 public final class ResXmlEncoders {
+    private static final Logger LOGGER = Logger.getLogger(ResXmlEncoders.class.getName());
 
     private ResXmlEncoders() {
-        // Private constructor for utility class
+        // Private constructor for utility class.
     }
 
-    public static String escapeXmlChars(String str) {
-        return StringUtils.replaceEach(
-            str,
-            new String[]{ "&", "<", "]]>" },
-            new String[]{ "&amp;", "&lt;", "]]&gt;" }
-        );
-    }
-
-    public static String encodeAsResXmlAttr(String str) {
-        if (str == null || str.isEmpty()) {
-            return str;
+    public static String coerceToString(int type, int data) {
+        switch (type) {
+            case TypedValue.TYPE_NULL:
+                return data == TypedValue.DATA_NULL_EMPTY ? "@empty" : "@null";
+            case TypedValue.TYPE_REFERENCE:
+            case TypedValue.TYPE_DYNAMIC_REFERENCE:
+                return data != 0 ? "@" + data : "@null";
+            case TypedValue.TYPE_ATTRIBUTE:
+            case TypedValue.TYPE_DYNAMIC_ATTRIBUTE:
+                return "?" + data;
+            case TypedValue.TYPE_STRING:
+                throw new IllegalArgumentException("Unexpected data type: TYPE_STRING");
+            case TypedValue.TYPE_FLOAT:
+                return Float.toString(Float.intBitsToFloat(data));
+            case TypedValue.TYPE_DIMENSION:
+                return TypedValue.coerceDimensionToString(data);
+            case TypedValue.TYPE_FRACTION:
+                return TypedValue.coerceFractionToString(data);
         }
 
-        char[] chars = str.toCharArray();
-        StringBuilder out = new StringBuilder(str.length() + 10);
-
-        switch (chars[0]) {
-            case '#':
-            case '@':
-            case '?':
-                out.append('\\');
-        }
-
-        for (char c : chars) {
-            switch (c) {
-                case '\\':
-                    out.append('\\');
-                    break;
-                case '"':
-                    out.append("&quot;");
-                    continue;
-                case '\n':
-                    out.append("\\n");
-                    continue;
+        if (type >= TypedValue.TYPE_FIRST_COLOR_INT && type <= TypedValue.TYPE_LAST_COLOR_INT) {
+            switch (type) {
                 default:
-                    if (isPrintableChar(c)) {
-                        break;
-                    }
-                    out.append(String.format("\\u%04x", (int) c));
-                    continue;
+                case TypedValue.TYPE_INT_COLOR_ARGB8:
+                    return String.format("#%08x", data);
+                case TypedValue.TYPE_INT_COLOR_RGB8:
+                    return String.format("#%06x", data & 0xFFFFFF);
+                case TypedValue.TYPE_INT_COLOR_ARGB4:
+                    return String.format("#%x%x%x%x",
+                        (data >>> 28) & 0xF, (data >>> 20) & 0xF,
+                        (data >>> 12) & 0xF, (data >>> 4) & 0xF);
+                case TypedValue.TYPE_INT_COLOR_RGB4:
+                    return String.format("#%x%x%x",
+                        (data >>> 20) & 0xF, (data >>> 12) & 0xF,
+                        (data >>> 4) & 0xF);
             }
-            out.append(c);
         }
 
-        return out.toString();
+        if (type >= TypedValue.TYPE_FIRST_INT && type <= TypedValue.TYPE_LAST_INT) {
+            switch (type) {
+                default:
+                case TypedValue.TYPE_INT_DEC:
+                    return Integer.toString(data);
+                case TypedValue.TYPE_INT_HEX:
+                    return String.format("0x%x", data);
+                case TypedValue.TYPE_INT_BOOLEAN:
+                    return data != 0 ? "true" : "false";
+            }
+        }
+
+        LOGGER.warning(String.format("Unsupported data type: 0x%02x", type));
+        return null;
     }
 
     public static String encodeAsXmlValue(String str) {
@@ -82,13 +92,14 @@ public final class ResXmlEncoders {
         }
 
         char[] chars = str.toCharArray();
-        StringBuilder out = new StringBuilder(str.length() + 10);
+        StringBuilder sb = new StringBuilder(str.length() + 10);
 
         switch (chars[0]) {
             case '#':
             case '@':
             case '?':
-                out.append('\\');
+                sb.append('\\');
+                break;
         }
 
         boolean isInStyleTag = false;
@@ -99,7 +110,7 @@ public final class ResXmlEncoders {
             if (isInStyleTag) {
                 if (c == '>') {
                     isInStyleTag = false;
-                    startPos = out.length() + 1;
+                    startPos = sb.length() + 1;
                     enclose = false;
                 }
             } else if (c == ' ') {
@@ -112,7 +123,7 @@ public final class ResXmlEncoders {
                 switch (c) {
                     case '\\':
                     case '"':
-                        out.append('\\');
+                        sb.append('\\');
                         break;
                     case '\'':
                     case '\n':
@@ -121,28 +132,74 @@ public final class ResXmlEncoders {
                     case '<':
                         isInStyleTag = true;
                         if (enclose) {
-                            out.insert(startPos, '"').append('"');
+                            sb.insert(startPos, '"').append('"');
                         }
                         break;
                     default:
                         if (isPrintableChar(c)) {
                             break;
                         }
-                        // let's not write trailing \u0000 if we are at end of string
-                        if ((out.length() + 1) == str.length() && c == '\u0000') {
+                        // Skip writing trailing \u0000 if we are at end of string.
+                        if ((sb.length() + 1) == str.length() && c == '\u0000') {
                             continue;
                         }
-                        out.append(String.format("\\u%04x", (int) c));
+                        sb.append(String.format("\\u%04x", (int) c));
                         continue;
                 }
             }
-            out.append(c);
+            sb.append(c);
         }
 
         if (enclose || wasSpace) {
-            out.insert(startPos, '"').append('"');
+            sb.insert(startPos, '"').append('"');
         }
-        return out.toString();
+        return sb.toString();
+    }
+
+    public static String encodeAsResXmlAttrValue(String str) {
+        if (str == null || str.isEmpty()) {
+            return str;
+        }
+
+        char[] chars = str.toCharArray();
+        StringBuilder sb = new StringBuilder(str.length() + 10);
+
+        switch (chars[0]) {
+            case '#':
+            case '@':
+            case '?':
+                sb.append('\\');
+                break;
+        }
+
+        for (char c : chars) {
+            switch (c) {
+                case '\\':
+                    sb.append('\\');
+                    break;
+                case '"':
+                    sb.append("&quot;");
+                    continue;
+                case '\n':
+                    sb.append("\\n");
+                    continue;
+                default:
+                    if (isPrintableChar(c)) {
+                        break;
+                    }
+                    sb.append(String.format("\\u%04x", (int) c));
+                    continue;
+            }
+            sb.append(c);
+        }
+
+        return sb.toString();
+    }
+
+    public static String escapeXmlChars(String str) {
+        return StringUtils.replaceEach(str,
+            new String[] { "&", "<", "]]>" },
+            new String[] { "&amp;", "&lt;", "]]&gt;" });
     }
 
     public static boolean hasMultipleNonPositionalSubstitutions(String str) {
@@ -160,22 +217,23 @@ public final class ResXmlEncoders {
             return str;
         }
 
-        StringBuilder out = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         int pos = 0;
         int count = 0;
         for (int pos2 : nonPositional) {
-            out.append(str, pos, ++pos2).append(++count).append('$');
+            sb.append(str, pos, ++pos2).append(++count).append('$');
             pos = pos2;
         }
-        out.append(str.substring(pos));
+        sb.append(str.substring(pos));
 
-        return out.toString();
+        return sb.toString();
     }
 
     /**
-     * It returns a pair of:
-     *   - a list of offsets of non-positional substitutions. non-pos is defined as any "%" which isn't "%%" nor "%\d+\$"
-     *   - a list of offsets of positional substitutions
+     * Returns a pair of:
+     * - A list of offsets of non-positional substitutions.
+     *   non-positional is defined as any "%" which isn't "%%" nor "%\d+\$".
+     * - A list of offsets of positional substitutions.
      */
     private static Pair<List<Integer>, List<Integer>> findSubstitutions(String str, int nonPosMax) {
         if (nonPosMax == -1) {

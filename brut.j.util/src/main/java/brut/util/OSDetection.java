@@ -21,7 +21,7 @@ public final class OSDetection {
     private static final String BIT = System.getProperty("sun.arch.data.model").toLowerCase();
 
     private OSDetection() {
-        // Private constructor for utility class
+        // Private constructor for utility class.
     }
 
     public static boolean isWindows() {
