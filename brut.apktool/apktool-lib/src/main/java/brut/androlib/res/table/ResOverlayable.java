@@ -16,7 +16,7 @@
  */
 package brut.androlib.res.table;
 
-import brut.androlib.exceptions.AndrolibException;
+import brut.androlib.exceptions.UndefinedResObjectException;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
@@ -148,7 +148,7 @@ public class ResOverlayable {
             ResEntrySpec entrySpec;
             try {
                 entrySpec = mPackage.getEntrySpec(id);
-            } catch (AndrolibException ignored) {
+            } catch (UndefinedResObjectException ignored) {
                 entrySpec = null;
             }
 

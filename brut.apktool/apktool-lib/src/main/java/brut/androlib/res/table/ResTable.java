@@ -18,7 +18,6 @@ package brut.androlib.res.table;
 
 import brut.androlib.Config;
 import brut.androlib.exceptions.AndrolibException;
-import brut.androlib.exceptions.UndefinedResObjectException;
 import brut.androlib.meta.ApkInfo;
 import brut.androlib.meta.UsesFramework;
 import brut.androlib.res.Framework;
