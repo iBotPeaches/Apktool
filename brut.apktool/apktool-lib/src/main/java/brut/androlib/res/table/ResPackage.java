@@ -34,6 +34,7 @@ public class ResPackage {
     private final Map<Pair<Integer, ResConfig>, ResType> mTypes;
     private final Map<ResId, ResEntrySpec> mEntrySpecs;
     private final Map<Pair<ResId, ResConfig>, ResEntry> mEntries;
+    private final Map<String, ResOverlayable> mOverlayables;
 
     public ResPackage(ResTable table, int id, String name) {
         mTable = table;
@@ -43,6 +44,7 @@ public class ResPackage {
         mTypes = new HashMap<>();
         mEntrySpecs = new HashMap<>();
         mEntries = new HashMap<>();
+        mOverlayables = new HashMap<>();
     }
 
     public ResTable getTable() {
@@ -218,6 +220,23 @@ public class ResPackage {
 
     public Collection<ResEntry> listEntries() {
         return mEntries.values();
+    }
+
+    public ResOverlayable addOverlayable(String name, String actor) {
+        ResOverlayable overlayable = mOverlayables.get(name);
+        if (overlayable != null) {
+            LOGGER.warning(String.format(
+                "Repeated overlayable: name=%s, actor=%s", name, actor));
+            return overlayable;
+        }
+
+        overlayable = new ResOverlayable(this, name, actor);
+        mOverlayables.put(name, overlayable);
+        return overlayable;
+    }
+
+    public Collection<ResOverlayable> listOverlayables() {
+        return mOverlayables.values();
     }
 
     @Override

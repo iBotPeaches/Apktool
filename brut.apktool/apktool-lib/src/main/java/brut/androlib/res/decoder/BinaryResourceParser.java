@@ -712,7 +712,7 @@ public class BinaryResourceParser {
 
         skipRemainingHeader(parser);
 
-        ResOverlayable overlayable = mTable.addOverlayable(name, actor);
+        ResOverlayable overlayable = mPackage.addOverlayable(name, actor);
 
         parser = new ResChunkPullParser(mIn, parser.dataSize());
         while (nextChunk(parser)) {
