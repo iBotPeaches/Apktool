@@ -108,7 +108,7 @@ public class BinaryResourceParser {
 
             readTable(parser);
 
-            LOGGER.fine(String.format("End of Chunks pos=0x%08x", mIn.position()));
+            LOGGER.fine(String.format("End of chunks at 0x%08x", mIn.position()));
 
             // We can't use remaining() here, the length of the main stream is unknown.
             if (mIn.available() > 0) {

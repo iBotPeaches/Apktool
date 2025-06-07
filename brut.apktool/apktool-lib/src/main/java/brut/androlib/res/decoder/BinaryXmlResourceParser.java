@@ -770,8 +770,9 @@ public class BinaryXmlResourceParser implements XmlResourceParser {
 
             if (chunkType < ResChunkHeader.RES_XML_FIRST_CHUNK_TYPE || chunkType > ResChunkHeader.RES_XML_LAST_CHUNK_TYPE) {
                 chunkSize = mIn.readInt();
+                LOGGER.warning(String.format(
+                    "Skipping unknown chunk %s of %d bytes.", ResChunkHeader.nameOf(chunkType), chunkSize));
                 mIn.jumpTo(chunkStart + chunkSize);
-                LOGGER.warning(String.format("Skipping unsupported chunk type: 0x%04x", chunkType));
                 break;
             }
 

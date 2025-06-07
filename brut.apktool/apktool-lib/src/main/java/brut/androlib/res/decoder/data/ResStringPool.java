@@ -50,7 +50,7 @@ public class ResStringPool {
     public static ResStringPool read(BinaryDataInputStream in) throws IOException {
         ResChunkPullParser parser = new ResChunkPullParser(in);
         if (!parser.next()) {
-            throw new IOException("Invalid input stream");
+            throw new IOException("Invalid input stream.");
         }
 
         if (parser.chunkType() != ResChunkHeader.RES_STRING_POOL_TYPE) {

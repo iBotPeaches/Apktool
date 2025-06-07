@@ -73,8 +73,6 @@ public final class ResChunkHeader {
                 return "RES_XML_END_ELEMENT_TYPE";
             case RES_XML_CDATA_TYPE:
                 return "RES_XML_CDATA_TYPE";
-            case RES_XML_LAST_CHUNK_TYPE:
-                return "RES_XML_LAST_CHUNK_TYPE";
             case RES_XML_RESOURCE_MAP_TYPE:
                 return "RES_XML_RESOURCE_MAP_TYPE";
             case RES_TABLE_PACKAGE_TYPE:
