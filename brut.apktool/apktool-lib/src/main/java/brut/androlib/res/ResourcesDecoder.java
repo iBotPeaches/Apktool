@@ -112,7 +112,7 @@ public class ResourcesDecoder {
         }
 
         generatePublicXml(pkg, outDir, serial);
-        generateOverlayableXml(outDir, serial);
+        generateOverlayableXml(pkg, outDir, serial);
 
         AndrolibException ex = parser.getFirstError();
         if (ex != null) {
@@ -184,9 +184,9 @@ public class ResourcesDecoder {
         }
     }
 
-    private void generateOverlayableXml(Directory outDir, XmlSerializer serial)
+    private void generateOverlayableXml(ResPackage pkg, Directory outDir, XmlSerializer serial)
             throws AndrolibException {
-        List<ResOverlayable> overlayables = new ArrayList<>(mTable.listOverlayables());
+        List<ResOverlayable> overlayables = new ArrayList<>(pkg.listOverlayables());
         if (overlayables.isEmpty()) {
             return;
         }

@@ -6,7 +6,7 @@ doNotCompress:
 resourcesInfo:
     packageId: '127'
     packageName: 'com.test.basic'
-    sparseResources: true
+    sparseEntries: true
 sdkInfo:
     minSdkVersion: '4'
     targetSdkVersion: '22'

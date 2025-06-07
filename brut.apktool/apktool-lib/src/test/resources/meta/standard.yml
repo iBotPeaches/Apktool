@@ -5,7 +5,7 @@ doNotCompress:
 resourcesInfo:
   packageId: '127'
   packageName: null
-  sparseResources: false
+  sparseEntries: false
 sdkInfo:
   minSdkVersion: '25'
   targetSdkVersion: '30'

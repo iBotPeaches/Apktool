@@ -8,7 +8,7 @@ versionInfo:
   versionName: '1.0'
 resourcesInfo:
   packageId: '127'
-  sparseResources: false
+  sparseEntries: false
 featureFlags:
   brut.feature.permission: true
   brut.feature.activity: true

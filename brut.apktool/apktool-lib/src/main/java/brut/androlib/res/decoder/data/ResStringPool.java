@@ -16,8 +16,9 @@
  */
 package brut.androlib.res.decoder.data;
 
+import brut.androlib.res.decoder.ResChunkPullParser;
 import brut.androlib.res.xml.ResXmlEncoders;
-import brut.util.ExtDataInput;
+import brut.util.BinaryDataInputStream;
 import com.google.common.annotations.VisibleForTesting;
 
 import java.io.IOException;
@@ -46,19 +47,22 @@ public class ResStringPool {
     private int[] mStyles;
     private boolean mIsUtf8;
 
-    public static ResStringPool read(ExtDataInput in) throws IOException {
-        ResChunkHeader chunkHeader = ResChunkHeader.read(in);
-
-        if (chunkHeader.type != ResChunkHeader.RES_STRING_POOL_TYPE) {
-            throw new IOException(String.format(
-                "Unexpected chunk type: 0x%08x (expected: 0x%08x)",
-                chunkHeader.type, ResChunkHeader.RES_STRING_POOL_TYPE));
+    public static ResStringPool read(BinaryDataInputStream in) throws IOException {
+        ResChunkPullParser parser = new ResChunkPullParser(in);
+        if (!parser.next()) {
+            throw new IOException("Invalid input stream.");
         }
 
-        return read(in, chunkHeader);
+        if (parser.chunkType() != ResChunkHeader.RES_STRING_POOL_TYPE) {
+            throw new IOException("Unexpected chunk: " + parser.chunkName()
+                    + " (expected: RES_STRING_POOL_TYPE)");
+        }
+
+        return read(parser);
     }
 
-    public static ResStringPool read(ExtDataInput in, ResChunkHeader chunkHeader) throws IOException {
+    public static ResStringPool read(ResChunkPullParser parser) throws IOException {
+        BinaryDataInputStream in = parser.stream();
         // ResStringPool_header
         int stringCount = in.readInt();
         int styleCount = in.readInt();
@@ -67,19 +71,17 @@ public class ResStringPool {
         int stylesOffset = in.readInt();
 
         // For some apps they pack the chunk header with more unused data at end.
-        if (chunkHeader.headerSize > HEADER_SIZE) {
-            in.skipBytes(chunkHeader.headerSize - HEADER_SIZE);
-        }
+        parser.skipHeader();
 
-        int[] stringOffsets = readIntArraySafe(in, stringCount, chunkHeader.startPos + stringsOffset);
+        int[] stringOffsets = readIntArraySafe(in, stringCount, parser.chunkStart() + stringsOffset);
         int[] styleOffsets = null;
         if (styleCount != 0) {
-            styleOffsets = readIntArraySafe(in, styleCount, chunkHeader.startPos + stylesOffset);
+            styleOffsets = readIntArraySafe(in, styleCount, parser.chunkStart() + stylesOffset);
         }
 
         // #3236 - Some apps give a style offset, but have 0 styles. Make this check more robust.
         boolean hasStyles = stylesOffset != 0 && styleCount != 0;
-        int size = chunkHeader.size - stringsOffset;
+        int size = parser.chunkSize() - stringsOffset;
 
         // If we have both strings and even just a lying style offset - lets calculate the size of the strings without
         // accidentally parsing all the styles.
@@ -90,7 +92,7 @@ public class ResStringPool {
         byte[] strings = in.readBytes(size);
         int[] styles = null;
         if (hasStyles) {
-            size = chunkHeader.size - stylesOffset;
+            size = parser.chunkSize() - stylesOffset;
             styles = in.readIntArray(size / 4);
         }
 
@@ -107,7 +109,7 @@ public class ResStringPool {
         return new ResStringPool(stringOffsets, strings, styleOffsets, styles, isUtf8);
     }
 
-    private static int[] readIntArraySafe(ExtDataInput in, int len, long maxPosition) throws IOException {
+    private static int[] readIntArraySafe(BinaryDataInputStream in, int len, long maxPosition) throws IOException {
         int[] arr = new int[len];
         for (int i = 0; i < len; i++) {
             // #3236 - Some apps have more strings than can fit into the block.

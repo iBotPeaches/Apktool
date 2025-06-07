@@ -79,7 +79,7 @@ public class StyledString implements CharSequence {
             mBuffer.append(ResXmlEncoders.escapeXmlChars(mText.substring(mLastOffset)));
         }
 
-        return (mDecodedText = mBuffer.toString());
+        return mDecodedText = mBuffer.toString();
     }
 
     private void decodeIterate(PeekingIterator<Span> it) {

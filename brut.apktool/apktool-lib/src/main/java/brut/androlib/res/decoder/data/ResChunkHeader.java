@@ -16,11 +16,9 @@
  */
 package brut.androlib.res.decoder.data;
 
-import brut.util.ExtDataInput;
-
-import java.io.IOException;
-
 public final class ResChunkHeader {
+    public static final int HEADER_SIZE = 8;
+
     public static final int RES_NULL_TYPE = 0x0000;
     public static final int RES_STRING_POOL_TYPE = 0x0001;
     public static final int RES_TABLE_TYPE = 0x0002;
@@ -48,24 +46,51 @@ public final class ResChunkHeader {
     public final int type;
     public final int headerSize;
     public final int size;
-    public final long startPos;
-    public final long endPos;
 
-    public ResChunkHeader(int type, int headerSize, int size, long startPos) {
+    public ResChunkHeader(int type, int headerSize, int size) {
         this.type = type;
         this.headerSize = headerSize;
         this.size = size;
-        this.startPos = startPos;
-        this.endPos = startPos + size;
     }
 
-    public static ResChunkHeader read(ExtDataInput in) throws IOException {
-        long startPos = in.position();
-        // ResChunk_header
-        int type = in.readUnsignedShort();
-        int headerSize = in.readUnsignedShort();
-        int size = in.readInt();
-
-        return new ResChunkHeader(type, headerSize, size, startPos);
+    public static String nameOf(int type) {
+        switch (type) {
+            case RES_NULL_TYPE:
+                return "RES_NULL_TYPE";
+            case RES_STRING_POOL_TYPE:
+                return "RES_STRING_POOL_TYPE";
+            case RES_TABLE_TYPE:
+                return "RES_TABLE_TYPE";
+            case RES_XML_TYPE:
+                return "RES_XML_TYPE";
+            case RES_XML_START_NAMESPACE_TYPE:
+                return "RES_XML_START_NAMESPACE_TYPE";
+            case RES_XML_END_NAMESPACE_TYPE:
+                return "RES_XML_END_NAMESPACE_TYPE";
+            case RES_XML_START_ELEMENT_TYPE:
+                return "RES_XML_START_ELEMENT_TYPE";
+            case RES_XML_END_ELEMENT_TYPE:
+                return "RES_XML_END_ELEMENT_TYPE";
+            case RES_XML_CDATA_TYPE:
+                return "RES_XML_CDATA_TYPE";
+            case RES_XML_RESOURCE_MAP_TYPE:
+                return "RES_XML_RESOURCE_MAP_TYPE";
+            case RES_TABLE_PACKAGE_TYPE:
+                return "RES_TABLE_PACKAGE_TYPE";
+            case RES_TABLE_TYPE_TYPE:
+                return "RES_TABLE_TYPE_TYPE";
+            case RES_TABLE_TYPE_SPEC_TYPE:
+                return "RES_TABLE_TYPE_SPEC_TYPE";
+            case RES_TABLE_LIBRARY_TYPE:
+                return "RES_TABLE_LIBRARY_TYPE";
+            case RES_TABLE_OVERLAYABLE_TYPE:
+                return "RES_TABLE_OVERLAYABLE_TYPE";
+            case RES_TABLE_OVERLAYABLE_POLICY_TYPE:
+                return "RES_TABLE_OVERLAYABLE_POLICY_TYPE";
+            case RES_TABLE_STAGED_ALIAS_TYPE:
+                return "RES_TABLE_STAGED_ALIAS_TYPE";
+            default:
+                return String.format("0x%04x", type);
+        }
     }
 }

@@ -30,6 +30,13 @@ public class ResId extends Number implements Comparable<ResId> {
         return id != 0 ? sCache.computeIfAbsent(id, ResId::new) : NULL;
     }
 
+    public static ResId of(int pkgId, int typeId, int entryId) {
+        assert (pkgId & 0xFF) == pkgId;
+        assert (typeId & 0xFF) == typeId;
+        assert (entryId & 0xFFFF) == entryId;
+        return ResId.of((pkgId << 24) | (typeId << 16) | entryId);
+    }
+
     private ResId(int id) {
         mId = id;
     }
@@ -44,21 +51,6 @@ public class ResId extends Number implements Comparable<ResId> {
 
     public int getEntryId() {
         return mId & 0xFFFF;
-    }
-
-    public ResId withPackageId(int pkgId) {
-        assert (pkgId & 0xFF) == pkgId;
-        return ResId.of((mId & 0x00FFFFFF) | (pkgId << 24));
-    }
-
-    public ResId withTypeId(int typeId) {
-        assert (typeId & 0xFF) == typeId;
-        return ResId.of((mId & 0xFF00FFFF) | (typeId << 16));
-    }
-
-    public ResId withEntryId(int entryId) {
-        assert (entryId & 0xFFFF) == entryId;
-        return ResId.of((mId & 0xFFFF0000) | entryId);
     }
 
     @Override

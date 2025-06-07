@@ -32,7 +32,7 @@ public class SparseFlagTest extends BaseTest {
     }
 
     @Test
-    public void decodeWithExpectationOfSparseResources() throws BrutException {
+    public void decodeWithExpectationOfSparseEntries() throws BrutException {
         sConfig.setFrameworkTag("issue-3298");
 
         LOGGER.info("Decoding sparse.apk...");
@@ -40,14 +40,14 @@ public class SparseFlagTest extends BaseTest {
         ExtFile testDir = new ExtFile(testApk + ".out");
         ApkInfo apkInfo = new ApkDecoder(testApk, sConfig).decode(testDir);
 
-        assertTrue("Expecting sparse resources", apkInfo.getResourcesInfo().isSparseResources());
+        assertTrue("Expecting sparse entries", apkInfo.getResourcesInfo().isSparseEntries());
 
         LOGGER.info("Building sparse.apk...");
         new ApkBuilder(testDir, sConfig).build(null);
     }
 
     @Test
-    public void decodeWithExpectationOfNoSparseResources() throws BrutException {
+    public void decodeWithExpectationOfNoSparseEntries() throws BrutException {
         sConfig.setFrameworkTag("issue-3298");
 
         LOGGER.info("Decoding not-sparse.apk...");
@@ -55,7 +55,7 @@ public class SparseFlagTest extends BaseTest {
         ExtFile testDir = new ExtFile(testApk + ".out");
         ApkInfo apkInfo = new ApkDecoder(testApk, sConfig).decode(testDir);
 
-        assertFalse("Expecting not-sparse resources", apkInfo.getResourcesInfo().isSparseResources());
+        assertFalse("Expecting not-sparse entries", apkInfo.getResourcesInfo().isSparseEntries());
 
         LOGGER.info("Building not-sparse.apk...");
         new ApkBuilder(testDir, sConfig).build(null);

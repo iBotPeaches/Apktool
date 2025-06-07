@@ -16,7 +16,7 @@
  */
 package brut.androlib.res.table;
 
-import brut.androlib.exceptions.AndrolibException;
+import brut.androlib.exceptions.UndefinedResObjectException;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
@@ -50,20 +50,20 @@ public class ResOverlayable {
         "config_signature"
     };
 
-    private final ResTable mTable;
+    private final ResPackage mPackage;
     private final String mName;
     private final String mActor;
     private final List<Policy> mPolicies;
 
-    public ResOverlayable(ResTable table, String name, String actor) {
-        mTable = table;
+    public ResOverlayable(ResPackage pkg, String name, String actor) {
+        mPackage = pkg;
         mName = name;
         mActor = actor;
         mPolicies = new ArrayList<>();
     }
 
-    public ResTable getTable() {
-        return mTable;
+    public ResPackage getPackage() {
+        return mPackage;
     }
 
     public String getName() {
@@ -147,8 +147,8 @@ public class ResOverlayable {
 
             ResEntrySpec entrySpec;
             try {
-                entrySpec = mTable.getEntrySpec(id);
-            } catch (AndrolibException ignored) {
+                entrySpec = mPackage.getEntrySpec(id);
+            } catch (UndefinedResObjectException ignored) {
                 entrySpec = null;
             }
 
@@ -169,8 +169,8 @@ public class ResOverlayable {
 
     @Override
     public String toString() {
-        return String.format("ResOverlayable{table=%s, name=%s, actor=%s, policies=%s}",
-            mTable, mName, mActor, mPolicies);
+        return String.format("ResOverlayable{pkg=%s, name=%s, actor=%s, policies=%s}",
+            mPackage, mName, mActor, mPolicies);
     }
 
     @Override
@@ -180,7 +180,7 @@ public class ResOverlayable {
         }
         if (obj instanceof ResOverlayable) {
             ResOverlayable other = (ResOverlayable) obj;
-            return Objects.equals(mTable, other.mTable)
+            return Objects.equals(mPackage, other.mPackage)
                     && Objects.equals(mName, other.mName)
                     && Objects.equals(mActor, other.mActor);
         }
@@ -189,7 +189,7 @@ public class ResOverlayable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(mTable, mName, mActor);
+        return Objects.hash(mPackage, mName, mActor);
     }
 
     private static class Policy {
