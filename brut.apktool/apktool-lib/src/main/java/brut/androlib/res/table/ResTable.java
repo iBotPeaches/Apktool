@@ -97,6 +97,7 @@ public class ResTable {
             throws AndrolibException {
         try (
             ExtFile inFile = new ExtFile(apkFile);
+            // Must be wrapped with BufferedInputStream for mark() support.
             BufferedInputStream in = new BufferedInputStream(
                 inFile.getDirectory().getFileInput("resources.arsc"))
         ) {

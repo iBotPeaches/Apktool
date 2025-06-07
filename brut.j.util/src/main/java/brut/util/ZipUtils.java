@@ -19,7 +19,6 @@ package brut.util;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.io.IOException;
@@ -94,7 +93,7 @@ public final class ZipUtils {
             if (doNotCompress.test(entryName)) {
                 zipEntry.setMethod(ZipEntry.STORED);
                 zipEntry.setSize(file.length());
-                try (BufferedInputStream in = new BufferedInputStream(Files.newInputStream(file.toPath()))) {
+                try (InputStream in = Files.newInputStream(file.toPath())) {
                     CRC32 crc = BrutIO.calculateCrc(in);
                     zipEntry.setCrc(crc.getValue());
                 }
