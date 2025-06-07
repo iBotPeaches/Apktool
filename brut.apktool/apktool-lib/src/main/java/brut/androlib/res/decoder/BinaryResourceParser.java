@@ -241,7 +241,6 @@ public class BinaryResourceParser {
 
         mPackage = new ResPackage(mTable, id, name);
         mPackages.add(mPackage);
-        mEntryId = ResId.of(id << 24);
 
         parser = new ResChunkPullParser(mIn, parser.dataSize());
         while (nextChunk(parser)) {
@@ -273,12 +272,12 @@ public class BinaryResourceParser {
         injectMissingEntrySpecs();
         mMissingEntrySpecs.clear();
         mInvalidConfigs.clear();
+        mEntryId = null;
         mType = null;
         mTypeSpec = null;
         mKeyStrings = null;
         mTypeStrings = null;
         mPackage = null;
-        mEntryId = null;
     }
 
     private void readTypeSpec(ResChunkPullParser parser) throws AndrolibException, IOException {
@@ -364,10 +363,9 @@ public class BinaryResourceParser {
             mType = mPackage.addType(id, config);
         }
 
-        mEntryId = mEntryId.withTypeId(id);
-
+        int pkgId = mPackage.getId();
         for (int index : entryOffsets.keySet()) {
-            mEntryId = mEntryId.withEntryId(index);
+            mEntryId = ResId.of(pkgId, id, index);
 
             int entryOffset = entryOffsets.get(index);
             if (entryOffset == NO_ENTRY) {
