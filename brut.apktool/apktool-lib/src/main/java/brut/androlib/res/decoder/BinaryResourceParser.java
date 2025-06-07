@@ -171,7 +171,7 @@ public class BinaryResourceParser {
         // ResTable_header
         int packageCount = mIn.readInt();
 
-        skipRemainingHeader(parser);
+        skipUnreadHeader(parser);
 
         parser = new ResChunkPullParser(mIn, parser.dataSize());
         while (nextChunk(parser)) {
@@ -231,7 +231,7 @@ public class BinaryResourceParser {
             mTypeIdOffset = 0;
         }
 
-        skipRemainingHeader(parser);
+        skipUnreadHeader(parser);
 
         if (id == 0 && mTable.isMainPackageLoaded()) {
             // The package ID is 0x00. That means that a shared library is being loaded,
@@ -288,7 +288,7 @@ public class BinaryResourceParser {
         mIn.skipShort(); // typesCount
         int entryCount = mIn.readInt();
 
-        skipRemainingHeader(parser);
+        skipUnreadHeader(parser);
 
         if (mFlagsOffsets != null) {
             mFlagsOffsets.add(new FlagsOffset(mIn.position(), entryCount));
@@ -299,7 +299,6 @@ public class BinaryResourceParser {
         }
 
         mTypeSpec = mPackage.addTypeSpec(id, mTypeStrings.getString(id - 1));
-        mEntryId = mEntryId.withTypeId(id);
     }
 
     private void readType(ResChunkPullParser parser) throws AndrolibException, IOException {
@@ -311,7 +310,7 @@ public class BinaryResourceParser {
         int entriesStart = mIn.readInt();
         ResConfig config = readConfig();
 
-        skipRemainingHeader(parser);
+        skipUnreadHeader(parser);
 
         boolean isOffset16 = (flags & TYPE_FLAG_OFFSET16) != 0;
         boolean isSparse = (flags & TYPE_FLAG_SPARSE) != 0;
@@ -692,7 +691,7 @@ public class BinaryResourceParser {
         // ResTable_lib_header
         int count = mIn.readInt();
 
-        skipRemainingHeader(parser);
+        skipUnreadHeader(parser);
 
         for (int i = 0; i < count; i++) {
             // ResTable_lib_entry
@@ -710,7 +709,7 @@ public class BinaryResourceParser {
         String name = mIn.readUtf16(256);
         String actor = mIn.readUtf16(256);
 
-        skipRemainingHeader(parser);
+        skipUnreadHeader(parser);
 
         ResOverlayable overlayable = mPackage.addOverlayable(name, actor);
 
@@ -725,7 +724,7 @@ public class BinaryResourceParser {
             int flags = mIn.readInt();
             int entryCount = mIn.readInt();
 
-            skipRemainingHeader(parser);
+            skipUnreadHeader(parser);
 
             ResId[] entries = new ResId[entryCount];
             int entriesCount = 0;
@@ -750,7 +749,7 @@ public class BinaryResourceParser {
         // ResTable_staged_alias_header
         int count = mIn.readInt();
 
-        skipRemainingHeader(parser);
+        skipUnreadHeader(parser);
 
         for (int i = 0; i < count; i++) {
             // ResTable_staged_alias_entry
@@ -762,7 +761,7 @@ public class BinaryResourceParser {
         }
     }
 
-    public void skipRemainingHeader(ResChunkPullParser parser) throws IOException {
+    public void skipUnreadHeader(ResChunkPullParser parser) throws IOException {
         // Some apps lie about the reported size of their chunk header.
         // Trusting the header size is misleading, so compare to what we actually read in the
         // header vs reported and skip the rest. However, this runs after each chunk and not
