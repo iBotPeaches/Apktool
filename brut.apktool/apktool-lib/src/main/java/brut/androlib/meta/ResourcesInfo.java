@@ -21,7 +21,7 @@ import brut.yaml.*;
 public class ResourcesInfo implements YamlSerializable {
     private String mPackageId;
     private String mPackageName;
-    private Boolean mSparseResources;
+    private Boolean mSparseEntries;
     private Boolean mCompactEntries;
 
     public ResourcesInfo() {
@@ -31,13 +31,13 @@ public class ResourcesInfo implements YamlSerializable {
     public void clear() {
         mPackageId = null;
         mPackageName = null;
-        mSparseResources = null;
+        mSparseEntries = null;
         mCompactEntries = null;
     }
 
     public boolean isEmpty() {
         return mPackageId == null && mPackageName == null
-                && mSparseResources == null && mCompactEntries == null;
+                && mSparseEntries == null && mCompactEntries == null;
     }
 
     @Override
@@ -52,8 +52,8 @@ public class ResourcesInfo implements YamlSerializable {
                 mPackageName = line.getValue();
                 break;
             }
-            case "sparseResources": {
-                mSparseResources = line.getValueBool();
+            case "sparseEntries": {
+                mSparseEntries = line.getValueBool();
                 break;
             }
             case "compactEntries": {
@@ -71,8 +71,8 @@ public class ResourcesInfo implements YamlSerializable {
         if (mPackageName != null) {
             writer.writeString("packageName", mPackageName);
         }
-        if (mSparseResources != null) {
-            writer.writeBool("sparseResources", mSparseResources);
+        if (mSparseEntries != null) {
+            writer.writeBool("sparseEntries", mSparseEntries);
         }
         if (mCompactEntries != null) {
             writer.writeBool("compactEntries", mCompactEntries);
@@ -95,12 +95,12 @@ public class ResourcesInfo implements YamlSerializable {
         mPackageName = packageName;
     }
 
-    public boolean isSparseResources() {
-        return mSparseResources != null ? mSparseResources : false;
+    public boolean isSparseEntries() {
+        return mSparseEntries != null ? mSparseEntries : false;
     }
 
-    public void setSparseResources(boolean sparseResources) {
-        mSparseResources = sparseResources;
+    public void setSparseEntries(boolean sparseEntries) {
+        mSparseEntries = sparseEntries;
     }
 
     public boolean isCompactEntries() {

@@ -318,7 +318,7 @@ public class BinaryResourceParser {
 
         // Only flag the app as sparse if the main package is not loaded yet.
         if (isSparse && !mTable.isMainPackageLoaded()) {
-            mTable.getApkInfo().getResourcesInfo().setSparseResources(true);
+            mTable.getApkInfo().getResourcesInfo().setSparseEntries(true);
         }
 
         // #3778 - In some apps the res entries are unordered and might have to jump
