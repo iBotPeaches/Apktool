@@ -324,7 +324,7 @@ public class BinaryResourceParser {
         mIn.mark(parser.dataSize());
 
         // #3372 - The offsets that are 16-bit should be stored as real offsets (* 4u).
-        HashMap<Integer, Integer> entryOffsets = new LinkedHashMap<>();
+        Map<Integer, Integer> entryOffsets = new LinkedHashMap<>();
         for (int i = 0; i < entryCount; i++) {
             int index, offset;
 
@@ -363,12 +363,14 @@ public class BinaryResourceParser {
             mType = mPackage.addType(id, config);
         }
 
-        int pkgId = mPackage.getId();
-        for (int index : entryOffsets.keySet()) {
-            mEntryId = ResId.of(pkgId, id, index);
+        long endPosition = mIn.position();
+        for (Map.Entry<Integer, Integer> entry : entryOffsets.entrySet()) {
+            int index = entry.getKey();
+            int offset = entry.getValue();
 
-            int entryOffset = entryOffsets.get(index);
-            if (entryOffset == NO_ENTRY) {
+            mEntryId = ResId.of(mPackage.getId(), id, index);
+
+            if (offset == NO_ENTRY) {
                 if (!mPackage.hasEntrySpec(mEntryId)) {
                     mMissingEntrySpecs.add(mEntryId);
                 }
@@ -377,7 +379,7 @@ public class BinaryResourceParser {
 
             // #3428 - In some apps the res entries are padded for alignment, but in #3778
             // it made sense to align to the start of the entries to handle all cases.
-            long entryStart = parser.chunkStart() + entriesStart + entryOffset;
+            long entryStart = parser.chunkStart() + entriesStart + offset;
 
             // As seen in some recent APKs - there are more entries reported than can fit
             // in the chunk.
@@ -401,7 +403,15 @@ public class BinaryResourceParser {
             if (value == null && !mPackage.hasEntrySpec(mEntryId)) {
                 mMissingEntrySpecs.add(mEntryId);
             }
+
+            // #3778 - Remember the furthermost position we visited.
+            if (endPosition < mIn.position()) {
+                endPosition = mIn.position();
+            }
         }
+
+        // #3778 - Jump back to the furthermost position we visited.
+        mIn.jumpTo(endPosition);
     }
 
     private ResConfig readConfig() throws AndrolibException, IOException {
