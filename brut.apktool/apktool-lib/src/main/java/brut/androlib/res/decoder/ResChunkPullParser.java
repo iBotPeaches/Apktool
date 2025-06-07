@@ -134,7 +134,7 @@ public class ResChunkPullParser {
             mChunkOffset = -1;
             return false;
         } catch (IOException ex) {
-            throw new IOException("IO error while reading chunk header: " + ex.getMessage());
+            throw new IOException("Error while reading chunk header.", ex);
         }
 
         if (headerSize < ResChunkHeader.HEADER_SIZE || size < headerSize) {
@@ -163,7 +163,7 @@ public class ResChunkPullParser {
         } catch (EOFException ignored) {
             throw new EOFException("Unexpected EOF while skipping chunk.");
         } catch (IOException ex) {
-            throw new IOException("Error skipping chunk: " + ex.getMessage());
+            throw new IOException("Error while skipping chunk.", ex);
         }
     }
 
@@ -184,7 +184,7 @@ public class ResChunkPullParser {
         } catch (EOFException ignored) {
             throw new EOFException("Unexpected EOF while skipping chunk header.");
         } catch (IOException ex) {
-            throw new IOException("Error skipping chunk header: " + ex.getMessage());
+            throw new IOException("Error while skipping chunk header.", ex);
         }
     }
 }
