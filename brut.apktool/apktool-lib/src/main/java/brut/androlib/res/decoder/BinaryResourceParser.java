@@ -19,11 +19,13 @@ package brut.androlib.res.decoder;
 import android.util.TypedValue;
 import brut.androlib.Config;
 import brut.androlib.exceptions.AndrolibException;
+import brut.androlib.exceptions.UndefinedResObjectException;
 import brut.androlib.meta.ApkInfo;
 import brut.androlib.res.decoder.data.*;
 import brut.androlib.res.table.*;
 import brut.androlib.res.table.value.*;
 import brut.util.BinaryDataInputStream;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.*;
 import java.math.BigInteger;
@@ -297,7 +299,7 @@ public class BinaryResourceParser {
             mIn.skipInt(); // flags
         }
 
-        mTypeSpec = mPackage.addTypeSpec(id, mTypeStrings.getString(id - 1));
+        mPackage.addTypeSpec(id, mTypeStrings.getString(id - 1));
     }
 
     private void readType(ResChunkPullParser parser) throws AndrolibException, IOException {
@@ -311,6 +313,26 @@ public class BinaryResourceParser {
 
         skipUnreadHeader(parser);
 
+        // #3311 - Some older apps have no TYPE_SPEC chunks, but still define TYPE chunks.
+        try {
+            mTypeSpec = mPackage.getTypeSpec(id);
+        } catch (UndefinedResObjectException ignored) {
+            mTypeSpec = mPackage.addTypeSpec(id, mTypeStrings.getString(id - 1));
+        }
+
+        if (mInvalidConfigs.contains(config)) {
+            String dirName = mTypeSpec.getName() + config.getQualifiers();
+            if (mKeepBroken) {
+                LOGGER.warning("Invalid res config detected: " + dirName);
+                mType = mPackage.addType(id, config);
+            } else {
+                LOGGER.warning("Invalid res config detected. Dropping resources: " + dirName);
+                mType = null;
+            }
+        } else {
+            mType = mPackage.addType(id, config);
+        }
+
         boolean isOffset16 = (flags & TYPE_FLAG_OFFSET16) != 0;
         boolean isSparse = (flags & TYPE_FLAG_SPARSE) != 0;
 
@@ -319,12 +341,8 @@ public class BinaryResourceParser {
             mTable.getApkInfo().getResourcesInfo().setSparseEntries(true);
         }
 
-        // #3778 - In some apps the res entries are unordered and might have to jump
-        // backwards.
-        mIn.mark(parser.dataSize());
-
         // #3372 - The offsets that are 16-bit should be stored as real offsets (* 4u).
-        Map<Integer, Integer> entryOffsets = new LinkedHashMap<>();
+        List<Pair<Integer, Integer>> entryOffsets = new ArrayList<>(entryCount);
         for (int i = 0; i < entryCount; i++) {
             int index, offset;
 
@@ -342,40 +360,29 @@ public class BinaryResourceParser {
                 }
             }
 
-            entryOffsets.put(index, offset);
-        }
-
-        // #3311 - Some older apps have no TYPE_SPEC chunks, but still define TYPE chunks.
-        if (!mPackage.hasTypeSpec(id)) {
-            mTypeSpec = mPackage.addTypeSpec(id, mTypeStrings.getString(id - 1));
-        }
-
-        if (mInvalidConfigs.contains(config)) {
-            String dirName = mTypeSpec.getName() + config.getQualifiers();
-            if (mKeepBroken) {
-                LOGGER.warning("Invalid res config detected: " + dirName);
-                mType = mPackage.addType(id, config);
-            } else {
-                LOGGER.warning("Invalid res config detected. Dropping resources: " + dirName);
-                mType = null;
-            }
-        } else {
-            mType = mPackage.addType(id, config);
-        }
-
-        long endPosition = mIn.position();
-        for (Map.Entry<Integer, Integer> entry : entryOffsets.entrySet()) {
-            int index = entry.getKey();
-            int offset = entry.getValue();
-
-            mEntryId = ResId.of(mPackage.getId(), id, index);
-
             if (offset == NO_ENTRY) {
-                if (!mPackage.hasEntrySpec(mEntryId)) {
-                    mMissingEntrySpecs.add(mEntryId);
+                ResId entryId = ResId.of(mPackage.getId(), id, index);
+
+                if (!mPackage.hasEntrySpec(entryId)) {
+                    mMissingEntrySpecs.add(entryId);
                 }
                 continue;
             }
+
+            entryOffsets.add(Pair.of(index, offset));
+        }
+
+        // #3778 - In some apps the res entries are unordered and might have to jump
+        // backwards. We simply pre-sort them by offset.
+        entryOffsets.sort(Comparator.comparingInt(Pair::getRight));
+
+        // Offsets with NO_ENTRY might have been skipped, update the entry count.
+        entryCount = entryOffsets.size();
+
+        for (int i = 0; i < entryCount; i++) {
+            Pair<Integer, Integer> pair = entryOffsets.get(i);
+            int index = pair.getKey();
+            int offset = pair.getValue();
 
             // #3428 - In some apps the res entries are padded for alignment, but in #3778
             // it made sense to align to the start of the entries to handle all cases.
@@ -384,34 +391,30 @@ public class BinaryResourceParser {
             // As seen in some recent APKs - there are more entries reported than can fit
             // in the chunk.
             if (entryStart >= parser.chunkEnd()) {
-                int remainingEntries = entryCount - index;
                 LOGGER.warning(String.format(
                     "End of chunk hit. Skipping remaining %d entries in type: %s",
-                    remainingEntries, mTypeSpec.getName()));
+                    entryCount - i, mTypeSpec.getName()));
                 break;
             }
 
-            // #3778 - In some apps the res entries are unordered and might have to jump
-            // backwards.
-            if (entryStart < mIn.position()) {
+            // Align the stream with the start of the entry.
+            if (entryStart >= mIn.position()) {
+                mIn.jumpTo(entryStart);
+
+                // The offset might be repeated, mark in case we need to reset.
+                mIn.mark((int) (parser.chunkEnd() - entryStart));
+            } else {
+                // The offset was repeated, reset back to last mark.
                 mIn.reset();
             }
 
-            mIn.jumpTo(entryStart);
+            mEntryId = ResId.of(mPackage.getId(), id, index);
 
             ResValue value = readEntry();
             if (value == null && !mPackage.hasEntrySpec(mEntryId)) {
                 mMissingEntrySpecs.add(mEntryId);
             }
-
-            // #3778 - Remember the furthermost position we visited.
-            if (endPosition < mIn.position()) {
-                endPosition = mIn.position();
-            }
         }
-
-        // #3778 - Jump back to the furthermost position we visited.
-        mIn.jumpTo(endPosition);
     }
 
     private ResConfig readConfig() throws AndrolibException, IOException {
@@ -620,7 +623,7 @@ public class BinaryResourceParser {
     }
 
     private ResValue readMapEntry() throws IOException {
-        String typeName = mType.getName();
+        String typeName = mTypeSpec.getName();
         // ResTable_map_entry
         int parentId = mIn.readInt();
         int count = mIn.readInt();
@@ -670,7 +673,7 @@ public class BinaryResourceParser {
     }
 
     private ResValue parseValue(int type, int data, boolean inBag) {
-        String typeName = mType.getName();
+        String typeName = mTypeSpec.getName();
         String rawValue = null;
 
         // ID resource values are either encoded as a boolean (false) or a resource reference.
