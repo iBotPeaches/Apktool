@@ -297,7 +297,10 @@ public class BinaryDataInputStream extends FilterInputStream implements DataInpu
         if (remain == 0) {
             return -1;
         }
-        int read = in.read(b, off, (int) Math.min(len, remain));
+        if (len > remain) {
+            len = (int) remain;
+        }
+        int read = in.read(b, off, len);
         if (read > 0) {
             mPosition += read;
         }
@@ -310,7 +313,16 @@ public class BinaryDataInputStream extends FilterInputStream implements DataInpu
         if (remain == 0) {
             return 0;
         }
-        long skipped = in.skip(Math.min(n, remain));
+        if (n > remain) {
+            n = remain;
+        }
+        // For many reasons, skip() may end up skipping less bytes
+        // than requested. Try harder.
+        long skipped = 0;
+        long s;
+        while (skipped < n && (s = in.skip(n - skipped)) > 0) {
+            skipped += s;
+        }
         mPosition += skipped;
         return skipped;
     }
