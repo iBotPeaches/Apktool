@@ -138,7 +138,7 @@ public class AaptInvoker {
             cmd.add("--rename-resources-package");
             cmd.add(mApkInfo.getResourcesInfo().getPackageName());
         }
-        if (mApkInfo.getResourcesInfo().isSparseResources()) {
+        if (mApkInfo.getResourcesInfo().isSparseEntries()) {
             cmd.add("--enable-sparse-encoding");
         }
         if (mApkInfo.getResourcesInfo().isCompactEntries()) {

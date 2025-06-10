@@ -20,8 +20,7 @@ import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.exceptions.NinePatchNotFoundException;
 import brut.androlib.res.decoder.data.LayoutBounds;
 import brut.androlib.res.decoder.data.NinePatchData;
-import brut.util.ExtDataInput;
-import brut.util.ExtDataInputStream;
+import brut.util.BinaryDataInputStream;
 import org.apache.commons.io.IOUtils;
 
 import javax.imageio.ImageIO;
@@ -29,6 +28,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 import java.io.*;
+import java.nio.ByteOrder;
 
 public class ResNinePatchStreamDecoder implements ResStreamDecoder {
 
@@ -122,18 +122,18 @@ public class ResNinePatchStreamDecoder implements ResStreamDecoder {
     }
 
     private NinePatchData findNinePatchData(byte[] data) throws NinePatchNotFoundException, IOException {
-        ExtDataInput in = ExtDataInputStream.bigEndian(new ByteArrayInputStream(data));
+        BinaryDataInputStream in = new BinaryDataInputStream(data, ByteOrder.BIG_ENDIAN);
         findChunk(in, NinePatchData.MAGIC);
         return NinePatchData.read(in);
     }
 
     private LayoutBounds findLayoutBounds(byte[] data) throws NinePatchNotFoundException, IOException {
-        ExtDataInput in = ExtDataInputStream.bigEndian(new ByteArrayInputStream(data));
+        BinaryDataInputStream in = new BinaryDataInputStream(data, ByteOrder.BIG_ENDIAN);
         findChunk(in, LayoutBounds.MAGIC);
         return LayoutBounds.read(in);
     }
 
-    private void findChunk(ExtDataInput in, int magic) throws NinePatchNotFoundException, IOException {
+    private void findChunk(BinaryDataInputStream in, int magic) throws NinePatchNotFoundException, IOException {
         in.skipBytes(8);
         for (;;) {
             int size;

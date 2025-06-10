@@ -18,7 +18,6 @@ package brut.androlib.res.table;
 
 import brut.androlib.Config;
 import brut.androlib.exceptions.AndrolibException;
-import brut.androlib.exceptions.UndefinedResObjectException;
 import brut.androlib.meta.ApkInfo;
 import brut.androlib.meta.UsesFramework;
 import brut.androlib.res.Framework;
@@ -39,7 +38,6 @@ public class ResTable {
     private final Set<ResPackage> mLibPackages;
     private final Set<ResPackage> mFramePackages;
     private final Map<Integer, String> mDynamicRefTable;
-    private final Map<String, ResOverlayable> mOverlayables;
     private ResPackage mMainPackage;
 
     public ResTable(ApkInfo apkInfo, Config config) {
@@ -49,7 +47,6 @@ public class ResTable {
         mLibPackages = new HashSet<>();
         mFramePackages = new HashSet<>();
         mDynamicRefTable = new LinkedHashMap<>(); // must preserve order
-        mOverlayables = new HashMap<>();
     }
 
     public ApkInfo getApkInfo() {
@@ -97,6 +94,7 @@ public class ResTable {
             throws AndrolibException {
         try (
             ExtFile inFile = new ExtFile(apkFile);
+            // Must be wrapped with BufferedInputStream for mark() support.
             BufferedInputStream in = new BufferedInputStream(
                 inFile.getDirectory().getFileInput("resources.arsc"))
         ) {
@@ -281,23 +279,6 @@ public class ResTable {
 
         LOGGER.warning("Package ID not defined for dynamic ref package: " + name);
         return 0;
-    }
-
-    public ResOverlayable addOverlayable(String name, String actor) {
-        ResOverlayable overlayable = mOverlayables.get(name);
-        if (overlayable != null) {
-            LOGGER.warning(String.format(
-                "Repeated overlayable: name=%s, actor=%s", name, actor));
-            return overlayable;
-        }
-
-        overlayable = new ResOverlayable(this, name, actor);
-        mOverlayables.put(name, overlayable);
-        return overlayable;
-    }
-
-    public Collection<ResOverlayable> listOverlayables() {
-        return mOverlayables.values();
     }
 
     public void updateApkInfo() {

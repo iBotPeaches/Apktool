@@ -16,7 +16,7 @@
  */
 package brut.androlib.res.decoder.data;
 
-import brut.util.ExtDataInput;
+import brut.util.BinaryDataInputStream;
 
 import java.io.IOException;
 
@@ -37,7 +37,7 @@ public final class NinePatchData {
         this.paddingBottom = paddingBottom;
     }
 
-    public static NinePatchData read(ExtDataInput in) throws IOException {
+    public static NinePatchData read(BinaryDataInputStream in) throws IOException {
         in.skipByte(); // wasDeserialized
         int numXDivs = in.readUnsignedByte();
         int numYDivs = in.readUnsignedByte();

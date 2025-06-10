@@ -31,7 +31,7 @@ public class ApkInfoReaderTest extends BaseTest {
         assertNotNull(apkInfo.getResourcesInfo());
         assertEquals("127", apkInfo.getResourcesInfo().getPackageId());
         assertNull(apkInfo.getResourcesInfo().getPackageName());
-        assertFalse(apkInfo.getResourcesInfo().isSparseResources());
+        assertFalse(apkInfo.getResourcesInfo().isSparseEntries());
         assertNotNull(apkInfo.getSdkInfo());
         assertEquals("25", apkInfo.getSdkInfo().getMinSdkVersion());
         assertEquals("30", apkInfo.getSdkInfo().getTargetSdkVersion());
@@ -107,7 +107,7 @@ public class ApkInfoReaderTest extends BaseTest {
         assertNotNull(apkInfo.getResourcesInfo());
         assertEquals("127", apkInfo.getResourcesInfo().getPackageId());
         assertEquals("com.test.basic", apkInfo.getResourcesInfo().getPackageName());
-        assertTrue(apkInfo.getResourcesInfo().isSparseResources());
+        assertTrue(apkInfo.getResourcesInfo().isSparseEntries());
         assertNotNull(apkInfo.getSdkInfo());
         assertEquals("4", apkInfo.getSdkInfo().getMinSdkVersion());
         assertEquals("22", apkInfo.getSdkInfo().getTargetSdkVersion());
