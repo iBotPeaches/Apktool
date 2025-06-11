@@ -127,7 +127,7 @@ public class ResChunkPullParser {
         // Read the chunk header at the current position.
         try {
             mChunkOffset = mIn.position();
-            ResChunkHeader chunkHeader = ResChunkHeader.parse(mIn);
+            ResChunkHeader chunkHeader = ResChunkHeader.read(mIn);
 
             if (chunkHeader.headerSize < ResChunkHeader.HEADER_SIZE
                     || chunkHeader.size < chunkHeader.headerSize) {

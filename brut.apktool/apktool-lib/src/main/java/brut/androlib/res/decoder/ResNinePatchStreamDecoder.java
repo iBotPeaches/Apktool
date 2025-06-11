@@ -124,13 +124,13 @@ public class ResNinePatchStreamDecoder implements ResStreamDecoder {
     private NinePatchData findNinePatchData(byte[] data) throws NinePatchNotFoundException, IOException {
         BinaryDataInputStream in = new BinaryDataInputStream(data, ByteOrder.BIG_ENDIAN);
         findChunk(in, NinePatchData.MAGIC);
-        return NinePatchData.parse(in);
+        return NinePatchData.read(in);
     }
 
     private LayoutBounds findLayoutBounds(byte[] data) throws NinePatchNotFoundException, IOException {
         BinaryDataInputStream in = new BinaryDataInputStream(data, ByteOrder.BIG_ENDIAN);
         findChunk(in, LayoutBounds.MAGIC);
-        return LayoutBounds.parse(in);
+        return LayoutBounds.read(in);
     }
 
     private void findChunk(BinaryDataInputStream in, int magic) throws NinePatchNotFoundException, IOException {

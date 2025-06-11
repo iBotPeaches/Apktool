@@ -57,7 +57,7 @@ public final class ResChunkHeader {
         this.size = size;
     }
 
-    public static ResChunkHeader parse(BinaryDataInputStream in) throws IOException {
+    public static ResChunkHeader read(BinaryDataInputStream in) throws IOException {
         int type = in.readUnsignedShort();
         int headerSize = in.readUnsignedShort();
         int size = in.readInt();
