@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.nio.ByteOrder;
 
 public class ResChunkPullParser {
+    private static final long OFFSET_ENDED = -1;
+
     private final BinaryDataInputStream mIn;
     private final long mOffset;
     private final int mSize;
@@ -106,7 +108,7 @@ public class ResChunkPullParser {
     }
 
     public boolean next() throws IOException {
-        if (mChunkOffset == -1) {
+        if (mChunkOffset == OFFSET_ENDED) {
             return false;
         }
 
@@ -118,32 +120,31 @@ public class ResChunkPullParser {
 
         if (mIn.position() >= mOffset + mSize) {
             // End of chunks due to size limit.
-            mChunkOffset = -1;
+            mChunkOffset = OFFSET_ENDED;
             return false;
         }
 
         // Read the chunk header at the current position.
-        int type, headerSize, size;
         try {
             mChunkOffset = mIn.position();
-            type = mIn.readShort();
-            headerSize = mIn.readShort();
-            size = mIn.readInt();
+            ResChunkHeader chunkHeader = ResChunkHeader.read(mIn);
+
+            if (chunkHeader.headerSize < ResChunkHeader.HEADER_SIZE
+                    || chunkHeader.size < chunkHeader.headerSize) {
+                throw new IOException(String.format(
+                    "Invalid chunk header: type=0x%04x, headerSize=%d, size=%d",
+                    chunkHeader.type, chunkHeader.headerSize, chunkHeader.size));
+            }
+
+            mChunkHeader = chunkHeader;
+            return true;
         } catch (EOFException ignored) {
             // End of chunks due to end of stream.
-            mChunkOffset = -1;
+            mChunkOffset = OFFSET_ENDED;
             return false;
         } catch (IOException ex) {
             throw new IOException("Error while reading chunk header.", ex);
         }
-
-        if (headerSize < ResChunkHeader.HEADER_SIZE || size < headerSize) {
-            throw new IOException(String.format(
-                "Invalid chunk header: headerSize=%d size=%d", headerSize, size));
-        }
-
-        mChunkHeader = new ResChunkHeader(type, headerSize, size);
-        return true;
     }
 
     public int skipChunk() throws IOException {

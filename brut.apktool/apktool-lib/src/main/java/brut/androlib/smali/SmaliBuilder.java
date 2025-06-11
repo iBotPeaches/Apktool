@@ -77,8 +77,8 @@ public class SmaliBuilder {
         boolean success;
         Exception cause;
         try {
-            File inFile = new File(mSmaliDir, fileName);
-            success = buildFile(inFile, dexBuilder, mApiLevel);
+            File smaliFile = new File(mSmaliDir, fileName);
+            success = buildFile(smaliFile, dexBuilder, mApiLevel);
             cause = null;
         } catch (Exception ex) {
             success = false;

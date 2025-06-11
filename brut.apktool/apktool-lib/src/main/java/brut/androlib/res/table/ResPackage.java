@@ -21,7 +21,10 @@ import brut.androlib.exceptions.UndefinedResObjectException;
 import brut.androlib.res.table.value.ResValue;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 public class ResPackage {
@@ -241,8 +244,7 @@ public class ResPackage {
 
     @Override
     public String toString() {
-        return String.format("ResPackage{table=%s, id=0x%02x, name=%s}",
-            mTable, mId, mName);
+        return String.format("ResPackage{id=0x%02x, name=%s}", mId, mName);
     }
 
     @Override
