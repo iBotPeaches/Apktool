@@ -21,7 +21,9 @@ import android.util.TypedValue;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.exceptions.FrameworkNotFoundException;
 import brut.androlib.exceptions.UndefinedResObjectException;
-import brut.androlib.res.decoder.data.*;
+import brut.androlib.res.decoder.data.NamespaceStack;
+import brut.androlib.res.decoder.data.ResChunkHeader;
+import brut.androlib.res.decoder.data.ResStringPool;
 import brut.androlib.res.table.*;
 import brut.androlib.res.table.value.*;
 import brut.androlib.res.xml.ResXmlEncodable;
@@ -716,7 +718,7 @@ public class BinaryXmlResourceParser implements XmlResourceParser {
             mIn.skipInt(); // XML Chunk AXML Type
             mIn.skipInt(); // Chunk Size
 
-            mStringPool = ResStringPool.read(mIn);
+            mStringPool = ResStringPool.parse(mIn);
             mNamespaces.increaseDepth();
             mIsOperational = true;
         }

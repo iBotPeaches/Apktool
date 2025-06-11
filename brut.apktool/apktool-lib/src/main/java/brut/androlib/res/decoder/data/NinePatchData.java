@@ -37,7 +37,7 @@ public final class NinePatchData {
         this.paddingBottom = paddingBottom;
     }
 
-    public static NinePatchData read(BinaryDataInputStream in) throws IOException {
+    public static NinePatchData parse(BinaryDataInputStream in) throws IOException {
         in.skipByte(); // wasDeserialized
         int numXDivs = in.readUnsignedByte();
         int numYDivs = in.readUnsignedByte();

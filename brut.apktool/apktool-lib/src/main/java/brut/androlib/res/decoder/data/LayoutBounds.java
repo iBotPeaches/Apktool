@@ -33,7 +33,7 @@ public final class LayoutBounds {
         this.bottom = bottom;
     }
 
-    public static LayoutBounds read(BinaryDataInputStream in) throws IOException {
+    public static LayoutBounds parse(BinaryDataInputStream in) throws IOException {
         int left = Integer.reverseBytes(in.readInt());
         int top = Integer.reverseBytes(in.readInt());
         int right = Integer.reverseBytes(in.readInt());

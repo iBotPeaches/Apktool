@@ -81,7 +81,7 @@ public class ResFileDecoder {
         if (inResFileName.endsWith(".9.png")) {
             ext = "9.png";
         } else {
-            ext = FilenameUtils.getExtension(inResFileName);
+            ext = FilenameUtils.getExtension(inResFileName).toLowerCase();
         }
 
         // Use aapt2-like logic to determine which decoder to use.

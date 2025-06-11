@@ -149,10 +149,6 @@ public class ResOverlayable {
             try {
                 entrySpec = mPackage.getEntrySpec(id);
             } catch (UndefinedResObjectException ignored) {
-                entrySpec = null;
-            }
-
-            if (entrySpec == null) {
                 LOGGER.warning("Unresolved overlayable entry ID: " + id);
                 continue;
             }

@@ -82,6 +82,14 @@ public class ResEntrySpec {
         return mName.startsWith(DUMMY_PREFIX);
     }
 
+    public boolean isMissing() {
+        return mName.startsWith(MISSING_PREFIX);
+    }
+
+    public boolean isRenamed() {
+        return mName.startsWith(RENAMED_PREFIX);
+    }
+
     @Override
     public String toString() {
         return String.format("ResEntrySpec{typeSpec=%s, id=%s, name=%s}",

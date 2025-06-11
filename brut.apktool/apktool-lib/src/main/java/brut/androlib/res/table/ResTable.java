@@ -22,6 +22,7 @@ import brut.androlib.meta.ApkInfo;
 import brut.androlib.meta.UsesFramework;
 import brut.androlib.res.Framework;
 import brut.androlib.res.decoder.BinaryResourceParser;
+import brut.directory.Directory;
 import brut.directory.DirectoryException;
 import brut.directory.ExtFile;
 
@@ -72,18 +73,13 @@ public class ResTable {
         LOGGER.info("Loading resource table...");
         File apkFile = mApkInfo.getApkFile();
         List<ResPackage> pkgs = loadResPackagesFromApk(apkFile, mConfig.isKeepBrokenResources());
-        ResPackage pkg;
 
-        switch (pkgs.size()) {
-            case 0:
-                pkg = new ResPackage(this, 0, null);
-                break;
-            case 1:
-                pkg = pkgs.get(0);
-                break;
-            default:
-                pkg = selectPackageWithMostEntrySpecs(pkgs);
-                break;
+        ResPackage pkg;
+        if (pkgs.isEmpty()) {
+            // Empty resources.arsc, create a dummy package.
+            pkg = new ResPackage(this, 0, null);
+        } else {
+            pkg = selectPackageWithMostEntrySpecs(pkgs);
         }
 
         registerPackage(pkg);
@@ -92,15 +88,17 @@ public class ResTable {
 
     private List<ResPackage> loadResPackagesFromApk(File apkFile, boolean keepBrokenResources)
             throws AndrolibException {
-        try (
-            ExtFile inFile = new ExtFile(apkFile);
-            // Must be wrapped with BufferedInputStream for mark() support.
-            BufferedInputStream in = new BufferedInputStream(
-                inFile.getDirectory().getFileInput("resources.arsc"))
-        ) {
-            BinaryResourceParser parser = new BinaryResourceParser(this, keepBrokenResources, false);
-            parser.parse(in);
-            return parser.getPackages();
+        try (ExtFile file = new ExtFile(apkFile)) {
+            Directory dir = file.getDirectory();
+            if (!dir.containsFile("resources.arsc")) {
+                throw new AndrolibException("Could not find resources.arsc in file: " + apkFile);
+            }
+
+            try (InputStream in = dir.getFileInput("resources.arsc")) {
+                BinaryResourceParser parser = new BinaryResourceParser(this, keepBrokenResources, false);
+                parser.parse(in);
+                return parser.getPackages();
+            }
         } catch (DirectoryException | IOException ex) {
             throw new AndrolibException("Could not load resources.arsc from file: " + apkFile, ex);
         }
@@ -218,20 +216,11 @@ public class ResTable {
             throws AndrolibException {
         LOGGER.info("Loading resource table from file: " + apkFile);
         List<ResPackage> pkgs = loadResPackagesFromApk(apkFile, keepBrokenResources);
-        ResPackage pkg;
-
-        switch (pkgs.size()) {
-            case 0:
-                throw new AndrolibException("Arsc file with zero packages");
-            case 1:
-                pkg = pkgs.get(0);
-                break;
-            default:
-                pkg = selectPackageWithMostEntrySpecs(pkgs);
-                break;
+        if (pkgs.isEmpty()) {
+            throw new AndrolibException("No packages in resources.arsc in file: " + apkFile);
         }
 
-        return pkg;
+        return selectPackageWithMostEntrySpecs(pkgs);
     }
 
     public ResEntrySpec getEntrySpec(ResId id) throws AndrolibException {

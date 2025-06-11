@@ -16,6 +16,10 @@
  */
 package brut.androlib.res.decoder.data;
 
+import brut.util.BinaryDataInputStream;
+
+import java.io.IOException;
+
 public final class ResChunkHeader {
     public static final int HEADER_SIZE = 8;
 
@@ -51,6 +55,14 @@ public final class ResChunkHeader {
         this.type = type;
         this.headerSize = headerSize;
         this.size = size;
+    }
+
+    public static ResChunkHeader parse(BinaryDataInputStream in) throws IOException {
+        int type = in.readUnsignedShort();
+        int headerSize = in.readUnsignedShort();
+        int size = in.readInt();
+
+        return new ResChunkHeader(type, headerSize, size);
     }
 
     public static String nameOf(int type) {

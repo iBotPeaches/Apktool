@@ -74,14 +74,19 @@ public class Framework {
         try (ZipFile zip = new ZipFile(apkFile)) {
             ZipEntry entry = zip.getEntry("resources.arsc");
             if (entry == null) {
-                throw new AndrolibException("Could not find resources.arsc file");
+                throw new AndrolibException("Could not find resources.arsc in file: " + apkFile);
             }
 
             byte[] data = BrutIO.readAndClose(zip.getInputStream(entry));
             BinaryResourceParser parser = parseResources(data);
             publicizeResources(data, parser.getFlagsOffsets());
 
-            ResPackage pkg = selectMainPackage(parser.getPackages());
+            List<ResPackage> pkgs = parser.getPackages();
+            if (pkgs.isEmpty()) {
+                throw new AndrolibException("No packages in resources.arsc in file: " + apkFile);
+            }
+
+            ResPackage pkg = selectPackageWithMostEntrySpecs(pkgs);
             File outFile = new File(getDirectory(), pkg.getId() + getApkSuffix());
 
             try (ZipOutputStream out = new ZipOutputStream(Files.newOutputStream(outFile.toPath()))) {
@@ -122,22 +127,6 @@ public class Framework {
         BinaryResourceParser parser = new BinaryResourceParser(table, true, true);
         parser.parse(new ByteArrayInputStream(data));
         return parser;
-    }
-
-    private ResPackage selectMainPackage(List<ResPackage> pkgs) throws AndrolibException {
-        switch (pkgs.size()) {
-            case 0:
-                throw new AndrolibException("Arsc file contains zero packages");
-            case 1:
-                return pkgs.get(0);
-            default: {
-                ResPackage pkg = selectPackageWithMostEntrySpecs(pkgs);
-                LOGGER.info("Arsc file contains multiple packages. Using package "
-                        + pkg.getName() + " as default.");
-
-                return pkg;
-            }
-        }
     }
 
     private ResPackage selectPackageWithMostEntrySpecs(List<ResPackage> pkgs) {
