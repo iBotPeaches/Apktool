@@ -128,7 +128,7 @@ public class ResFlagsAttr extends ResAttr {
             ResResSpec referent = item.ref.getReferent();
 
             // #2836 - Support skipping items if the resource cannot be identified.
-            if (referent == null && mConfig.getDecodeResolveMode() == Config.DECODE_RES_RESOLVE_REMOVE) {
+            if (referent == null && mConfig.getDecodeResolve() == Config.DecodeResolve.REMOVE) {
                 LOGGER.fine(String.format("null flag reference: 0x%08x(%s)", item.ref.getValue(), item.ref.getType()));
                 continue;
             }

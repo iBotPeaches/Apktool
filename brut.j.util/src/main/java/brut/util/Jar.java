@@ -17,10 +17,12 @@
 package brut.util;
 
 import brut.common.BrutException;
-import brut.util.BrutIO;
 import org.apache.commons.io.IOUtils;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;

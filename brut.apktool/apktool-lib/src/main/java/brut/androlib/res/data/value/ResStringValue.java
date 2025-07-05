@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.util.regex.Pattern;
 
 public class ResStringValue extends ResScalarValue {
-    private static final Pattern ALL_DIGITS = Pattern.compile("\\d{9,}");
+    private static final Pattern PATTERN_NUMERIC_STRING = Pattern.compile("\\s?\\d{9,}");
 
     public ResStringValue(String value, int rawValue) {
         this(value, rawValue, "string");
@@ -65,8 +65,11 @@ public class ResStringValue extends ResScalarValue {
 
     private String checkIfStringIsNumeric(String val) {
         if (val == null || val.isEmpty()) {
+            return "";
+        }
+        if (!PATTERN_NUMERIC_STRING.matcher(val).matches()) {
             return val;
         }
-        return ALL_DIGITS.matcher(val).matches() ? "\\ " + val : val;
+        return "\\ " + val.trim();
     }
 }

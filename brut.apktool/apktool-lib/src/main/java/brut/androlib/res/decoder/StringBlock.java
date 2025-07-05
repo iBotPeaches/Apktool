@@ -44,35 +44,39 @@ public class StringBlock {
     private int[] mStyles;
     private boolean mIsUtf8;
 
-    public static StringBlock readWithChunk(ExtDataInput reader) throws IOException {
-        long startPosition = reader.position();
-        reader.skipCheckShort(ARSCHeader.RES_STRING_POOL_TYPE);
-        int headerSize = reader.readShort();
-        int chunkSize = reader.readInt();
+    public static StringBlock readWithChunk(ExtDataInput in) throws IOException {
+        long startPosition = in.position();
+        int chunkType = in.readUnsignedShort();
+        if (chunkType != ARSCHeader.RES_STRING_POOL_TYPE) {
+            throw new IOException(String.format("Invalid chunk type: expected=0x%08x, got=0x%08x",
+                    ARSCHeader.RES_STRING_POOL_TYPE, chunkType));
+        }
+        int headerSize = in.readUnsignedShort();
+        int chunkSize = in.readInt();
 
-        return readWithoutChunk(reader, startPosition, headerSize, chunkSize);
+        return readWithoutChunk(in, startPosition, headerSize, chunkSize);
     }
 
-    public static StringBlock readWithoutChunk(ExtDataInput reader, long startPosition,
-                                               int headerSize, int chunkSize) throws IOException {
+    public static StringBlock readWithoutChunk(ExtDataInput in, long startPosition, int headerSize,
+                                               int chunkSize) throws IOException {
         // ResStringPool_header
-        int stringCount = reader.readInt();
-        int styleCount = reader.readInt();
-        int flags = reader.readInt();
-        int stringsOffset = reader.readInt();
-        int stylesOffset = reader.readInt();
+        int stringCount = in.readInt();
+        int styleCount = in.readInt();
+        int flags = in.readInt();
+        int stringsOffset = in.readInt();
+        int stylesOffset = in.readInt();
 
         // For some applications they pack the StringBlock header with more unused data at end.
         if (headerSize > STRING_BLOCK_HEADER_SIZE) {
-            reader.skipBytes(headerSize - STRING_BLOCK_HEADER_SIZE);
+            in.skipBytes(headerSize - STRING_BLOCK_HEADER_SIZE);
         }
 
         StringBlock block = new StringBlock();
         block.mIsUtf8 = (flags & UTF8_FLAG) != 0;
-        block.mStringOffsets = reader.readSafeIntArray(stringCount, startPosition + stringsOffset);
+        block.mStringOffsets = in.readSafeIntArray(stringCount, startPosition + stringsOffset);
 
         if (styleCount != 0) {
-            block.mStyleOffsets = reader.readSafeIntArray(styleCount, startPosition + stylesOffset);
+            block.mStyleOffsets = in.readSafeIntArray(styleCount, startPosition + stylesOffset);
         }
 
         // #3236 - Some applications give a style offset, but have 0 styles. Make this check more robust.
@@ -85,19 +89,18 @@ public class StringBlock {
             size = stylesOffset - stringsOffset;
         }
 
-        block.mStrings = new byte[size];
-        reader.readFully(block.mStrings);
+        block.mStrings = in.readBytes(size);
 
         if (hasStyles) {
             size = chunkSize - stylesOffset;
-            block.mStyles = reader.readIntArray(size / 4);
+            block.mStyles = in.readIntArray(size / 4);
         }
 
         // In case we aren't 4 byte aligned we need to skip the remaining bytes.
         int remaining = size % 4;
         if (remaining >= 1) {
             while (remaining-- > 0) {
-                reader.readByte();
+                in.readByte();
             }
         }
 
@@ -261,7 +264,7 @@ public class StringBlock {
     }
 
     private static int getShort(byte[] array, int offset) {
-        return (array[offset + 1] & 0xff) << 8 | array[offset] & 0xff;
+        return ((array[offset + 1] & 0xFF) << 8) | (array[offset] & 0xFF);
     }
 
     private static int[] getUtf8(byte[] array, int offset) {
@@ -287,12 +290,12 @@ public class StringBlock {
     }
 
     private static int[] getUtf16(byte[] array, int offset) {
-        int val = (array[offset + 1] & 0xFF) << 8 | array[offset] & 0xFF;
+        int val = ((array[offset + 1] & 0xFF) << 8) | (array[offset] & 0xFF);
 
         if ((val & 0x8000) != 0) {
             int high = (array[offset + 3] & 0xFF) << 8;
-            int low = (array[offset + 2] & 0xFF);
-            int len_value = ((val & 0x7FFF) << 16) + (high + low);
+            int low = array[offset + 2] & 0xFF;
+            int len_value = ((val & 0x7FFF) << 16) + high + low;
             return new int[] { 4, len_value * 2 };
 
         }

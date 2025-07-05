@@ -1,0 +1,10 @@
+version: 2.0.0
+apkFileName: pkgid8.apk
+usesFramework:
+  ids:
+  - 1
+packageInfo:
+  forcedPackageId: '128'
+versionInfo:
+  versionCode: '1'
+  versionName: '1.0'

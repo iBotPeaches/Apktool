@@ -24,16 +24,15 @@ public class ResID extends Number implements Comparable<ResID> {
     }
 
     public int getPackageId() {
-        int pkgId = (mId >> 24) & 0xff;
-        return pkgId == 0 ? 2 : pkgId;
+        return (mId >> 24) & 0xFF;
     }
 
     public int getType() {
-        return (mId >> 16) & 0x000000ff;
+        return (mId >> 16) & 0xFF;
     }
 
     public int getEntry() {
-        return mId & 0x0000ffff;
+        return mId & 0xFFFF;
     }
 
     @Override

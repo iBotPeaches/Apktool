@@ -9,8 +9,8 @@ Apktool is a tool for reverse engineering third-party, closed, binary, Android a
 Apktool is **NOT** intended for piracy and other non-legal uses. It could be used for localizing and adding features, adding support for custom platforms, and other GOOD purposes. Just try to be fair with the authors of an app, that you use and probably like.
 
 #### Support
-- [Project Page](https://ibotpeaches.github.io/Apktool/)
-- [#apktool on libera.chat](https://web.libera.chat/)
+- [Project Page](https://apktool.org)
+- [#apktool on libera.chat](https://web.libera.chat)
 
 #### Security Vulnerabilities
 
@@ -18,13 +18,13 @@ If you discover a security vulnerability within Apktool, please send an e-mail t
 
 #### Links
 - [Downloads](https://bitbucket.org/iBotPeaches/apktool/downloads)
-- [Downloads Mirror](https://connortumbleson.com/apktool/)
-- [How to Build](https://ibotpeaches.github.io/Apktool/build/)
-- [Documentation](https://ibotpeaches.github.io/Apktool/documentation/)
+- [Downloads Mirror](https://connortumbleson.com/apktool)
+- [How to Build](https://apktool.org/docs/build)
+- [Documentation](https://apktool.org/wiki/the-basics/intro)
 - [Bug Reports](https://github.com/iBotPeaches/Apktool/issues)
-- [Changelog/Information](https://ibotpeaches.github.io/Apktool/changes/)
+- [Changelog/Information](https://apktool.org/blog)
 - [XDA Post](https://forum.xda-developers.com/t/util-dec-2-2020-apktool-tool-for-reverse-engineering-apk-files.1755243/)
-- [Source (Github)](https://github.com/iBotPeaches/Apktool)
+- [Source (GitHub)](https://github.com/iBotPeaches/Apktool)
 - [Source (Bitbucket)](https://bitbucket.org/iBotPeaches/apktool/)
 
 

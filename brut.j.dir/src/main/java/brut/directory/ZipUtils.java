@@ -24,7 +24,10 @@ import brut.util.BrutIO;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.InputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Collection;
 import java.util.function.Predicate;

@@ -16,24 +16,12 @@
  */
 package brut.androlib.res.data.value;
 
-import brut.androlib.exceptions.AndrolibException;
-
 public class ResFileValue extends ResIntBasedValue {
     private final String mPath;
 
     public ResFileValue(String path, int rawIntValue) {
         super(rawIntValue);
         mPath = path;
-    }
-
-    public String getStrippedPath() throws AndrolibException {
-        if (mPath.startsWith("res/")) {
-            return mPath.substring(4);
-        }
-        if (mPath.startsWith("r/") || mPath.startsWith("R/")) {
-            return mPath.substring(2);
-        }
-        throw new AndrolibException("File path does not start with \"res/\" or \"r/\": " + mPath);
     }
 
     @Override

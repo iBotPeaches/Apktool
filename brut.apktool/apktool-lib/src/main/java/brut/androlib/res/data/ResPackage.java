@@ -50,10 +50,6 @@ public class ResPackage {
         mSynthesizedRes = new HashSet<>();
     }
 
-    public Config getConfig() {
-        return mResTable.getConfig();
-    }
-
     public List<ResResSpec> listResSpecs() {
         return new ArrayList<>(mResSpecs.values());
     }

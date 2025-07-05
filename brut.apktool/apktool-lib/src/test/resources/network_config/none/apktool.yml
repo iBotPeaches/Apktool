@@ -1,0 +1,8 @@
+version: 2.0.0
+apkFileName: testapp.apk
+usesFramework:
+  ids:
+  - 1
+versionInfo:
+  versionCode: '1'
+  versionName: '1.0'

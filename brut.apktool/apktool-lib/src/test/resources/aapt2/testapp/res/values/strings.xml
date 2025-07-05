@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="app_name">testapp</string>
-    <string name="long_string_32767" />
-    <string name="surrogate_issue_2299">🔆</string>
-    <string name="html_string_issue_2632"><ul> <li><b>aaaaa aa aaaaa</b> – aaaaaaa aaaaaaaaaa aa aaaaaaaa aaaaaa aaaaa (aaaa) aaaa aaaaaaaaa aaaaa aa aaaaaaaaa aaaaaaa aaaa</li> <li><b>aaaaaaaaa aaaaaaaaaaaaaaa aaaaaaaa</b> – aaaaaaa aaaaaaaaaa aaaaaaaaa aaaa aaaaaa aa aaaa aaaa aaaa aaaa aaaaaaa aaaaaaaaaaaaa, aaaaaa aaa aaaaaaaaaa (aaa) aaaaaaaaaaaaaaa</li> <li><b>aaaaaaaaaaa aaaaaa aaaaaaaaaa</b> – aaaaaaaaaa aaaa aaaaaa aa a aaa aa aaaaaa aaa aaaaaaa (aaaaa aaaaaaaa) aaaaaaaa aa aaaaaa aaaaa aaa aaaa</li> </ul></string>
-    <string name="styled_string_issue_2815">Quickly zoom in on the screen to display content more clearly.<br/><br/> <b>To zoom in:</b><br/> 1. Use shortcut to start magnification<br/> 2. Tap the screen<br/> 3. Drag 2 fingers to move around screen<br/> 4. Pinch with 2 fingers to adjust zoom<br/> 5. Use shortcut to stop magnification<br/><br/> <b>To zoom in temporarily:</b><br/> 1. Use shortcut to start magnification<br/> 2. Touch &amp; hold anywhere on the screen<br/> 3. Drag finger to move around screen<br/> 4. Lift finger to stop magnification</string>
-</resources>

@@ -1,0 +1,21 @@
+!!brut.androlib.meta.MetaInfo
+apkFileName: basic.apk
+doNotCompress:
+    - arsc
+    - png
+packageInfo:
+    forcedPackageId: '127'
+    renameManifestPackage: 'com.test.basic'
+sdkInfo:
+    minSdkVersion: '4'
+    targetSdkVersion: '22'
+    maxSdkVersion: '30'
+sparseResources: true
+usesFramework:
+    ids:
+        - 1
+    tag: 'tag'
+version: 2.8.0
+versionInfo:
+    versionCode: '71'
+    versionName: 1.0.70

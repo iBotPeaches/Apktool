@@ -1,0 +1,20 @@
+version: 2.3.2
+apkFileName: testapp.apk
+usesFramework:
+  ids:
+  - 1
+packageInfo:
+  forcedPackageId: '127'
+versionInfo:
+  versionCode: '1'
+  versionName: '1.0'
+featureFlags:
+  brut.feature.permission: true
+  brut.feature.activity: true
+sparseResources: false
+doNotCompress:
+- assets/0byte_file.jpg
+- arsc
+- png
+- mp3
+- stored.file

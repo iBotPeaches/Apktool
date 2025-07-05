@@ -19,8 +19,8 @@ package brut.androlib;
 import org.apache.commons.io.IOUtils;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
+import java.io.IOException;
 import java.util.Properties;
 import java.util.logging.Logger;
 

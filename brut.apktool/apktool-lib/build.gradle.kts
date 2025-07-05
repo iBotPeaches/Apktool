@@ -28,6 +28,7 @@ dependencies {
     api(project(":brut.j.util"))
     api(project(":brut.j.dir"))
     api(project(":brut.j.xml"))
+    api(project(":brut.j.yaml"))
 
     implementation(libs.baksmali)
     implementation(libs.smali)
