@@ -16,8 +16,51 @@ if exist apktool.jar (
     set BASENAME=apktool
     goto skipversioned
 )
-set max=0
-for /f "tokens=1* delims=-_.0" %%A in ('dir /b /a-d %BASENAME%*.jar') do if %%~B gtr !max! set max=%%~nB
+
+set BASENAME=apktool
+set max_major=0
+set max_minor=0
+set max_patch=0
+
+rem Loop through all versioned .jar files matching the basename
+for %%F in (%BASENAME%*.jar) do (
+    set "filename=%%~nF"
+    
+    rem Extract version part (apktool-X.Y.Z)
+    for /f "tokens=2 delims=_-" %%A in ("!filename!") do (
+        for /f "tokens=1,2,3 delims=." %%B in ("%%A") do (
+            set "major=%%B"
+            set "minor=%%C"
+            set "patch=%%D"
+
+            rem Set Default minor/patch to 0
+            if "!minor!"=="" set "minor=0"
+            if "!patch!"=="" set "patch=0"
+
+            rem Compare major version
+            if !major! gtr !max_major! (
+                set "max_major=!major!"
+                set "max_minor=!minor!"
+                set "max_patch=!patch!"
+            ) else if !major! == !max_major! (
+                rem Compare minor version
+                if !minor! gtr !max_minor! (
+                    set "max_minor=!minor!"
+                    set "max_patch=!patch!"
+                ) else if !minor! == !max_minor! (
+                    rem Compare patch version
+                    if !patch! gtr !max_patch! (
+                        set "max_patch=!patch!"
+                    )
+                )
+            )
+        )
+    )
+)
+
+rem Construct full version string
+set "max=_!max_major!.!max_minor!.!max_patch!"
+
 :skipversioned
 popd
 setlocal DisableDelayedExpansion
