@@ -1,6 +1,6 @@
 [versions]
 baksmali = "3.0.9"
-commons_io = "2.19.0"
+commons_io = "2.20.0"
 commons_cli = "1.9.0"
 commons_lang3 = "3.17.0"
 commons_text = "1.13.1"
