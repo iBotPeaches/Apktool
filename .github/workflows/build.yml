@@ -77,7 +77,7 @@ jobs:
           distribution: 'zulu'
           java-version: ${{ matrix.java }}
 
-      - uses: gradle/actions/setup-gradle@v4.4.1
+      - uses: gradle/actions/setup-gradle@v4.4.2
 
       - name: Build (Linux/Mac)
         if: runner.os != 'Windows'
@@ -103,7 +103,7 @@ jobs:
           distribution: 'zulu'
           java-version: 17
 
-      - uses: gradle/actions/setup-gradle@v4.4.1
+      - uses: gradle/actions/setup-gradle@v4.4.2
         with:
           dependency-graph: generate-and-submit
 
