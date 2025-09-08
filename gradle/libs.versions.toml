@@ -1,7 +1,7 @@
 [versions]
 baksmali = "3.0.9"
 commons_io = "2.20.0"
-commons_cli = "1.9.0"
+commons_cli = "1.10.0"
 commons_lang3 = "3.18.0"
 commons_text = "1.14.0"
 guava = "33.4.8-jre"
