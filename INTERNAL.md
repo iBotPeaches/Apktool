@@ -57,8 +57,8 @@ the new binary version. We should not have any new commits since the tagged comm
 
 The build should tell you what version you are building and it should match the commits you made previously.
 
-    ➜ Apktool git:(master) ./gradlew build shadowJar proguard release
-    Building RELEASE (master): 2.2.2
+    ➜ Apktool git:(main) ./gradlew build shadowJar proguard release
+    Building RELEASE (main): 2.2.2
 
 ### Testing the binary.
 
@@ -82,14 +82,14 @@ This can be shown for the `2.2.2` release like so
     ➜  Desktop sha256sum apktool-2.2.2.jar
     1f1f186edcc09b8677bc1037f3f812dff89077187b24c8558ca2a89186ea3251  apktool-2.2.2.jar
 
-Remember these hashes. These are the local hashes. These are our master hashes. All others (Bitbucket, Backup)
+Remember these hashes. These are the local hashes. These are our main hashes. All others (Bitbucket, Backup)
 must match these. If they do not - they are invalid.
 
 ### Lets get uploading.
 
 Lets make sure we actually pushed these release changes to the repo (Both Github & Bitbucket)
 
-    git push origin master
+    git push origin main
     git push origin vx.x.x
 
     git push bitbucket master

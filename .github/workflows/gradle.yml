@@ -2,7 +2,7 @@ name: Gradle Validate
 on:
   push:
     branches:
-      - master
+      - main
     paths:
       - 'gradle/wrapper/gradle-wrapper.jar'
   pull_request:

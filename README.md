@@ -8,6 +8,10 @@ Apktool is a tool for reverse engineering third-party, closed, binary, Android a
 
 Apktool is **NOT** intended for piracy and other non-legal uses. It could be used for localizing and adding features, adding support for custom platforms, and other GOOD purposes. Just try to be fair with the authors of an app, that you use and probably like.
 
+### Branches
+- `main` - In-development Apktool 3.x branch
+- `2.x` - Maintenance branch for Apktool 2.x releases
+
 #### Support
 - [Project Page](https://apktool.org)
 - [#apktool on libera.chat](https://web.libera.chat)
