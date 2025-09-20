@@ -49,3 +49,13 @@ Suggestions: [#2811](https://github.com/iBotPeaches/Apktool/issues/2811)
 Applications are further getting split on qualifiers. Apktool has been built on the assumption of one apk.
 
 Suggestions: [#2283](https://github.com/iBotPeaches/Apktool/issues/2283), [#2218](https://github.com/iBotPeaches/Apktool/issues/2218), [#2880](https://github.com/iBotPeaches/Apktool/issues/2880)
+
+## Version relevant framework files
+Applications are built against a specific framework version. Apktool ships with the latest framework file at that
+time of release. So an application built with API 33 may be recompiled with API 36 which leads to issues.
+
+Apktool packing 15+ older framework files would bloat the distribution. A better solution would be to have a
+central repository of framework files that Apktool can download on demand, but that would require hosting
+and maintenance.
+
+Suggestions: [#3946](https://github.com/iBotPeaches/Apktool/issues/3946)
