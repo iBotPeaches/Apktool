@@ -221,9 +221,6 @@ Relax and watch the bug tracker.
 
 # Building aapt2 binaries.
 
-> [!WARNING]
-> aapt (aapt1) is deprecated and no longer receives updates.
-
 The steps taken for building our modified aapt2 binaries for apktool.
 
 ### Getting the modified `frameworks/base` repo.
@@ -246,7 +243,7 @@ to get the source downloaded. This is no small download, expect to use 150-250GB
 
 Some optimization techniques for a smaller clone:
 
- * `~/bin/repo init -u https://android.googlesource.com/platform/manifest -b master --partial-clone` - Partial clone
+ * `~/bin/repo init -u https://android.googlesource.com/platform/manifest -b android16-release --partial-clone` - Partial clone
  * `repo sync -c` - Only current branch
 
 After that, you need to build AOSP via this [documentation](https://source.android.com/source/building.html) guide. Now
@@ -254,8 +251,7 @@ we aren't building the entire AOSP package, the initial build is to just see if 
 
 We check out a certain tag or branch. Currently, we use
 
- * aapt2 - `android-14.0.0_r54`
- * aapt1 - `android-14.0.0_r2` (deprecated)
+ * aapt2 - `android-16-release`
 
 ### Including our modified `frameworks/base` package.
 
@@ -264,35 +260,15 @@ There is probably a more automated way to do this, but for now:
 1. `cd frameworks/base`
 2. `git remote add origin git@github.com:iBotPeaches/platform_frameworks_base.git`
 3. `git fetch origin -v`
-4. `git checkout origin/master`
+4. `git checkout origin/apktool-{x}`
 
 #### Mac Patch
 
-Normally you'll be building this on a recent Mac OS that isn't supported. You'll want to follow these steps:
+Normally you'll be building this on a recent macOS that isn't supported. You'll want to follow these steps:
 
 1. `vim build/soong/cc/config/darwin_host.go`
 2. Find `darwinSupportedSdkVersions` array.
 3. Add number that corresponds to output of: `find /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs -iname "*.sdk"`
-
-### Building the aapt1 (Legacy) binary.
-
-The steps below are different per flavor and operating system.
-
-#### Linux / Windows
-1. `source build/envsetup.sh`
-2. `lunch aosp_arm64-trunk_staging-eng`
-3. `m aapt`
-4. `strip out/host/linux-x86/bin/aapt`
-5. `strip out/host/linux-x86/bin/aapt_64`
-6. `strip out/host/windows-x86/bin/aapt.exe`
-7. `strip out/host/windows-x86/bin/aapt_64.exe`
-
-#### Mac
-1. `source build/envsetup.sh`
-2. `m aapt`
-3. `strip out/host/darwin-x86/bin/aapt_64`
-
-32/64 bit binaries will be built for Linux and Windows.
 
 ### Building the aapt2 binary.
 
@@ -300,7 +276,7 @@ The steps below are different per flavor and operating system.
 
 #### Linux / Windows
 1. `source build/envsetup.sh`
-1. `lunch aosp_arm64-trunk_staging-eng`
+1. `lunch aosp_cf_x86_64_only_phone-aosp_current-eng`
 1. `m aapt2`
 1. `strip out/host/linux-x86/bin/aapt2`
 1. `strip out/host/linux-x86/bin/aapt2_64`
@@ -310,7 +286,7 @@ The steps below are different per flavor and operating system.
 #### Mac
 1. `export ANDROID_JAVA_HOME=/Path/To/Jdk`
 1. `source build/envsetup.sh`
-1. `lunch aosp_arm64-trunk_staging-eng`
+1. `lunch aosp_cf_x86_64_only_phone-aosp_current-eng`
 1. `m aapt2`
 1. `strip out/host/darwin-x86/bin/aapt2_64`
 
