@@ -362,11 +362,6 @@ public class BuildAndDecodeApkTest extends BaseTest {
     }
 
     @Test
-    public void xmlSmallNumbersDontEscapeTest() throws BrutException {
-        compareXmlFiles("res/layout/issue1130.xml");
-    }
-
-    @Test
     public void xmlCustomAttrsNotAndroidTest() throws BrutException {
         compareXmlFiles("res/layout/issue1157.xml");
     }

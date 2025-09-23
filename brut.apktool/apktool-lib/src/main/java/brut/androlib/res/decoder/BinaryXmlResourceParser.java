@@ -26,7 +26,6 @@ import brut.androlib.res.decoder.data.ResChunkHeader;
 import brut.androlib.res.decoder.data.ResStringPool;
 import brut.androlib.res.table.*;
 import brut.androlib.res.table.value.*;
-import brut.androlib.res.xml.ResXmlEncodable;
 import brut.androlib.res.xml.ResXmlEncoders;
 import brut.util.BinaryDataInputStream;
 import org.xmlpull.v1.XmlPullParserException;
@@ -415,12 +414,6 @@ public class BinaryXmlResourceParser implements XmlResourceParser {
         return mResourceIds[name];
     }
 
-    // Non-standard API
-    protected int getAttributeValueType(int index) {
-        int offset = getAttributeOffset(index);
-        return mAttributes[offset + ATTRIBUTE_IX_VALUE_TYPE];
-    }
-
     @Override
     public String getAttributeValue(int index) {
         int offset = getAttributeOffset(index);
@@ -428,6 +421,7 @@ public class BinaryXmlResourceParser implements XmlResourceParser {
         int valueData = mAttributes[offset + ATTRIBUTE_IX_VALUE_DATA];
         int valueRaw = mAttributes[offset + ATTRIBUTE_IX_VALUE_STRING];
 
+        String decoded = null;
         try {
             String stringPoolValue = valueRaw != -1
                 ? ResXmlEncoders.escapeXmlChars(mStringPool.getString(valueRaw)) : null;
@@ -446,23 +440,23 @@ public class BinaryXmlResourceParser implements XmlResourceParser {
             ResId nameId = ResId.of(getAttributeNameResource(index));
             ResItem value = ResItem.parse(mTable.getCurrentPackage(), valueType, valueData,
                 getPreferredString(stringPoolValue, resourceMapValue));
-            String decoded = null;
-            if (nameId != ResId.NULL && value instanceof ResPrimitive) {
+            if (nameId != ResId.NULL) {
                 try {
                     // We need the attribute entry's value to format this value.
                     ResEntrySpec nameSpec = mTable.getEntrySpec(nameId);
                     ResValue nameDefValue = mTable.getDefaultEntry(nameId).getValue();
 
                     if (nameDefValue instanceof ResAttribute) {
-                        decoded = ((ResAttribute) nameDefValue).convertToResXmlFormat(value);
+                        decoded = ((ResAttribute) nameDefValue).formatValue(value, false);
                     } else {
                         LOGGER.warning("Unexpected attribute name: " + nameSpec);
                     }
                 } catch (UndefinedResObjectException ignored) {
                 }
             }
-            if (decoded == null && value instanceof ResXmlEncodable) {
-                decoded = ((ResXmlEncodable) value).encodeAsResXmlAttrValue();
+            if (decoded == null) {
+                // Fall back to default attribute.
+                decoded = ResAttribute.DEFAULT.formatValue(value, false);
             }
             if (decoded != null) {
                 return decoded;
@@ -470,10 +464,12 @@ public class BinaryXmlResourceParser implements XmlResourceParser {
         } catch (AndrolibException ex) {
             setFirstError(ex);
         }
+
         LOGGER.warning(String.format(
             "Could not decode attr value: ns=%s, name=%s, value=0x%08x",
             getAttributePrefix(index), getAttributeName(index), valueData));
-        return ResXmlEncoders.coerceToString(valueType, valueData);
+        decoded = ResXmlEncoders.coerceToString(valueType, valueData);
+        return decoded != null ? decoded : "";
     }
 
     @Override

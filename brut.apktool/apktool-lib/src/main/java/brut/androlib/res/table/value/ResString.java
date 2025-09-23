@@ -27,11 +27,8 @@ import org.xmlpull.v1.XmlSerializer;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 public class ResString extends ResItem implements ResXmlEncodable, ValuesXmlSerializable {
-    private static final Pattern PATTERN_NUMERIC_STRING = Pattern.compile("\\s?\\d{9,}");
-
     private final String mValue;
 
     public ResString(String text) {
@@ -61,13 +58,7 @@ public class ResString extends ResItem implements ResXmlEncodable, ValuesXmlSeri
     @Override
     public String encodeAsResXmlAttrValue() {
         String value = ResXmlEncoders.encodeAsResXmlAttrValue(mValue);
-        if (value == null || value.isEmpty()) {
-            return "";
-        }
-        if (PATTERN_NUMERIC_STRING.matcher(value).matches()) {
-            return "\\ " + value.trim();
-        }
-        return value;
+        return value != null ? value : "";
     }
 
     @Override

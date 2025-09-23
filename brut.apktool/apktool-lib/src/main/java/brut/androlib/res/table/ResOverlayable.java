@@ -29,16 +29,16 @@ import java.util.logging.Logger;
 public class ResOverlayable {
     private static final Logger LOGGER = Logger.getLogger(ResOverlayable.class.getName());
 
-    private static final int FLAG_NONE = 0x00000000;
-    private static final int FLAG_PUBLIC = 0x00000001;
-    private static final int FLAG_SYSTEM_PARTITION = 0x00000002;
-    private static final int FLAG_VENDOR_PARTITION = 0x00000004;
-    private static final int FLAG_PRODUCT_PARTITION = 0x00000008;
-    private static final int FLAG_SIGNATURE = 0x00000010;
-    private static final int FLAG_ODM_PARTITION = 0x00000020;
-    private static final int FLAG_OEM_PARTITION = 0x00000040;
-    private static final int FLAG_ACTOR_SIGNATURE = 0x00000080;
-    private static final int FLAG_CONFIG_SIGNATURE = 0x00000100;
+    private static final int FLAG_NONE = 0;
+    private static final int FLAG_PUBLIC = 1 << 0; // 0x0001
+    private static final int FLAG_SYSTEM_PARTITION = 1 << 1; // 0x0002
+    private static final int FLAG_VENDOR_PARTITION = 1 << 2; // 0x0004
+    private static final int FLAG_PRODUCT_PARTITION = 1 << 3; // 0x0008
+    private static final int FLAG_SIGNATURE = 1 << 4; // 0x0010
+    private static final int FLAG_ODM_PARTITION = 1 << 5; // 0x0020
+    private static final int FLAG_OEM_PARTITION = 1 << 6; // 0x0040
+    private static final int FLAG_ACTOR_SIGNATURE = 1 << 7; // 0x0080
+    private static final int FLAG_CONFIG_SIGNATURE = 1 << 8; // 0x0100
 
     private static final int[] FLAG_MASKS = {
         FLAG_PUBLIC, FLAG_SYSTEM_PARTITION, FLAG_VENDOR_PARTITION, FLAG_PRODUCT_PARTITION,

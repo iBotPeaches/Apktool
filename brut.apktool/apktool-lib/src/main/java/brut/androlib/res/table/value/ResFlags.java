@@ -72,15 +72,15 @@ public class ResFlags extends ResAttribute {
     }
 
     @Override
-    public String convertToResXmlFormat(ResItem value) throws AndrolibException {
-        if (value instanceof ResReference) {
-            return ((ResReference) value).encodeAsResXmlAttrValue();
+    protected String formatValueToSymbols(ResItem value) throws AndrolibException {
+        if (!(value instanceof ResPrimitive)) {
+            return null;
         }
 
         int data = ((ResPrimitive) value).getData();
-        String decoded = mFormatCache.get(data);
-        if (decoded != null) {
-            return decoded;
+        String formatted = mFormatCache.get(data);
+        if (formatted != null) {
+            return formatted;
         }
 
         Symbol[] symbols;
@@ -90,7 +90,7 @@ public class ResFlags extends ResAttribute {
             count = symbols.length;
 
             if (count == 0) {
-                return super.convertToResXmlFormat(value);
+                return null;
             }
         } else {
             symbols = new Symbol[mFlags.length];
@@ -113,11 +113,13 @@ public class ResFlags extends ResAttribute {
 
             if (count == 0) {
                 LOGGER.warning("Invalid flags value: " + value);
-                return super.convertToResXmlFormat(value);
+                return null;
             }
         }
 
         // Render the flags as a format.
+        Config config = mParent.getPackage().getTable().getConfig();
+        boolean removeUnresolved = config.getDecodeResolve() == Config.DecodeResolve.REMOVE;
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < count; i++) {
             Symbol symbol = symbols[i];
@@ -150,19 +152,24 @@ public class ResFlags extends ResAttribute {
             if (keySpec != null) {
                 sb.append(keySpec.getName());
             } else {
+                // #2836 - Support skipping items if the resource cannot be identified.
+                if (removeUnresolved) {
+                    return null;
+                }
+
                 sb.append(ResEntrySpec.MISSING_PREFIX + key.getId());
             }
         }
 
-        decoded = sb.toString();
-        mFormatCache.put(data, decoded);
-        return decoded;
+        formatted = sb.toString();
+        mFormatCache.put(data, formatted);
+        return formatted;
     }
 
     @Override
-    public void serializeSymbolsToValuesXml(XmlSerializer serial, ResEntry entry)
+    protected void serializeSymbolsToValuesXml(XmlSerializer serial, ResEntry entry)
             throws AndrolibException, IOException {
-        Config config = entry.getPackage().getTable().getConfig();
+        Config config = mParent.getPackage().getTable().getConfig();
         boolean removeUnresolved = config.getDecodeResolve() == Config.DecodeResolve.REMOVE;
 
         for (Symbol symbol : mSymbols) {
