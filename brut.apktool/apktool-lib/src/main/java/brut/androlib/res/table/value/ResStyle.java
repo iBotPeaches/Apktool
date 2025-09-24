@@ -23,7 +23,6 @@ import brut.androlib.res.table.ResEntry;
 import brut.androlib.res.table.ResEntrySpec;
 import brut.androlib.res.table.ResId;
 import brut.androlib.res.table.ResPackage;
-import brut.androlib.res.xml.ResXmlEncodable;
 import brut.androlib.res.xml.ValuesXmlSerializable;
 import org.apache.commons.lang3.tuple.Pair;
 import org.xmlpull.v1.XmlSerializer;
@@ -82,7 +81,7 @@ public class ResStyle extends ResBag implements ValuesXmlSerializable {
     @Override
     public void serializeToValuesXml(XmlSerializer serial, ResEntry entry)
             throws AndrolibException, IOException {
-        Config config = entry.getPackage().getTable().getConfig();
+        Config config = mParent.getPackage().getTable().getConfig();
         boolean skipDuplicates = !config.isAnalysisMode();
 
         serial.startTag(null, "style");
@@ -113,22 +112,21 @@ public class ResStyle extends ResBag implements ValuesXmlSerializable {
             }
 
             String body = null;
-            if (value instanceof ResPrimitive) {
-                try {
-                    // We need the attribute entry's value to format the item's value.
-                    ResValue keyDefValue =
-                        keySpec.getPackage().getDefaultEntry(keySpec.getId()).getValue();
+            try {
+                // We need the attribute entry's value to format the item's value.
+                ResValue keyDefValue =
+                    keySpec.getPackage().getDefaultEntry(keySpec.getId()).getValue();
 
-                    if (keyDefValue instanceof ResAttribute) {
-                        body = ((ResAttribute) keyDefValue).convertToResXmlFormat(value);
-                    } else {
-                        LOGGER.warning("Unexpected style item key: " + keySpec);
-                    }
-                } catch (UndefinedResObjectException ignored) {
+                if (keyDefValue instanceof ResAttribute) {
+                    body = ((ResAttribute) keyDefValue).formatValue(value, true);
+                } else {
+                    LOGGER.warning("Unexpected style item key: " + keySpec);
                 }
+            } catch (UndefinedResObjectException ignored) {
             }
-            if (body == null && value instanceof ResXmlEncodable) {
-                body = ((ResXmlEncodable) value).encodeAsResXmlValue();
+            if (body == null) {
+                // Fall back to default attribute.
+                body = ResAttribute.DEFAULT.formatValue(value, true);
             }
             if (body == null) {
                 continue;

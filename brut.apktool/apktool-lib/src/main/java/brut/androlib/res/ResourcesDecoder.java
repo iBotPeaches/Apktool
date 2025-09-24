@@ -216,7 +216,7 @@ public class ResourcesDecoder {
             return;
         }
 
-        BinaryXmlResourceParser parser = new AndroidManifestResourceParser(mTable);
+        BinaryXmlResourceParser parser = new BinaryXmlResourceParser(mTable);
         XmlSerializer serial = newXmlSerializer();
         ResStreamDecoder decoder = new AndroidManifestPullStreamDecoder(parser, serial);
 
@@ -309,7 +309,14 @@ public class ResourcesDecoder {
         if (flags != null) {
             Map<String, Boolean> featureFlags = mApkInfo.getFeatureFlags();
             for (String flag : flags) {
-                featureFlags.put(flag, true);
+                boolean value;
+                if (flag.startsWith("!")) {
+                    flag = flag.substring(1);
+                    value = false;
+                } else {
+                    value = true;
+                }
+                featureFlags.put(flag, value);
             }
         }
     }

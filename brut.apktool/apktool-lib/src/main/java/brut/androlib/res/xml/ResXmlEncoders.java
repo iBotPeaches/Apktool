@@ -91,10 +91,9 @@ public final class ResXmlEncoders {
             return str;
         }
 
-        char[] chars = str.toCharArray();
         StringBuilder sb = new StringBuilder(str.length() + 10);
 
-        switch (chars[0]) {
+        switch (str.charAt(0)) {
             case '#':
             case '@':
             case '?':
@@ -106,21 +105,22 @@ public final class ResXmlEncoders {
         int startPos = 0;
         boolean enclose = false;
         boolean wasSpace = true;
-        for (char c : chars) {
+        for (int i = 0; i < str.length(); i++) {
+            char ch = str.charAt(i);
             if (isInStyleTag) {
-                if (c == '>') {
+                if (ch == '>') {
                     isInStyleTag = false;
                     startPos = sb.length() + 1;
                     enclose = false;
                 }
-            } else if (c == ' ') {
+            } else if (ch == ' ') {
                 if (wasSpace) {
                     enclose = true;
                 }
                 wasSpace = true;
             } else {
                 wasSpace = false;
-                switch (c) {
+                switch (ch) {
                     case '\\':
                     case '"':
                         sb.append('\\');
@@ -136,18 +136,18 @@ public final class ResXmlEncoders {
                         }
                         break;
                     default:
-                        if (isPrintableChar(c)) {
+                        if (isPrintableChar(ch)) {
                             break;
                         }
                         // Skip writing trailing \u0000 if we are at end of string.
-                        if ((sb.length() + 1) == str.length() && c == '\u0000') {
+                        if ((sb.length() + 1) == str.length() && ch == '\u0000') {
                             continue;
                         }
-                        sb.append(String.format("\\u%04x", (int) c));
+                        sb.append(String.format("\\u%04x", (int) ch));
                         continue;
                 }
             }
-            sb.append(c);
+            sb.append(ch);
         }
 
         if (enclose || wasSpace) {
@@ -161,10 +161,9 @@ public final class ResXmlEncoders {
             return str;
         }
 
-        char[] chars = str.toCharArray();
         StringBuilder sb = new StringBuilder(str.length() + 10);
 
-        switch (chars[0]) {
+        switch (str.charAt(0)) {
             case '#':
             case '@':
             case '?':
@@ -172,8 +171,9 @@ public final class ResXmlEncoders {
                 break;
         }
 
-        for (char c : chars) {
-            switch (c) {
+        for (int i = 0; i < str.length(); i++) {
+            char ch = str.charAt(i);
+            switch (ch) {
                 case '\\':
                     sb.append('\\');
                     break;
@@ -184,13 +184,13 @@ public final class ResXmlEncoders {
                     sb.append("\\n");
                     continue;
                 default:
-                    if (isPrintableChar(c)) {
+                    if (isPrintableChar(ch)) {
                         break;
                     }
-                    sb.append(String.format("\\u%04x", (int) c));
+                    sb.append(String.format("\\u%04x", (int) ch));
                     continue;
             }
-            sb.append(c);
+            sb.append(ch);
         }
 
         return sb.toString();
@@ -256,13 +256,13 @@ public final class ResXmlEncoders {
                 nonPositional.add(pos);
                 break;
             }
-            char c = str.charAt(pos2++);
-            if (c == '%') {
+            char ch = str.charAt(pos2++);
+            if (ch == '%') {
                 continue;
             }
-            if (c >= '0' && c <= '9' && pos2 < length) {
-                while ((c = str.charAt(pos2++)) >= '0' && c <= '9' && pos2 < length);
-                if (c == '$') {
+            if (ch >= '0' && ch <= '9' && pos2 < length) {
+                while ((ch = str.charAt(pos2++)) >= '0' && ch <= '9' && pos2 < length);
+                if (ch == '$') {
                     positional.add(pos);
                     continue;
                 }
@@ -277,9 +277,9 @@ public final class ResXmlEncoders {
         return Pair.of(nonPositional, positional);
     }
 
-    private static boolean isPrintableChar(char c) {
-        Character.UnicodeBlock block = Character.UnicodeBlock.of(c);
-        return !Character.isISOControl(c) && c != KeyEvent.CHAR_UNDEFINED
+    private static boolean isPrintableChar(char ch) {
+        Character.UnicodeBlock block = Character.UnicodeBlock.of(ch);
+        return !Character.isISOControl(ch) && ch != KeyEvent.CHAR_UNDEFINED
                 && block != null && block != Character.UnicodeBlock.SPECIALS;
     }
 }

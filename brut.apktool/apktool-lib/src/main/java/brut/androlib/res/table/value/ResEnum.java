@@ -41,11 +41,15 @@ public class ResEnum extends ResAttribute {
     }
 
     @Override
-    public String convertToResXmlFormat(ResItem value) throws AndrolibException {
+    protected String formatValueToSymbols(ResItem value) throws AndrolibException {
+        if (!(value instanceof ResPrimitive)) {
+            return null;
+        }
+
         int data = ((ResPrimitive) value).getData();
-        String decoded = mFormatCache.get(data);
-        if (decoded != null) {
-            return decoded;
+        String formatted = mFormatCache.get(data);
+        if (formatted != null) {
+            return formatted;
         }
 
         for (Symbol symbol : mSymbols) {
@@ -56,25 +60,25 @@ public class ResEnum extends ResAttribute {
             ResReference key = symbol.getKey();
             ResEntrySpec keySpec = key.resolve();
             if (keySpec != null) {
-                decoded = keySpec.getName();
-                mFormatCache.put(data, decoded);
+                formatted = keySpec.getName();
+                mFormatCache.put(data, formatted);
 
                 // fill_parent is deprecated since API 8 but appears first.
                 // Keep looking for match_parent and use it instead if found.
-                if (data == -1 && decoded.equals("fill_parent")) {
+                if (data == -1 && formatted.equals("fill_parent")) {
                     continue;
                 }
             }
             break;
         }
 
-        return decoded != null ? decoded : super.convertToResXmlFormat(value);
+        return formatted;
     }
 
     @Override
-    public void serializeSymbolsToValuesXml(XmlSerializer serial, ResEntry entry)
+    protected void serializeSymbolsToValuesXml(XmlSerializer serial, ResEntry entry)
             throws AndrolibException, IOException {
-        Config config = entry.getPackage().getTable().getConfig();
+        Config config = mParent.getPackage().getTable().getConfig();
         boolean removeUnresolved = config.getDecodeResolve() == Config.DecodeResolve.REMOVE;
 
         for (Symbol symbol : mSymbols) {

@@ -22,6 +22,7 @@ import brut.androlib.res.table.ResId;
 import brut.androlib.res.table.ResPackage;
 import brut.androlib.res.xml.ResXmlEncodable;
 import brut.androlib.res.xml.ValuesXmlSerializable;
+import com.google.common.primitives.Ints;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
@@ -57,6 +58,9 @@ public class ResAttribute extends ResBag implements ValuesXmlSerializable {
     private static final String[] TYPE_FORMATS = {
         "string", "integer", "boolean", "color", "float", "dimension", "fraction", "reference"
     };
+
+    public static final ResAttribute DEFAULT = new ResAttribute(
+        null, TYPE_ANY, Integer.MIN_VALUE, Integer.MAX_VALUE, L10N_NOT_REQUIRED);
 
     protected final int mType;
     protected final int mMin;
@@ -145,10 +149,36 @@ public class ResAttribute extends ResBag implements ValuesXmlSerializable {
         }
     }
 
-    public String convertToResXmlFormat(ResItem value) throws AndrolibException {
-        if (value instanceof ResXmlEncodable) {
-            return ((ResXmlEncodable) value).encodeAsResXmlValue();
+    public String formatValue(ResItem value, boolean asTextNode) throws AndrolibException {
+        if (!(value instanceof ResXmlEncodable)) {
+            return null;
         }
+
+        String formatted = formatValueToSymbols(value);
+        if (formatted != null) {
+            return formatted;
+        }
+
+        formatted = asTextNode
+            ? ((ResXmlEncodable) value).encodeAsResXmlValue()
+            : ((ResXmlEncodable) value).encodeAsResXmlAttrValue();
+        if (formatted == null || formatted.isEmpty()) {
+            return formatted;
+        }
+
+        // If the value is encoded as a string and the attribute also accepts
+        // integers, then if the decoded string is ambiguous, force it back
+        // to a string by prepending a backslash.
+        if (value instanceof ResString && (mType & TYPE_INT) != 0
+                && Ints.tryParse(formatted.trim()) != null) {
+            formatted = "\\" + formatted;
+        }
+
+        return formatted;
+    }
+
+    protected String formatValueToSymbols(ResItem value) throws AndrolibException {
+        // Stub for attribute types with symbols.
         return null;
     }
 
@@ -175,7 +205,7 @@ public class ResAttribute extends ResBag implements ValuesXmlSerializable {
     }
 
     private String renderFormat() {
-        if ((mType & TYPE_ANY) == 0) {
+        if ((mType & TYPE_ANY) == TYPE_ANY) {
             return null;
         }
         StringBuilder sb = new StringBuilder();
@@ -193,7 +223,7 @@ public class ResAttribute extends ResBag implements ValuesXmlSerializable {
         return sb.toString();
     }
 
-    public void serializeSymbolsToValuesXml(XmlSerializer serial, ResEntry entry)
+    protected void serializeSymbolsToValuesXml(XmlSerializer serial, ResEntry entry)
             throws AndrolibException, IOException {
         // Stub for attribute types with symbols.
     }
