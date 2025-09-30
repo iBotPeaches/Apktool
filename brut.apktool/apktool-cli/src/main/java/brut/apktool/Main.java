@@ -306,14 +306,6 @@ public class Main {
             return;
         }
 
-        // Keep support for older (-version/--version) command line arguments
-        for (String arg : args) {
-            if (arg.equals("-version") || arg.equals("--version")) {
-                printVersion();
-                return;
-            }
-        }
-
         String cmdName = args[0];
         String[] cmdArgs = Arrays.copyOfRange(args, 1, args.length);
 
@@ -349,6 +341,8 @@ public class Main {
                 break;
             case "v":
             case "version":
+            case "-version":
+            case "--version":
                 printVersion();
                 break;
             default:
