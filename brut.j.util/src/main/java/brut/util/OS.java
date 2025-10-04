@@ -145,7 +145,7 @@ public final class OS {
 
             int exitValue = ps.waitFor();
             if (exitValue != 0) {
-                throw new BrutException("could not exec (exit code = " + exitValue + "): " + Arrays.toString(cmd));
+                throw new BrutException("Execution failed (exit code = " + exitValue + "): " + Arrays.toString(cmd));
             }
         } catch (IOException ex) {
             throw new BrutException("could not exec: " + Arrays.toString(cmd), ex);

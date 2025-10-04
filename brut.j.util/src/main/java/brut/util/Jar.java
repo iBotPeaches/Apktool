@@ -36,9 +36,13 @@ public final class Jar {
     }
 
     public static File getResourceAsFile(Class<?> clz, String name) throws BrutException {
+        return getResourceAsFile(clz, name, "brut_util_Jar_");
+    }
+
+    public static File getResourceAsFile(Class<?> clz, String name, String tmpPrefix) throws BrutException {
         File file = sExtracted.get(name);
         if (file == null) {
-            file = extractToTmp(clz, name);
+            file = extractToTmp(clz, name, tmpPrefix);
             sExtracted.put(name, file);
         }
         return file;

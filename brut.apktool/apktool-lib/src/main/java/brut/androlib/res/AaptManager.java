@@ -45,11 +45,11 @@ public final class AaptManager {
 
         StringBuilder binPath = new StringBuilder("/prebuilt/");
         if (OSDetection.isUnix()) {
-            binPath.append("linux");
+            binPath.append("linux"); // ELF 64-bit LSB executable, x86-64
         } else if (OSDetection.isMacOSX()) {
-            binPath.append("macosx");
+            binPath.append("macosx"); // fat binary x86_64 + arm64
         } else if (OSDetection.isWindows()) {
-            binPath.append("windows");
+            binPath.append("windows"); // x86_64
         } else {
             throw new AndrolibException("Could not identify platform: " + OSDetection.returnOS());
         }
@@ -61,7 +61,7 @@ public final class AaptManager {
 
         File binFile;
         try {
-            binFile = Jar.getResourceAsFile(AaptManager.class, binPath.toString());
+            binFile = Jar.getResourceAsFile(AaptManager.class, binPath.toString(), binName + "_");
         } catch (BrutException ex) {
             throw new AndrolibException(ex);
         }
