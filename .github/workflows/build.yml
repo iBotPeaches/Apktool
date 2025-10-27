@@ -116,7 +116,7 @@ jobs:
         run: ./gradlew.bat build shadowJar proguard
 
       - name: Upload
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: apktool.jar
           path: brut.apktool/apktool-cli/build/libs/apktool-v*
