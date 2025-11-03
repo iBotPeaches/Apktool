@@ -54,11 +54,14 @@ public class BinaryResourceParser {
     private static final int ENTRY_FLAG_COMPLEX = 0x0001;
     // If set, this resource has been declared public, so libraries are allowed to reference it.
     private static final int ENTRY_FLAG_PUBLIC = 0x0002;
-    // If set, this is a weak resource and may be overriden by strong resources of the same name/type.
+    // If set, this is a weak resource and may be overridden by strong resources of the same name/type.
     // This is only useful during linking with other resource tables.
     private static final int ENTRY_FLAG_WEAK = 0x0004;
-    // If set, this is a compact entry with data type and value directly encoded in the this entry.
+    // If set, this is a compact entry with data type and value directly encoded in the entry.
     private static final int ENTRY_FLAG_COMPACT = 0x0008;
+    // If set, this resource relies on an android feature flag.
+    // This should not be encountered in most cases (#3993)
+    private static final int ENTRY_FLAG_FEATUREFLAG = 0x0010;
 
     private static final int CONFIG_KNOWN_MAX_SIZE = 64;
 
