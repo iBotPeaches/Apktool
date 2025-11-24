@@ -1,5 +1,5 @@
 [versions]
-baksmali = "b6365a84f4" # https://github.com/google/smali/issues/100
+baksmali = "v2.4.0" # https://github.com/google/smali/issues/100
 commons_io = "2.21.0"
 commons_cli = "1.11.0"
 commons_lang3 = "3.20.0"
