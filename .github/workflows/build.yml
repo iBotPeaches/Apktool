@@ -28,7 +28,7 @@ jobs:
       matrix:
         file: [ aapt2 ]
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Verify Executable
         run: ${{ env.BINARY_PATH }}/macosx/${{ matrix.file }} version
       - name: Output Static
@@ -40,7 +40,7 @@ jobs:
       matrix:
         file: [ aapt2 ]
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Verify Executable
         run: ${{ env.BINARY_PATH }}/linux/${{ matrix.file }} version
       - name: Output Static
@@ -52,7 +52,7 @@ jobs:
       matrix:
         file: [ aapt2.exe ]
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Verify Executable
         run: ${{ env.BINARY_PATH }}/windows/${{ matrix.file }} version
       - name: Output Static
@@ -71,7 +71,7 @@ jobs:
         os: [ ubuntu-latest, macOS-latest, windows-latest ]
         java: [ 8, 11, 17, 21 ]
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: actions/setup-java@v5
         with:
           distribution: 'zulu'
@@ -94,7 +94,7 @@ jobs:
     needs:
       - build-and-test-with-Java-8-and-later
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
