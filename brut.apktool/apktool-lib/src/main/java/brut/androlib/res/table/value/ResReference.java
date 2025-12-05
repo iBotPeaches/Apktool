@@ -91,16 +91,23 @@ public class ResReference extends ResItem implements ResXmlEncodable, ValuesXmlS
 
     @Override
     public String encodeAsResXmlValue() throws AndrolibException {
+
         if (mName != null) {
             return mName;
         }
 
         ResEntrySpec spec = resolve();
+
+        boolean isAttrRef = mType == Type.ATTRIBUTE;
+
         if (spec == null) {
+            // FIX: unresolved reference ➢ APKTOOL_MISSING_ID
+            if (mId != null && mId != ResId.NULL) {
+                return (isAttrRef ? "?" : "@") + ResEntrySpec.MISSING_PREFIX + mId.toString();
+            }
             return "@null";
         }
 
-        boolean isAttrRef = mType == Type.ATTRIBUTE;
         boolean excludeType = isAttrRef && spec.getTypeName().equals("attr");
 
         return (isAttrRef ? "?" : "@") + spec.getFullName(mPackage, excludeType);
