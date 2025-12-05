@@ -115,6 +115,11 @@ public class ResourcesDecoder {
 
         BinaryXmlResourceParser.MISSING_ATTRIBUTES.putAll(ResStyle.MISSING_ATTRIBUTES);
 
+        if (!BinaryXmlResourceParser.ATTRIBUTE_FORMATS.isEmpty()) {
+            LOGGER.info("Recognize attribute format into attrs.xml");
+            recognizeAttributeFormat(apkDir);
+        }
+
         if (!BinaryXmlResourceParser.MISSING_ATTRIBUTES.isEmpty()) {
             LOGGER.info("Writing missing attributes into attrs.xml");
             writeMissingATTR(apkDir, serial);
@@ -163,6 +168,45 @@ public class ResourcesDecoder {
             serial.flush();
         } catch (DirectoryException | IOException ex) {
             throw new AndrolibException("Could not generate: " + path, ex);
+        }
+    }
+
+    private void recognizeAttributeFormat(File apkDir) throws AndrolibException {
+
+        File attrsFile = new File(apkDir, "res/values/attrs.xml");
+
+        if (!attrsFile.exists()
+                || BinaryXmlResourceParser.ATTRIBUTE_FORMATS.isEmpty()) {
+            return;
+        }
+
+        try {
+            String content = new String(Files.readAllBytes(attrsFile.toPath()));
+
+            for (Map.Entry<String, Set<String>> entries
+                    : BinaryXmlResourceParser.ATTRIBUTE_FORMATS.entrySet()) {
+
+                String name = entries.getKey();
+
+                for (String format : entries.getValue()) {
+
+                    if (content.contains(
+                            "name=\"" + name + "\" format=\"" + format)
+                    ) {
+                        continue;
+                    }
+
+                    content = content.replaceFirst(
+                            "<attr name=\"" + name + "\" format=\"([^\"]+)\" />",
+                            "<attr name=\"" + name + "\" format=\"$1|" + format + "\" />"
+                    );
+                }
+            }
+
+            Files.write(attrsFile.toPath(), content.getBytes());
+
+        } catch (IOException ex) {
+            throw new AndrolibException(ex);
         }
     }
 
