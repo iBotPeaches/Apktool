@@ -34,8 +34,13 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Reader;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 
 /**
  * Binary xml files parser.
@@ -314,6 +319,7 @@ public class BinaryXmlResourceParser implements XmlResourceParser {
         // we can resolve it to the default namespace. This may prove to be too aggressive as we scope the entire
         // system namespace, but it is better than not resolving it at all.
 
+        String attrName = getAttributeName(index);
         ResId id = ResId.of(getAttributeNameResource(index));
 
         int pkgId = id.getPackageId();
@@ -321,7 +327,7 @@ public class BinaryXmlResourceParser implements XmlResourceParser {
         if (namespace == -1) {
             if (pkgId == 1) {
                 return ANDROID_RES_NS;  // android: namespace
-            } else if (pkgId != 0) {
+            } else if (pkgId != 0 && !attrName.startsWith(ResEntrySpec.MISSING_PREFIX)) {
                 return ANDROID_RES_NS_AUTO;  // app: namespace
             }
             return "";
@@ -364,15 +370,77 @@ public class BinaryXmlResourceParser implements XmlResourceParser {
         return mStringPool.getString(prefix);
     }
 
+    public int getAttributeValueType(int index) {
+        int offset = getAttributeOffset(index);
+        return mAttributes[offset + ATTRIBUTE_IX_VALUE_TYPE];
+    }
+
+    public int getAttributeValueData(int index) {
+        int offset = getAttributeOffset(index);
+        return mAttributes[offset + ATTRIBUTE_IX_VALUE_DATA];
+    }
+
+    public int getAttributeValueRaw(int index) {
+        int offset = getAttributeOffset(index);
+        return mAttributes[offset + ATTRIBUTE_IX_VALUE_STRING];
+    }
+
+    public ResItem getAttributeResValue(int index) {
+        int valueType = getAttributeValueType(index);
+        int valueData = getAttributeValueData(index);
+        int valueRaw = getAttributeValueRaw(index);
+
+        ResItem value = null;
+        try {
+            String stringPoolValue = valueRaw != -1
+                ? ResXmlEncoders.escapeXmlChars(mStringPool.getString(valueRaw)) : null;
+            String resourceMapValue = null;
+
+            // Ensure we only track down obfuscated values for reference/attribute type values. Otherwise, we might
+            // spam lookups against resource table for invalid IDs.
+            if (valueType == TypedValue.TYPE_REFERENCE
+                    || valueType == TypedValue.TYPE_DYNAMIC_REFERENCE
+                    || valueType == TypedValue.TYPE_ATTRIBUTE
+                    || valueType == TypedValue.TYPE_DYNAMIC_ATTRIBUTE) {
+                resourceMapValue = decodeFromResourceId(ResId.of(valueData));
+            }
+
+            value = ResItem.parse(
+                mTable.getCurrentPackage(),
+                valueType,
+                valueData,
+                getPreferredString(stringPoolValue, resourceMapValue)
+            );
+        } catch (AndrolibException ex) {
+            setFirstError(ex);
+        }
+        return value;
+    }
+
+    public static final Map<String, Set<String>> MISSING_ATTRIBUTES = new LinkedHashMap<>();
+
+    public static Set<String> isMissingATTR(String name, String format) {
+
+        Set<String> formats = MISSING_ATTRIBUTES.computeIfAbsent(name, k -> new LinkedHashSet<>());
+
+        if (format != null && !format.isEmpty()) {
+            formats.add(format);
+        }
+
+        return formats;
+    }
+
     @Override
     public String getAttributeName(int index) {
         int offset = getAttributeOffset(index);
         int name = mAttributes[offset + ATTRIBUTE_IX_NAME];
+
         if (name == -1) {
             return "";
         }
 
         ResId nameId = ResId.of(getAttributeNameResource(index));
+        ResItem value = getAttributeResValue(index);
 
         // Android prefers the resource map value over what the string pool has.
         // This can be seen quite often in obfuscated apps where values such as:
@@ -381,6 +449,7 @@ public class BinaryXmlResourceParser implements XmlResourceParser {
         // Leveraging the resource map allows us to get the proper value.
         // <item android:state_enabled="true" app:d2="false" app:d3="true">
         String resourceMapValue;
+        String isFormat = value != null ? value.getFormat() : null;
         try {
             resourceMapValue = decodeFromResourceId(nameId);
         } catch (AndrolibException ignored) {
@@ -396,7 +465,19 @@ public class BinaryXmlResourceParser implements XmlResourceParser {
         }
 
         // If it was not found in either, then we have a bogus resource.
-        return ResEntrySpec.MISSING_PREFIX + nameId;
+        String isMissedName = ResEntrySpec.MISSING_PREFIX + nameId;
+
+        try {
+            ResPackage pkg = mTable.getCurrentPackage();
+
+            isMissingATTR(isMissedName, isFormat);
+
+            pkg.addEntrySpec(nameId, isMissedName); // add entries into public.xml
+        } catch (AndrolibException ex) {
+            setFirstError(ex);
+        }
+
+        return isMissedName;
     }
 
     private String decodeFromResourceId(ResId resId) throws AndrolibException {
@@ -421,30 +502,15 @@ public class BinaryXmlResourceParser implements XmlResourceParser {
 
     @Override
     public String getAttributeValue(int index) {
-        int offset = getAttributeOffset(index);
-        int valueType = mAttributes[offset + ATTRIBUTE_IX_VALUE_TYPE];
-        int valueData = mAttributes[offset + ATTRIBUTE_IX_VALUE_DATA];
-        int valueRaw = mAttributes[offset + ATTRIBUTE_IX_VALUE_STRING];
+        int valueType = getAttributeValueType(index);
+        int valueData = getAttributeValueData(index);
 
         String decoded = null;
         try {
-            String stringPoolValue = valueRaw != -1
-                ? ResXmlEncoders.escapeXmlChars(mStringPool.getString(valueRaw)) : null;
-            String resourceMapValue = null;
-
-            // Ensure we only track down obfuscated values for reference/attribute type values. Otherwise, we might
-            // spam lookups against resource table for invalid IDs.
-            if (valueType == TypedValue.TYPE_REFERENCE
-                    || valueType == TypedValue.TYPE_DYNAMIC_REFERENCE
-                    || valueType == TypedValue.TYPE_ATTRIBUTE
-                    || valueType == TypedValue.TYPE_DYNAMIC_ATTRIBUTE) {
-                resourceMapValue = decodeFromResourceId(ResId.of(valueData));
-            }
-
             // Try to decode from resource table.
             ResId nameId = ResId.of(getAttributeNameResource(index));
-            ResItem value = ResItem.parse(mTable.getCurrentPackage(), valueType, valueData,
-                getPreferredString(stringPoolValue, resourceMapValue));
+            ResItem value = getAttributeResValue(index);
+
             if (nameId != ResId.NULL) {
                 try {
                     // We need the attribute entry's value to format this value.
@@ -457,6 +523,10 @@ public class BinaryXmlResourceParser implements XmlResourceParser {
                         LOGGER.warning("Unexpected attribute name: " + nameSpec);
                     }
                 } catch (UndefinedResObjectException ignored) {
+                    if (decoded == null) {
+                        // Fall back to default attribute.
+                        decoded = ResAttribute.DEFAULT.formatValue(value, false);
+                   }
                 }
             }
             if (decoded == null) {
@@ -472,9 +542,12 @@ public class BinaryXmlResourceParser implements XmlResourceParser {
 
         LOGGER.warning(String.format(
             "Could not decode attr value: ns=%s, name=%s, value=0x%08x",
-            getAttributePrefix(index), getAttributeName(index), valueData));
-        decoded = ResXmlEncoders.coerceToString(valueType, valueData);
-        return decoded != null ? decoded : "";
+            getAttributePrefix(index), getAttributeName(index), valueData)
+        );
+
+       decoded = ResXmlEncoders.coerceToString(valueType, valueData);
+
+       return decoded != null ? decoded : "";
     }
 
     @Override
