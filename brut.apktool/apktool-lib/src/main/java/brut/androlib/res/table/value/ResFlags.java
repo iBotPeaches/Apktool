@@ -119,7 +119,6 @@ public class ResFlags extends ResAttribute {
 
         // Render the flags as a format.
         Config config = mParent.getPackage().getTable().getConfig();
-        boolean removeUnresolved = config.getDecodeResolve() == Config.DecodeResolve.REMOVE;
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < count; i++) {
             Symbol symbol = symbols[i];
@@ -152,12 +151,7 @@ public class ResFlags extends ResAttribute {
             if (keySpec != null) {
                 sb.append(keySpec.getName());
             } else {
-                // #2836 - Support skipping items if the resource cannot be identified.
-                if (removeUnresolved) {
-                    return null;
-                }
-
-                sb.append(ResEntrySpec.MISSING_PREFIX + key.getId());
+                sb.append("id_" + key.getId());
             }
         }
 
@@ -170,7 +164,6 @@ public class ResFlags extends ResAttribute {
     protected void serializeSymbolsToValuesXml(XmlSerializer serial, ResEntry entry)
             throws AndrolibException, IOException {
         Config config = mParent.getPackage().getTable().getConfig();
-        boolean removeUnresolved = config.getDecodeResolve() == Config.DecodeResolve.REMOVE;
 
         for (Symbol symbol : mSymbols) {
             ResReference key = symbol.getKey();
@@ -178,17 +171,13 @@ public class ResFlags extends ResAttribute {
             ResPrimitive value = symbol.getValue();
 
             String name;
+
             if (keySpec != null) {
                 name = keySpec.getName();
             } else {
-                // #2836 - Support skipping items if the resource cannot be identified.
-                if (removeUnresolved) {
-                    LOGGER.warning(String.format(
-                        "null flag reference: key=%s, value=%s", key, value));
-                    continue;
-                }
+                name = "id_" + key.getId();
 
-                name = ResEntrySpec.MISSING_PREFIX + key.getId();
+                key.getPackage().addEntrySpec(key.getId(), name); // add entries into public.xml
             }
 
             serial.startTag(null, "flag");
