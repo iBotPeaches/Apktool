@@ -45,7 +45,7 @@ public class DecodeResolveTest extends BaseTest {
 
         File attrXml = new File(testDir, "res/values/attrs.xml");
         Document attrDocument = loadDocument(attrXml);
-        assertEquals(3, attrDocument.getElementsByTagName("enum").getLength());
+        assertEquals(4, attrDocument.getElementsByTagName("enum").getLength());
 
         File colorXml = new File(testDir, "res/values/colors.xml");
         Document colorDocument = loadDocument(colorXml);
@@ -54,7 +54,7 @@ public class DecodeResolveTest extends BaseTest {
 
         File publicXml = new File(testDir, "res/values/public.xml");
         Document publicDocument = loadDocument(publicXml);
-        assertEquals(21, publicDocument.getElementsByTagName("public").getLength());
+        assertEquals(22, publicDocument.getElementsByTagName("public").getLength());
     }
 
     @Test
@@ -78,7 +78,7 @@ public class DecodeResolveTest extends BaseTest {
 
         File publicXml = new File(testDir, "res/values/public.xml");
         Document publicDocument = loadDocument(publicXml);
-        assertEquals(22, publicDocument.getElementsByTagName("public").getLength());
+        assertEquals(23, publicDocument.getElementsByTagName("public").getLength());
     }
 
     @Test
@@ -99,6 +99,6 @@ public class DecodeResolveTest extends BaseTest {
         assertEquals(0, colorDocument.getElementsByTagName("item").getLength());
 
         Document publicDocument = loadDocument(new File(testDir, "res/values/public.xml"));
-        assertEquals(21, publicDocument.getElementsByTagName("public").getLength());
+        assertEquals(22, publicDocument.getElementsByTagName("public").getLength());
     }
 }
