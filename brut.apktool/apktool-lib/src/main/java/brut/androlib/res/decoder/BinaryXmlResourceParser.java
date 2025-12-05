@@ -430,6 +430,15 @@ public class BinaryXmlResourceParser implements XmlResourceParser {
         return formats;
     }
 
+    public static final Map<String, Set<String>> ATTRIBUTE_FORMATS = new LinkedHashMap<>();
+
+    public static void addAttributeFormat(String name, String format) {
+        if (name == null || name.isEmpty()) return;
+        if (format == null || format.isEmpty()) return;
+
+        ATTRIBUTE_FORMATS.computeIfAbsent(name, k -> new LinkedHashSet<>()).add(format);
+    }
+
     @Override
     public String getAttributeName(int index) {
         int offset = getAttributeOffset(index);
@@ -456,11 +465,13 @@ public class BinaryXmlResourceParser implements XmlResourceParser {
             resourceMapValue = null;
         }
         if (resourceMapValue != null) {
+            addAttributeFormat(resourceMapValue, isFormat);
             return resourceMapValue;
         }
 
         String stringPoolValue = mStringPool.getString(name);
         if (stringPoolValue != null && !stringPoolValue.isEmpty()) {
+            addAttributeFormat(stringPoolValue, isFormat);
             return stringPoolValue;
         }
 
