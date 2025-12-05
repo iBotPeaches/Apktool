@@ -313,12 +313,17 @@ public class BinaryXmlResourceParser implements XmlResourceParser {
         // #2972 - If the namespace index is -1, the attribute is not present, but if the attribute is from system
         // we can resolve it to the default namespace. This may prove to be too aggressive as we scope the entire
         // system namespace, but it is better than not resolving it at all.
+
         ResId id = ResId.of(getAttributeNameResource(index));
+
         int pkgId = id.getPackageId();
-        if (namespace == -1 && pkgId == 1) {
-            return ANDROID_RES_NS;
-        }
+
         if (namespace == -1) {
+            if (pkgId == 1) {
+                return ANDROID_RES_NS;  // android: namespace
+            } else if (pkgId != 0) {
+                return ANDROID_RES_NS_AUTO;  // app: namespace
+            }
             return "";
         }
 
@@ -386,7 +391,7 @@ public class BinaryXmlResourceParser implements XmlResourceParser {
         }
 
         String stringPoolValue = mStringPool.getString(name);
-        if (stringPoolValue != null) {
+        if (stringPoolValue != null && !stringPoolValue.isEmpty()) {
             return stringPoolValue;
         }
 
