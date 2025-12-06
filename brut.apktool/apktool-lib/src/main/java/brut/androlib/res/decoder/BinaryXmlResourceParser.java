@@ -319,7 +319,6 @@ public class BinaryXmlResourceParser implements XmlResourceParser {
         // we can resolve it to the default namespace. This may prove to be too aggressive as we scope the entire
         // system namespace, but it is better than not resolving it at all.
 
-        String attrName = getAttributeName(index);
         ResId id = ResId.of(getAttributeNameResource(index));
 
         int pkgId = id.getPackageId();
@@ -327,7 +326,7 @@ public class BinaryXmlResourceParser implements XmlResourceParser {
         if (namespace == -1) {
             if (pkgId == 1) {
                 return ANDROID_RES_NS;  // android: namespace
-            } else if (pkgId != 0 && !attrName.startsWith(ResEntrySpec.MISSING_PREFIX)) {
+            } else if (pkgId != 0) {
                 return ANDROID_RES_NS_AUTO;  // app: namespace
             }
             return "";
