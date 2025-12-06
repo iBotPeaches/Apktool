@@ -16,7 +16,6 @@
  */
 package brut.androlib.res.table.value;
 
-import brut.androlib.Config;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.table.ResEntry;
 import brut.androlib.res.table.ResEntrySpec;
@@ -61,14 +60,16 @@ public class ResEnum extends ResAttribute {
             ResEntrySpec keySpec = key.resolve();
             if (keySpec != null) {
                 formatted = keySpec.getName();
-                mFormatCache.put(data, formatted);
 
                 // fill_parent is deprecated since API 8 but appears first.
                 // Keep looking for match_parent and use it instead if found.
                 if (data == -1 && formatted.equals("fill_parent")) {
                     continue;
                 }
+            } else {
+            formatted = "id_" + key.getId();
             }
+            mFormatCache.put(data, formatted);
             break;
         }
 
@@ -78,8 +79,6 @@ public class ResEnum extends ResAttribute {
     @Override
     protected void serializeSymbolsToValuesXml(XmlSerializer serial, ResEntry entry)
             throws AndrolibException, IOException {
-        Config config = mParent.getPackage().getTable().getConfig();
-        boolean removeUnresolved = config.getDecodeResolve() == Config.DecodeResolve.REMOVE;
 
         for (Symbol symbol : mSymbols) {
             ResReference key = symbol.getKey();
@@ -87,17 +86,13 @@ public class ResEnum extends ResAttribute {
             ResPrimitive value = symbol.getValue();
 
             String name;
+
             if (keySpec != null) {
                 name = keySpec.getName();
             } else {
-                // #2836 - Support skipping items if the resource cannot be identified.
-                if (removeUnresolved) {
-                    LOGGER.warning(String.format(
-                        "null enum reference: key=%s, value=%s", key, value));
-                    continue;
-                }
+                name = "id_" + key.getId();
 
-                name = ResEntrySpec.MISSING_PREFIX + key.getId();
+                key.getPackage().addEntrySpec(key.getId(), name); // add entries into public.xml
             }
 
             serial.startTag(null, "enum");

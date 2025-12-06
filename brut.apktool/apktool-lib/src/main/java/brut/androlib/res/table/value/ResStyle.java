@@ -24,17 +24,21 @@ import brut.androlib.res.table.ResEntrySpec;
 import brut.androlib.res.table.ResId;
 import brut.androlib.res.table.ResPackage;
 import brut.androlib.res.xml.ValuesXmlSerializable;
-import org.apache.commons.lang3.tuple.Pair;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Objects;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 
 public class ResStyle extends ResBag implements ValuesXmlSerializable {
     private static final Logger LOGGER = Logger.getLogger(ResStyle.class.getName());
+
+    public static final Map<String, Set<String>> MISSING_ATTRIBUTES = new LinkedHashMap<>();
 
     private final Item[] mItems;
 
@@ -78,9 +82,21 @@ public class ResStyle extends ResBag implements ValuesXmlSerializable {
         }
     }
 
+    public static Set<String> isMissingATTR(String name, String format) {
+
+        Set<String> formats = MISSING_ATTRIBUTES.computeIfAbsent(name, k -> new LinkedHashSet<>());
+
+        if (format != null && !format.isEmpty()) {
+            formats.add(format);
+        }
+
+        return formats;
+    }
+
     @Override
     public void serializeToValuesXml(XmlSerializer serial, ResEntry entry)
             throws AndrolibException, IOException {
+
         Config config = mParent.getPackage().getTable().getConfig();
         boolean skipDuplicates = !config.isAnalysisMode();
 
@@ -98,13 +114,20 @@ public class ResStyle extends ResBag implements ValuesXmlSerializable {
             ResEntrySpec keySpec = key.resolve();
             ResItem value = item.getValue();
 
-            // #2836 - Support skipping items if the resource cannot be identified.
-            if (keySpec == null) {
-                LOGGER.warning(String.format("null style reference: key=%s, value=%s", key, value));
-                continue;
-            }
+            String name;
+            String isFormat = null;
 
-            String name = keySpec.getFullName(entry.getPackage(), true);
+            if (keySpec == null) {
+                name = ResEntrySpec.MISSING_PREFIX + key.getId();
+
+                isFormat = value.getFormat();
+
+                isMissingATTR(name, isFormat);
+
+                key.getPackage().addEntrySpec(key.getId(), name); // add entries into public.xml
+            } else {
+                name = keySpec.getFullName(entry.getPackage(), true);
+            }
 
             // #3400 - Skip duplicate items in styles.
             if (skipDuplicates && processedNames.contains(name)) {
@@ -112,22 +135,27 @@ public class ResStyle extends ResBag implements ValuesXmlSerializable {
             }
 
             String body = null;
-            try {
-                // We need the attribute entry's value to format the item's value.
-                ResValue keyDefValue =
-                    keySpec.getPackage().getDefaultEntry(keySpec.getId()).getValue();
 
-                if (keyDefValue instanceof ResAttribute) {
-                    body = ((ResAttribute) keyDefValue).formatValue(value, true);
-                } else {
-                    LOGGER.warning("Unexpected style item key: " + keySpec);
+            if (keySpec != null) {
+                try {
+                    // We need the attribute entry's value to format the item's value.
+                    ResValue keyDefValue =
+                        keySpec.getPackage().getDefaultEntry(keySpec.getId()).getValue();
+
+                    if (keyDefValue instanceof ResAttribute) {
+                        body = ((ResAttribute) keyDefValue).formatValue(value, true);
+                    } else {
+                        LOGGER.warning("Unexpected style item key: " + keySpec);
+                    }
+                } catch (UndefinedResObjectException ignored) {
                 }
-            } catch (UndefinedResObjectException ignored) {
             }
+            
             if (body == null) {
                 // Fall back to default attribute.
                 body = ResAttribute.DEFAULT.formatValue(value, true);
             }
+
             if (body == null) {
                 continue;
             }

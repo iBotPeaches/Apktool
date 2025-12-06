@@ -25,6 +25,7 @@ import brut.androlib.meta.VersionInfo;
 import brut.androlib.res.decoder.*;
 import brut.androlib.res.table.*;
 import brut.androlib.res.table.value.ResFileReference;
+import brut.androlib.res.table.value.ResStyle;
 import brut.androlib.res.xml.ResXmlUtils;
 import brut.androlib.res.xml.ValuesXmlSerializable;
 import brut.directory.Directory;
@@ -34,6 +35,7 @@ import brut.xmlpull.MXSerializer;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.*;
+import java.nio.file.*;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -111,6 +113,18 @@ public class ResourcesDecoder {
             generateValuesXml(pkg, entry.getKey(), entry.getValue(), outDir, serial);
         }
 
+        BinaryXmlResourceParser.MISSING_ATTRIBUTES.putAll(ResStyle.MISSING_ATTRIBUTES);
+
+        if (!BinaryXmlResourceParser.ATTRIBUTE_FORMATS.isEmpty()) {
+            LOGGER.info("Recognize attribute format into attrs.xml");
+            recognizeAttributeFormat(apkDir);
+        }
+
+        if (!BinaryXmlResourceParser.MISSING_ATTRIBUTES.isEmpty()) {
+            LOGGER.info("Writing missing attributes into attrs.xml");
+            writeMissingATTR(apkDir, serial);
+        }
+
         generatePublicXml(pkg, outDir, serial);
         generateOverlayableXml(pkg, outDir, serial);
 
@@ -154,6 +168,100 @@ public class ResourcesDecoder {
             serial.flush();
         } catch (DirectoryException | IOException ex) {
             throw new AndrolibException("Could not generate: " + path, ex);
+        }
+    }
+
+    private void recognizeAttributeFormat(File apkDir) throws AndrolibException {
+
+        File attrsFile = new File(apkDir, "res/values/attrs.xml");
+
+        if (!attrsFile.exists()
+                || BinaryXmlResourceParser.ATTRIBUTE_FORMATS.isEmpty()) {
+            return;
+        }
+
+        try {
+            String content = new String(Files.readAllBytes(attrsFile.toPath()));
+
+            for (Map.Entry<String, Set<String>> entries
+                    : BinaryXmlResourceParser.ATTRIBUTE_FORMATS.entrySet()) {
+
+                String name = entries.getKey();
+
+                for (String format : entries.getValue()) {
+
+                    if (content.contains(
+                            "name=\"" + name + "\" format=\"" + format)
+                    ) {
+                        continue;
+                    }
+
+                    content = content.replaceFirst(
+                            "<attr name=\"" + name + "\" format=\"([^\"]+)\" />",
+                            "<attr name=\"" + name + "\" format=\"$1|" + format + "\" />"
+                    );
+                }
+            }
+
+            Files.write(attrsFile.toPath(), content.getBytes());
+
+        } catch (IOException ex) {
+            throw new AndrolibException(ex);
+        }
+    }
+
+    private void writeMissingATTR(File apkDir, XmlSerializer serial) throws AndrolibException {
+
+        File attrsFile = new File(apkDir, "res/values/attrs.xml");
+
+        BinaryXmlResourceParser.MISSING_ATTRIBUTES.putAll(ResStyle.MISSING_ATTRIBUTES);
+
+        if (!attrsFile.exists()
+                || BinaryXmlResourceParser.MISSING_ATTRIBUTES.isEmpty()) {
+            return;
+        }
+
+        try {
+            String content = new String(
+                Files.readAllBytes(attrsFile.toPath())
+            );
+
+            String XmlEndTag = content.substring(0, content.lastIndexOf("</resources>")).replaceFirst("\\s+$", "");
+
+            try (FileOutputStream fos = new FileOutputStream(attrsFile, false)) {
+                fos.write((XmlEndTag + "\n").getBytes());
+            }
+
+            try (FileOutputStream fos = new FileOutputStream(attrsFile, true)) {
+
+                serial.setOutput(fos, null);
+
+                for (Map.Entry<String, Set<String>> entry : BinaryXmlResourceParser.MISSING_ATTRIBUTES.entrySet()) {
+
+                    String name = entry.getKey();
+                    Set<String> formats = entry.getValue();
+
+                    serial.text("    ");
+
+                    serial.startTag(null, "attr");
+                    serial.attribute(null, "name", name);
+
+                    if (!formats.isEmpty()) {
+                        serial.attribute(null, "format", String.join("|", formats));
+                    }
+
+                    serial.endTag(null, "attr");
+                    serial.text("\n");
+                }
+                serial.flush();
+            }
+
+            try (FileOutputStream fos = new FileOutputStream(attrsFile, true)) {
+                fos.write("</resources>\n".getBytes());
+            }
+
+        } catch (IOException ex) {
+            throw new AndrolibException(ex);
         }
     }
 

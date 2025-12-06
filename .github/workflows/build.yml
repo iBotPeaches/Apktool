@@ -90,7 +90,7 @@ jobs:
   upload-artifact:
     runs-on: ubuntu-latest
     name: Build apktool.jar
-    if: github.repository == 'iBotPeaches/Apktool' && github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main'
     needs:
       - build-and-test-with-Java-8-and-later
     steps:
