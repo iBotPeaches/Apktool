@@ -16,7 +16,6 @@
  */
 package brut.androlib.res.table.value;
 
-import brut.androlib.Config;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.table.ResEntry;
 import brut.androlib.res.table.ResEntrySpec;
@@ -80,7 +79,6 @@ public class ResEnum extends ResAttribute {
     @Override
     protected void serializeSymbolsToValuesXml(XmlSerializer serial, ResEntry entry)
             throws AndrolibException, IOException {
-        Config config = mParent.getPackage().getTable().getConfig();
 
         for (Symbol symbol : mSymbols) {
             ResReference key = symbol.getKey();
