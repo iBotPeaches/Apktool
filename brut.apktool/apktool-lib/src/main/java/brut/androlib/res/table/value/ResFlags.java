@@ -16,7 +16,6 @@
  */
 package brut.androlib.res.table.value;
 
-import brut.androlib.Config;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.table.ResEntry;
 import brut.androlib.res.table.ResEntrySpec;
@@ -118,7 +117,6 @@ public class ResFlags extends ResAttribute {
         }
 
         // Render the flags as a format.
-        Config config = mParent.getPackage().getTable().getConfig();
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < count; i++) {
             Symbol symbol = symbols[i];
@@ -163,7 +161,6 @@ public class ResFlags extends ResAttribute {
     @Override
     protected void serializeSymbolsToValuesXml(XmlSerializer serial, ResEntry entry)
             throws AndrolibException, IOException {
-        Config config = mParent.getPackage().getTable().getConfig();
 
         for (Symbol symbol : mSymbols) {
             ResReference key = symbol.getKey();
