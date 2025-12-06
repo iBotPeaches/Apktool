@@ -16,7 +16,6 @@
  */
 package brut.androlib.res.table.value;
 
-import brut.androlib.Config;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.exceptions.UndefinedResObjectException;
 import brut.androlib.res.table.ResEntry;
@@ -96,8 +95,6 @@ public class ResStyle extends ResBag implements ValuesXmlSerializable {
     @Override
     public void serializeToValuesXml(XmlSerializer serial, ResEntry entry)
             throws AndrolibException, IOException {
-        Config config = mParent.getPackage().getTable().getConfig();
-        boolean skipDuplicates = !config.isAnalysisMode();
 
         serial.startTag(null, "style");
         serial.attribute(null, "name", entry.getName());
