@@ -29,7 +29,6 @@ public class ResEntrySpec {
 
     public static final String DUMMY_PREFIX = "APKTOOL_DUMMY_";
     public static final String MISSING_PREFIX = "APKTOOL_MISSING_";
-    public static final String RENAMED_PREFIX = "APKTOOL_RENAMED_";
 
     private final ResTypeSpec mTypeSpec;
     private final ResId mId;
@@ -40,10 +39,22 @@ public class ResEntrySpec {
         assert typeSpec.getId() == id.getTypeId();
         mTypeSpec = typeSpec;
         mId = id;
+
         // Some apps had their entry names collapsed to a single value in
         // the key string pool. Rename to avoid duplicates.
-        if (name == null || name.isEmpty() || INVALID_ENTRY_NAMES.contains(name)) {
-            mName = RENAMED_PREFIX + id;
+        // || getTypeName().startsWith("^attr-private"))
+
+        if (name == null
+                || name.isEmpty()
+                || INVALID_ENTRY_NAMES.contains(name)) {
+
+            mName = getTypeName() + "_" + id;
+
+        } else if ("attr".equals(getTypeName())
+                && Character.isDigit(name.charAt(0))) {
+
+            mName = getTypeName() + "_" + id; // attr_id
+
         } else {
             mName = name;
         }
@@ -84,10 +95,6 @@ public class ResEntrySpec {
 
     public boolean isMissing() {
         return mName.startsWith(MISSING_PREFIX);
-    }
-
-    public boolean isRenamed() {
-        return mName.startsWith(RENAMED_PREFIX);
     }
 
     @Override
