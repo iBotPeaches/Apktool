@@ -117,6 +117,9 @@ public class ResReference extends ResItem implements ResXmlEncodable, ValuesXmlS
         if (entry.getType().isBagType()) {
             asItem = true;
         }
+        if (asItem && "attr".equals(type)) {
+            asItem = false;
+        }
 
         String tagName = asItem ? "item" : type;
         serial.startTag(null, tagName);
