@@ -18,7 +18,6 @@ package brut.androlib.res.table.value;
 
 import brut.androlib.Config;
 import brut.androlib.exceptions.AndrolibException;
-import brut.androlib.exceptions.UndefinedResObjectException;
 import brut.androlib.res.table.ResConfig;
 import brut.androlib.res.table.ResEntry;
 import brut.androlib.res.table.ResEntrySpec;
