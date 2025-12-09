@@ -39,7 +39,8 @@ public class YamlLine {
             return;
         }
         // count indent - space only
-        for (int i = 0; i < line.length(); i++) {
+        int len = line.length();
+        for (int i = 0; i < len; i++) {
             if (line.charAt(i) == ' ') {
                 indent++;
             } else {

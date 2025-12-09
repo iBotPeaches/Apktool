@@ -103,9 +103,4 @@ public final class BrutIO {
 
         return basePath.relativize(resolvedPath).toString();
     }
-
-    public static boolean detectPossibleDirectoryTraversal(String path) {
-        return path.contains("../") || path.contains("/..")
-                || path.contains("..\\") || path.contains("\\..");
-    }
 }

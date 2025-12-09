@@ -18,8 +18,12 @@ package brut.androlib.res.table.value;
 
 import brut.androlib.Config;
 import brut.androlib.exceptions.AndrolibException;
+import brut.androlib.exceptions.UndefinedResObjectException;
+import brut.androlib.res.table.ResConfig;
 import brut.androlib.res.table.ResEntry;
 import brut.androlib.res.table.ResEntrySpec;
+import brut.androlib.res.table.ResId;
+import brut.androlib.res.table.ResPackage;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
@@ -41,6 +45,32 @@ public class ResEnum extends ResAttribute {
     }
 
     @Override
+    public void resolveKeys() throws AndrolibException {
+        ResPackage pkg = mParent.getPackage();
+        Config config = pkg.getTable().getConfig();
+        boolean removeUnresolved = config.getDecodeResolve() == Config.DecodeResolve.REMOVE;
+
+        for (Symbol symbol : mSymbols) {
+            ResReference key = symbol.getKey();
+            if (key.resolve() != null) {
+                continue;
+            }
+
+            ResId entryId = key.getId();
+
+            // #2836 - Skip item if the resource cannot be identified.
+            if (removeUnresolved || entryId.getPackageId() != pkg.getId()) {
+                LOGGER.warning(String.format(
+                    "null enum reference: key=%s, value=%s", key, symbol.getValue()));
+                continue;
+            }
+
+            pkg.addEntrySpec(entryId, ResEntrySpec.MISSING_PREFIX + entryId);
+            pkg.addEntry(entryId, ResConfig.DEFAULT, new ResCustom("id"));
+        }
+    }
+
+    @Override
     protected String formatValueToSymbols(ResItem value) throws AndrolibException {
         if (!(value instanceof ResPrimitive)) {
             return null;
@@ -57,17 +87,18 @@ public class ResEnum extends ResAttribute {
                 continue;
             }
 
-            ResReference key = symbol.getKey();
-            ResEntrySpec keySpec = key.resolve();
-            if (keySpec != null) {
-                formatted = keySpec.getName();
-                mFormatCache.put(data, formatted);
+            ResEntrySpec keySpec = symbol.getKey().resolve();
+            if (keySpec == null) {
+                continue;
+            }
 
-                // fill_parent is deprecated since API 8 but appears first.
-                // Keep looking for match_parent and use it instead if found.
-                if (data == -1 && formatted.equals("fill_parent")) {
-                    continue;
-                }
+            formatted = keySpec.getName();
+            mFormatCache.put(data, formatted);
+
+            // fill_parent is deprecated since API 8 but appears first.
+            // Keep looking for match_parent and use it instead if found.
+            if (data == -1 && formatted.equals("fill_parent")) {
+                continue;
             }
             break;
         }
@@ -78,31 +109,15 @@ public class ResEnum extends ResAttribute {
     @Override
     protected void serializeSymbolsToValuesXml(XmlSerializer serial, ResEntry entry)
             throws AndrolibException, IOException {
-        Config config = mParent.getPackage().getTable().getConfig();
-        boolean removeUnresolved = config.getDecodeResolve() == Config.DecodeResolve.REMOVE;
-
         for (Symbol symbol : mSymbols) {
-            ResReference key = symbol.getKey();
-            ResEntrySpec keySpec = key.resolve();
-            ResPrimitive value = symbol.getValue();
-
-            String name;
-            if (keySpec != null) {
-                name = keySpec.getName();
-            } else {
-                // #2836 - Support skipping items if the resource cannot be identified.
-                if (removeUnresolved) {
-                    LOGGER.warning(String.format(
-                        "null enum reference: key=%s, value=%s", key, value));
-                    continue;
-                }
-
-                name = ResEntrySpec.MISSING_PREFIX + key.getId();
+            ResEntrySpec keySpec = symbol.getKey().resolve();
+            if (keySpec == null) {
+                continue;
             }
 
             serial.startTag(null, "enum");
-            serial.attribute(null, "name", name);
-            serial.attribute(null, "value", value.encodeAsResXmlAttrValue());
+            serial.attribute(null, "name", keySpec.getName());
+            serial.attribute(null, "value", symbol.getValue().encodeAsResXmlAttrValue());
             serial.endTag(null, "enum");
         }
     }

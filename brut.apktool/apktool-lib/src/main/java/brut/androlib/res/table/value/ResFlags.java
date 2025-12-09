@@ -18,8 +18,12 @@ package brut.androlib.res.table.value;
 
 import brut.androlib.Config;
 import brut.androlib.exceptions.AndrolibException;
+import brut.androlib.exceptions.UndefinedResObjectException;
+import brut.androlib.res.table.ResConfig;
 import brut.androlib.res.table.ResEntry;
 import brut.androlib.res.table.ResEntrySpec;
+import brut.androlib.res.table.ResId;
+import brut.androlib.res.table.ResPackage;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
@@ -72,6 +76,32 @@ public class ResFlags extends ResAttribute {
     }
 
     @Override
+    public void resolveKeys() throws AndrolibException {
+        ResPackage pkg = mParent.getPackage();
+        Config config = pkg.getTable().getConfig();
+        boolean removeUnresolved = config.getDecodeResolve() == Config.DecodeResolve.REMOVE;
+
+        for (Symbol symbol : mSymbols) {
+            ResReference key = symbol.getKey();
+            if (key.resolve() != null) {
+                continue;
+            }
+
+            ResId entryId = key.getId();
+
+            // #2836 - Skip item if the resource cannot be identified.
+            if (removeUnresolved || entryId.getPackageId() != pkg.getId()) {
+                LOGGER.warning(String.format(
+                    "null flag reference: key=%s, value=%s", key, symbol.getValue()));
+                continue;
+            }
+
+            pkg.addEntrySpec(entryId, ResEntrySpec.MISSING_PREFIX + entryId);
+            pkg.addEntry(entryId, ResConfig.DEFAULT, new ResCustom("id"));
+        }
+    }
+
+    @Override
     protected String formatValueToSymbols(ResItem value) throws AndrolibException {
         if (!(value instanceof ResPrimitive)) {
             return null;
@@ -118,8 +148,6 @@ public class ResFlags extends ResAttribute {
         }
 
         // Render the flags as a format.
-        Config config = mParent.getPackage().getTable().getConfig();
-        boolean removeUnresolved = config.getDecodeResolve() == Config.DecodeResolve.REMOVE;
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < count; i++) {
             Symbol symbol = symbols[i];
@@ -144,21 +172,14 @@ public class ResFlags extends ResAttribute {
             }
 
             // Append the flag to the format.
-            ResReference key = symbol.getKey();
-            ResEntrySpec keySpec = key.resolve();
+            ResEntrySpec keySpec = symbol.getKey().resolve();
+            if (keySpec == null) {
+                continue;
+            }
             if (sb.length() > 0) {
                 sb.append('|');
             }
-            if (keySpec != null) {
-                sb.append(keySpec.getName());
-            } else {
-                // #2836 - Support skipping items if the resource cannot be identified.
-                if (removeUnresolved) {
-                    return null;
-                }
-
-                sb.append(ResEntrySpec.MISSING_PREFIX + key.getId());
-            }
+            sb.append(keySpec.getName());
         }
 
         formatted = sb.toString();
@@ -169,31 +190,15 @@ public class ResFlags extends ResAttribute {
     @Override
     protected void serializeSymbolsToValuesXml(XmlSerializer serial, ResEntry entry)
             throws AndrolibException, IOException {
-        Config config = mParent.getPackage().getTable().getConfig();
-        boolean removeUnresolved = config.getDecodeResolve() == Config.DecodeResolve.REMOVE;
-
         for (Symbol symbol : mSymbols) {
-            ResReference key = symbol.getKey();
-            ResEntrySpec keySpec = key.resolve();
-            ResPrimitive value = symbol.getValue();
-
-            String name;
-            if (keySpec != null) {
-                name = keySpec.getName();
-            } else {
-                // #2836 - Support skipping items if the resource cannot be identified.
-                if (removeUnresolved) {
-                    LOGGER.warning(String.format(
-                        "null flag reference: key=%s, value=%s", key, value));
-                    continue;
-                }
-
-                name = ResEntrySpec.MISSING_PREFIX + key.getId();
+            ResEntrySpec keySpec = symbol.getKey().resolve();
+            if (keySpec == null) {
+                continue;
             }
 
             serial.startTag(null, "flag");
-            serial.attribute(null, "name", name);
-            serial.attribute(null, "value", value.encodeAsResXmlAttrValue());
+            serial.attribute(null, "name", keySpec.getName());
+            serial.attribute(null, "value", symbol.getValue().encodeAsResXmlAttrValue());
             serial.endTag(null, "flag");
         }
     }

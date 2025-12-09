@@ -91,7 +91,8 @@ public final class ResXmlEncoders {
             return str;
         }
 
-        StringBuilder sb = new StringBuilder(str.length() + 10);
+        int len = str.length();
+        StringBuilder sb = new StringBuilder(len + 10);
 
         switch (str.charAt(0)) {
             case '#':
@@ -105,7 +106,7 @@ public final class ResXmlEncoders {
         int startPos = 0;
         boolean enclose = false;
         boolean wasSpace = true;
-        for (int i = 0; i < str.length(); i++) {
+        for (int i = 0; i < len; i++) {
             char ch = str.charAt(i);
             if (isInStyleTag) {
                 if (ch == '>') {
@@ -140,7 +141,7 @@ public final class ResXmlEncoders {
                             break;
                         }
                         // Skip writing trailing \u0000 if we are at end of string.
-                        if ((sb.length() + 1) == str.length() && ch == '\u0000') {
+                        if ((sb.length() + 1) == len && ch == '\u0000') {
                             continue;
                         }
                         sb.append(String.format("\\u%04x", (int) ch));
@@ -161,7 +162,8 @@ public final class ResXmlEncoders {
             return str;
         }
 
-        StringBuilder sb = new StringBuilder(str.length() + 10);
+        int len = str.length();
+        StringBuilder sb = new StringBuilder(len + 10);
 
         switch (str.charAt(0)) {
             case '#':
@@ -171,7 +173,7 @@ public final class ResXmlEncoders {
                 break;
         }
 
-        for (int i = 0; i < str.length(); i++) {
+        for (int i = 0; i < len; i++) {
             char ch = str.charAt(i);
             switch (ch) {
                 case '\\':
@@ -239,20 +241,18 @@ public final class ResXmlEncoders {
         if (nonPosMax == -1) {
             nonPosMax = Integer.MAX_VALUE;
         }
-        int pos;
-        int pos2 = 0;
+
         List<Integer> nonPositional = new ArrayList<>();
         List<Integer> positional = new ArrayList<>();
-
         if (str == null) {
             return Pair.of(nonPositional, positional);
         }
 
-        int length = str.length();
-
+        int len = str.length();
+        int pos, pos2 = 0;
         while ((pos = str.indexOf('%', pos2)) != -1) {
             pos2 = pos + 1;
-            if (pos2 == length) {
+            if (pos2 == len) {
                 nonPositional.add(pos);
                 break;
             }
@@ -260,8 +260,8 @@ public final class ResXmlEncoders {
             if (ch == '%') {
                 continue;
             }
-            if (ch >= '0' && ch <= '9' && pos2 < length) {
-                while ((ch = str.charAt(pos2++)) >= '0' && ch <= '9' && pos2 < length);
+            if (ch >= '0' && ch <= '9' && pos2 < len) {
+                while ((ch = str.charAt(pos2++)) >= '0' && ch <= '9' && pos2 < len);
                 if (ch == '$') {
                     positional.add(pos);
                     continue;

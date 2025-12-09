@@ -460,15 +460,15 @@ public class Main {
                     case "remove":
                         config.setDecodeResolve(Config.DecodeResolve.REMOVE);
                         break;
-                    case "dummy":
-                        config.setDecodeResolve(Config.DecodeResolve.DUMMY);
-                        break;
                     case "keep":
                         config.setDecodeResolve(Config.DecodeResolve.KEEP);
                         break;
+                    case "dummy":
+                        config.setDecodeResolve(Config.DecodeResolve.DUMMY);
+                        break;
                     default:
                         System.err.println("Unknown resolve resources mode: " + mode);
-                        System.err.println("Expect: 'remove', 'dummy' or 'keep'.");
+                        System.err.println("Expect: 'remove', 'keep' or 'dummy'.");
                         System.exit(1);
                         return;
                 }

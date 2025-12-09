@@ -438,7 +438,7 @@ public class BuildAndDecodeApkTest extends BaseTest {
 
     @Test
     public void ninePatchImageColorTest() throws IOException {
-        String fileName = "res/drawable-xhdpi/9patch.9.png";
+        String fileName = "res/drawable-xhdpi/ninepatch.9.png";
 
         File control = new File(sTestOrigDir, fileName);
         File test = new File(sTestNewDir, fileName);
