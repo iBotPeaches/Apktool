@@ -812,10 +812,6 @@ public class BinaryResourceParser {
         }
 
         for (ResId id : mMissingEntrySpecs) {
-            if (mPackage.hasEntrySpec(id)) {
-                continue;
-            }
-
             ResTypeSpec typeSpec = mPackage.getTypeSpec(id.getTypeId());
             ResValue value;
             switch (typeSpec.getName()) {
