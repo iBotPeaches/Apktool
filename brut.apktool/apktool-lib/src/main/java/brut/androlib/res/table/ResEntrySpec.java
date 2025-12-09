@@ -47,11 +47,14 @@ public class ResEntrySpec {
         if (!Character.isJavaIdentifierStart(name.charAt(0))) {
             return false;
         }
-        // Normalize.
-        name = name.replace('.', '_').replace('-', '_');
         // The rest must be valid Java identifier part characters.
         for (int i = 1; i < len; i++) {
-            if (!Character.isJavaIdentifierPart(name.charAt(i))) {
+            char ch = name.charAt(i);
+            // Whitelisted special characters.
+            if (ch == '.' || ch == '-') {
+                continue;
+            }
+            if (!Character.isJavaIdentifierPart(ch)) {
                 return false;
             }
         }
