@@ -48,7 +48,7 @@ public class ResEntrySpec {
             return false;
         }
         // Normalize.
-        name = name.replace('.', '_');
+        name = name.replace('.', '_').replace('-', '_');
         // The rest must be valid Java identifier part characters.
         for (int i = 1; i < len; i++) {
             if (!Character.isJavaIdentifierPart(name.charAt(i))) {
