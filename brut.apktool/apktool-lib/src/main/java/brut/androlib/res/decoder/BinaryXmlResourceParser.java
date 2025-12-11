@@ -493,11 +493,11 @@ public class BinaryXmlResourceParser implements XmlResourceParser {
                 try {
                     // We need the attribute entry's value to format this value.
                     ResEntrySpec nameSpec = mTable.getEntrySpec(nameId);
-                    ResValue nameDefValue = mTable.getDefaultEntry(nameId).getValue();
+                    ResValue nameValue = mTable.getDefaultEntry(nameId).getValue();
 
-                    if (nameDefValue instanceof ResAttribute) {
-                        ResAttribute nameAttr = (ResAttribute) nameDefValue;
-                        if (isExplicitType) {
+                    if (nameValue instanceof ResAttribute) {
+                        ResAttribute nameAttr = (ResAttribute) nameValue;
+                        if (isExplicitType && !nameAttr.hasSymbolsForValue(value)) {
                             nameAttr.addType(valueType);
                         }
                         decoded = nameAttr.formatValue(value, false);

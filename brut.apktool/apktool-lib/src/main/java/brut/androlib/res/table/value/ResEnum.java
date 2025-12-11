@@ -16,6 +16,7 @@
  */
 package brut.androlib.res.table.value;
 
+import android.util.TypedValue;
 import brut.androlib.Config;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.table.ResConfig;
@@ -26,6 +27,7 @@ import brut.androlib.res.table.ResPackage;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -35,12 +37,12 @@ public class ResEnum extends ResAttribute {
     private static final Logger LOGGER = Logger.getLogger(ResEnum.class.getName());
 
     private final Symbol[] mSymbols;
-    private final Map<Integer, String> mFormatCache;
+    private Map<Integer, Symbol[]> mSymbolsCache;
+    private Map<Integer, String> mFormatsCache;
 
     public ResEnum(ResReference parent, int type, int min, int max, int l10n, Symbol[] symbols) {
         super(parent, type, min, max, l10n);
         mSymbols = symbols;
-        mFormatCache = new HashMap<>();
     }
 
     @Override
@@ -70,38 +72,87 @@ public class ResEnum extends ResAttribute {
     }
 
     @Override
-    protected String formatValueToSymbols(ResItem value) throws AndrolibException {
-        if (!(value instanceof ResPrimitive)) {
+    protected Symbol[] getSymbolsForValue(ResItem value) throws AndrolibException {
+        if (!isSymbolValueType(value)) {
             return null;
         }
 
         int data = ((ResPrimitive) value).getData();
-        String formatted = mFormatCache.get(data);
-        if (formatted != null) {
-            return formatted;
+        return getSymbols(data);
+    }
+
+    private boolean isSymbolValueType(ResItem value) throws AndrolibException {
+        if (!(value instanceof ResPrimitive)) {
+            return false;
         }
+
+        int type = ((ResPrimitive) value).getType();
+        return type == TypedValue.TYPE_INT_DEC || type == TypedValue.TYPE_INT_HEX;
+    }
+
+    private Symbol[] getSymbols(int data) throws AndrolibException {
+        if (mSymbolsCache == null) {
+            // Lazily establish a symbols cache for performance.
+            mSymbolsCache = new HashMap<>();
+        } else if (mSymbolsCache.containsKey(data)) {
+            return mSymbolsCache.get(data);
+        }
+
+        Symbol[] symbols = new Symbol[mSymbols.length];
+        int symbolsCount = 0;
 
         for (Symbol symbol : mSymbols) {
-            if (symbol.getValue().getData() != data) {
-                continue;
+            if (symbol.getValue().getData() == data) {
+                symbols[symbolsCount++] = symbol;
             }
-
-            ResEntrySpec keySpec = symbol.getKey().resolve();
-            if (keySpec == null) {
-                continue;
-            }
-
-            formatted = keySpec.getName();
-            mFormatCache.put(data, formatted);
-
-            // fill_parent is deprecated since API 8 but appears first.
-            // Keep looking for match_parent and use it instead if found.
-            if (data == -1 && formatted.equals("fill_parent")) {
-                continue;
-            }
-            break;
         }
 
+        if (symbolsCount == 0) {
+            symbols = null;
+        } else if (symbolsCount < symbols.length) {
+            symbols = Arrays.copyOf(symbols, symbolsCount);
+        }
+
+        mSymbolsCache.put(data, symbols);
+        return symbols;
+    }
+
+    @Override
+    protected String formatValueToSymbols(ResItem value) throws AndrolibException {
+        if (!isSymbolValueType(value)) {
+            return null;
+        }
+
+        int data = ((ResPrimitive) value).getData();
+        if (mFormatsCache == null) {
+            // Lazily establish a formats cache for performance.
+            mFormatsCache = new HashMap<>();
+        } else if (mFormatsCache.containsKey(data)) {
+            return mFormatsCache.get(data);
+        }
+
+        Symbol[] symbols = getSymbols(data);
+        String formatted = null;
+
+        if (symbols != null) {
+            for (Symbol symbol : symbols) {
+                ResEntrySpec keySpec = symbol.getKey().resolve();
+                if (keySpec == null) {
+                    continue;
+                }
+
+                formatted = keySpec.getName();
+
+                // fill_parent is deprecated since API 8 but appears first.
+                // Keep looking for match_parent and use it instead if found.
+                if (data == -1 && formatted.equals("fill_parent")) {
+                    continue;
+                }
+                break;
+            }
+        }
+
+        mFormatsCache.put(data, formatted);
         return formatted;
     }
 

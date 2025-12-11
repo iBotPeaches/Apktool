@@ -180,14 +180,19 @@ public class ResAttribute extends ResBag implements ValuesXmlSerializable {
                 if (type >= TypedValue.TYPE_FIRST_COLOR_INT && type <= TypedValue.TYPE_LAST_COLOR_INT) {
                     mType |= TYPE_COLOR;
                 } else if (type >= TypedValue.TYPE_FIRST_INT && type <= TypedValue.TYPE_LAST_INT) {
-                    if ((mType & (TYPE_ENUM | TYPE_FLAGS)) != 0) {
-                        // For enum/flags, integer type is reserved for symbol values.
-                        return;
-                    }
                     mType |= TYPE_INT;
                 }
                 return;
         }
+    }
+
+    public boolean hasSymbolsForValue(ResItem value) throws AndrolibException {
+        return getSymbolsForValue(value) != null;
+    }
+
+    protected Symbol[] getSymbolsForValue(ResItem value) throws AndrolibException {
+        // Stub for attribute types with symbols.
+        return null;
     }
 
     public String formatValue(ResItem value, boolean asTextNode) throws AndrolibException {

@@ -16,6 +16,7 @@
  */
 package brut.androlib.res.table.value;
 
+import android.util.TypedValue;
 import brut.androlib.Config;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.table.ResConfig;
@@ -37,41 +38,13 @@ public class ResFlags extends ResAttribute {
     private static final Logger LOGGER = Logger.getLogger(ResFlags.class.getName());
 
     private final Symbol[] mSymbols;
-    private final Symbol[] mZeroFlags;
-    private final Symbol[] mFlags;
-    private final Map<Integer, String> mFormatCache;
+    private Map<Integer, Symbol[]> mSymbolsCache;
+    private Map<Integer, String> mFormatsCache;
+    private Symbol[] mSortedSymbols;
 
     public ResFlags(ResReference parent, int type, int min, int max, int l10n, Symbol[] symbols) {
         super(parent, type, min, max, l10n);
         mSymbols = symbols;
-        mFormatCache = new HashMap<>();
-
-        Symbol[] zeroFlags = new Symbol[symbols.length];
-        int zeroFlagsCount = 0;
-        Symbol[] flags = new Symbol[symbols.length];
-        int flagsCount = 0;
-
-        for (Symbol symbol : symbols) {
-            ResPrimitive value = symbol.getValue();
-
-            if (value.getData() == 0) {
-                zeroFlags[zeroFlagsCount++] = symbol;
-            } else {
-                flags[flagsCount++] = symbol;
-            }
-        }
-
-        mZeroFlags = zeroFlagsCount < zeroFlags.length
-            ? Arrays.copyOf(zeroFlags, zeroFlagsCount) : zeroFlags;
-        mFlags = flagsCount < flags.length ? Arrays.copyOf(flags, flagsCount) : flags;
-
-        // We establish a priority list for the flags. This can never be completely
-        // accurate to the source, but it's a best-guess approach.
-        Comparator<Symbol> byBitCount = Comparator.comparingInt(
-            (Symbol symbol) -> Integer.bitCount(symbol.getValue().getData()));
-        Comparator<Symbol> byRawValue = Comparator.comparingInt(
-            (Symbol symbol) -> symbol.getValue().getData());
-        Arrays.sort(mFlags, byBitCount.reversed().thenComparing(byRawValue));
     }
 
     @Override
@@ -101,38 +74,62 @@ public class ResFlags extends ResAttribute {
     }
 
     @Override
-    protected String formatValueToSymbols(ResItem value) throws AndrolibException {
-        if (!(value instanceof ResPrimitive)) {
+    protected Symbol[] getSymbolsForValue(ResItem value) throws AndrolibException {
+        if (!isSymbolValueType(value)) {
             return null;
         }
 
         int data = ((ResPrimitive) value).getData();
-        String formatted = mFormatCache.get(data);
-        if (formatted != null) {
-            return formatted;
+        return getSymbols(data);
+    }
+
+    private boolean isSymbolValueType(ResItem value) throws AndrolibException {
+        if (!(value instanceof ResPrimitive)) {
+            return false;
         }
 
-        Symbol[] symbols;
-        int count = 0;
-        if (data == 0) {
-            symbols = mZeroFlags;
-            count = symbols.length;
+        int type = ((ResPrimitive) value).getType();
+        return type == TypedValue.TYPE_INT_DEC || type == TypedValue.TYPE_INT_HEX;
+    }
 
-            if (count == 0) {
-                return null;
+    private Symbol[] getSymbols(int data) throws AndrolibException {
+        if (mSymbolsCache == null) {
+            // Lazily establish a symbols cache for performance.
+            mSymbolsCache = new HashMap<>();
+        } else if (mSymbolsCache.containsKey(data)) {
+            return mSymbolsCache.get(data);
+        }
+
+        if (mSortedSymbols == null) {
+            // Lazily establish a priority list for the flags. This can never be
+            // completely accurate to the source, but it's a best-effort approach.
+            mSortedSymbols = mSymbols.clone();
+            Comparator<Symbol> byBitCount = Comparator.comparingInt(
+                (Symbol symbol) -> Integer.bitCount(symbol.getValue().getData()));
+            Comparator<Symbol> byRawValue = Comparator.comparingInt(
+                (Symbol symbol) -> symbol.getValue().getData());
+            Arrays.sort(mSortedSymbols, byBitCount.reversed().thenComparing(byRawValue));
+        }
+
+        Symbol[] symbols = new Symbol[mSortedSymbols.length];
+        int symbolsCount = 0;
+
+        if (data == 0) {
+            for (Symbol symbol : mSortedSymbols) {
+                if (symbol.getValue().getData() == 0) {
+                    symbols[symbolsCount++] = symbol;
+                }
             }
         } else {
-            symbols = new Symbol[mFlags.length];
             int mask = 0;
 
-            for (Symbol symbol : mFlags) {
+            for (Symbol symbol : mSortedSymbols) {
                 int flag = symbol.getValue().getData();
-
                 if ((data & flag) != flag || (mask & flag) == flag) {
                     continue;
                 }
 
-                symbols[count++] = symbol;
+                symbols[symbolsCount++] = symbol;
                 mask |= flag;
 
                 if (mask == data) {
@@ -140,49 +137,83 @@ public class ResFlags extends ResAttribute {
                 }
             }
 
-            if (count == 0) {
-                LOGGER.warning("Invalid flags value: " + value);
-                return null;
+            // Filter out redundant flags.
+            if (symbolsCount > 2) {
+                Symbol[] filtered = new Symbol[symbolsCount];
+                int filteredCount = 0;
+
+                for (int i = 0; i < symbolsCount; i++) {
+                    Symbol symbol = symbols[i];
+                    mask = 0;
+
+                    // Combine the other flags.
+                    for (int j = 0; j < symbolsCount; j++) {
+                        Symbol other = symbols[j];
+
+                        if (j != i) {
+                            mask |= other.getValue().getData();
+                        }
+                    }
+
+                    // Skip if it doesn't add at least one unique bit.
+                    if ((symbol.getValue().getData() & ~mask) == 0) {
+                        continue;
+                    }
+
+                    filtered[filteredCount++] = symbol;
+                }
+
+                symbols = filtered;
+                symbolsCount = filteredCount;
             }
         }
 
-        // Render the flags as a format.
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < count; i++) {
-            Symbol symbol = symbols[i];
+        if (symbolsCount == 0) {
+            symbols = null;
+        } else if (symbolsCount < symbols.length) {
+            symbols = Arrays.copyOf(symbols, symbolsCount);
+        }
 
-            // Filter out redundant flags.
-            if (count > 2) {
-                int mask = 0;
+        mSymbolsCache.put(data, symbols);
+        return symbols;
+    }
 
-                // Combine the other flags.
-                for (int j = 0; j < count; j++) {
-                    Symbol other = symbols[j];
+    @Override
+    protected String formatValueToSymbols(ResItem value) throws AndrolibException {
+        if (!isSymbolValueType(value)) {
+            return null;
+        }
 
-                    if (j != i) {
-                        mask |= other.getValue().getData();
-                    }
-                }
+        int data = ((ResPrimitive) value).getData();
+        if (mFormatsCache == null) {
+            // Lazily establish a formats cache for performance.
+            mFormatsCache = new HashMap<>();
+        } else if (mFormatsCache.containsKey(data)) {
+            return mFormatsCache.get(data);
+        }
 
-                // Skip if it doesn't add at least one unique bit.
-                if ((symbol.getValue().getData() & ~mask) == 0) {
+        Symbol[] symbols = getSymbols(data);
+        String formatted = null;
+
+        if (symbols != null) {
+            StringBuilder sb = new StringBuilder();
+
+            for (Symbol symbol : symbols) {
+                ResEntrySpec keySpec = symbol.getKey().resolve();
+                if (keySpec == null) {
                     continue;
                 }
+
+                if (sb.length() > 0) {
+                    sb.append('|');
+                }
+                sb.append(keySpec.getName());
             }
 
-            // Append the flag to the format.
-            ResEntrySpec keySpec = symbol.getKey().resolve();
-            if (keySpec == null) {
-                continue;
-            }
-            if (sb.length() > 0) {
-                sb.append('|');
-            }
-            sb.append(keySpec.getName());
+            formatted = sb.toString();
         }
 
-        formatted = sb.toString();
-        mFormatCache.put(data, formatted);
+        mFormatsCache.put(data, formatted);
         return formatted;
     }
 
