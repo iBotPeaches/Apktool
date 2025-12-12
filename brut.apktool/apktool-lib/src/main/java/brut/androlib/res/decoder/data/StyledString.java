@@ -65,7 +65,8 @@ public class StyledString implements CharSequence {
             return mDecodedText;
         }
 
-        mBuffer = new StringBuilder(mText.length() * 2);
+        int len = mText.length();
+        mBuffer = new StringBuilder(len * 2);
         mLastOffset = 0;
 
         // Recurse top-level tags.
@@ -75,7 +76,7 @@ public class StyledString implements CharSequence {
         }
 
         // Write the remaining encoded raw text.
-        if (mLastOffset < mText.length()) {
+        if (mLastOffset < len) {
             mBuffer.append(ResXmlEncoders.escapeXmlChars(mText.substring(mLastOffset)));
         }
 
@@ -117,10 +118,11 @@ public class StyledString implements CharSequence {
         }
 
         // Write encoded raw text preceding the closing tag.
-        if (spanEnd > mLastOffset && mText.length() >= spanEnd) {
+        int len = mText.length();
+        if (spanEnd > mLastOffset && len >= spanEnd) {
             mBuffer.append(ResXmlEncoders.escapeXmlChars(mText.substring(mLastOffset, spanEnd)));
-        } else if (mText.length() >= mLastOffset && mText.length() < spanEnd) {
-            LOGGER.warning("Span (" + name + ") exceeds text length " + mText.length());
+        } else if (len >= mLastOffset && len < spanEnd) {
+            LOGGER.warning("Span (" + name + ") exceeds text length " + len);
             mBuffer.append(ResXmlEncoders.escapeXmlChars(mText.substring(mLastOffset)));
         }
         mLastOffset = spanEnd;

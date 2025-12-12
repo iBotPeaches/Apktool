@@ -41,8 +41,6 @@ public abstract class ResItem extends ResValue {
         STANDARD_TYPE_FORMATS.put("string", Sets.newHashSet("string"));
     }
 
-    public abstract String getFormat();
-
     public static ResItem parse(ResPackage pkg, int type, int data, String rawValue) {
         switch (type) {
             case TypedValue.TYPE_NULL:
@@ -72,4 +70,6 @@ public abstract class ResItem extends ResValue {
                 return null;
         }
     }
+
+    public abstract String getFormat();
 }

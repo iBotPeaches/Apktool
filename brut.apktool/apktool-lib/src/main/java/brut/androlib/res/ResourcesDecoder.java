@@ -24,6 +24,7 @@ import brut.androlib.meta.SdkInfo;
 import brut.androlib.meta.VersionInfo;
 import brut.androlib.res.decoder.*;
 import brut.androlib.res.table.*;
+import brut.androlib.res.table.value.ResBag;
 import brut.androlib.res.table.value.ResFileReference;
 import brut.androlib.res.xml.ResXmlUtils;
 import brut.androlib.res.xml.ValuesXmlSerializable;
@@ -86,15 +87,24 @@ public class ResourcesDecoder {
         }
 
         ResPackage pkg = mTable.getMainPackage();
-        Map<ResType, List<ResEntry>> valuesEntries = new HashMap<>();
 
-        LOGGER.info("Decoding file-resources...");
-        for (ResEntry entry : pkg.listEntries()) {
+        LOGGER.info("Decoding value resources...");
+        for (ResEntry entry : new ArrayList<>(pkg.listEntries())) {
+            if (entry.getValue() instanceof ResBag) {
+                ((ResBag) entry.getValue()).resolveKeys();
+            }
+        }
+
+        LOGGER.info("Decoding file resources...");
+        for (ResEntry entry : new ArrayList<>(pkg.listEntries())) {
             if (entry.getValue() instanceof ResFileReference) {
                 fileDecoder.decode(entry, inDir, outDir, mResFileMapping);
             }
-            // ResFileDecoder may have replaced an invalid file reference,
-            // so we use "if" here rather than "else if".
+        }
+
+        LOGGER.info("Generating values XMLs...");
+        Map<ResType, List<ResEntry>> valuesEntries = new HashMap<>();
+        for (ResEntry entry : pkg.listEntries()) {
             if (entry.getValue() instanceof ValuesXmlSerializable) {
                 ResType type = entry.getType();
                 List<ResEntry> entries = valuesEntries.get(type);
@@ -105,8 +115,6 @@ public class ResourcesDecoder {
                 entries.add(entry);
             }
         }
-
-        LOGGER.info("Decoding values */* XMLs...");
         for (Map.Entry<ResType, List<ResEntry>> entry : valuesEntries.entrySet()) {
             generateValuesXml(pkg, entry.getKey(), entry.getValue(), outDir, serial);
         }

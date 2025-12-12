@@ -63,9 +63,8 @@ public final class YamlStringEscapeUtils {
         if (str == null) {
             return;
         }
-        int sz;
-        sz = str.length();
-        for (int i = 0; i < sz; i++) {
+        int len = str.length();
+        for (int i = 0; i < len; i++) {
             char ch = str.charAt(i);
             // "[^\t\n\r\u0020-\u007E\u0085\u00A0-\uD7FF\uE000-\uFFFD]"
             // handle unicode

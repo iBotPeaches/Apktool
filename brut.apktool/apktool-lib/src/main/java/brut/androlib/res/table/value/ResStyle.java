@@ -19,6 +19,7 @@ package brut.androlib.res.table.value;
 import brut.androlib.Config;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.exceptions.UndefinedResObjectException;
+import brut.androlib.res.table.ResConfig;
 import brut.androlib.res.table.ResEntry;
 import brut.androlib.res.table.ResEntrySpec;
 import brut.androlib.res.table.ResId;
@@ -79,11 +80,41 @@ public class ResStyle extends ResBag implements ValuesXmlSerializable {
     }
 
     @Override
+    public void resolveKeys() throws AndrolibException {
+        ResPackage pkg = mParent.getPackage();
+        Config config = pkg.getTable().getConfig();
+        boolean removeUnresolved = config.getDecodeResolve() == Config.DecodeResolve.REMOVE;
+
+        for (Item item : mItems) {
+            ResReference key = item.getKey();
+            ResEntrySpec keySpec = key.resolve();
+            if (keySpec != null) {
+                try {
+                    keySpec.getPackage().getDefaultEntry(keySpec.getId());
+                    continue;
+                } catch (UndefinedResObjectException ignored) {
+                }
+            }
+
+            ResId entryId = key.getId();
+
+            // #2836 - Skip item if the resource cannot be identified.
+            if (removeUnresolved || entryId.getPackageId() != pkg.getId()) {
+                LOGGER.warning(String.format(
+                    "null style reference: key=%s, value=%s", key, item.getValue()));
+                continue;
+            }
+
+            if (keySpec == null) {
+                pkg.addEntrySpec(entryId, ResEntrySpec.MISSING_PREFIX + entryId);
+            }
+            pkg.addEntry(entryId, ResConfig.DEFAULT, ResAttribute.DEFAULT);
+        }
+    }
+
+    @Override
     public void serializeToValuesXml(XmlSerializer serial, ResEntry entry)
             throws AndrolibException, IOException {
-        Config config = mParent.getPackage().getTable().getConfig();
-        boolean skipDuplicates = !config.isAnalysisMode();
-
         serial.startTag(null, "style");
         serial.attribute(null, "name", entry.getName());
         if (mParent.resolve() != null) {
@@ -92,52 +123,48 @@ public class ResStyle extends ResBag implements ValuesXmlSerializable {
             serial.attribute(null, "parent", "");
         }
 
+        Config config = mParent.getPackage().getTable().getConfig();
+        boolean skipDuplicates = !config.isAnalysisMode();
         Set<String> processedNames = new HashSet<>();
         for (Item item : mItems) {
-            ResReference key = item.getKey();
-            ResEntrySpec keySpec = key.resolve();
-            ResItem value = item.getValue();
-
-            // #2836 - Support skipping items if the resource cannot be identified.
+            ResEntrySpec keySpec = item.getKey().resolve();
             if (keySpec == null) {
-                LOGGER.warning(String.format("null style reference: key=%s, value=%s", key, value));
                 continue;
             }
 
-            String name = keySpec.getFullName(entry.getPackage(), true);
+            String keyName = keySpec.getFullName(entry.getPackage(), true);
 
             // #3400 - Skip duplicate items in styles.
-            if (skipDuplicates && processedNames.contains(name)) {
+            if (skipDuplicates && processedNames.contains(keyName)) {
                 continue;
             }
 
-            String body = null;
+            // We need the attribute entry's value to format the item's value.
+            ResValue keyValue;
             try {
-                // We need the attribute entry's value to format the item's value.
-                ResValue keyDefValue =
-                    keySpec.getPackage().getDefaultEntry(keySpec.getId()).getValue();
-
-                if (keyDefValue instanceof ResAttribute) {
-                    body = ((ResAttribute) keyDefValue).formatValue(value, true);
-                } else {
-                    LOGGER.warning("Unexpected style item key: " + keySpec);
-                }
+                keyValue = keySpec.getPackage().getDefaultEntry(keySpec.getId()).getValue();
             } catch (UndefinedResObjectException ignored) {
+                continue;
+            }
+
+            ResItem value = item.getValue();
+            String body = null;
+            if (keyValue instanceof ResAttribute) {
+                body = ((ResAttribute) keyValue).formatValue(value, true);
+            } else {
+                LOGGER.warning("Unexpected style item key: " + keySpec);
             }
             if (body == null) {
                 // Fall back to default attribute.
                 body = ResAttribute.DEFAULT.formatValue(value, true);
             }
-            if (body == null) {
-                continue;
-            }
 
             serial.startTag(null, "item");
-            serial.attribute(null, "name", name);
+            serial.attribute(null, "name", keyName);
             serial.text(body);
             serial.endTag(null, "item");
 
-            processedNames.add(name);
+            processedNames.add(keyName);
         }
 
         serial.endTag(null, "style");

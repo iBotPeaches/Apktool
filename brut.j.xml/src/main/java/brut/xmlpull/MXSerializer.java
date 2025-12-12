@@ -266,13 +266,13 @@ public class MXSerializer implements XmlSerializer {
         }
         int bufPos = 0;
         if (writeLineSeparator) {
-            for (int i = 0; i < lineSeparator.length(); i++) {
+            for (int i = 0, n = lineSeparator.length(); i < n; i++) {
                 indentationBuf[bufPos++] = lineSeparator.charAt(i);
             }
         }
         if (writeIndentation) {
             for (int i = 0; i < maxIndentLevel; i++) {
-                for (int j = 0; j < indentationString.length(); j++) {
+                for (int j = 0, n = indentationString.length(); j < n; j++) {
                     indentationBuf[bufPos++] = indentationString.charAt(j);
                 }
             }
@@ -894,8 +894,9 @@ public class MXSerializer implements XmlSerializer {
             return;
         }
         // .[&, < and " escaped],
+        int len = value.length();
         int pos = 0;
-        for (int i = 0; i < value.length(); i++) {
+        for (int i = 0; i < len; i++) {
             char ch = value.charAt(i);
             if (ch == '&') {
                 if (i > pos) {
@@ -930,8 +931,8 @@ public class MXSerializer implements XmlSerializer {
                     pos = i + 1;
                 } else {
                     if (TRACE_ESCAPING) {
-                        System.err.println(getClass().getName() + " DEBUG ATTR value.len=" + value.length()
-                                + " " + printable(value));
+                        System.err.println(getClass().getName() + " DEBUG ATTR value.len=" + len + " "
+                                + printable(value));
                     }
                     throw new IllegalStateException(
                             "character " + printable(ch) + " (" + Integer.toString(ch) + ") is not allowed in output"
@@ -951,8 +952,9 @@ public class MXSerializer implements XmlSerializer {
         }
 
         // escape '<', '&', ']]>', <32 if necessary
+        int len = text.length();
         int pos = 0;
-        for (int i = 0; i < text.length(); i++) {
+        for (int i = 0; i < len; i++) {
             // TODO: check if doing char[] text.getChars() would be faster than
             // getCharAt(i) ...
             char ch = text.charAt(i);
@@ -964,7 +966,7 @@ public class MXSerializer implements XmlSerializer {
                 }
             } else {
                 if (ch == '&') {
-                    if (!(i < text.length() - 3 && text.charAt(i + 1) == 'l'
+                    if (!(i < len - 3 && text.charAt(i + 1) == 'l'
                             && text.charAt(i + 2) == 't' && text.charAt(i + 3) == ';')) {
                         if (i > pos) {
                             write(text.substring(pos, i));
@@ -990,8 +992,8 @@ public class MXSerializer implements XmlSerializer {
                         // fallthrough
                     } else {
                         if (TRACE_ESCAPING) {
-                            System.err.println(getClass().getName() + " DEBUG TEXT value.len=" + text.length()
-                                    + " " + printable(text));
+                            System.err.println(getClass().getName() + " DEBUG TEXT value.len=" + len + " "
+                                    + printable(text));
                         }
                         throw new IllegalStateException("character " + Integer.toString(ch)
                                 + " is not allowed in output" + getLocation()
@@ -1066,9 +1068,10 @@ public class MXSerializer implements XmlSerializer {
         if (str == null) {
             return "null";
         }
-        StringBuffer retval = new StringBuffer(str.length() + 16);
+        int len = str.length();
+        StringBuffer retval = new StringBuffer(len + 16);
         retval.append('\'');
-        for (int i = 0; i < str.length(); i++) {
+        for (int i = 0; i < len; i++) {
             addPrintable(retval, str.charAt(i));
         }
         retval.append('\'');

@@ -812,8 +812,20 @@ public class BinaryResourceParser {
         }
 
         for (ResId id : mMissingEntrySpecs) {
+            ResTypeSpec typeSpec = mPackage.getTypeSpec(id.getTypeId());
+            ResValue value;
+            switch (typeSpec.getName()) {
+                case "attr":
+                case "^attr-private":
+                    value = ResAttribute.DEFAULT;
+                    break;
+                default:
+                    value = ResReference.NULL;
+                    break;
+            }
+
             mPackage.addEntrySpec(id, ResEntrySpec.DUMMY_PREFIX + id);
-            mPackage.addEntry(id, ResConfig.DEFAULT, ResReference.NULL);
+            mPackage.addEntry(id, ResConfig.DEFAULT, value);
         }
     }
 }

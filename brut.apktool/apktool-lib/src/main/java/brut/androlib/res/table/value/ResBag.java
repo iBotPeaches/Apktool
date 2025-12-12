@@ -16,6 +16,8 @@
  */
 package brut.androlib.res.table.value;
 
+import brut.androlib.exceptions.AndrolibException;
+
 import java.util.logging.Logger;
 
 public abstract class ResBag extends ResValue {
@@ -60,5 +62,9 @@ public abstract class ResBag extends ResValue {
         public ResItem getValue() {
             return mValue;
         }
+    }
+
+    public void resolveKeys() throws AndrolibException {
+        // Stub for bags with resolvable keys.
     }
 }

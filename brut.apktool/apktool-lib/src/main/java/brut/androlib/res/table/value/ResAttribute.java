@@ -16,6 +16,7 @@
  */
 package brut.androlib.res.table.value;
 
+import android.util.TypedValue;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.table.ResEntry;
 import brut.androlib.res.table.ResId;
@@ -62,7 +63,7 @@ public class ResAttribute extends ResBag implements ValuesXmlSerializable {
     public static final ResAttribute DEFAULT = new ResAttribute(
         null, TYPE_ANY, Integer.MIN_VALUE, Integer.MAX_VALUE, L10N_NOT_REQUIRED);
 
-    protected final int mType;
+    protected int mType;
     protected final int mMin;
     protected final int mMax;
     protected final int mL10n;
@@ -147,6 +148,51 @@ public class ResAttribute extends ResBag implements ValuesXmlSerializable {
         public ResPrimitive getValue() {
             return mValue;
         }
+    }
+
+    public void addType(int type) {
+        if ((mType & TYPE_ANY) == TYPE_ANY) {
+            return;
+        }
+        switch (type) {
+            case TypedValue.TYPE_REFERENCE:
+            case TypedValue.TYPE_DYNAMIC_REFERENCE:
+            case TypedValue.TYPE_ATTRIBUTE:
+            case TypedValue.TYPE_DYNAMIC_ATTRIBUTE:
+                mType |= TYPE_REFERENCE;
+                return;
+            case TypedValue.TYPE_STRING:
+                mType |= TYPE_STRING;
+                return;
+            case TypedValue.TYPE_FLOAT:
+                mType |= TYPE_FLOAT;
+                return;
+            case TypedValue.TYPE_DIMENSION:
+                mType |= TYPE_DIMEN;
+                return;
+            case TypedValue.TYPE_FRACTION:
+                mType |= TYPE_FRACTION;
+                return;
+            case TypedValue.TYPE_INT_BOOLEAN:
+                mType |= TYPE_BOOL;
+                return;
+            default:
+                if (type >= TypedValue.TYPE_FIRST_COLOR_INT && type <= TypedValue.TYPE_LAST_COLOR_INT) {
+                    mType |= TYPE_COLOR;
+                } else if (type >= TypedValue.TYPE_FIRST_INT && type <= TypedValue.TYPE_LAST_INT) {
+                    mType |= TYPE_INT;
+                }
+                return;
+        }
+    }
+
+    public boolean hasSymbolsForValue(ResItem value) throws AndrolibException {
+        return getSymbolsForValue(value) != null;
+    }
+
+    protected Symbol[] getSymbolsForValue(ResItem value) throws AndrolibException {
+        // Stub for attribute types with symbols.
+        return null;
     }
 
     public String formatValue(ResItem value, boolean asTextNode) throws AndrolibException {

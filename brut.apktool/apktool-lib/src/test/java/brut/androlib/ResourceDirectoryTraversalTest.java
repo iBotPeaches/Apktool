@@ -16,6 +16,7 @@
  */
 package brut.androlib;
 
+import brut.androlib.res.table.ResEntrySpec;
 import brut.common.BrutException;
 import brut.directory.ExtFile;
 
@@ -33,13 +34,13 @@ public class ResourceDirectoryTraversalTest extends BaseTest {
     }
 
     @Test
-    public void checkIfMaliciousRawFileIsDisassembledProperly() throws BrutException {
+    public void checkIfMaliciousRawFileRenamed() throws BrutException {
         sConfig.setForced(true);
 
         ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
         ExtFile testDir = new ExtFile(testApk + ".out");
         new ApkDecoder(testApk, sConfig).decode(testDir);
 
-        assertTrue(new File(testDir, "res/raw/poc").exists());
+        assertTrue(new File(testDir, "res/raw/" + ResEntrySpec.RENAMED_PREFIX + "0x7f040000").exists());
     }
 }

@@ -56,8 +56,6 @@ public class ResPlural extends ResBag implements ValuesXmlSerializable {
 
         for (RawItem item : mItems) {
             int key = item.getKey();
-            ResItem value = item.getValue();
-
             String quantity;
             switch (key) {
                 case ATTR_OTHER:
@@ -83,6 +81,7 @@ public class ResPlural extends ResBag implements ValuesXmlSerializable {
                     continue;
             }
 
+            ResItem value = item.getValue();
             String body;
             if (value instanceof ResString) {
                 body = ResXmlEncoders.enumerateNonPositionalSubstitutionsIfRequired(

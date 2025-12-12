@@ -100,13 +100,8 @@ public class ResFileDecoder {
         }
 
         // Generate output file path from entry.
-        String outResPath = entry.getTypeName() + entry.getConfig().getQualifiers() + "/" + entry.getName();
-        if (BrutIO.detectPossibleDirectoryTraversal(outResPath)) {
-            LOGGER.warning("Potentially malicious file path: " + outResPath + ", using instead: " + inResPath);
-            outResPath = inResPath;
-        } else if (!ext.isEmpty()) {
-            outResPath += "." + ext;
-        }
+        String outResPath = entry.getTypeName() + entry.getConfig().getQualifiers() + "/" + entry.getName()
+                + (ext.isEmpty() ? "" : "." + ext);
 
         // Map output path to original path if it's different.
         String outFileName = "res/" + outResPath;
