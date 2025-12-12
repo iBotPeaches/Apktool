@@ -23,8 +23,10 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.logging.Logger;
 
 public class ResPackage {
@@ -36,6 +38,7 @@ public class ResPackage {
     private final Map<Integer, ResTypeSpec> mTypeSpecs;
     private final Map<Pair<Integer, ResConfig>, ResType> mTypes;
     private final Map<ResId, ResEntrySpec> mEntrySpecs;
+    private final Map<Integer, Set<String>> mEntryNames;
     private final Map<Pair<ResId, ResConfig>, ResEntry> mEntries;
     private final Map<String, ResOverlayable> mOverlayables;
 
@@ -46,6 +49,7 @@ public class ResPackage {
         mTypeSpecs = new HashMap<>();
         mTypes = new HashMap<>();
         mEntrySpecs = new HashMap<>();
+        mEntryNames = new HashMap<>();
         mEntries = new HashMap<>();
         mOverlayables = new HashMap<>();
     }
@@ -152,8 +156,24 @@ public class ResPackage {
 
         int typeId = id.getTypeId();
         ResTypeSpec typeSpec = getTypeSpec(typeId);
+
+        // Obfuscation can cause specs to be generated using existing names.
+        // Enforce uniqueness by renaming the spec when that happens.
+        Set<String> entryNames = mEntryNames.get(typeId);
+        if (entryNames == null) {
+            entryNames = new HashSet<>();
+            mEntryNames.put(typeId, entryNames);
+        } else if (entryNames.contains(name)) {
+            // Clear the name to force a rename.
+            name = "";
+        }
+
         entrySpec = new ResEntrySpec(typeSpec, id, name);
         mEntrySpecs.put(id, entrySpec);
+
+        // Record the name to enforce uniqueness.
+        entryNames.add(entrySpec.getName());
+
         return entrySpec;
     }
 

@@ -61,7 +61,7 @@ public final class ZipUtils {
             if (file.isDirectory()) {
                 zipDir(baseDir, fileName, out, doNotCompress);
             } else if (file.isFile()) {
-                zipFile(baseDir, fileName, out, doNotCompress != null && !doNotCompress.isEmpty()
+                zipFile(baseDir, fileName, out, (doNotCompress != null && !doNotCompress.isEmpty())
                     ? entryName -> doNotCompress.contains(entryName)
                             || doNotCompress.contains(FilenameUtils.getExtension(entryName))
                     : entryName -> false);

@@ -382,18 +382,19 @@ public class BinaryXmlResourceParser implements XmlResourceParser {
         // Are improperly decoded when trusting the string pool.
         // Leveraging the resource map allows us to get the proper value.
         // <item android:state_enabled="true" app:d2="false" app:d3="true">
+        String nameStr;
         try {
-            String resourceMapValue = decodeFromResourceId(nameId);
-            if (resourceMapValue != null) {
-                return resourceMapValue;
+            nameStr = decodeFromResourceId(nameId);
+            if (nameStr != null) {
+                return nameStr;
             }
         } catch (AndrolibException ignored) {
         }
 
         // Couldn't decode from resource map, fall back to string pool.
-        String stringPoolValue = mStringPool.getString(name);
-        if (stringPoolValue == null) {
-            stringPoolValue = "";
+        nameStr = mStringPool.getString(name);
+        if (nameStr == null) {
+            nameStr = "";
         }
 
         // In certain optimized apps, some attributes's specs are removed despite being used.
@@ -408,24 +409,24 @@ public class BinaryXmlResourceParser implements XmlResourceParser {
                 if (removeUnresolved || nameId.getPackageId() != pkg.getId()) {
                     LOGGER.warning(String.format(
                         "null attr reference: ns=%s, name=%s, id=%s",
-                        getAttributePrefix(index), stringPoolValue, nameId));
-                    return stringPoolValue;
+                        getAttributePrefix(index), nameStr, nameId));
+                    return nameStr;
                 }
 
-                if (stringPoolValue.isEmpty()) {
-                    stringPoolValue = ResEntrySpec.MISSING_PREFIX + nameId;
+                if (nameStr.isEmpty()) {
+                    nameStr = ResEntrySpec.MISSING_PREFIX + nameId;
                 }
-                pkg.addEntrySpec(nameId, stringPoolValue);
+                nameStr = pkg.addEntrySpec(nameId, nameStr).getName();
                 pkg.addEntry(nameId, ResConfig.DEFAULT, ResAttribute.DEFAULT);
             } catch (AndrolibException ex) {
                 setFirstError(ex);
                 LOGGER.warning(String.format(
                     "Could not add missing attr: ns=%s, name=%s, id=%s",
-                    getAttributePrefix(index), stringPoolValue, nameId));
+                    getAttributePrefix(index), nameStr, nameId));
             }
         }
 
-        return stringPoolValue;
+        return nameStr;
     }
 
     private String decodeFromResourceId(ResId resId) throws AndrolibException {
