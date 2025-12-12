@@ -47,12 +47,12 @@ public abstract class ResItem extends ResValue {
                 return data == TypedValue.DATA_NULL_EMPTY ? ResPrimitive.EMPTY : ResReference.NULL;
             case TypedValue.TYPE_REFERENCE:
             case TypedValue.TYPE_DYNAMIC_REFERENCE:
-                return data != 0 || rawValue != null
+                return (data != 0 || rawValue != null)
                     ? new ResReference(pkg, ResId.of(data), rawValue)
                     : ResReference.NULL;
             case TypedValue.TYPE_ATTRIBUTE:
             case TypedValue.TYPE_DYNAMIC_ATTRIBUTE:
-                return data != 0 || rawValue != null
+                return (data != 0 || rawValue != null)
                     ? new ResReference(pkg, ResId.of(data), rawValue, ResReference.Type.ATTRIBUTE)
                     : ResReference.NULL;
             case TypedValue.TYPE_STRING:

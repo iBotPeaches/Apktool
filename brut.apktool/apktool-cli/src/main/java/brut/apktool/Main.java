@@ -457,18 +457,18 @@ public class Main {
             } else {
                 String mode = cli.getOptionValue(decodeResResolveModeOption);
                 switch (mode) {
-                    case "remove":
-                        config.setDecodeResolve(Config.DecodeResolve.REMOVE);
-                        break;
                     case "keep":
                         config.setDecodeResolve(Config.DecodeResolve.KEEP);
+                        break;
+                    case "remove":
+                        config.setDecodeResolve(Config.DecodeResolve.REMOVE);
                         break;
                     case "dummy":
                         config.setDecodeResolve(Config.DecodeResolve.DUMMY);
                         break;
                     default:
                         System.err.println("Unknown resolve resources mode: " + mode);
-                        System.err.println("Expect: 'remove', 'keep' or 'dummy'.");
+                        System.err.println("Expect: 'keep', 'remove' or 'dummy'.");
                         System.exit(1);
                         return;
                 }

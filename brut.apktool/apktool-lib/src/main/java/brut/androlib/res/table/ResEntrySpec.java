@@ -32,8 +32,8 @@ public class ResEntrySpec {
         assert typeSpec.getId() == id.getTypeId();
         mTypeSpec = typeSpec;
         mId = id;
-        // Some apps had their entry names obfuscated or collapsed to
-        // a single value in the key string pool.
+        // Some apps had their entry names obfuscated or collapsed to a single
+        // value in the key string pool.
         mName = isValidEntryName(name) ? name : RENAMED_PREFIX + id;
     }
 
@@ -47,14 +47,11 @@ public class ResEntrySpec {
         if (!Character.isJavaIdentifierStart(name.charAt(0))) {
             return false;
         }
-        // The rest must be valid Java identifier part characters.
+        // The rest must be valid Java identifier part characters or any of the
+        // whitelisted special characters.
         for (int i = 1; i < len; i++) {
             char ch = name.charAt(i);
-            // Whitelisted special characters.
-            if (ch == '.' || ch == '-') {
-                continue;
-            }
-            if (!Character.isJavaIdentifierPart(ch)) {
+            if (!Character.isJavaIdentifierPart(ch) && ch != '.' && ch != '-') {
                 return false;
             }
         }
