@@ -119,7 +119,7 @@ public class Main {
     private static final Option decodeResResolveModeOption = Option.builder()
         .longOpt("res-resolve-mode")
         .desc("Set the resolve mode for resources to <mode>.\n"
-            + "Possible values are: 'remove' (default), 'dummy' or 'keep'.")
+            + "Possible values are: 'keep' (default), 'remove' or 'dummy'.")
         .hasArg()
         .argName("mode")
         .build();
