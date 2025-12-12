@@ -271,7 +271,6 @@ public class BinaryResourceParser {
 
         // Clean up.
         injectMissingEntrySpecs();
-        mMissingEntrySpecs.clear();
         mInvalidConfigs.clear();
         mKeyStrings = null;
         mTypeStrings = null;
@@ -807,25 +806,25 @@ public class BinaryResourceParser {
     }
 
     private void injectMissingEntrySpecs() throws AndrolibException {
-        if (mPackage == null || mTable.getConfig().getDecodeResolve() != Config.DecodeResolve.DUMMY) {
-            return;
-        }
+        if (mTable.getConfig().getDecodeResolve() == Config.DecodeResolve.DUMMY) {
+            for (ResId id : mMissingEntrySpecs) {
+                ResTypeSpec typeSpec = mPackage.getTypeSpec(id.getTypeId());
+                ResValue value;
+                switch (typeSpec.getName()) {
+                    case "attr":
+                    case "^attr-private":
+                        value = ResAttribute.DEFAULT;
+                        break;
+                    default:
+                        value = ResReference.NULL;
+                        break;
+                }
 
-        for (ResId id : mMissingEntrySpecs) {
-            ResTypeSpec typeSpec = mPackage.getTypeSpec(id.getTypeId());
-            ResValue value;
-            switch (typeSpec.getName()) {
-                case "attr":
-                case "^attr-private":
-                    value = ResAttribute.DEFAULT;
-                    break;
-                default:
-                    value = ResReference.NULL;
-                    break;
+                mPackage.addEntrySpec(id, ResEntrySpec.DUMMY_PREFIX + id);
+                mPackage.addEntry(id, ResConfig.DEFAULT, value);
             }
-
-            mPackage.addEntrySpec(id, ResEntrySpec.DUMMY_PREFIX + id);
-            mPackage.addEntry(id, ResConfig.DEFAULT, value);
         }
+
+        mMissingEntrySpecs.clear();
     }
 }
