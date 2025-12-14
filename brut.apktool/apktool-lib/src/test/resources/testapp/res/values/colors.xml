@@ -6,5 +6,5 @@
     <color name="test_color4">#c1ac1a</color>
     <color name="test_color5">#abcd</color>
     <color name="test_color6">#123</color>
-    <color name="issue_3416">@null</color>
+    <item type="color" name="issue_3416" format="string">\@null</item>
 </resources>

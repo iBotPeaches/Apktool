@@ -49,7 +49,7 @@ public class ResEnum extends ResAttribute {
     public void resolveKeys() throws AndrolibException {
         ResPackage pkg = mParent.getPackage();
         Config config = pkg.getTable().getConfig();
-        boolean removeUnresolved = config.getDecodeResolve() == Config.DecodeResolve.REMOVE;
+        boolean skipUnresolved = config.getDecodeResolve() == Config.DecodeResolve.LAZY;
 
         for (Symbol symbol : mSymbols) {
             ResReference key = symbol.getKey();
@@ -59,15 +59,15 @@ public class ResEnum extends ResAttribute {
 
             ResId entryId = key.getId();
 
-            // #2836 - Skip item if the resource cannot be identified.
-            if (removeUnresolved || entryId.getPackageId() != pkg.getId()) {
+            // #2836 - Skip item if the resource cannot be resolved.
+            if (skipUnresolved || entryId.getPackageId() != pkg.getId()) {
                 LOGGER.warning(String.format(
                     "null enum reference: key=%s, value=%s", key, symbol.getValue()));
                 continue;
             }
 
-            pkg.addEntrySpec(entryId, ResEntrySpec.MISSING_PREFIX + entryId);
-            pkg.addEntry(entryId, ResConfig.DEFAULT, new ResCustom("id"));
+            pkg.addEntrySpec(entryId, ResEntrySpec.DUMMY_PREFIX + entryId);
+            pkg.addEntry(entryId, ResConfig.DEFAULT, ResCustom.ID);
         }
     }
 

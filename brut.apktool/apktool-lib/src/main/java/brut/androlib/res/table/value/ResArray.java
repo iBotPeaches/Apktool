@@ -53,17 +53,18 @@ public class ResArray extends ResBag implements ValuesXmlSerializable {
         // Since only string and integer arrays are supported,
         // it's safe to use the format as an array type.
         String format = resolveFormat();
-        String type = null;
         if (format != null) {
             switch (format) {
                 case "string":
                 case "integer":
-                    type = format;
+                    break;
+                default:
+                    format = null;
                     break;
             }
         }
 
-        String tagName = type != null ? type + "-array" : "array";
+        String tagName = (format != null ? format + "-" : "") + "array";
         serial.startTag(null, tagName);
         serial.attribute(null, "name", entry.getName());
 

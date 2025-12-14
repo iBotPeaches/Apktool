@@ -34,11 +34,54 @@ public class DecodeResolveTest extends BaseTest {
     }
 
     @Test
-    public void decodeResolveRemoveTest() throws BrutException {
-        sConfig.setDecodeResolve(Config.DecodeResolve.REMOVE);
+    public void decodeResolveDefaultTest() throws BrutException {
+        sConfig.setDecodeResolve(Config.DecodeResolve.DEFAULT);
 
         ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
-        ExtFile testDir = new ExtFile(testApk + ".out.remove");
+        ExtFile testDir = new ExtFile(testApk + ".out.default");
+        new ApkDecoder(testApk, sConfig).decode(testDir);
+
+        assertTrue(new File(testDir, "res/values/strings.xml").isFile());
+
+        Document attrDocument = loadDocument(new File(testDir, "res/values/attrs.xml"));
+        assertEquals(4, attrDocument.getElementsByTagName("enum").getLength());
+
+        Document colorDocument = loadDocument(new File(testDir, "res/values/colors.xml"));
+        assertEquals(8, colorDocument.getElementsByTagName("color").getLength());
+
+        Document publicDocument = loadDocument(new File(testDir, "res/values/public.xml"));
+        assertEquals(22, publicDocument.getElementsByTagName("public").getLength());
+    }
+
+    @Test
+    public void decodeResolveGreedyTest() throws BrutException {
+        sConfig.setDecodeResolve(Config.DecodeResolve.GREEDY);
+
+        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
+        ExtFile testDir = new ExtFile(testApk + ".out.greedy");
+        new ApkDecoder(testApk, sConfig).decode(testDir);
+
+        assertTrue(new File(testDir, "res/values/strings.xml").isFile());
+
+        File attrXml = new File(testDir, "res/values/attrs.xml");
+        Document attrDocument = loadDocument(attrXml);
+        assertEquals(4, attrDocument.getElementsByTagName("enum").getLength());
+
+        File colorXml = new File(testDir, "res/values/colors.xml");
+        Document colorDocument = loadDocument(colorXml);
+        assertEquals(9, colorDocument.getElementsByTagName("color").getLength());
+
+        File publicXml = new File(testDir, "res/values/public.xml");
+        Document publicDocument = loadDocument(publicXml);
+        assertEquals(23, publicDocument.getElementsByTagName("public").getLength());
+    }
+
+    @Test
+    public void decodeResolveLazyTest() throws BrutException {
+        sConfig.setDecodeResolve(Config.DecodeResolve.LAZY);
+
+        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
+        ExtFile testDir = new ExtFile(testApk + ".out.lazy");
         new ApkDecoder(testApk, sConfig).decode(testDir);
 
         assertTrue(new File(testDir, "res/values/strings.xml").isFile());
@@ -50,55 +93,9 @@ public class DecodeResolveTest extends BaseTest {
         File colorXml = new File(testDir, "res/values/colors.xml");
         Document colorDocument = loadDocument(colorXml);
         assertEquals(8, colorDocument.getElementsByTagName("color").getLength());
-        assertEquals(0, colorDocument.getElementsByTagName("item").getLength());
 
         File publicXml = new File(testDir, "res/values/public.xml");
         Document publicDocument = loadDocument(publicXml);
         assertEquals(21, publicDocument.getElementsByTagName("public").getLength());
-    }
-
-    @Test
-    public void decodeResolveKeepTest() throws BrutException {
-        sConfig.setDecodeResolve(Config.DecodeResolve.KEEP);
-
-        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
-        ExtFile testDir = new ExtFile(testApk + ".out.leave");
-        new ApkDecoder(testApk, sConfig).decode(testDir);
-
-        assertTrue(new File(testDir, "res/values/strings.xml").isFile());
-
-        Document attrDocument = loadDocument(new File(testDir, "res/values/attrs.xml"));
-        assertEquals(4, attrDocument.getElementsByTagName("enum").getLength());
-
-        Document colorDocument = loadDocument(new File(testDir, "res/values/colors.xml"));
-        assertEquals(8, colorDocument.getElementsByTagName("color").getLength());
-        assertEquals(0, colorDocument.getElementsByTagName("item").getLength());
-
-        Document publicDocument = loadDocument(new File(testDir, "res/values/public.xml"));
-        assertEquals(22, publicDocument.getElementsByTagName("public").getLength());
-    }
-
-    @Test
-    public void decodeResolveDummyTest() throws BrutException {
-        sConfig.setDecodeResolve(Config.DecodeResolve.DUMMY);
-
-        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
-        ExtFile testDir = new ExtFile(testApk + ".out.dummies");
-        new ApkDecoder(testApk, sConfig).decode(testDir);
-
-        assertTrue(new File(testDir, "res/values/strings.xml").isFile());
-
-        File attrXml = new File(testDir, "res/values/attrs.xml");
-        Document attrDocument = loadDocument(attrXml);
-        assertEquals(4, attrDocument.getElementsByTagName("enum").getLength());
-
-        File colorXml = new File(testDir, "res/values/colors.xml");
-        Document colorDocument = loadDocument(colorXml);
-        assertEquals(8, colorDocument.getElementsByTagName("color").getLength());
-        assertEquals(1, colorDocument.getElementsByTagName("item").getLength());
-
-        File publicXml = new File(testDir, "res/values/public.xml");
-        Document publicDocument = loadDocument(publicXml);
-        assertEquals(23, publicDocument.getElementsByTagName("public").getLength());
     }
 }

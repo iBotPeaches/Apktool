@@ -51,7 +51,8 @@ public class ResPlural extends ResBag implements ValuesXmlSerializable {
     @Override
     public void serializeToValuesXml(XmlSerializer serial, ResEntry entry)
             throws AndrolibException, IOException {
-        serial.startTag(null, "plurals");
+        String tagName = "plurals";
+        serial.startTag(null, tagName);
         serial.attribute(null, "name", entry.getName());
 
         for (RawItem item : mItems) {
@@ -99,7 +100,7 @@ public class ResPlural extends ResBag implements ValuesXmlSerializable {
             serial.endTag(null, "item");
         }
 
-        serial.endTag(null, "plurals");
+        serial.endTag(null, tagName);
     }
 
     @Override

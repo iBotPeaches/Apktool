@@ -110,13 +110,15 @@ public class ResReference extends ResItem implements ResXmlEncodable, ValuesXmlS
     public void serializeToValuesXml(XmlSerializer serial, ResEntry entry)
             throws AndrolibException, IOException {
         String type = entry.getTypeName();
-        boolean asItem = entry.getSpec().isDummy();
 
         // A bag type with a reference value must be an <item> tag.
         // Otherwise, when the decoded app is rebuilt, the reference will be lost.
-        if (entry.getType().isBagType()) {
-            asItem = true;
-        }
+        boolean asItem = entry.getType().isBagType();
+
+        // Only set body if not @null or the entry is a <string> tag.
+        // @null is the default value for all item types except string.
+        // Note: We never set @null to <id> tags.
+        boolean needsBody = resolve() != null || type.equals("string");
 
         String tagName = asItem ? "item" : type;
         serial.startTag(null, tagName);
@@ -124,7 +126,9 @@ public class ResReference extends ResItem implements ResXmlEncodable, ValuesXmlS
             serial.attribute(null, "type", type);
         }
         serial.attribute(null, "name", entry.getName());
-        serial.text(encodeAsResXmlValue());
+        if (needsBody) {
+            serial.text(encodeAsResXmlValue());
+        }
         serial.endTag(null, tagName);
     }
 

@@ -47,7 +47,7 @@ public class AndResGuardTest extends BaseTest {
         sConfig.setDecodeResources(Config.DecodeResources.NONE);
 
         ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
-        ExtFile testDir = new ExtFile(testApk + ".raw.out");
+        ExtFile testDir = new ExtFile(testApk + ".out.raw");
         new ApkDecoder(testApk, sConfig).decode(testDir);
 
         assertTrue(new File(testDir, "r/a/a.png").isFile());

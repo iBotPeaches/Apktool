@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <attr name="test_attr0"/>
     <attr format="integer" name="test_attr1"/>
     <attr format="reference" name="test_attr2"/>
     <attr format="reference" name="test_attr3"/>

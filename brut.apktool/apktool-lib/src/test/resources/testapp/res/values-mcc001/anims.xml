@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <anim name="test_anims1">@android:anim/bounce_interpolator</anim>
-    <anim name="test_anims2">@android:anim/cycle_interpolator</anim>
-    <anim name="test_anims3">@android:anim/decelerate_interpolator</anim>
-    <anim name="test_anims4">@android:anim/fade_in</anim>
-    <anim name="test_anims5">@android:anim/fade_out</anim>
-    <anim name="test_anims6">@android:anim/linear_interpolator</anim>
-    <anim name="test_anims7">@android:anim/overshoot_interpolator</anim>
-    <anim name="test_anims8">@android:anim/slide_in_left</anim>
-    <anim name="test_anims9">@android:anim/slide_out_right</anim>
+    <anim name="test_anim0" />
+    <anim name="test_anim1">@android:anim/bounce_interpolator</anim>
+    <anim name="test_anim2">@android:anim/cycle_interpolator</anim>
+    <anim name="test_anim3">@android:anim/decelerate_interpolator</anim>
+    <anim name="test_anim4">@android:anim/fade_in</anim>
+    <anim name="test_anim5">@android:anim/fade_out</anim>
+    <anim name="test_anim6">@android:anim/linear_interpolator</anim>
+    <anim name="test_anim7">@android:anim/overshoot_interpolator</anim>
+    <anim name="test_anim8">@android:anim/slide_in_left</anim>
+    <anim name="test_anim9">@android:anim/slide_out_right</anim>
 </resources>

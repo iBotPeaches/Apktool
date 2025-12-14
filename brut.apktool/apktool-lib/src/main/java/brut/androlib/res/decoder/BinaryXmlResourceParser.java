@@ -401,12 +401,12 @@ public class BinaryXmlResourceParser implements XmlResourceParser {
         // Inject a generic spec for the attribute, otherwise we can't rebuild.
         if (nameId != ResId.NULL) {
             Config config = mTable.getConfig();
-            boolean removeUnresolved = config.getDecodeResolve() == Config.DecodeResolve.REMOVE;
+            boolean skipUnresolved = config.getDecodeResolve() == Config.DecodeResolve.LAZY;
             try {
                 ResPackage pkg = mTable.getMainPackage();
 
-                // #2836 - Skip item if the resource cannot be identified.
-                if (removeUnresolved || nameId.getPackageId() != pkg.getId()) {
+                // #2836 - Skip item if the resource cannot be resolved.
+                if (skipUnresolved || nameId.getPackageId() != pkg.getId()) {
                     LOGGER.warning(String.format(
                         "null attr reference: ns=%s, name=%s, id=%s",
                         getAttributePrefix(index), nameStr, nameId));
@@ -414,7 +414,7 @@ public class BinaryXmlResourceParser implements XmlResourceParser {
                 }
 
                 if (nameStr.isEmpty()) {
-                    nameStr = ResEntrySpec.MISSING_PREFIX + nameId;
+                    nameStr = ResEntrySpec.DUMMY_PREFIX + nameId;
                 }
                 nameStr = pkg.addEntrySpec(nameId, nameStr).getName();
                 pkg.addEntry(nameId, ResConfig.DEFAULT, ResAttribute.DEFAULT);

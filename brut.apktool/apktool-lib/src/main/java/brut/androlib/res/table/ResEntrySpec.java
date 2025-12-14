@@ -20,7 +20,6 @@ import java.util.Objects;
 
 public class ResEntrySpec {
     public static final String DUMMY_PREFIX = "APKTOOL_DUMMY_";
-    public static final String MISSING_PREFIX = "APKTOOL_MISSING_";
     public static final String RENAMED_PREFIX = "APKTOOL_RENAMED_";
 
     private final ResTypeSpec mTypeSpec;
@@ -85,18 +84,6 @@ public class ResEntrySpec {
     public String getFullName(boolean excludePackage, boolean excludeType) {
         return (excludePackage ? "" : getPackage().getName() + ":")
                 + (excludeType ? "" : getTypeName() + "/") + mName;
-    }
-
-    public boolean isDummy() {
-        return mName.startsWith(DUMMY_PREFIX);
-    }
-
-    public boolean isMissing() {
-        return mName.startsWith(MISSING_PREFIX);
-    }
-
-    public boolean isRenamed() {
-        return mName.startsWith(RENAMED_PREFIX);
     }
 
     @Override

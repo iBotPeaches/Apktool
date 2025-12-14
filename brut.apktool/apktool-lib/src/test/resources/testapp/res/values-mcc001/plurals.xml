@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <plurals name="test_plurals0" />
     <plurals name="test_plurals1">
         <item quantity="one">%1$s, %2$d foo</item>
         <item quantity="other">%1$s, %2$d foo(s)</item>

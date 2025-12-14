@@ -29,6 +29,8 @@ import java.util.Objects;
 import java.util.Set;
 
 public class ResString extends ResItem implements ResXmlEncodable, ValuesXmlSerializable {
+    public static final ResString EMPTY = new ResString("");
+
     private final String mValue;
 
     public ResString(String text) {
@@ -65,17 +67,11 @@ public class ResString extends ResItem implements ResXmlEncodable, ValuesXmlSeri
     public void serializeToValuesXml(XmlSerializer serial, ResEntry entry)
             throws AndrolibException, IOException {
         String type = entry.getTypeName();
-        boolean asItem = entry.getSpec().isDummy();
 
         // Specify format for <item> tags when the resource type doesn't
         // directly support the string format.
         Set<String> standardFormats = STANDARD_TYPE_FORMATS.get(type);
-        boolean needsFormat;
-        if (standardFormats != null && standardFormats.contains("string")) {
-            needsFormat = false;
-        } else {
-            needsFormat = asItem = true;
-        }
+        boolean asItem = standardFormats == null || !standardFormats.contains("string");
 
         String tagName = asItem ? "item" : type;
         serial.startTag(null, tagName);
@@ -83,7 +79,7 @@ public class ResString extends ResItem implements ResXmlEncodable, ValuesXmlSeri
             serial.attribute(null, "type", type);
         }
         serial.attribute(null, "name", entry.getName());
-        if (needsFormat) {
+        if (asItem) {
             serial.attribute(null, "format", "string");
         }
         if (!asItem && hasMultipleNonPositionalSubstitutions()) {

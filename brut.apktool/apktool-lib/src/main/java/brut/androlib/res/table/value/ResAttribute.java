@@ -231,7 +231,8 @@ public class ResAttribute extends ResBag implements ValuesXmlSerializable {
     @Override
     public void serializeToValuesXml(XmlSerializer serial, ResEntry entry)
             throws AndrolibException, IOException {
-        serial.startTag(null, "attr");
+        String tagName = "attr";
+        serial.startTag(null, tagName);
         serial.attribute(null, "name", entry.getName());
         String format = renderFormat();
         if (format != null) {
@@ -247,7 +248,7 @@ public class ResAttribute extends ResBag implements ValuesXmlSerializable {
             serial.attribute(null, "localization", "suggested");
         }
         serializeSymbolsToValuesXml(serial, entry);
-        serial.endTag(null, "attr");
+        serial.endTag(null, tagName);
     }
 
     private String renderFormat() {
