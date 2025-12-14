@@ -127,7 +127,7 @@ public class Main {
     private static final Option decodeKeepBrokenResOption = Option.builder()
         .longOpt("keep-broken-res")
         .desc("Use if there was an error and some resources were dropped, e.g.\n"
-            + "\"Invalid config flags detected. Dropping resources\", but you\n"
+            + "\"Invalid resource config detected. Dropping resources\", but you\n"
             + "want to decode them anyway, even with errors. You will have to\n"
             + "fix them manually before building.")
         .get();
