@@ -541,11 +541,11 @@ public class BinaryResourceParser {
             BigInteger exceedingBI = new BigInteger(1, buf);
             if (exceedingBI.equals(BigInteger.ZERO)) {
                 LOGGER.fine(String.format(
-                    "Config flags size of %d exceeds %d, but exceeding bytes are all zero.",
+                    "Config size of %d exceeds %d, but exceeding bytes are all zero.",
                     size, CONFIG_KNOWN_MAX_SIZE));
             } else {
                 LOGGER.warning(String.format(
-                    "Config flags size of %d exceeds %d. Exceeding bytes: %X",
+                    "Config size of %d exceeds %d. Exceeding bytes: %X",
                     size, CONFIG_KNOWN_MAX_SIZE, exceedingBI));
                 isInvalid = true;
             }
@@ -556,7 +556,7 @@ public class BinaryResourceParser {
             mIn.skipBytes(remainingSize);
         }
 
-        ResConfig flags = new ResConfig(
+        ResConfig config = new ResConfig(
             mcc, mnc, language, region, orientation,
             touchscreen, density, keyboard, navigation, inputFlags,
             grammaticalInflection, screenWidth, screenHeight, sdkVersion,
@@ -564,11 +564,11 @@ public class BinaryResourceParser {
             screenWidthDp, screenHeightDp, localeScript, localeVariant,
             screenLayout2, colorMode, localeNumberingSystem);
 
-        if (isInvalid || flags.isInvalid()) {
-            mInvalidConfigs.add(flags);
+        if (isInvalid || config.isInvalid()) {
+            mInvalidConfigs.add(config);
         }
 
-        return flags;
+        return config;
     }
 
     private String unpackLanguageOrRegion(byte[] in, char base) {
