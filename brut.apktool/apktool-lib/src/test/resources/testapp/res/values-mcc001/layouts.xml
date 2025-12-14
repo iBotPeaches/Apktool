@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <layout name="test_layouts1">@android:layout/activity_list_item</layout>
-    <layout name="test_layouts2">@android:layout/browser_link_context_header</layout>
-    <layout name="test_layouts3">@android:layout/simple_list_item_1</layout>
-    <layout name="test_layouts4">@android:layout/simple_spinner_item</layout>
+    <layout name="test_layout0" />
+    <layout name="test_layout1">@android:layout/activity_list_item</layout>
+    <layout name="test_layout2">@android:layout/browser_link_context_header</layout>
+    <layout name="test_layout3">@android:layout/simple_list_item_1</layout>
+    <layout name="test_layout4">@android:layout/simple_spinner_item</layout>
 </resources>

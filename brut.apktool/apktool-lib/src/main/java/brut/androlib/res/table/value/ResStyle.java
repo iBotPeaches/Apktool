@@ -83,7 +83,7 @@ public class ResStyle extends ResBag implements ValuesXmlSerializable {
     public void resolveKeys() throws AndrolibException {
         ResPackage pkg = mParent.getPackage();
         Config config = pkg.getTable().getConfig();
-        boolean removeUnresolved = config.getDecodeResolve() == Config.DecodeResolve.REMOVE;
+        boolean skipUnresolved = config.getDecodeResolve() == Config.DecodeResolve.LAZY;
 
         for (Item item : mItems) {
             ResReference key = item.getKey();
@@ -98,15 +98,15 @@ public class ResStyle extends ResBag implements ValuesXmlSerializable {
 
             ResId entryId = key.getId();
 
-            // #2836 - Skip item if the resource cannot be identified.
-            if (removeUnresolved || entryId.getPackageId() != pkg.getId()) {
+            // #2836 - Skip item if the resource cannot be resolved.
+            if (skipUnresolved || entryId.getPackageId() != pkg.getId()) {
                 LOGGER.warning(String.format(
                     "null style reference: key=%s, value=%s", key, item.getValue()));
                 continue;
             }
 
             if (keySpec == null) {
-                pkg.addEntrySpec(entryId, ResEntrySpec.MISSING_PREFIX + entryId);
+                pkg.addEntrySpec(entryId, ResEntrySpec.DUMMY_PREFIX + entryId);
             }
             pkg.addEntry(entryId, ResConfig.DEFAULT, ResAttribute.DEFAULT);
         }
@@ -115,7 +115,8 @@ public class ResStyle extends ResBag implements ValuesXmlSerializable {
     @Override
     public void serializeToValuesXml(XmlSerializer serial, ResEntry entry)
             throws AndrolibException, IOException {
-        serial.startTag(null, "style");
+        String tagName = "style";
+        serial.startTag(null, tagName);
         serial.attribute(null, "name", entry.getName());
         if (mParent.resolve() != null) {
             serial.attribute(null, "parent", mParent.encodeAsResXmlAttrValue());
@@ -167,7 +168,7 @@ public class ResStyle extends ResBag implements ValuesXmlSerializable {
             processedNames.add(keyName);
         }
 
-        serial.endTag(null, "style");
+        serial.endTag(null, tagName);
     }
 
     @Override

@@ -49,12 +49,12 @@ public class Main {
     private static final Option verboseOption = Option.builder("v")
         .longOpt("verbose")
         .desc("Increase output verbosity.")
-        .build();
+        .get();
 
     private static final Option quietOption = Option.builder("q")
         .longOpt("quiet")
         .desc("Suppress normal output.")
-        .build();
+        .get();
 
     private static final Option jobsOption = Option.builder("j")
         .longOpt("jobs")
@@ -62,21 +62,21 @@ public class Main {
         .hasArg()
         .argName("num")
         .type(Integer.class)
-        .build();
+        .get();
 
     private static final Option frameDirOption = Option.builder("p")
         .longOpt("frame-path")
         .desc("Use framework files located in <dir>.")
         .hasArg()
         .argName("dir")
-        .build();
+        .get();
 
     private static final Option frameTagOption = Option.builder("t")
         .longOpt("frame-tag")
         .desc("Use framework files tagged with <tag>.")
         .hasArg()
         .argName("tag")
-        .build();
+        .get();
 
     private static final Option libOption = Option.builder("l")
         .longOpt("lib")
@@ -84,45 +84,45 @@ public class Main {
             + "Can be specified multiple times.")
         .hasArg()
         .argName("package:file")
-        .build();
+        .get();
 
     private static final Option decodeForceOption = Option.builder("f")
         .longOpt("force")
         .desc("Force delete destination directory.")
-        .build();
+        .get();
 
     private static final Option decodeNoSrcOption = Option.builder("s")
         .longOpt("no-src")
         .desc("Do not decode sources.")
-        .build();
+        .get();
 
     private static final Option decodeOnlyMainClassesOption = Option.builder()
         .longOpt("only-main-classes")
         .desc("Only disassemble the main dex classes (classes[0-9]*.dex) in the root.")
-        .build();
+        .get();
 
     private static final Option decodeNoDebugInfoOption = Option.builder()
         .longOpt("no-debug-info")
         .desc("Do not include debug info in sources (.local, .param, .line, etc.)")
-        .build();
+        .get();
 
     private static final Option decodeNoResOption = Option.builder("r")
         .longOpt("no-res")
         .desc("Do not decode resources.")
-        .build();
+        .get();
 
     private static final Option decodeOnlyManifestOption = Option.builder()
         .longOpt("only-manifest")
         .desc("Only decode AndroidManifest.xml without resources.")
-        .build();
+        .get();
 
     private static final Option decodeResResolveModeOption = Option.builder()
         .longOpt("res-resolve-mode")
         .desc("Set the resolve mode for resources to <mode>.\n"
-            + "Possible values are: 'keep' (default), 'remove' or 'dummy'.")
+            + "Possible values: 'default', 'greedy' or 'lazy'.")
         .hasArg()
         .argName("mode")
-        .build();
+        .get();
 
     private static final Option decodeKeepBrokenResOption = Option.builder()
         .longOpt("keep-broken-res")
@@ -130,87 +130,87 @@ public class Main {
             + "\"Invalid config flags detected. Dropping resources\", but you\n"
             + "want to decode them anyway, even with errors. You will have to\n"
             + "fix them manually before building.")
-        .build();
+        .get();
 
     private static final Option decodeMatchOriginalOption = Option.builder()
         .longOpt("match-original")
         .desc("Keep files closest to original as possible (prevents rebuild).")
-        .build();
+        .get();
 
     private static final Option decodeNoAssetsOption = Option.builder()
         .longOpt("no-assets")
         .desc("Do not decode assets.")
-        .build();
+        .get();
 
     private static final Option decodeOutputOption = Option.builder("o")
         .longOpt("output")
         .desc("Output decoded files to <dir>. (default: apk.out)")
         .hasArg()
         .argName("dir")
-        .build();
+        .get();
 
     private static final Option buildForceOption = Option.builder("f")
         .longOpt("force")
         .desc("Skip changes detection and build all files.")
-        .build();
+        .get();
 
     private static final Option buildNoApkOption = Option.builder()
         .longOpt("no-apk")
         .desc("Disable repacking of the built files into a new apk.")
-        .build();
+        .get();
 
     private static final Option buildNoCrunchOption = Option.builder()
         .longOpt("no-crunch")
         .desc("Disable crunching of resource files during the build step.")
-        .build();
+        .get();
 
     private static final Option buildCopyOriginalOption = Option.builder()
         .longOpt("copy-original")
         .desc("Copy original AndroidManifest.xml and META-INF. See project page for more info.")
-        .build();
+        .get();
 
     private static final Option buildDebuggableOption = Option.builder()
         .longOpt("debuggable")
         .desc("Set android:debuggable to \"true\" in AndroidManifest.xml for the built apk.")
-        .build();
+        .get();
 
     private static final Option buildNetSecConfOption = Option.builder()
         .longOpt("net-sec-conf")
         .desc("Add a generic network security configuration file to the built apk.")
-        .build();
+        .get();
 
     private static final Option buildAaptOption = Option.builder()
         .longOpt("aapt")
         .desc("Use aapt2 binary located in <file>.")
         .hasArg()
         .argName("file")
-        .build();
+        .get();
 
     private static final Option buildOutputOption = Option.builder("o")
         .longOpt("output")
         .desc("Output the built apk to <file>. (default: dist/name.apk)")
         .hasArg()
         .argName("file")
-        .build();
+        .get();
 
     private static final Option frameFrameDirOption = Option.builder("p")
         .longOpt("frame-path")
         .desc("Set the path for framework files to <dir>.")
         .hasArg()
         .argName("dir")
-        .build();
+        .get();
 
     private static final Option frameFrameTagOption = Option.builder("t")
         .longOpt("frame-tag")
         .desc("Suffix framework files with <tag>.")
         .hasArg()
         .argName("tag")
-        .build();
+        .get();
 
     private static final Option frameForceAllOption = Option.builder("a")
         .longOpt("all")
         .desc("Include all framework files regardless of tag.")
-        .build();
+        .get();
 
     private static final Options generalOptions = new Options();
     private static final Options decodeOptions = new Options();
@@ -457,18 +457,18 @@ public class Main {
             } else {
                 String mode = cli.getOptionValue(decodeResResolveModeOption);
                 switch (mode) {
-                    case "keep":
-                        config.setDecodeResolve(Config.DecodeResolve.KEEP);
+                    case "default":
+                        config.setDecodeResolve(Config.DecodeResolve.DEFAULT);
                         break;
-                    case "remove":
-                        config.setDecodeResolve(Config.DecodeResolve.REMOVE);
+                    case "greedy":
+                        config.setDecodeResolve(Config.DecodeResolve.GREEDY);
                         break;
-                    case "dummy":
-                        config.setDecodeResolve(Config.DecodeResolve.DUMMY);
+                    case "lazy":
+                        config.setDecodeResolve(Config.DecodeResolve.LAZY);
                         break;
                     default:
                         System.err.println("Unknown resolve resources mode: " + mode);
-                        System.err.println("Expect: 'keep', 'remove' or 'dummy'.");
+                        System.err.println("Expect: 'default', 'greedy' or 'lazy'.");
                         System.exit(1);
                         return;
                 }
@@ -711,6 +711,7 @@ public class Main {
         return sb.toString();
     }
 
+    @SuppressWarnings("deprecation")
     private static void printUsage() {
         PrintWriter writer = new PrintWriter(System.out);
         HelpFormatter formatter = new HelpFormatter();
@@ -773,6 +774,7 @@ public class Main {
         writer.flush();
     }
 
+    @SuppressWarnings("deprecation")
     private static void printOptions(PrintWriter writer, HelpFormatter formatter, Options options) {
         final int width = 120;
         final int leftPadding = 1;

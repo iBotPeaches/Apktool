@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <drawable name="test_drawable0" />
     <drawable name="test_drawable1">@android:drawable/btn_default</drawable>
     <drawable name="test_drawable2">@drawable/ic_launcher</drawable>
-    <drawable name="test_drawable3">@null</drawable>
-    <drawable name="test_drawable4">#00000000</drawable>
+    <drawable name="test_drawable3">#00000000</drawable>
 </resources>

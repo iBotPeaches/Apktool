@@ -61,17 +61,16 @@ public class ResPrimitive extends ResItem implements ResXmlEncodable, ValuesXmlS
     public void serializeToValuesXml(XmlSerializer serial, ResEntry entry)
             throws AndrolibException, IOException {
         String type = entry.getTypeName();
-        boolean asItem = entry.getSpec().isDummy();
 
         // Specify format for <item> tags when the resource type doesn't
         // directly support this primitive format.
         String format = getFormat();
-        Set<String> standardFormats = STANDARD_TYPE_FORMATS.get(type);
-        boolean needsFormat;
-        if (format != null && standardFormats != null && standardFormats.contains(format)) {
-            needsFormat = false;
+        boolean asItem;
+        if (format != null) {
+            Set<String> standardFormats = STANDARD_TYPE_FORMATS.get(type);
+            asItem = standardFormats == null || !standardFormats.contains(format);
         } else {
-            needsFormat = asItem = true;
+            asItem = false;
         }
 
         String tagName = asItem ? "item" : type;
@@ -80,7 +79,7 @@ public class ResPrimitive extends ResItem implements ResXmlEncodable, ValuesXmlS
             serial.attribute(null, "type", type);
         }
         serial.attribute(null, "name", entry.getName());
-        if (needsFormat) {
+        if (asItem) {
             serial.attribute(null, "format", format);
         }
         serial.text(encodeAsResXmlValue());

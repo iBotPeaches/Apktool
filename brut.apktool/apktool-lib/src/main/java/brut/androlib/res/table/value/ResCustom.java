@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.util.Objects;
 
 public class ResCustom extends ResValue implements ValuesXmlSerializable {
+    public static final ResCustom ID = new ResCustom("id");
+
     private final String mType;
     private final String mValue;
     private final boolean mAsItem;

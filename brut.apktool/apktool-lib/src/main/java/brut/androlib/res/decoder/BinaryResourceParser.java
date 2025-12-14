@@ -270,7 +270,7 @@ public class BinaryResourceParser {
         }
 
         // Clean up.
-        injectMissingEntrySpecs();
+        injectDummyEntrySpecs();
         mInvalidConfigs.clear();
         mKeyStrings = null;
         mTypeStrings = null;
@@ -316,9 +316,10 @@ public class BinaryResourceParser {
             typeSpec = mPackage.addTypeSpec(id, mTypeStrings.getString(id - 1));
         }
 
+        String typeName = typeSpec.getName();
         ResType type;
         if (mInvalidConfigs.contains(config)) {
-            String dirName = typeSpec.getName() + config.getQualifiers();
+            String dirName = typeName + config.getQualifiers();
             if (mKeepBroken) {
                 LOGGER.warning("Invalid resource config detected: " + dirName);
                 type = mPackage.addType(id, config);
@@ -399,14 +400,14 @@ public class BinaryResourceParser {
             if (entryStart >= parser.chunkEnd()) {
                 LOGGER.warning(String.format(
                     "End of chunk hit. Skipping remaining %d entries in type: %s",
-                    entryCount, typeSpec.getName()));
+                    entryCount, typeName));
                 break;
             }
 
             // Align the stream with the start of the entry.
             mIn.jumpTo(entryStart);
 
-            Pair<Integer, ResValue> entry = parseEntry(typeSpec.getName());
+            Pair<Integer, ResValue> entry = parseEntry(typeName);
             int key = entry.getLeft();
             ResValue value = entry.getRight();
 
@@ -634,7 +635,7 @@ public class BinaryResourceParser {
         // Some apps store ID resource values generated for enum/flag items in attribute
         // resources as empty maps. Replace with a placeholder value.
         if (typeName.equals("id")) {
-            return new ResCustom("id");
+            return ResCustom.ID;
         }
 
         ResReference parent = new ResReference(mPackage, ResId.of(parentId));
@@ -683,7 +684,7 @@ public class BinaryResourceParser {
         // A resource reference is handled normally, unless it's @null.
         if (typeName.equals("id") && (data == 0 || (type != TypedValue.TYPE_REFERENCE
                 && type != TypedValue.TYPE_DYNAMIC_REFERENCE))) {
-            return new ResCustom("id");
+            return ResCustom.ID;
         }
 
         // Special handling for strings and file references.
@@ -805,19 +806,23 @@ public class BinaryResourceParser {
         }
     }
 
-    private void injectMissingEntrySpecs() throws AndrolibException {
-        if (mTable.getConfig().getDecodeResolve() == Config.DecodeResolve.DUMMY) {
+    private void injectDummyEntrySpecs() throws AndrolibException {
+        if (mTable.getConfig().getDecodeResolve() == Config.DecodeResolve.GREEDY) {
+            ResReference parent = new ResReference(mPackage, ResId.NULL);
+            ResBag.RawItem[] rawItems = new ResBag.RawItem[0];
+
             for (ResId id : mMissingEntrySpecs) {
                 ResTypeSpec typeSpec = mPackage.getTypeSpec(id.getTypeId());
+                String typeName = typeSpec.getName();
                 ResValue value;
-                switch (typeSpec.getName()) {
-                    case "attr":
-                    case "^attr-private":
-                        value = ResAttribute.DEFAULT;
-                        break;
-                    default:
-                        value = ResReference.NULL;
-                        break;
+                if (typeName.equals("id")) {
+                    value = ResCustom.ID;
+                } else if (typeName.equals("string")) {
+                    value = ResString.EMPTY;
+                } else if (typeSpec.isBagType()) {
+                    value = ResBag.parse(typeName, parent, rawItems);
+                } else {
+                    value = ResReference.NULL;
                 }
 
                 mPackage.addEntrySpec(id, ResEntrySpec.DUMMY_PREFIX + id);

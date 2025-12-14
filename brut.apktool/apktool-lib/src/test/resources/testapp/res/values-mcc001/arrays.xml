@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <array name="test_array0" />
     <string-array name="test_array1">
         <item>TEST1</item>
         <item>TEST2</item>
