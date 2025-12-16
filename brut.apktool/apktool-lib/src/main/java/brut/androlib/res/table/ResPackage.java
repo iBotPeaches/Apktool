@@ -204,21 +204,11 @@ public class ResPackage {
     }
 
     public ResEntry addEntry(ResId id, ResConfig config, ResValue value) throws AndrolibException {
-        return addEntry(id, config, value, false);
-    }
-
-    public ResEntry addEntry(ResId id, ResConfig config, ResValue value, boolean overwrite)
-            throws AndrolibException {
         Pair<ResId, ResConfig> entryKey = Pair.of(id, config);
         ResEntry entry = mEntries.get(entryKey);
         if (entry != null) {
-            if (overwrite) {
-                LOGGER.warning(String.format(
-                    "Overwriting repeated entry: id=%s, config=%s", id, config));
-            } else {
-                throw new AndrolibException(String.format(
-                    "Repeated entry: id=%s, config=%s", id, config));
-            }
+            throw new AndrolibException(String.format(
+                "Repeated entry: id=%s, config=%s", id, config));
         }
 
         ResEntrySpec entrySpec = getEntrySpec(id);
@@ -245,17 +235,31 @@ public class ResPackage {
         return mEntries.values();
     }
 
-    public ResOverlayable addOverlayable(String name, String actor) {
+    public boolean hasOverlayable(String name) {
+        return mOverlayables.containsKey(name);
+    }
+
+    public ResOverlayable getOverlayable(String name) throws UndefinedResObjectException {
+        ResOverlayable overlayable = mOverlayables.get(name);
+        if (overlayable == null) {
+            throw new UndefinedResObjectException(String.format("overlayable: name=%s", name));
+        }
+        return overlayable;
+    }
+
+    public ResOverlayable addOverlayable(String name, String actor) throws AndrolibException {
         ResOverlayable overlayable = mOverlayables.get(name);
         if (overlayable != null) {
-            LOGGER.warning(String.format(
-                "Repeated overlayable: name=%s, actor=%s", name, actor));
-            return overlayable;
+            throw new AndrolibException(String.format("Repeated overlayable: name=%s", name));
         }
 
         overlayable = new ResOverlayable(this, name, actor);
         mOverlayables.put(name, overlayable);
         return overlayable;
+    }
+
+    public int getOverlayableCount() {
+        return mOverlayables.size();
     }
 
     public Collection<ResOverlayable> listOverlayables() {

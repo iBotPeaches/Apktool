@@ -16,6 +16,8 @@
  */
 package brut.androlib.res.table;
 
+import java.util.Arrays;
+
 public class ResConfig {
     public static final int SDK_BASE = 1;
     public static final int SDK_BASE_1_1 = 2;
@@ -191,7 +193,9 @@ public class ResConfig {
     private final String mLocaleVariant;
     private final int mScreenLayout2;
     private final int mColorMode;
-    private final String mLocaleNumberingSystem;
+    //private final boolean mLocaleScriptWasComputed;
+    //private final String mLocaleNumberingSystem;
+    private final byte[] mUnknown;
 
     private final String mQualifiers;
     private boolean mIsInvalid;
@@ -221,7 +225,9 @@ public class ResConfig {
         mLocaleVariant = "";
         mScreenLayout2 = 0;
         mColorMode = COLOR_MODE_WIDECG_ANY | COLOR_MODE_HDR_ANY;
-        mLocaleNumberingSystem = "";
+        //mLocaleScriptWasComputed = false;
+        //mLocaleNumberingSystem = "";
+        mUnknown = null;
         mQualifiers = "";
     }
 
@@ -230,7 +236,8 @@ public class ResConfig {
                      int grammaticalInflection, int screenWidth, int screenHeight, int sdkVersion,
                      int minorVersion, int screenLayout, int uiMode, int smallestScreenWidthDp,
                      int screenWidthDp, int screenHeightDp, String localeScript, String localeVariant,
-                     int screenLayout2, int colorMode, String localeNumberingSystem) {
+                     int screenLayout2, int colorMode, /*boolean localeScriptWasComputed,
+                     String localeNumberingSystem,*/ byte[] unknown) {
         mMcc = mcc;
         mMnc = mnc;
         mLanguage = language;
@@ -255,7 +262,9 @@ public class ResConfig {
         mLocaleVariant = localeVariant;
         mScreenLayout2 = screenLayout2;
         mColorMode = colorMode;
-        mLocaleNumberingSystem = localeNumberingSystem;
+        //mLocaleScriptWasComputed = localeScriptWasComputed;
+        //mLocaleNumberingSystem = localeNumberingSystem;
+        mUnknown = unknown;
         mQualifiers = generateQualifiers();
     }
 
@@ -612,7 +621,11 @@ public class ResConfig {
             //    sb.append('.').append(mMinorVersion);
             //}
         }
-
+        if (mUnknown != null) {
+            // We have to separate unknown resources to avoid conflicts.
+            sb.append("-unk").append(String.format("%08X", Arrays.hashCode(mUnknown)));
+            mIsInvalid = true;
+        }
         return sb.toString();
     }
 
