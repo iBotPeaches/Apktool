@@ -528,16 +528,7 @@ public class BinaryResourceParser {
             mIn.skipShort(); // screenConfigPad2
         }
 
-        // Locale extensions are currently not supported by aapt2.
-        // Data beyond this point may be repurposed by certain vendors.
-        /*boolean localeScriptWasComputed = false;
-        String localeNumberingSystem = "";
-        if (size >= 64) {
-            localeScriptWasComputed = mIn.readUnsignedByte() != 0;
-            localeNumberingSystem = mIn.readAscii(8);
-            mIn.skipBytes(3); // endPadding
-        }*/
-
+        // Data beyond this point is non-standard.
         int bytesRead = (int) (mIn.position() - startPosition);
         byte[] unknown = readExceedingBytes("Config", size, bytesRead);
 
@@ -547,8 +538,7 @@ public class BinaryResourceParser {
             grammaticalInflection, screenWidth, screenHeight, sdkVersion,
             minorVersion, screenLayout, uiMode, smallestScreenWidthDp,
             screenWidthDp, screenHeightDp, localeScript, localeVariant,
-            screenLayout2, colorMode, /*localeScriptWasComputed,
-            localeNumberingSystem,*/ unknown);
+            screenLayout2, colorMode, unknown);
 
         if (config.isInvalid()) {
             mInvalidConfigs.add(config);

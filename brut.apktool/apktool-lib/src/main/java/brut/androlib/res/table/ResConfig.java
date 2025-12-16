@@ -193,8 +193,6 @@ public class ResConfig {
     private final String mLocaleVariant;
     private final int mScreenLayout2;
     private final int mColorMode;
-    //private final boolean mLocaleScriptWasComputed;
-    //private final String mLocaleNumberingSystem;
     private final byte[] mUnknown;
 
     private final String mQualifiers;
@@ -225,8 +223,6 @@ public class ResConfig {
         mLocaleVariant = "";
         mScreenLayout2 = 0;
         mColorMode = COLOR_MODE_WIDECG_ANY | COLOR_MODE_HDR_ANY;
-        //mLocaleScriptWasComputed = false;
-        //mLocaleNumberingSystem = "";
         mUnknown = null;
         mQualifiers = "";
     }
@@ -236,8 +232,7 @@ public class ResConfig {
                      int grammaticalInflection, int screenWidth, int screenHeight, int sdkVersion,
                      int minorVersion, int screenLayout, int uiMode, int smallestScreenWidthDp,
                      int screenWidthDp, int screenHeightDp, String localeScript, String localeVariant,
-                     int screenLayout2, int colorMode, /*boolean localeScriptWasComputed,
-                     String localeNumberingSystem,*/ byte[] unknown) {
+                     int screenLayout2, int colorMode, byte[] unknown) {
         mMcc = mcc;
         mMnc = mnc;
         mLanguage = language;
@@ -262,8 +257,6 @@ public class ResConfig {
         mLocaleVariant = localeVariant;
         mScreenLayout2 = screenLayout2;
         mColorMode = colorMode;
-        //mLocaleScriptWasComputed = localeScriptWasComputed;
-        //mLocaleNumberingSystem = localeNumberingSystem;
         mUnknown = unknown;
         mQualifiers = generateQualifiers();
     }
@@ -278,7 +271,7 @@ public class ResConfig {
         }
         if (!mLanguage.isEmpty()) {
             if (mLocaleScript.isEmpty() && (mRegion.isEmpty() || mRegion.length() == 2)
-                    && mLocaleVariant.isEmpty()/* && mLocaleNumberingSystem.isEmpty()*/) {
+                    && mLocaleVariant.isEmpty()) {
                 // Legacy format.
                 sb.append('-').append(mLanguage);
                 if (!mRegion.isEmpty()) {
@@ -297,10 +290,6 @@ public class ResConfig {
                 if (!mLocaleVariant.isEmpty()) {
                     sb.append('+').append(mLocaleVariant);
                 }
-                // Locale extensions are currently not supported by aapt2.
-                //if (!mLocaleNumberingSystem.isEmpty()) {
-                //    sb.append("+u+nu+").append(mLocaleNumberingSystem);
-                //}
             }
         }
         switch (mGrammaticalInflection & MASK_GRAMMATICAL_GENDER) {
@@ -616,10 +605,6 @@ public class ResConfig {
         }
         if (mSdkVersion != 0) {
             sb.append("-v").append(mSdkVersion);
-            // Minor version is currently not supported by aapt2.
-            //if (mMinorVersion != 0) {
-            //    sb.append('.').append(mMinorVersion);
-            //}
         }
         if (mUnknown != null) {
             // We have to separate unknown resources to avoid conflicts.
