@@ -336,6 +336,8 @@ public class Main {
                 break;
             case "h":
             case "help":
+            case "-help":
+            case "--help":
                 loadOptions(null, true);
                 printUsage();
                 break;
