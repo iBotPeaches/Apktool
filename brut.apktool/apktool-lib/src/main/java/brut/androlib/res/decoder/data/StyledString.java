@@ -17,13 +17,14 @@
 package brut.androlib.res.decoder.data;
 
 import brut.androlib.res.xml.ResXmlEncoders;
-import com.google.common.base.Splitter;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.PeekingIterator;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 public class StyledString implements CharSequence {
     private static final Logger LOGGER = Logger.getLogger(StyledString.class.getName());
@@ -132,8 +133,8 @@ public class StyledString implements CharSequence {
     }
 
     public static class Span {
-        private static final Splitter.MapSplitter ATTRIBUTES_SPLITTER =
-            Splitter.on(';').omitEmptyStrings().withKeyValueSeparator(Splitter.on('=').limit(2));
+        private static final Pattern ATTR_SPLIT_PATTERN = Pattern.compile(
+            ";(?=[\\p{L}_][\\p{L}\\p{N}_.-]*=)");
 
         private final String mTag;
         private final int mFirstChar;
@@ -159,14 +160,24 @@ public class StyledString implements CharSequence {
 
         public String getName() {
             int separatorIdx = mTag.indexOf(';');
-            return separatorIdx == -1 ? mTag : mTag.substring(0, separatorIdx);
+            return separatorIdx != -1 ? mTag.substring(0, separatorIdx) : mTag;
         }
 
         public Map<String, String> getAttributes() {
             int separatorIdx = mTag.indexOf(';');
-            return separatorIdx != -1 ? ATTRIBUTES_SPLITTER.split(
-                mTag.substring(separatorIdx + 1, mTag.endsWith(";") ? mTag.length() - 1 : mTag.length())
-            ) : null;
+            if (separatorIdx == -1) {
+                return null;
+            }
+
+            String[] attrs = ATTR_SPLIT_PATTERN.split(mTag.substring(separatorIdx + 1));
+            Map<String, String> map = new LinkedHashMap<>();
+
+            for (String attr : attrs) {
+                int eqIdx = attr.indexOf('=');
+                map.put(attr.substring(0, eqIdx), attr.substring(eqIdx + 1));
+            }
+
+            return map;
         }
     }
 }
