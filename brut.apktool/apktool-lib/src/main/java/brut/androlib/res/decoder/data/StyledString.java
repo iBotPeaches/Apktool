@@ -17,6 +17,7 @@
 package brut.androlib.res.decoder.data;
 
 import brut.androlib.res.xml.ResXmlEncoders;
+import com.google.common.base.Splitter;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.PeekingIterator;
 
@@ -101,9 +102,10 @@ public class StyledString implements CharSequence {
         mBuffer.append('<').append(name);
         if (attributes != null) {
             for (Map.Entry<String, String> entry : attributes.entrySet()) {
-                mBuffer.append(' ').append(entry.getKey()).append("=\"")
-                       .append(ResXmlEncoders.escapeXmlChars(entry.getValue()))
-                       .append('"');
+                mBuffer.append(' ')
+                    .append(entry.getKey()).append("=\"")
+                    .append(ResXmlEncoders.escapeXmlChars(entry.getValue()))
+                    .append('"');
             }
         }
         // If an opening tag is followed by a matching closing tag, write as an empty-element tag.
@@ -133,8 +135,9 @@ public class StyledString implements CharSequence {
     }
 
     public static class Span {
-        private static final Pattern ATTR_SPLIT_PATTERN = Pattern.compile(
-            ";(?=[\\p{L}_][\\p{L}\\p{N}_.-]*=)");
+        private static final Splitter.MapSplitter ATTR_SPLITTER = Splitter.on(
+            Pattern.compile(";(?=[\\p{L}_][\\p{L}\\p{N}_.-]*=)"))
+                .withKeyValueSeparator(Splitter.on('=').limit(2));
 
         private final String mTag;
         private final int mFirstChar;
@@ -165,19 +168,7 @@ public class StyledString implements CharSequence {
 
         public Map<String, String> getAttributes() {
             int separatorIdx = mTag.indexOf(';');
-            if (separatorIdx == -1) {
-                return null;
-            }
-
-            String[] attrs = ATTR_SPLIT_PATTERN.split(mTag.substring(separatorIdx + 1));
-            Map<String, String> map = new LinkedHashMap<>();
-
-            for (String attr : attrs) {
-                int eqIdx = attr.indexOf('=');
-                map.put(attr.substring(0, eqIdx), attr.substring(eqIdx + 1));
-            }
-
-            return map;
+            return separatorIdx != -1 ? ATTR_SPLITTER.split(mTag.substring(separatorIdx + 1)) : null;
         }
     }
 }
