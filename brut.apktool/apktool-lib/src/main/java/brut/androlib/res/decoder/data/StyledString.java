@@ -21,9 +21,11 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.PeekingIterator;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 public class StyledString implements CharSequence {
     private static final Logger LOGGER = Logger.getLogger(StyledString.class.getName());
@@ -100,9 +102,10 @@ public class StyledString implements CharSequence {
         mBuffer.append('<').append(name);
         if (attributes != null) {
             for (Map.Entry<String, String> entry : attributes.entrySet()) {
-                mBuffer.append(' ').append(entry.getKey()).append("=\"")
-                       .append(ResXmlEncoders.escapeXmlChars(entry.getValue()))
-                       .append('"');
+                mBuffer.append(' ')
+                    .append(entry.getKey()).append("=\"")
+                    .append(ResXmlEncoders.escapeXmlChars(entry.getValue()))
+                    .append('"');
             }
         }
         // If an opening tag is followed by a matching closing tag, write as an empty-element tag.
@@ -132,8 +135,9 @@ public class StyledString implements CharSequence {
     }
 
     public static class Span {
-        private static final Splitter.MapSplitter ATTRIBUTES_SPLITTER =
-            Splitter.on(';').omitEmptyStrings().withKeyValueSeparator(Splitter.on('=').limit(2));
+        private static final Splitter.MapSplitter ATTR_SPLITTER = Splitter.on(
+            Pattern.compile(";(?=[\\p{L}_][\\p{L}\\p{N}_.-]*=)"))
+                .withKeyValueSeparator(Splitter.on('=').limit(2));
 
         private final String mTag;
         private final int mFirstChar;
@@ -159,14 +163,12 @@ public class StyledString implements CharSequence {
 
         public String getName() {
             int separatorIdx = mTag.indexOf(';');
-            return separatorIdx == -1 ? mTag : mTag.substring(0, separatorIdx);
+            return separatorIdx != -1 ? mTag.substring(0, separatorIdx) : mTag;
         }
 
         public Map<String, String> getAttributes() {
             int separatorIdx = mTag.indexOf(';');
-            return separatorIdx != -1 ? ATTRIBUTES_SPLITTER.split(
-                mTag.substring(separatorIdx + 1, mTag.endsWith(";") ? mTag.length() - 1 : mTag.length())
-            ) : null;
+            return separatorIdx != -1 ? ATTR_SPLITTER.split(mTag.substring(separatorIdx + 1)) : null;
         }
     }
 }

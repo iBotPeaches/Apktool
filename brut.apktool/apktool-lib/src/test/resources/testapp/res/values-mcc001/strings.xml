@@ -6,15 +6,17 @@
     <string name="test_string3">\@</string>
     <string name="test_string4">\?</string>
     <string name="test_string5">\#ff123456</string>
-    <string name="test_string7">&amp;</string>
-    <string name="test_string8">"'"</string>
-    <string name="test_string9">\"</string>
-    <string name="test_string10">\u0005</string>
-    <string name="test_string11">" foo  bar   "</string>
-    <string name="test_string12">"foo
+    <string name="test_string6">&amp;</string>
+    <string name="test_string7">"'"</string>
+    <string name="test_string8">\"</string>
+    <string name="test_string9">\u0005</string>
+    <string name="test_string10">" foo  bar   "</string>
+    <string name="test_string11">"foo
 bar"</string>
-    <string name="test_string13">" foo"<b>bar <i> baz </i></b> <u>foo</u></string>
-    <string name="test_string14">foo<sometag someattr1="someval1" someattr2="someval2">bar</sometag>baz</string>
+    <string name="test_string12">" foo"<b>bar <i> baz </i></b> <u>foo</u></string>
+    <string name="test_string13">foo<sometag someattr1="someval1" someattr2="someval2">bar</sometag>baz</string>
+    <string name="test_string14">foo<span style="font-family:serif;font-size: 12px;">bar</span>baz</string>
+    <string name="test_string15">foo<span href="https://test.com/1234#param=val" style="font-family: serif; font-size:12px;">bar</span>baz</string>
     <string name="test_string16">foo<b>bar<i>"b
         az"</i></b>foo</string>
     <string name="test_string17" formatted="false">%d of %d</string>
