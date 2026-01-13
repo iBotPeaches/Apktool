@@ -302,10 +302,17 @@ public class ApkDecoder {
         try {
             Map<String, String> resFileMapping = mResDecoder.getResFileMapping();
             Directory in = mApkFile.getDirectory();
+            boolean hasResTable = mApkInfo.hasResources();
 
             for (String fileName : in.getFiles(true)) {
-                if (!ApkInfo.STANDARD_FILENAMES_PATTERN.matcher(fileName).matches()
-                        && !resFileMapping.containsKey(fileName)) {
+                boolean isStandard = ApkInfo.STANDARD_FILENAMES_PATTERN.matcher(fileName).matches();
+
+                // Handle arbitrary resources
+                if (!hasResTable && fileName.startsWith("res/")) {
+                    isStandard = false;
+                }
+
+                if (!isStandard && !resFileMapping.containsKey(fileName)) {
                     in.copyToDir(unknownDir, fileName);
                 }
             }
