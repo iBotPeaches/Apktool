@@ -193,16 +193,16 @@ public abstract class AbstractDirectory implements Directory {
         }
     }
 
-    public void copyToDir(Directory out, String[] fileNames)
+    public void copyToDir(Directory out, String fileName)
+            throws DirectoryException {
+        copyToDir(fileName, out, fileName);
+    }
+
+    public void copyToDir(Directory out, String... fileNames)
             throws DirectoryException {
         for (String fileName : fileNames) {
             copyToDir(out, fileName);
         }
-    }
-
-    public void copyToDir(Directory out, String fileName)
-            throws DirectoryException {
-        copyToDir(fileName, out, fileName);
     }
 
     public void copyToDir(String inFileName, Directory out, String outFileName)
@@ -224,16 +224,16 @@ public abstract class AbstractDirectory implements Directory {
         }
     }
 
-    public void copyToDir(File out, String[] fileNames)
+    public void copyToDir(File out, String fileName)
+            throws DirectoryException {
+        copyToDir(fileName, out, fileName);
+    }
+
+    public void copyToDir(File out, String... fileNames)
             throws DirectoryException {
         for (String fileName : fileNames) {
             copyToDir(out, fileName);
         }
-    }
-
-    public void copyToDir(File out, String fileName)
-            throws DirectoryException {
-        copyToDir(fileName, out, fileName);
     }
 
     public void copyToDir(String inFileName, File out, String outFileName)

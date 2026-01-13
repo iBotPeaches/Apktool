@@ -123,53 +123,32 @@ public class ApkBuilder {
     }
 
     private void buildSources(File outDir) throws AndrolibException {
-        if (!copySourcesRaw(outDir, "classes.dex")) {
-            buildSourcesSmali(outDir, "smali", "classes.dex");
-        }
-
         try {
             Directory in = mApkDir.getDirectory();
 
-            // Loop through any smali_ directories for multi-dex APKs.
+            // Process smali dirs.
             for (String dirName : in.getDirs().keySet()) {
-                if (dirName.startsWith("smali_")) {
-                    String fileName = dirName.substring(dirName.indexOf("_") + 1) + ".dex";
-                    if (!copySourcesRaw(outDir, fileName)) {
-                        buildSourcesSmali(outDir, dirName, fileName);
-                    }
+                String fileName;
+                if (dirName.equals("smali")) {
+                    fileName = "classes.dex";
+                } else if (dirName.startsWith("smali_")) {
+                    fileName = dirName.substring(dirName.indexOf('_') + 1) + ".dex";
+                } else {
+                    continue;
                 }
+
+                buildSourcesSmali(outDir, dirName, fileName);
             }
 
-            // Loop through any classes#.dex files for multi-dex APKs.
+            // Process dex files.
             for (String fileName : in.getFiles()) {
-                // Skip classes.dex because we have handled it.
-                if (fileName.endsWith(".dex") && !fileName.equals("classes.dex")) {
+                if (fileName.endsWith(".dex")) {
                     copySourcesRaw(outDir, fileName);
                 }
             }
         } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
         }
-    }
-
-    private boolean copySourcesRaw(File outDir, String fileName) throws AndrolibException {
-        File working = new File(mApkDir, fileName);
-        if (!working.isFile()) {
-            return false;
-        }
-
-        File stored = new File(outDir, fileName);
-        if (!mConfig.isForced() && !isModified(working, stored)) {
-            return true;
-        }
-
-        LOGGER.info("Copying raw " + fileName + " file...");
-        try {
-            BrutIO.copyAndClose(Files.newInputStream(working.toPath()), Files.newOutputStream(stored.toPath()));
-        } catch (IOException ex) {
-            throw new AndrolibException(ex);
-        }
-        return true;
     }
 
     private void buildSourcesSmali(File outDir, String dirName, String fileName) throws AndrolibException {
@@ -195,17 +174,35 @@ public class ApkBuilder {
         }
 
         File dexFile = new File(outDir, fileName);
-        if (!mConfig.isForced()) {
-            LOGGER.info("Checking whether sources have changed...");
-            if (!isModified(smaliDir, dexFile)) {
-                return;
-            }
+        if (!mConfig.isForced() && !isFileNewer(smaliDir, dexFile)) {
+            LOGGER.info("Sources in " + dirName + " have not changed.");
+            return;
         }
         OS.rmfile(dexFile);
 
         LOGGER.info("Smaling " + dirName + " folder into " + fileName + "...");
         SmaliBuilder builder = new SmaliBuilder(smaliDir, mMinSdkVersion);
         builder.build(dexFile);
+    }
+
+    private void copySourcesRaw(File outDir, String fileName) throws AndrolibException {
+        File inFile = new File(mApkDir, fileName);
+        if (!inFile.isFile()) {
+            return;
+        }
+
+        File outFile = new File(outDir, fileName);
+        if (!mConfig.isForced() && !isFileNewer(inFile, outFile)) {
+            LOGGER.info("File " + fileName + " has not changed.");
+            return;
+        }
+
+        LOGGER.info("Copying raw " + fileName + " file...");
+        try {
+            BrutIO.copyAndClose(Files.newInputStream(inFile.toPath()), Files.newOutputStream(outFile.toPath()));
+        } catch (IOException ex) {
+            throw new AndrolibException(ex);
+        }
     }
 
     private void backupManifestFile(File manifest, File manifestOrig) throws AndrolibException {
@@ -230,55 +227,34 @@ public class ApkBuilder {
 
     private void buildResources(File outDir, File manifest) throws AndrolibException {
         if (!manifest.isFile()) {
-            LOGGER.fine("Could not find AndroidManifest.xml");
             return;
         }
 
-        if (new File(mApkDir, "resources.arsc").isFile()) {
-            copyResourcesRaw(outDir, manifest);
-        } else if (new File(mApkDir, "res").isDirectory()) {
-            buildResourcesFull(outDir, manifest);
-        } else {
-            LOGGER.fine("Could not find resources");
-            buildManifest(outDir, manifest);
+        File resDir = new File(mApkDir, "res");
+        if (resDir.isDirectory()) {
+            buildResourcesFull(outDir, manifest, resDir);
+            return;
         }
+
+        File arscFile = new File(mApkDir, "resources.arsc");
+        if (arscFile.isFile()) {
+            copyResourcesRaw(outDir, manifest, arscFile);
+            return;
+        }
+
+        LOGGER.fine("Could not find resources.");
+        buildManifest(outDir, manifest);
     }
 
-    private void copyResourcesRaw(File outDir, File manifest) throws AndrolibException {
-        if (!mConfig.isForced()) {
-            LOGGER.info("Checking whether resources have changed...");
-            if (!isModified(manifest, new File(outDir, "AndroidManifest.xml"))
-                    && !isModified(new File(mApkDir, "resources.arsc"), new File(outDir, "resources.arsc"))
-                    && !isModified(newFiles(mApkDir, ApkInfo.RESOURCES_DIRNAMES),
-                        newFiles(outDir, ApkInfo.RESOURCES_DIRNAMES))) {
-                return;
-            }
+    private void buildResourcesFull(File outDir, File manifest, File resDir) throws AndrolibException {
+        File resZip = new File(outDir.getParentFile(), "resources.zip");
+        if (!mConfig.isForced() && resZip.isFile()
+                && !isFileNewer(manifest, new File(outDir, "AndroidManifest.xml"))
+                && !isFileNewer(resDir, new File(outDir, "res"))) {
+            LOGGER.info("Resources have not changed.");
+            return;
         }
-
-        LOGGER.info("Copying raw resources...");
-        try {
-            Directory in = mApkDir.getDirectory();
-
-            in.copyToDir(outDir, "AndroidManifest.xml");
-            in.copyToDir(outDir, "resources.arsc");
-            in.copyToDir(outDir, ApkInfo.RESOURCES_DIRNAMES);
-        } catch (DirectoryException ex) {
-            throw new AndrolibException(ex);
-        }
-    }
-
-    private void buildResourcesFull(File outDir, File manifest) throws AndrolibException {
-        File resourcesFile = new File(outDir.getParentFile(), "resources.zip");
-        if (!mConfig.isForced()) {
-            LOGGER.info("Checking whether resources have changed...");
-            if (!isModified(manifest, new File(outDir, "AndroidManifest.xml"))
-                    && !isModified(newFiles(mApkDir, ApkInfo.RESOURCES_DIRNAMES),
-                        newFiles(outDir, ApkInfo.RESOURCES_DIRNAMES))
-                    && resourcesFile.isFile()) {
-                return;
-            }
-        }
-        OS.rmfile(resourcesFile);
+        OS.rmfile(resZip);
 
         if (mConfig.isDebuggable()) {
             LOGGER.info("Setting 'debuggable' attribute to 'true' in AndroidManifest.xml");
@@ -287,10 +263,8 @@ public class ApkBuilder {
 
         if (mConfig.isNetSecConf()) {
             String targetSdkVersion = mApkInfo.getSdkInfo().getTargetSdkVersion();
-            if (targetSdkVersion != null) {
-                if (SdkInfo.parseSdkInt(targetSdkVersion) < ResConfig.SDK_NOUGAT) {
-                    LOGGER.warning("Target SDK version is lower than 24! Network Security Configuration might be ignored!");
-                }
+            if (targetSdkVersion != null && SdkInfo.parseSdkInt(targetSdkVersion) < ResConfig.SDK_NOUGAT) {
+                LOGGER.warning("Target SDK version is lower than 24! Network Security Configuration might be ignored!");
             }
 
             File netSecConfOrig = new File(mApkDir, "res/xml/network_security_config.xml");
@@ -308,7 +282,6 @@ public class ApkBuilder {
         }
         OS.rmfile(tmpFile);
 
-        File resDir = new File(mApkDir, "res");
         File npDir = new File(mApkDir, "9patch");
         if (!npDir.isDirectory()) {
             npDir = null;
@@ -320,9 +293,7 @@ public class ApkBuilder {
             invoker.invoke(tmpFile, manifest, resDir, npDir, null, getIncludeFiles());
 
             Directory tmpDir = tmpFile.getDirectory();
-            tmpDir.copyToDir(outDir, "AndroidManifest.xml");
-            tmpDir.copyToDir(outDir, "resources.arsc");
-            tmpDir.copyToDir(outDir, ApkInfo.RESOURCES_DIRNAMES);
+            tmpDir.copyToDir(outDir, "AndroidManifest.xml", "resources.arsc", "res");
         } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
         } finally {
@@ -330,12 +301,29 @@ public class ApkBuilder {
         }
     }
 
+    private void copyResourcesRaw(File outDir, File manifest, File arscFile) throws AndrolibException {
+        if (!mConfig.isForced()
+                && !isFileNewer(manifest, new File(outDir, "AndroidManifest.xml"))
+                && !isFileNewer(arscFile, new File(outDir, "resources.arsc"))) {
+            LOGGER.info("Resources have not changed.");
+            return;
+        }
+
+        LOGGER.info("Copying raw resources...");
+        try {
+            Directory in = mApkDir.getDirectory();
+
+            in.copyToDir(outDir, "AndroidManifest.xml", "resources.arsc");
+        } catch (DirectoryException ex) {
+            throw new AndrolibException(ex);
+        }
+    }
+
     private void buildManifest(File outDir, File manifest) throws AndrolibException {
-        if (!mConfig.isForced()) {
-            LOGGER.info("Checking whether AndroidManifest.xml has changed...");
-            if (!isModified(manifest, new File(outDir, "AndroidManifest.xml"))) {
-                return;
-            }
+        if (!mConfig.isForced()
+                && !isFileNewer(manifest, new File(outDir, "AndroidManifest.xml"))) {
+            LOGGER.info("AndroidManifest.xml has not changed.");
+            return;
         }
 
         ExtFile tmpFile;
@@ -480,24 +468,7 @@ public class ApkBuilder {
         return files.toArray(new File[0]);
     }
 
-    private boolean isModified(File working, File stored) {
-        return !stored.exists() || BrutIO.recursiveModifiedTime(working) > BrutIO.recursiveModifiedTime(stored);
-    }
-
-    private boolean isModified(File[] working, File[] stored) {
-        for (File file : stored) {
-            if (!file.exists()) {
-                return true;
-            }
-        }
-        return BrutIO.recursiveModifiedTime(working) > BrutIO.recursiveModifiedTime(stored);
-    }
-
-    private File[] newFiles(File dir, String[] names) {
-        File[] files = new File[names.length];
-        for (int i = 0; i < names.length; i++) {
-            files[i] = new File(dir, names[i]);
-        }
-        return files;
+    private boolean isFileNewer(File file, File reference) {
+        return !reference.exists() || BrutIO.recursiveModifiedTime(file) > BrutIO.recursiveModifiedTime(reference);
     }
 }

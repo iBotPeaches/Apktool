@@ -19,12 +19,10 @@ package brut.androlib.res.decoder;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.exceptions.NinePatchNotFoundException;
 import brut.androlib.exceptions.RawXmlEncounteredException;
-import brut.androlib.meta.ApkInfo;
 import brut.androlib.res.table.ResEntry;
 import brut.androlib.res.table.value.*;
 import brut.directory.Directory;
 import brut.directory.DirectoryException;
-import brut.util.BrutIO;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.InputStream;
@@ -56,32 +54,12 @@ public class ResFileDecoder {
             return;
         }
 
-        // Strip resources dir to get inner path.
-        String inResPath = inFileName;
-        for (String dirName : ApkInfo.RESOURCES_DIRNAMES) {
-            String prefix = dirName + "/";
-            if (inResPath.startsWith(prefix)) {
-                inResPath = inResPath.substring(prefix.length());
-                break;
-            }
-        }
-
-        // Get resource file name.
-        String inResFileName = FilenameUtils.getName(inResPath);
-
-        // Some apps were somehow built with Thumbs.db in drawables.
-        // Replace with a null reference so we can rebuild the app.
-        if (inResFileName.equals("Thumbs.db")) {
-            entry.setValue(ResReference.NULL);
-            return;
-        }
-
-        // Get the file extension.
+        // Get input file extension.
         String ext;
-        if (inResFileName.endsWith(".9.png")) {
+        if (inFileName.endsWith(".9.png")) {
             ext = "9.png";
         } else {
-            ext = FilenameUtils.getExtension(inResFileName).toLowerCase();
+            ext = FilenameUtils.getExtension(inFileName).toLowerCase();
         }
 
         // Use aapt2-like logic to determine which decoder to use.
@@ -99,15 +77,12 @@ public class ResFileDecoder {
             }
         }
 
-        // Generate output file path from entry.
-        String outResPath = entry.getTypeName() + entry.getConfig().getQualifiers() + "/" + entry.getName()
-                + (ext.isEmpty() ? "" : "." + ext);
+        // Generate output file name from entry.
+        String outFileName = "res/" + entry.getTypeName() + entry.getConfig().getQualifiers()
+                + "/" + entry.getName() + (ext.isEmpty() ? "" : "." + ext);
 
-        // Map output path to original path if it's different.
-        String outFileName = "res/" + outResPath;
-        if (!inFileName.equals(outFileName)) {
-            resFileMapping.put(inFileName, outFileName);
-        }
+        // Map input file name to output file name.
+        resFileMapping.put(inFileName, outFileName);
 
         LOGGER.fine("Decoding file " + inFileName + " to " + outFileName);
 

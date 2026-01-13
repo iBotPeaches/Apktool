@@ -111,21 +111,11 @@ public class ApkDecoder {
             return;
         }
 
-        switch (mConfig.getDecodeSources()) {
-            case NONE:
-                copySourcesRaw(outDir, "classes.dex");
-                break;
-            case FULL:
-            case ONLY_MAIN_CLASSES:
-                decodeSourcesSmali(outDir, "classes.dex");
-                break;
-        }
-
         try {
             Directory in = mApkFile.getDirectory();
 
             for (String fileName : in.getFiles(true)) {
-                if (!fileName.endsWith(".dex") || fileName.equals("classes.dex")) {
+                if (!fileName.endsWith(".dex")) {
                     continue;
                 }
 
@@ -150,17 +140,6 @@ public class ApkDecoder {
         }
     }
 
-    private void copySourcesRaw(File outDir, String fileName) throws AndrolibException {
-        LOGGER.info("Copying raw " + fileName + " file...");
-        try {
-            Directory in = mApkFile.getDirectory();
-
-            in.copyToDir(outDir, fileName);
-        } catch (DirectoryException ex) {
-            throw new AndrolibException(ex);
-        }
-    }
-
     private void decodeSourcesSmali(File outDir, String fileName) throws AndrolibException {
         if (mWorker != null) {
             mWorker.submit(() -> {
@@ -178,12 +157,8 @@ public class ApkDecoder {
     }
 
     private void decodeSourcesSmaliJob(File outDir, String fileName) throws AndrolibException {
-        File smaliDir;
-        if (fileName.equals("classes.dex")) {
-            smaliDir = new File(outDir, "smali");
-        } else {
-            smaliDir = new File(outDir, "smali_" + fileName.substring(0, fileName.indexOf('.')));
-        }
+        File smaliDir = new File(outDir, "smali" + (!fileName.equals("classes.dex")
+            ? "_" + fileName.substring(0, fileName.indexOf('.')) : ""));
 
         OS.mkdir(smaliDir);
 
@@ -195,6 +170,17 @@ public class ApkDecoder {
         int minSdkVersion = decoder.getInferredApiLevel();
         if (mMinSdkVersion == 0 || mMinSdkVersion > minSdkVersion) {
             mMinSdkVersion = minSdkVersion;
+        }
+    }
+
+    private void copySourcesRaw(File outDir, String fileName) throws AndrolibException {
+        LOGGER.info("Copying raw " + fileName + " file...");
+        try {
+            Directory in = mApkFile.getDirectory();
+
+            in.copyToDir(outDir, fileName);
+        } catch (DirectoryException ex) {
+            throw new AndrolibException(ex);
         }
     }
 
@@ -220,7 +206,6 @@ public class ApkDecoder {
             Directory in = mApkFile.getDirectory();
 
             in.copyToDir(outDir, "resources.arsc");
-            in.copyToDir(outDir, ApkInfo.RESOURCES_DIRNAMES);
         } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
         }

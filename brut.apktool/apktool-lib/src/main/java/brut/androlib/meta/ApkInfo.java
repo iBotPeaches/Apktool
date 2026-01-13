@@ -33,15 +33,14 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 public class ApkInfo implements YamlSerializable {
-    public static final String[] RESOURCES_DIRNAMES = { "res", "r", "R" };
     public static final String[] RAW_DIRNAMES = { "assets", "lib" };
 
     public static final Pattern ORIGINAL_FILENAMES_PATTERN = Pattern.compile(
         "AndroidManifest\\.xml|META-INF/[^/]+\\.(RSA|SF|MF)|stamp-cert-sha256");
 
     public static final Pattern STANDARD_FILENAMES_PATTERN = Pattern.compile(
-        "[^/]+\\.dex|resources\\.arsc|(" + String.join("|", RESOURCES_DIRNAMES) + "|"
-            + String.join("|", RAW_DIRNAMES) + ")/.*|" + ORIGINAL_FILENAMES_PATTERN.pattern());
+        "[^/]+\\.dex|resources\\.arsc|(" + String.join("|", RAW_DIRNAMES) + ")/.*|"
+            + ORIGINAL_FILENAMES_PATTERN.pattern());
 
     private String mVersion;
     private String mApkFileName;
