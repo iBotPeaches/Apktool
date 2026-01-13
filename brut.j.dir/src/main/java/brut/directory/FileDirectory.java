@@ -63,6 +63,11 @@ public class FileDirectory extends AbstractDirectory {
     }
 
     @Override
+    public int getCompressionLevel(String fileName) throws DirectoryException {
+        return -1; // unknown
+    }
+
+    @Override
     protected AbstractDirectory createDirLocal(String name) throws DirectoryException {
         File dir = new File(generatePath(name));
         OS.mkdir(dir);
@@ -105,15 +110,20 @@ public class FileDirectory extends AbstractDirectory {
         OS.rmfile(file);
     }
 
+    @Override
+    public void close() throws IOException {
+        // Do nothing
+    }
+
     private String generatePath(String name) {
-        return getDir().getPath() + separator + name;
+        return mDir.getPath() + separator + name;
     }
 
     private void loadAll() {
         mFiles = new LinkedHashSet<>();
         mDirs = new LinkedHashMap<>();
 
-        File[] files = getDir().listFiles();
+        File[] files = mDir.listFiles();
         Arrays.sort(files, Comparator.comparing(File::getName));
 
         for (File file : files) {
@@ -126,9 +136,5 @@ public class FileDirectory extends AbstractDirectory {
                 }
             }
         }
-    }
-
-    public File getDir() {
-        return mDir;
     }
 }

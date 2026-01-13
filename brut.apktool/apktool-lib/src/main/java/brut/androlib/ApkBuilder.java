@@ -126,7 +126,16 @@ public class ApkBuilder {
         try {
             Directory in = mApkDir.getDirectory();
 
-            // Process smali dirs.
+            // Copy raw dex files.
+            Set<String> dexFiles = new HashSet<>();
+            for (String fileName : in.getFiles()) {
+                if (fileName.endsWith(".dex")) {
+                    copySourcesRaw(outDir, fileName);
+                    dexFiles.add(fileName);
+                }
+            }
+
+            // Build smali dirs.
             for (String dirName : in.getDirs().keySet()) {
                 String fileName;
                 if (dirName.equals("smali")) {
@@ -137,16 +146,31 @@ public class ApkBuilder {
                     continue;
                 }
 
-                buildSourcesSmali(outDir, dirName, fileName);
-            }
-
-            // Process dex files.
-            for (String fileName : in.getFiles()) {
-                if (fileName.endsWith(".dex")) {
-                    copySourcesRaw(outDir, fileName);
+                if (!dexFiles.contains(fileName)) {
+                    buildSourcesSmali(outDir, dirName, fileName);
                 }
             }
         } catch (DirectoryException ex) {
+            throw new AndrolibException(ex);
+        }
+    }
+
+    private void copySourcesRaw(File outDir, String fileName) throws AndrolibException {
+        File inFile = new File(mApkDir, fileName);
+        if (!inFile.isFile()) {
+            return;
+        }
+
+        File outFile = new File(outDir, fileName);
+        if (!mConfig.isForced() && !isFileNewer(inFile, outFile)) {
+            LOGGER.info("File " + fileName + " has not changed.");
+            return;
+        }
+
+        LOGGER.info("Copying raw " + fileName + " file...");
+        try {
+            BrutIO.copyAndClose(Files.newInputStream(inFile.toPath()), Files.newOutputStream(outFile.toPath()));
+        } catch (IOException ex) {
             throw new AndrolibException(ex);
         }
     }
@@ -185,26 +209,6 @@ public class ApkBuilder {
         builder.build(dexFile);
     }
 
-    private void copySourcesRaw(File outDir, String fileName) throws AndrolibException {
-        File inFile = new File(mApkDir, fileName);
-        if (!inFile.isFile()) {
-            return;
-        }
-
-        File outFile = new File(outDir, fileName);
-        if (!mConfig.isForced() && !isFileNewer(inFile, outFile)) {
-            LOGGER.info("File " + fileName + " has not changed.");
-            return;
-        }
-
-        LOGGER.info("Copying raw " + fileName + " file...");
-        try {
-            BrutIO.copyAndClose(Files.newInputStream(inFile.toPath()), Files.newOutputStream(outFile.toPath()));
-        } catch (IOException ex) {
-            throw new AndrolibException(ex);
-        }
-    }
-
     private void backupManifestFile(File manifest, File manifestOrig) throws AndrolibException {
         // We cannot patch AndroidManifest.xml if it was not decoded.
         if (new File(mApkDir, "resources.arsc").isFile()) {
@@ -230,20 +234,41 @@ public class ApkBuilder {
             return;
         }
 
-        File resDir = new File(mApkDir, "res");
-        if (resDir.isDirectory()) {
-            buildResourcesFull(outDir, manifest, resDir);
-            return;
-        }
-
+        // Copy raw resources.
         File arscFile = new File(mApkDir, "resources.arsc");
         if (arscFile.isFile()) {
             copyResourcesRaw(outDir, manifest, arscFile);
             return;
         }
 
+        // Build resources.
+        File resDir = new File(mApkDir, "res");
+        if (resDir.isDirectory()) {
+            buildResourcesFull(outDir, manifest, resDir);
+            return;
+        }
+
+        // Build manifest only.
         LOGGER.fine("Could not find resources.");
         buildManifest(outDir, manifest);
+    }
+
+    private void copyResourcesRaw(File outDir, File manifest, File arscFile) throws AndrolibException {
+        if (!mConfig.isForced()
+                && !isFileNewer(manifest, new File(outDir, "AndroidManifest.xml"))
+                && !isFileNewer(arscFile, new File(outDir, "resources.arsc"))) {
+            LOGGER.info("Resources have not changed.");
+            return;
+        }
+
+        LOGGER.info("Copying raw resources...");
+        try {
+            Directory in = mApkDir.getDirectory();
+
+            in.copyToDir(outDir, "AndroidManifest.xml", "resources.arsc");
+        } catch (DirectoryException ex) {
+            throw new AndrolibException(ex);
+        }
     }
 
     private void buildResourcesFull(File outDir, File manifest, File resDir) throws AndrolibException {
@@ -298,24 +323,6 @@ public class ApkBuilder {
             throw new AndrolibException(ex);
         } finally {
             OS.rmfile(tmpFile);
-        }
-    }
-
-    private void copyResourcesRaw(File outDir, File manifest, File arscFile) throws AndrolibException {
-        if (!mConfig.isForced()
-                && !isFileNewer(manifest, new File(outDir, "AndroidManifest.xml"))
-                && !isFileNewer(arscFile, new File(outDir, "resources.arsc"))) {
-            LOGGER.info("Resources have not changed.");
-            return;
-        }
-
-        LOGGER.info("Copying raw resources...");
-        try {
-            Directory in = mApkDir.getDirectory();
-
-            in.copyToDir(outDir, "AndroidManifest.xml", "resources.arsc");
-        } catch (DirectoryException ex) {
-            throw new AndrolibException(ex);
         }
     }
 
