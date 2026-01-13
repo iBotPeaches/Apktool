@@ -140,6 +140,17 @@ public class ApkDecoder {
         }
     }
 
+    private void copySourcesRaw(File outDir, String fileName) throws AndrolibException {
+        LOGGER.info("Copying raw " + fileName + " file...");
+        try {
+            Directory in = mApkFile.getDirectory();
+
+            in.copyToDir(outDir, fileName);
+        } catch (DirectoryException ex) {
+            throw new AndrolibException(ex);
+        }
+    }
+
     private void decodeSourcesSmali(File outDir, String fileName) throws AndrolibException {
         if (mWorker != null) {
             mWorker.submit(() -> {
@@ -170,17 +181,6 @@ public class ApkDecoder {
         int minSdkVersion = decoder.getInferredApiLevel();
         if (mMinSdkVersion == 0 || mMinSdkVersion > minSdkVersion) {
             mMinSdkVersion = minSdkVersion;
-        }
-    }
-
-    private void copySourcesRaw(File outDir, String fileName) throws AndrolibException {
-        LOGGER.info("Copying raw " + fileName + " file...");
-        try {
-            Directory in = mApkFile.getDirectory();
-
-            in.copyToDir(outDir, fileName);
-        } catch (DirectoryException ex) {
-            throw new AndrolibException(ex);
         }
     }
 
