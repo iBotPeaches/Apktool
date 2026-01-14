@@ -42,8 +42,7 @@ public class ZipRODirectory extends AbstractDirectory {
         this(zipFile, "");
     }
 
-    public ZipRODirectory(String zipFileName, String path)
-            throws DirectoryException {
+    public ZipRODirectory(String zipFileName, String path) throws DirectoryException {
         this(new File(zipFileName), path);
     }
 
@@ -67,10 +66,9 @@ public class ZipRODirectory extends AbstractDirectory {
     }
 
     @Override
-    protected InputStream getFileInputLocal(String name)
-            throws DirectoryException {
+    protected InputStream getFileInputLocal(String name) throws DirectoryException {
         try {
-            return getZipFile().getInputStream(new ZipEntry(getPath() + name));
+            return mZipFile.getInputStream(new ZipEntry(mPath + name));
         } catch (IOException ex) {
             throw new PathNotExist(name, ex);
         }
@@ -97,28 +95,29 @@ public class ZipRODirectory extends AbstractDirectory {
     }
 
     @Override
-    public long getSize(String fileName)
-            throws DirectoryException {
+    public long getSize(String fileName) throws DirectoryException {
         ZipEntry entry = getZipFileEntry(fileName);
         return entry.getSize();
     }
 
     @Override
-    public long getCompressedSize(String fileName)
-            throws DirectoryException {
+    public long getCompressedSize(String fileName) throws DirectoryException {
         ZipEntry entry = getZipFileEntry(fileName);
         return entry.getCompressedSize();
     }
 
     @Override
-    public int getCompressionLevel(String fileName)
-            throws DirectoryException {
+    public int getCompressionLevel(String fileName) throws DirectoryException {
         ZipEntry entry = getZipFileEntry(fileName);
         return entry.getMethod();
     }
 
-    private ZipEntry getZipFileEntry(String fileName)
-            throws DirectoryException {
+    @Override
+    public void close() throws IOException {
+        mZipFile.close();
+    }
+
+    private ZipEntry getZipFileEntry(String fileName) throws DirectoryException {
         ZipEntry entry = mZipFile.getEntry(fileName);
         if (entry == null) {
             throw new PathNotExist("Entry not found: " + fileName);
@@ -130,13 +129,13 @@ public class ZipRODirectory extends AbstractDirectory {
         mFiles = new LinkedHashSet<>();
         mDirs = new LinkedHashMap<>();
 
-        int prefixLen = getPath().length();
-        Enumeration<? extends ZipEntry> entries = getZipFile().entries();
+        int prefixLen = mPath.length();
+        Enumeration<? extends ZipEntry> entries = mZipFile.entries();
         while (entries.hasMoreElements()) {
             ZipEntry entry = entries.nextElement();
             String name = entry.getName();
 
-            if (name.equals(getPath()) || !name.startsWith(getPath()) || name.contains(".." + separator)) {
+            if (name.equals(mPath) || !name.startsWith(mPath) || name.contains(".." + separator)) {
                 continue;
             }
 
@@ -153,21 +152,9 @@ public class ZipRODirectory extends AbstractDirectory {
             }
 
             if (!mDirs.containsKey(subname)) {
-                AbstractDirectory dir = new ZipRODirectory(getZipFile(), getPath() + subname + separator);
+                AbstractDirectory dir = new ZipRODirectory(mZipFile, mPath + subname + separator);
                 mDirs.put(subname, dir);
             }
         }
-    }
-
-    private String getPath() {
-        return mPath;
-    }
-
-    private ZipFile getZipFile() {
-        return mZipFile;
-    }
-
-    public void close() throws IOException {
-        mZipFile.close();
     }
 }

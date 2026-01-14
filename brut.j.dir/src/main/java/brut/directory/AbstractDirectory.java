@@ -187,24 +187,28 @@ public abstract class AbstractDirectory implements Directory {
         return true;
     }
 
+    @Override
     public void copyToDir(Directory out) throws DirectoryException {
         for (String fileName : getFiles(true)) {
             copyToDir(out, fileName);
         }
     }
 
-    public void copyToDir(Directory out, String[] fileNames)
+    @Override
+    public void copyToDir(Directory out, String fileName)
+            throws DirectoryException {
+        copyToDir(fileName, out, fileName);
+    }
+
+    @Override
+    public void copyToDir(Directory out, String... fileNames)
             throws DirectoryException {
         for (String fileName : fileNames) {
             copyToDir(out, fileName);
         }
     }
 
-    public void copyToDir(Directory out, String fileName)
-            throws DirectoryException {
-        copyToDir(fileName, out, fileName);
-    }
-
+    @Override
     public void copyToDir(String inFileName, Directory out, String outFileName)
             throws DirectoryException {
         try {
@@ -218,24 +222,28 @@ public abstract class AbstractDirectory implements Directory {
         }
     }
 
+    @Override
     public void copyToDir(File out) throws DirectoryException {
         for (String fileName : getFiles(true)) {
             copyToDir(out, fileName);
         }
     }
 
-    public void copyToDir(File out, String[] fileNames)
+    @Override
+    public void copyToDir(File out, String fileName)
+            throws DirectoryException {
+        copyToDir(fileName, out, fileName);
+    }
+
+    @Override
+    public void copyToDir(File out, String... fileNames)
             throws DirectoryException {
         for (String fileName : fileNames) {
             copyToDir(out, fileName);
         }
     }
 
-    public void copyToDir(File out, String fileName)
-            throws DirectoryException {
-        copyToDir(fileName, out, fileName);
-    }
-
+    @Override
     public void copyToDir(String inFileName, File out, String outFileName)
             throws DirectoryException {
         try {
@@ -268,11 +276,6 @@ public abstract class AbstractDirectory implements Directory {
         }
     }
 
-    public int getCompressionLevel(String fileName)
-            throws DirectoryException {
-        return -1;  // Unknown
-    }
-
     protected Map<String, AbstractDirectory> getAbstractDirs() {
         return getAbstractDirs(false);
     }
@@ -293,10 +296,6 @@ public abstract class AbstractDirectory implements Directory {
             }
         }
         return dirs;
-    }
-
-    public void close() throws IOException {
-        // stub
     }
 
     private SubPath getSubPath(String path) throws PathNotExist {

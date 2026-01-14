@@ -42,7 +42,7 @@ public class AndResGuardTest extends BaseTest {
     }
 
     @Test
-    public void checkIfAndResDecodeRemapsRFolderInRawMode() throws BrutException {
+    public void checkIfAndResDecodeIgnoresRFolderInRawMode() throws BrutException {
         sConfig.setForced(true);
         sConfig.setDecodeResources(Config.DecodeResources.NONE);
 
@@ -50,6 +50,6 @@ public class AndResGuardTest extends BaseTest {
         ExtFile testDir = new ExtFile(testApk + ".out.raw");
         new ApkDecoder(testApk, sConfig).decode(testDir);
 
-        assertTrue(new File(testDir, "r/a/a.png").isFile());
+        assertTrue(new File(testDir, "unknown/r/a/a.png").isFile());
     }
 }
