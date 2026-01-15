@@ -19,6 +19,7 @@ package brut.androlib.smali;
 import brut.androlib.exceptions.AndrolibException;
 import brut.directory.DirectoryException;
 import brut.directory.ExtFile;
+import brut.util.OS;
 import com.android.tools.smali.dexlib2.Opcodes;
 import com.android.tools.smali.dexlib2.writer.builder.DexBuilder;
 import com.android.tools.smali.dexlib2.writer.io.FileDataStore;
@@ -44,48 +45,56 @@ public class SmaliBuilder {
     private static final boolean VERBOSE_ERRORS = false;
     private static final boolean PRINT_TOKENS = false;
 
-    private final File mSmaliDir;
     private final int mApiLevel;
 
-    public SmaliBuilder(File smaliDir, int apiLevel) {
-        mSmaliDir = smaliDir;
+    public SmaliBuilder(int apiLevel) {
         // #3641 - Limit opcode API level to 29 or below (dex version up to 039).
         mApiLevel = Math.min(apiLevel, 29);
     }
 
-    public void build(File dexFile) throws AndrolibException {
-        try (ExtFile smaliDir = new ExtFile(mSmaliDir)) {
+    public void build(File smaliDir, File dexFile) throws AndrolibException {
+        try (ExtFile dir = new ExtFile(smaliDir)) {
             DexBuilder dexBuilder = new DexBuilder(
                 mApiLevel > 0 ? Opcodes.forApi(mApiLevel) : Opcodes.getDefault());
 
-            for (String fileName : smaliDir.getDirectory().getFiles(true)) {
+            for (String fileName : dir.getDirectory().getFiles(true)) {
                 if (!fileName.endsWith(".smali")) {
                     LOGGER.warning("Unknown file type, ignoring: " + fileName);
                     continue;
                 }
 
-                buildFile(fileName, dexBuilder);
+                buildFile(smaliDir, fileName, dexBuilder);
+            }
+
+            if (dexFile.exists()) {
+                OS.rmfile(dexFile);
+            } else {
+                File parentDir = dexFile.getParentFile();
+                if (parentDir != null) {
+                    OS.mkdir(parentDir);
+                }
             }
 
             dexBuilder.writeTo(new FileDataStore(dexFile));
         } catch (DirectoryException | IOException | RuntimeException ex) {
-            throw new AndrolibException("Could not smali folder: " + mSmaliDir.getName(), ex);
+            throw new AndrolibException("Could not smali folder: " + smaliDir.getName(), ex);
         }
     }
 
-    private void buildFile(String fileName, DexBuilder dexBuilder) throws AndrolibException {
+    private void buildFile(File smaliDir, String dexName, DexBuilder dexBuilder)
+            throws AndrolibException {
         boolean success;
         Exception cause;
         try {
-            File smaliFile = new File(mSmaliDir, fileName);
-            success = buildFile(smaliFile, dexBuilder, mApiLevel);
+            File smaliFile = new File(smaliDir, dexName);
+            success = buildFile(smaliFile, dexBuilder);
             cause = null;
         } catch (Exception ex) {
             success = false;
             cause = ex;
         }
         if (!success) {
-            AndrolibException ex = new AndrolibException("Could not smali file: " + fileName);
+            AndrolibException ex = new AndrolibException("Could not smali file: " + dexName);
             if (cause != null) {
                 ex.initCause(cause);
             }
@@ -93,11 +102,11 @@ public class SmaliBuilder {
         }
     }
 
-    private boolean buildFile(File smaliFile, DexBuilder dexBuilder, int apiLevel)
+    private boolean buildFile(File smaliFile, DexBuilder dexBuilder)
             throws IOException, RecognitionException {
         try (InputStreamReader reader = new InputStreamReader(
                 Files.newInputStream(smaliFile.toPath()), StandardCharsets.UTF_8)) {
-            smaliFlexLexer lexer = new smaliFlexLexer(reader, apiLevel);
+            smaliFlexLexer lexer = new smaliFlexLexer(reader, mApiLevel);
             lexer.setSourceFile(smaliFile);
 
             CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -112,7 +121,7 @@ public class SmaliBuilder {
             }
 
             smaliParser parser = new smaliParser(tokens);
-            parser.setApiLevel(apiLevel);
+            parser.setApiLevel(mApiLevel);
             parser.setVerboseErrors(VERBOSE_ERRORS);
 
             smaliParser.smali_file_return result = parser.smali_file();
@@ -126,7 +135,7 @@ public class SmaliBuilder {
             treeStream.setTokenStream(tokens);
 
             smaliTreeWalker treeWalker = new smaliTreeWalker(treeStream);
-            treeWalker.setApiLevel(apiLevel);
+            treeWalker.setApiLevel(mApiLevel);
             treeWalker.setVerboseErrors(VERBOSE_ERRORS);
             treeWalker.setDexBuilder(dexBuilder);
             treeWalker.smali_file();

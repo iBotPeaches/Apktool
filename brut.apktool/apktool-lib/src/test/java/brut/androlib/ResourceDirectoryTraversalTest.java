@@ -30,13 +30,11 @@ public class ResourceDirectoryTraversalTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        TestUtils.copyResourceDir(ResourceDirectoryTraversalTest.class, "arbitrary-write", sTmpDir);
+        TestUtils.copyResourceDir(ResourceDirectoryTraversalTest.class, "arbitrary_write", sTmpDir);
     }
 
     @Test
     public void checkIfMaliciousRawFileRenamed() throws BrutException {
-        sConfig.setForced(true);
-
         ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
         ExtFile testDir = new ExtFile(testApk + ".out");
         new ApkDecoder(testApk, sConfig).decode(testDir);

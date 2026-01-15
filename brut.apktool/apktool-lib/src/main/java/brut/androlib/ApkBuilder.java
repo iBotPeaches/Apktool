@@ -50,13 +50,14 @@ public class ApkBuilder {
     private final AtomicReference<AndrolibException> mFirstError;
 
     private ApkInfo mApkInfo;
-    private int mMinSdkVersion;
+    private SmaliBuilder mSmaliBuilder;
+    private AaptInvoker mAaptInvoker;
     private BackgroundWorker mWorker;
 
     public ApkBuilder(ExtFile apkDir, Config config) {
         mApkDir = apkDir;
         mConfig = config;
-        mFirstError = new AtomicReference<>(null);
+        mFirstError = new AtomicReference<>();
     }
 
     public void build(File outApk) throws AndrolibException {
@@ -65,11 +66,10 @@ public class ApkBuilder {
         }
         try {
             mApkInfo = ApkInfo.load(mApkDir);
-
             String minSdkVersion = mApkInfo.getSdkInfo().getMinSdkVersion();
-            if (minSdkVersion != null) {
-                mMinSdkVersion = SdkInfo.parseSdkInt(minSdkVersion);
-            }
+            mSmaliBuilder = new SmaliBuilder(minSdkVersion != null
+                ? SdkInfo.parseSdkInt(minSdkVersion) : 0);
+            mAaptInvoker = new AaptInvoker(mApkInfo, mConfig);
 
             String apkName = mApkInfo.getApkFileName();
             if (apkName == null) {
@@ -141,7 +141,8 @@ public class ApkBuilder {
                 if (dirName.equals("smali")) {
                     fileName = "classes.dex";
                 } else if (dirName.startsWith("smali_")) {
-                    fileName = dirName.substring(dirName.indexOf('_') + 1) + ".dex";
+                    fileName = dirName.substring(dirName.indexOf('_') + 1)
+                        .replace('@', File.separatorChar) + ".dex";
                 } else {
                     continue;
                 }
@@ -157,11 +158,8 @@ public class ApkBuilder {
 
     private void copySourcesRaw(File outDir, String fileName) throws AndrolibException {
         File inFile = new File(mApkDir, fileName);
-        if (!inFile.isFile()) {
-            return;
-        }
-
         File outFile = new File(outDir, fileName);
+
         if (!mConfig.isForced() && !isFileNewer(inFile, outFile)) {
             LOGGER.info("File " + fileName + " has not changed.");
             return;
@@ -193,20 +191,15 @@ public class ApkBuilder {
 
     private void buildSourcesSmaliJob(File outDir, String dirName, String fileName) throws AndrolibException {
         File smaliDir = new File(mApkDir, dirName);
-        if (!smaliDir.isDirectory()) {
-            return;
-        }
-
         File dexFile = new File(outDir, fileName);
+
         if (!mConfig.isForced() && !isFileNewer(smaliDir, dexFile)) {
             LOGGER.info("Sources in " + dirName + " have not changed.");
             return;
         }
-        OS.rmfile(dexFile);
 
         LOGGER.info("Smaling " + dirName + " folder into " + fileName + "...");
-        SmaliBuilder builder = new SmaliBuilder(smaliDir, mMinSdkVersion);
-        builder.build(dexFile);
+        mSmaliBuilder.build(smaliDir, dexFile);
     }
 
     private void backupManifestFile(File manifest, File manifestOrig) throws AndrolibException {
@@ -218,8 +211,6 @@ public class ApkBuilder {
         if (!manifest.isFile()) {
             return;
         }
-
-        OS.rmfile(manifestOrig);
 
         try {
             OS.cpfile(manifest, manifestOrig);
@@ -272,40 +263,38 @@ public class ApkBuilder {
     }
 
     private void buildResourcesFull(File outDir, File manifest, File resDir) throws AndrolibException {
-        File resZip = new File(outDir.getParentFile(), "resources.zip");
-        if (!mConfig.isForced() && resZip.isFile()
+        if (!mConfig.isForced()
                 && !isFileNewer(manifest, new File(outDir, "AndroidManifest.xml"))
                 && !isFileNewer(resDir, new File(outDir, "res"))) {
             LOGGER.info("Resources have not changed.");
             return;
         }
-        OS.rmfile(resZip);
 
         if (mConfig.isDebuggable()) {
-            LOGGER.info("Setting 'debuggable' attribute to 'true' in AndroidManifest.xml");
+            LOGGER.info("Setting 'debuggable' attribute to 'true' in AndroidManifest.xml...");
             ResXmlUtils.setApplicationDebugTagTrue(manifest);
         }
 
         if (mConfig.isNetSecConf()) {
-            String targetSdkVersion = mApkInfo.getSdkInfo().getTargetSdkVersion();
-            if (targetSdkVersion != null && SdkInfo.parseSdkInt(targetSdkVersion) < ResConfig.SDK_NOUGAT) {
-                LOGGER.warning("Target SDK version is lower than 24! Network Security Configuration might be ignored!");
-            }
-
+            LOGGER.info("Adding permissive network security config in manifest...");
             File netSecConfOrig = new File(mApkDir, "res/xml/network_security_config.xml");
             OS.mkdir(netSecConfOrig.getParentFile());
             ResXmlUtils.modNetworkSecurityConfig(netSecConfOrig);
             ResXmlUtils.setNetworkSecurityConfig(manifest);
-            LOGGER.info("Added permissive network security config in manifest");
+
+            String targetSdkVersion = mApkInfo.getSdkInfo().getTargetSdkVersion();
+            if (targetSdkVersion != null && SdkInfo.parseSdkInt(targetSdkVersion) < ResConfig.SDK_NOUGAT) {
+                LOGGER.warning("Target SDK version is lower than 24, Network Security Configuration might be ignored!");
+            }
         }
 
         ExtFile tmpFile;
         try {
             tmpFile = new ExtFile(File.createTempFile("APKTOOL", null));
+            OS.rmfile(tmpFile);
         } catch (IOException ex) {
             throw new AndrolibException(ex);
         }
-        OS.rmfile(tmpFile);
 
         File npDir = new File(mApkDir, "9patch");
         if (!npDir.isDirectory()) {
@@ -314,8 +303,7 @@ public class ApkBuilder {
 
         LOGGER.info("Building resources with " + AaptManager.getBinaryName() + "...");
         try {
-            AaptInvoker invoker = new AaptInvoker(mApkInfo, mConfig);
-            invoker.invoke(tmpFile, manifest, resDir, npDir, null, getIncludeFiles());
+            mAaptInvoker.invoke(tmpFile, manifest, resDir, npDir, null, getIncludeFiles());
 
             Directory tmpDir = tmpFile.getDirectory();
             tmpDir.copyToDir(outDir, "AndroidManifest.xml", "resources.arsc", "res");
@@ -336,10 +324,10 @@ public class ApkBuilder {
         ExtFile tmpFile;
         try {
             tmpFile = new ExtFile(File.createTempFile("APKTOOL", null));
+            OS.rmfile(tmpFile);
         } catch (IOException ex) {
             throw new AndrolibException(ex);
         }
-        OS.rmfile(tmpFile);
 
         File npDir = new File(mApkDir, "9patch");
         if (!npDir.isDirectory()) {
@@ -348,8 +336,7 @@ public class ApkBuilder {
 
         LOGGER.info("Building AndroidManifest.xml with " + AaptManager.getBinaryName() + "...");
         try {
-            AaptInvoker invoker = new AaptInvoker(mApkInfo, mConfig);
-            invoker.invoke(tmpFile, manifest, null, npDir, null, getIncludeFiles());
+            mAaptInvoker.invoke(tmpFile, manifest, null, npDir, null, getIncludeFiles());
 
             Directory tmpDir = tmpFile.getDirectory();
             tmpDir.copyToDir(outDir, "AndroidManifest.xml");
@@ -389,7 +376,7 @@ public class ApkBuilder {
             Directory in = originalDir.getDirectory();
 
             for (String fileName : in.getFiles(true)) {
-                if (ApkInfo.ORIGINAL_FILENAMES_PATTERN.matcher(fileName).matches()) {
+                if (ApkInfo.ORIGINAL_FILES_PATTERN.matcher(fileName).matches()) {
                     in.copyToDir(outDir, fileName);
                 }
             }
@@ -417,7 +404,7 @@ public class ApkBuilder {
             ZipUtils.zipDir(outDir, out, doNotCompress);
 
             // Zip standard raw files.
-            for (String dirName : ApkInfo.RAW_DIRNAMES) {
+            for (String dirName : ApkInfo.RAW_DIRS) {
                 File rawDir = new File(mApkDir, dirName);
                 if (rawDir.isDirectory()) {
                     LOGGER.info("Importing " + dirName + "...");

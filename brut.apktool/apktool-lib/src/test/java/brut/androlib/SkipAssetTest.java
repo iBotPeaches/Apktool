@@ -34,11 +34,10 @@ public class SkipAssetTest extends BaseTest {
 
     @Test
     public void checkIfEnablingSkipAssetWorks() throws BrutException {
-        sConfig.setForced(true);
         sConfig.setDecodeAssets(Config.DecodeAssets.NONE);
 
         ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
-        ExtFile testDir = new ExtFile(testApk + ".out");
+        ExtFile testDir = new ExtFile(testApk + ".out.none");
         new ApkDecoder(testApk, sConfig).decode(testDir);
 
         assertFalse(new File(testDir, "assets/kotlin.kotlin_builtins").isFile());
@@ -47,11 +46,10 @@ public class SkipAssetTest extends BaseTest {
 
     @Test
     public void checkControl() throws BrutException {
-        sConfig.setForced(true);
         sConfig.setDecodeAssets(Config.DecodeAssets.FULL);
 
         ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
-        ExtFile testDir = new ExtFile(testApk + ".out");
+        ExtFile testDir = new ExtFile(testApk + ".out.full");
         new ApkDecoder(testApk, sConfig).decode(testDir);
 
         assertTrue(new File(testDir, "assets/kotlin.kotlin_builtins").isFile());

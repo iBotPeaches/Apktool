@@ -91,14 +91,14 @@ public class Main {
         .desc("Force delete destination directory.")
         .get();
 
+    private static final Option decodeAllSrcOption = Option.builder("a")
+        .longOpt("all-src")
+        .desc("Decode all sources in the apk (includes unknown dex files).")
+        .get();
+
     private static final Option decodeNoSrcOption = Option.builder("s")
         .longOpt("no-src")
         .desc("Do not decode sources.")
-        .get();
-
-    private static final Option decodeOnlyMainClassesOption = Option.builder()
-        .longOpt("only-main-classes")
-        .desc("Only disassemble the main dex classes (classes[0-9]*.dex) in the root.")
         .get();
 
     private static final Option decodeNoDebugInfoOption = Option.builder()
@@ -242,11 +242,11 @@ public class Main {
             decodeOptions.addOption(jobsOption);
             decodeOptions.addOption(libOption);
             if (advanced) {
+                decodeOptions.addOption(decodeAllSrcOption);
                 decodeOptions.addOption(decodeKeepBrokenResOption);
                 decodeOptions.addOption(decodeMatchOriginalOption);
                 decodeOptions.addOption(decodeNoAssetsOption);
                 decodeOptions.addOption(decodeNoDebugInfoOption);
-                decodeOptions.addOption(decodeOnlyMainClassesOption);
                 decodeOptions.addOption(decodeOnlyManifestOption);
                 decodeOptions.addOption(decodeResResolveModeOption);
             }
@@ -424,14 +424,14 @@ public class Main {
         if (cli.hasOption(decodeForceOption)) {
             config.setForced(true);
         }
-        if (cli.hasOption(decodeNoSrcOption)) {
-            config.setDecodeSources(Config.DecodeSources.NONE);
+        if (cli.hasOption(decodeAllSrcOption)) {
+            config.setDecodeSources(Config.DecodeSources.FULL);
         }
-        if (cli.hasOption(decodeOnlyMainClassesOption)) {
-            if (cli.hasOption(decodeNoSrcOption)) {
-                printOptionConflict(decodeOnlyMainClassesOption, decodeNoSrcOption);
+        if (cli.hasOption(decodeNoSrcOption)) {
+            if (cli.hasOption(decodeAllSrcOption)) {
+                printOptionConflict(decodeNoSrcOption, decodeAllSrcOption);
             } else {
-                config.setDecodeSources(Config.DecodeSources.ONLY_MAIN_CLASSES);
+                config.setDecodeSources(Config.DecodeSources.NONE);
             }
         }
         if (cli.hasOption(decodeNoDebugInfoOption)) {

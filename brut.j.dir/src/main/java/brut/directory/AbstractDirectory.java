@@ -310,7 +310,7 @@ public abstract class AbstractDirectory implements Directory {
     }
 
     private ParsedPath parsePath(String path) {
-        int pos = path.indexOf(separator);
+        int pos = path.indexOf(separatorChar);
         if (pos == -1) {
             return new ParsedPath(null, path);
         }

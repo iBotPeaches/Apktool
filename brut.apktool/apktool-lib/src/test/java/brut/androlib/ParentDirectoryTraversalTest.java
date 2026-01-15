@@ -32,7 +32,6 @@ public class ParentDirectoryTraversalTest extends BaseTest {
 
     @Test
     public void checkIfDrawableFileDecodesProperly() throws BrutException {
-        sConfig.setForced(true);
         sConfig.setDecodeResources(Config.DecodeResources.NONE);
 
         ExtFile testApk = new ExtFile(sTmpDir, apk);

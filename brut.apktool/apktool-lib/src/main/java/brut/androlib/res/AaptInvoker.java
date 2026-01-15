@@ -52,43 +52,43 @@ public class AaptInvoker {
             }
         }
 
-        List<String> cmd;
-        File resourcesZip = null;
+        List<String> cmd = new ArrayList<>();
+        File resZip = null;
 
         if (resDir != null) {
-            resourcesZip = Paths.get(resDir.getParent(), "build", "resources.zip").toFile();
+            resZip = Paths.get(resDir.getParent(), "build", "resources.zip").toFile();
+            OS.rmfile(resZip);
 
-            if (!resourcesZip.exists()) {
-                // Compile the files into flat arsc files.
-                cmd = new ArrayList<>();
-                cmd.add(aaptPath);
-                cmd.add("compile");
+            // Compile the files into flat arsc files.
+            cmd.add(aaptPath);
+            cmd.add("compile");
 
-                cmd.add("--dir");
-                cmd.add(resDir.getAbsolutePath());
+            cmd.add("--dir");
+            cmd.add(resDir.getAbsolutePath());
 
-                // Treats error that used to be valid in aapt1 as warnings in aapt2.
-                cmd.add("--legacy");
+            // Treats error that used to be valid in aapt1 as warnings in aapt2.
+            cmd.add("--legacy");
 
-                cmd.add("-o");
-                cmd.add(resourcesZip.getAbsolutePath());
+            cmd.add("-o");
+            cmd.add(resZip.getAbsolutePath());
 
-                if (mConfig.isVerbose()) {
-                    cmd.add("-v");
-                }
-
-                if (mConfig.isNoCrunch()) {
-                    cmd.add("--no-crunch");
-                }
-
-                try {
-                    OS.exec(cmd.toArray(new String[0]));
-                    LOGGER.fine("aapt2 compile command ran: ");
-                    LOGGER.fine(cmd.toString());
-                } catch (BrutException ex) {
-                    throw new AndrolibException(ex);
-                }
+            if (mConfig.isVerbose()) {
+                cmd.add("-v");
             }
+
+            if (mConfig.isNoCrunch()) {
+                cmd.add("--no-crunch");
+            }
+
+            try {
+                OS.exec(cmd.toArray(new String[0]));
+                LOGGER.fine("aapt2 compile command ran: ");
+                LOGGER.fine(cmd.toString());
+            } catch (BrutException ex) {
+                throw new AndrolibException(ex);
+            }
+
+            cmd.clear();
         }
 
         if (manifest == null) {
@@ -96,7 +96,6 @@ public class AaptInvoker {
         }
 
         // Link resources to the final apk.
-        cmd = new ArrayList<>();
         cmd.add(aaptPath);
         cmd.add("link");
 
@@ -180,8 +179,8 @@ public class AaptInvoker {
         if (mConfig.isVerbose()) {
             cmd.add("-v");
         }
-        if (resourcesZip != null) {
-            cmd.add(resourcesZip.getAbsolutePath());
+        if (resZip != null) {
+            cmd.add(resZip.getAbsolutePath());
         }
 
         try {

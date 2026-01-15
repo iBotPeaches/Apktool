@@ -57,7 +57,7 @@ public final class TestUtils {
         }
 
         if (dirURL == null) {
-            String className = clz.getName().replace(".", "/") + ".class";
+            String className = clz.getName().replace('.', '/') + ".class";
             dirURL = clz.getClassLoader().getResource(className);
         }
 
@@ -85,6 +85,6 @@ public final class TestUtils {
     }
 
     public static String replaceNewlines(String value) {
-        return value.replace("\n", "").replace("\r", "");
+        return value.replaceAll("[\n\r]", "");
     }
 }
