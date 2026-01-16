@@ -28,6 +28,22 @@ import java.util.logging.Logger;
 public final class ResXmlEncoders {
     private static final Logger LOGGER = Logger.getLogger(ResXmlEncoders.class.getName());
 
+    private static final String[] DIMENSION_UNIT_STRS = new String[] {
+        "px", "dp", "sp", "pt", "in", "mm"
+    };
+
+    private static final String[] FRACTION_UNIT_STRS = new String[] {
+        "%", "%p"
+    };
+
+    private static final float MANTISSA_MULT = 1.0f / (1 << TypedValue.COMPLEX_MANTISSA_SHIFT);
+    private static final float[] RADIX_MULTS = new float[] {
+        MANTISSA_MULT,
+        (1.0f / (1 << 7)) * MANTISSA_MULT,
+        (1.0f / (1 << 15)) * MANTISSA_MULT,
+        (1.0f / (1 << 23)) * MANTISSA_MULT
+    };
+
     private ResXmlEncoders() {
         // Private constructor for utility class.
     }
@@ -47,9 +63,9 @@ public final class ResXmlEncoders {
             case TypedValue.TYPE_FLOAT:
                 return Float.toString(Float.intBitsToFloat(data));
             case TypedValue.TYPE_DIMENSION:
-                return TypedValue.coerceDimensionToString(data);
+                return coerceDimensionToString(data);
             case TypedValue.TYPE_FRACTION:
-                return TypedValue.coerceFractionToString(data);
+                return coerceFractionToString(data);
         }
 
         if (type >= TypedValue.TYPE_FIRST_COLOR_INT && type <= TypedValue.TYPE_LAST_COLOR_INT) {
@@ -84,6 +100,26 @@ public final class ResXmlEncoders {
 
         LOGGER.warning(String.format("Unsupported data type: 0x%02x", type));
         return null;
+    }
+
+    private static String coerceDimensionToString(int complex) {
+        float value = complexToFloat(complex);
+        int unit = (complex >> TypedValue.COMPLEX_UNIT_SHIFT) & TypedValue.COMPLEX_UNIT_MASK;
+        String unitStr = unit < DIMENSION_UNIT_STRS.length ? DIMENSION_UNIT_STRS[unit] : "";
+        return Float.toString(value) + unitStr;
+    }
+
+    private static String coerceFractionToString(int complex) {
+        float value = complexToFloat(complex) * 100;
+        int unit = (complex >> TypedValue.COMPLEX_UNIT_SHIFT) & TypedValue.COMPLEX_UNIT_MASK;
+        String unitStr = unit < FRACTION_UNIT_STRS.length ? FRACTION_UNIT_STRS[unit] : "";
+        return Float.toString(value) + unitStr;
+    }
+
+    private static float complexToFloat(int complex) {
+        // AOSP: TypedValue.complexToFloat(int complex)
+        return (complex & (TypedValue.COMPLEX_MANTISSA_MASK << TypedValue.COMPLEX_MANTISSA_SHIFT))
+                * RADIX_MULTS[(complex >> TypedValue.COMPLEX_RADIX_SHIFT) & TypedValue.COMPLEX_RADIX_MASK];
     }
 
     public static String encodeAsXmlValue(String str) {
