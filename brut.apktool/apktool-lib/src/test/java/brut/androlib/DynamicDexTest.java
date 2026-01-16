@@ -23,29 +23,17 @@ import brut.directory.ExtFile;
 import org.junit.*;
 import static org.junit.Assert.*;
 
-public class DuplicateDexTest extends BaseTest {
-    private static final String TEST_APK = "duplicatedex.apk";
+public class DynamicDexTest extends BaseTest {
+    private static final String TEST_APK = "dynamic_dex.apk";
 
     @BeforeClass
     public static void beforeClass() throws Exception {
         LOGGER.info("Unpacking " + TEST_APK + "...");
-        TestUtils.copyResourceDir(DuplicateDexTest.class, "duplicatedex", sTmpDir);
-    }
-
-    @Test(expected = AndrolibException.class)
-    public void decodeAllSourcesShouldThrowException() throws BrutException {
-        LOGGER.info("Decoding " + TEST_APK + "...");
-        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
-        ExtFile testDir = new ExtFile(testApk + ".out");
-        new ApkDecoder(testApk, sConfig).decode(testDir);
-
-        LOGGER.info("Building " + TEST_APK + "...");
-        new ApkBuilder(testDir, sConfig).build(null);
+        TestUtils.copyResourceDir(DynamicDexTest.class, "dynamic_dex", sTmpDir);
     }
 
     @Test
-    public void decodeUsingOnlyMainClassesMode() throws BrutException {
-        sConfig.setForced(true);
+    public void decodeOnlyMainClassesTest() throws BrutException {
         sConfig.setDecodeSources(Config.DecodeSources.ONLY_MAIN_CLASSES);
 
         LOGGER.info("Decoding " + TEST_APK + "...");
@@ -57,4 +45,16 @@ public class DuplicateDexTest extends BaseTest {
         new ApkBuilder(testDir, sConfig).build(null);
     }
 
+    @Test
+    public void decodeAllSourcesTest() throws BrutException {
+        sConfig.setDecodeSources(Config.DecodeSources.FULL);
+
+        LOGGER.info("Decoding " + TEST_APK + "...");
+        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
+        ExtFile testDir = new ExtFile(testApk + ".out.full");
+        new ApkDecoder(testApk, sConfig).decode(testDir);
+
+        LOGGER.info("Building " + TEST_APK + "...");
+        new ApkBuilder(testDir, sConfig).build(null);
+    }
 }

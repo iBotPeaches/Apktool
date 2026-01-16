@@ -22,7 +22,6 @@ import brut.directory.ExtFile;
 import brut.yaml.*;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -33,14 +32,18 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 public class ApkInfo implements YamlSerializable {
-    public static final String[] RAW_DIRNAMES = { "assets", "lib" };
+    public static final String[] RAW_DIRS = { "assets", "lib" };
 
-    public static final Pattern ORIGINAL_FILENAMES_PATTERN = Pattern.compile(
+    public static final Pattern CLASSES_FILES_PATTERN = Pattern.compile(
+        "classes([2-9]|[1-9][0-9]+)?\\.dex");
+
+    public static final Pattern ORIGINAL_FILES_PATTERN = Pattern.compile(
         "AndroidManifest\\.xml|META-INF/[^/]+\\.(RSA|SF|MF)|stamp-cert-sha256");
 
-    public static final Pattern STANDARD_FILENAMES_PATTERN = Pattern.compile(
-        "[^/]+\\.dex|resources\\.arsc|(" + String.join("|", RAW_DIRNAMES) + ")/.*|"
-            + ORIGINAL_FILENAMES_PATTERN.pattern());
+    public static final Pattern STANDARD_FILES_PATTERN = Pattern.compile(
+        "resources\\.arsc|(" + String.join("|", RAW_DIRS) + ")/.*|"
+            + CLASSES_FILES_PATTERN.pattern() + "|"
+            + ORIGINAL_FILES_PATTERN.pattern());
 
     private String mVersion;
     private String mApkFileName;

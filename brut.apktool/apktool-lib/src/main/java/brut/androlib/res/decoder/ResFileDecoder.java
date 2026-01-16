@@ -42,7 +42,7 @@ public class ResFileDecoder {
         mDecoders = decoders;
     }
 
-    public void decode(ResEntry entry, Directory inDir, Directory outDir, Map<String, String> resFileMapping)
+    public void decode(ResEntry entry, Directory inDir, Directory outDir, Map<String, String> resFileMap)
             throws AndrolibException {
         String inFileName = ((ResFileReference) entry.getValue()).getPath();
 
@@ -82,7 +82,7 @@ public class ResFileDecoder {
                 + "/" + entry.getName() + (ext.isEmpty() ? "" : "." + ext);
 
         // Map input file name to output file name.
-        resFileMapping.put(inFileName, outFileName);
+        resFileMap.put(inFileName, outFileName);
 
         LOGGER.fine("Decoding file " + inFileName + " to " + outFileName);
 

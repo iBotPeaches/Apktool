@@ -141,7 +141,7 @@ public class ZipRODirectory extends AbstractDirectory {
 
             String subname = name.substring(prefixLen);
 
-            int pos = subname.indexOf(separator);
+            int pos = subname.indexOf(separatorChar);
             if (pos == -1) {
                 if (!entry.isDirectory()) {
                     mFiles.add(subname);

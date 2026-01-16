@@ -61,7 +61,7 @@ public class Config {
         mVerbose = false;
 
         // Decode options
-        mDecodeSources = DecodeSources.FULL;
+        mDecodeSources = DecodeSources.ONLY_MAIN_CLASSES;
         mBaksmaliDebugMode = true;
         mDecodeResources = DecodeResources.FULL;
         mDecodeResolve = DecodeResolve.DEFAULT;

@@ -17,7 +17,7 @@
 package brut.androlib;
 
 import brut.androlib.meta.ApkInfo;
-import brut.androlib.res.ResourcesDecoder;
+import brut.androlib.res.ResDecoder;
 import brut.androlib.res.table.ResId;
 import brut.androlib.res.table.ResTable;
 import brut.common.BrutException;
@@ -46,7 +46,7 @@ public class NonStandardPkgIdTest extends BaseTest {
 
         LOGGER.info("Decoding pkgid8.apk...");
         ApkInfo testInfo = new ApkInfo(testApk);
-        ResourcesDecoder resDecoder = new ResourcesDecoder(testInfo, sConfig);
+        ResDecoder resDecoder = new ResDecoder(testInfo, sConfig);
         OS.mkdir(sTestNewDir);
         resDecoder.decodeResources(sTestNewDir);
         resDecoder.decodeManifest(sTestNewDir);

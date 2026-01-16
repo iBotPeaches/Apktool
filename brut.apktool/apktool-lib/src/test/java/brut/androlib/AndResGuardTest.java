@@ -43,7 +43,6 @@ public class AndResGuardTest extends BaseTest {
 
     @Test
     public void checkIfAndResDecodeIgnoresRFolderInRawMode() throws BrutException {
-        sConfig.setForced(true);
         sConfig.setDecodeResources(Config.DecodeResources.NONE);
 
         ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);

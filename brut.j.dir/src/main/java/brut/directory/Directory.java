@@ -24,7 +24,8 @@ import java.util.Map;
 import java.util.Set;
 
 public interface Directory {
-    char separator = '/';
+    String separator = "/";
+    char separatorChar = '/';
 
     Set<String> getFiles();
 

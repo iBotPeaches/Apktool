@@ -38,27 +38,27 @@ import java.io.*;
 import java.util.*;
 import java.util.logging.Logger;
 
-public class ResourcesDecoder {
-    private static final Logger LOGGER = Logger.getLogger(ResourcesDecoder.class.getName());
+public class ResDecoder {
+    private static final Logger LOGGER = Logger.getLogger(ResDecoder.class.getName());
 
     private final ApkInfo mApkInfo;
     private final Config mConfig;
     private final ResTable mTable;
-    private final Map<String, String> mResFileMapping;
+    private final Map<String, String> mResFileMap;
 
-    public ResourcesDecoder(ApkInfo apkInfo, Config config) {
+    public ResDecoder(ApkInfo apkInfo, Config config) {
         mApkInfo = apkInfo;
         mConfig = config;
         mTable = new ResTable(apkInfo, config);
-        mResFileMapping = new HashMap<>();
+        mResFileMap = new HashMap<>();
     }
 
     public ResTable getTable() {
         return mTable;
     }
 
-    public Map<String, String> getResFileMapping() {
-        return mResFileMapping;
+    public Map<String, String> getResFileMap() {
+        return mResFileMap;
     }
 
     public void decodeResources(File apkDir) throws AndrolibException {
@@ -98,7 +98,7 @@ public class ResourcesDecoder {
         LOGGER.info("Decoding file resources...");
         for (ResEntry entry : new ArrayList<>(pkg.listEntries())) {
             if (entry.getValue() instanceof ResFileReference) {
-                fileDecoder.decode(entry, inDir, outDir, mResFileMapping);
+                fileDecoder.decode(entry, inDir, outDir, mResFileMap);
             }
         }
 

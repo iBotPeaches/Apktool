@@ -25,11 +25,11 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 public class Empty9PatchTest extends BaseTest {
-    private static final String TEST_APK = "empty9patch.apk";
+    private static final String TEST_APK = "empty_9patch.apk";
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        TestUtils.copyResourceDir(Empty9PatchTest.class, "empty9patch", sTmpDir);
+        TestUtils.copyResourceDir(Empty9PatchTest.class, "empty_9patch", sTmpDir);
     }
 
     @Test
