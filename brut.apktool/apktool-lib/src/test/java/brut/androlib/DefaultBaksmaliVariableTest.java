@@ -16,12 +16,9 @@
  */
 package brut.androlib;
 
-import brut.common.BrutException;
 import brut.directory.ExtFile;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -34,7 +31,7 @@ public class DefaultBaksmaliVariableTest extends BaseTest {
         sTestNewDir = new ExtFile(sTmpDir, "issue1481-new");
 
         LOGGER.info("Unpacking issue1481...");
-        TestUtils.copyResourceDir(DefaultBaksmaliVariableTest.class, "issue1481", sTestOrigDir);
+        copyResourceDir(DefaultBaksmaliVariableTest.class, "issue1481", sTestOrigDir);
 
         LOGGER.info("Building issue1481.jar...");
         ExtFile testJar = new ExtFile(sTmpDir, "issue1481.jar");
@@ -45,7 +42,7 @@ public class DefaultBaksmaliVariableTest extends BaseTest {
     }
 
     @Test
-    public void confirmBaksmaliParamsAreTheSame() throws IOException {
+    public void confirmBaksmaliParamsAreTheSame() throws Exception {
         String expected = ".class public final Lcom/ibotpeaches/issue1481/BuildConfig;\n"
                 + ".super Ljava/lang/Object;\n"
                 + ".source \"BuildConfig.java\"\n"
@@ -92,9 +89,8 @@ public class DefaultBaksmaliVariableTest extends BaseTest {
                 + "    return-void\n"
                 + ".end method";
 
-        File smali = new File(sTestNewDir, "smali/com/ibotpeaches/issue1481/BuildConfig.smali");
-        String obtained = new String(Files.readAllBytes(smali.toPath()));
+        String obtained = readTextFile(new File(sTestNewDir, "smali/com/ibotpeaches/issue1481/BuildConfig.smali"));
 
-        assertEquals(TestUtils.replaceNewlines(expected), TestUtils.replaceNewlines(obtained));
+        assertEquals(replaceNewlines(expected), replaceNewlines(obtained));
     }
 }

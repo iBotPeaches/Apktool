@@ -17,7 +17,6 @@
 package brut.androlib.meta;
 
 import brut.androlib.BaseTest;
-import brut.common.BrutException;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -25,7 +24,7 @@ import static org.junit.Assert.*;
 public class DoNotCompressHieroglyphTest extends BaseTest {
 
     @Test
-    public void testHieroglyph() throws BrutException {
+    public void testHieroglyph() throws Exception {
         ApkInfo apkInfo = ApkInfo.load(getClass().getResourceAsStream("/meta/donotcompress_with_hieroglyph.yml"));
         assertEquals("2.0.0", apkInfo.getVersion());
         assertEquals("testapp.apk", apkInfo.getApkFileName());

@@ -17,7 +17,6 @@
 package brut.androlib;
 
 import brut.androlib.meta.ApkInfo;
-import brut.common.BrutException;
 import brut.directory.ExtFile;
 
 import org.junit.*;
@@ -28,17 +27,19 @@ public class SparseFlagTest extends BaseTest {
     @BeforeClass
     public static void beforeClass() throws Exception {
         LOGGER.info("Unpacking sparse.apk && not-sparse.apk...");
-        TestUtils.copyResourceDir(SparseFlagTest.class, "sparse", sTmpDir);
+        copyResourceDir(SparseFlagTest.class, "sparse", sTmpDir);
     }
 
     @Test
-    public void decodeWithExpectationOfSparseEntries() throws BrutException {
+    public void decodeWithExpectationOfSparseEntries() throws Exception {
         sConfig.setFrameworkTag("issue-3298");
 
         LOGGER.info("Decoding sparse.apk...");
         ExtFile testApk = new ExtFile(sTmpDir, "sparse.apk");
         ExtFile testDir = new ExtFile(testApk + ".out");
-        ApkInfo apkInfo = new ApkDecoder(testApk, sConfig).decode(testDir);
+        ApkDecoder apkDecoder = new ApkDecoder(testApk, sConfig);
+        apkDecoder.decode(testDir);
+        ApkInfo apkInfo = apkDecoder.getApkInfo();
 
         assertTrue("Expecting sparse entries", apkInfo.getResourcesInfo().isSparseEntries());
 
@@ -47,13 +48,15 @@ public class SparseFlagTest extends BaseTest {
     }
 
     @Test
-    public void decodeWithExpectationOfNoSparseEntries() throws BrutException {
+    public void decodeWithExpectationOfNoSparseEntries() throws Exception {
         sConfig.setFrameworkTag("issue-3298");
 
         LOGGER.info("Decoding not-sparse.apk...");
         ExtFile testApk = new ExtFile(sTmpDir, "not-sparse.apk");
         ExtFile testDir = new ExtFile(testApk + ".out");
-        ApkInfo apkInfo = new ApkDecoder(testApk, sConfig).decode(testDir);
+        ApkDecoder apkDecoder = new ApkDecoder(testApk, sConfig);
+        apkDecoder.decode(testDir);
+        ApkInfo apkInfo = apkDecoder.getApkInfo();
 
         assertFalse("Expecting not-sparse entries", apkInfo.getResourcesInfo().isSparseEntries());
 

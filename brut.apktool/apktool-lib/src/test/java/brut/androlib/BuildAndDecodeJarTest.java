@@ -16,7 +16,6 @@
  */
 package brut.androlib;
 
-import brut.common.BrutException;
 import brut.directory.ExtFile;
 
 import org.junit.*;
@@ -30,7 +29,7 @@ public class BuildAndDecodeJarTest extends BaseTest {
         sTestNewDir = new ExtFile(sTmpDir, "testjar-new");
 
         LOGGER.info("Unpacking testjar...");
-        TestUtils.copyResourceDir(BuildAndDecodeJarTest.class, "testjar", sTestOrigDir);
+        copyResourceDir(BuildAndDecodeJarTest.class, "testjar", sTestOrigDir);
 
         LOGGER.info("Building testjar.jar...");
         ExtFile testJar = new ExtFile(sTmpDir, "testjar.jar");

@@ -17,7 +17,6 @@
 package brut.directory;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URI;
 
 public class ExtFile extends File implements AutoCloseable {
@@ -55,7 +54,7 @@ public class ExtFile extends File implements AutoCloseable {
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() throws DirectoryException {
         if (mDirectory != null) {
             mDirectory.close();
             mDirectory = null;
@@ -66,7 +65,8 @@ public class ExtFile extends File implements AutoCloseable {
     public boolean delete() {
         try {
             close();
-        } catch (IOException ignored) {
+        } catch (DirectoryException ignored) {
+            return false;
         }
 
         return super.delete();

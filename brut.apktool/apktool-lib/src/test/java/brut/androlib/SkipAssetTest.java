@@ -16,7 +16,6 @@
  */
 package brut.androlib;
 
-import brut.common.BrutException;
 import brut.directory.ExtFile;
 
 import java.io.File;
@@ -29,11 +28,11 @@ public class SkipAssetTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        TestUtils.copyResourceDir(SkipAssetTest.class, "issue1605", sTmpDir);
+        copyResourceDir(SkipAssetTest.class, "issue1605", sTmpDir);
     }
 
     @Test
-    public void checkIfEnablingSkipAssetWorks() throws BrutException {
+    public void checkIfEnablingSkipAssetWorks() throws Exception {
         sConfig.setDecodeAssets(Config.DecodeAssets.NONE);
 
         ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
@@ -45,7 +44,7 @@ public class SkipAssetTest extends BaseTest {
     }
 
     @Test
-    public void checkControl() throws BrutException {
+    public void checkControl() throws Exception {
         sConfig.setDecodeAssets(Config.DecodeAssets.FULL);
 
         ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);

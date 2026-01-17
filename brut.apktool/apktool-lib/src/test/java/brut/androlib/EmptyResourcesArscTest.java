@@ -16,7 +16,6 @@
  */
 package brut.androlib;
 
-import brut.common.BrutException;
 import brut.directory.ExtFile;
 
 import org.junit.*;
@@ -30,7 +29,7 @@ public class EmptyResourcesArscTest extends BaseTest {
         sTestNewDir = new ExtFile(sTmpDir, "issue1730-new");
 
         LOGGER.info("Unpacking issue1730.apk...");
-        TestUtils.copyResourceDir(EmptyResourcesArscTest.class, "issue1730", sTestOrigDir);
+        copyResourceDir(EmptyResourcesArscTest.class, "issue1730", sTestOrigDir);
 
         LOGGER.info("Decoding issue1730.apk...");
         ExtFile testApk = new ExtFile(sTestOrigDir, "issue1730.apk");

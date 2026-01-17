@@ -16,7 +16,6 @@
  */
 package brut.androlib;
 
-import brut.common.BrutException;
 import brut.directory.ExtFile;
 
 import org.junit.*;
@@ -30,7 +29,7 @@ public class AndroidOreoNotSparseTest extends BaseTest {
         sTestNewDir = new ExtFile(sTmpDir, "issue1594-new");
 
         LOGGER.info("Unpacking not_sparse.apk...");
-        TestUtils.copyResourceDir(AndroidOreoNotSparseTest.class, "issue1594", sTestOrigDir);
+        copyResourceDir(AndroidOreoNotSparseTest.class, "issue1594", sTestOrigDir);
 
         LOGGER.info("Decoding not_sparse.apk...");
         ExtFile testApk = new ExtFile(sTestOrigDir, "not_sparse.apk");

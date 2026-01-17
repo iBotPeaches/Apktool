@@ -16,7 +16,6 @@
  */
 package brut.androlib;
 
-import brut.common.BrutException;
 import brut.directory.ExtFile;
 
 import org.junit.*;
@@ -27,11 +26,11 @@ public class ParentDirectoryTraversalTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        TestUtils.copyResourceDir(ParentDirectoryTraversalTest.class, "issue1498", sTmpDir);
+        copyResourceDir(ParentDirectoryTraversalTest.class, "issue1498", sTmpDir);
     }
 
     @Test
-    public void checkIfDrawableFileDecodesProperly() throws BrutException {
+    public void checkIfDrawableFileDecodesProperly() throws Exception {
         sConfig.setDecodeResources(Config.DecodeResources.NONE);
 
         ExtFile testApk = new ExtFile(sTmpDir, apk);

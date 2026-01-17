@@ -21,7 +21,6 @@ import brut.androlib.res.table.ResId;
 import brut.androlib.res.table.ResTable;
 import brut.androlib.res.table.value.ResArray;
 import brut.androlib.res.table.value.ResValue;
-import brut.common.BrutException;
 import brut.directory.ExtFile;
 
 import org.junit.*;
@@ -32,7 +31,7 @@ public class DecodeArrayTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        TestUtils.copyResourceDir(MissingVersionManifestTest.class, "issue1994", sTmpDir);
+        copyResourceDir(MissingVersionManifestTest.class, "issue1994", sTmpDir);
 
         LOGGER.info("Decoding issue1994.apk...");
         ExtFile testApk = new ExtFile(sTmpDir, "issue1994.apk");
@@ -47,13 +46,13 @@ public class DecodeArrayTest extends BaseTest {
     }
 
     @Test
-    public void decodeStringArray() throws BrutException {
+    public void decodeStringArray() throws Exception {
         ResValue value = sTable.getDefaultEntry(ResId.of(0x7F020001)).getValue();
         assertTrue("Not a ResArray. Found: " + value.getClass(), value instanceof ResArray);
     }
 
     @Test
-    public void decodeArray() throws BrutException {
+    public void decodeArray() throws Exception {
         ResValue value = sTable.getDefaultEntry(ResId.of(0x7F020000)).getValue();
         assertTrue("Not a ResArray. Found: " + value.getClass(), value instanceof ResArray);
     }

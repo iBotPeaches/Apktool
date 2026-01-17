@@ -16,11 +16,7 @@
  */
 package brut.androlib;
 
-import brut.common.BrutException;
 import brut.directory.ExtFile;
-
-import java.io.File;
-import java.io.IOException;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -30,11 +26,11 @@ public class LargeIntsInManifestTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        TestUtils.copyResourceDir(LargeIntsInManifestTest.class, "issue767", sTmpDir);
+        copyResourceDir(LargeIntsInManifestTest.class, "issue767", sTmpDir);
     }
 
     @Test
-    public void checkIfLargeIntsAreHandledTest() throws BrutException {
+    public void checkIfLargeIntsAreHandledTest() throws Exception {
         ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
         ExtFile testDir = new ExtFile(testApk + ".out");
         new ApkDecoder(testApk, sConfig).decode(testDir);

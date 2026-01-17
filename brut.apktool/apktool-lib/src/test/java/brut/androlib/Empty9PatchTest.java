@@ -16,7 +16,6 @@
  */
 package brut.androlib;
 
-import brut.common.BrutException;
 import brut.directory.ExtFile;
 
 import java.io.File;
@@ -29,11 +28,11 @@ public class Empty9PatchTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        TestUtils.copyResourceDir(Empty9PatchTest.class, "empty_9patch", sTmpDir);
+        copyResourceDir(Empty9PatchTest.class, "empty_9patch", sTmpDir);
     }
 
     @Test
-    public void decodeWithEmpty9PatchFile() throws BrutException {
+    public void decodeWithEmpty9PatchFile() throws Exception {
         ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
         ExtFile testDir = new ExtFile(testApk + ".out");
         new ApkDecoder(testApk, sConfig).decode(testDir);

@@ -501,11 +501,8 @@ public class Main {
                 : apkName + ".out");
         }
 
-        try (ExtFile apkFile = new ExtFile(apkName)) {
-            ApkDecoder decoder = new ApkDecoder(apkFile, config);
-            decoder.decode(outDir);
-        } catch (IOException ignored) {
-            // Input file could not be closed, just ignore.
+        try {
+            new ApkDecoder(new ExtFile(apkName), config).decode(outDir);
         } catch (InFileNotFoundException | OutDirExistsException | FrameworkNotFoundException ex) {
             System.err.println(ex.getMessage());
             System.exit(1);
@@ -581,9 +578,7 @@ public class Main {
             }
         }
 
-        ExtFile apkDir = new ExtFile(apkDirName);
-        ApkBuilder builder = new ApkBuilder(apkDir, config);
-        builder.build(outFile);
+        new ApkBuilder(new ExtFile(apkDirName), config).build(outFile);
     }
 
     private static void cmdInstallFramework(String[] args) throws AndrolibException {

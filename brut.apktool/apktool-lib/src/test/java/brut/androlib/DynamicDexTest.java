@@ -16,8 +16,6 @@
  */
 package brut.androlib;
 
-import brut.androlib.exceptions.AndrolibException;
-import brut.common.BrutException;
 import brut.directory.ExtFile;
 
 import org.junit.*;
@@ -29,11 +27,11 @@ public class DynamicDexTest extends BaseTest {
     @BeforeClass
     public static void beforeClass() throws Exception {
         LOGGER.info("Unpacking " + TEST_APK + "...");
-        TestUtils.copyResourceDir(DynamicDexTest.class, "dynamic_dex", sTmpDir);
+        copyResourceDir(DynamicDexTest.class, "dynamic_dex", sTmpDir);
     }
 
     @Test
-    public void decodeOnlyMainClassesTest() throws BrutException {
+    public void decodeOnlyMainClassesTest() throws Exception {
         sConfig.setDecodeSources(Config.DecodeSources.ONLY_MAIN_CLASSES);
 
         LOGGER.info("Decoding " + TEST_APK + "...");
@@ -46,7 +44,7 @@ public class DynamicDexTest extends BaseTest {
     }
 
     @Test
-    public void decodeAllSourcesTest() throws BrutException {
+    public void decodeAllSourcesTest() throws Exception {
         sConfig.setDecodeSources(Config.DecodeSources.FULL);
 
         LOGGER.info("Decoding " + TEST_APK + "...");

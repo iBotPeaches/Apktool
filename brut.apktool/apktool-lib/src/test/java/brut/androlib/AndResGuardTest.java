@@ -16,7 +16,6 @@
  */
 package brut.androlib;
 
-import brut.common.BrutException;
 import brut.directory.ExtFile;
 
 import java.io.File;
@@ -29,11 +28,11 @@ public class AndResGuardTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        TestUtils.copyResourceDir(AndResGuardTest.class, "issue1170", sTmpDir);
+        copyResourceDir(AndResGuardTest.class, "issue1170", sTmpDir);
     }
 
     @Test
-    public void checkifAndResDecodeRemapsRFolder() throws BrutException {
+    public void checkifAndResDecodeRemapsRFolder() throws Exception {
         ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
         ExtFile testDir = new ExtFile(testApk + ".out");
         new ApkDecoder(testApk, sConfig).decode(testDir);
@@ -42,7 +41,7 @@ public class AndResGuardTest extends BaseTest {
     }
 
     @Test
-    public void checkIfAndResDecodeIgnoresRFolderInRawMode() throws BrutException {
+    public void checkIfAndResDecodeIgnoresRFolderInRawMode() throws Exception {
         sConfig.setDecodeResources(Config.DecodeResources.NONE);
 
         ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);

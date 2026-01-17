@@ -17,7 +17,6 @@
 package brut.androlib;
 
 import brut.androlib.meta.ApkInfo;
-import brut.common.BrutException;
 import brut.directory.ExtFile;
 
 import org.junit.*;
@@ -28,11 +27,11 @@ public class MissingVersionManifestTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        TestUtils.copyResourceDir(MissingVersionManifestTest.class, "issue1264", sTmpDir);
+        copyResourceDir(MissingVersionManifestTest.class, "issue1264", sTmpDir);
     }
 
     @Test
-    public void missingVersionParsesCorrectlyTest() throws BrutException {
+    public void missingVersionParsesCorrectlyTest() throws Exception {
         ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
         ExtFile testDir = new ExtFile(testApk + ".out");
         new ApkDecoder(testApk, sConfig).decode(testDir);

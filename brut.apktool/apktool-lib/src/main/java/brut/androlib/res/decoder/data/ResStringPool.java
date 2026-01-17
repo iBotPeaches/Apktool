@@ -47,20 +47,6 @@ public class ResStringPool {
     private int[] mStyles;
     private boolean mIsUtf8;
 
-    public static ResStringPool parse(BinaryDataInputStream in) throws IOException {
-        ResChunkPullParser parser = new ResChunkPullParser(in);
-        if (!parser.next()) {
-            throw new IOException("Invalid input stream.");
-        }
-
-        if (parser.chunkType() != ResChunkHeader.RES_STRING_POOL_TYPE) {
-            throw new IOException("Unexpected chunk: " + parser.chunkName()
-                    + " (expected: RES_STRING_POOL_TYPE)");
-        }
-
-        return parse(parser);
-    }
-
     public static ResStringPool parse(ResChunkPullParser parser) throws IOException {
         BinaryDataInputStream in = parser.stream();
         // ResStringPool_header

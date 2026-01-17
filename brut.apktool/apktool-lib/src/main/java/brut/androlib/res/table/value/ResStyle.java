@@ -25,7 +25,6 @@ import brut.androlib.res.table.ResEntrySpec;
 import brut.androlib.res.table.ResId;
 import brut.androlib.res.table.ResPackage;
 import brut.androlib.res.xml.ValuesXmlSerializable;
-import org.apache.commons.lang3.tuple.Pair;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;

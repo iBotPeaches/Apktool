@@ -16,13 +16,9 @@
  */
 package brut.androlib;
 
-import brut.common.BrutException;
 import brut.directory.ExtFile;
-import org.xml.sax.SAXException;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -33,11 +29,11 @@ public class ProviderAttributeTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        TestUtils.copyResourceDir(ProviderAttributeTest.class, "issue636", sTmpDir);
+        copyResourceDir(ProviderAttributeTest.class, "issue636", sTmpDir);
     }
 
     @Test
-    public void isProviderStringReplacementWorking() throws BrutException, IOException, SAXException {
+    public void isProviderStringReplacementWorking() throws Exception {
         ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
         ExtFile testDir = new ExtFile(testApk + ".out");
         new ApkDecoder(testApk, sConfig).decode(testDir);
@@ -57,8 +53,7 @@ public class ProviderAttributeTest extends BaseTest {
                 + "    </application>\n"
                 + "</manifest>";
 
-        File xml = new File(newDir, "AndroidManifest.xml");
-        String obtained = new String(Files.readAllBytes(xml.toPath()));
+        String obtained = readTextFile(new File(newDir, "AndroidManifest.xml"));
 
         assertXMLEqual(expected, obtained);
     }

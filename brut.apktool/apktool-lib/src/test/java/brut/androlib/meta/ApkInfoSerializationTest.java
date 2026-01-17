@@ -17,11 +17,9 @@
 package brut.androlib.meta;
 
 import brut.androlib.BaseTest;
-import brut.common.BrutException;
 
 import java.io.File;
 import java.io.InputStream;
-import java.io.IOException;
 import java.nio.file.Files;
 
 import org.junit.*;
@@ -53,7 +51,7 @@ public class ApkInfoSerializationTest extends BaseTest {
     }
 
     @Test
-    public void checkApkInfoSerialization() throws BrutException, IOException {
+    public void checkApkInfoSerialization() throws Exception {
         ApkInfo control = ApkInfo.load(getClass().getResourceAsStream("/meta/unknown_files.yml"));
         check(control);
 

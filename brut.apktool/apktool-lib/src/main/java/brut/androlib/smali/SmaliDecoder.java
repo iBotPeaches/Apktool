@@ -21,7 +21,6 @@ import brut.util.OS;
 import com.android.tools.smali.baksmali.Baksmali;
 import com.android.tools.smali.baksmali.BaksmaliOptions;
 import com.android.tools.smali.dexlib2.DexFileFactory;
-import com.android.tools.smali.dexlib2.Opcodes;
 import com.android.tools.smali.dexlib2.analysis.InlineMethodResolver;
 import com.android.tools.smali.dexlib2.dexbacked.DexBackedDexFile;
 import com.android.tools.smali.dexlib2.dexbacked.DexBackedOdexFile;

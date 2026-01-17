@@ -22,9 +22,8 @@ import brut.androlib.meta.ApkInfo;
 import brut.androlib.meta.UsesFramework;
 import brut.androlib.res.Framework;
 import brut.androlib.res.decoder.BinaryResourceParser;
-import brut.directory.Directory;
 import brut.directory.DirectoryException;
-import brut.directory.ExtFile;
+import brut.directory.ZipRODirectory;
 
 import java.io.*;
 import java.util.*;
@@ -88,8 +87,7 @@ public class ResTable {
 
     private List<ResPackage> loadResPackagesFromApk(File apkFile, boolean keepBrokenResources)
             throws AndrolibException {
-        try (ExtFile file = new ExtFile(apkFile)) {
-            Directory dir = file.getDirectory();
+        try (ZipRODirectory dir = new ZipRODirectory(apkFile)) {
             if (!dir.containsFile("resources.arsc")) {
                 throw new AndrolibException("Could not find resources.arsc in file: " + apkFile);
             }

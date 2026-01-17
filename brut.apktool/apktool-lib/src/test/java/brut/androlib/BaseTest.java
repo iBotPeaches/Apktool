@@ -18,23 +18,22 @@ package brut.androlib;
 
 import brut.androlib.Config;
 import brut.androlib.res.Framework;
-import brut.common.BrutException;
 import brut.directory.ExtFile;
+import brut.directory.FileDirectory;
 import brut.util.OS;
-import brut.xml.XmlUtils;
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPathExpressionException;
 import java.io.File;
 import java.io.FileReader;
+import java.io.InputStream;
 import java.io.IOException;
 import java.io.Reader;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.nio.file.Files;
 import java.util.logging.Logger;
 
 import org.junit.*;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 import org.custommonkey.xmlunit.*;
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 
@@ -52,7 +51,7 @@ public class BaseTest {
         XMLUnit.setIgnoreWhitespace(true);
     }
 
-    private static void cleanFrameworkFile() throws BrutException {
+    private static void cleanFrameworkFile() throws Exception {
         File apkFile = new File(new Framework(sConfig).getDirectory(), "1.apk");
         if (apkFile.isFile()) {
             OS.rmfile(apkFile.getAbsolutePath());
@@ -87,15 +86,58 @@ public class BaseTest {
     }
 
     @Before
-    public void beforeEachTest() throws Exception {
+    public void beforeEachTest() {
         sConfig = new Config("TEST");
     }
 
-    protected void compareBinaryFolder(String path) throws BrutException {
+    protected static void copyResourceDir(Class<?> clz, String dirPath, File outDir) throws Exception {
+        if (clz == null) {
+            clz = Class.class;
+        }
+
+        URL dirURL = clz.getClassLoader().getResource(dirPath);
+        if (dirURL != null && dirURL.getProtocol().equals("file")) {
+            String jarPath = URLDecoder.decode(dirURL.getFile(), "UTF-8");
+            new FileDirectory(jarPath).copyToDir(outDir);
+            return;
+        }
+
+        if (dirURL == null) {
+            String className = clz.getName().replace('.', '/') + ".class";
+            dirURL = clz.getClassLoader().getResource(className);
+        }
+
+        if (dirURL.getProtocol().equals("jar")) {
+            String jarPath = URLDecoder.decode(dirURL.getPath().substring(5, dirURL.getPath().indexOf('!')), "UTF-8");
+            new FileDirectory(jarPath).copyToDir(outDir);
+        }
+    }
+
+    protected static String readTextFile(File file) throws Exception {
+        return new String(Files.readAllBytes(file.toPath()));
+    }
+
+    protected static byte[] readHeaderOfFile(File file, int size) throws Exception {
+        byte[] buffer = new byte[size];
+
+        try (InputStream in = Files.newInputStream(file.toPath())) {
+            if (in.read(buffer) != buffer.length) {
+                throw new IOException("File size too small for buffer length: " + size);
+            }
+        }
+
+        return buffer;
+    }
+
+    protected static String replaceNewlines(String value) {
+        return value.replaceAll("[\n\r]", "");
+    }
+
+    protected static void compareBinaryFolder(String path) throws Exception {
         compareBinaryFolder(sTestOrigDir, sTestNewDir, path);
     }
 
-    protected void compareBinaryFolder(File controlDir, File testDir, String path) throws BrutException {
+    protected static void compareBinaryFolder(File controlDir, File testDir, String path) throws Exception {
         ExtFile controlBase = new ExtFile(controlDir, path);
         File testBase = new File(testDir, path);
 
@@ -113,56 +155,34 @@ public class BaseTest {
         assertTrue(exists);
     }
 
-    protected void compareValuesFiles(String path) throws BrutException {
+    protected static void compareValuesFiles(String path) throws Exception {
         compareValuesFiles(sTestOrigDir, sTestNewDir, path);
     }
 
-    protected void compareValuesFiles(File controlDir, File testDir, String path) throws BrutException {
+    protected static void compareValuesFiles(File controlDir, File testDir, String path) throws Exception {
         compareXmlFiles(controlDir, testDir, "res/" + path, new ElementNameAndAttributeQualifier("name"));
     }
 
-    protected void compareXmlFiles(String path) throws BrutException {
+    protected static void compareXmlFiles(String path) throws Exception {
         compareXmlFiles(sTestOrigDir, sTestNewDir, path, null);
     }
 
-    protected void compareXmlFiles(File controlDir, File testDir, String path) throws BrutException {
+    protected static void compareXmlFiles(File controlDir, File testDir, String path) throws Exception {
         compareXmlFiles(controlDir, testDir, path, null);
     }
 
-    private void compareXmlFiles(File controlDir, File testDir, String path, ElementQualifier qualifier)
-            throws BrutException {
-        try {
-            Reader control = new FileReader(new File(controlDir, path));
-            Reader test = new FileReader(new File(testDir, path));
+    private static void compareXmlFiles(File controlDir, File testDir, String path, ElementQualifier qualifier) throws Exception {
+        Reader control = new FileReader(new File(controlDir, path));
+        Reader test = new FileReader(new File(testDir, path));
 
-            if (qualifier == null) {
-                assertXMLEqual(control, test);
-                return;
-            }
-
-            DetailedDiff diff = new DetailedDiff(new Diff(control, test));
-            diff.overrideElementQualifier(qualifier);
-
-            assertTrue(path + ": " + diff.getAllDifferences().toString(), diff.similar());
-        } catch (IOException | SAXException ex) {
-            throw new BrutException(ex);
+        if (qualifier == null) {
+            assertXMLEqual(control, test);
+            return;
         }
-    }
 
-    protected static Document loadDocument(File file) throws BrutException {
-        try {
-            return XmlUtils.loadDocument(file);
-        } catch (IOException | SAXException | ParserConfigurationException ex) {
-            throw new BrutException(ex);
-        }
-    }
+        DetailedDiff diff = new DetailedDiff(new Diff(control, test));
+        diff.overrideElementQualifier(qualifier);
 
-    protected static <T> T evaluateXPath(Document doc, String expression, Class<T> returnType)
-            throws BrutException {
-        try {
-            return XmlUtils.evaluateXPath(doc, expression, returnType);
-        } catch (XPathExpressionException ex) {
-            throw new BrutException(ex);
-        }
+        assertTrue(path + ": " + diff.getAllDifferences().toString(), diff.similar());
     }
 }

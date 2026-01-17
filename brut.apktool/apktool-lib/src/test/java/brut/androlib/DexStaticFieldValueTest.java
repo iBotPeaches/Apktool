@@ -16,12 +16,9 @@
  */
 package brut.androlib;
 
-import brut.common.BrutException;
 import brut.directory.ExtFile;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -34,7 +31,7 @@ public class DexStaticFieldValueTest extends BaseTest {
         sTestNewDir = new ExtFile(sTmpDir, "issue2543-new");
 
         LOGGER.info("Unpacking issue2543...");
-        TestUtils.copyResourceDir(DexStaticFieldValueTest.class, "issue2543", sTestOrigDir);
+        copyResourceDir(DexStaticFieldValueTest.class, "issue2543", sTestOrigDir);
 
         sConfig.setBaksmaliDebugMode(false);
 
@@ -47,7 +44,7 @@ public class DexStaticFieldValueTest extends BaseTest {
     }
 
     @Test
-    public void disassembleDexFileToKeepDefaultParameters() throws IOException {
+    public void disassembleDexFileToKeepDefaultParameters() throws Exception {
         String expected = ".class public LHelloWorld;\n"
                 + ".super Ljava/lang/Object;\n"
                 + "\n"
@@ -65,9 +62,8 @@ public class DexStaticFieldValueTest extends BaseTest {
                 + "    return-void\n"
                 + ".end method";
 
-        File smali = new File(sTestNewDir, "smali/HelloWorld.smali");
-        String obtained = new String(Files.readAllBytes(smali.toPath()));
+        String obtained = readTextFile(new File(sTestNewDir, "smali/HelloWorld.smali"));
 
-        assertEquals(TestUtils.replaceNewlines(expected), TestUtils.replaceNewlines(obtained));
+        assertEquals(replaceNewlines(expected), replaceNewlines(obtained));
     }
 }

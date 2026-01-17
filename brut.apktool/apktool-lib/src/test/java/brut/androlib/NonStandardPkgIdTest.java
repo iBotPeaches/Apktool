@@ -20,7 +20,6 @@ import brut.androlib.meta.ApkInfo;
 import brut.androlib.res.ResDecoder;
 import brut.androlib.res.table.ResId;
 import brut.androlib.res.table.ResTable;
-import brut.common.BrutException;
 import brut.directory.ExtFile;
 import brut.util.OS;
 
@@ -36,7 +35,7 @@ public class NonStandardPkgIdTest extends BaseTest {
         sTestNewDir = new ExtFile(sTmpDir, "pkgid8-new");
 
         LOGGER.info("Unpacking pkgid8...");
-        TestUtils.copyResourceDir(NonStandardPkgIdTest.class, "pkgid8", sTestOrigDir);
+        copyResourceDir(NonStandardPkgIdTest.class, "pkgid8", sTestOrigDir);
 
         sConfig.setVerbose(true);
 
@@ -64,17 +63,17 @@ public class NonStandardPkgIdTest extends BaseTest {
     }
 
     @Test
-    public void valuesStringsTest() throws BrutException {
+    public void valuesStringsTest() throws Exception {
         compareValuesFiles("values/strings.xml");
     }
 
     @Test
-    public void confirmManifestStructureTest() throws BrutException {
+    public void confirmManifestStructureTest() throws Exception {
         compareXmlFiles("AndroidManifest.xml");
     }
 
     @Test
-    public void confirmResourcesAreFromPkgId8() throws BrutException {
+    public void confirmResourcesAreFromPkgId8() throws Exception {
         assertEquals(0x80, sTable.getMainPackage().getId());
 
         assertEquals(0x80, sTable.getEntrySpec(ResId.of(0x80020000)).getPackage().getId());

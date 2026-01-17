@@ -16,7 +16,6 @@
  */
 package brut.androlib;
 
-import brut.common.BrutException;
 import brut.directory.ExtFile;
 
 import java.io.File;
@@ -29,11 +28,11 @@ public class ProtectedChunksTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        TestUtils.copyResourceDir(ProtectedChunksTest.class, "protected_chunks", sTmpDir);
+        copyResourceDir(ProtectedChunksTest.class, "protected_chunks", sTmpDir);
     }
 
     @Test
-    public void checkIfDecodeWorksWithoutCrash() throws BrutException {
+    public void checkIfDecodeWorksWithoutCrash() throws Exception {
         ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
         ExtFile testDir = new ExtFile(testApk + ".out");
         new ApkDecoder(testApk, sConfig).decode(testDir);

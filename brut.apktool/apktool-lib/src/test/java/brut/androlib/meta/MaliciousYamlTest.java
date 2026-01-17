@@ -17,7 +17,6 @@
 package brut.androlib.meta;
 
 import brut.androlib.BaseTest;
-import brut.common.BrutException;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -25,7 +24,7 @@ import static org.junit.Assert.*;
 public class MaliciousYamlTest extends BaseTest {
 
     @Test
-    public void testMaliciousYaml() throws BrutException {
+    public void testMaliciousYaml() throws Exception {
         ApkInfo apkInfo = ApkInfo.load(getClass().getResourceAsStream("/meta/cve20220476.yml"));
         assertEquals("2.6.1-ddc4bb-SNAPSHOT", apkInfo.getVersion());
     }

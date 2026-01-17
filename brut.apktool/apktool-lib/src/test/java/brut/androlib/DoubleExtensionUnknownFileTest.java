@@ -17,7 +17,6 @@
 package brut.androlib;
 
 import brut.androlib.meta.ApkInfo;
-import brut.common.BrutException;
 import brut.directory.ExtFile;
 import org.apache.commons.lang3.StringUtils;
 
@@ -29,18 +28,18 @@ public class DoubleExtensionUnknownFileTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        TestUtils.copyResourceDir(DoubleExtensionUnknownFileTest.class, "issue1244", sTmpDir);
+        copyResourceDir(DoubleExtensionUnknownFileTest.class, "issue1244", sTmpDir);
     }
 
     @Test
-    public void multipleExtensionUnknownFileTest() throws BrutException {
+    public void multipleExtensionUnknownFileTest() throws Exception {
         ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
         ExtFile testDir = new ExtFile(testApk + ".out");
         new ApkDecoder(testApk, sConfig).decode(testDir);
 
         ApkInfo testInfo = ApkInfo.load(testDir);
         for (String path : testInfo.getDoNotCompress()) {
-            if (StringUtils.countMatches(path, ".") > 1) {
+            if (StringUtils.countMatches(path, '.') > 1) {
                 assertTrue(path.equals("assets/bin/Data/sharedassets1.assets.split0"));
             }
         }

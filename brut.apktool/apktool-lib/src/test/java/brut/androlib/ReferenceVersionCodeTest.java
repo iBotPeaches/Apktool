@@ -17,7 +17,6 @@
 package brut.androlib;
 
 import brut.androlib.meta.ApkInfo;
-import brut.common.BrutException;
 import brut.directory.ExtFile;
 
 import org.junit.*;
@@ -28,11 +27,11 @@ public class ReferenceVersionCodeTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        TestUtils.copyResourceDir(ReferenceVersionCodeTest.class, "issue1234", sTmpDir);
+        copyResourceDir(ReferenceVersionCodeTest.class, "issue1234", sTmpDir);
     }
 
     @Test
-    public void referenceBecomesLiteralTest() throws BrutException {
+    public void referenceBecomesLiteralTest() throws Exception {
         ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
         ExtFile testDir = new ExtFile(testApk + ".out");
         new ApkDecoder(testApk, sConfig).decode(testDir);

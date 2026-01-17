@@ -16,7 +16,6 @@
  */
 package brut.androlib;
 
-import brut.common.BrutException;
 import brut.directory.ExtFile;
 
 import java.io.File;
@@ -28,7 +27,7 @@ public class OutsideOfDirectoryEntryTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        TestUtils.copyResourceDir(OutsideOfDirectoryEntryTest.class, "issue1589", sTmpDir);
+        copyResourceDir(OutsideOfDirectoryEntryTest.class, "issue1589", sTmpDir);
 
         ExtFile testApk = new ExtFile(sTmpDir, "issue1589.apk");
         ExtFile testDir = new ExtFile(testApk + ".out");
