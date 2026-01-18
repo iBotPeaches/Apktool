@@ -16,8 +16,7 @@
  */
 package brut.androlib;
 
-import brut.common.BrutException;
-import brut.directory.ExtFile;
+import java.io.File;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -26,14 +25,14 @@ public class BuildAndDecodeJarTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        sTestOrigDir = new ExtFile(sTmpDir, "testjar-orig");
-        sTestNewDir = new ExtFile(sTmpDir, "testjar-new");
+        sTestOrigDir = new File(sTmpDir, "testjar-orig");
+        sTestNewDir = new File(sTmpDir, "testjar-new");
 
         LOGGER.info("Unpacking testjar...");
-        TestUtils.copyResourceDir(BuildAndDecodeJarTest.class, "testjar", sTestOrigDir);
+        copyResourceDir(BuildAndDecodeJarTest.class, "testjar", sTestOrigDir);
 
         LOGGER.info("Building testjar.jar...");
-        ExtFile testJar = new ExtFile(sTmpDir, "testjar.jar");
+        File testJar = new File(sTmpDir, "testjar.jar");
         new ApkBuilder(sTestOrigDir, sConfig).build(testJar);
 
         LOGGER.info("Decoding testjar.jar...");

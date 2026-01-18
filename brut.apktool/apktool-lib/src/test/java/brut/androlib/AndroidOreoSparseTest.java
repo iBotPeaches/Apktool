@@ -16,9 +16,6 @@
  */
 package brut.androlib;
 
-import brut.common.BrutException;
-import brut.directory.ExtFile;
-
 import java.io.File;
 
 import org.junit.*;
@@ -28,14 +25,14 @@ public class AndroidOreoSparseTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        sTestOrigDir = new ExtFile(sTmpDir, "issue1594-orig");
-        sTestNewDir = new ExtFile(sTmpDir, "issue1594-new");
+        sTestOrigDir = new File(sTmpDir, "issue1594-orig");
+        sTestNewDir = new File(sTmpDir, "issue1594-new");
 
         LOGGER.info("Unpacking sparse.apk...");
-        TestUtils.copyResourceDir(AndroidOreoSparseTest.class, "issue1594", sTestOrigDir);
+        copyResourceDir(AndroidOreoSparseTest.class, "issue1594", sTestOrigDir);
 
         LOGGER.info("Decoding sparse.apk...");
-        ExtFile testApk = new ExtFile(sTestOrigDir, "sparse.apk");
+        File testApk = new File(sTestOrigDir, "sparse.apk");
         new ApkDecoder(testApk, sConfig).decode(sTestNewDir);
 
         LOGGER.info("Building sparse.apk...");

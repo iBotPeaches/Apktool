@@ -17,8 +17,6 @@
 package brut.androlib;
 
 import brut.androlib.res.Framework;
-import brut.common.BrutException;
-import brut.directory.ExtFile;
 
 import java.io.File;
 
@@ -31,45 +29,45 @@ public class SharedLibraryTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        TestUtils.copyResourceDir(SharedLibraryTest.class, "shared_libraries", sTmpDir);
+        copyResourceDir(SharedLibraryTest.class, "shared_libraries", sTmpDir);
     }
 
     @Test
-    public void isFrameworkTaggingWorking() throws BrutException {
+    public void isFrameworkTaggingWorking() throws Exception {
         sConfig.setFrameworkDirectory(sTmpDir.getAbsolutePath());
         sConfig.setFrameworkTag("building");
 
-        ExtFile libraryApk = new ExtFile(sTmpDir, LIBRARY_APK);
+        File libraryApk = new File(sTmpDir, LIBRARY_APK);
         new Framework(sConfig).install(libraryApk);
 
         assertTrue(new File(sTmpDir, "0-building.apk").exists());
     }
 
     @Test
-    public void isFrameworkInstallingWorking() throws BrutException {
+    public void isFrameworkInstallingWorking() throws Exception {
         sConfig.setFrameworkDirectory(sTmpDir.getAbsolutePath());
 
-        ExtFile libraryApk = new ExtFile(sTmpDir, LIBRARY_APK);
+        File libraryApk = new File(sTmpDir, LIBRARY_APK);
         new Framework(sConfig).install(libraryApk);
 
         assertTrue(new File(sTmpDir, "0.apk").exists());
     }
 
     @Test
-    public void isSharedResourceDecodingAndRebuildingWorking() throws BrutException {
+    public void isSharedResourceDecodingAndRebuildingWorking() throws Exception {
         sConfig.setFrameworkDirectory(sTmpDir.getAbsolutePath());
         sConfig.setLibraryFiles(new String[] {
             "com.google.android.test.shared_library:" + new File(sTmpDir, LIBRARY_APK).getAbsolutePath()
         });
 
         // decode library.apk
-        ExtFile libraryApk = new ExtFile(sTmpDir, LIBRARY_APK);
-        ExtFile libraryDir = new ExtFile(libraryApk + ".out");
+        File libraryApk = new File(sTmpDir, LIBRARY_APK);
+        File libraryDir = new File(libraryApk + ".out");
         new ApkDecoder(libraryApk, sConfig).decode(libraryDir);
 
         // decode client.apk
-        ExtFile clientApk = new ExtFile(sTmpDir, CLIENT_APK);
-        ExtFile clientDir = new ExtFile(clientApk + ".out");
+        File clientApk = new File(sTmpDir, CLIENT_APK);
+        File clientDir = new File(clientApk + ".out");
         new ApkDecoder(clientApk, sConfig).decode(clientDir);
 
         // build library.apk

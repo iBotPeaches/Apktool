@@ -16,8 +16,7 @@
  */
 package brut.androlib;
 
-import brut.common.BrutException;
-import brut.directory.ExtFile;
+import brut.xml.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -32,16 +31,16 @@ public class NetworkConfigTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        sTestOrigDir = new ExtFile(sTmpDir, "network_config-orig");
-        sTestNewDir = new ExtFile(sTmpDir, "network_config-new");
+        sTestOrigDir = new File(sTmpDir, "network_config-orig");
+        sTestNewDir = new File(sTmpDir, "network_config-new");
 
         LOGGER.info("Unpacking network_config...");
-        TestUtils.copyResourceDir(NetworkConfigTest.class, "network_config/existing", sTestOrigDir);
+        copyResourceDir(NetworkConfigTest.class, "network_config/existing", sTestOrigDir);
 
         sConfig.setNetSecConf(true);
 
         LOGGER.info("Building network_config.apk...");
-        ExtFile testApk = new ExtFile(sTmpDir, "network_config.apk");
+        File testApk = new File(sTmpDir, "network_config.apk");
         new ApkBuilder(sTestOrigDir, sConfig).build(testApk);
 
         LOGGER.info("Decoding network_config.apk...");
@@ -54,29 +53,29 @@ public class NetworkConfigTest extends BaseTest {
     }
 
     @Test
-    public void netSecConfGeneric() throws BrutException {
+    public void netSecConfGeneric() throws Exception {
         LOGGER.info("Verifying network security configuration file contains user and system certificates...");
 
         // Load the XML document
-        Document doc = loadDocument(new File(sTestNewDir, "res/xml/network_security_config.xml"));
+        Document doc = XmlUtils.loadDocument(new File(sTestNewDir, "res/xml/network_security_config.xml"));
 
         // Check if 'system' certificate exists
         String systemCertExpr = "/network-security-config/base-config/trust-anchors/certificates[@src='system']";
-        NodeList systemCertNodes = evaluateXPath(doc, systemCertExpr, NodeList.class);
+        NodeList systemCertNodes = XmlUtils.evaluateXPath(doc, systemCertExpr, NodeList.class);
         assertTrue(systemCertNodes.getLength() > 0);
 
         // Check if 'user' certificate exists
         String userCertExpr = "/network-security-config/base-config/trust-anchors/certificates[@src='user']";
-        NodeList userCertNodes = evaluateXPath(doc, userCertExpr, NodeList.class);
+        NodeList userCertNodes = XmlUtils.evaluateXPath(doc, userCertExpr, NodeList.class);
         assertTrue(userCertNodes.getLength() > 0);
     }
 
     @Test
-    public void netSecConfInManifest() throws BrutException {
+    public void netSecConfInManifest() throws Exception {
         LOGGER.info("Validating network security config in Manifest...");
 
         // Load the XML document
-        Document doc = loadDocument(new File(sTestNewDir, "AndroidManifest.xml"));
+        Document doc = XmlUtils.loadDocument(new File(sTestNewDir, "AndroidManifest.xml"));
 
         // Check if network security config attribute is set correctly
         Node application = doc.getElementsByTagName("application").item(0);

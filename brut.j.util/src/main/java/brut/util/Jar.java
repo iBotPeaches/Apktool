@@ -17,7 +17,6 @@
 package brut.util;
 
 import brut.common.BrutException;
-import org.apache.commons.io.IOUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -53,9 +52,7 @@ public final class Jar {
     }
 
     public static File extractToTmp(Class<?> clz, String name, String tmpPrefix) throws BrutException {
-        InputStream in = null;
-        try {
-            in = clz.getResourceAsStream(name);
+        try (InputStream in = clz.getResourceAsStream(name)) {
             if (in == null) {
                 throw new FileNotFoundException(name);
             }
@@ -69,8 +66,6 @@ public final class Jar {
             return fileOut;
         } catch (IOException ex) {
             throw new BrutException("Could not extract resource: " + name, ex);
-        } finally {
-            IOUtils.closeQuietly(in);
         }
     }
 }

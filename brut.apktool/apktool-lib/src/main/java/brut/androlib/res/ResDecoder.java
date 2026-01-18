@@ -30,7 +30,7 @@ import brut.androlib.res.xml.ResXmlUtils;
 import brut.androlib.res.xml.ValuesXmlSerializable;
 import brut.directory.Directory;
 import brut.directory.DirectoryException;
-import brut.directory.ExtFile;
+import brut.directory.FileDirectory;
 import brut.xmlpull.MXSerializer;
 import org.xmlpull.v1.XmlSerializer;
 
@@ -81,7 +81,7 @@ public class ResDecoder {
 
         try {
             inDir = mApkInfo.getApkFile().getDirectory();
-            outDir = new ExtFile(apkDir).getDirectory();
+            outDir = new FileDirectory(apkDir);
         } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
         }
@@ -231,7 +231,7 @@ public class ResDecoder {
         Directory inDir, outDir;
         try {
             inDir = mApkInfo.getApkFile().getDirectory();
-            outDir = new ExtFile(apkDir).getDirectory();
+            outDir = new FileDirectory(apkDir);
 
             LOGGER.info("Decoding AndroidManifest.xml with "
                     + (mTable.isMainPackageLoaded() ? "resources" : "only framework resources") + "...");

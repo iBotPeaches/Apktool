@@ -16,13 +16,7 @@
  */
 package brut.androlib;
 
-import brut.common.BrutException;
-import brut.directory.ExtFile;
-import org.xml.sax.SAXException;
-
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -32,23 +26,22 @@ public class MinifiedArscTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        TestUtils.copyResourceDir(MinifiedArscTest.class, "issue1157", sTmpDir);
+        copyResourceDir(MinifiedArscTest.class, "issue1157", sTmpDir);
 
-        ExtFile testApk = new ExtFile(sTmpDir, "issue1157.apk");
-        sTestNewDir = new ExtFile(testApk + ".out");
+        File testApk = new File(sTmpDir, "issue1157.apk");
+        sTestNewDir = new File(testApk + ".out");
 
         new ApkDecoder(testApk, sConfig).decode(sTestNewDir);
     }
 
     @Test
-    public void checkIfMinifiedArscLayoutFileMatchesTest() throws IOException, SAXException {
+    public void checkIfMinifiedArscLayoutFileMatchesTest() throws Exception {
         String expected = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
                 + "<LinearLayout n1:orientation=\"vertical\" n1:layout_width=\"match_parent\" n1:layout_height=\"match_parent\" xmlns:n1=\"http://schemas.android.com/apk/res/android\">\n"
                 + "    <com.ibotpeaches.issue1157.MyCustomView n1:max=\"100\" n2:default_value=\"1.0\" n2:max_value=\"5.0\" n2:min_value=\"0.2\" xmlns:n2=\"http://schemas.android.com/apk/res-auto\" />\n"
                 + "</LinearLayout>";
 
-        File xml = new File(sTestNewDir, "res/xml/custom.xml");
-        String obtained = new String(Files.readAllBytes(xml.toPath()));
+        String obtained = readTextFile(new File(sTestNewDir, "res/xml/custom.xml"));
 
         assertXMLEqual(expected, obtained);
     }

@@ -20,32 +20,35 @@ import brut.androlib.meta.ApkInfo;
 import brut.androlib.res.ResDecoder;
 import brut.androlib.res.table.ResId;
 import brut.androlib.res.table.ResTable;
-import brut.common.BrutException;
 import brut.directory.ExtFile;
 import brut.util.OS;
+
+import java.io.File;
 
 import org.junit.*;
 import static org.junit.Assert.*;
 
 public class NonStandardPkgIdTest extends BaseTest {
+    private static ExtFile sTestApk;
     private static ResTable sTable;
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        sTestOrigDir = new ExtFile(sTmpDir, "pkgid8-orig");
-        sTestNewDir = new ExtFile(sTmpDir, "pkgid8-new");
+        sTestOrigDir = new File(sTmpDir, "pkgid8-orig");
+        sTestNewDir = new File(sTmpDir, "pkgid8-new");
 
         LOGGER.info("Unpacking pkgid8...");
-        TestUtils.copyResourceDir(NonStandardPkgIdTest.class, "pkgid8", sTestOrigDir);
+        copyResourceDir(NonStandardPkgIdTest.class, "pkgid8", sTestOrigDir);
 
         sConfig.setVerbose(true);
 
         LOGGER.info("Building pkgid8.apk...");
-        ExtFile testApk = new ExtFile(sTmpDir, "pkgid8.apk");
-        new ApkBuilder(sTestOrigDir, sConfig).build(testApk);
+        sTestApk = new ExtFile(sTmpDir, "pkgid8.apk");
+        new ApkBuilder(sTestOrigDir, sConfig).build(sTestApk);
 
         LOGGER.info("Decoding pkgid8.apk...");
-        ApkInfo testInfo = new ApkInfo(testApk);
+        ApkInfo testInfo = new ApkInfo();
+        testInfo.setApkFile(sTestApk);
         ResDecoder resDecoder = new ResDecoder(testInfo, sConfig);
         OS.mkdir(sTestNewDir);
         resDecoder.decodeResources(sTestNewDir);
@@ -55,7 +58,7 @@ public class NonStandardPkgIdTest extends BaseTest {
 
     @AfterClass
     public static void afterClass() throws Exception {
-        sTable.getApkInfo().getApkFile().close();
+        sTestApk.close();
     }
 
     @Test
@@ -64,17 +67,17 @@ public class NonStandardPkgIdTest extends BaseTest {
     }
 
     @Test
-    public void valuesStringsTest() throws BrutException {
+    public void valuesStringsTest() throws Exception {
         compareValuesFiles("values/strings.xml");
     }
 
     @Test
-    public void confirmManifestStructureTest() throws BrutException {
+    public void confirmManifestStructureTest() throws Exception {
         compareXmlFiles("AndroidManifest.xml");
     }
 
     @Test
-    public void confirmResourcesAreFromPkgId8() throws BrutException {
+    public void confirmResourcesAreFromPkgId8() throws Exception {
         assertEquals(0x80, sTable.getMainPackage().getId());
 
         assertEquals(0x80, sTable.getEntrySpec(ResId.of(0x80020000)).getPackage().getId());

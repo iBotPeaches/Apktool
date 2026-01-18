@@ -17,9 +17,9 @@
 package brut.androlib;
 
 import brut.androlib.meta.ApkInfo;
-import brut.common.BrutException;
 import brut.directory.ExtFile;
 import brut.util.OSDetection;
+import brut.xml.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -27,30 +27,35 @@ import org.w3c.dom.Node;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 
 import org.junit.*;
 import static org.junit.Assert.*;
 import static org.junit.Assume.assumeTrue;
 
 public class BuildAndDecodeApkTest extends BaseTest {
+    private static ExtFile sTestApk;
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        sTestOrigDir = new ExtFile(sTmpDir, "testapp-orig");
-        sTestNewDir = new ExtFile(sTmpDir, "testapp-new");
+        sTestOrigDir = new File(sTmpDir, "testapp-orig");
+        sTestNewDir = new File(sTmpDir, "testapp-new");
 
         LOGGER.info("Unpacking testapp...");
-        TestUtils.copyResourceDir(BuildAndDecodeApkTest.class, "testapp", sTestOrigDir);
+        copyResourceDir(BuildAndDecodeApkTest.class, "testapp", sTestOrigDir);
 
         sConfig.setVerbose(true);
 
         LOGGER.info("Building testapp.apk...");
-        ExtFile testApk = new ExtFile(sTmpDir, "testapp.apk");
-        new ApkBuilder(sTestOrigDir, sConfig).build(testApk);
+        sTestApk = new ExtFile(sTmpDir, "testapp.apk");
+        new ApkBuilder(sTestOrigDir, sConfig).build(sTestApk);
 
         LOGGER.info("Decoding testapp.apk...");
-        new ApkDecoder(testApk, sConfig).decode(sTestNewDir);
+        new ApkDecoder(sTestApk, sConfig).decode(sTestNewDir);
+    }
+
+    @AfterClass
+    public static void afterClass() throws Exception {
+        sTestApk.close();
     }
 
     @Test
@@ -59,32 +64,32 @@ public class BuildAndDecodeApkTest extends BaseTest {
     }
 
     @Test
-    public void confirmFeatureFlagsRecorded() throws BrutException {
+    public void confirmFeatureFlagsRecorded() throws Exception {
         ApkInfo testInfo = ApkInfo.load(sTestNewDir);
         assertTrue(testInfo.getFeatureFlags().get("brut.feature.permission"));
         assertTrue(testInfo.getFeatureFlags().get("brut.feature.activity"));
     }
 
     @Test
-    public void confirmZeroByteFileExtensionIsNotStored() throws BrutException {
+    public void confirmZeroByteFileExtensionIsNotStored() throws Exception {
         ApkInfo testInfo = ApkInfo.load(sTestNewDir);
         assertFalse(testInfo.getDoNotCompress().contains("jpg"));
     }
 
     @Test
-    public void confirmZeroByteFileIsStored() throws BrutException {
+    public void confirmZeroByteFileIsStored() throws Exception {
         ApkInfo testInfo = ApkInfo.load(sTestNewDir);
         assertTrue(testInfo.getDoNotCompress().contains("assets/0byte_file.jpg"));
     }
 
     @Test
-    public void confirmManifestStructureTest() throws BrutException {
+    public void confirmManifestStructureTest() throws Exception {
         compareXmlFiles("AndroidManifest.xml");
     }
 
     @Test
-    public void confirmPlatformManifestValuesTest() throws BrutException {
-        Document doc = loadDocument(new File(sTestNewDir, "AndroidManifest.xml"));
+    public void confirmPlatformManifestValuesTest() throws Exception {
+        Document doc = XmlUtils.loadDocument(new File(sTestNewDir, "AndroidManifest.xml"));
         Node application = doc.getElementsByTagName("manifest").item(0);
         NamedNodeMap attrs = application.getAttributes();
 
@@ -102,91 +107,91 @@ public class BuildAndDecodeApkTest extends BaseTest {
     }
 
     @Test
-    public void valuesAnimsTest() throws BrutException {
+    public void valuesAnimsTest() throws Exception {
         compareValuesFiles("values-mcc001/anims.xml");
     }
 
     @Test
-    public void valuesArraysTest() throws BrutException {
+    public void valuesArraysTest() throws Exception {
         compareValuesFiles("values-mcc001/arrays.xml");
     }
 
     @Test
-    public void valuesArraysCastingTest() throws BrutException {
+    public void valuesArraysCastingTest() throws Exception {
         compareValuesFiles("values-mcc002/arrays.xml");
         compareValuesFiles("values-mcc003/arrays.xml");
     }
 
     @Test
-    public void valuesAttrsTest() throws BrutException {
+    public void valuesAttrsTest() throws Exception {
         compareValuesFiles("values/attrs.xml");
     }
 
     @Test
-    public void valuesBoolsTest() throws BrutException {
+    public void valuesBoolsTest() throws Exception {
         compareValuesFiles("values-mcc001/bools.xml");
     }
 
     @Test
-    public void valuesColorsTest() throws BrutException {
+    public void valuesColorsTest() throws Exception {
         compareValuesFiles("values/colors.xml");
         compareValuesFiles("values-mcc001/colors.xml");
     }
 
     @Test
-    public void valuesDimensTest() throws BrutException {
+    public void valuesDimensTest() throws Exception {
         compareValuesFiles("values-mcc001/dimens.xml");
     }
 
     @Test
-    public void valuesDrawablesTest() throws BrutException {
+    public void valuesDrawablesTest() throws Exception {
         compareValuesFiles("values-mcc001/drawables.xml");
     }
 
     @Test
-    public void valuesIdsTest() throws BrutException {
+    public void valuesIdsTest() throws Exception {
         compareValuesFiles("values-mcc001/ids.xml");
     }
 
     @Test
-    public void valuesIntegersTest() throws BrutException {
+    public void valuesIntegersTest() throws Exception {
         compareValuesFiles("values-mcc001/integers.xml");
     }
 
     @Test
-    public void valuesLayoutsTest() throws BrutException {
+    public void valuesLayoutsTest() throws Exception {
         compareValuesFiles("values-mcc001/layouts.xml");
     }
 
     @Test
-    public void valuesPluralsTest() throws BrutException {
+    public void valuesPluralsTest() throws Exception {
         compareValuesFiles("values-mcc001/plurals.xml");
     }
 
     @Test
-    public void valuesOverlayableTest() throws BrutException {
+    public void valuesOverlayableTest() throws Exception {
         compareValuesFiles("values/overlayable.xml");
     }
 
     @Test
-    public void valuesStringsTest() throws BrutException {
+    public void valuesStringsTest() throws Exception {
         compareValuesFiles("values/strings.xml");
         compareValuesFiles("values-mcc001/strings.xml");
     }
 
     @Test
-    public void valuesStylesTest() throws BrutException {
+    public void valuesStylesTest() throws Exception {
         compareValuesFiles("values-mcc001/styles.xml");
     }
 
     @Test
-    public void valuesExtraLongTest() throws BrutException {
+    public void valuesExtraLongTest() throws Exception {
         compareValuesFiles("values-en/strings.xml");
     }
 
     @Test
-    public void valuesMaxLengthTest() throws BrutException {
-        Document doc = loadDocument(new File(sTestNewDir, "res/values-en/strings.xml"));
+    public void valuesMaxLengthTest() throws Exception {
+        Document doc = XmlUtils.loadDocument(new File(sTestNewDir, "res/values-en/strings.xml"));
 
         // long_string_32767 should be exactly 0x7FFF chars of "a",
         // which is the longest allowed length for UTF-8 strings.
@@ -194,82 +199,82 @@ public class BuildAndDecodeApkTest extends BaseTest {
         // valuesExtraLongTest covers this scenario, but we want a specific test
         // for such an edge case.
         String expression = "/resources/string[@name='long_string_32767']/text()";
-        String str = evaluateXPath(doc, expression, String.class);
+        String str = XmlUtils.evaluateXPath(doc, expression, String.class);
         assertEquals(0x7FFF, str.length());
     }
 
     @Test
-    public void valuesGrammaticalGenderTest() throws BrutException {
+    public void valuesGrammaticalGenderTest() throws Exception {
         compareValuesFiles("values-neuter/strings.xml");
         compareValuesFiles("values-feminine/strings.xml");
     }
 
     @Test
-    public void bug702Test() throws BrutException {
+    public void bug702Test() throws Exception {
         compareValuesFiles("values-mcc001-mnc00/strings.xml");
     }
 
     @Test
-    public void valuesReferencesTest() throws BrutException {
+    public void valuesReferencesTest() throws Exception {
         compareValuesFiles("values-mcc002/strings.xml");
     }
 
     @Test
-    public void crossTypeTest() throws BrutException {
+    public void crossTypeTest() throws Exception {
         compareValuesFiles("values-mcc003/strings.xml");
         compareValuesFiles("values-mcc003/integers.xml");
         compareValuesFiles("values-mcc003/bools.xml");
     }
 
     @Test
-    public void qualifiersTest() throws BrutException {
+    public void qualifiersTest() throws Exception {
         compareValuesFiles("values-mcc004-mnc04-en-rUS-ldrtl-sw100dp-w200dp-h300dp"
                 + "-long-round-highdr-land-desk-night-xhdpi-finger-keyssoft-12key"
                 + "-navhidden-dpad-v26/strings.xml");
     }
 
     @Test
-    public void shortendedMncTest() throws BrutException {
+    public void shortendedMncTest() throws Exception {
         compareValuesFiles("values-mcc001-mnc01/strings.xml");
     }
 
     @Test
-    public void shortMncHtcTest() throws BrutException {
+    public void shortMncHtcTest() throws Exception {
         compareValuesFiles("values-mnc01/strings.xml");
     }
 
     @Test
-    public void shortMncv2Test() throws BrutException {
+    public void shortMncv2Test() throws Exception {
         compareValuesFiles("values-mcc238-mnc06/strings.xml");
     }
 
     @Test
-    public void longMncTest() throws BrutException {
+    public void longMncTest() throws Exception {
         compareValuesFiles("values-mcc238-mnc870/strings.xml");
     }
 
     @Test
-    public void anyDpiTest() throws BrutException {
+    public void anyDpiTest() throws Exception {
         compareValuesFiles("values-watch/strings.xml");
     }
 
     @Test
-    public void packed3CharsTest() throws BrutException {
+    public void packed3CharsTest() throws Exception {
         compareValuesFiles("values-ast-rES/strings.xml");
     }
 
     @Test
-    public void rightToLeftTest() throws BrutException {
+    public void rightToLeftTest() throws Exception {
         compareValuesFiles("values-ldrtl/strings.xml");
     }
 
     @Test
-    public void threeLetterLangBcp47Test() throws BrutException {
+    public void threeLetterLangBcp47Test() throws Exception {
         compareValuesFiles("values-ast/strings.xml");
     }
 
     @Test
-    public void androidOStringTest() throws BrutException {
+    public void androidOStringTest() throws Exception {
         compareValuesFiles("values-ast/strings.xml");
     }
 
@@ -279,49 +284,49 @@ public class BuildAndDecodeApkTest extends BaseTest {
     }
 
     @Test
-    public void twoLetterLangBcp47Test() throws BrutException {
+    public void twoLetterLangBcp47Test() throws Exception {
         compareValuesFiles("values-en-rUS/strings.xml");
     }
 
     @Test
-    public void scriptBcp47Test() throws BrutException {
+    public void scriptBcp47Test() throws Exception {
         compareValuesFiles("values-b+en+Latn+US/strings.xml");
     }
 
     @Test
-    public void regionLocaleBcp47Test() throws BrutException {
+    public void regionLocaleBcp47Test() throws Exception {
         compareValuesFiles("values-b+en+Latn+419/strings.xml");
     }
 
     @Test
-    public void numericalRegionBcp47Test() throws BrutException {
+    public void numericalRegionBcp47Test() throws Exception {
         compareValuesFiles("values-b+eng+419/strings.xml");
     }
 
     @Test
-    public void variantBcp47Test() throws BrutException {
+    public void variantBcp47Test() throws Exception {
         compareValuesFiles("values-b+en+US+posix/strings.xml");
     }
 
     @Test
-    public void valuesBcp47LanguageVariantTest() throws BrutException {
+    public void valuesBcp47LanguageVariantTest() throws Exception {
         compareValuesFiles("values-b+iw+660/strings.xml");
     }
 
     @Test
-    public void valuesBcp47LanguageScriptRegionVariantTest() throws BrutException {
+    public void valuesBcp47LanguageScriptRegionVariantTest() throws Exception {
         compareValuesFiles("values-b+ast+Latn+IT+arevela/strings.xml");
         compareValuesFiles("values-b+ast+Hant+IT+arabext/strings.xml");
     }
 
     @Test
-    public void api23ConfigurationsTest() throws BrutException {
+    public void api23ConfigurationsTest() throws Exception {
         compareValuesFiles("values-round/strings.xml");
         compareValuesFiles("values-notround/strings.xml");
     }
 
     @Test
-    public void api26ConfigurationsTest() throws BrutException {
+    public void api26ConfigurationsTest() throws Exception {
         compareValuesFiles("values-widecg-v26/strings.xml");
         compareValuesFiles("values-lowdr-v26/strings.xml");
         compareValuesFiles("values-nowidecg-v26/strings.xml");
@@ -329,7 +334,7 @@ public class BuildAndDecodeApkTest extends BaseTest {
     }
 
     @Test
-    public void leadingDollarSignResourceNameTest() throws BrutException {
+    public void leadingDollarSignResourceNameTest() throws Exception {
         compareXmlFiles("res/drawable/$avd_hide_password__0.xml");
         compareXmlFiles("res/drawable/$avd_show_password__0.xml");
         compareXmlFiles("res/drawable/$avd_show_password__1.xml");
@@ -338,7 +343,7 @@ public class BuildAndDecodeApkTest extends BaseTest {
     }
 
     @Test
-    public void fontTest() throws BrutException {
+    public void fontTest() throws Exception {
         File fontXml = new File(sTestNewDir, "res/font/lobster.xml");
         File fontFile = new File(sTestNewDir, "res/font/lobster_regular.otf");
 
@@ -352,92 +357,92 @@ public class BuildAndDecodeApkTest extends BaseTest {
     }
 
     @Test
-    public void xmlReferenceAttributeTest() throws BrutException {
+    public void xmlReferenceAttributeTest() throws Exception {
         compareXmlFiles("res/layout/issue1040.xml");
     }
 
     @Test
-    public void xmlCustomAttributeTest() throws BrutException {
+    public void xmlCustomAttributeTest() throws Exception {
         compareXmlFiles("res/layout/issue1063.xml");
     }
 
     @Test
-    public void xmlCustomAttrsNotAndroidTest() throws BrutException {
+    public void xmlCustomAttrsNotAndroidTest() throws Exception {
         compareXmlFiles("res/layout/issue1157.xml");
     }
 
     @Test
-    public void xmlExpectMatchParentTest() throws BrutException {
+    public void xmlExpectMatchParentTest() throws Exception {
         compareXmlFiles("res/layout/issue1274.xml");
     }
 
     @Test
-    public void xmlUniformAutoTextTest() throws BrutException {
+    public void xmlUniformAutoTextTest() throws Exception {
         compareXmlFiles("res/layout/issue1674.xml");
     }
 
     @Test
-    public void navigationResourceTest() throws BrutException {
+    public void navigationResourceTest() throws Exception {
         compareXmlFiles("res/navigation/nav_graph.xml");
     }
 
     @Test
-    public void xmlXsdFileTest() throws BrutException {
+    public void xmlXsdFileTest() throws Exception {
         compareXmlFiles("res/xml/ww_box_styles_schema.xsd");
     }
 
     @Test
-    public void xmlLiteralsTest() throws BrutException {
+    public void xmlLiteralsTest() throws Exception {
         compareXmlFiles("res/xml/literals.xml");
     }
 
     @Test
-    public void xmlReferencesTest() throws BrutException {
+    public void xmlReferencesTest() throws Exception {
         compareXmlFiles("res/xml/references.xml");
     }
 
     @Test
-    public void xmlAccessibilityTest() throws BrutException {
+    public void xmlAccessibilityTest() throws Exception {
         compareXmlFiles("res/xml/accessibility_service_config.xml");
     }
 
     @Test
-    public void drawableNoDpiTest() throws BrutException {
+    public void drawableNoDpiTest() throws Exception {
         compareBinaryFolder("res/drawable-nodpi");
     }
 
     @Test
-    public void drawableAnyDpiTest() throws BrutException {
+    public void drawableAnyDpiTest() throws Exception {
         compareBinaryFolder("res/drawable-anydpi");
     }
 
     @Test
-    public void drawableNumberedDpiTest() throws BrutException {
+    public void drawableNumberedDpiTest() throws Exception {
         compareBinaryFolder("res/drawable-534dpi");
     }
 
     @Test
-    public void drawableLdpiTest() throws BrutException {
+    public void drawableLdpiTest() throws Exception {
         compareBinaryFolder("res/drawable-ldpi");
     }
 
     @Test
-    public void drawableMdpiTest() throws BrutException {
+    public void drawableMdpiTest() throws Exception {
         compareBinaryFolder("res/drawable-mdpi");
     }
 
     @Test
-    public void drawableTvdpiTest() throws BrutException {
+    public void drawableTvdpiTest() throws Exception {
         compareBinaryFolder("res/drawable-tvdpi");
     }
 
     @Test
-    public void drawableXhdpiTest() throws BrutException {
+    public void drawableXhdpiTest() throws Exception {
         compareBinaryFolder("res/drawable-xhdpi");
     }
 
     @Test
-    public void ninePatchImageColorTest() throws IOException {
+    public void ninePatchImageColorTest() throws Exception {
         String fileName = "res/drawable-xhdpi/ninepatch.9.png";
 
         File control = new File(sTestOrigDir, fileName);
@@ -457,7 +462,7 @@ public class BuildAndDecodeApkTest extends BaseTest {
     }
 
     @Test
-    public void issue1508Test() throws IOException {
+    public void issue1508Test() throws Exception {
         String fileName = "res/drawable-xhdpi/btn_zoom_up_normal.9.png";
 
         File control = new File(sTestOrigDir, fileName);
@@ -477,7 +482,7 @@ public class BuildAndDecodeApkTest extends BaseTest {
     }
 
     @Test
-    public void issue1511Test() throws IOException {
+    public void issue1511Test() throws Exception {
         String fileName = "res/drawable-xxhdpi/textfield_activated_holo_dark.9.png";
 
         File control = new File(sTestOrigDir, fileName);
@@ -499,7 +504,7 @@ public class BuildAndDecodeApkTest extends BaseTest {
     }
 
     @Test
-    public void robust9patchTest() throws IOException {
+    public void robust9patchTest() throws Exception {
         String[] ninePatches = {
                 "ic_notification_overlay.9.png",
                 "status_background.9.png",
@@ -547,56 +552,53 @@ public class BuildAndDecodeApkTest extends BaseTest {
     }
 
     @Test
-    public void drawableXxhdpiTest() throws BrutException {
+    public void drawableXxhdpiTest() throws Exception {
         compareBinaryFolder("res/drawable-xxhdpi");
     }
 
     @Test
-    public void drawableQualifierXxhdpiTest() throws BrutException {
+    public void drawableQualifierXxhdpiTest() throws Exception {
         compareBinaryFolder("res/drawable-xxhdpi-v4");
     }
 
     @Test
-    public void drawableXxxhdpiTest() throws BrutException {
+    public void drawableXxxhdpiTest() throws Exception {
         compareBinaryFolder("res/drawable-xxxhdpi");
     }
 
     @Test
-    public void resRawTest() throws BrutException {
+    public void resRawTest() throws Exception {
         compareBinaryFolder("res/raw");
     }
 
     @Test
-    public void storedMp3FilesAreNotCompressedTest() throws BrutException, IOException {
-        try (ExtFile testApk = new ExtFile(sTmpDir, "testapp.apk")) {
-            Integer compLevel = testApk.getDirectory().getCompressionLevel("res/raw/rain.mp3");
-            assertEquals(Integer.valueOf(0), compLevel);
-        }
+    public void storedMp3FilesAreNotCompressedTest() throws Exception {
+        assertEquals(0, sTestApk.getDirectory().getCompressionLevel("res/raw/rain.mp3"));
     }
 
     @Test
-    public void libsTest() throws BrutException {
+    public void libsTest() throws Exception {
         compareBinaryFolder("lib");
     }
 
     @Test
-    public void fileAssetTest() throws BrutException {
+    public void fileAssetTest() throws Exception {
         compareBinaryFolder("assets/txt");
     }
 
     @Test
-    public void unicodeAssetTest() throws BrutException {
+    public void unicodeAssetTest() throws Exception {
         assumeTrue(!OSDetection.isWindows());
         compareBinaryFolder("assets/unicode-txt");
     }
 
     @Test
-    public void unknownFolderTest() throws BrutException {
+    public void unknownFolderTest() throws Exception {
         compareBinaryFolder("unknown");
     }
 
     @Test
-    public void multipleDexTest() throws BrutException {
+    public void multipleDexTest() throws Exception {
         compareBinaryFolder("smali_classes2");
         compareBinaryFolder("smali_classes3");
         assertTrue(new File(sTestOrigDir, "build/apk/classes2.dex").isFile());
@@ -604,7 +606,7 @@ public class BuildAndDecodeApkTest extends BaseTest {
     }
 
     @Test
-    public void singleDexTest() throws BrutException {
+    public void singleDexTest() throws Exception {
         compareBinaryFolder("smali");
         assertTrue(new File(sTestOrigDir, "build/apk/classes.dex").isFile());
     }

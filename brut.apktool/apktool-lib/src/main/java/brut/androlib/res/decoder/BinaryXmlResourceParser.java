@@ -22,6 +22,7 @@ import brut.androlib.Config;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.exceptions.FrameworkNotFoundException;
 import brut.androlib.exceptions.UndefinedResObjectException;
+import brut.androlib.res.decoder.ResChunkPullParser;
 import brut.androlib.res.decoder.data.NamespaceStack;
 import brut.androlib.res.decoder.data.ResChunkHeader;
 import brut.androlib.res.decoder.data.ResStringPool;
@@ -33,9 +34,7 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.InputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.Reader;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -744,21 +743,38 @@ public class BinaryXmlResourceParser implements XmlResourceParser {
     }
 
     private void doNext() throws IOException {
-        if (mStringPool == null) {
-            mIn.skipInt(); // XML Chunk AXML Type
-            mIn.skipInt(); // Chunk Size
-
-            mStringPool = ResStringPool.parse(mIn);
-            mNamespaces.increaseDepth();
-            mIsOperational = true;
-        }
-
         if (mEvent == END_DOCUMENT) {
             return;
         }
 
         int event = mEvent;
         resetEventInfo();
+
+        if (mStringPool == null) {
+            ResChunkPullParser parser = new ResChunkPullParser(mIn);
+            if (!parser.next()) {
+                throw new IOException("Input file is empty.");
+            }
+
+            if (parser.chunkType() != ResChunkHeader.RES_XML_TYPE) {
+                throw new IOException("Unexpected chunk: " + parser.chunkName()
+                        + " (expected: RES_XML_TYPE)");
+            }
+
+            parser = new ResChunkPullParser(mIn, parser.dataSize());
+            if (!parser.next()) {
+                throw new IOException("Invalid AXML file.");
+            }
+
+            if (parser.chunkType() != ResChunkHeader.RES_STRING_POOL_TYPE) {
+                throw new IOException("Unexpected chunk: " + parser.chunkName()
+                        + " (expected: RES_STRING_POOL_TYPE)");
+            }
+
+            mStringPool = ResStringPool.parse(parser);
+            mNamespaces.increaseDepth();
+            mIsOperational = true;
+        }
 
         for (;;) {
             if (mDecreaseDepth) {

@@ -22,23 +22,17 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 
-public class FileDirectory extends AbstractDirectory {
+public class FileDirectory extends Directory {
     private final File mDir;
 
-    public FileDirectory(ExtFile dir, String folder) throws DirectoryException {
-        this(new File(dir.toString().replaceAll("%20", " "), folder));
-    }
-
-    public FileDirectory(String dir) throws DirectoryException, UnsupportedEncodingException {
-        this(new File(URLDecoder.decode(dir, "UTF-8")));
+    public FileDirectory(String dirName) throws DirectoryException {
+        this(new File(dirName));
     }
 
     public FileDirectory(File dir) throws DirectoryException {
@@ -49,77 +43,7 @@ public class FileDirectory extends AbstractDirectory {
     }
 
     @Override
-    public long getSize(String fileName) throws DirectoryException {
-        File file = new File(generatePath(fileName));
-        if (!file.isFile()) {
-            throw new DirectoryException("file must be a file: " + file);
-        }
-        return file.length();
-    }
-
-    @Override
-    public long getCompressedSize(String fileName) throws DirectoryException {
-        return getSize(fileName);
-    }
-
-    @Override
-    public int getCompressionLevel(String fileName) throws DirectoryException {
-        return -1; // unknown
-    }
-
-    @Override
-    protected AbstractDirectory createDirLocal(String name) throws DirectoryException {
-        File dir = new File(generatePath(name));
-        OS.mkdir(dir);
-        return new FileDirectory(dir);
-    }
-
-    @Override
-    protected InputStream getFileInputLocal(String name) throws DirectoryException {
-        try {
-            File file = new File(generatePath(name));
-            return Files.newInputStream(file.toPath());
-        } catch (IOException ex) {
-            throw new DirectoryException(ex);
-        }
-    }
-
-    @Override
-    protected OutputStream getFileOutputLocal(String name) throws DirectoryException {
-        try {
-            File file = new File(generatePath(name));
-            return Files.newOutputStream(file.toPath());
-        } catch (IOException ex) {
-            throw new DirectoryException(ex);
-        }
-    }
-
-    @Override
-    protected void loadDirs() {
-        loadAll();
-    }
-
-    @Override
-    protected void loadFiles() {
-        loadAll();
-    }
-
-    @Override
-    protected void removeFileLocal(String name) {
-        File file = new File(generatePath(name));
-        OS.rmfile(file);
-    }
-
-    @Override
-    public void close() throws IOException {
-        // Do nothing
-    }
-
-    private String generatePath(String name) {
-        return mDir.getPath() + separator + name;
-    }
-
-    private void loadAll() {
+    protected void load() {
         mFiles = new LinkedHashSet<>();
         mDirs = new LinkedHashMap<>();
 
@@ -136,5 +60,61 @@ public class FileDirectory extends AbstractDirectory {
                 }
             }
         }
+    }
+
+    private String generatePath(String name) {
+        return mDir.getPath() + separator + name;
+    }
+
+    @Override
+    protected InputStream getFileInputImpl(String name) throws DirectoryException {
+        try {
+            File file = new File(generatePath(name));
+            return Files.newInputStream(file.toPath());
+        } catch (IOException ex) {
+            throw new DirectoryException(ex);
+        }
+    }
+
+    @Override
+    protected OutputStream getFileOutputImpl(String name) throws DirectoryException {
+        try {
+            File file = new File(generatePath(name));
+            return Files.newOutputStream(file.toPath());
+        } catch (IOException ex) {
+            throw new DirectoryException(ex);
+        }
+    }
+
+    @Override
+    protected void removeFileImpl(String name) {
+        File file = new File(generatePath(name));
+        OS.rmfile(file);
+    }
+
+    @Override
+    protected Directory createDirImpl(String name) throws DirectoryException {
+        File dir = new File(generatePath(name));
+        OS.mkdir(dir);
+        return new FileDirectory(dir);
+    }
+
+    @Override
+    public long getSize(String name) throws DirectoryException {
+        File file = new File(generatePath(name));
+        if (!file.isFile()) {
+            throw new DirectoryException("file must be a file: " + file);
+        }
+        return file.length();
+    }
+
+    @Override
+    public long getCompressedSize(String name) throws DirectoryException {
+        return getSize(name);
+    }
+
+    @Override
+    public int getCompressionLevel(String name) {
+        return 0;
     }
 }

@@ -18,7 +18,7 @@ package brut.androlib.smali;
 
 import brut.androlib.exceptions.AndrolibException;
 import brut.directory.DirectoryException;
-import brut.directory.ExtFile;
+import brut.directory.FileDirectory;
 import brut.util.OS;
 import com.android.tools.smali.dexlib2.Opcodes;
 import com.android.tools.smali.dexlib2.writer.builder.DexBuilder;
@@ -53,11 +53,11 @@ public class SmaliBuilder {
     }
 
     public void build(File smaliDir, File dexFile) throws AndrolibException {
-        try (ExtFile dir = new ExtFile(smaliDir)) {
+        try {
             DexBuilder dexBuilder = new DexBuilder(
                 mApiLevel > 0 ? Opcodes.forApi(mApiLevel) : Opcodes.getDefault());
 
-            for (String fileName : dir.getDirectory().getFiles(true)) {
+            for (String fileName : new FileDirectory(smaliDir).getFiles(true)) {
                 if (!fileName.endsWith(".smali")) {
                     LOGGER.warning("Unknown file type, ignoring: " + fileName);
                     continue;

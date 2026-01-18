@@ -16,13 +16,7 @@
  */
 package brut.androlib;
 
-import brut.common.BrutException;
-import brut.directory.ExtFile;
-import org.xml.sax.SAXException;
-
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -32,14 +26,14 @@ public class ExternalEntityTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        sTestOrigDir = new ExtFile(sTmpDir, "doctype-orig");
-        sTestNewDir = new ExtFile(sTmpDir, "doctype-new");
+        sTestOrigDir = new File(sTmpDir, "doctype-orig");
+        sTestNewDir = new File(sTmpDir, "doctype-new");
 
         LOGGER.info("Unpacking doctype...");
-        TestUtils.copyResourceDir(ExternalEntityTest.class, "doctype", sTestOrigDir);
+        copyResourceDir(ExternalEntityTest.class, "doctype", sTestOrigDir);
 
         LOGGER.info("Building doctype.apk...");
-        ExtFile testApk = new ExtFile(sTmpDir, "doctype.apk");
+        File testApk = new File(sTmpDir, "doctype.apk");
         new ApkBuilder(sTestOrigDir, sConfig).build(testApk);
 
         LOGGER.info("Decoding doctype.apk...");
@@ -47,15 +41,14 @@ public class ExternalEntityTest extends BaseTest {
     }
 
     @Test
-    public void doctypeTest() throws IOException, SAXException {
+    public void doctypeTest() throws Exception {
         String expected = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
                 + "<manifest hardwareAccelerated=\"true\" package=\"com.ibotpeaches.doctype\" platformBuildVersionCode=\"24\" platformBuildVersionName=\"6.0-2456767\"\n"
                 + "  xmlns:android=\"http://schemas.android.com/apk/res/android\">\n"
                 + "    <supports-screens android:anyDensity=\"true\" android:smallScreens=\"true\" android:normalScreens=\"true\" android:largeScreens=\"true\" android:resizeable=\"true\" android:xlargeScreens=\"true\" />\n"
                 + "</manifest>";
 
-        File xml = new File(sTestNewDir, "AndroidManifest.xml");
-        String obtained = new String(Files.readAllBytes(xml.toPath()));
+        String obtained = readTextFile(new File(sTestNewDir, "AndroidManifest.xml"));
 
         assertXMLEqual(expected, obtained);
     }

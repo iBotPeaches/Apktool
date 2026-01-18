@@ -16,9 +16,6 @@
  */
 package brut.androlib;
 
-import brut.common.BrutException;
-import brut.directory.ExtFile;
-
 import java.io.File;
 
 import org.junit.*;
@@ -29,13 +26,13 @@ public class VectorDrawableTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        TestUtils.copyResourceDir(VectorDrawableTest.class, "issue1456", sTmpDir);
+        copyResourceDir(VectorDrawableTest.class, "issue1456", sTmpDir);
     }
 
     @Test
-    public void checkIfDrawableFileDecodesProperly() throws BrutException {
-        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
-        ExtFile testDir = new ExtFile(testApk + ".out");
+    public void checkIfDrawableFileDecodesProperly() throws Exception {
+        File testApk = new File(sTmpDir, TEST_APK);
+        File testDir = new File(testApk + ".out");
         new ApkDecoder(testApk, sConfig).decode(testDir);
 
         assertTrue(new File(testDir, "res/drawable/ic_arrow_drop_down_black_24dp.xml").isFile());

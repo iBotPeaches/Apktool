@@ -27,6 +27,7 @@ import brut.directory.DirectoryException;
 import brut.directory.ExtFile;
 import brut.util.BackgroundWorker;
 import brut.util.OS;
+import com.google.common.annotations.VisibleForTesting;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.*;
@@ -51,13 +52,13 @@ public class ApkDecoder {
     private ResDecoder mResDecoder;
     private BackgroundWorker mWorker;
 
-    public ApkDecoder(ExtFile apkFile, Config config) {
-        mApkFile = apkFile;
+    public ApkDecoder(File apkFile, Config config) {
+        mApkFile = new ExtFile(apkFile);
         mConfig = config;
         mFirstError = new AtomicReference<>();
     }
 
-    public ApkInfo decode(File outDir) throws AndrolibException {
+    public void decode(File outDir) throws AndrolibException {
         if (!mConfig.isForced() && outDir.exists()) {
             throw new OutDirExistsException(outDir.getPath());
         }
@@ -68,8 +69,9 @@ public class ApkDecoder {
             mWorker = new BackgroundWorker(mConfig.getJobs() - 1);
         }
         try {
-            mApkInfo = new ApkInfo(mApkFile);
+            mApkInfo = new ApkInfo();
             mApkInfo.setVersion(mConfig.getVersion());
+            mApkInfo.setApkFile(mApkFile);
             mSmaliDecoder = new SmaliDecoder(mApkFile, mConfig.isBaksmaliDebugMode());
             mResDecoder = new ResDecoder(mApkInfo, mConfig);
 
@@ -94,17 +96,20 @@ public class ApkDecoder {
             copyRawFiles(outDir);
             copyUnknownFiles(outDir);
             writeApkInfo(outDir);
-
-            return mApkInfo;
         } finally {
             if (mWorker != null) {
                 mWorker.shutdownNow();
             }
             try {
                 mApkFile.close();
-            } catch (IOException ignored) {
+            } catch (DirectoryException ignored) {
             }
         }
+    }
+
+    @VisibleForTesting
+    ApkInfo getApkInfo() {
+        return mApkInfo;
     }
 
     private void decodeSources(File outDir) throws AndrolibException {
@@ -140,7 +145,7 @@ public class ApkDecoder {
     }
 
     private void copySourcesRaw(File outDir, String fileName) throws AndrolibException {
-        LOGGER.info("Copying raw " + fileName + " file...");
+        LOGGER.info("Copying raw " + fileName + "...");
         try {
             Directory in = mApkFile.getDirectory();
 
@@ -184,7 +189,7 @@ public class ApkDecoder {
     }
 
     private void copyResourcesRaw(File outDir) throws AndrolibException {
-        LOGGER.info("Copying raw resources...");
+        LOGGER.info("Copying raw resources.arsc...");
         try {
             Directory in = mApkFile.getDirectory();
 
@@ -207,7 +212,7 @@ public class ApkDecoder {
     }
 
     private void copyManifestRaw(File outDir) throws AndrolibException {
-        LOGGER.info("Copying raw manifest...");
+        LOGGER.info("Copying raw AndroidManifest.xml...");
         try {
             Directory in = mApkFile.getDirectory();
 
@@ -340,7 +345,7 @@ public class ApkDecoder {
             throw new AndrolibException(ex);
         }
 
-        // Serialize ApkInfo to file.
-        mApkInfo.save(new File(outDir, "apktool.yml"));
+        // Serialize apk info to file.
+        mApkInfo.save(outDir);
     }
 }

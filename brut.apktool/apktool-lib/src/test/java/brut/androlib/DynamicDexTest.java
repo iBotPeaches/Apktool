@@ -16,9 +16,7 @@
  */
 package brut.androlib;
 
-import brut.androlib.exceptions.AndrolibException;
-import brut.common.BrutException;
-import brut.directory.ExtFile;
+import java.io.File;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -29,16 +27,16 @@ public class DynamicDexTest extends BaseTest {
     @BeforeClass
     public static void beforeClass() throws Exception {
         LOGGER.info("Unpacking " + TEST_APK + "...");
-        TestUtils.copyResourceDir(DynamicDexTest.class, "dynamic_dex", sTmpDir);
+        copyResourceDir(DynamicDexTest.class, "dynamic_dex", sTmpDir);
     }
 
     @Test
-    public void decodeOnlyMainClassesTest() throws BrutException {
+    public void decodeOnlyMainClassesTest() throws Exception {
         sConfig.setDecodeSources(Config.DecodeSources.ONLY_MAIN_CLASSES);
 
         LOGGER.info("Decoding " + TEST_APK + "...");
-        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
-        ExtFile testDir = new ExtFile(testApk + ".out.main");
+        File testApk = new File(sTmpDir, TEST_APK);
+        File testDir = new File(testApk + ".out.main");
         new ApkDecoder(testApk, sConfig).decode(testDir);
 
         LOGGER.info("Building " + TEST_APK + "...");
@@ -46,12 +44,12 @@ public class DynamicDexTest extends BaseTest {
     }
 
     @Test
-    public void decodeAllSourcesTest() throws BrutException {
+    public void decodeAllSourcesTest() throws Exception {
         sConfig.setDecodeSources(Config.DecodeSources.FULL);
 
         LOGGER.info("Decoding " + TEST_APK + "...");
-        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
-        ExtFile testDir = new ExtFile(testApk + ".out.full");
+        File testApk = new File(sTmpDir, TEST_APK);
+        File testDir = new File(testApk + ".out.full");
         new ApkDecoder(testApk, sConfig).decode(testDir);
 
         LOGGER.info("Building " + TEST_APK + "...");

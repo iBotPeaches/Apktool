@@ -16,13 +16,7 @@
  */
 package brut.androlib;
 
-import brut.common.BrutException;
-import brut.directory.ExtFile;
-import org.xml.sax.SAXException;
-
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -33,19 +27,19 @@ public class ProviderAttributeTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        TestUtils.copyResourceDir(ProviderAttributeTest.class, "issue636", sTmpDir);
+        copyResourceDir(ProviderAttributeTest.class, "issue636", sTmpDir);
     }
 
     @Test
-    public void isProviderStringReplacementWorking() throws BrutException, IOException, SAXException {
-        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
-        ExtFile testDir = new ExtFile(testApk + ".out");
+    public void isProviderStringReplacementWorking() throws Exception {
+        File testApk = new File(sTmpDir, TEST_APK);
+        File testDir = new File(testApk + ".out");
         new ApkDecoder(testApk, sConfig).decode(testDir);
 
         new ApkBuilder(testDir, sConfig).build(null);
 
-        ExtFile newApk = new ExtFile(testDir, "dist/" + testApk.getName());
-        ExtFile newDir = new ExtFile(testApk + ".out.new");
+        File newApk = new File(testDir, "dist/" + testApk.getName());
+        File newDir = new File(testApk + ".out.new");
         new ApkDecoder(newApk, sConfig).decode(newDir);
 
         String expected = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
@@ -57,8 +51,7 @@ public class ProviderAttributeTest extends BaseTest {
                 + "    </application>\n"
                 + "</manifest>";
 
-        File xml = new File(newDir, "AndroidManifest.xml");
-        String obtained = new String(Files.readAllBytes(xml.toPath()));
+        String obtained = readTextFile(new File(newDir, "AndroidManifest.xml"));
 
         assertXMLEqual(expected, obtained);
     }

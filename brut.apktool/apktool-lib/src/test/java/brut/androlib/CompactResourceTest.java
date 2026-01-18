@@ -16,8 +16,7 @@
  */
 package brut.androlib;
 
-import brut.common.BrutException;
-import brut.directory.ExtFile;
+import brut.xml.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
@@ -31,18 +30,18 @@ public class CompactResourceTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        TestUtils.copyResourceDir(CompactResourceTest.class, "issue3366", sTmpDir);
+        copyResourceDir(CompactResourceTest.class, "issue3366", sTmpDir);
     }
 
     @Test
-    public void checkIfDecodeSucceeds() throws BrutException {
-        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
-        ExtFile testDir = new ExtFile(testApk + ".out");
+    public void checkIfDecodeSucceeds() throws Exception {
+        File testApk = new File(sTmpDir, TEST_APK);
+        File testDir = new File(testApk + ".out");
         new ApkDecoder(testApk, sConfig).decode(testDir);
 
-        Document doc = loadDocument(new File(testDir, "res/values/strings.xml"));
+        Document doc = XmlUtils.loadDocument(new File(testDir, "res/values/strings.xml"));
         String expression = "/resources/string[@name]";
-        NodeList nodes = evaluateXPath(doc, expression, NodeList.class);
+        NodeList nodes = XmlUtils.evaluateXPath(doc, expression, NodeList.class);
         assertEquals(1002, nodes.getLength());
 
         new ApkBuilder(testDir, sConfig).build(null);

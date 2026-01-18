@@ -22,7 +22,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import org.junit.*;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class ResXmlEncodersTest extends BaseTest {
 
@@ -35,7 +35,7 @@ public class ResXmlEncodersTest extends BaseTest {
     }
 
     @Test
-    public void escapeXmlCharsRoundtrip() throws Throwable {
+    public void escapeXmlCharsRoundtrip() throws Exception {
         assertRoundtrips("foo");
         assertRoundtrips("'foo'");
         assertRoundtrips("\"foo\"");
@@ -44,9 +44,9 @@ public class ResXmlEncodersTest extends BaseTest {
         assertRoundtrips("<![CDATA[foo]]>");
     }
 
-    private static void assertRoundtrips(String value) throws Throwable {
+    private static void assertRoundtrips(String value) throws Exception {
         String escaped = ResXmlEncoders.escapeXmlChars(value);
-        Document doc = XmlUtils.loadDocumentContent("<root>" + escaped + "</root>", false);
+        Document doc = XmlUtils.parseDocument("<root>" + escaped + "</root>");
         Node node = doc.getElementsByTagName("root").item(0);
         assertEquals(value, node.getTextContent());
     }

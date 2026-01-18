@@ -22,9 +22,9 @@ import brut.androlib.meta.ApkInfo;
 import brut.androlib.meta.UsesFramework;
 import brut.androlib.res.Framework;
 import brut.androlib.res.decoder.BinaryResourceParser;
-import brut.directory.Directory;
 import brut.directory.DirectoryException;
 import brut.directory.ExtFile;
+import brut.directory.ZipRODirectory;
 
 import java.io.*;
 import java.util.*;
@@ -64,16 +64,23 @@ public class ResTable {
 
     public ResPackage getMainPackage() throws AndrolibException {
         if (mMainPackage == null) {
-            throw new AndrolibException("Main package has not been loaded");
+            throw new AndrolibException("Main package has not been loaded.");
         }
         return mMainPackage;
     }
 
     public void loadMainPackage() throws AndrolibException {
         LOGGER.info("Loading resource table...");
-        File apkFile = mApkInfo.getApkFile();
-        List<ResPackage> pkgs = loadResPackagesFromApk(apkFile, mConfig.isKeepBrokenResources());
+        ExtFile apkFile = mApkInfo.getApkFile();
 
+        ZipRODirectory zipDir;
+        try {
+            zipDir = (ZipRODirectory) apkFile.getDirectory();
+        } catch (DirectoryException ex) {
+            throw new AndrolibException("Could not open apk file: " + apkFile, ex);
+        }
+
+        List<ResPackage> pkgs = loadResPackagesFromApk(apkFile, zipDir, mConfig.isKeepBrokenResources());
         ResPackage pkg;
         if (pkgs.isEmpty()) {
             // Empty resources.arsc, create a dummy package.
@@ -86,15 +93,14 @@ public class ResTable {
         mMainPackage = pkg;
     }
 
-    private List<ResPackage> loadResPackagesFromApk(File apkFile, boolean keepBrokenResources)
+    private List<ResPackage> loadResPackagesFromApk(File apkFile, ZipRODirectory zipDir, boolean keepBrokenResources)
             throws AndrolibException {
-        try (ExtFile file = new ExtFile(apkFile)) {
-            Directory dir = file.getDirectory();
-            if (!dir.containsFile("resources.arsc")) {
+        try {
+            if (!zipDir.containsFile("resources.arsc")) {
                 throw new AndrolibException("Could not find resources.arsc in file: " + apkFile);
             }
 
-            try (InputStream in = dir.getFileInput("resources.arsc")) {
+            try (InputStream in = zipDir.getFileInput("resources.arsc")) {
                 BinaryResourceParser parser = new BinaryResourceParser(this, keepBrokenResources, false);
                 parser.parse(in);
                 return parser.getPackages();
@@ -215,7 +221,13 @@ public class ResTable {
     private ResPackage loadResPackageFromApk(File apkFile, boolean keepBrokenResources)
             throws AndrolibException {
         LOGGER.info("Loading resource table from file: " + apkFile);
-        List<ResPackage> pkgs = loadResPackagesFromApk(apkFile, keepBrokenResources);
+
+        List<ResPackage> pkgs;
+        try (ZipRODirectory zipDir = new ZipRODirectory(apkFile)) {
+            pkgs = loadResPackagesFromApk(apkFile, zipDir, keepBrokenResources);
+        } catch (DirectoryException ex) {
+            throw new AndrolibException("Could not open apk file: " + apkFile, ex);
+        }
         if (pkgs.isEmpty()) {
             throw new AndrolibException("No packages in resources.arsc in file: " + apkFile);
         }

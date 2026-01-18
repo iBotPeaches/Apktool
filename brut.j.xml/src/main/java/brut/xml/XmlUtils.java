@@ -19,6 +19,7 @@ package brut.xml;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import javax.xml.XMLConstants;
@@ -37,11 +38,11 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Collections;
@@ -84,16 +85,21 @@ public final class XmlUtils {
         return newDocumentBuilder(nsAware).newDocument();
     }
 
+    public static Document parseDocument(String xml)
+            throws IOException, SAXException, ParserConfigurationException {
+        return parseDocument(xml, false);
+    }
+
+    public static Document parseDocument(String xml, boolean nsAware)
+            throws IOException, SAXException, ParserConfigurationException {
+        DocumentBuilder builder = newDocumentBuilder(nsAware);
+        StringReader reader = new StringReader(xml);
+        return builder.parse(new InputSource(reader));
+    }
+
     public static Document loadDocument(File file)
             throws IOException, SAXException, ParserConfigurationException {
         return loadDocument(file, false);
-    }
-
-    public static Document loadDocumentContent(String content, boolean nsAware)
-            throws IOException, SAXException, ParserConfigurationException {
-        DocumentBuilder builder = newDocumentBuilder(nsAware);
-        InputStream in = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
-        return builder.parse(in);
     }
 
     public static Document loadDocument(File file, boolean nsAware)
@@ -102,7 +108,7 @@ public final class XmlUtils {
         // Not using the parse(File) method on purpose, so that we can control when
         // to close it. Somehow parse(File) does not seem to close the file in all cases.
         try (InputStream in = Files.newInputStream(file.toPath())) {
-            return builder.parse(in);
+            return builder.parse(new InputSource(in));
         }
     }
 

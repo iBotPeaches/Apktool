@@ -20,7 +20,6 @@ import android.util.TypedValue;
 import brut.androlib.Config;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.exceptions.UndefinedResObjectException;
-import brut.androlib.meta.ApkInfo;
 import brut.androlib.res.decoder.data.FlagsOffset;
 import brut.androlib.res.decoder.data.ResChunkHeader;
 import brut.androlib.res.decoder.data.ResStringPool;
