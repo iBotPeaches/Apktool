@@ -18,17 +18,19 @@ package brut.androlib.meta;
 
 import brut.androlib.BaseTest;
 
-import java.io.File;
-import java.io.InputStream;
-import java.nio.file.Files;
-
 import org.junit.*;
-import org.junit.rules.TemporaryFolder;
 import static org.junit.Assert.*;
 
 public class ApkInfoSerializationTest extends BaseTest {
-    @Rule
-    public TemporaryFolder folder = new TemporaryFolder();
+
+    @Test
+    public void checkApkInfoSerialization() throws Exception {
+        ApkInfo control = ApkInfo.load(getClass().getResourceAsStream("/meta/unknown_files.yml"));
+        check(control);
+        control.save(sTmpDir);
+
+        check(ApkInfo.load(sTmpDir));
+    }
 
     private void check(ApkInfo apkInfo) {
         assertEquals("2.0.0", apkInfo.getVersion());
@@ -48,17 +50,5 @@ public class ApkInfoSerializationTest extends BaseTest {
         assertEquals("png", apkInfo.getDoNotCompress().get(2));
         assertEquals("mp3", apkInfo.getDoNotCompress().get(3));
         assertEquals("stored.file", apkInfo.getDoNotCompress().get(4));
-    }
-
-    @Test
-    public void checkApkInfoSerialization() throws Exception {
-        ApkInfo control = ApkInfo.load(getClass().getResourceAsStream("/meta/unknown_files.yml"));
-        check(control);
-
-        File savedApkInfo = folder.newFile("saved.yml");
-        control.save(savedApkInfo);
-        try (InputStream in = Files.newInputStream(savedApkInfo.toPath())) {
-            check(ApkInfo.load(in));
-        }
     }
 }

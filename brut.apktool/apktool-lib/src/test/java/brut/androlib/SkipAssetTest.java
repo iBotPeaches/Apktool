@@ -16,8 +16,6 @@
  */
 package brut.androlib;
 
-import brut.directory.ExtFile;
-
 import java.io.File;
 
 import org.junit.*;
@@ -35,8 +33,8 @@ public class SkipAssetTest extends BaseTest {
     public void checkIfEnablingSkipAssetWorks() throws Exception {
         sConfig.setDecodeAssets(Config.DecodeAssets.NONE);
 
-        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
-        ExtFile testDir = new ExtFile(testApk + ".out.none");
+        File testApk = new File(sTmpDir, TEST_APK);
+        File testDir = new File(testApk + ".out.none");
         new ApkDecoder(testApk, sConfig).decode(testDir);
 
         assertFalse(new File(testDir, "assets/kotlin.kotlin_builtins").isFile());
@@ -47,8 +45,8 @@ public class SkipAssetTest extends BaseTest {
     public void checkControl() throws Exception {
         sConfig.setDecodeAssets(Config.DecodeAssets.FULL);
 
-        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
-        ExtFile testDir = new ExtFile(testApk + ".out.full");
+        File testApk = new File(sTmpDir, TEST_APK);
+        File testDir = new File(testApk + ".out.full");
         new ApkDecoder(testApk, sConfig).decode(testDir);
 
         assertTrue(new File(testDir, "assets/kotlin.kotlin_builtins").isFile());

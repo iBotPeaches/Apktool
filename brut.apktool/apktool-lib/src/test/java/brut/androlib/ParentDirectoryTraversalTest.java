@@ -16,7 +16,7 @@
  */
 package brut.androlib;
 
-import brut.directory.ExtFile;
+import java.io.File;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -33,8 +33,8 @@ public class ParentDirectoryTraversalTest extends BaseTest {
     public void checkIfDrawableFileDecodesProperly() throws Exception {
         sConfig.setDecodeResources(Config.DecodeResources.NONE);
 
-        ExtFile testApk = new ExtFile(sTmpDir, apk);
-        ExtFile testDir = new ExtFile(testApk + ".out");
+        File testApk = new File(sTmpDir, apk);
+        File testDir = new File(testApk + ".out");
         new ApkDecoder(testApk, sConfig).decode(testDir);
     }
 }

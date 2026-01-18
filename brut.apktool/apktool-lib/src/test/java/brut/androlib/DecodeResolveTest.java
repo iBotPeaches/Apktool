@@ -16,7 +16,6 @@
  */
 package brut.androlib;
 
-import brut.directory.ExtFile;
 import brut.xml.XmlUtils;
 import org.w3c.dom.Document;
 
@@ -37,8 +36,8 @@ public class DecodeResolveTest extends BaseTest {
     public void decodeResolveDefaultTest() throws Exception {
         sConfig.setDecodeResolve(Config.DecodeResolve.DEFAULT);
 
-        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
-        ExtFile testDir = new ExtFile(testApk + ".out.default");
+        File testApk = new File(sTmpDir, TEST_APK);
+        File testDir = new File(testApk + ".out.default");
         new ApkDecoder(testApk, sConfig).decode(testDir);
 
         assertTrue(new File(testDir, "res/values/strings.xml").isFile());
@@ -57,8 +56,8 @@ public class DecodeResolveTest extends BaseTest {
     public void decodeResolveGreedyTest() throws Exception {
         sConfig.setDecodeResolve(Config.DecodeResolve.GREEDY);
 
-        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
-        ExtFile testDir = new ExtFile(testApk + ".out.greedy");
+        File testApk = new File(sTmpDir, TEST_APK);
+        File testDir = new File(testApk + ".out.greedy");
         new ApkDecoder(testApk, sConfig).decode(testDir);
 
         assertTrue(new File(testDir, "res/values/strings.xml").isFile());
@@ -80,8 +79,8 @@ public class DecodeResolveTest extends BaseTest {
     public void decodeResolveLazyTest() throws Exception {
         sConfig.setDecodeResolve(Config.DecodeResolve.LAZY);
 
-        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
-        ExtFile testDir = new ExtFile(testApk + ".out.lazy");
+        File testApk = new File(sTmpDir, TEST_APK);
+        File testDir = new File(testApk + ".out.lazy");
         new ApkDecoder(testApk, sConfig).decode(testDir);
 
         assertTrue(new File(testDir, "res/values/strings.xml").isFile());

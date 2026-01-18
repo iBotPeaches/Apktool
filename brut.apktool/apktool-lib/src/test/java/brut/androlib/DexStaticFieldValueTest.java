@@ -16,8 +16,6 @@
  */
 package brut.androlib;
 
-import brut.directory.ExtFile;
-
 import java.io.File;
 
 import org.junit.*;
@@ -27,8 +25,8 @@ public class DexStaticFieldValueTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        sTestOrigDir = new ExtFile(sTmpDir, "issue2543-orig");
-        sTestNewDir = new ExtFile(sTmpDir, "issue2543-new");
+        sTestOrigDir = new File(sTmpDir, "issue2543-orig");
+        sTestNewDir = new File(sTmpDir, "issue2543-new");
 
         LOGGER.info("Unpacking issue2543...");
         copyResourceDir(DexStaticFieldValueTest.class, "issue2543", sTestOrigDir);
@@ -36,7 +34,7 @@ public class DexStaticFieldValueTest extends BaseTest {
         sConfig.setBaksmaliDebugMode(false);
 
         LOGGER.info("Building issue2543.jar...");
-        ExtFile testJar = new ExtFile(sTmpDir, "issue2543.jar");
+        File testJar = new File(sTmpDir, "issue2543.jar");
         new ApkBuilder(sTestOrigDir, sConfig).build(testJar);
 
         LOGGER.info("Decoding issue2543.jar...");

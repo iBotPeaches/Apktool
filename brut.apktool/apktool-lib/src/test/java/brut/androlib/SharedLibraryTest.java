@@ -17,7 +17,6 @@
 package brut.androlib;
 
 import brut.androlib.res.Framework;
-import brut.directory.ExtFile;
 
 import java.io.File;
 
@@ -38,7 +37,7 @@ public class SharedLibraryTest extends BaseTest {
         sConfig.setFrameworkDirectory(sTmpDir.getAbsolutePath());
         sConfig.setFrameworkTag("building");
 
-        ExtFile libraryApk = new ExtFile(sTmpDir, LIBRARY_APK);
+        File libraryApk = new File(sTmpDir, LIBRARY_APK);
         new Framework(sConfig).install(libraryApk);
 
         assertTrue(new File(sTmpDir, "0-building.apk").exists());
@@ -48,7 +47,7 @@ public class SharedLibraryTest extends BaseTest {
     public void isFrameworkInstallingWorking() throws Exception {
         sConfig.setFrameworkDirectory(sTmpDir.getAbsolutePath());
 
-        ExtFile libraryApk = new ExtFile(sTmpDir, LIBRARY_APK);
+        File libraryApk = new File(sTmpDir, LIBRARY_APK);
         new Framework(sConfig).install(libraryApk);
 
         assertTrue(new File(sTmpDir, "0.apk").exists());
@@ -62,13 +61,13 @@ public class SharedLibraryTest extends BaseTest {
         });
 
         // decode library.apk
-        ExtFile libraryApk = new ExtFile(sTmpDir, LIBRARY_APK);
-        ExtFile libraryDir = new ExtFile(libraryApk + ".out");
+        File libraryApk = new File(sTmpDir, LIBRARY_APK);
+        File libraryDir = new File(libraryApk + ".out");
         new ApkDecoder(libraryApk, sConfig).decode(libraryDir);
 
         // decode client.apk
-        ExtFile clientApk = new ExtFile(sTmpDir, CLIENT_APK);
-        ExtFile clientDir = new ExtFile(clientApk + ".out");
+        File clientApk = new File(sTmpDir, CLIENT_APK);
+        File clientDir = new File(clientApk + ".out");
         new ApkDecoder(clientApk, sConfig).decode(clientDir);
 
         // build library.apk

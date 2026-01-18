@@ -16,7 +16,6 @@
  */
 package brut.androlib;
 
-import brut.directory.ExtFile;
 import brut.xml.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -32,8 +31,8 @@ public class NoNetworkConfigTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        sTestOrigDir = new ExtFile(sTmpDir, "network_config-orig");
-        sTestNewDir = new ExtFile(sTmpDir, "network_config-new");
+        sTestOrigDir = new File(sTmpDir, "network_config-orig");
+        sTestNewDir = new File(sTmpDir, "network_config-new");
 
         LOGGER.info("Unpacking network_config...");
         copyResourceDir(NoNetworkConfigTest.class, "network_config/none", sTestOrigDir);
@@ -41,7 +40,7 @@ public class NoNetworkConfigTest extends BaseTest {
         sConfig.setNetSecConf(true);
 
         LOGGER.info("Building network_config.apk...");
-        ExtFile testApk = new ExtFile(sTmpDir, "network_config.apk");
+        File testApk = new File(sTmpDir, "network_config.apk");
         new ApkBuilder(sTestOrigDir, sConfig).build(testApk);
 
         LOGGER.info("Decoding network_config.apk...");

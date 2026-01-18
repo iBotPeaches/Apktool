@@ -20,6 +20,7 @@ import brut.androlib.exceptions.AndrolibException;
 import brut.directory.DirectoryException;
 import brut.directory.ExtFile;
 import brut.yaml.*;
+import com.google.common.annotations.VisibleForTesting;
 
 import java.io.File;
 import java.io.InputStream;
@@ -70,29 +71,25 @@ public class ApkInfo implements YamlSerializable {
         mDoNotCompress = new ArrayList<>();
     }
 
-    public ApkInfo(ExtFile apkFile) {
-        this();
-        setApkFile(apkFile);
+    public static ApkInfo load(File apkDir) throws AndrolibException {
+        File file = new File(apkDir, "apktool.yml");
+        try (InputStream in = Files.newInputStream(file.toPath())) {
+            return ApkInfo.load(in);
+        } catch (IOException ex) {
+            throw new AndrolibException(ex);
+        }
     }
 
-    public static ApkInfo load(InputStream in) {
+    @VisibleForTesting
+    static ApkInfo load(InputStream in) {
         YamlReader reader = new YamlReader(in);
         ApkInfo apkInfo = new ApkInfo();
         reader.readRoot(apkInfo);
         return apkInfo;
     }
 
-    public static ApkInfo load(ExtFile apkDir) throws AndrolibException {
-        try (InputStream in = apkDir.getDirectory().getFileInput("apktool.yml")) {
-            ApkInfo apkInfo = ApkInfo.load(in);
-            apkInfo.setApkFile(apkDir);
-            return apkInfo;
-        } catch (DirectoryException | IOException ex) {
-            throw new AndrolibException(ex);
-        }
-    }
-
-    public void save(File file) throws AndrolibException {
+    public void save(File apkDir) throws AndrolibException {
+        File file = new File(apkDir, "apktool.yml");
         try (YamlWriter writer = new YamlWriter(Files.newOutputStream(file.toPath()))) {
             write(writer);
         } catch (IOException ex) {

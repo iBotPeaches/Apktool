@@ -33,11 +33,12 @@ import static org.junit.Assert.*;
 import static org.junit.Assume.assumeTrue;
 
 public class BuildAndDecodeApkTest extends BaseTest {
+    private static ExtFile sTestApk;
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        sTestOrigDir = new ExtFile(sTmpDir, "testapp-orig");
-        sTestNewDir = new ExtFile(sTmpDir, "testapp-new");
+        sTestOrigDir = new File(sTmpDir, "testapp-orig");
+        sTestNewDir = new File(sTmpDir, "testapp-new");
 
         LOGGER.info("Unpacking testapp...");
         copyResourceDir(BuildAndDecodeApkTest.class, "testapp", sTestOrigDir);
@@ -45,11 +46,16 @@ public class BuildAndDecodeApkTest extends BaseTest {
         sConfig.setVerbose(true);
 
         LOGGER.info("Building testapp.apk...");
-        ExtFile testApk = new ExtFile(sTmpDir, "testapp.apk");
-        new ApkBuilder(sTestOrigDir, sConfig).build(testApk);
+        sTestApk = new ExtFile(sTmpDir, "testapp.apk");
+        new ApkBuilder(sTestOrigDir, sConfig).build(sTestApk);
 
         LOGGER.info("Decoding testapp.apk...");
-        new ApkDecoder(testApk, sConfig).decode(sTestNewDir);
+        new ApkDecoder(sTestApk, sConfig).decode(sTestNewDir);
+    }
+
+    @AfterClass
+    public static void afterClass() throws Exception {
+        sTestApk.close();
     }
 
     @Test
@@ -567,10 +573,7 @@ public class BuildAndDecodeApkTest extends BaseTest {
 
     @Test
     public void storedMp3FilesAreNotCompressedTest() throws Exception {
-        try (ExtFile testApk = new ExtFile(sTmpDir, "testapp.apk")) {
-            Integer compLevel = testApk.getDirectory().getCompressionLevel("res/raw/rain.mp3");
-            assertEquals(Integer.valueOf(0), compLevel);
-        }
+        assertEquals(0, sTestApk.getDirectory().getCompressionLevel("res/raw/rain.mp3"));
     }
 
     @Test

@@ -52,26 +52,26 @@ public class ApkDecoder {
     private ResDecoder mResDecoder;
     private BackgroundWorker mWorker;
 
-    public ApkDecoder(ExtFile apkFile, Config config) {
-        mApkFile = apkFile;
+    public ApkDecoder(File apkFile, Config config) {
+        mApkFile = new ExtFile(apkFile);
         mConfig = config;
         mFirstError = new AtomicReference<>();
     }
 
     public void decode(File outDir) throws AndrolibException {
+        if (!mConfig.isForced() && outDir.exists()) {
+            throw new OutDirExistsException(outDir.getPath());
+        }
+        if (!mApkFile.isFile() || !mApkFile.canRead()) {
+            throw new InFileNotFoundException(mApkFile.getPath());
+        }
+        if (mConfig.getJobs() > 1) {
+            mWorker = new BackgroundWorker(mConfig.getJobs() - 1);
+        }
         try {
-            if (!mConfig.isForced() && outDir.exists()) {
-                throw new OutDirExistsException(outDir.getPath());
-            }
-            if (!mApkFile.isFile() || !mApkFile.canRead()) {
-                throw new InFileNotFoundException(mApkFile.getPath());
-            }
-            if (mConfig.getJobs() > 1) {
-                mWorker = new BackgroundWorker(mConfig.getJobs() - 1);
-            }
-
-            mApkInfo = new ApkInfo(mApkFile);
+            mApkInfo = new ApkInfo();
             mApkInfo.setVersion(mConfig.getVersion());
+            mApkInfo.setApkFile(mApkFile);
             mSmaliDecoder = new SmaliDecoder(mApkFile, mConfig.isBaksmaliDebugMode());
             mResDecoder = new ResDecoder(mApkInfo, mConfig);
 
@@ -346,6 +346,6 @@ public class ApkDecoder {
         }
 
         // Serialize apk info to file.
-        mApkInfo.save(new File(outDir, "apktool.yml"));
+        mApkInfo.save(outDir);
     }
 }

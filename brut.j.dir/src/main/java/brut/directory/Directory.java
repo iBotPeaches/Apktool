@@ -71,6 +71,7 @@ public abstract class Directory implements AutoCloseable {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public void close() throws DirectoryException {
         // Stub.
     }

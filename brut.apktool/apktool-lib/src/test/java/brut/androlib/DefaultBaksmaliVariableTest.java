@@ -16,8 +16,6 @@
  */
 package brut.androlib;
 
-import brut.directory.ExtFile;
-
 import java.io.File;
 
 import org.junit.*;
@@ -27,14 +25,14 @@ public class DefaultBaksmaliVariableTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        sTestOrigDir = new ExtFile(sTmpDir, "issue1481-orig");
-        sTestNewDir = new ExtFile(sTmpDir, "issue1481-new");
+        sTestOrigDir = new File(sTmpDir, "issue1481-orig");
+        sTestNewDir = new File(sTmpDir, "issue1481-new");
 
         LOGGER.info("Unpacking issue1481...");
         copyResourceDir(DefaultBaksmaliVariableTest.class, "issue1481", sTestOrigDir);
 
         LOGGER.info("Building issue1481.jar...");
-        ExtFile testJar = new ExtFile(sTmpDir, "issue1481.jar");
+        File testJar = new File(sTmpDir, "issue1481.jar");
         new ApkBuilder(sTestOrigDir, sConfig).build(testJar);
 
         LOGGER.info("Decoding issue1481.jar...");

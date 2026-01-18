@@ -16,8 +16,6 @@
  */
 package brut.androlib;
 
-import brut.directory.ExtFile;
-
 import java.io.File;
 
 import org.junit.*;
@@ -33,8 +31,8 @@ public class VectorDrawableTest extends BaseTest {
 
     @Test
     public void checkIfDrawableFileDecodesProperly() throws Exception {
-        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
-        ExtFile testDir = new ExtFile(testApk + ".out");
+        File testApk = new File(sTmpDir, TEST_APK);
+        File testDir = new File(testApk + ".out");
         new ApkDecoder(testApk, sConfig).decode(testDir);
 
         assertTrue(new File(testDir, "res/drawable/ic_arrow_drop_down_black_24dp.xml").isFile());

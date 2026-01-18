@@ -25,10 +25,8 @@ import brut.androlib.exceptions.InFileNotFoundException;
 import brut.androlib.exceptions.OutDirExistsException;
 import brut.androlib.res.AaptManager;
 import brut.androlib.res.Framework;
-import brut.directory.ExtFile;
 import brut.util.OSDetection;
 import org.apache.commons.cli.*;
-import org.apache.commons.io.IOUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -502,7 +500,7 @@ public class Main {
         }
 
         try {
-            new ApkDecoder(new ExtFile(apkName), config).decode(outDir);
+            new ApkDecoder(new File(apkName), config).decode(outDir);
         } catch (InFileNotFoundException | OutDirExistsException | FrameworkNotFoundException ex) {
             System.err.println(ex.getMessage());
             System.exit(1);
@@ -578,7 +576,7 @@ public class Main {
             }
         }
 
-        new ApkBuilder(new ExtFile(apkDirName), config).build(outFile);
+        new ApkBuilder(new File(apkDirName), config).build(outFile);
     }
 
     private static void cmdInstallFramework(String[] args) throws AndrolibException {
@@ -873,17 +871,13 @@ public class Main {
         }
 
         private void load(Properties props, String name) {
-            InputStream in = null;
-            try {
-                in = Main.class.getResourceAsStream(name);
+            try (InputStream in = Main.class.getResourceAsStream(name)) {
                 if (in == null) {
                     throw new FileNotFoundException(name);
                 }
                 props.load(in);
             } catch (IOException ignored) {
-                System.out.println("Could not load " + name);
-            } finally {
-                IOUtils.closeQuietly(in);
+                System.err.println("Could not load resource: " + name);
             }
         }
     }

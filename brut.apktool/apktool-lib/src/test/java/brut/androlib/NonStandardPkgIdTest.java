@@ -23,16 +23,19 @@ import brut.androlib.res.table.ResTable;
 import brut.directory.ExtFile;
 import brut.util.OS;
 
+import java.io.File;
+
 import org.junit.*;
 import static org.junit.Assert.*;
 
 public class NonStandardPkgIdTest extends BaseTest {
+    private static ExtFile sTestApk;
     private static ResTable sTable;
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        sTestOrigDir = new ExtFile(sTmpDir, "pkgid8-orig");
-        sTestNewDir = new ExtFile(sTmpDir, "pkgid8-new");
+        sTestOrigDir = new File(sTmpDir, "pkgid8-orig");
+        sTestNewDir = new File(sTmpDir, "pkgid8-new");
 
         LOGGER.info("Unpacking pkgid8...");
         copyResourceDir(NonStandardPkgIdTest.class, "pkgid8", sTestOrigDir);
@@ -40,11 +43,12 @@ public class NonStandardPkgIdTest extends BaseTest {
         sConfig.setVerbose(true);
 
         LOGGER.info("Building pkgid8.apk...");
-        ExtFile testApk = new ExtFile(sTmpDir, "pkgid8.apk");
-        new ApkBuilder(sTestOrigDir, sConfig).build(testApk);
+        sTestApk = new ExtFile(sTmpDir, "pkgid8.apk");
+        new ApkBuilder(sTestOrigDir, sConfig).build(sTestApk);
 
         LOGGER.info("Decoding pkgid8.apk...");
-        ApkInfo testInfo = new ApkInfo(testApk);
+        ApkInfo testInfo = new ApkInfo();
+        testInfo.setApkFile(sTestApk);
         ResDecoder resDecoder = new ResDecoder(testInfo, sConfig);
         OS.mkdir(sTestNewDir);
         resDecoder.decodeResources(sTestNewDir);
@@ -54,7 +58,7 @@ public class NonStandardPkgIdTest extends BaseTest {
 
     @AfterClass
     public static void afterClass() throws Exception {
-        sTable.getApkInfo().getApkFile().close();
+        sTestApk.close();
     }
 
     @Test

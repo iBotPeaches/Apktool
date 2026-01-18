@@ -27,6 +27,7 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 public class DecodeArrayTest extends BaseTest {
+    private static ExtFile sTestApk;
     private static ResTable sTable;
 
     @BeforeClass
@@ -34,15 +35,16 @@ public class DecodeArrayTest extends BaseTest {
         copyResourceDir(MissingVersionManifestTest.class, "issue1994", sTmpDir);
 
         LOGGER.info("Decoding issue1994.apk...");
-        ExtFile testApk = new ExtFile(sTmpDir, "issue1994.apk");
-        ApkInfo testInfo = new ApkInfo(testApk);
+        sTestApk = new ExtFile(sTmpDir, "issue1994.apk");
+        ApkInfo testInfo = new ApkInfo();
+        testInfo.setApkFile(sTestApk);
         sTable = new ResTable(testInfo, sConfig);
         sTable.loadMainPackage();
     }
 
     @AfterClass
     public static void afterClass() throws Exception {
-        sTable.getApkInfo().getApkFile().close();
+        sTestApk.close();
     }
 
     @Test

@@ -16,8 +16,6 @@
  */
 package brut.androlib;
 
-import brut.directory.ExtFile;
-
 import java.io.File;
 
 import org.junit.*;
@@ -34,14 +32,14 @@ public class ProviderAttributeTest extends BaseTest {
 
     @Test
     public void isProviderStringReplacementWorking() throws Exception {
-        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
-        ExtFile testDir = new ExtFile(testApk + ".out");
+        File testApk = new File(sTmpDir, TEST_APK);
+        File testDir = new File(testApk + ".out");
         new ApkDecoder(testApk, sConfig).decode(testDir);
 
         new ApkBuilder(testDir, sConfig).build(null);
 
-        ExtFile newApk = new ExtFile(testDir, "dist/" + testApk.getName());
-        ExtFile newDir = new ExtFile(testApk + ".out.new");
+        File newApk = new File(testDir, "dist/" + testApk.getName());
+        File newDir = new File(testApk + ".out.new");
         new ApkDecoder(newApk, sConfig).decode(newDir);
 
         String expected = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"

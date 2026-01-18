@@ -16,8 +16,6 @@
  */
 package brut.androlib;
 
-import brut.directory.ExtFile;
-
 import java.io.File;
 
 import org.junit.*;
@@ -28,8 +26,8 @@ public class DebuggableFalseChangeToTrueTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        sTestOrigDir = new ExtFile(sTmpDir, "issue2328-debuggable-false-orig");
-        sTestNewDir = new ExtFile(sTmpDir, "issue2328-debuggable-false-new");
+        sTestOrigDir = new File(sTmpDir, "issue2328-debuggable-false-orig");
+        sTestNewDir = new File(sTmpDir, "issue2328-debuggable-false-new");
 
         LOGGER.info("Unpacking issue2328-debuggable-false...");
         copyResourceDir(DebuggableFalseChangeToTrueTest.class, "issue2328/debuggable-false", sTestOrigDir);
@@ -38,7 +36,7 @@ public class DebuggableFalseChangeToTrueTest extends BaseTest {
         sConfig.setVerbose(true);
 
         LOGGER.info("Building issue2328-debuggable-false.apk...");
-        ExtFile testApk = new ExtFile(sTmpDir, "issue2328-debuggable-false.apk");
+        File testApk = new File(sTmpDir, "issue2328-debuggable-false.apk");
         new ApkBuilder(sTestOrigDir, sConfig).build(testApk);
 
         LOGGER.info("Decoding issue2328-debuggable-false.apk...");

@@ -16,7 +16,6 @@
  */
 package brut.androlib;
 
-import brut.directory.ExtFile;
 import brut.xml.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -36,8 +35,8 @@ public class LargeCompactResourceTest extends BaseTest {
 
     @Test
     public void checkIfDecodeSucceeds() throws Exception {
-        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
-        ExtFile testDir = new ExtFile(testApk + ".out");
+        File testApk = new File(sTmpDir, TEST_APK);
+        File testDir = new File(testApk + ".out");
         new ApkDecoder(testApk, sConfig).decode(testDir);
 
         Document doc = XmlUtils.loadDocument(new File(testDir, "res/values/strings.xml"));

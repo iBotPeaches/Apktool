@@ -16,8 +16,6 @@
  */
 package brut.androlib;
 
-import brut.directory.ExtFile;
-
 import java.io.File;
 
 import org.junit.*;
@@ -30,8 +28,8 @@ public class MinifiedArscTest extends BaseTest {
     public static void beforeClass() throws Exception {
         copyResourceDir(MinifiedArscTest.class, "issue1157", sTmpDir);
 
-        ExtFile testApk = new ExtFile(sTmpDir, "issue1157.apk");
-        sTestNewDir = new ExtFile(testApk + ".out");
+        File testApk = new File(sTmpDir, "issue1157.apk");
+        sTestNewDir = new File(testApk + ".out");
 
         new ApkDecoder(testApk, sConfig).decode(sTestNewDir);
     }

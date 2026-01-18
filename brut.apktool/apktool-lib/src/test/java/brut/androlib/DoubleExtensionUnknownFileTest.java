@@ -17,8 +17,9 @@
 package brut.androlib;
 
 import brut.androlib.meta.ApkInfo;
-import brut.directory.ExtFile;
 import org.apache.commons.lang3.StringUtils;
+
+import java.io.File;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -33,8 +34,8 @@ public class DoubleExtensionUnknownFileTest extends BaseTest {
 
     @Test
     public void multipleExtensionUnknownFileTest() throws Exception {
-        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
-        ExtFile testDir = new ExtFile(testApk + ".out");
+        File testApk = new File(sTmpDir, TEST_APK);
+        File testDir = new File(testApk + ".out");
         new ApkDecoder(testApk, sConfig).decode(testDir);
 
         ApkInfo testInfo = ApkInfo.load(testDir);

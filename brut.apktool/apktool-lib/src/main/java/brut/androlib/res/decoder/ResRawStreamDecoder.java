@@ -30,7 +30,7 @@ public class ResRawStreamDecoder implements ResStreamDecoder {
         try {
             IOUtils.copy(in, out);
         } catch (IOException ex) {
-            throw new AndrolibException("Could not decode raw stream", ex);
+            throw new AndrolibException("Could not decode raw stream.", ex);
         }
     }
 }

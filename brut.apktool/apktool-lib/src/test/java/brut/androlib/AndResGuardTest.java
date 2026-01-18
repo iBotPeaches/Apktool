@@ -16,8 +16,6 @@
  */
 package brut.androlib;
 
-import brut.directory.ExtFile;
-
 import java.io.File;
 
 import org.junit.*;
@@ -33,8 +31,8 @@ public class AndResGuardTest extends BaseTest {
 
     @Test
     public void checkifAndResDecodeRemapsRFolder() throws Exception {
-        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
-        ExtFile testDir = new ExtFile(testApk + ".out");
+        File testApk = new File(sTmpDir, TEST_APK);
+        File testDir = new File(testApk + ".out");
         new ApkDecoder(testApk, sConfig).decode(testDir);
 
         assertTrue(new File(testDir, "res/mipmap-hdpi-v4/a.png").isFile());
@@ -44,8 +42,8 @@ public class AndResGuardTest extends BaseTest {
     public void checkIfAndResDecodeIgnoresRFolderInRawMode() throws Exception {
         sConfig.setDecodeResources(Config.DecodeResources.NONE);
 
-        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
-        ExtFile testDir = new ExtFile(testApk + ".out.raw");
+        File testApk = new File(sTmpDir, TEST_APK);
+        File testDir = new File(testApk + ".out.raw");
         new ApkDecoder(testApk, sConfig).decode(testDir);
 
         assertTrue(new File(testDir, "unknown/r/a/a.png").isFile());

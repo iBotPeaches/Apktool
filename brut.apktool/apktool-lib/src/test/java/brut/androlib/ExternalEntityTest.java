@@ -16,8 +16,6 @@
  */
 package brut.androlib;
 
-import brut.directory.ExtFile;
-
 import java.io.File;
 
 import org.junit.*;
@@ -28,14 +26,14 @@ public class ExternalEntityTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        sTestOrigDir = new ExtFile(sTmpDir, "doctype-orig");
-        sTestNewDir = new ExtFile(sTmpDir, "doctype-new");
+        sTestOrigDir = new File(sTmpDir, "doctype-orig");
+        sTestNewDir = new File(sTmpDir, "doctype-new");
 
         LOGGER.info("Unpacking doctype...");
         copyResourceDir(ExternalEntityTest.class, "doctype", sTestOrigDir);
 
         LOGGER.info("Building doctype.apk...");
-        ExtFile testApk = new ExtFile(sTmpDir, "doctype.apk");
+        File testApk = new File(sTmpDir, "doctype.apk");
         new ApkBuilder(sTestOrigDir, sConfig).build(testApk);
 
         LOGGER.info("Decoding doctype.apk...");

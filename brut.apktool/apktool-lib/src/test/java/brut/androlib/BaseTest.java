@@ -18,7 +18,6 @@ package brut.androlib;
 
 import brut.androlib.Config;
 import brut.androlib.res.Framework;
-import brut.directory.ExtFile;
 import brut.directory.FileDirectory;
 import brut.util.OS;
 
@@ -42,8 +41,8 @@ public class BaseTest {
 
     protected static Config sConfig;
     protected static File sTmpDir;
-    protected static ExtFile sTestOrigDir;
-    protected static ExtFile sTestNewDir;
+    protected static File sTestOrigDir;
+    protected static File sTestNewDir;
 
     static {
         XMLUnit.setEnableXXEProtection(true);
@@ -68,15 +67,8 @@ public class BaseTest {
 
     @AfterClass
     public static void afterEachClass() throws Exception {
-        if (sTestOrigDir != null) {
-            sTestOrigDir.close();
-            sTestOrigDir = null;
-        }
-
-        if (sTestNewDir != null) {
-            sTestNewDir.close();
-            sTestNewDir = null;
-        }
+        sTestOrigDir = null;
+        sTestNewDir = null;
 
         OS.rmdir(sTmpDir);
         sTmpDir = null;
@@ -138,12 +130,12 @@ public class BaseTest {
     }
 
     protected static void compareBinaryFolder(File controlDir, File testDir, String path) throws Exception {
-        ExtFile controlBase = new ExtFile(controlDir, path);
+        File controlBase = new File(controlDir, path);
         File testBase = new File(testDir, path);
 
         boolean exists = true;
 
-        for (String fileName : controlBase.getDirectory().getFiles(true)) {
+        for (String fileName : new FileDirectory(controlBase).getFiles(true)) {
             File control = new File(controlBase, fileName);
             File test = new File(testBase, fileName);
 
@@ -172,17 +164,19 @@ public class BaseTest {
     }
 
     private static void compareXmlFiles(File controlDir, File testDir, String path, ElementQualifier qualifier) throws Exception {
-        Reader control = new FileReader(new File(controlDir, path));
-        Reader test = new FileReader(new File(testDir, path));
+        try (
+            Reader control = new FileReader(new File(controlDir, path));
+            Reader test = new FileReader(new File(testDir, path))
+        ) {
+            if (qualifier == null) {
+                assertXMLEqual(control, test);
+                return;
+            }
 
-        if (qualifier == null) {
-            assertXMLEqual(control, test);
-            return;
+            DetailedDiff diff = new DetailedDiff(new Diff(control, test));
+            diff.overrideElementQualifier(qualifier);
+
+            assertTrue(path + ": " + diff.getAllDifferences().toString(), diff.similar());
         }
-
-        DetailedDiff diff = new DetailedDiff(new Diff(control, test));
-        diff.overrideElementQualifier(qualifier);
-
-        assertTrue(path + ": " + diff.getAllDifferences().toString(), diff.similar());
     }
 }

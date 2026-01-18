@@ -16,8 +16,6 @@
  */
 package brut.androlib;
 
-import brut.directory.ExtFile;
-
 import java.io.File;
 
 import org.junit.*;
@@ -28,8 +26,8 @@ public class DebuggableTrueAddedTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        sTestOrigDir = new ExtFile(sTmpDir, "issue2328-debuggable-missing-orig");
-        sTestNewDir = new ExtFile(sTmpDir, "issue2328-debuggable-missing-new");
+        sTestOrigDir = new File(sTmpDir, "issue2328-debuggable-missing-orig");
+        sTestNewDir = new File(sTmpDir, "issue2328-debuggable-missing-new");
 
         LOGGER.info("Unpacking issue2328-debuggable-missing...");
         copyResourceDir(DebuggableTrueAddedTest.class, "issue2328/debuggable-missing", sTestOrigDir);
@@ -38,7 +36,7 @@ public class DebuggableTrueAddedTest extends BaseTest {
         sConfig.setVerbose(true);
 
         LOGGER.info("Building issue2328-debuggable-missing.apk...");
-        ExtFile testApk = new ExtFile(sTmpDir, "issue2328-debuggable-missing.apk");
+        File testApk = new File(sTmpDir, "issue2328-debuggable-missing.apk");
         new ApkBuilder(sTestOrigDir, sConfig).build(testApk);
 
         LOGGER.info("Decoding issue2328-debuggable-missing.apk...");

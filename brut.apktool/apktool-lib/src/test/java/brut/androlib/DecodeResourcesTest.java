@@ -16,8 +16,6 @@
  */
 package brut.androlib;
 
-import brut.directory.ExtFile;
-
 import java.io.File;
 import java.util.Arrays;
 
@@ -45,8 +43,8 @@ public class DecodeResourcesTest extends BaseTest {
     public void decodeResourcesNoneTest() throws Exception {
         sConfig.setDecodeResources(Config.DecodeResources.NONE);
 
-        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
-        ExtFile testDir = new ExtFile(testApk + ".out.none");
+        File testApk = new File(sTmpDir, TEST_APK);
+        File testDir = new File(testApk + ".out.none");
         new ApkDecoder(testApk, sConfig).decode(testDir);
 
         // assert that manifest is not XML
@@ -60,8 +58,8 @@ public class DecodeResourcesTest extends BaseTest {
     public void decodeResourcesFullTest() throws Exception {
         sConfig.setDecodeResources(Config.DecodeResources.FULL);
 
-        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
-        ExtFile testDir = new ExtFile(testApk + ".out.full");
+        File testApk = new File(sTmpDir, TEST_APK);
+        File testDir = new File(testApk + ".out.full");
         new ApkDecoder(testApk, sConfig).decode(testDir);
 
         // assert that manifest is XML
@@ -75,8 +73,8 @@ public class DecodeResourcesTest extends BaseTest {
     public void decodeResourcesOnlyManifestTest() throws Exception {
         sConfig.setDecodeResources(Config.DecodeResources.ONLY_MANIFEST);
 
-        ExtFile testApk = new ExtFile(sTmpDir, TEST_APK);
-        ExtFile testDir = new ExtFile(testApk + ".out.manifest");
+        File testApk = new File(sTmpDir, TEST_APK);
+        File testDir = new File(testApk + ".out.manifest");
         new ApkDecoder(testApk, sConfig).decode(testDir);
 
         // assert that manifest is XML

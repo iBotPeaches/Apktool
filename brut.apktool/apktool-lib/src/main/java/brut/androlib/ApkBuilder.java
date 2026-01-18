@@ -29,6 +29,7 @@ import brut.common.BrutException;
 import brut.directory.Directory;
 import brut.directory.DirectoryException;
 import brut.directory.ExtFile;
+import brut.directory.FileDirectory;
 import brut.directory.ZipRODirectory;
 import brut.util.BackgroundWorker;
 import brut.util.BinaryDataInputStream;
@@ -55,18 +56,17 @@ public class ApkBuilder {
     private AaptInvoker mAaptInvoker;
     private BackgroundWorker mWorker;
 
-    public ApkBuilder(ExtFile apkDir, Config config) {
-        mApkDir = apkDir;
+    public ApkBuilder(File apkDir, Config config) {
+        mApkDir = new ExtFile(apkDir);
         mConfig = config;
         mFirstError = new AtomicReference<>();
     }
 
     public void build(File outApk) throws AndrolibException {
+        if (mConfig.getJobs() > 1) {
+            mWorker = new BackgroundWorker(mConfig.getJobs() - 1);
+        }
         try {
-            if (mConfig.getJobs() > 1) {
-                mWorker = new BackgroundWorker(mConfig.getJobs() - 1);
-            }
-
             mApkInfo = ApkInfo.load(mApkDir);
             String minSdkVersion = mApkInfo.getSdkInfo().getMinSdkVersion();
             mSmaliBuilder = new SmaliBuilder(minSdkVersion != null
@@ -383,14 +383,14 @@ public class ApkBuilder {
             return;
         }
 
-        ExtFile originalDir = new ExtFile(mApkDir, "original");
+        File originalDir = new File(mApkDir, "original");
         if (!originalDir.isDirectory()) {
             return;
         }
 
         LOGGER.info("Copying original files...");
         try {
-            Directory in = originalDir.getDirectory();
+            FileDirectory in = new FileDirectory(originalDir);
 
             for (String fileName : in.getFiles(true)) {
                 if (ApkInfo.ORIGINAL_FILES_PATTERN.matcher(fileName).matches()) {
