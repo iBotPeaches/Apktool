@@ -56,7 +56,7 @@ if ("release" !in gradle.startParameter.taskNames) {
 
 plugins {
     `java-library`
-    id("com.vanniktech.maven.publish") version "0.30.0"
+    alias(libs.plugins.vanniktech.maven.publish)
 }
 
 allprojects {
