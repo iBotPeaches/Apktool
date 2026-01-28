@@ -20,7 +20,9 @@ import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.exceptions.NinePatchNotFoundException;
 import brut.androlib.exceptions.RawXmlEncounteredException;
 import brut.androlib.res.table.ResEntry;
-import brut.androlib.res.table.value.*;
+import brut.androlib.res.table.value.ResFileReference;
+import brut.androlib.res.table.value.ResPrimitive;
+import brut.androlib.res.table.value.ResString;
 import brut.directory.Directory;
 import brut.directory.DirectoryException;
 import org.apache.commons.io.FilenameUtils;
@@ -42,8 +44,7 @@ public class ResFileDecoder {
         mDecoders = decoders;
     }
 
-    public void decode(ResEntry entry, Directory inDir, Directory outDir, Map<String, String> resFileMap)
-            throws AndrolibException {
+    public void decode(ResEntry entry, Directory inDir, Directory outDir, Map<String, String> resFileMap) {
         String inFileName = ((ResFileReference) entry.getValue()).getPath();
 
         // Some apps have string values where they shouldn't be.
@@ -104,8 +105,8 @@ public class ResFileDecoder {
 
             decode(Type.UNKNOWN, inDir, inFileName, outDir, outFileName);
         } catch (AndrolibException ignored) {
-            LOGGER.warning("Could not decode file, replacing by FALSE value: " + inFileName);
-            entry.setValue(ResPrimitive.FALSE);
+            LOGGER.warning("Could not decode file, replacing by NULL value: " + inFileName);
+            entry.setValue(ResPrimitive.NULL);
         }
     }
 

@@ -39,14 +39,12 @@ public class VersionInfo implements YamlSerializable {
     public void readItem(YamlReader reader) {
         YamlLine line = reader.getLine();
         switch (line.getKey()) {
-            case "versionCode": {
+            case "versionCode":
                 mVersionCode = line.getValue();
                 break;
-            }
-            case "versionName": {
+            case "versionName":
                 mVersionName = line.getValue();
                 break;
-            }
         }
     }
 

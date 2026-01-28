@@ -23,6 +23,7 @@ public class ResType {
     private final ResConfig mConfig;
 
     public ResType(ResTypeSpec spec, ResConfig config) {
+        assert spec != null && config != null;
         mSpec = spec;
         mConfig = config;
     }

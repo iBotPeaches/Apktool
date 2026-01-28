@@ -14,11 +14,26 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib.exceptions;
+package brut.androlib.res.xml;
 
-public class BinaryXmlDecodingException extends AndrolibException {
+import brut.androlib.BaseTest;
 
-    public BinaryXmlDecodingException(String message, Throwable cause) {
-        super(message, cause);
+import org.junit.*;
+import static org.junit.Assert.*;
+
+public class EscapeXmlValueTest extends BaseTest {
+
+    @Test
+    public void escapeXmlValueTest() {
+        assertEquals("foo", escape("foo"));
+        assertEquals("\"'foo'\"", escape("'foo'"));
+        assertEquals("\\\"foo\\\"", escape("\"foo\""));
+        assertEquals("foo&amp;bar", escape("foo&bar"));
+        assertEquals("&lt;foo>", escape("<foo>"));
+        assertEquals("&lt;![CDATA[foo]]&gt;", escape("<![CDATA[foo]]>"));
+    }
+
+    private static String escape(String value) {
+        return ResStringEncoder.encodeTextValue(value);
     }
 }

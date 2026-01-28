@@ -42,6 +42,7 @@ public class ResTable {
     private ResPackage mMainPackage;
 
     public ResTable(ApkInfo apkInfo, Config config) {
+        assert apkInfo != null && config != null;
         mApkInfo = apkInfo;
         mConfig = config;
         mPackages = new HashMap<>();
@@ -62,10 +63,7 @@ public class ResTable {
         return mMainPackage != null;
     }
 
-    public ResPackage getMainPackage() throws AndrolibException {
-        if (mMainPackage == null) {
-            throw new AndrolibException("Main package has not been loaded.");
-        }
+    public ResPackage getMainPackage() {
         return mMainPackage;
     }
 
@@ -80,11 +78,11 @@ public class ResTable {
             throw new AndrolibException("Could not open apk file: " + apkFile, ex);
         }
 
-        List<ResPackage> pkgs = loadResPackagesFromApk(apkFile, zipDir, mConfig.isKeepBrokenResources());
+        List<ResPackage> pkgs = loadResPackagesFromApk(apkFile, zipDir, true);
         ResPackage pkg;
         if (pkgs.isEmpty()) {
             // Empty resources.arsc, create a dummy package.
-            pkg = new ResPackage(this, 0, null);
+            pkg = new ResPackage(this, 0, "");
         } else {
             pkg = selectPackageWithMostEntrySpecs(pkgs);
         }
@@ -93,24 +91,30 @@ public class ResTable {
         mMainPackage = pkg;
     }
 
-    private List<ResPackage> loadResPackagesFromApk(File apkFile, ZipRODirectory zipDir, boolean keepBrokenResources)
+    private List<ResPackage> loadResPackagesFromApk(File apkFile, ZipRODirectory zipDir,
+                                                    boolean isMainPackage)
             throws AndrolibException {
         try {
             if (!zipDir.containsFile("resources.arsc")) {
-                throw new AndrolibException("Could not find resources.arsc in file: " + apkFile);
+                throw new AndrolibException(
+                    "Could not find resources.arsc in file: " + apkFile);
             }
 
             try (InputStream in = zipDir.getFileInput("resources.arsc")) {
-                BinaryResourceParser parser = new BinaryResourceParser(this, keepBrokenResources, false);
+                BinaryResourceParser parser = isMainPackage
+                    ? new BinaryResourceParser(this, mConfig.isKeepBrokenResources(),
+                        mConfig.isDecodeResolveGreedy(), false)
+                    : new BinaryResourceParser(this, true, true, false);
                 parser.parse(in);
                 return parser.getPackages();
             }
         } catch (DirectoryException | IOException ex) {
-            throw new AndrolibException("Could not load resources.arsc from file: " + apkFile, ex);
+            throw new AndrolibException(
+                "Could not load resources.arsc from file: " + apkFile, ex);
         }
     }
 
-    private ResPackage selectPackageWithMostEntrySpecs(List<ResPackage> pkgs) {
+    private static ResPackage selectPackageWithMostEntrySpecs(List<ResPackage> pkgs) {
         ResPackage ret = pkgs.get(0);
         int count = 0;
 
@@ -142,15 +146,6 @@ public class ResTable {
         }
 
         mPackages.put(id, pkg);
-    }
-
-    public ResPackage getCurrentPackage() throws AndrolibException {
-        if (mMainPackage == null) {
-            // If no main package, we directly get "android" instead.
-            return getPackage(1);
-        }
-
-        return mMainPackage;
     }
 
     public ResPackage getPackage(int id) throws AndrolibException {
@@ -189,7 +184,7 @@ public class ResTable {
             return null;
         }
 
-        ResPackage pkg = loadResPackageFromApk(apkFile, true);
+        ResPackage pkg = loadResPackageFromApk(apkFile);
         if (pkg.getId() != id) {
             throw new AndrolibException(String.format(
                 "Unexpected package ID: %d (expected: %d)", pkg.getId(), id));
@@ -207,7 +202,7 @@ public class ResTable {
     private ResPackage loadFrameworkPackage(int id) throws AndrolibException {
         File apkFile = new Framework(mConfig).getApkFile(id);
 
-        ResPackage pkg = loadResPackageFromApk(apkFile, true);
+        ResPackage pkg = loadResPackageFromApk(apkFile);
         if (pkg.getId() != id) {
             throw new AndrolibException(String.format(
                 "Unexpected package ID: %d (expected: %d)", pkg.getId(), id));
@@ -218,13 +213,13 @@ public class ResTable {
         return pkg;
     }
 
-    private ResPackage loadResPackageFromApk(File apkFile, boolean keepBrokenResources)
+    private ResPackage loadResPackageFromApk(File apkFile)
             throws AndrolibException {
         LOGGER.info("Loading resource table from file: " + apkFile);
 
         List<ResPackage> pkgs;
         try (ZipRODirectory zipDir = new ZipRODirectory(apkFile)) {
-            pkgs = loadResPackagesFromApk(apkFile, zipDir, keepBrokenResources);
+            pkgs = loadResPackagesFromApk(apkFile, zipDir, false);
         } catch (DirectoryException ex) {
             throw new AndrolibException("Could not open apk file: " + apkFile, ex);
         }

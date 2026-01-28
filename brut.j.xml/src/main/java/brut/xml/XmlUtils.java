@@ -52,8 +52,16 @@ import java.util.logging.Logger;
 public final class XmlUtils {
     private static final Logger LOGGER = Logger.getLogger("");
 
-    private static final String FEATURE_DISALLOW_DOCTYPE_DECL = "http://apache.org/xml/features/disallow-doctype-decl";
-    private static final String FEATURE_LOAD_EXTERNAL_DTD = "http://apache.org/xml/features/nonvalidating/load-external-dtd";
+    public static final String XML_PROLOG = "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
+    public static final String XML_PREFIX = "xml";
+    public static final String XML_URI = "http://www.w3.org/XML/1998/namespace";
+    public static final String XMLNS_PREFIX = "xmlns";
+    public static final String XMLNS_URI = "http://www.w3.org/2000/xmlns/";
+
+    private static final String FEATURE_DISALLOW_DOCTYPE_DECL =
+        "http://apache.org/xml/features/disallow-doctype-decl";
+    private static final String FEATURE_LOAD_EXTERNAL_DTD =
+        "http://apache.org/xml/features/nonvalidating/load-external-dtd";
 
     private XmlUtils() {
         // Private constructor for utility class.
@@ -81,7 +89,8 @@ public final class XmlUtils {
         return newDocument(false);
     }
 
-    public static Document newDocument(boolean nsAware) throws SAXException, ParserConfigurationException {
+    public static Document newDocument(boolean nsAware)
+            throws SAXException, ParserConfigurationException {
         return newDocumentBuilder(nsAware).newDocument();
     }
 
@@ -118,7 +127,7 @@ public final class XmlUtils {
         Transformer transformer = factory.newTransformer();
         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
 
-        byte[] xmlDecl = "<?xml version=\"1.0\" encoding=\"utf-8\"?>".getBytes(StandardCharsets.US_ASCII);
+        byte[] xmlDecl = XML_PROLOG.getBytes(StandardCharsets.US_ASCII);
         byte[] newLine = System.lineSeparator().getBytes(StandardCharsets.US_ASCII);
 
         try (OutputStream out = Files.newOutputStream(file.toPath())) {

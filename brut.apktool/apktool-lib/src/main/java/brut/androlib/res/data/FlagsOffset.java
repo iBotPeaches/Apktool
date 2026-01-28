@@ -14,18 +14,14 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib.res.xml;
+package brut.androlib.res.data;
 
-import brut.androlib.exceptions.AndrolibException;
+public final class FlagsOffset {
+    public final long offset;
+    public final int count;
 
-public interface ResXmlEncodable {
-    String encodeAsResXmlValue() throws AndrolibException;
-
-    default String encodeAsResXmlItemValue() throws AndrolibException {
-        return encodeAsResXmlValue();
-    }
-
-    default String encodeAsResXmlAttrValue() throws AndrolibException {
-        return encodeAsResXmlValue();
+    public FlagsOffset(long offset, int count) {
+        this.offset = offset;
+        this.count = count;
     }
 }

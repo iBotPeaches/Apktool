@@ -24,6 +24,7 @@ public class ResTypeSpec {
     private final String mName;
 
     public ResTypeSpec(ResPackage pkg, int id, String name) {
+        assert pkg != null && name != null;
         mPackage = pkg;
         mId = id;
         mName = name;

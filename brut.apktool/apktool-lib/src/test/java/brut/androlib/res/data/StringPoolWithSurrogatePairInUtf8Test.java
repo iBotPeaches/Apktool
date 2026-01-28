@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib.res.decoder.data;
+package brut.androlib.res.data;
 
 import brut.androlib.BaseTest;
 

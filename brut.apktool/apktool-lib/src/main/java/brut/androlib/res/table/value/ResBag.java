@@ -17,10 +17,11 @@
 package brut.androlib.res.table.value;
 
 import brut.androlib.exceptions.AndrolibException;
+import brut.androlib.res.xml.ValuesXmlSerializable;
 
 import java.util.logging.Logger;
 
-public abstract class ResBag extends ResValue {
+public abstract class ResBag extends ResValue implements ValuesXmlSerializable {
     private static final Logger LOGGER = Logger.getLogger(ResBag.class.getName());
 
     protected final ResReference mParent;
@@ -51,6 +52,7 @@ public abstract class ResBag extends ResValue {
         private final ResItem mValue;
 
         public RawItem(int key, ResItem value) {
+            assert value != null;
             mKey = key;
             mValue = value;
         }

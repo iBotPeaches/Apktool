@@ -101,49 +101,40 @@ public class ApkInfo implements YamlSerializable {
     public void readItem(YamlReader reader) {
         YamlLine line = reader.getLine();
         switch (line.getKey()) {
-            case "version": {
+            case "version":
                 mVersion = line.getValue();
                 break;
-            }
-            case "apkFileName": {
+            case "apkFileName":
                 mApkFileName = line.getValue();
                 break;
-            }
-            case "usesFramework": {
+            case "usesFramework":
                 mUsesFramework.clear();
                 reader.readObject(mUsesFramework);
                 break;
-            }
-            case "usesLibrary": {
+            case "usesLibrary":
                 mUsesLibrary.clear();
                 reader.readStringList(mUsesLibrary);
                 break;
-            }
-            case "sdkInfo": {
+            case "sdkInfo":
                 mSdkInfo.clear();
                 reader.readObject(mSdkInfo);
                 break;
-            }
-            case "versionInfo": {
+            case "versionInfo":
                 mVersionInfo.clear();
                 reader.readObject(mVersionInfo);
                 break;
-            }
-            case "resourcesInfo": {
+            case "resourcesInfo":
                 mResourcesInfo.clear();
                 reader.readObject(mResourcesInfo);
                 break;
-            }
-            case "featureFlags": {
+            case "featureFlags":
                 mFeatureFlags.clear();
                 reader.readBoolMap(mFeatureFlags);
                 break;
-            }
-            case "doNotCompress": {
+            case "doNotCompress":
                 mDoNotCompress.clear();
                 reader.readStringList(mDoNotCompress);
                 break;
-            }
         }
     }
 

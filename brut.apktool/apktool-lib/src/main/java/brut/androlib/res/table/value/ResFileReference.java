@@ -22,6 +22,7 @@ public class ResFileReference extends ResValue {
     private final String mPath;
 
     public ResFileReference(String path) {
+        assert path != null;
         mPath = path;
     }
 

@@ -28,7 +28,7 @@ public class ResCustom extends ResValue implements ValuesXmlSerializable {
     public static final ResCustom ID = new ResCustom("id");
 
     private final String mType;
-    private final String mValue;
+    private final Object mValue;
     private final boolean mAsItem;
 
     public ResCustom(String type) {
@@ -39,11 +39,12 @@ public class ResCustom extends ResValue implements ValuesXmlSerializable {
         this(type, null, asItem);
     }
 
-    public ResCustom(String type, String value) {
+    public ResCustom(String type, Object value) {
         this(type, value, false);
     }
 
-    public ResCustom(String type, String value, boolean asItem) {
+    public ResCustom(String type, Object value, boolean asItem) {
+        assert type != null;
         mType = type;
         mValue = value;
         mAsItem = asItem;
@@ -59,7 +60,7 @@ public class ResCustom extends ResValue implements ValuesXmlSerializable {
         }
         serial.attribute(null, "name", entry.getName());
         if (mValue != null) {
-            serial.text(mValue);
+            serial.text(mValue.toString());
         }
         serial.endTag(null, tagName);
     }

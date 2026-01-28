@@ -16,13 +16,11 @@
  */
 package brut.androlib.res.decoder;
 
-import android.util.TypedValue;
-import brut.androlib.Config;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.exceptions.UndefinedResObjectException;
-import brut.androlib.res.decoder.data.FlagsOffset;
-import brut.androlib.res.decoder.data.ResChunkHeader;
-import brut.androlib.res.decoder.data.ResStringPool;
+import brut.androlib.res.data.FlagsOffset;
+import brut.androlib.res.data.ResChunkHeader;
+import brut.androlib.res.data.ResStringPool;
 import brut.androlib.res.table.*;
 import brut.androlib.res.table.value.*;
 import brut.util.BinaryDataInputStream;
@@ -63,7 +61,8 @@ public class BinaryResourceParser {
     private static final int ENTRY_FLAG_FEATUREFLAG = 0x0010;
 
     private final ResTable mTable;
-    private final boolean mKeepBroken;
+    private final boolean mKeepBrokenResources;
+    private final boolean mAllowDummyEntrySpecs;
     private final boolean mRecordFlagsOffsets;
 
     private BinaryDataInputStream mIn;
@@ -77,9 +76,11 @@ public class BinaryResourceParser {
     private ResStringPool mTypeStrings;
     private ResStringPool mKeyStrings;
 
-    public BinaryResourceParser(ResTable table, boolean keepBroken, boolean recordFlagsOffsets) {
+    public BinaryResourceParser(ResTable table, boolean keepBrokenResources,
+                                boolean allowDummyEntrySpecs, boolean recordFlagsOffsets) {
         mTable = table;
-        mKeepBroken = keepBroken;
+        mKeepBrokenResources = keepBrokenResources;
+        mAllowDummyEntrySpecs = allowDummyEntrySpecs;
         mRecordFlagsOffsets = recordFlagsOffsets;
     }
 
@@ -112,7 +113,7 @@ public class BinaryResourceParser {
 
             // We can't use remaining() here, the length of the main stream is unknown.
             if (mIn.available() > 0) {
-                LOGGER.warning(String.format(
+                LOGGER.fine(String.format(
                     "Ignoring trailing data at 0x%08x.", mIn.position()));
             }
         } catch (IOException ex) {
@@ -138,30 +139,32 @@ public class BinaryResourceParser {
         if (parser.isChunk()) {
             int skipped = parser.skipChunk();
             if (skipped > 0) {
-                LOGGER.warning(String.format(
+                LOGGER.fine(String.format(
                     "Skipped unknown %d bytes at end of %s chunk.",
                     skipped, parser.chunkName()));
             }
         }
 
-        // Move to next chunk.
-        if (!parser.next()) {
-            return false;
+        // Parse next chunk.
+        while (parser.next()) {
+            // Skip unknown or unsupported chunks.
+            if (parser.chunkType() == ResChunkHeader.RES_NULL_TYPE) {
+                LOGGER.fine(String.format(
+                    "Skipping unknown chunk (%s) of %d bytes at 0x%08x.",
+                    parser.chunkName(), parser.chunkSize(), parser.chunkStart()));
+                parser.skipChunk();
+                continue;
+            }
+
+            // Return this chunk.
+            LOGGER.fine(String.format(
+                "Chunk at 0x%08x: %s (%d bytes)",
+                parser.chunkStart(), parser.chunkName(), parser.chunkSize()));
+            return true;
         }
 
-        // Skip unknown or unsupported chunks.
-        if (parser.chunkType() == ResChunkHeader.RES_NULL_TYPE) {
-            LOGGER.warning(String.format(
-                "Skipping unknown chunk of %d bytes at 0x%08x.",
-                parser.chunkSize(), parser.chunkStart()));
-            parser.skipChunk();
-            return nextChunk(parser);
-        }
-
-        LOGGER.fine(String.format(
-            "Chunk at 0x%08x: %s (%d bytes)",
-            parser.chunkStart(), parser.chunkName(), parser.chunkSize()));
-        return true;
+        // End of chunks.
+        return false;
     }
 
     private void parseTable(ResChunkPullParser parser) throws AndrolibException, IOException {
@@ -316,7 +319,7 @@ public class BinaryResourceParser {
         String typeName = typeSpec.getName();
         ResType type;
         if (mInvalidConfigs.contains(config)) {
-            if (mKeepBroken) {
+            if (mKeepBrokenResources) {
                 LOGGER.warning(String.format(
                     "Invalid resource config detected: %s %s", typeName, config));
                 type = mPackage.addType(id, config);
@@ -652,28 +655,29 @@ public class BinaryResourceParser {
     }
 
     private ResValue parseItem(String typeName, boolean inBag, int type, int data) {
-        String rawValue = null;
-
         // ID resource values are either encoded as a boolean (false) or a resource reference.
         // A boolean (false) is no longer allowed in XML, replace with a placeholder value.
         // A resource reference is handled normally, unless it's @null.
-        if (typeName.equals("id") && (data == 0 || (type != TypedValue.TYPE_REFERENCE
-                && type != TypedValue.TYPE_DYNAMIC_REFERENCE))) {
+        if (typeName.equals("id") && (data == 0 || (type != ResValue.TYPE_REFERENCE
+                && type != ResValue.TYPE_DYNAMIC_REFERENCE))) {
             return ResCustom.ID;
         }
 
         // Special handling for strings and file references.
-        if (type == TypedValue.TYPE_STRING) {
-            rawValue = mTableStrings.getHTML(data);
+        if (type == ResValue.TYPE_STRING) {
+            CharSequence strValue = mTableStrings.getText(data);
 
             // If a string is not allowed here, assume it's a file reference.
             // ResFileDecoder will replace it if it's an invalid file reference.
-            if (!inBag && rawValue != null && !rawValue.isEmpty() && !typeName.equals("string")) {
-                return new ResFileReference(rawValue);
+            if (strValue instanceof String && strValue.length() > 0 && !inBag
+                    && !typeName.equals("string")) {
+                return new ResFileReference((String) strValue);
             }
+
+            return new ResString(strValue);
         }
 
-        return ResItem.parse(mPackage, type, data, rawValue);
+        return ResItem.parse(mPackage, type, data);
     }
 
     private void parseLibrary(ResChunkPullParser parser) throws IOException {
@@ -725,11 +729,7 @@ public class BinaryResourceParser {
             int entriesCount = 0;
 
             for (int i = 0; i < entryCount; i++) {
-                int id = mIn.readInt();
-
-                if (id != 0) {
-                    entries[entriesCount++] = ResId.of(id);
-                }
+                entries[entriesCount++] = ResId.of(mIn.readInt());
             }
 
             if (entriesCount < entries.length) {
@@ -766,8 +766,7 @@ public class BinaryResourceParser {
     private void skipUnreadHeader(ResChunkPullParser parser) throws IOException {
         // Some apps lie about the reported size of their chunk header.
         // Trusting the header size is misleading, so compare to what we actually read in the
-        // header vs reported and skip the rest. However, this runs after each chunk and not
-        // every chunk reading has a specific distinction between the header and the body.
+        // header vs reported and skip the rest.
         int bytesRead = (int) (mIn.position() - parser.chunkStart());
         readExceedingBytes("Chunk header", parser.headerSize(), bytesRead);
     }
@@ -789,7 +788,7 @@ public class BinaryResourceParser {
     }
 
     private void injectDummyEntrySpecs() throws AndrolibException {
-        if (mTable.getConfig().getDecodeResolve() == Config.DecodeResolve.GREEDY) {
+        if (mAllowDummyEntrySpecs) {
             ResReference parent = new ResReference(mPackage, ResId.NULL);
             ResBag.RawItem[] rawItems = new ResBag.RawItem[0];
 
@@ -804,7 +803,7 @@ public class BinaryResourceParser {
                 } else if (typeSpec.isBagType()) {
                     value = ResBag.parse(typeName, parent, rawItems);
                 } else {
-                    value = ResReference.NULL;
+                    value = ResPrimitive.NULL;
                 }
 
                 mPackage.addEntrySpec(id, ResEntrySpec.DUMMY_PREFIX + id);

@@ -17,7 +17,7 @@
 package brut.androlib.res.decoder;
 
 import brut.androlib.BaseTest;
-import brut.androlib.res.decoder.data.NinePatchData;
+import brut.androlib.res.data.NinePatchData;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;

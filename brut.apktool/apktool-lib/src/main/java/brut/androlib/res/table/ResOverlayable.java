@@ -56,6 +56,7 @@ public class ResOverlayable {
     private final List<Policy> mPolicies;
 
     public ResOverlayable(ResPackage pkg, String name, String actor) {
+        assert pkg != null && name != null && actor != null;
         mPackage = pkg;
         mName = name;
         mActor = actor;

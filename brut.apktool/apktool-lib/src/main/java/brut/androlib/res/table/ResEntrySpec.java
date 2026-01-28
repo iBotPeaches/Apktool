@@ -27,6 +27,7 @@ public class ResEntrySpec {
     private final String mName;
 
     public ResEntrySpec(ResTypeSpec typeSpec, ResId id, String name) {
+        assert typeSpec != null && id != null && name != null;
         assert typeSpec.getPackage().getId() == id.getPackageId();
         assert typeSpec.getId() == id.getTypeId();
         mTypeSpec = typeSpec;
@@ -75,15 +76,6 @@ public class ResEntrySpec {
 
     public String getName() {
         return mName;
-    }
-
-    public String getFullName(ResPackage relativeToPackage, boolean excludeType) {
-        return getFullName(getPackage() == relativeToPackage, excludeType);
-    }
-
-    public String getFullName(boolean excludePackage, boolean excludeType) {
-        return (excludePackage ? "" : getPackage().getName() + ":")
-                + (excludeType ? "" : getTypeName() + "/") + mName;
     }
 
     @Override

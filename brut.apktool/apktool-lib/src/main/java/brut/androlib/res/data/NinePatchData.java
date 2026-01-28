@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib.res.decoder.data;
+package brut.androlib.res.data;
 
 import brut.util.BinaryDataInputStream;
 
@@ -28,7 +28,7 @@ public final class NinePatchData {
     public final int paddingLeft, paddingRight, paddingTop, paddingBottom;
 
     public NinePatchData(int[] xDivs, int[] yDivs, int paddingLeft, int paddingRight, int paddingTop,
-                     int paddingBottom) {
+                         int paddingBottom) {
         this.xDivs = xDivs;
         this.yDivs = yDivs;
         this.paddingLeft = paddingLeft;

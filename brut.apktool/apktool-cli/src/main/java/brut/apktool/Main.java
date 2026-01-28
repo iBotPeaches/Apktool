@@ -130,6 +130,11 @@ public class Main {
             + "fix them manually before building.")
         .get();
 
+    private static final Option decodeIgnoreRawValuesOption = Option.builder()
+        .longOpt("ignore-raw-values")
+        .desc("Ignore raw attribute values in XML resource files.")
+        .get();
+
     private static final Option decodeMatchOriginalOption = Option.builder()
         .longOpt("match-original")
         .desc("Keep files closest to original as possible (prevents rebuild).")
@@ -241,6 +246,7 @@ public class Main {
             decodeOptions.addOption(jobsOption);
             decodeOptions.addOption(libOption);
             if (advanced) {
+                decodeOptions.addOption(decodeIgnoreRawValuesOption);
                 decodeOptions.addOption(decodeKeepBrokenResOption);
                 decodeOptions.addOption(decodeMatchOriginalOption);
                 decodeOptions.addOption(decodeNoAssetsOption);
@@ -481,6 +487,13 @@ public class Main {
                 printOptionConflict(decodeKeepBrokenResOption, decodeOnlyManifestOption);
             } else {
                 config.setKeepBrokenResources(true);
+            }
+        }
+        if (cli.hasOption(decodeIgnoreRawValuesOption)) {
+            if (cli.hasOption(decodeNoResOption)) {
+                printOptionConflict(decodeIgnoreRawValuesOption, decodeNoResOption);
+            } else {
+                config.setIgnoreRawValues(true);
             }
         }
         if (cli.hasOption(decodeMatchOriginalOption)) {
