@@ -27,12 +27,11 @@ import brut.androlib.res.table.*;
 import brut.androlib.res.table.value.ResBag;
 import brut.androlib.res.table.value.ResFileReference;
 import brut.androlib.res.xml.ResXmlUtils;
+import brut.androlib.res.xml.ResXmlSerializer;
 import brut.androlib.res.xml.ValuesXmlSerializable;
 import brut.directory.Directory;
 import brut.directory.DirectoryException;
 import brut.directory.FileDirectory;
-import brut.xmlpull.MXSerializer;
-import org.xmlpull.v1.XmlSerializer;
 
 import java.io.*;
 import java.util.*;
@@ -72,8 +71,9 @@ public class ResDecoder {
         decoders.put(ResFileDecoder.Type.UNKNOWN, new ResRawStreamDecoder());
         decoders.put(ResFileDecoder.Type.PNG_9PATCH, new ResNinePatchStreamDecoder());
 
-        BinaryXmlResourceParser parser = new BinaryXmlResourceParser(mTable);
-        XmlSerializer serial = newXmlSerializer();
+        BinaryXmlResourceParser parser = new BinaryXmlResourceParser(
+            mTable, mConfig.isIgnoreRawValues(), mConfig.isDecodeResolveLazy());
+        ResXmlSerializer serial = new ResXmlSerializer(true);
         decoders.put(ResFileDecoder.Type.BINARY_XML, new ResXmlPullStreamDecoder(parser, serial));
 
         ResFileDecoder fileDecoder = new ResFileDecoder(decoders);
@@ -102,6 +102,9 @@ public class ResDecoder {
             }
         }
 
+        // Disable auto-escaping in generated XMLs.
+        serial = new ResXmlSerializer(false);
+
         LOGGER.info("Generating values XMLs...");
         Map<ResType, List<ResEntry>> valuesEntries = new HashMap<>();
         for (ResEntry entry : pkg.listEntries()) {
@@ -128,21 +131,9 @@ public class ResDecoder {
         }
     }
 
-    private XmlSerializer newXmlSerializer() throws AndrolibException {
-        try {
-            XmlSerializer serial = new MXSerializer();
-            serial.setFeature(MXSerializer.FEATURE_ATTR_VALUE_NO_ESCAPE, true);
-            serial.setProperty(MXSerializer.PROPERTY_DEFAULT_ENCODING, "utf-8");
-            serial.setProperty(MXSerializer.PROPERTY_INDENTATION, "    ");
-            serial.setProperty(MXSerializer.PROPERTY_LINE_SEPARATOR, System.lineSeparator());
-            return serial;
-        } catch (IllegalArgumentException | IllegalStateException ex) {
-            throw new AndrolibException(ex);
-        }
-    }
-
     private void generateValuesXml(ResPackage pkg, ResType type, List<ResEntry> entries,
-                                   Directory outDir, XmlSerializer serial) throws AndrolibException {
+                                   Directory outDir, ResXmlSerializer serial)
+            throws AndrolibException {
         String path = "res/values" + type.getConfig().getQualifiers() + "/"
                 + type.getName() + (type.getName().endsWith("s") ? "" : "s") + ".xml";
         entries.sort(Comparator.comparing(ResEntry::getId));
@@ -165,7 +156,7 @@ public class ResDecoder {
         }
     }
 
-    private void generatePublicXml(ResPackage pkg, Directory outDir, XmlSerializer serial)
+    private void generatePublicXml(ResPackage pkg, Directory outDir, ResXmlSerializer serial)
             throws AndrolibException {
         String path = "res/values/public.xml";
         List<ResEntrySpec> specs = new ArrayList<>(pkg.listEntrySpecs());
@@ -192,7 +183,7 @@ public class ResDecoder {
         }
     }
 
-    private void generateOverlayableXml(ResPackage pkg, Directory outDir, XmlSerializer serial)
+    private void generateOverlayableXml(ResPackage pkg, Directory outDir, ResXmlSerializer serial)
             throws AndrolibException {
         List<ResOverlayable> overlayables = new ArrayList<>(pkg.listOverlayables());
         if (overlayables.isEmpty()) {
@@ -224,9 +215,12 @@ public class ResDecoder {
             return;
         }
 
-        BinaryXmlResourceParser parser = new BinaryXmlResourceParser(mTable);
-        XmlSerializer serial = newXmlSerializer();
-        ResStreamDecoder decoder = new AndroidManifestPullStreamDecoder(parser, serial);
+        BinaryXmlResourceParser parser = new BinaryXmlResourceParser(
+            mTable, mConfig.isIgnoreRawValues(), mConfig.isDecodeResolveLazy());
+        ResXmlSerializer serial = new ResXmlSerializer(true);
+        ManifestPullEventHandler handler = new ManifestPullEventHandler(
+            mApkInfo, !mConfig.isAnalysisMode());
+        ResXmlPullStreamDecoder decoder = new ResXmlPullStreamDecoder(parser, serial, handler);
 
         Directory inDir, outDir;
         try {

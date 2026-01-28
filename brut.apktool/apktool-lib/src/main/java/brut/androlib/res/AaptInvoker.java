@@ -18,8 +18,7 @@ package brut.androlib.res;
 
 import brut.androlib.Config;
 import brut.androlib.exceptions.AndrolibException;
-import brut.androlib.meta.ApkInfo;
-import brut.androlib.meta.UsesFramework;
+import brut.androlib.meta.*;
 import brut.androlib.res.Framework;
 import brut.common.BrutException;
 import brut.util.OS;
@@ -42,6 +41,10 @@ public class AaptInvoker {
     }
 
     public void invoke(File outApk, File manifest, File resDir) throws AndrolibException {
+        SdkInfo sdkInfo = mApkInfo.getSdkInfo();
+        VersionInfo versionInfo = mApkInfo.getVersionInfo();
+        ResourcesInfo resourcesInfo = mApkInfo.getResourcesInfo();
+
         String aaptPath = mConfig.getAaptBinary();
         if (aaptPath == null || aaptPath.isEmpty()) {
             try {
@@ -105,24 +108,24 @@ public class AaptInvoker {
         cmd.add("--manifest");
         cmd.add(manifest.getPath());
 
-        if (mApkInfo.getSdkInfo().getMinSdkVersion() != null) {
+        if (sdkInfo.getMinSdkVersion() != null) {
             cmd.add("--min-sdk-version");
-            cmd.add(mApkInfo.getSdkInfo().getMinSdkVersion());
+            cmd.add(sdkInfo.getMinSdkVersion());
         }
-        if (mApkInfo.getSdkInfo().getTargetSdkVersion() != null) {
+        if (sdkInfo.getTargetSdkVersion() != null) {
             cmd.add("--target-sdk-version");
-            cmd.add(mApkInfo.getSdkInfo().getTargetSdkVersion());
+            cmd.add(sdkInfo.getTargetSdkVersion());
         }
-        if (mApkInfo.getVersionInfo().getVersionCode() != null) {
+        if (versionInfo.getVersionCode() != null) {
             cmd.add("--version-code");
-            cmd.add(mApkInfo.getVersionInfo().getVersionCode());
+            cmd.add(versionInfo.getVersionCode());
         }
-        if (mApkInfo.getVersionInfo().getVersionName() != null) {
+        if (versionInfo.getVersionName() != null) {
             cmd.add("--version-name");
-            cmd.add(mApkInfo.getVersionInfo().getVersionName());
+            cmd.add(versionInfo.getVersionName());
         }
-        if (mApkInfo.getResourcesInfo().getPackageId() != null) {
-            int pkgId = Integer.parseInt(mApkInfo.getResourcesInfo().getPackageId());
+        if (resourcesInfo.getPackageId() != null) {
+            int pkgId = Integer.parseInt(resourcesInfo.getPackageId());
             if (pkgId == 0) {
                 cmd.add("--shared-lib");
             } else if (pkgId > 1) {
@@ -133,15 +136,18 @@ public class AaptInvoker {
                 }
             }
         }
-        if (mApkInfo.getResourcesInfo().getPackageName() != null) {
+        if (resourcesInfo.getPackageName() != null) {
             cmd.add("--rename-resources-package");
-            cmd.add(mApkInfo.getResourcesInfo().getPackageName());
+            cmd.add(resourcesInfo.getPackageName());
         }
-        if (mApkInfo.getResourcesInfo().isSparseEntries()) {
+        if (resourcesInfo.isSparseEntries()) {
             cmd.add("--enable-sparse-encoding");
         }
-        if (mApkInfo.getResourcesInfo().isCompactEntries()) {
+        if (resourcesInfo.isCompactEntries()) {
             cmd.add("--enable-compact-entries");
+        }
+        if (resourcesInfo.isKeepRawValues()) {
+            cmd.add("--keep-raw-values");
         }
         if (!mApkInfo.getFeatureFlags().isEmpty()) {
             List<String> featureFlags = new ArrayList<>();

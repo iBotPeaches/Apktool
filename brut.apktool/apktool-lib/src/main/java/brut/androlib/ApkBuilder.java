@@ -21,7 +21,7 @@ import brut.androlib.meta.ApkInfo;
 import brut.androlib.meta.SdkInfo;
 import brut.androlib.res.AaptInvoker;
 import brut.androlib.res.AaptManager;
-import brut.androlib.res.decoder.data.ResChunkHeader;
+import brut.androlib.res.data.ResChunkHeader;
 import brut.androlib.res.table.ResConfig;
 import brut.androlib.res.xml.ResXmlUtils;
 import brut.androlib.smali.SmaliBuilder;

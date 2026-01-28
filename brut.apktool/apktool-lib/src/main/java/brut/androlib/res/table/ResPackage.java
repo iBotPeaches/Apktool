@@ -27,11 +27,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.logging.Logger;
 
 public class ResPackage {
-    private static final Logger LOGGER = Logger.getLogger(ResPackage.class.getName());
-
     private final ResTable mTable;
     private final int mId;
     private final String mName;
@@ -43,6 +40,7 @@ public class ResPackage {
     private final Map<String, ResOverlayable> mOverlayables;
 
     public ResPackage(ResTable table, int id, String name) {
+        assert table != null && name != null;
         mTable = table;
         mId = id;
         mName = name;

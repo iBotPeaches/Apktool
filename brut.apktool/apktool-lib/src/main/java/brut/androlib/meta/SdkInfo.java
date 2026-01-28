@@ -42,18 +42,15 @@ public class SdkInfo implements YamlSerializable {
     public void readItem(YamlReader reader) {
         YamlLine line = reader.getLine();
         switch (line.getKey()) {
-            case "minSdkVersion": {
+            case "minSdkVersion":
                 mMinSdkVersion = line.getValue();
                 break;
-            }
-            case "targetSdkVersion": {
+            case "targetSdkVersion":
                 mTargetSdkVersion = line.getValue();
                 break;
-            }
-            case "maxSdkVersion": {
+            case "maxSdkVersion":
                 mMaxSdkVersion = line.getValue();
                 break;
-            }
         }
     }
 

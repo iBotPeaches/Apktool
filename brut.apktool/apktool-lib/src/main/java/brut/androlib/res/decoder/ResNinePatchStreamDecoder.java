@@ -18,8 +18,8 @@ package brut.androlib.res.decoder;
 
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.exceptions.NinePatchNotFoundException;
-import brut.androlib.res.decoder.data.LayoutBounds;
-import brut.androlib.res.decoder.data.NinePatchData;
+import brut.androlib.res.data.LayoutBounds;
+import brut.androlib.res.data.NinePatchData;
 import brut.util.BinaryDataInputStream;
 import org.apache.commons.io.IOUtils;
 
@@ -27,7 +27,11 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.EOFException;
+import java.io.InputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.ByteOrder;
 
 public class ResNinePatchStreamDecoder implements ResStreamDecoder {
@@ -40,16 +44,16 @@ public class ResNinePatchStreamDecoder implements ResStreamDecoder {
                 return;
             }
 
-            BufferedImage im = ImageIO.read(new ByteArrayInputStream(data));
-            int w = im.getWidth(), h = im.getHeight();
+            BufferedImage src = ImageIO.read(new ByteArrayInputStream(data));
+            int w = src.getWidth(), h = src.getHeight();
 
-            BufferedImage im2 = new BufferedImage(w + 2, h + 2, BufferedImage.TYPE_INT_ARGB);
-            if (im.getType() == BufferedImage.TYPE_CUSTOM) {
+            BufferedImage dst = new BufferedImage(w + 2, h + 2, BufferedImage.TYPE_INT_ARGB);
+            if (src.getType() == BufferedImage.TYPE_CUSTOM) {
                 // TODO: Ensure this is gray + alpha case?
-                Raster srcRaster = im.getRaster();
-                WritableRaster dstRaster = im2.getRaster();
+                Raster srcRaster = src.getRaster();
+                WritableRaster dstRaster = dst.getRaster();
                 int[] gray = null, alpha = null;
-                for (int y = 0; y < im.getHeight(); y++) {
+                for (int y = 0; y < src.getHeight(); y++) {
                     gray = srcRaster.getSamples(0, y, w, 1, 0, gray);
                     alpha = srcRaster.getSamples(0, y, w, 1, 1, alpha);
 
@@ -59,64 +63,64 @@ public class ResNinePatchStreamDecoder implements ResStreamDecoder {
                     dstRaster.setSamples(1, y + 1, w, 1, 3, alpha);
                 }
             } else {
-                im2.createGraphics().drawImage(im, 1, 1, w, h, null);
+                dst.createGraphics().drawImage(src, 1, 1, w, h, null);
             }
 
             NinePatchData np = findNinePatchData(data);
-            drawHLine(im2, h + 1, np.paddingLeft + 1, w - np.paddingRight);
-            drawVLine(im2, w + 1, np.paddingTop + 1, h - np.paddingBottom);
+            drawHLine(dst, h + 1, np.paddingLeft + 1, w - np.paddingRight);
+            drawVLine(dst, w + 1, np.paddingTop + 1, h - np.paddingBottom);
 
             int[] xDivs = np.xDivs;
             if (xDivs.length == 0) {
-                drawHLine(im2, 0, 1, w);
+                drawHLine(dst, 0, 1, w);
             } else {
                 for (int i = 0; i < xDivs.length; i += 2) {
-                    drawHLine(im2, 0, xDivs[i] + 1, xDivs[i + 1]);
+                    drawHLine(dst, 0, xDivs[i] + 1, xDivs[i + 1]);
                 }
             }
 
             int[] yDivs = np.yDivs;
             if (yDivs.length == 0) {
-                drawVLine(im2, 0, 1, h);
+                drawVLine(dst, 0, 1, h);
             } else {
                 for (int i = 0; i < yDivs.length; i += 2) {
-                    drawVLine(im2, 0, yDivs[i] + 1, yDivs[i + 1]);
+                    drawVLine(dst, 0, yDivs[i] + 1, yDivs[i + 1]);
                 }
             }
 
-            // Some images optionally use optical inset/layout bounds
+            // Some images optionally use optical inset/layout bounds.
             // https://developer.android.com/about/versions/android-4.3.html#OpticalBounds
             try {
                 LayoutBounds lb = findLayoutBounds(data);
 
                 for (int i = 0; i < lb.left; i++) {
                     int x = 1 + i;
-                    im2.setRGB(x, h + 1, LayoutBounds.COLOR_TICK);
+                    dst.setRGB(x, h + 1, LayoutBounds.COLOR_TICK);
                 }
 
                 for (int i = 0; i < lb.right; i++) {
                     int x = w - i;
-                    im2.setRGB(x, h + 1, LayoutBounds.COLOR_TICK);
+                    dst.setRGB(x, h + 1, LayoutBounds.COLOR_TICK);
                 }
 
                 for (int i = 0; i < lb.top; i++) {
                     int y = 1 + i;
-                    im2.setRGB(w + 1, y, LayoutBounds.COLOR_TICK);
+                    dst.setRGB(w + 1, y, LayoutBounds.COLOR_TICK);
                 }
 
                 for (int i = 0; i < lb.bottom; i++) {
                     int y = h - i;
-                    im2.setRGB(w + 1, y, LayoutBounds.COLOR_TICK);
+                    dst.setRGB(w + 1, y, LayoutBounds.COLOR_TICK);
                 }
             } catch (NinePatchNotFoundException ignored) {
                 // This chunk might not exist.
             }
 
-            ImageIO.write(im2, "png", out);
+            ImageIO.write(dst, "png", out);
         } catch (IOException | NullPointerException ex) {
-            // In my case this was triggered because a .png file was
-            // containing a html document instead of an image.
-            // This could be more verbose and try to MIME?
+            // In my case this was triggered because a .png file was contained
+            // an HTML document instead of an image.
+            // TODO: This could be more verbose and try to MIME?
             throw new AndrolibException(ex);
         }
     }

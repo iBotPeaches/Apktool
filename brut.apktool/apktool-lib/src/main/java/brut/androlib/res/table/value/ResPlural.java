@@ -18,16 +18,14 @@ package brut.androlib.res.table.value;
 
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.table.ResEntry;
-import brut.androlib.res.xml.ResXmlEncodable;
-import brut.androlib.res.xml.ResXmlEncoders;
-import brut.androlib.res.xml.ValuesXmlSerializable;
+import brut.androlib.res.xml.ResStringEncoder;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
 import java.util.Objects;
 import java.util.logging.Logger;
 
-public class ResPlural extends ResBag implements ValuesXmlSerializable {
+public class ResPlural extends ResBag {
     private static final Logger LOGGER = Logger.getLogger(ResPlural.class.getName());
 
     private static final int ATTR_OTHER = 0x01000004;
@@ -41,6 +39,7 @@ public class ResPlural extends ResBag implements ValuesXmlSerializable {
 
     public ResPlural(ResReference parent, RawItem[] items) {
         super(parent);
+        assert items != null;
         mItems = items;
     }
 
@@ -83,15 +82,9 @@ public class ResPlural extends ResBag implements ValuesXmlSerializable {
             }
 
             ResItem value = item.getValue();
-            String body;
-            if (value instanceof ResString) {
-                body = ResXmlEncoders.enumerateNonPositionalSubstitutionsIfRequired(
-                    ((ResString) value).encodeAsResXmlItemValueUnescaped());
-            } else if (value instanceof ResXmlEncodable) {
-                body = ((ResXmlEncodable) value).encodeAsResXmlItemValue();
-            } else {
-                LOGGER.warning("Unexpected plurals value: " + value);
-                continue;
+            String body = value.toXmlTextValue();
+            if (!body.isEmpty()) {
+                body = ResStringEncoder.normalizeFormatSpecifiers(body);
             }
 
             serial.startTag(null, "item");

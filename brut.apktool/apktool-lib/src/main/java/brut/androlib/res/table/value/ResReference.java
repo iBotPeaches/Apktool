@@ -22,48 +22,26 @@ import brut.androlib.res.table.ResEntry;
 import brut.androlib.res.table.ResEntrySpec;
 import brut.androlib.res.table.ResId;
 import brut.androlib.res.table.ResPackage;
-import brut.androlib.res.xml.ResXmlEncodable;
-import brut.androlib.res.xml.ValuesXmlSerializable;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
 import java.util.Objects;
 
-public class ResReference extends ResItem implements ResXmlEncodable, ValuesXmlSerializable {
-    public enum Type { RESOURCE, ATTRIBUTE }
-
-    public static final ResReference NULL = new ResReference(null, null, null, null);
-
+public class ResReference extends ResItem {
     private final ResPackage mPackage;
     private final ResId mId;
-    private final String mName;
-    private final Type mType;
+    private final boolean mAsAttr;
 
     public ResReference(ResPackage pkg, ResId id) {
-        this(pkg, id, null, Type.RESOURCE);
+        this(pkg, id, false);
     }
 
-    public ResReference(ResPackage pkg, String name) {
-        this(pkg, null, name, Type.RESOURCE);
-    }
-
-    public ResReference(ResPackage pkg, ResId id, String name) {
-        this(pkg, id, name, Type.RESOURCE);
-    }
-
-    public ResReference(ResPackage pkg, ResId id, Type type) {
-        this(pkg, id, null, type);
-    }
-
-    public ResReference(ResPackage pkg, String name, Type type) {
-        this(pkg, null, name, type);
-    }
-
-    public ResReference(ResPackage pkg, ResId id, String name, Type type) {
+    public ResReference(ResPackage pkg, ResId id, boolean asAttr) {
+        super(asAttr ? TYPE_ATTRIBUTE : TYPE_REFERENCE);
+        assert pkg != null && id != null;
         mPackage = pkg;
-        mId = id != null ? id : ResId.NULL;
-        mName = name;
-        mType = type;
+        mId = id;
+        mAsAttr = asAttr;
     }
 
     public ResPackage getPackage() {
@@ -72,10 +50,6 @@ public class ResReference extends ResItem implements ResXmlEncodable, ValuesXmlS
 
     public ResId getId() {
         return mId;
-    }
-
-    public String getName() {
-        return mName;
     }
 
     public ResEntrySpec resolve() throws AndrolibException {
@@ -90,20 +64,20 @@ public class ResReference extends ResItem implements ResXmlEncodable, ValuesXmlS
     }
 
     @Override
-    public String encodeAsResXmlValue() throws AndrolibException {
-        if (mName != null) {
-            return mName;
-        }
-
+    public String toXmlTextValue() throws AndrolibException {
         ResEntrySpec spec = resolve();
         if (spec == null) {
+            // @null is a special primitive, not a true reference, but we have
+            // to fall back to it if we can't resolve the reference.
             return "@null";
         }
 
-        boolean isAttrRef = mType == Type.ATTRIBUTE;
-        boolean excludeType = isAttrRef && spec.getTypeName().equals("attr");
-
-        return (isAttrRef ? "?" : "@") + spec.getFullName(mPackage, excludeType);
+        boolean includePackage = mPackage != spec.getPackage();
+        boolean includeType = !mAsAttr || !spec.getTypeName().equals("attr");
+        return (mAsAttr ? "?" : "@")
+                + (includePackage ? spec.getPackage().getName() + ":" : "")
+                + (includeType ? spec.getTypeName() + "/" : "")
+                + spec.getName();
     }
 
     @Override
@@ -127,20 +101,15 @@ public class ResReference extends ResItem implements ResXmlEncodable, ValuesXmlS
         }
         serial.attribute(null, "name", entry.getName());
         if (needsBody) {
-            serial.text(encodeAsResXmlValue());
+            serial.text(toXmlTextValue());
         }
         serial.endTag(null, tagName);
     }
 
     @Override
-    public String getFormat() {
-        return "reference";
-    }
-
-    @Override
     public String toString() {
-        return String.format("ResReference{pkg=%s, id=%s, name=%s, type=%s}",
-            mPackage, mId, mName, mType);
+        return String.format("ResReference{pkg=%s, id=%s, type=%s}",
+            mPackage, mId, mAsAttr ? "attr" : "ref");
     }
 
     @Override
@@ -152,14 +121,13 @@ public class ResReference extends ResItem implements ResXmlEncodable, ValuesXmlS
             ResReference other = (ResReference) obj;
             return Objects.equals(mPackage, other.mPackage)
                     && Objects.equals(mId, other.mId)
-                    && Objects.equals(mName, other.mName)
-                    && Objects.equals(mType, other.mType);
+                    && mAsAttr == other.mAsAttr;
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(mPackage, mId, mName, mType);
+        return Objects.hash(mPackage, mId, mAsAttr);
     }
 }

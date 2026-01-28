@@ -25,7 +25,7 @@ set max_patch=0
 rem Loop through all versioned .jar files matching the basename
 for %%F in (%BASENAME%*.jar) do (
     set "filename=%%~nF"
-    
+
     rem Extract version part (apktool-X.Y.Z)
     for /f "tokens=2 delims=_-" %%A in ("!filename!") do (
         for /f "tokens=1,2,3 delims=." %%B in ("%%A") do (

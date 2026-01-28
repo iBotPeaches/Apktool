@@ -18,49 +18,36 @@ package brut.androlib.res.table.value;
 
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.table.ResEntry;
-import brut.androlib.res.xml.ResXmlEncodable;
-import brut.androlib.res.xml.ResXmlEncoders;
-import brut.androlib.res.xml.ValuesXmlSerializable;
-import org.apache.commons.lang3.StringUtils;
+import brut.androlib.res.xml.ResStringEncoder;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Set;
 
-public class ResString extends ResItem implements ResXmlEncodable, ValuesXmlSerializable {
+public class ResString extends ResItem {
     public static final ResString EMPTY = new ResString("");
 
-    private final String mValue;
+    private final CharSequence mValue;
 
-    public ResString(String text) {
-        mValue = text;
+    public ResString(CharSequence value) {
+        super(TYPE_STRING);
+        assert value != null;
+        mValue = value;
     }
 
-    public boolean hasMultipleNonPositionalSubstitutions() {
-        return ResXmlEncoders.hasMultipleNonPositionalSubstitutions(mValue);
-    }
-
-    public String encodeAsResXmlItemValueUnescaped() {
-        return StringUtils.replaceEach(encodeAsResXmlValue(),
-            new String[] { "&amp;", "&lt;" },
-            new String[] { "&", "<" });
+    public CharSequence getValue() {
+        return mValue;
     }
 
     @Override
-    public String encodeAsResXmlValue() {
-        return ResXmlEncoders.encodeAsXmlValue(mValue);
+    public String toXmlTextValue() {
+        return ResStringEncoder.encodeTextValue(mValue);
     }
 
     @Override
-    public String encodeAsResXmlItemValue() {
-        return ResXmlEncoders.enumerateNonPositionalSubstitutionsIfRequired(encodeAsResXmlValue());
-    }
-
-    @Override
-    public String encodeAsResXmlAttrValue() {
-        String value = ResXmlEncoders.encodeAsResXmlAttrValue(mValue);
-        return value != null ? value : "";
+    public String toXmlAttributeValue() {
+        return ResStringEncoder.encodeAttributeValue(mValue);
     }
 
     @Override
@@ -69,9 +56,10 @@ public class ResString extends ResItem implements ResXmlEncodable, ValuesXmlSeri
         String type = entry.getTypeName();
 
         // Specify format for <item> tags when the resource type doesn't
-        // directly support the string format.
-        Set<String> standardFormats = STANDARD_TYPE_FORMATS.get(type);
-        boolean asItem = standardFormats == null || !standardFormats.contains("string");
+        // directly support this value's format.
+        Set<String> stdFormats = STANDARD_TYPE_FORMATS.get(type);
+        String format = stdFormats != null ? getFormat() : null;
+        boolean asItem = format != null && !stdFormats.contains(format);
 
         String tagName = asItem ? "item" : type;
         serial.startTag(null, tagName);
@@ -80,21 +68,28 @@ public class ResString extends ResItem implements ResXmlEncodable, ValuesXmlSeri
         }
         serial.attribute(null, "name", entry.getName());
         if (asItem) {
-            serial.attribute(null, "format", "string");
+            serial.attribute(null, "format", format);
         }
-        if (!asItem && hasMultipleNonPositionalSubstitutions()) {
+        if (!asItem && !isFormatted()) {
             serial.attribute(null, "formatted", "false");
         }
-        String body = encodeAsResXmlValue();
+        String body = toXmlTextValue();
         if (!body.isEmpty()) {
-            serial.ignorableWhitespace(body);
+            serial.text(body);
         }
         serial.endTag(null, tagName);
     }
 
-    @Override
-    public String getFormat() {
-        return "string";
+    private boolean isFormatted() {
+        if (mValue.length() == 0) {
+            return true;
+        }
+        // Formatting must be disabled if the string has multiple sequential
+        // format specifier.
+        int[][] specs = ResStringEncoder.findFormatSpecifiers(mValue.toString());
+        int[] sequential = specs[0];
+        int[] positional = specs[1];
+        return specs[0].length == 0 || specs[0].length + specs[1].length <= 1;
     }
 
     @Override

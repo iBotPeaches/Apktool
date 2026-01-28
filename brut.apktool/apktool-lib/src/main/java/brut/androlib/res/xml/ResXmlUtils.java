@@ -27,6 +27,8 @@ import java.io.*;
 import java.util.*;
 
 public final class ResXmlUtils {
+    public static final String ANDROID_RES_NS = "http://schemas.android.com/apk/res/android";
+    public static final String ANDROID_RES_NS_AUTO = "http://schemas.android.com/apk/res-auto";
 
     private ResXmlUtils() {
         // Private constructor for utility class.

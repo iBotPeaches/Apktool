@@ -16,8 +16,6 @@
  */
 package brut.androlib.res.table.value;
 
-import android.util.TypedValue;
-import brut.androlib.Config;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.table.ResConfig;
 import brut.androlib.res.table.ResEntry;
@@ -44,14 +42,14 @@ public class ResFlags extends ResAttribute {
 
     public ResFlags(ResReference parent, int type, int min, int max, int l10n, Symbol[] symbols) {
         super(parent, type, min, max, l10n);
+        assert parent != null && symbols != null;
         mSymbols = symbols;
     }
 
     @Override
     public void resolveKeys() throws AndrolibException {
         ResPackage pkg = mParent.getPackage();
-        Config config = pkg.getTable().getConfig();
-        boolean skipUnresolved = config.getDecodeResolve() == Config.DecodeResolve.LAZY;
+        boolean skipUnresolved = pkg.getTable().getConfig().isDecodeResolveLazy();
 
         for (Symbol symbol : mSymbols) {
             ResReference key = symbol.getKey();
@@ -64,7 +62,7 @@ public class ResFlags extends ResAttribute {
             // #2836 - Skip item if the resource cannot be resolved.
             if (skipUnresolved || entryId.getPackageId() != pkg.getId()) {
                 LOGGER.warning(String.format(
-                    "null flag reference: key=%s, value=%s", key, symbol.getValue()));
+                    "Unresolved flag reference: key=%s, value=%s", key, symbol.getValue()));
                 continue;
             }
 
@@ -74,7 +72,7 @@ public class ResFlags extends ResAttribute {
     }
 
     @Override
-    protected Symbol[] getSymbolsForValue(ResItem value) throws AndrolibException {
+    protected Symbol[] getSymbolsForValue(ResItem value) {
         if (!isSymbolValueType(value)) {
             return null;
         }
@@ -83,16 +81,16 @@ public class ResFlags extends ResAttribute {
         return getSymbols(data);
     }
 
-    private boolean isSymbolValueType(ResItem value) throws AndrolibException {
+    private boolean isSymbolValueType(ResItem value) {
         if (!(value instanceof ResPrimitive)) {
             return false;
         }
 
-        int type = ((ResPrimitive) value).getType();
-        return type == TypedValue.TYPE_INT_DEC || type == TypedValue.TYPE_INT_HEX;
+        int type = value.getType();
+        return type == TYPE_INT_DEC || type == TYPE_INT_HEX;
     }
 
-    private Symbol[] getSymbols(int data) throws AndrolibException {
+    private Symbol[] getSymbols(int data) {
         if (mSymbolsCache == null) {
             // Lazily establish a symbols cache for performance.
             mSymbolsCache = new HashMap<>();
@@ -179,7 +177,7 @@ public class ResFlags extends ResAttribute {
     }
 
     @Override
-    protected String formatValueToSymbols(ResItem value) throws AndrolibException {
+    protected String formatValueFromSymbols(ResItem value) throws AndrolibException {
         if (!isSymbolValueType(value)) {
             return null;
         }
@@ -228,7 +226,7 @@ public class ResFlags extends ResAttribute {
 
             serial.startTag(null, "flag");
             serial.attribute(null, "name", keySpec.getName());
-            serial.attribute(null, "value", symbol.getValue().encodeAsResXmlAttrValue());
+            serial.attribute(null, "value", symbol.getValue().toXmlAttributeValue());
             serial.endTag(null, "flag");
         }
     }

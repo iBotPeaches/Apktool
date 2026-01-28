@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="test_color1">#ff123456</color>
-    <color name="test_color2">@android:color/white</color>
-    <color name="test_color3">#00000000</color>
-    <color name="test_color4">#c1ac1a</color>
-    <color name="test_color5">#abcd</color>
-    <color name="test_color6">#123</color>
+    <color name="test_color1">#123</color>
+    <color name="test_color2">#abcd</color>
+    <color name="test_color3">#c1ac1a</color>
+    <color name="test_color4">#ff123456</color>
+    <color name="test_color5">#00000000</color>
+    <color name="test_color6">@android:color/white</color>
     <item type="color" name="issue_3416" format="string">\@null</item>
 </resources>

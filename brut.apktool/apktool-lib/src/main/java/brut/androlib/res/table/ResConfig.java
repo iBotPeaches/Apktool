@@ -196,7 +196,7 @@ public class ResConfig {
     private final byte[] mUnknown;
 
     private final String mQualifiers;
-    private boolean mIsInvalid;
+    private final boolean mIsInvalid;
 
     private ResConfig() {
         mMcc = 0;
@@ -225,6 +225,7 @@ public class ResConfig {
         mColorMode = COLOR_MODE_WIDECG_ANY | COLOR_MODE_HDR_ANY;
         mUnknown = null;
         mQualifiers = "";
+        mIsInvalid = false;
     }
 
     public ResConfig(int mcc, int mnc, String language, String region, int orientation,
@@ -258,10 +259,12 @@ public class ResConfig {
         mScreenLayout2 = screenLayout2;
         mColorMode = colorMode;
         mUnknown = unknown;
-        mQualifiers = generateQualifiers();
+        boolean[] isInvalid = new boolean[1];
+        mQualifiers = computeQualifiers(isInvalid);
+        mIsInvalid = isInvalid[0];
     }
 
-    private String generateQualifiers() {
+    private String computeQualifiers(boolean[] isInvalid) {
         StringBuilder sb = new StringBuilder();
         if (mMcc != 0) {
             sb.append("-mcc").append(String.format("%03d", mMcc));
@@ -306,7 +309,7 @@ public class ResConfig {
                 break;
             default:
                 sb.append("-grammaticalGender=").append(mGrammaticalInflection & MASK_GRAMMATICAL_GENDER);
-                mIsInvalid = true;
+                isInvalid[0] = true;
                 break;
         }
         switch (mScreenLayout & MASK_LAYOUTDIR) {
@@ -320,7 +323,7 @@ public class ResConfig {
                 break;
             default:
                 sb.append("-layoutDir=").append(mScreenLayout & MASK_LAYOUTDIR);
-                mIsInvalid = true;
+                isInvalid[0] = true;
                 break;
         }
         if (mSmallestScreenWidthDp != 0) {
@@ -349,7 +352,7 @@ public class ResConfig {
                 break;
             default:
                 sb.append("-screenSize=").append(mScreenLayout & MASK_SCREENSIZE);
-                mIsInvalid = true;
+                isInvalid[0] = true;
                 break;
         }
         switch (mScreenLayout & MASK_SCREENLONG) {
@@ -363,7 +366,7 @@ public class ResConfig {
                 break;
             default:
                 sb.append("-screenLong=").append(mScreenLayout & MASK_SCREENLONG);
-                mIsInvalid = true;
+                isInvalid[0] = true;
                 break;
         }
         switch (mScreenLayout2 & MASK_SCREENROUND) {
@@ -377,7 +380,7 @@ public class ResConfig {
                 break;
             default:
                 sb.append("-screenRound=").append(mScreenLayout2 & MASK_SCREENROUND);
-                mIsInvalid = true;
+                isInvalid[0] = true;
                 break;
         }
         switch (mColorMode & MASK_COLOR_MODE_WIDECG) {
@@ -391,7 +394,7 @@ public class ResConfig {
                 break;
             default:
                 sb.append("-colorModeWideCG=").append(mColorMode & MASK_COLOR_MODE_WIDECG);
-                mIsInvalid = true;
+                isInvalid[0] = true;
                 break;
         }
         switch (mColorMode & MASK_COLOR_MODE_HDR) {
@@ -405,7 +408,7 @@ public class ResConfig {
                 break;
             default:
                 sb.append("-colorModeHdr=").append(mColorMode & MASK_COLOR_MODE_HDR);
-                mIsInvalid = true;
+                isInvalid[0] = true;
                 break;
         }
         switch (mOrientation) {
@@ -422,7 +425,7 @@ public class ResConfig {
                 break;
             default:
                 sb.append("-orientation=").append(mOrientation);
-                mIsInvalid = true;
+                isInvalid[0] = true;
                 break;
         }
         switch (mUiMode & MASK_UI_MODE_TYPE) {
@@ -464,7 +467,7 @@ public class ResConfig {
                 break;
             default:
                 sb.append("-uiModeType=").append(mUiMode & MASK_UI_MODE_TYPE);
-                mIsInvalid = true;
+                isInvalid[0] = true;
                 break;
         }
         switch (mUiMode & MASK_UI_MODE_NIGHT) {
@@ -478,7 +481,7 @@ public class ResConfig {
                 break;
             default:
                 sb.append("-uiModeNight=").append(mUiMode & MASK_UI_MODE_NIGHT);
-                mIsInvalid = true;
+                isInvalid[0] = true;
                 break;
         }
         switch (mDensity) {
@@ -529,7 +532,7 @@ public class ResConfig {
                 break;
             default:
                 sb.append("-touchscreen=").append(mTouchscreen);
-                mIsInvalid = true;
+                isInvalid[0] = true;
                 break;
         }
         switch (mInputFlags & MASK_KEYSHIDDEN) {
@@ -546,7 +549,7 @@ public class ResConfig {
                 break;
             default:
                 sb.append("-keysHidden=").append(mInputFlags & MASK_KEYSHIDDEN);
-                mIsInvalid = true;
+                isInvalid[0] = true;
                 break;
         }
         switch (mKeyboard) {
@@ -563,7 +566,7 @@ public class ResConfig {
                 break;
             default:
                 sb.append("-keyboard=").append(mKeyboard);
-                mIsInvalid = true;
+                isInvalid[0] = true;
                 break;
         }
         switch (mInputFlags & MASK_NAVHIDDEN) {
@@ -577,7 +580,7 @@ public class ResConfig {
                 break;
             default:
                 sb.append("-navHidden=").append(mInputFlags & MASK_NAVHIDDEN);
-                mIsInvalid = true;
+                isInvalid[0] = true;
                 break;
         }
         switch (mNavigation) {
@@ -597,7 +600,7 @@ public class ResConfig {
                 break;
             default:
                 sb.append("-navigation=").append(mNavigation);
-                mIsInvalid = true;
+                isInvalid[0] = true;
                 break;
         }
         if (mScreenWidth != 0 && mScreenHeight != 0) {
@@ -609,7 +612,7 @@ public class ResConfig {
         if (mUnknown != null) {
             // We have to separate unknown resources to avoid conflicts.
             sb.append("-unk").append(String.format("%08X", Arrays.hashCode(mUnknown)));
-            mIsInvalid = true;
+            isInvalid[0] = true;
         }
         return sb.toString();
     }

@@ -16,7 +16,6 @@
  */
 package brut.androlib.res.table.value;
 
-import brut.androlib.Config;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.exceptions.UndefinedResObjectException;
 import brut.androlib.res.table.ResConfig;
@@ -24,7 +23,6 @@ import brut.androlib.res.table.ResEntry;
 import brut.androlib.res.table.ResEntrySpec;
 import brut.androlib.res.table.ResId;
 import brut.androlib.res.table.ResPackage;
-import brut.androlib.res.xml.ValuesXmlSerializable;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
@@ -33,13 +31,14 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Logger;
 
-public class ResStyle extends ResBag implements ValuesXmlSerializable {
+public class ResStyle extends ResBag {
     private static final Logger LOGGER = Logger.getLogger(ResStyle.class.getName());
 
     private final Item[] mItems;
 
     public ResStyle(ResReference parent, Item[] items) {
         super(parent);
+        assert parent != null && items != null;
         mItems = items;
     }
 
@@ -65,6 +64,7 @@ public class ResStyle extends ResBag implements ValuesXmlSerializable {
         private final ResItem mValue;
 
         public Item(ResReference key, ResItem value) {
+            assert key != null && value != null;
             mKey = key;
             mValue = value;
         }
@@ -81,8 +81,7 @@ public class ResStyle extends ResBag implements ValuesXmlSerializable {
     @Override
     public void resolveKeys() throws AndrolibException {
         ResPackage pkg = mParent.getPackage();
-        Config config = pkg.getTable().getConfig();
-        boolean skipUnresolved = config.getDecodeResolve() == Config.DecodeResolve.LAZY;
+        boolean skipUnresolved = pkg.getTable().getConfig().isDecodeResolveLazy();
 
         for (Item item : mItems) {
             ResReference key = item.getKey();
@@ -100,7 +99,7 @@ public class ResStyle extends ResBag implements ValuesXmlSerializable {
             // #2836 - Skip item if the resource cannot be resolved.
             if (skipUnresolved || entryId.getPackageId() != pkg.getId()) {
                 LOGGER.warning(String.format(
-                    "null style reference: key=%s, value=%s", key, item.getValue()));
+                    "Unresolved style reference: key=%s, value=%s", key, item.getValue()));
                 continue;
             }
 
@@ -118,13 +117,13 @@ public class ResStyle extends ResBag implements ValuesXmlSerializable {
         serial.startTag(null, tagName);
         serial.attribute(null, "name", entry.getName());
         if (mParent.resolve() != null) {
-            serial.attribute(null, "parent", mParent.encodeAsResXmlAttrValue());
+            serial.attribute(null, "parent", mParent.toXmlAttributeValue());
         } else if (entry.getName().indexOf('.') != -1) {
             serial.attribute(null, "parent", "");
         }
 
-        Config config = mParent.getPackage().getTable().getConfig();
-        boolean skipDuplicates = !config.isAnalysisMode();
+        ResPackage pkg = mParent.getPackage();
+        boolean skipDuplicates = !pkg.getTable().getConfig().isAnalysisMode();
         Set<String> processedNames = new HashSet<>();
         for (Item item : mItems) {
             ResEntrySpec keySpec = item.getKey().resolve();
@@ -132,7 +131,9 @@ public class ResStyle extends ResBag implements ValuesXmlSerializable {
                 continue;
             }
 
-            String keyName = keySpec.getFullName(entry.getPackage(), true);
+            boolean includePackage = pkg != keySpec.getPackage();
+            String keyName = (includePackage ? keySpec.getPackage().getName() + ":" : "")
+                    + keySpec.getName();
 
             // #3400 - Skip duplicate items in styles.
             if (skipDuplicates && processedNames.contains(keyName)) {
@@ -148,15 +149,13 @@ public class ResStyle extends ResBag implements ValuesXmlSerializable {
             }
 
             ResItem value = item.getValue();
-            String body = null;
+            String body;
             if (keyValue instanceof ResAttribute) {
-                body = ((ResAttribute) keyValue).formatValue(value, true);
+                body = ((ResAttribute) keyValue).formatAsTextValue(value);
             } else {
-                LOGGER.warning("Unexpected style item key: " + keySpec);
-            }
-            if (body == null) {
-                // Fall back to default attribute.
-                body = ResAttribute.DEFAULT.formatValue(value, true);
+                LOGGER.warning("Unexpected style item key spec: " + keySpec);
+                // Fall back to the default attribute.
+                body = ResAttribute.DEFAULT.formatAsTextValue(value);
             }
 
             serial.startTag(null, "item");

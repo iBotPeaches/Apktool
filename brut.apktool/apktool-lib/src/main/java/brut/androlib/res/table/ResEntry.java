@@ -23,9 +23,10 @@ import java.util.Objects;
 public class ResEntry {
     private final ResType mType;
     private final ResEntrySpec mSpec;
-    private ResValue mValue;
+    private ResValue mValue; // might be updated later
 
     public ResEntry(ResType type, ResEntrySpec spec, ResValue value) {
+        assert type != null && spec != null && value != null;
         assert type.getSpec() == spec.getTypeSpec();
         mType = type;
         mSpec = spec;

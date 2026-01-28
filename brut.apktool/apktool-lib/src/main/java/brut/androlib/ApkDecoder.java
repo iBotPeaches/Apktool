@@ -119,8 +119,8 @@ public class ApkDecoder {
 
         try {
             Directory in = mApkFile.getDirectory();
-            boolean allSrc = mConfig.getDecodeSources() == Config.DecodeSources.FULL;
-            boolean noSrc = mConfig.getDecodeSources() == Config.DecodeSources.NONE;
+            boolean allSrc = mConfig.isDecodeSourcesFull();
+            boolean noSrc = mConfig.isDecodeSourcesNone();
 
             for (String fileName : in.getFiles(allSrc)) {
                 if (allSrc ? !fileName.endsWith(".dex")
@@ -181,7 +181,7 @@ public class ApkDecoder {
             return;
         }
 
-        if (mConfig.getDecodeResources() == Config.DecodeResources.FULL) {
+        if (mConfig.isDecodeResourcesFull()) {
             mResDecoder.decodeResources(outDir);
         } else {
             copyResourcesRaw(outDir);
@@ -204,7 +204,7 @@ public class ApkDecoder {
             return;
         }
 
-        if (mConfig.getDecodeResources() != Config.DecodeResources.NONE) {
+        if (!mConfig.isDecodeResourcesNone()) {
             mResDecoder.decodeManifest(outDir);
         } else {
             copyManifestRaw(outDir);
@@ -227,7 +227,7 @@ public class ApkDecoder {
             Directory in = mApkFile.getDirectory();
             Set<String> dexFiles = mSmaliDecoder.getDexFiles();
             Map<String, String> resFileMap = mResDecoder.getResFileMap();
-            boolean noAssets = mConfig.getDecodeAssets() == Config.DecodeAssets.NONE;
+            boolean noAssets = mConfig.isDecodeAssetsNone();
 
             for (String dirName : ApkInfo.RAW_DIRS) {
                 if (!in.containsDir(dirName) || (noAssets && dirName.equals("assets"))) {
@@ -289,8 +289,7 @@ public class ApkDecoder {
 
     private void writeApkInfo(File outDir) throws AndrolibException {
         // If we did not decode the manifest, store the inferred dex opcode API level.
-        if (!mApkInfo.hasManifest()
-                || mConfig.getDecodeResources() == Config.DecodeResources.NONE) {
+        if (!mApkInfo.hasManifest() || mConfig.isDecodeResourcesNone()) {
             int apiLevel = mSmaliDecoder.getInferredApiLevel();
             if (apiLevel > 0) {
                 mApkInfo.getSdkInfo().setMinSdkVersion(Integer.toString(apiLevel));

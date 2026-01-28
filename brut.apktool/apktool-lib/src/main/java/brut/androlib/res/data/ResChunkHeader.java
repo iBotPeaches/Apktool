@@ -14,14 +14,14 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.androlib.res.decoder.data;
+package brut.androlib.res.data;
 
 import brut.util.BinaryDataInputStream;
 
 import java.io.IOException;
 
 public final class ResChunkHeader {
-    public static final int HEADER_SIZE = 8;
+    public static final int SIZE = 8;
 
     public static final int RES_NULL_TYPE = 0x0000;
     public static final int RES_STRING_POOL_TYPE = 0x0001;
@@ -58,6 +58,7 @@ public final class ResChunkHeader {
     }
 
     public static ResChunkHeader read(BinaryDataInputStream in) throws IOException {
+        // ResChunk_header
         int type = in.readUnsignedShort();
         int headerSize = in.readUnsignedShort();
         int size = in.readInt();
