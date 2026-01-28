@@ -49,7 +49,6 @@ public class ResNinePatchStreamDecoder implements ResStreamDecoder {
 
             BufferedImage dst = new BufferedImage(w + 2, h + 2, BufferedImage.TYPE_INT_ARGB);
             if (src.getType() == BufferedImage.TYPE_CUSTOM) {
-                // TODO: Ensure this is gray + alpha case?
                 Raster srcRaster = src.getRaster();
                 WritableRaster dstRaster = dst.getRaster();
                 int[] gray = null, alpha = null;
@@ -118,26 +117,27 @@ public class ResNinePatchStreamDecoder implements ResStreamDecoder {
 
             ImageIO.write(dst, "png", out);
         } catch (IOException | NullPointerException ex) {
-            // In my case this was triggered because a .png file was contained
-            // an HTML document instead of an image.
-            // TODO: This could be more verbose and try to MIME?
+            // The file is not a valid image.
             throw new AndrolibException(ex);
         }
     }
 
-    private NinePatchData findNinePatchData(byte[] data) throws NinePatchNotFoundException, IOException {
+    private NinePatchData findNinePatchData(byte[] data)
+            throws NinePatchNotFoundException, IOException {
         BinaryDataInputStream in = new BinaryDataInputStream(data, ByteOrder.BIG_ENDIAN);
         findChunk(in, NinePatchData.MAGIC);
         return NinePatchData.read(in);
     }
 
-    private LayoutBounds findLayoutBounds(byte[] data) throws NinePatchNotFoundException, IOException {
+    private LayoutBounds findLayoutBounds(byte[] data)
+            throws NinePatchNotFoundException, IOException {
         BinaryDataInputStream in = new BinaryDataInputStream(data, ByteOrder.BIG_ENDIAN);
         findChunk(in, LayoutBounds.MAGIC);
         return LayoutBounds.read(in);
     }
 
-    private void findChunk(BinaryDataInputStream in, int magic) throws NinePatchNotFoundException, IOException {
+    private void findChunk(BinaryDataInputStream in, int magic)
+            throws NinePatchNotFoundException, IOException {
         in.skipBytes(8);
         for (;;) {
             int size;
