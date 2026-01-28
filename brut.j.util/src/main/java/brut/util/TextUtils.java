@@ -123,11 +123,15 @@ public final class TextUtils {
         if (start > end || end > text.length()) {
             throw new IndexOutOfBoundsException();
         }
-        if (start == end || text.charAt(0) != '#') {
+        if (start == end) {
             throw new NumberFormatException();
         }
 
-        int i = start + 1;
+        int i = start;
+        if (text.charAt(i) != '#' || ++i == end) {
+            throw new NumberFormatException();
+        }
+
         int value = 0;
 
         switch (end - start) {
