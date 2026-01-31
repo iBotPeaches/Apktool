@@ -93,7 +93,7 @@ subprojects {
     if (project.name in mavenProjects && JavaVersion.current().isJava11Compatible) {
         apply(plugin = "com.vanniktech.maven.publish")
 
-        mavenPublishing {
+        configure<com.vanniktech.maven.publish.MavenPublishBaseExtension> {
             publishToMavenCentral()
             signAllPublications()
 
