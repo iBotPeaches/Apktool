@@ -56,7 +56,9 @@ if ("release" !in gradle.startParameter.taskNames) {
 
 plugins {
     `java-library`
-    alias(libs.plugins.vanniktech.maven.publish)
+    if (JavaVersion.current().isJava11Compatible) {
+        alias(libs.plugins.vanniktech.maven.publish)
+    }
 }
 
 allprojects {
@@ -88,7 +90,7 @@ subprojects {
         "apktool-lib", "apktool-cli"
     )
 
-    if (project.name in mavenProjects) {
+    if (project.name in mavenProjects && JavaVersion.current().isJava11Compatible) {
         apply(plugin = "com.vanniktech.maven.publish")
 
         mavenPublishing {
