@@ -57,7 +57,7 @@ if ("release" !in gradle.startParameter.taskNames) {
 plugins {
     `java-library`
     if (JavaVersion.current().isJava11Compatible) {
-        alias(libs.plugins.vanniktech.maven.publish)
+        alias(libs.plugins.vanniktech.maven.publish) apply false
     }
 }
 
@@ -91,48 +91,7 @@ subprojects {
     )
 
     if (project.name in mavenProjects && JavaVersion.current().isJava11Compatible) {
-        apply(plugin = "com.vanniktech.maven.publish")
-
-        configure<com.vanniktech.maven.publish.MavenPublishBaseExtension> {
-            publishToMavenCentral()
-            signAllPublications()
-
-            coordinates("org.apktool", project.name, apktoolVersion)
-
-            pom {
-                name.set("Apktool")
-                description.set("A tool for reverse engineering Android apk files.")
-                url.set("https://apktool.org")
-
-                licenses {
-                    license {
-                        name.set("The Apache License 2.0")
-                        url.set("https://opensource.org/licenses/Apache-2.0")
-                    }
-                }
-                developers {
-                    developer {
-                        id.set("iBotPeaches")
-                        name.set("Connor Tumbleson")
-                        email.set("connor.tumbleson@gmail.com")
-                    }
-                    developer {
-                        id.set("brutall")
-                        name.set("Ryszard Wiśniewski")
-                        email.set("brut.alll@gmail.com")
-                    }
-                }
-                scm {
-                    connection.set("scm:git:git://github.com/iBotPeaches/Apktool.git")
-                    developerConnection.set("scm:git:git@github.com:iBotPeaches/Apktool.git")
-                    url.set("https://github.com/iBotPeaches/Apktool")
-                }
-            }
-        }
-
-        tasks.withType<Javadoc>() {
-            (options as StandardJavadocDocletOptions).addStringOption("Xdoclint:none", "-quiet")
-        }
+        apply(from = "${rootProject.projectDir}/gradle/scripts/publishing.gradle")
     }
 }
 
