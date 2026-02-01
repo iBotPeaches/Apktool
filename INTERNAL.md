@@ -50,12 +50,15 @@ Release with maven with `./gradlew build shadowJar release publish`.
 
 ### Building the binary.
 
+> [!IMPORTANT]
+> In order to publish Maven artifacts you need JDK 11+.
+
 In order to maintain a clean slate. Run `gradlew clean` to start from a clean slate. Now lets build
 the new binary version. We should not have any new commits since the tagged commit.
 
     ./gradlew build shadowJar proguard release
 
-The build should tell you what version you are building and it should match the commits you made previously.
+The build should tell you what version you are building, and it should match the commits you made previously.
 
     ➜ Apktool git:(main) ./gradlew build shadowJar proguard release
     Building RELEASE (main): 2.2.2

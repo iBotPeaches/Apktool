@@ -1,0 +1,42 @@
+apply plugin: 'com.vanniktech.maven.publish'
+
+mavenPublishing {
+    publishToMavenCentral()
+    signAllPublications()
+
+    coordinates("org.apktool", project.name, project.apktoolVersion)
+
+    pom {
+        name = "Apktool"
+        description = "A tool for reverse engineering Android apk files."
+        url = "https://apktool.org"
+
+        licenses {
+            license {
+                name = "The Apache License 2.0"
+                url = "https://opensource.org/licenses/Apache-2.0"
+            }
+        }
+        developers {
+            developer {
+                id = "iBotPeaches"
+                name = "Connor Tumbleson"
+                email = "connor.tumbleson@gmail.com"
+            }
+            developer {
+                id = "brutall"
+                name = "Ryszard Wiśniewski"
+                email = "brut.alll@gmail.com"
+            }
+        }
+        scm {
+            connection = "scm:git:git://github.com/iBotPeaches/Apktool.git"
+            developerConnection = "scm:git:git@github.com:iBotPeaches/Apktool.git"
+            url = "https://github.com/iBotPeaches/Apktool"
+        }
+    }
+}
+
+tasks.withType(Javadoc) {
+    options.addStringOption('Xdoclint:none', '-quiet')
+}
