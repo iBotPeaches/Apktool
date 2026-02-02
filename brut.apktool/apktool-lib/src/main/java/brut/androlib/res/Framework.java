@@ -20,30 +20,30 @@ import brut.androlib.Config;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.exceptions.FrameworkNotFoundException;
 import brut.androlib.meta.ApkInfo;
-import brut.androlib.res.data.FlagsOffset;
 import brut.androlib.res.decoder.BinaryResourceParser;
-import brut.androlib.res.table.ResPackage;
 import brut.androlib.res.table.ResTable;
+import brut.common.Log;
 import brut.util.BrutIO;
 import brut.util.OS;
 import brut.util.OSDetection;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.logging.Logger;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 public class Framework {
-    private static final Logger LOGGER = Logger.getLogger(Framework.class.getName());
+    private static final String TAG = Framework.class.getName();
 
     private static final File DEFAULT_DIRECTORY;
-
     static {
         String userHome = System.getProperty("user.home");
         Path defDir;
@@ -78,15 +78,17 @@ public class Framework {
 
             byte[] data = BrutIO.readAndClose(zip.getInputStream(entry));
             BinaryResourceParser parser = parseResources(data);
-            publicizeResources(data, parser.getFlagsOffsets());
+            parser.parse(new ByteArrayInputStream(data));
 
-            List<ResPackage> pkgs = parser.getPackages();
-            if (pkgs.isEmpty()) {
+            ResTable table = parser.getTable();
+            if (table.getPackageGroupCount() == 0) {
                 throw new AndrolibException("No packages in resources.arsc in file: " + apkFile);
             }
 
-            ResPackage pkg = selectPackageWithMostEntrySpecs(pkgs);
-            File outFile = new File(getDirectory(), pkg.getId() + getApkSuffix());
+            publicizeResources(data, parser.getEntrySpecFlagsOffsets());
+
+            int pkgId = table.listPackageGroups().iterator().next().getId();
+            File outFile = new File(getDirectory(), pkgId + getApkSuffix());
 
             try (ZipOutputStream out = new ZipOutputStream(Files.newOutputStream(outFile.toPath()))) {
                 out.setMethod(ZipOutputStream.STORED);
@@ -115,7 +117,7 @@ public class Framework {
                 }
             }
 
-            LOGGER.info("Framework installed to: " + outFile);
+            Log.i(TAG, "Framework installed to: " + outFile);
         } catch (IOException ex) {
             throw new AndrolibException(ex);
         }
@@ -123,35 +125,22 @@ public class Framework {
 
     private BinaryResourceParser parseResources(byte[] data) throws AndrolibException {
         ResTable table = new ResTable(new ApkInfo(), mConfig);
-        BinaryResourceParser parser = new BinaryResourceParser(table, true, true, true);
+        BinaryResourceParser parser = new BinaryResourceParser(table, true, true);
+        parser.enableCollectFlagsOffsets();
         parser.parse(new ByteArrayInputStream(data));
         return parser;
     }
 
-    private static void publicizeResources(byte[] data, List<FlagsOffset> flagsOffsets) {
-        for (FlagsOffset flags : flagsOffsets) {
-            int offset = ((int) flags.offset) + 3;
-            int end = offset + 4 * flags.count;
-
-            while (offset < end) {
-                data[offset] |= (byte) 0x40;
-                offset += 4;
+    private static void publicizeResources(byte[] data, Collection<Pair<Long, Integer>> flagsOffsets) {
+        ByteBuffer buffer = ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN);
+        for (Pair<Long, Integer> pair : flagsOffsets) {
+            int position = pair.getKey().intValue();
+            int count = pair.getValue();
+            for (int i = 0; i < count; i++, position += 4) {
+                int flags = buffer.getInt(position);
+                buffer.putInt(position, flags | 0x40000000); // ResTable_typeSpec::SPEC_PUBLIC
             }
         }
-    }
-
-    private static ResPackage selectPackageWithMostEntrySpecs(List<ResPackage> pkgs) {
-        ResPackage ret = pkgs.get(0);
-        int count = 0;
-
-        for (ResPackage pkg : pkgs) {
-            if (pkg.getEntrySpecCount() > count) {
-                count = pkg.getEntrySpecCount();
-                ret = pkg;
-            }
-        }
-
-        return ret;
     }
 
     public File getDirectory() throws AndrolibException {
@@ -222,7 +211,7 @@ public class Framework {
 
     public void cleanDirectory() throws AndrolibException {
         for (File apkFile : listDirectory()) {
-            LOGGER.info("Removing framework file: " + apkFile.getName());
+            Log.i(TAG, "Removing framework file: " + apkFile.getName());
             OS.rmfile(apkFile);
         }
     }
@@ -273,7 +262,7 @@ public class Framework {
         }
 
         BinaryResourceParser parser = parseResources(data);
-        publicizeResources(data, parser.getFlagsOffsets());
+        publicizeResources(data, parser.getEntrySpecFlagsOffsets());
 
         try (OutputStream out = Files.newOutputStream(arscFile.toPath())) {
             out.write(data);

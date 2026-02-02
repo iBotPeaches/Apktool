@@ -35,16 +35,14 @@ import java.util.regex.Pattern;
 public class ApkInfo implements YamlSerializable {
     public static final String[] RAW_DIRS = { "assets", "lib" };
 
-    public static final Pattern CLASSES_FILES_PATTERN = Pattern.compile(
-        "classes([2-9]|[1-9][0-9]+)?\\.dex");
+    public static final Pattern CLASSES_FILES_PATTERN = Pattern.compile("classes([2-9]|[1-9][0-9]+)?\\.dex");
 
     public static final Pattern ORIGINAL_FILES_PATTERN = Pattern.compile(
         "AndroidManifest\\.xml|META-INF/[^/]+\\.(RSA|SF|MF)|stamp-cert-sha256");
 
     public static final Pattern STANDARD_FILES_PATTERN = Pattern.compile(
         "resources\\.arsc|(" + String.join("|", RAW_DIRS) + ")/.*|"
-            + CLASSES_FILES_PATTERN.pattern() + "|"
-            + ORIGINAL_FILES_PATTERN.pattern());
+      + CLASSES_FILES_PATTERN.pattern() + "|" + ORIGINAL_FILES_PATTERN.pattern());
 
     private String mVersion;
     private String mApkFileName;
@@ -74,7 +72,7 @@ public class ApkInfo implements YamlSerializable {
     public static ApkInfo load(File apkDir) throws AndrolibException {
         File file = new File(apkDir, "apktool.yml");
         try (InputStream in = Files.newInputStream(file.toPath())) {
-            return ApkInfo.load(in);
+            return load(in);
         } catch (IOException ex) {
             throw new AndrolibException(ex);
         }

@@ -17,11 +17,11 @@
 package brut.androlib.res.table.value;
 
 import brut.androlib.exceptions.AndrolibException;
-import brut.androlib.res.table.ResConfig;
 import brut.androlib.res.table.ResEntry;
 import brut.androlib.res.table.ResEntrySpec;
 import brut.androlib.res.table.ResId;
 import brut.androlib.res.table.ResPackage;
+import brut.common.Log;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
@@ -30,10 +30,9 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.logging.Logger;
 
 public class ResFlags extends ResAttribute {
-    private static final Logger LOGGER = Logger.getLogger(ResFlags.class.getName());
+    private static final String TAG = ResFlags.class.getName();
 
     private final Symbol[] mSymbols;
     private Map<Integer, Symbol[]> mSymbolsCache;
@@ -57,17 +56,16 @@ public class ResFlags extends ResAttribute {
                 continue;
             }
 
-            ResId entryId = key.getId();
+            ResId keyId = key.getResId();
 
             // #2836 - Skip item if the resource cannot be resolved.
-            if (skipUnresolved || entryId.getPackageId() != pkg.getId()) {
-                LOGGER.warning(String.format(
-                    "Unresolved flag reference: key=%s, value=%s", key, symbol.getValue()));
+            if (skipUnresolved || keyId.pkgId() != pkg.getId()) {
+                Log.w(TAG, "Unresolved flag reference: key=%s, value=%s", key, symbol.getValue());
                 continue;
             }
 
-            pkg.addEntrySpec(entryId, ResEntrySpec.DUMMY_PREFIX + entryId);
-            pkg.addEntry(entryId, ResConfig.DEFAULT, ResCustom.ID);
+            pkg.addEntrySpec(keyId.typeId(), keyId.entryId(), ResEntrySpec.DUMMY_PREFIX + keyId);
+            pkg.addEntry(keyId.typeId(), keyId.entryId(), ResCustom.ID);
         }
     }
 
@@ -99,8 +97,8 @@ public class ResFlags extends ResAttribute {
         }
 
         if (mSortedSymbols == null) {
-            // Lazily establish a priority list for the flags. This can never be
-            // completely accurate to the source, but it's a best-effort approach.
+            // Lazily establish a priority list for the flags.
+            // This can never be completely accurate to the source, but it's a best-effort approach.
             mSortedSymbols = mSymbols.clone();
             Comparator<Symbol> byBitCount = Comparator.comparingInt(
                 (Symbol symbol) -> Integer.bitCount(symbol.getValue().getData()));
@@ -233,8 +231,8 @@ public class ResFlags extends ResAttribute {
 
     @Override
     public String toString() {
-        return String.format("ResFlags{parent=%s, type=0x%04x, min=%d, max=%d, l10n=%d, symbols=%s}",
-            mParent, mType, mMin, mMax, mL10n, mSymbols);
+        return String.format("ResFlags{parent=%s, type=0x%04x, min=%s, max=%s, l10n=%s, symbols=%s}",
+            mParent, mType, mMin, mMax, mL10n, Arrays.toString(mSymbols));
     }
 
     @Override
@@ -244,18 +242,18 @@ public class ResFlags extends ResAttribute {
         }
         if (obj instanceof ResFlags) {
             ResFlags other = (ResFlags) obj;
-            return Objects.equals(mParent, other.mParent)
-                    && mType == other.mType
-                    && mMin == other.mMin
-                    && mMax == other.mMax
-                    && mL10n == other.mL10n
-                    && Objects.equals(mSymbols, other.mSymbols);
+            return mParent.equals(other.mParent)
+                && mType == other.mType
+                && mMin == other.mMin
+                && mMax == other.mMax
+                && mL10n == other.mL10n
+                && Arrays.equals(mSymbols, other.mSymbols);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(mParent, mType, mMin, mMax, mL10n, mSymbols);
+        return Objects.hash(mParent, mType, mMin, mMax, mL10n, Arrays.hashCode(mSymbols));
     }
 }

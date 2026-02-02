@@ -16,6 +16,7 @@
  */
 package brut.directory;
 
+import brut.common.Log;
 import brut.util.BrutIO;
 import brut.util.OS;
 
@@ -29,10 +30,9 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
 
 public abstract class Directory implements AutoCloseable {
-    private static final Logger LOGGER = Logger.getLogger("");
+    private static final String TAG = "";
 
     public final String separator = "/";
     public final char separatorChar = '/';
@@ -296,7 +296,7 @@ public abstract class Directory implements AutoCloseable {
                 return;
             }
         } catch (InvalidPathException ex) {
-            LOGGER.warning(String.format("Skipping file %s (%s)", inFileName, ex.getMessage()));
+            Log.w(TAG, "Skipping file %s (%s)", inFileName, ex.getMessage());
         } catch (IOException ex) {
             throw new DirectoryException("Error copying file: " + inFileName, ex);
         }

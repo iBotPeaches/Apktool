@@ -19,6 +19,7 @@ package brut.androlib.smali;
 import brut.androlib.exceptions.AndrolibException;
 import brut.directory.DirectoryException;
 import brut.directory.FileDirectory;
+import brut.common.Log;
 import brut.util.OS;
 import com.android.tools.smali.dexlib2.Opcodes;
 import com.android.tools.smali.dexlib2.writer.builder.DexBuilder;
@@ -37,10 +38,9 @@ import java.io.InputStreamReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.logging.Logger;
 
 public class SmaliBuilder {
-    private static final Logger LOGGER = Logger.getLogger(SmaliBuilder.class.getName());
+    private static final String TAG = SmaliBuilder.class.getName();
 
     private static final boolean VERBOSE_ERRORS = false;
     private static final boolean PRINT_TOKENS = false;
@@ -54,12 +54,11 @@ public class SmaliBuilder {
 
     public void build(File smaliDir, File dexFile) throws AndrolibException {
         try {
-            DexBuilder dexBuilder = new DexBuilder(
-                mApiLevel > 0 ? Opcodes.forApi(mApiLevel) : Opcodes.getDefault());
+            DexBuilder dexBuilder = new DexBuilder(mApiLevel > 0 ? Opcodes.forApi(mApiLevel) : Opcodes.getDefault());
 
             for (String fileName : new FileDirectory(smaliDir).getFiles(true)) {
                 if (!fileName.endsWith(".smali")) {
-                    LOGGER.warning("Unknown file type, ignoring: " + fileName);
+                    Log.w(TAG, "Unknown file type, ignoring: " + fileName);
                     continue;
                 }
 
@@ -81,8 +80,7 @@ public class SmaliBuilder {
         }
     }
 
-    private void buildFile(File smaliDir, String dexName, DexBuilder dexBuilder)
-            throws AndrolibException {
+    private void buildFile(File smaliDir, String dexName, DexBuilder dexBuilder) throws AndrolibException {
         boolean success;
         Exception cause;
         try {
@@ -102,8 +100,7 @@ public class SmaliBuilder {
         }
     }
 
-    private boolean buildFile(File smaliFile, DexBuilder dexBuilder)
-            throws IOException, RecognitionException {
+    private boolean buildFile(File smaliFile, DexBuilder dexBuilder) throws IOException, RecognitionException {
         try (InputStreamReader reader = new InputStreamReader(
                 Files.newInputStream(smaliFile.toPath()), StandardCharsets.UTF_8)) {
             smaliFlexLexer lexer = new smaliFlexLexer(reader, mApiLevel);
@@ -114,8 +111,7 @@ public class SmaliBuilder {
             if (PRINT_TOKENS) {
                 for (Token token : tokens.getTokens()) {
                     if (token.getChannel() != smaliParser.HIDDEN) {
-                        System.out.println(
-                            smaliParser.tokenNames[token.getType()] + ": " + token.getText());
+                        System.out.println(smaliParser.tokenNames[token.getType()] + ": " + token.getText());
                     }
                 }
             }

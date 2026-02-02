@@ -18,37 +18,48 @@ package brut.androlib.res.table;
 
 import brut.androlib.Config;
 import brut.androlib.exceptions.AndrolibException;
+import brut.androlib.exceptions.UndefinedResObjectException;
 import brut.androlib.meta.ApkInfo;
-import brut.androlib.meta.UsesFramework;
 import brut.androlib.res.Framework;
 import brut.androlib.res.decoder.BinaryResourceParser;
+import brut.common.Log;
 import brut.directory.DirectoryException;
 import brut.directory.ExtFile;
 import brut.directory.ZipRODirectory;
 
-import java.io.*;
-import java.util.*;
-import java.util.logging.Logger;
+import java.io.File;
+import java.io.InputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ResTable {
-    private static final Logger LOGGER = Logger.getLogger(ResTable.class.getName());
+    private static final String TAG = ResTable.class.getName();
+
+    public static final int SYS_PACKAGE_ID = 0x01;
+    public static final int APP_PACKAGE_ID = 0x7F;
 
     private final ApkInfo mApkInfo;
     private final Config mConfig;
-    private final Map<Integer, ResPackage> mPackages;
-    private final Set<ResPackage> mLibPackages;
-    private final Set<ResPackage> mFramePackages;
+    private final Map<Integer, ResPackageGroup> mPackageGroups;
+    private final List<Integer> mLibPackageIds;
+    private final List<Integer> mFramePackageIds;
     private final Map<Integer, String> mDynamicRefTable;
+    private int mNextPackageId;
     private ResPackage mMainPackage;
 
     public ResTable(ApkInfo apkInfo, Config config) {
         assert apkInfo != null && config != null;
         mApkInfo = apkInfo;
         mConfig = config;
-        mPackages = new HashMap<>();
-        mLibPackages = new HashSet<>();
-        mFramePackages = new HashSet<>();
-        mDynamicRefTable = new LinkedHashMap<>(); // must preserve order
+        mPackageGroups = new LinkedHashMap<>();
+        mLibPackageIds = new ArrayList<>();
+        mFramePackageIds = new ArrayList<>();
+        mDynamicRefTable = new LinkedHashMap<>();
+        mNextPackageId = SYS_PACKAGE_ID + 1;
     }
 
     public ApkInfo getApkInfo() {
@@ -59,16 +70,24 @@ public class ResTable {
         return mConfig;
     }
 
-    public boolean isMainPackageLoaded() {
-        return mMainPackage != null;
-    }
-
     public ResPackage getMainPackage() {
         return mMainPackage;
     }
 
-    public void loadMainPackage() throws AndrolibException {
-        LOGGER.info("Loading resource table...");
+    public Collection<Integer> getLibPackageIds() {
+        return mLibPackageIds;
+    }
+
+    public Collection<Integer> getFramePackageIds() {
+        return mFramePackageIds;
+    }
+
+    public void load() throws AndrolibException {
+        if (mMainPackage != null) {
+            return;
+        }
+
+        Log.i(TAG, "Loading resource table...");
         ExtFile apkFile = mApkInfo.getApkFile();
 
         ZipRODirectory zipDir;
@@ -78,192 +97,171 @@ public class ResTable {
             throw new AndrolibException("Could not open apk file: " + apkFile, ex);
         }
 
-        List<ResPackage> pkgs = loadResPackagesFromApk(apkFile, zipDir, true);
-        ResPackage pkg;
-        if (pkgs.isEmpty()) {
-            // Empty resources.arsc, create a dummy package.
-            pkg = new ResPackage(this, 0, "");
+        loadPackagesFromApk(apkFile, zipDir, true);
+
+        ResPackageGroup pkgGroup;
+        if (mPackageGroups.isEmpty()) {
+            // Empty resources.arsc, create a dummy package group.
+            pkgGroup = new ResPackageGroup(this, 0, "");
+            mPackageGroups.put(0, pkgGroup);
+        } else if (mPackageGroups.containsKey(APP_PACKAGE_ID)) {
+            // Prefer the standard app package group.
+            pkgGroup = mPackageGroups.get(APP_PACKAGE_ID);
         } else {
-            pkg = selectPackageWithMostEntrySpecs(pkgs);
+            // Fall back to the first package group in the table.
+            pkgGroup = mPackageGroups.values().iterator().next();
         }
 
-        registerPackage(pkg);
-        mMainPackage = pkg;
+        mMainPackage = pkgGroup.getBasePackage();
     }
 
-    private List<ResPackage> loadResPackagesFromApk(File apkFile, ZipRODirectory zipDir,
-                                                    boolean isMainPackage)
+    private void loadPackagesFromApk(File apkFile, ZipRODirectory zipDir, boolean isMainPackage)
             throws AndrolibException {
         try {
             if (!zipDir.containsFile("resources.arsc")) {
-                throw new AndrolibException(
-                    "Could not find resources.arsc in file: " + apkFile);
+                throw new AndrolibException("Could not find resources.arsc in file: " + apkFile);
             }
 
             try (InputStream in = zipDir.getFileInput("resources.arsc")) {
                 BinaryResourceParser parser = isMainPackage
-                    ? new BinaryResourceParser(this, mConfig.isKeepBrokenResources(),
-                        mConfig.isDecodeResolveGreedy(), false)
-                    : new BinaryResourceParser(this, true, true, false);
+                    ? new BinaryResourceParser(this, mConfig.isKeepBrokenResources(), mConfig.isDecodeResolveGreedy())
+                    : new BinaryResourceParser(this, true, true);
                 parser.parse(in);
-                return parser.getPackages();
+
+                // Only flag the app for the main package.
+                if (isMainPackage) {
+                    if (parser.isSparseEntries()) {
+                        mApkInfo.getResourcesInfo().setSparseEntries(true);
+                    }
+                    if (parser.isCompactEntries()) {
+                        mApkInfo.getResourcesInfo().setCompactEntries(true);
+                    }
+                }
             }
         } catch (DirectoryException | IOException ex) {
-            throw new AndrolibException(
-                "Could not load resources.arsc from file: " + apkFile, ex);
+            throw new AndrolibException("Could not load resources.arsc from file: " + apkFile, ex);
         }
     }
 
-    private static ResPackage selectPackageWithMostEntrySpecs(List<ResPackage> pkgs) {
-        ResPackage ret = pkgs.get(0);
-        int count = 0;
-
-        for (ResPackage pkg : pkgs) {
-            if (pkg.getEntrySpecCount() > count) {
-                count = pkg.getEntrySpecCount();
-                ret = pkg;
-            }
-        }
-
-        return ret;
+    public boolean hasPackageGroup(int id) {
+        return mPackageGroups.containsKey(id);
     }
 
-    private void registerPackage(ResPackage pkg) throws AndrolibException {
-        int id = pkg.getId();
-        String name = pkg.getName();
-
-        for (Map.Entry<Integer, ResPackage> entry : mPackages.entrySet()) {
-            if (id == entry.getKey()) {
-                throw new AndrolibException(String.format(
-                    "Repeated package ID: %d (assigned to name: %s)",
-                    id, entry.getValue().getName()));
-            }
-            if (name.equals(entry.getValue().getName())) {
-                throw new AndrolibException(String.format(
-                    "Repeated package name: %s (assigned to ID: %d)",
-                    name, entry.getKey()));
-            }
+    public ResPackageGroup getPackageGroup(int id) throws UndefinedResObjectException {
+        ResPackageGroup pkgGroup = mPackageGroups.get(id);
+        if (pkgGroup == null) {
+            throw new UndefinedResObjectException(String.format("package group: id=0x%02x", id));
         }
-
-        mPackages.put(id, pkg);
+        return pkgGroup;
     }
 
-    public ResPackage getPackage(int id) throws AndrolibException {
+    public ResPackageGroup addPackageGroup(int id, String name) throws AndrolibException {
+        ResPackageGroup pkgGroup = mPackageGroups.get(id);
+        if (pkgGroup != null) {
+            throw new AndrolibException(String.format("Repeated package group: id=0x%02x, name=%s", id, name));
+        }
+
+        // The package ID is 0x00 and the main package is loaded, that means that a shared library
+        // is being loaded, so we change it to the reference package ID defined in the dynamic
+        // reference table, or assign it the next available ID.
         if (id == 0 && mMainPackage != null) {
-            // The package ID is 0x00. That means that a shared library is accessing its own
-            // local resource, so we fix up this resource with the calling package ID.
-            id = mMainPackage.getId();
-        }
-
-        ResPackage pkg = mPackages.get(id);
-        if (pkg == null) {
-            pkg = loadLibraryPackage(id);
-            if (pkg == null) {
-                pkg = loadFrameworkPackage(id);
+            id = getDynamicRefPackageId(name);
+            if (id == 0) {
+                id = mNextPackageId++;
             }
         }
 
-        return pkg;
+        pkgGroup = new ResPackageGroup(this, id, name);
+        mPackageGroups.put(id, pkgGroup);
+        return pkgGroup;
     }
 
-    private ResPackage loadLibraryPackage(int id) throws AndrolibException {
+    public int getPackageGroupCount() {
+        return mPackageGroups.size();
+    }
+
+    public Collection<ResPackageGroup> listPackageGroups() {
+        return mPackageGroups.values();
+    }
+
+    public ResPackageGroup resolvePackageGroup(int id) throws AndrolibException {
+        ResPackageGroup pkgGroup = mPackageGroups.get(id);
+        if (pkgGroup == null) {
+            pkgGroup = loadLibraryById(id);
+            if (pkgGroup == null) {
+                pkgGroup = loadFrameworkById(id);
+            }
+        }
+        return pkgGroup;
+    }
+
+    private ResPackageGroup loadLibraryById(int id) throws AndrolibException {
         String name = mDynamicRefTable.get(id);
         String[] libFiles = mConfig.getLibraryFiles();
-        File apkFile = null;
+        if (name == null || libFiles == null) {
+            return null;
+        }
 
-        if (name != null && libFiles != null) {
-            for (String libEntry : libFiles) {
-                String[] parts = libEntry.split(":", 2);
-                if (parts.length == 2 && name.equals(parts[0])) {
-                    apkFile = new File(parts[1]);
-                    break;
-                }
+        File apkFile = null;
+        for (String libEntry : libFiles) {
+            String[] parts = libEntry.split(":", 2);
+            if (parts.length == 2 && name.equals(parts[0])) {
+                apkFile = new File(parts[1]);
+                break;
             }
         }
         if (apkFile == null) {
             return null;
         }
 
-        ResPackage pkg = loadResPackageFromApk(apkFile);
-        if (pkg.getId() != id) {
-            throw new AndrolibException(String.format(
-                "Unexpected package ID: %d (expected: %d)", pkg.getId(), id));
-        }
-        if (!pkg.getName().equals(name)) {
-            throw new AndrolibException(String.format(
-                "Unexpected package name: %s (expected: %s)", pkg.getName(), id));
+        loadPackagesFromApk(apkFile);
+
+        ResPackageGroup pkgGroup = mPackageGroups.get(id);
+        if (pkgGroup == null) {
+            throw new AndrolibException(String.format("Library package not found: id=0x%02x", id));
         }
 
-        registerPackage(pkg);
-        mLibPackages.add(pkg);
-        return pkg;
+        mLibPackageIds.add(id);
+        return pkgGroup;
     }
 
-    private ResPackage loadFrameworkPackage(int id) throws AndrolibException {
+    private ResPackageGroup loadFrameworkById(int id) throws AndrolibException {
         File apkFile = new Framework(mConfig).getApkFile(id);
+        loadPackagesFromApk(apkFile);
 
-        ResPackage pkg = loadResPackageFromApk(apkFile);
-        if (pkg.getId() != id) {
-            throw new AndrolibException(String.format(
-                "Unexpected package ID: %d (expected: %d)", pkg.getId(), id));
+        ResPackageGroup pkgGroup = mPackageGroups.get(id);
+        if (pkgGroup == null) {
+            throw new AndrolibException(String.format("Framework package not found: id=0x%02x", id));
         }
 
-        registerPackage(pkg);
-        mFramePackages.add(pkg);
-        return pkg;
+        mFramePackageIds.add(id);
+        return pkgGroup;
     }
 
-    private ResPackage loadResPackageFromApk(File apkFile)
-            throws AndrolibException {
-        LOGGER.info("Loading resource table from file: " + apkFile);
+    private void loadPackagesFromApk(File apkFile) throws AndrolibException {
+        Log.i(TAG, "Loading resource table from file: " + apkFile);
 
-        List<ResPackage> pkgs;
         try (ZipRODirectory zipDir = new ZipRODirectory(apkFile)) {
-            pkgs = loadResPackagesFromApk(apkFile, zipDir, false);
+            loadPackagesFromApk(apkFile, zipDir, false);
         } catch (DirectoryException ex) {
             throw new AndrolibException("Could not open apk file: " + apkFile, ex);
         }
-        if (pkgs.isEmpty()) {
-            throw new AndrolibException("No packages in resources.arsc in file: " + apkFile);
+    }
+
+    public ResEntrySpec resolve(ResId resId) throws AndrolibException {
+        return resolvePackageGroup(resId.pkgId()).getEntrySpec(resId.typeId(), resId.entryId());
+    }
+
+    public ResEntry resolveEntry(ResId resId) throws AndrolibException {
+        return resolvePackageGroup(resId.pkgId()).getEntry(resId.typeId(), resId.entryId());
+    }
+
+    public String getDynamicRefPackageName(int id) {
+        String name = mDynamicRefTable.get(id);
+        if (name == null) {
+            Log.w(TAG, "Dynamic ref package name not defined for package ID: 0x02x", id);
         }
-
-        return selectPackageWithMostEntrySpecs(pkgs);
-    }
-
-    public ResEntrySpec getEntrySpec(ResId id) throws AndrolibException {
-        return getPackage(id.getPackageId()).getEntrySpec(id);
-    }
-
-    public ResEntry getDefaultEntry(ResId id) throws AndrolibException {
-        return getPackage(id.getPackageId()).getDefaultEntry(id);
-    }
-
-    public ResEntry getEntry(ResId id, ResConfig config) throws AndrolibException {
-        return getPackage(id.getPackageId()).getEntry(id, config);
-    }
-
-    public void addDynamicRefPackage(int id, String name) {
-        assert id != 0;
-        for (Map.Entry<Integer, String> entry : mDynamicRefTable.entrySet()) {
-            if (id == entry.getKey()) {
-                if (name.equals(entry.getValue())) {
-                    // Duplicate definitions are normal.
-                    return;
-                }
-                LOGGER.warning(String.format(
-                    "Repeated dynamic ref package ID: %d (assigned to name: %s)",
-                    id, entry.getValue()));
-                return;
-            }
-            if (name.equals(entry.getValue())) {
-                LOGGER.warning(String.format(
-                    "Repeated dynamic ref package name: %s (assigned to ID: %d)",
-                    name, entry.getKey()));
-                return;
-            }
-        }
-
-        mDynamicRefTable.put(id, name);
+        return name;
     }
 
     public int getDynamicRefPackageId(String name) {
@@ -272,47 +270,30 @@ public class ResTable {
                 return entry.getKey();
             }
         }
-
-        LOGGER.warning("Package ID not defined for dynamic ref package: " + name);
+        Log.w(TAG, "Dynamic ref package ID not defined for package: " + name);
         return 0;
     }
 
-    public void updateApkInfo() {
-        if (mMainPackage != null) {
-            mApkInfo.getResourcesInfo().setPackageId(Integer.toString(mMainPackage.getId()));
+    public void addDynamicRefPackage(int id, String name) {
+        // Ensure the package ID isn't already mapped to a different name.
+        String existing = mDynamicRefTable.get(id);
+        if (existing != null) {
+            if (!existing.equals(name)) {
+                Log.w(TAG, "Repeated dynamic ref package ID: %s (assigned to name: %s)", id, existing);
+                return;
+            }
+            // Identical mappings are normal.
+            return;
         }
 
-        if (!mFramePackages.isEmpty()) {
-            UsesFramework usesFramework = mApkInfo.getUsesFramework();
-            List<Integer> frameworkIds = usesFramework.getIds();
-            int[] ids = new int[mFramePackages.size()];
-
-            int i = 0;
-            for (ResPackage pkg : mFramePackages) {
-                ids[i++] = pkg.getId();
-            }
-            Arrays.sort(ids);
-
-            for (int id : ids) {
-                frameworkIds.add(id);
-            }
-
-            usesFramework.setTag(mConfig.getFrameworkTag());
-        }
-
-        if (!mLibPackages.isEmpty()) {
-            List<String> usesLibrary = mApkInfo.getUsesLibrary();
-            int[] ids = new int[mLibPackages.size()];
-
-            int i = 0;
-            for (ResPackage pkg : mLibPackages) {
-                ids[i++] = pkg.getId();
-            }
-            Arrays.sort(ids);
-
-            for (int id : ids) {
-                usesLibrary.add(mDynamicRefTable.get(id));
+        // Ensure the package name isn't already mapped to a different ID.
+        for (Map.Entry<Integer, String> entry : mDynamicRefTable.entrySet()) {
+            if (name.equals(entry.getValue())) {
+                Log.w(TAG, "Repeated dynamic ref package name: %s (assigned to ID: %s)", name, entry.getKey());
+                return;
             }
         }
+
+        mDynamicRefTable.put(id, name);
     }
 }

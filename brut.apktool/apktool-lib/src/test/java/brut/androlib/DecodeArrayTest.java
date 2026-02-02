@@ -34,12 +34,12 @@ public class DecodeArrayTest extends BaseTest {
     public static void beforeClass() throws Exception {
         copyResourceDir(MissingVersionManifestTest.class, "issue1994", sTmpDir);
 
-        LOGGER.info("Decoding issue1994.apk...");
+        log("Decoding issue1994.apk...");
         sTestApk = new ExtFile(sTmpDir, "issue1994.apk");
         ApkInfo testInfo = new ApkInfo();
         testInfo.setApkFile(sTestApk);
         sTable = new ResTable(testInfo, sConfig);
-        sTable.loadMainPackage();
+        sTable.load();
     }
 
     @AfterClass
@@ -49,13 +49,13 @@ public class DecodeArrayTest extends BaseTest {
 
     @Test
     public void decodeStringArray() throws Exception {
-        ResValue value = sTable.getDefaultEntry(ResId.of(0x7F020001)).getValue();
+        ResValue value = sTable.resolveEntry(ResId.of(0x7F020001)).getValue();
         assertTrue("Not a ResArray. Found: " + value.getClass(), value instanceof ResArray);
     }
 
     @Test
     public void decodeArray() throws Exception {
-        ResValue value = sTable.getDefaultEntry(ResId.of(0x7F020000)).getValue();
+        ResValue value = sTable.resolveEntry(ResId.of(0x7F020000)).getValue();
         assertTrue("Not a ResArray. Found: " + value.getClass(), value instanceof ResArray);
     }
 }

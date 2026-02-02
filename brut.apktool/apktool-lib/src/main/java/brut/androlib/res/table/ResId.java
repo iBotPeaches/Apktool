@@ -35,21 +35,19 @@ public class ResId extends Number implements Comparable<ResId> {
     }
 
     public static ResId of(int pkgId, int typeId, int entryId) {
-        assert (pkgId & 0xFF) == pkgId;
-        assert (typeId & 0xFF) == typeId;
-        assert (entryId & 0xFFFF) == entryId;
-        return ResId.of((pkgId << 24) | (typeId << 16) | entryId);
+        assert (pkgId & 0xFF) == pkgId && (typeId & 0xFF) == typeId && (entryId & 0xFFFF) == entryId;
+        return of((pkgId << 24) | (typeId << 16) | entryId);
     }
 
-    public int getPackageId() {
+    public int pkgId() {
         return (mId >>> 24) & 0xFF;
     }
 
-    public int getTypeId() {
+    public int typeId() {
         return (mId >>> 16) & 0xFF;
     }
 
-    public int getEntryId() {
+    public int entryId() {
         return mId & 0xFFFF;
     }
 

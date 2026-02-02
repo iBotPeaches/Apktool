@@ -18,16 +18,16 @@ package brut.androlib.res.table.value;
 
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.table.ResEntry;
+import brut.common.Log;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
-import java.util.logging.Logger;
 
 public class ResPrimitive extends ResItem {
-    private static final Logger LOGGER = Logger.getLogger(ResPrimitive.class.getName());
+    private static final String TAG = ResPrimitive.class.getName();
 
     // Complex data
     private static final int COMPLEX_UNIT_MASK = 0xF;
@@ -37,8 +37,8 @@ public class ResPrimitive extends ResItem {
     private static final int COMPLEX_MANTISSA_MASK = 0xFFFFFF;
     private static final float MANTISSA_MULT = 1.0f / (1 << COMPLEX_MANTISSA_SHIFT);
     private static final float[] RADIX_MULTS = {
-        MANTISSA_MULT, 1.0f / (1 << 7) * MANTISSA_MULT,
-        1.0f / (1 << 15) * MANTISSA_MULT, 1.0f / (1 << 23) * MANTISSA_MULT
+        MANTISSA_MULT, 1.0f / (1 << 7) * MANTISSA_MULT, 1.0f / (1 << 15) * MANTISSA_MULT,
+        1.0f / (1 << 23) * MANTISSA_MULT
     };
 
     // Complex units in TYPE_DIMENSION
@@ -99,7 +99,7 @@ public class ResPrimitive extends ResItem {
                         value += "mm";
                         break;
                     default:
-                        LOGGER.warning("Unexpected value unit: " + unitType);
+                        Log.w(TAG, "Unexpected value unit: " + unitType);
                         value += "??";
                         break;
                 }
@@ -116,7 +116,7 @@ public class ResPrimitive extends ResItem {
                         value += "%p";
                         break;
                     default:
-                        LOGGER.warning("Unexpected value unit: " + unitType);
+                        Log.w(TAG, "Unexpected value unit: " + unitType);
                         value += "??";
                         break;
                 }
@@ -151,7 +151,7 @@ public class ResPrimitive extends ResItem {
                     return String.format("0x%x", mData);
             }
         }
-        LOGGER.warning(String.format("Unexpected value type: 0x%02x", mType));
+        Log.w(TAG, "Unexpected value type: 0x%02x", mType);
         return "";
     }
 
@@ -170,20 +170,19 @@ public class ResPrimitive extends ResItem {
     }
 
     @Override
-    public void serializeToValuesXml(XmlSerializer serial, ResEntry entry)
-            throws AndrolibException, IOException {
-        String type = entry.getTypeName();
+    public void serializeToValuesXml(XmlSerializer serial, ResEntry entry) throws AndrolibException, IOException {
+        String typeName = entry.getType().getName();
 
         // Specify format for <item> tags when the resource type doesn't
         // directly support this value's format.
-        Set<String> stdFormats = STANDARD_TYPE_FORMATS.get(type);
+        Set<String> stdFormats = STANDARD_TYPE_FORMATS.get(typeName);
         String format = stdFormats != null ? getFormat() : null;
         boolean asItem = format != null && !stdFormats.contains(format);
 
-        String tagName = asItem ? "item" : type;
+        String tagName = asItem ? "item" : typeName;
         serial.startTag(null, tagName);
         if (asItem) {
-            serial.attribute(null, "type", type);
+            serial.attribute(null, "type", typeName);
         }
         serial.attribute(null, "name", entry.getName());
         if (asItem) {
@@ -206,7 +205,7 @@ public class ResPrimitive extends ResItem {
         if (obj instanceof ResPrimitive) {
             ResPrimitive other = (ResPrimitive) obj;
             return mType == other.mType
-                    && mData == other.mData;
+                && mData == other.mData;
         }
         return false;
     }

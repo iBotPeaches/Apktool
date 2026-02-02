@@ -35,7 +35,9 @@ public class SdkInfo implements YamlSerializable {
     }
 
     public boolean isEmpty() {
-        return mMinSdkVersion == null && mTargetSdkVersion == null && mMaxSdkVersion == null;
+        return mMinSdkVersion == null
+            && mTargetSdkVersion == null
+            && mMaxSdkVersion == null;
     }
 
     @Override

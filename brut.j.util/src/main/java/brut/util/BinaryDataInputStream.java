@@ -83,13 +83,11 @@ public class BinaryDataInputStream extends FilterInputStream implements DataInpu
             return 0;
         }
         if (expected < 0) {
-            throw new IOException(String.format(
-                "Illegal backwards jump from %d to %d", mPosition, pos));
+            throw new IOException(String.format("Illegal backwards jump from %s to %s", mPosition, pos));
         }
         long skipped = skip(expected);
         if (skipped != expected) {
-            throw new IOException(String.format(
-                "Jump failed: skipped %d bytes (expected: %d)", skipped, expected));
+            throw new IOException(String.format("Jump failed: skipped %s bytes (expected: %s)", skipped, expected));
         }
         return skipped;
     }

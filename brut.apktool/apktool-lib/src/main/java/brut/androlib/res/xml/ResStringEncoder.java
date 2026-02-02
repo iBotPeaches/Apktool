@@ -26,8 +26,7 @@ import java.util.Deque;
 import java.util.regex.Pattern;
 
 public final class ResStringEncoder {
-    private static final Pattern TAG_SPLIT_PATTERN = Pattern.compile(
-        ";(?=[\\p{L}_][\\p{L}\\p{N}_.-]*=)");
+    private static final Pattern TAG_SPLIT_PATTERN = Pattern.compile(";(?=[\\p{L}_][\\p{L}\\p{N}_.-]*=)");
 
     private ResStringEncoder() {
         // Private constructor for utility class.
@@ -163,8 +162,7 @@ public final class ResStringEncoder {
         StringBuilder out = new StringBuilder(len * 2);
         appendEscapedString(out, str, 0, len, attrType, false);
 
-        // Raw strings might get encoded as typed values in edge cases.
-        // We skip this if the string has been quoted.
+        // Raw strings might get encoded as typed values in edge cases. We skip this if the string has been quoted.
         if (out.charAt(0) != '"' && isAmbiguousString(out, attrType)) {
             out.insert(0, '\\');
         }
@@ -172,8 +170,8 @@ public final class ResStringEncoder {
         return out.toString();
     }
 
-    private static void appendEscapedString(StringBuilder out, String str, int start, int end,
-                                            int attrType, boolean styled) {
+    private static void appendEscapedString(StringBuilder out, String str, int start, int end, int attrType,
+                                            boolean styled) {
         int len = str.length();
         int offset = out.length();
         boolean quote = false;
@@ -196,11 +194,10 @@ public final class ResStringEncoder {
                     out.append('\\');
                     // fallthrough
                 } else if (attrType == 0) {
-                    // The following are used for values XMLs only. The serializer will handle
-                    // attribute values.
+                    // The following are used for values XMLs only. The serializer will handle attribute values.
                     if (ch == ' ') {
-                        // Normal strings collapse whitespace and trim both ends, while styled
-                        // strings only collapse whitespace.
+                        // Normal strings collapse whitespace and trim both ends, while styled strings only collapse
+                        // whitespace.
                         if (prev == ' ' || (!styled && (i == 0 || i == len - 1))) {
                             quote = true;
                         }
@@ -233,6 +230,7 @@ public final class ResStringEncoder {
                     i++;
                     continue;
                 }
+                // fallthrough
             }
             // Skip writing trailing \u0000 if we are at end of string.
             if (ch == 0 && i == len - 1) {
@@ -254,19 +252,17 @@ public final class ResStringEncoder {
         // Note: We don't check attribute type here because a reference is valid for any type.
         if (ch == '@') {
             if (len == 5) {
-                if (text.charAt(1) == 'n' && text.charAt(2) == 'u' && text.charAt(3) == 'l'
-                        && text.charAt(4) == 'l') {
+                if (text.charAt(1) == 'n' && text.charAt(2) == 'u' && text.charAt(3) == 'l' && text.charAt(4) == 'l') {
                     return true;
                 }
             } else if (len == 6) {
-                if (text.charAt(1) == 'e' && text.charAt(2) == 'm' && text.charAt(3) == 'p'
-                        && text.charAt(4) == 't' && text.charAt(5) == 'y') {
+                if (text.charAt(1) == 'e' && text.charAt(2) == 'm' && text.charAt(3) == 'p' && text.charAt(4) == 't'
+                        && text.charAt(5) == 'y') {
                     return true;
                 }
             }
             for (int i = 1; i < len; i++) {
-                ch = text.charAt(i);
-                if (ch == '/') {
+                if (text.charAt(i) == '/') {
                     return true;
                 }
             }
@@ -427,9 +423,13 @@ public final class ResStringEncoder {
             sequential[sequentialCount++] = i;
         }
 
-        return new int[][] {
-            Arrays.copyOf(sequential, sequentialCount),
-            Arrays.copyOf(positional, positionalCount)
-        };
+        if (sequentialCount < sequential.length) {
+            sequential = Arrays.copyOf(sequential, sequentialCount);
+        }
+        if (positionalCount < positional.length) {
+            positional = Arrays.copyOf(positional, positionalCount);
+        }
+
+        return new int[][] { sequential, positional };
     }
 }

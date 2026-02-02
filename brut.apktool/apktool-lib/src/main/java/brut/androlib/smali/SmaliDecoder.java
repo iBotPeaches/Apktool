@@ -73,8 +73,7 @@ public class SmaliDecoder {
             }
 
             // Create the container.
-            MultiDexContainer<? extends DexBackedDexFile> container =
-                DexFileFactory.loadDexContainer(mApkFile, null);
+            MultiDexContainer<? extends DexBackedDexFile> container = DexFileFactory.loadDexContainer(mApkFile, null);
 
             // If we have 1 item, ignore the passed file. Pull the DexFile we need.
             MultiDexContainer.DexEntry<? extends DexBackedDexFile> dexEntry =

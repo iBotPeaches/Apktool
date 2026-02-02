@@ -24,7 +24,7 @@ public class ResTypeSpec {
     private final String mName;
 
     public ResTypeSpec(ResPackage pkg, int id, String name) {
-        assert pkg != null && name != null;
+        assert pkg != null && id > 0 && name != null;
         mPackage = pkg;
         mId = id;
         mName = name;
@@ -57,8 +57,7 @@ public class ResTypeSpec {
 
     @Override
     public String toString() {
-        return String.format("ResTypeSpec{pkg=%s, id=0x%02x, name=%s}",
-            mPackage, mId, mName);
+        return String.format("ResTypeSpec{pkg=%s, id=0x%02x, name=%s}", mPackage, mId, mName);
     }
 
     @Override
@@ -68,9 +67,9 @@ public class ResTypeSpec {
         }
         if (obj instanceof ResTypeSpec) {
             ResTypeSpec other = (ResTypeSpec) obj;
-            return Objects.equals(mPackage, other.mPackage)
-                    && mId == other.mId
-                    && Objects.equals(mName, other.mName);
+            return mPackage.equals(other.mPackage)
+                && mId == other.mId
+                && mName.equals(other.mName);
         }
         return false;
     }

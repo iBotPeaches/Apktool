@@ -29,24 +29,25 @@ public class ExternalEntityTest extends BaseTest {
         sTestOrigDir = new File(sTmpDir, "doctype-orig");
         sTestNewDir = new File(sTmpDir, "doctype-new");
 
-        LOGGER.info("Unpacking doctype...");
+        log("Unpacking doctype...");
         copyResourceDir(ExternalEntityTest.class, "doctype", sTestOrigDir);
 
-        LOGGER.info("Building doctype.apk...");
+        log("Building doctype.apk...");
         File testApk = new File(sTmpDir, "doctype.apk");
         new ApkBuilder(sTestOrigDir, sConfig).build(testApk);
 
-        LOGGER.info("Decoding doctype.apk...");
+        log("Decoding doctype.apk...");
         new ApkDecoder(testApk, sConfig).decode(sTestNewDir);
     }
 
     @Test
     public void doctypeTest() throws Exception {
-        String expected = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
-                + "<manifest hardwareAccelerated=\"true\" package=\"com.ibotpeaches.doctype\" platformBuildVersionCode=\"24\" platformBuildVersionName=\"6.0-2456767\"\n"
-                + "  xmlns:android=\"http://schemas.android.com/apk/res/android\">\n"
-                + "    <supports-screens android:anyDensity=\"true\" android:smallScreens=\"true\" android:normalScreens=\"true\" android:largeScreens=\"true\" android:resizeable=\"true\" android:xlargeScreens=\"true\" />\n"
-                + "</manifest>";
+        String expected =
+            "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+          + "<manifest hardwareAccelerated=\"true\" package=\"com.ibotpeaches.doctype\" platformBuildVersionCode=\"24\" platformBuildVersionName=\"6.0-2456767\"\n"
+          + "  xmlns:android=\"http://schemas.android.com/apk/res/android\">\n"
+          + "    <supports-screens android:anyDensity=\"true\" android:smallScreens=\"true\" android:normalScreens=\"true\" android:largeScreens=\"true\" android:resizeable=\"true\" android:xlargeScreens=\"true\" />\n"
+          + "</manifest>";
 
         String obtained = readTextFile(new File(sTestNewDir, "AndroidManifest.xml"));
 

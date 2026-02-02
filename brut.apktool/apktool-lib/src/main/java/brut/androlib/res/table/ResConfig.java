@@ -17,6 +17,7 @@
 package brut.androlib.res.table;
 
 import java.util.Arrays;
+import java.util.Locale;
 
 public class ResConfig {
     public static final int SDK_BASE = 1;
@@ -228,12 +229,11 @@ public class ResConfig {
         mIsInvalid = false;
     }
 
-    public ResConfig(int mcc, int mnc, String language, String region, int orientation,
-                     int touchscreen, int density, int keyboard, int navigation, int inputFlags,
-                     int grammaticalInflection, int screenWidth, int screenHeight, int sdkVersion,
-                     int minorVersion, int screenLayout, int uiMode, int smallestScreenWidthDp,
-                     int screenWidthDp, int screenHeightDp, String localeScript, String localeVariant,
-                     int screenLayout2, int colorMode, byte[] unknown) {
+    public ResConfig(int mcc, int mnc, String language, String region, int orientation, int touchscreen, int density,
+                     int keyboard, int navigation, int inputFlags, int grammaticalInflection, int screenWidth,
+                     int screenHeight, int sdkVersion, int minorVersion, int screenLayout, int uiMode,
+                     int smallestScreenWidthDp, int screenWidthDp, int screenHeightDp, String localeScript,
+                     String localeVariant, int screenLayout2, int colorMode, byte[] unknown) {
         mMcc = mcc;
         mMnc = mnc;
         mLanguage = language;
@@ -267,14 +267,13 @@ public class ResConfig {
     private String computeQualifiers(boolean[] isInvalid) {
         StringBuilder sb = new StringBuilder();
         if (mMcc != 0) {
-            sb.append("-mcc").append(String.format("%03d", mMcc));
+            sb.append("-mcc").append(String.format(Locale.ROOT, "%03d", mMcc));
         }
         if (mMnc != 0) {
-            sb.append("-mnc").append(String.format("%02d", mMnc == MNC_ZERO ? 0 : mMnc));
+            sb.append("-mnc").append(String.format(Locale.ROOT, "%02d", mMnc == MNC_ZERO ? 0 : mMnc));
         }
         if (!mLanguage.isEmpty()) {
-            if (mLocaleScript.isEmpty() && (mRegion.isEmpty() || mRegion.length() == 2)
-                    && mLocaleVariant.isEmpty()) {
+            if (mLocaleScript.isEmpty() && (mRegion.isEmpty() || mRegion.length() == 2) && mLocaleVariant.isEmpty()) {
                 // Legacy format.
                 sb.append('-').append(mLanguage);
                 if (!mRegion.isEmpty()) {
@@ -621,7 +620,7 @@ public class ResConfig {
         return mIsInvalid;
     }
 
-    public String getQualifiers() {
+    public String toQualifiers() {
         return mQualifiers;
     }
 

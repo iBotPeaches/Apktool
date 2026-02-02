@@ -16,37 +16,39 @@
  */
 package brut.androlib;
 
+import brut.androlib.res.Framework;
+
 import java.io.File;
 
 import org.junit.*;
 import static org.junit.Assert.*;
 
-public class AndroidOreoSparseTest extends BaseTest {
+public class FrameworkTest extends BaseTest {
+    private static final String FRAMEWORK_APK = "framework.apk";
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        sTestOrigDir = new File(sTmpDir, "issue1594-orig");
-        sTestNewDir = new File(sTmpDir, "issue1594-new");
-
-        log("Unpacking sparse.apk...");
-        copyResourceDir(AndroidOreoSparseTest.class, "issue1594", sTestOrigDir);
-
-        log("Decoding sparse.apk...");
-        File testApk = new File(sTestOrigDir, "sparse.apk");
-        new ApkDecoder(testApk, sConfig).decode(sTestNewDir);
-
-        log("Building sparse.apk...");
-        new ApkBuilder(sTestNewDir, sConfig).build(testApk);
+        copyResourceDir(FrameworkTest.class, "framework", sTmpDir);
     }
 
     @Test
-    public void buildAndDecodeTest() {
-        assertTrue(sTestNewDir.isDirectory());
-        assertTrue(sTestOrigDir.isDirectory());
+    public void isFrameworkTaggingWorking() throws Exception {
+        sConfig.setFrameworkDirectory(sTmpDir.getAbsolutePath());
+        sConfig.setFrameworkTag("building");
+
+        File frameApk = new File(sTmpDir, FRAMEWORK_APK);
+        new Framework(sConfig).install(frameApk);
+
+        assertTrue(new File(sTmpDir, "2-building.apk").exists());
     }
 
     @Test
-    public void ensureStringsOreoTest() {
-        assertTrue(new File(sTestNewDir, "res/values-v26/strings.xml").isFile());
+    public void isFrameworkInstallingWorking() throws Exception {
+        sConfig.setFrameworkDirectory(sTmpDir.getAbsolutePath());
+
+        File frameApk = new File(sTmpDir, FRAMEWORK_APK);
+        new Framework(sConfig).install(frameApk);
+
+        assertTrue(new File(sTmpDir, "2.apk").exists());
     }
 }

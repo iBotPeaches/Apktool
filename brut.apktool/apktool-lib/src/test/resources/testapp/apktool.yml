@@ -4,10 +4,10 @@ usesFramework:
   ids:
   - 1
 versionInfo:
-  versionCode: '1'
-  versionName: '1.0'
+  versionCode: 1
+  versionName: 1.0
 resourcesInfo:
-  packageId: '127'
+  packageId: 127
   sparseEntries: false
 featureFlags:
   brut.feature.permission: true

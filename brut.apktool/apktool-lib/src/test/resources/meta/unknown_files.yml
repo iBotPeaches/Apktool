@@ -4,10 +4,10 @@ usesFramework:
   ids:
   - 1
 resourcesInfo:
-  packageId: '127'
+  packageId: 127
 versionInfo:
-  versionCode: '1'
-  versionName: '1.0'
+  versionCode: 1
+  versionName: 1.0
 doNotCompress:
 - assets/0byte_file.jpg
 - arsc

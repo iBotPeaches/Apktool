@@ -22,7 +22,6 @@ import brut.androlib.res.xml.ResStringEncoder;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
-import java.util.Objects;
 import java.util.Set;
 
 public class ResString extends ResItem {
@@ -51,20 +50,19 @@ public class ResString extends ResItem {
     }
 
     @Override
-    public void serializeToValuesXml(XmlSerializer serial, ResEntry entry)
-            throws AndrolibException, IOException {
-        String type = entry.getTypeName();
+    public void serializeToValuesXml(XmlSerializer serial, ResEntry entry) throws AndrolibException, IOException {
+        String typeName = entry.getType().getName();
 
         // Specify format for <item> tags when the resource type doesn't
         // directly support this value's format.
-        Set<String> stdFormats = STANDARD_TYPE_FORMATS.get(type);
+        Set<String> stdFormats = STANDARD_TYPE_FORMATS.get(typeName);
         String format = stdFormats != null ? getFormat() : null;
         boolean asItem = format != null && !stdFormats.contains(format);
 
-        String tagName = asItem ? "item" : type;
+        String tagName = asItem ? "item" : typeName;
         serial.startTag(null, tagName);
         if (asItem) {
-            serial.attribute(null, "type", type);
+            serial.attribute(null, "type", typeName);
         }
         serial.attribute(null, "name", entry.getName());
         if (asItem) {
@@ -104,13 +102,13 @@ public class ResString extends ResItem {
         }
         if (obj instanceof ResString) {
             ResString other = (ResString) obj;
-            return Objects.equals(mValue, other.mValue);
+            return mValue.equals(other.mValue);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(mValue);
+        return mValue.hashCode();
     }
 }

@@ -29,17 +29,17 @@ public class DebuggableFalseChangeToTrueTest extends BaseTest {
         sTestOrigDir = new File(sTmpDir, "issue2328-debuggable-false-orig");
         sTestNewDir = new File(sTmpDir, "issue2328-debuggable-false-new");
 
-        LOGGER.info("Unpacking issue2328-debuggable-false...");
+        log("Unpacking issue2328-debuggable-false...");
         copyResourceDir(DebuggableFalseChangeToTrueTest.class, "issue2328/debuggable-false", sTestOrigDir);
 
         sConfig.setDebuggable(true);
         sConfig.setVerbose(true);
 
-        LOGGER.info("Building issue2328-debuggable-false.apk...");
+        log("Building issue2328-debuggable-false.apk...");
         File testApk = new File(sTmpDir, "issue2328-debuggable-false.apk");
         new ApkBuilder(sTestOrigDir, sConfig).build(testApk);
 
-        LOGGER.info("Decoding issue2328-debuggable-false.apk...");
+        log("Decoding issue2328-debuggable-false.apk...");
         new ApkDecoder(testApk, sConfig).decode(sTestNewDir);
     }
 
@@ -50,11 +50,12 @@ public class DebuggableFalseChangeToTrueTest extends BaseTest {
 
     @Test
     public void debugIsTruePriorToBeingFalseTest() throws Exception {
-        String expected = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
-                + "<manifest package=\"com.ibotpeaches.issue2328\" platformBuildVersionCode=\"20\" platformBuildVersionName=\"4.4W.2-1537038\"\n"
-                + "  xmlns:android=\"http://schemas.android.com/apk/res/android\">\n"
-                + "    <application android:debuggable=\"true\"/>\n"
-                + "</manifest>";
+        String expected =
+            "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+          + "<manifest package=\"com.ibotpeaches.issue2328\" platformBuildVersionCode=\"20\" platformBuildVersionName=\"4.4W.2-1537038\"\n"
+          + "  xmlns:android=\"http://schemas.android.com/apk/res/android\">\n"
+          + "    <application android:debuggable=\"true\"/>\n"
+          + "</manifest>";
 
         String obtained = readTextFile(new File(sTestNewDir, "AndroidManifest.xml"));
 

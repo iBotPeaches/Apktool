@@ -36,7 +36,8 @@ public class UsesFramework implements YamlSerializable {
     }
 
     public boolean isEmpty() {
-        return mIds.isEmpty() && mTag == null;
+        return mIds.isEmpty()
+            && mTag == null;
     }
 
     @Override

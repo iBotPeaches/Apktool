@@ -18,6 +18,7 @@ package brut.androlib;
 
 import brut.androlib.Config;
 import brut.androlib.res.Framework;
+import brut.common.Log;
 import brut.directory.FileDirectory;
 import brut.util.OS;
 
@@ -29,7 +30,6 @@ import java.io.Reader;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.file.Files;
-import java.util.logging.Logger;
 
 import org.junit.*;
 import static org.junit.Assert.assertTrue;
@@ -37,7 +37,7 @@ import org.custommonkey.xmlunit.*;
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 
 public class BaseTest {
-    protected static final Logger LOGGER = Logger.getLogger(BaseTest.class.getName());
+    private static final String TAG = "TEST";
 
     protected static Config sConfig;
     protected static File sTmpDir;
@@ -59,7 +59,7 @@ public class BaseTest {
 
     @BeforeClass
     public static void beforeEachClass() throws Exception {
-        sConfig = new Config("TEST");
+        sConfig = new Config(TAG);
         cleanFrameworkFile();
 
         sTmpDir = OS.createTempDirectory();
@@ -79,7 +79,15 @@ public class BaseTest {
 
     @Before
     public void beforeEachTest() {
-        sConfig = new Config("TEST");
+        sConfig = new Config(TAG);
+    }
+
+    protected static void log(String message) {
+        Log.i(TAG, message);
+    }
+
+    protected static void log(String message, Object... args) {
+        Log.i(TAG, message, args);
     }
 
     protected static void copyResourceDir(Class<?> clz, String dirPath, File outDir) throws Exception {

@@ -16,6 +16,7 @@
  */
 package brut.util;
 
+import brut.common.Log;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 
@@ -26,20 +27,18 @@ import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.util.Collection;
 import java.util.function.Predicate;
-import java.util.logging.Logger;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 public final class ZipUtils {
-    private static final Logger LOGGER = Logger.getLogger("");
+    private static final String TAG = "";
 
     private ZipUtils() {
         // Private constructor for utility class.
     }
 
-    public static void zipDir(File dir, ZipOutputStream out, Collection<String> doNotCompress)
-            throws IOException {
+    public static void zipDir(File dir, ZipOutputStream out, Collection<String> doNotCompress) throws IOException {
         zipDir(dir, null, out, doNotCompress);
     }
 
@@ -63,7 +62,7 @@ public final class ZipUtils {
             } else if (file.isFile()) {
                 zipFile(baseDir, fileName, out, (doNotCompress != null && !doNotCompress.isEmpty())
                     ? entryName -> doNotCompress.contains(entryName)
-                            || doNotCompress.contains(FilenameUtils.getExtension(entryName))
+                                || doNotCompress.contains(FilenameUtils.getExtension(entryName))
                     : entryName -> false);
             }
         }
@@ -107,7 +106,7 @@ public final class ZipUtils {
             }
             out.closeEntry();
         } catch (InvalidPathException ex) {
-            LOGGER.warning(String.format("Skipping file %s (%s)", fileName, ex.getMessage()));
+            Log.w(TAG, "Skipping file %s (%s)", fileName, ex.getMessage());
         }
     }
 }

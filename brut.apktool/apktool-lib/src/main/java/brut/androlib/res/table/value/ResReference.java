@@ -29,18 +29,18 @@ import java.util.Objects;
 
 public class ResReference extends ResItem {
     private final ResPackage mPackage;
-    private final ResId mId;
+    private final ResId mResId;
     private final boolean mAsAttr;
 
-    public ResReference(ResPackage pkg, ResId id) {
-        this(pkg, id, false);
+    public ResReference(ResPackage pkg, ResId resId) {
+        this(pkg, resId, false);
     }
 
-    public ResReference(ResPackage pkg, ResId id, boolean asAttr) {
+    public ResReference(ResPackage pkg, ResId resId, boolean asAttr) {
         super(asAttr ? TYPE_ATTRIBUTE : TYPE_REFERENCE);
-        assert pkg != null && id != null;
+        assert pkg != null && resId != null;
         mPackage = pkg;
-        mId = id;
+        mResId = resId;
         mAsAttr = asAttr;
     }
 
@@ -48,14 +48,25 @@ public class ResReference extends ResItem {
         return mPackage;
     }
 
-    public ResId getId() {
-        return mId;
+    public ResId getResId() {
+        return mResId;
     }
 
     public ResEntrySpec resolve() throws AndrolibException {
-        if (mPackage != null && mId != ResId.NULL) {
+        if (mPackage != null && mResId != ResId.NULL) {
             try {
-                return mPackage.getTable().getEntrySpec(mId);
+                return mPackage.getTable().resolve(mResId);
+            } catch (UndefinedResObjectException ignored) {
+            }
+        }
+
+        return null;
+    }
+
+    public ResEntry resolveEntry() throws AndrolibException {
+        if (mPackage != null && mResId != ResId.NULL) {
+            try {
+                return mPackage.getTable().resolveEntry(mResId);
             } catch (UndefinedResObjectException ignored) {
             }
         }
@@ -72,18 +83,17 @@ public class ResReference extends ResItem {
             return "@null";
         }
 
-        boolean includePackage = mPackage != spec.getPackage();
-        boolean includeType = !mAsAttr || !spec.getTypeName().equals("attr");
+        boolean includePackage = mPackage.getGroup() != spec.getPackage().getGroup();
+        boolean includeType = !mAsAttr || !spec.getTypeSpec().getName().equals("attr");
         return (mAsAttr ? "?" : "@")
-                + (includePackage ? spec.getPackage().getName() + ":" : "")
-                + (includeType ? spec.getTypeName() + "/" : "")
-                + spec.getName();
+             + (includePackage ? spec.getPackage().getName() + ":" : "")
+             + (includeType ? spec.getTypeSpec().getName() + "/" : "")
+             + spec.getName();
     }
 
     @Override
-    public void serializeToValuesXml(XmlSerializer serial, ResEntry entry)
-            throws AndrolibException, IOException {
-        String type = entry.getTypeName();
+    public void serializeToValuesXml(XmlSerializer serial, ResEntry entry) throws AndrolibException, IOException {
+        String typeName = entry.getType().getName();
 
         // A bag type with a reference value must be an <item> tag.
         // Otherwise, when the decoded app is rebuilt, the reference will be lost.
@@ -92,12 +102,12 @@ public class ResReference extends ResItem {
         // Only set body if not @null or the entry is a <string> tag.
         // @null is the default value for all item types except string.
         // Note: We never set @null to <id> tags.
-        boolean needsBody = resolve() != null || type.equals("string");
+        boolean needsBody = resolve() != null || typeName.equals("string");
 
-        String tagName = asItem ? "item" : type;
+        String tagName = asItem ? "item" : typeName;
         serial.startTag(null, tagName);
         if (asItem) {
-            serial.attribute(null, "type", type);
+            serial.attribute(null, "type", typeName);
         }
         serial.attribute(null, "name", entry.getName());
         if (needsBody) {
@@ -108,8 +118,7 @@ public class ResReference extends ResItem {
 
     @Override
     public String toString() {
-        return String.format("ResReference{pkg=%s, id=%s, type=%s}",
-            mPackage, mId, mAsAttr ? "attr" : "ref");
+        return String.format("ResReference{pkg=%s, id=%s, type=%s}", mPackage, mResId, mAsAttr ? "attr" : "ref");
     }
 
     @Override
@@ -119,15 +128,15 @@ public class ResReference extends ResItem {
         }
         if (obj instanceof ResReference) {
             ResReference other = (ResReference) obj;
-            return Objects.equals(mPackage, other.mPackage)
-                    && Objects.equals(mId, other.mId)
-                    && mAsAttr == other.mAsAttr;
+            return mPackage.equals(other.mPackage)
+                && mResId == other.mResId
+                && mAsAttr == other.mAsAttr;
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(mPackage, mId, mAsAttr);
+        return Objects.hash(mPackage, mResId, mAsAttr);
     }
 }

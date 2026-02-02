@@ -56,7 +56,7 @@ public class ApkInfoReaderTest extends BaseTest {
         assertEquals(1, apkInfo.getDoNotCompress().size());
         assertEquals("arsc", apkInfo.getDoNotCompress().get(0));
         assertNotNull(apkInfo.getResourcesInfo());
-        assertEquals("127", apkInfo.getResourcesInfo().getPackageId());
+        assertEquals(127, apkInfo.getResourcesInfo().getPackageId());
         assertNull(apkInfo.getResourcesInfo().getPackageName());
         assertFalse(apkInfo.getResourcesInfo().isSparseEntries());
         assertNotNull(apkInfo.getSdkInfo());
@@ -65,10 +65,10 @@ public class ApkInfoReaderTest extends BaseTest {
         assertNotNull(apkInfo.getUsesFramework());
         assertNotNull(apkInfo.getUsesFramework().getIds());
         assertEquals(1, apkInfo.getUsesFramework().getIds().size());
-        assertEquals(1, (long) apkInfo.getUsesFramework().getIds().get(0));
+        assertEquals(1, (int) apkInfo.getUsesFramework().getIds().get(0));
         assertNull(apkInfo.getUsesFramework().getTag());
         assertNotNull(apkInfo.getVersionInfo());
-        assertNull(apkInfo.getVersionInfo().getVersionCode());
+        assertEquals(-1, apkInfo.getVersionInfo().getVersionCode());
         assertNull(apkInfo.getVersionInfo().getVersionName());
     }
 
@@ -79,11 +79,11 @@ public class ApkInfoReaderTest extends BaseTest {
         assertEquals("testapp.apk", apkInfo.getApkFileName());
         assertNotNull(apkInfo.getUsesFramework());
         assertEquals(1, apkInfo.getUsesFramework().getIds().size());
-        assertEquals(1, (long) apkInfo.getUsesFramework().getIds().get(0));
+        assertEquals(1, (int) apkInfo.getUsesFramework().getIds().get(0));
         assertNotNull(apkInfo.getResourcesInfo());
-        assertEquals("127", apkInfo.getResourcesInfo().getPackageId());
+        assertEquals(127, apkInfo.getResourcesInfo().getPackageId());
         assertNotNull(apkInfo.getVersionInfo());
-        assertEquals("1", apkInfo.getVersionInfo().getVersionCode());
+        assertEquals(1, apkInfo.getVersionInfo().getVersionCode());
         assertEquals("1.0", apkInfo.getVersionInfo().getVersionName());
         assertNotNull(apkInfo.getDoNotCompress());
         assertEquals(5, apkInfo.getDoNotCompress().size());
@@ -101,10 +101,10 @@ public class ApkInfoReaderTest extends BaseTest {
         assertEquals("basic.apk", apkInfo.getApkFileName());
         assertNotNull(apkInfo.getUsesFramework());
         assertEquals(1, apkInfo.getUsesFramework().getIds().size());
-        assertEquals(1, (long) apkInfo.getUsesFramework().getIds().get(0));
+        assertEquals(1, (int) apkInfo.getUsesFramework().getIds().get(0));
         assertEquals("tag", apkInfo.getUsesFramework().getTag());
         assertNotNull(apkInfo.getResourcesInfo());
-        assertEquals("127", apkInfo.getResourcesInfo().getPackageId());
+        assertEquals(127, apkInfo.getResourcesInfo().getPackageId());
         assertEquals("com.test.basic", apkInfo.getResourcesInfo().getPackageName());
         assertTrue(apkInfo.getResourcesInfo().isSparseEntries());
         assertNotNull(apkInfo.getSdkInfo());
@@ -112,7 +112,7 @@ public class ApkInfoReaderTest extends BaseTest {
         assertEquals("22", apkInfo.getSdkInfo().getTargetSdkVersion());
         assertEquals("30", apkInfo.getSdkInfo().getMaxSdkVersion());
         assertNotNull(apkInfo.getVersionInfo());
-        assertEquals("71", apkInfo.getVersionInfo().getVersionCode());
+        assertEquals(71, apkInfo.getVersionInfo().getVersionCode());
         assertEquals("1.0.70", apkInfo.getVersionInfo().getVersionName());
         assertNotNull(apkInfo.getDoNotCompress());
         assertEquals(2, apkInfo.getDoNotCompress().size());

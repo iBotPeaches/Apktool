@@ -79,6 +79,14 @@ public class YamlLine {
         return YamlStringEscapeUtils.unescapeString(value);
     }
 
+    public String getKey() {
+        String res = unescape(key);
+        // remove quotation marks
+        res = res.replaceAll("^\"|\"$", "");
+        res = res.replaceAll("^'|'$", "");
+        return res;
+    }
+
     public String getValue() {
         if (value.equals("null")) {
             return null;
@@ -90,19 +98,11 @@ public class YamlLine {
         return res;
     }
 
-    public String getKey() {
-        String res = unescape(key);
-        // remove quotation marks
-        res = res.replaceAll("^\"|\"$", "");
-        res = res.replaceAll("^'|'$", "");
-        return res;
+    public int getValueInt() {
+        return Integer.parseInt(value);
     }
 
     public boolean getValueBool() {
         return Objects.equals(value, "true");
-    }
-
-    public int getValueInt() {
-        return Integer.parseInt(value);
     }
 }

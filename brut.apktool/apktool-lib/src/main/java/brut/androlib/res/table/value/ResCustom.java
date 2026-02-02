@@ -51,8 +51,7 @@ public class ResCustom extends ResValue implements ValuesXmlSerializable {
     }
 
     @Override
-    public void serializeToValuesXml(XmlSerializer serial, ResEntry entry)
-            throws AndrolibException, IOException {
+    public void serializeToValuesXml(XmlSerializer serial, ResEntry entry) throws AndrolibException, IOException {
         String tagName = mAsItem ? "item" : mType;
         serial.startTag(null, tagName);
         if (mAsItem) {
@@ -67,8 +66,7 @@ public class ResCustom extends ResValue implements ValuesXmlSerializable {
 
     @Override
     public String toString() {
-        return String.format("ResCustom{type=%s, value=%s, asItem=%s}",
-            mType, mValue, mAsItem);
+        return String.format("ResCustom{type=%s, value=%s, asItem=%s}", mType, mValue, mAsItem);
     }
 
     @Override
@@ -78,9 +76,9 @@ public class ResCustom extends ResValue implements ValuesXmlSerializable {
         }
         if (obj instanceof ResCustom) {
             ResCustom other = (ResCustom) obj;
-            return Objects.equals(mType, other.mType)
-                    && Objects.equals(mValue, other.mValue)
-                    && mAsItem == other.mAsItem;
+            return mType.equals(other.mType)
+                && Objects.equals(mValue, other.mValue)
+                && mAsItem == other.mAsItem;
         }
         return false;
     }

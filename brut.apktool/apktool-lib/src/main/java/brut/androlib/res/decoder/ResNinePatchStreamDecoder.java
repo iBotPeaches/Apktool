@@ -91,22 +91,18 @@ public class ResNinePatchStreamDecoder implements ResStreamDecoder {
             // https://developer.android.com/about/versions/android-4.3.html#OpticalBounds
             try {
                 LayoutBounds lb = findLayoutBounds(data);
-
                 for (int i = 0; i < lb.left; i++) {
                     int x = 1 + i;
                     dst.setRGB(x, h + 1, LayoutBounds.COLOR_TICK);
                 }
-
                 for (int i = 0; i < lb.right; i++) {
                     int x = w - i;
                     dst.setRGB(x, h + 1, LayoutBounds.COLOR_TICK);
                 }
-
                 for (int i = 0; i < lb.top; i++) {
                     int y = 1 + i;
                     dst.setRGB(w + 1, y, LayoutBounds.COLOR_TICK);
                 }
-
                 for (int i = 0; i < lb.bottom; i++) {
                     int y = h - i;
                     dst.setRGB(w + 1, y, LayoutBounds.COLOR_TICK);
@@ -122,22 +118,19 @@ public class ResNinePatchStreamDecoder implements ResStreamDecoder {
         }
     }
 
-    private NinePatchData findNinePatchData(byte[] data)
-            throws NinePatchNotFoundException, IOException {
+    private NinePatchData findNinePatchData(byte[] data) throws NinePatchNotFoundException, IOException {
         BinaryDataInputStream in = new BinaryDataInputStream(data, ByteOrder.BIG_ENDIAN);
         findChunk(in, NinePatchData.MAGIC);
         return NinePatchData.read(in);
     }
 
-    private LayoutBounds findLayoutBounds(byte[] data)
-            throws NinePatchNotFoundException, IOException {
+    private LayoutBounds findLayoutBounds(byte[] data) throws NinePatchNotFoundException, IOException {
         BinaryDataInputStream in = new BinaryDataInputStream(data, ByteOrder.BIG_ENDIAN);
         findChunk(in, LayoutBounds.MAGIC);
         return LayoutBounds.read(in);
     }
 
-    private void findChunk(BinaryDataInputStream in, int magic)
-            throws NinePatchNotFoundException, IOException {
+    private void findChunk(BinaryDataInputStream in, int magic) throws NinePatchNotFoundException, IOException {
         in.skipBytes(8);
         for (;;) {
             int size;

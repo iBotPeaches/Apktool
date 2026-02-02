@@ -23,6 +23,5 @@ import org.xmlpull.v1.XmlSerializer;
 import java.io.IOException;
 
 public interface ValuesXmlSerializable {
-    void serializeToValuesXml(XmlSerializer serial, ResEntry entry)
-            throws AndrolibException, IOException;
+    void serializeToValuesXml(XmlSerializer serial, ResEntry entry) throws AndrolibException, IOException;
 }
