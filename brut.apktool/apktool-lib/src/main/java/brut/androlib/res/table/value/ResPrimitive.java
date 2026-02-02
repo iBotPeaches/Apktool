@@ -21,6 +21,7 @@ import brut.androlib.res.table.ResEntry;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -157,7 +158,7 @@ public class ResPrimitive extends ResItem {
     private static String floatToString(float value) {
         // Use one decimal to show it's a float for exact integers.
         if (value == (long) value) {
-            return String.format("%.1f", value);
+            return String.format(Locale.ROOT, "%.1f", value);
         }
         // Use Java's default minimal string representation.
         return Float.toString(value);
