@@ -78,8 +78,7 @@ public class ManifestPullEventHandler implements XmlPullUtils.EventHandler {
             }
             if (ns.isEmpty()) {
                 if (name.equals("package")) {
-                    // This is temporary and will be compared to actual
-                    // resources package later.
+                    // This is temporary and will be compared to actual resources package later.
                     resourcesInfo.setPackageName(value);
                 }
             } else if (ns.equals(ResXmlUtils.ANDROID_RES_NS)) {

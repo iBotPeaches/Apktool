@@ -48,8 +48,7 @@ public class ResFileDecoder {
         String inFileName = ((ResFileReference) entry.getValue()).getPath();
 
         // Some apps have string values where they shouldn't be.
-        // We assumed that they are file references, but if no such file then
-        // fall back to a string value.
+        // We assumed that they are file references, but if no such file then fall back to a string value.
         if (!inDir.containsFile(inFileName)) {
             entry.setValue(new ResString(inFileName));
             return;

@@ -78,8 +78,8 @@ public class ResReference extends ResItem {
     public String toXmlTextValue() throws AndrolibException {
         ResEntrySpec spec = resolve();
         if (spec == null) {
-            // @null is a special primitive, not a true reference, but we have
-            // to fall back to it if we can't resolve the reference.
+            // @null is a special primitive, not a true reference, but we have to fall back to it if we can't
+            // resolve the reference.
             return "@null";
         }
 

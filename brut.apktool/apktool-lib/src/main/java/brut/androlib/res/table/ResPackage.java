@@ -37,9 +37,9 @@ public class ResPackage {
     private final Map<ResId, ResId> mAliases;
     private final Set<String> mNameRegistry;
 
-    public ResPackage(ResPackageGroup owner) {
-        assert owner != null;
-        mGroup = owner;
+    public ResPackage(ResPackageGroup group) {
+        assert group != null;
+        mGroup = group;
         mTypeSpecs = new HashMap<>();
         mTypes = new HashMap<>();
         mEntrySpecs = new HashMap<>();

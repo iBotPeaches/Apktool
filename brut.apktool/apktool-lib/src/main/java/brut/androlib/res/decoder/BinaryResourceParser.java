@@ -94,10 +94,6 @@ public class BinaryResourceParser {
         mInvalidConfigs = new HashSet<>();
     }
 
-    public ResTable getTable() {
-        return mTable;
-    }
-
     public boolean isSparseEntries() {
         return mSparseEntries;
     }
@@ -784,9 +780,8 @@ public class BinaryResourceParser {
     }
 
     private void skipUnreadHeader(ResChunkPullParser parser) throws IOException {
-        // Some apps lie about the reported size of their chunk header.
-        // Trusting the header size is misleading, so compare to what we actually read in the
-        // header vs reported and skip the rest.
+        // Some apps lie about the reported size of their chunk header. Trusting the header size is misleading,
+        // so compare to what we actually read in the header vs reported and skip the rest.
         int bytesRead = (int) (mIn.position() - parser.chunkStart());
         readExceedingBytes("Chunk header", parser.headerSize(), bytesRead);
     }

@@ -573,11 +573,9 @@ public class BinaryXmlResourceParser implements XmlPullParser {
     private String getNonDefaultNamespaceUri(int pos) {
         String prefix = getNamespacePrefix(pos);
         if (prefix == null) {
-            // If we are here. There is some clever obfuscation going on.
-            // Our reference points to the namespace are gone.
-            // We have the namespaces that can't be touched in the opening tag.
-            // Though no known way to correlate them at this time.
-            // So return the res-auto namespace.
+            // If we are here, there is some clever obfuscation going on.
+            // Our reference points to the namespace are gone. We have the namespaces that can't be touched in the
+            // opening tag, though no known way to correlate them at this time, so return the res-auto namespace.
             return ResXmlUtils.ANDROID_RES_NS_AUTO;
         }
         return getNamespaceUri(pos);
@@ -795,9 +793,8 @@ public class BinaryXmlResourceParser implements XmlPullParser {
     }
 
     private void skipUnreadHeader() throws IOException {
-        // Some apps lie about the reported size of their chunk header.
-        // Trusting the header size is misleading, so compare to what we actually read in the
-        // header vs reported and skip the rest.
+        // Some apps lie about the reported size of their chunk header. Trusting the header size is misleading,
+        // so compare to what we actually read in the header vs reported and skip the rest.
         int bytesRead = (int) (mIn.position() - mParser.chunkStart());
         readExceedingBytes("Chunk header", mParser.headerSize(), bytesRead);
     }

@@ -53,8 +53,7 @@ public class ResString extends ResItem {
     public void serializeToValuesXml(XmlSerializer serial, ResEntry entry) throws AndrolibException, IOException {
         String typeName = entry.getType().getName();
 
-        // Specify format for <item> tags when the resource type doesn't
-        // directly support this value's format.
+        // Specify format for <item> tags when the resource type doesn't directly support this value's format.
         Set<String> stdFormats = STANDARD_TYPE_FORMATS.get(typeName);
         String format = stdFormats != null ? getFormat() : null;
         boolean asItem = format != null && !stdFormats.contains(format);
@@ -82,8 +81,7 @@ public class ResString extends ResItem {
         if (mValue.length() == 0) {
             return true;
         }
-        // Formatting must be disabled if the string has multiple sequential
-        // format specifier.
+        // Formatting must be disabled if the string has multiple sequential format specifier.
         int[][] specs = ResStringEncoder.findFormatSpecifiers(mValue.toString());
         int[] sequential = specs[0];
         int[] positional = specs[1];
