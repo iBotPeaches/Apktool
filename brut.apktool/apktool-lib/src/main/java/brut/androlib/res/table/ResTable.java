@@ -161,9 +161,9 @@ public class ResTable {
             throw new AndrolibException(String.format("Repeated package group: id=0x%02x, name=%s", id, name));
         }
 
-        // The package ID is 0x00 and the main package is loaded, that means that a shared library
-        // is being loaded, so we change it to the reference package ID defined in the dynamic
-        // reference table, or assign it the next available ID.
+        // If the package ID is 0x00 and the main package is loaded, that means that a shared library is being loaded,
+        // so we change it to the reference package ID defined in the dynamic reference table, or assign it the next
+        // available ID.
         if (id == 0 && mMainPackage != null) {
             id = getDynamicRefPackageId(name);
             if (id == 0) {

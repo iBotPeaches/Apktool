@@ -42,8 +42,8 @@ public final class XmlPullUtils {
             throws XmlPullParserException, IOException {
         Boolean standalone = (Boolean) in.getProperty(PROPERTY_XMLDECL_STANDALONE);
 
-        // Some parsers may have already consumed the event that starts the
-        // document, so we manually emit that event here for consistency.
+        // Some parsers may have already consumed the event that starts the document, so we manually emit that
+        // event here for consistency.
         if (in.getEventType() == XmlPullParser.START_DOCUMENT) {
             out.startDocument(in.getInputEncoding(), standalone);
         }

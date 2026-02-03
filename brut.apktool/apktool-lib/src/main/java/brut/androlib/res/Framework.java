@@ -77,16 +77,7 @@ public class Framework {
             }
 
             byte[] data = BrutIO.readAndClose(zip.getInputStream(entry));
-            BinaryResourceParser parser = parseResources(data);
-            parser.parse(new ByteArrayInputStream(data));
-
-            ResTable table = parser.getTable();
-            if (table.getPackageGroupCount() == 0) {
-                throw new AndrolibException("No packages in resources.arsc in file: " + apkFile);
-            }
-
-            publicizeResources(data, parser.getEntrySpecFlagsOffsets());
-
+            ResTable table = parseAndPublicizeResources(data);
             int pkgId = table.listPackageGroups().iterator().next().getId();
             File outFile = new File(getDirectory(), pkgId + getApkSuffix());
 
@@ -123,17 +114,19 @@ public class Framework {
         }
     }
 
-    private BinaryResourceParser parseResources(byte[] data) throws AndrolibException {
+    private ResTable parseAndPublicizeResources(byte[] data) throws AndrolibException {
         ResTable table = new ResTable(new ApkInfo(), mConfig);
         BinaryResourceParser parser = new BinaryResourceParser(table, true, true);
         parser.enableCollectFlagsOffsets();
         parser.parse(new ByteArrayInputStream(data));
-        return parser;
-    }
 
-    private static void publicizeResources(byte[] data, Collection<Pair<Long, Integer>> flagsOffsets) {
+        if (table.getPackageGroupCount() == 0) {
+            throw new AndrolibException("No packages in resources.arsc in file.");
+        }
+
+        // Publicize all entry specs.
         ByteBuffer buffer = ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN);
-        for (Pair<Long, Integer> pair : flagsOffsets) {
+        for (Pair<Long, Integer> pair : parser.getEntrySpecFlagsOffsets()) {
             int position = pair.getKey().intValue();
             int count = pair.getValue();
             for (int i = 0; i < count; i++, position += 4) {
@@ -141,6 +134,8 @@ public class Framework {
                 buffer.putInt(position, flags | 0x40000000); // ResTable_typeSpec::SPEC_PUBLIC
             }
         }
+
+        return table;
     }
 
     public File getDirectory() throws AndrolibException {
@@ -252,20 +247,10 @@ public class Framework {
     }
 
     public void publicizeResources(File arscFile) throws AndrolibException {
-        byte[] data = new byte[(int) arscFile.length()];
-
-        try (InputStream in = Files.newInputStream(arscFile.toPath())) {
-            //noinspection ResultOfMethodCallIgnored
-            in.read(data);
-        } catch (IOException ex) {
-            throw new AndrolibException(ex);
-        }
-
-        BinaryResourceParser parser = parseResources(data);
-        publicizeResources(data, parser.getEntrySpecFlagsOffsets());
-
-        try (OutputStream out = Files.newOutputStream(arscFile.toPath())) {
-            out.write(data);
+        try {
+            byte[] data = Files.readAllBytes(arscFile.toPath());
+            parseAndPublicizeResources(data);
+            Files.write(arscFile.toPath(), data);
         } catch (IOException ex) {
             throw new AndrolibException(ex);
         }

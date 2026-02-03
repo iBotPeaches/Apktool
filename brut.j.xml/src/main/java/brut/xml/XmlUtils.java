@@ -111,8 +111,8 @@ public final class XmlUtils {
     public static Document loadDocument(File file, boolean nsAware)
             throws IOException, SAXException, ParserConfigurationException {
         DocumentBuilder builder = newDocumentBuilder(nsAware);
-        // Not using the parse(File) method on purpose, so that we can control when
-        // to close it. Somehow parse(File) does not seem to close the file in all cases.
+        // Not using the parse(File) method on purpose, so that we can control when to close it.
+        // Somehow parse(File) does not seem to close the file in all cases.
         try (InputStream in = Files.newInputStream(file.toPath())) {
             return builder.parse(new InputSource(in));
         }

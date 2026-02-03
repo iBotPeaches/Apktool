@@ -375,9 +375,9 @@ public class ResDecoder {
         if (pkg != null) {
             resourcesInfo.setPackageId(pkg.getId());
 
-            // We temporarily filled packageName in ResourcesInfo with the package from
-            // AndroidManifest.xml. Check if actual resources package differs from the
-            // manifest package and update packageName, otherwise clear packageName.
+            // We temporarily filled packageName in ResourcesInfo with the package from AndroidManifest.xml.
+            // Check if actual resources package differs from the manifest package and update packageName,
+            // otherwise clear packageName.
             String manifestPackage = resourcesInfo.getPackageName();
             String resourcesPackage = pkg.getName();
             if (resourcesPackage != null && !resourcesPackage.equals(manifestPackage)) {
@@ -454,8 +454,7 @@ public class ResDecoder {
         File manifest = new File(apkDir, "AndroidManifest.xml");
 
         if (!mConfig.isAnalysisMode()) {
-            // Remove versionCode and versionName, it will be passed to aapt as a parameter
-            // via apktool.yml.
+            // Remove versionCode and versionName, it will be passed to aapt as a parameter via apktool.yml.
             ResXmlUtils.removeManifestVersions(manifest);
         }
 

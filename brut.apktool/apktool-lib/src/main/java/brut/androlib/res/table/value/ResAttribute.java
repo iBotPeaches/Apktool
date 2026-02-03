@@ -111,8 +111,7 @@ public class ResAttribute extends ResBag {
 
         for (int j = 0; i < n; i++, j++) {
             RawItem rawItem = rawItems[i];
-            // The name of the symbol as a reference to a generated
-            // ID resource value.
+            // The name of the symbol as a reference to a generated ID resource value.
             int nameId = rawItem.getKey();
             ResReference name = new ResReference(pkg, ResId.of(nameId));
             ResPrimitive value = (ResPrimitive) rawItem.getValue();
