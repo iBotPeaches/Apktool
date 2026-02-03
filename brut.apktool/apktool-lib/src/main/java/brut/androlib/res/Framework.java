@@ -125,9 +125,8 @@ public class Framework {
         }
 
         // Publicize all entry specs.
-        Collection<Pair<Long, Integer>> flagsOffsets = parser.getEntrySpecFlagsOffsets();
         ByteBuffer buffer = ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN);
-        for (Pair<Long, Integer> pair : flagsOffsets) {
+        for (Pair<Long, Integer> pair : parser.getEntrySpecFlagsOffsets()) {
             int position = pair.getKey().intValue();
             int count = pair.getValue();
             for (int i = 0; i < count; i++, position += 4) {
