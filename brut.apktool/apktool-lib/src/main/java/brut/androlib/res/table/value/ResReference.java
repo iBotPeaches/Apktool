@@ -54,24 +54,33 @@ public class ResReference extends ResItem {
 
     public ResEntrySpec resolve() throws AndrolibException {
         if (mPackage != null && mResId != ResId.NULL) {
+            ResId resId = fixDynamicResourceId(mResId);
             try {
-                return mPackage.getTable().resolve(mResId);
+                return mPackage.getTable().resolve(resId);
             } catch (UndefinedResObjectException ignored) {
             }
         }
-
         return null;
     }
 
     public ResEntry resolveEntry() throws AndrolibException {
         if (mPackage != null && mResId != ResId.NULL) {
+            ResId resId = fixDynamicResourceId(mResId);
             try {
-                return mPackage.getTable().resolveEntry(mResId);
+                return mPackage.getTable().resolveEntry(resId);
             } catch (UndefinedResObjectException ignored) {
             }
         }
-
         return null;
+    }
+
+    private ResId fixDynamicResourceId(ResId resId) {
+        if (resId.pkgId() == 0 && mPackage.getId() != 0) {
+            // If the package ID is 0x00, that means that a shared library is accessing its own local resource,
+            // so fix it up with calling package ID.
+            resId = ResId.of(mPackage.getId(), resId.typeId(), resId.entryId());
+        }
+        return resId;
     }
 
     @Override
