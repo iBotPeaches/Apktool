@@ -17,6 +17,7 @@
 package brut.androlib.res.data;
 
 import brut.androlib.res.decoder.ResChunkPullParser;
+import brut.common.Log;
 import brut.util.BinaryDataInputStream;
 import com.google.common.annotations.VisibleForTesting;
 
@@ -27,10 +28,9 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.logging.Logger;
 
 public class ResStringPool {
-    private static final Logger LOGGER = Logger.getLogger(ResStringPool.class.getName());
+    private static final String TAG = ResStringPool.class.getName();
 
     private static final CharsetDecoder UTF16LE_DECODER = StandardCharsets.UTF_16LE.newDecoder();
     private static final CharsetDecoder UTF8_DECODER = StandardCharsets.UTF_8.newDecoder();
@@ -45,8 +45,7 @@ public class ResStringPool {
     private final int[] mStyles;
     private final boolean mIsUtf8;
 
-    private ResStringPool(int[] stringOffsets, byte[] strings, int[] styleOffsets, int[] styles,
-                          boolean isUtf8) {
+    private ResStringPool(int[] stringOffsets, byte[] strings, int[] styleOffsets, int[] styles, boolean isUtf8) {
         mStringOffsets = stringOffsets;
         mStrings = strings;
         mStyleOffsets = styleOffsets;
@@ -71,15 +70,14 @@ public class ResStringPool {
         // For some apps they pack the chunk header with more unused data at end.
         int skipped = parser.skipHeader();
         if (skipped > 0) {
-            LOGGER.fine(String.format(
-                "Skipped unknown %d bytes at end of %s chunk header.", skipped, parser.chunkName()));
+            Log.d(TAG, "Skipped unknown %s bytes at end of %s chunk header.", skipped, parser.chunkName());
         }
 
         int[] stringOffsets = readIntArraySafe(in, stringCount, parser.chunkStart() + stringsOffset);
         int[] styleOffsets = readIntArraySafe(in, styleCount, parser.chunkStart() + stylesOffset);
 
-        // If we have both strings and even just a lying style offset - let's calculate the size of
-        // the strings without accidentally parsing all the styles.
+        // If we have both strings and even just a lying style offset - let's calculate the size of the strings without
+        // accidentally parsing all the styles.
         int size = parser.chunkSize() - stringsOffset;
         if (styleCount > 0) {
             size = stylesOffset - stringsOffset;
@@ -104,17 +102,13 @@ public class ResStringPool {
         return new ResStringPool(stringOffsets, strings, styleOffsets, styles, isUtf8);
     }
 
-    private static int[] readIntArraySafe(BinaryDataInputStream in, int len, long maxPosition)
-            throws IOException {
+    private static int[] readIntArraySafe(BinaryDataInputStream in, int len, long maxPosition) throws IOException {
         int[] arr = new int[len];
         for (int i = 0; i < len; i++) {
-            // #3236 - Some apps have more strings than can fit into the block.
-            // This function takes an expected max position and if we are past it,
-            // we return early during processing.
+            // #3236 - Some apps have more strings than can fit into the block. This function takes an expected max
+            // position and if we are past it, we return early during processing.
             if (in.position() >= maxPosition) {
-                LOGGER.fine(String.format(
-                    "Bad string block: string entry is at %d, past end at %d",
-                    in.position(), maxPosition));
+                Log.d(TAG, "Bad string block: string entry is at %s, past end at %s", in.position(), maxPosition);
                 return arr;
             }
 
@@ -182,18 +176,16 @@ public class ResStringPool {
     @VisibleForTesting
     String decodeString(int offset, int length) {
         try {
-            ByteBuffer wrappedBuffer = ByteBuffer.wrap(mStrings, offset, length);
-            return (mIsUtf8 ? UTF8_DECODER : UTF16LE_DECODER).decode(wrappedBuffer).toString();
+            ByteBuffer buffer = ByteBuffer.wrap(mStrings, offset, length);
+            return (mIsUtf8 ? UTF8_DECODER : UTF16LE_DECODER).decode(buffer).toString();
         } catch (CharacterCodingException ignored) {
             if (!mIsUtf8) {
-                LOGGER.warning(String.format(
-                    "Failed to decode a string at offset %d of length %d", offset, length));
+                Log.w(TAG, "Failed to decode a string at offset %s of length %s", offset, length);
                 return null;
             }
         } catch (IndexOutOfBoundsException ignored) {
             if (!mIsUtf8) {
-                LOGGER.warning(String.format(
-                    "String extends outside of pool at  %d of length %d", offset, length));
+                Log.w(TAG, "String extends outside of pool at %s of length %s", offset, length);
                 return null;
             }
         }
@@ -202,10 +194,10 @@ public class ResStringPool {
         // If decoding failed, we try to use CESU-8 decoder, which is closer to what Android
         // actually uses.
         try {
-            ByteBuffer wrappedBufferRetry = ByteBuffer.wrap(mStrings, offset, length);
-            return CESU8_DECODER.decode(wrappedBufferRetry).toString();
+            ByteBuffer buffer = ByteBuffer.wrap(mStrings, offset, length);
+            return CESU8_DECODER.decode(buffer).toString();
         } catch (CharacterCodingException ignored) {
-            LOGGER.warning("Failed to decode a string with CESU-8 decoder.");
+            Log.w(TAG, "Failed to decode a string with CESU-8 decoder.");
             return null;
         }
     }

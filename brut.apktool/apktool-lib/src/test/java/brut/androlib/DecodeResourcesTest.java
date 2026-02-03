@@ -26,12 +26,12 @@ public class DecodeResourcesTest extends BaseTest {
     private static final String TEST_APK = "issue1680.apk";
 
     private static final byte[] XML_HEADER = {
-            0x3C, // <
-            0x3F, // ?
-            0x78, // x
-            0x6D, // m
-            0x6C, // l
-            0x20, // (empty)
+        0x3C, // <
+        0x3F, // ?
+        0x78, // x
+        0x6D, // m
+        0x6C, // l
+        0x20, // (empty)
     };
 
     @BeforeClass

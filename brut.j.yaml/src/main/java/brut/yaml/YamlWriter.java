@@ -69,26 +69,34 @@ public class YamlWriter implements Closeable {
         mWriter.print(getIndentString());
     }
 
-    public void writeBool(String key, boolean value) {
-        writeIndent();
-        String val = value ? "true": "false";
-        mWriter.println(escape(key) + ": " + val);
+    public void writeString(String key, String value) {
+        writeString(key, value, false);
     }
 
     public void writeString(String key, String value, boolean quoted) {
         writeIndent();
+        String val;
         if (Objects.isNull(value)) {
-            mWriter.println(escape(key) + ": null");
+            val = "null";
         } else {
+            val = escape(value);
             if (quoted) {
-                value = QUOTE + value + QUOTE;
+                val = QUOTE + val + QUOTE;
             }
-            mWriter.println(escape(key) + ": " + escape(value));
         }
+        mWriter.println(escape(key) + ": " + val);
     }
 
-    public void writeString(String key, String value) {
-        writeString(key, value, false);
+    public void writeInt(String key, int value) {
+        writeIndent();
+        String val = Integer.toString(value);
+        mWriter.println(escape(key) + ": " + val);
+    }
+
+    public void writeBool(String key, boolean value) {
+        writeIndent();
+        String val = value ? "true": "false";
+        mWriter.println(escape(key) + ": " + val);
     }
 
     public <T> void writeList(String key, List<T> list) {

@@ -85,7 +85,7 @@ public class ManifestPullEventHandler implements XmlPullUtils.EventHandler {
             } else if (ns.equals(ResXmlUtils.ANDROID_RES_NS)) {
                 switch (name) {
                     case "versionCode":
-                        versionInfo.setVersionCode(value);
+                        versionInfo.setVersionCode(Integer.parseInt(value));
                         break;
                     case "versionName":
                         versionInfo.setVersionName(value);

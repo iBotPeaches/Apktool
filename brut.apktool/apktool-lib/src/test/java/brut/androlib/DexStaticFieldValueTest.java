@@ -28,37 +28,38 @@ public class DexStaticFieldValueTest extends BaseTest {
         sTestOrigDir = new File(sTmpDir, "issue2543-orig");
         sTestNewDir = new File(sTmpDir, "issue2543-new");
 
-        LOGGER.info("Unpacking issue2543...");
+        log("Unpacking issue2543...");
         copyResourceDir(DexStaticFieldValueTest.class, "issue2543", sTestOrigDir);
 
         sConfig.setBaksmaliDebugMode(false);
 
-        LOGGER.info("Building issue2543.jar...");
+        log("Building issue2543.jar...");
         File testJar = new File(sTmpDir, "issue2543.jar");
         new ApkBuilder(sTestOrigDir, sConfig).build(testJar);
 
-        LOGGER.info("Decoding issue2543.jar...");
+        log("Decoding issue2543.jar...");
         new ApkDecoder(testJar, sConfig).decode(sTestNewDir);
     }
 
     @Test
     public void disassembleDexFileToKeepDefaultParameters() throws Exception {
-        String expected = ".class public LHelloWorld;\n"
-                + ".super Ljava/lang/Object;\n"
-                + "\n"
-                + "\n"
-                + "# static fields\n"
-                + ".field private static b:Z = false\n"
-                + "\n"
-                + ".field private static c:Z = true\n"
-                + "\n"
-                + "\n"
-                + "# direct methods\n"
-                + ".method public static main([Ljava/lang/String;)V\n"
-                + "    .locals 1\n"
-                + "\n"
-                + "    return-void\n"
-                + ".end method";
+        String expected =
+            ".class public LHelloWorld;\n"
+          + ".super Ljava/lang/Object;\n"
+          + "\n"
+          + "\n"
+          + "# static fields\n"
+          + ".field private static b:Z = false\n"
+          + "\n"
+          + ".field private static c:Z = true\n"
+          + "\n"
+          + "\n"
+          + "# direct methods\n"
+          + ".method public static main([Ljava/lang/String;)V\n"
+          + "    .locals 1\n"
+          + "\n"
+          + "    return-void\n"
+          + ".end method";
 
         String obtained = readTextFile(new File(sTestNewDir, "smali/HelloWorld.smali"));
 

@@ -64,10 +64,10 @@ public class StringPoolWithSurrogatePairInUtf8Test extends BaseTest {
         // See: https://github.com/iBotPeaches/Apktool/issues/2546
         // Bytes with characters before surrogate pair
         byte[] bytes1 = {
-                'G', 'o', 'o', 'd', ' ', 'm', 'o', 'r', 'n', 'i', 'n', 'g', '!', ' ',
-                (byte) 0xED, (byte) 0xA0, (byte) 0xBD, (byte) 0xED, (byte) 0xB1, (byte) 0x8B,
-                ' ', 'S', 'u', 'n', ' ',
-                (byte) 0xED, (byte) 0xA0, (byte) 0xBC, (byte) 0xED, (byte) 0xBC, (byte) 0x9E
+            'G', 'o', 'o', 'd', ' ', 'm', 'o', 'r', 'n', 'i', 'n', 'g', '!', ' ',
+            (byte) 0xED, (byte) 0xA0, (byte) 0xBD, (byte) 0xED, (byte) 0xB1, (byte) 0x8B,
+            ' ', 'S', 'u', 'n', ' ',
+            (byte) 0xED, (byte) 0xA0, (byte) 0xBC, (byte) 0xED, (byte) 0xBC, (byte) 0x9E
         };
         String actual1 = new ResStringPool(bytes1, true).decodeString(0, 31);
         // D83D -> 0xED 0xA0 0xBD

@@ -20,6 +20,6 @@ public class FrameworkNotFoundException extends AndrolibException {
 
     public FrameworkNotFoundException(int pkgId) {
         super("Could not find framework resources for package ID " + pkgId + "." + System.lineSeparator()
-                + "You must install proper framework files, see project website for more info.");
+            + "You must install proper framework files, see project website for more info.");
     }
 }

@@ -28,14 +28,14 @@ public class EmptyResourcesArscTest extends BaseTest {
         sTestOrigDir = new File(sTmpDir, "issue1730-orig");
         sTestNewDir = new File(sTmpDir, "issue1730-new");
 
-        LOGGER.info("Unpacking issue1730.apk...");
+        log("Unpacking issue1730.apk...");
         copyResourceDir(EmptyResourcesArscTest.class, "issue1730", sTestOrigDir);
 
-        LOGGER.info("Decoding issue1730.apk...");
+        log("Decoding issue1730.apk...");
         File testApk = new File(sTestOrigDir, "issue1730.apk");
         new ApkDecoder(testApk, sConfig).decode(sTestNewDir);
 
-        LOGGER.info("Building issue1730.apk...");
+        log("Building issue1730.apk...");
         new ApkBuilder(sTestNewDir, sConfig).build(testApk);
     }
 

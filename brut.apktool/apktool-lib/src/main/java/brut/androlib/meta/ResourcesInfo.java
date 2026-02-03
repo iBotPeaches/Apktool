@@ -19,7 +19,7 @@ package brut.androlib.meta;
 import brut.yaml.*;
 
 public class ResourcesInfo implements YamlSerializable {
-    private String mPackageId;
+    private Integer mPackageId;
     private String mPackageName;
     private Boolean mSparseEntries;
     private Boolean mCompactEntries;
@@ -38,9 +38,11 @@ public class ResourcesInfo implements YamlSerializable {
     }
 
     public boolean isEmpty() {
-        return mPackageId == null && mPackageName == null
-                && mSparseEntries == null && mCompactEntries == null
-                && mKeepRawValues == null;
+        return mPackageId == null
+            && mPackageName == null
+            && mSparseEntries == null
+            && mCompactEntries == null
+            && mKeepRawValues == null;
     }
 
     @Override
@@ -48,7 +50,7 @@ public class ResourcesInfo implements YamlSerializable {
         YamlLine line = reader.getLine();
         switch (line.getKey()) {
             case "packageId":
-                mPackageId = line.getValue();
+                mPackageId = line.getValueInt();
                 break;
             case "packageName":
                 mPackageName = line.getValue();
@@ -68,7 +70,7 @@ public class ResourcesInfo implements YamlSerializable {
     @Override
     public void write(YamlWriter writer) {
         if (mPackageId != null) {
-            writer.writeString("packageId", mPackageId);
+            writer.writeInt("packageId", mPackageId);
         }
         if (mPackageName != null) {
             writer.writeString("packageName", mPackageName);
@@ -84,11 +86,11 @@ public class ResourcesInfo implements YamlSerializable {
         }
     }
 
-    public String getPackageId() {
-        return mPackageId;
+    public int getPackageId() {
+        return mPackageId != null ? mPackageId : -1;
     }
 
-    public void setPackageId(String packageId) {
+    public void setPackageId(int packageId) {
         mPackageId = packageId;
     }
 

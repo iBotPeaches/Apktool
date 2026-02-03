@@ -42,14 +42,15 @@ public class ProviderAttributeTest extends BaseTest {
         File newDir = new File(testApk + ".out.new");
         new ApkDecoder(newApk, sConfig).decode(newDir);
 
-        String expected = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
-                + "<manifest package=\"com.ibotpeaches.issue636\" platformBuildVersionCode=\"22\" platformBuildVersionName=\"5.1-1756733\"\n"
-                + "  xmlns:android=\"http://schemas.android.com/apk/res/android\">\n"
-                + "    <application android:allowBackup=\"true\" android:debuggable=\"true\" android:icon=\"@mipmap/ic_launcher\" android:label=\"@string/app_name\" android:theme=\"@style/AppTheme\">\n"
-                + "        <provider android:authorities=\"com.ibotpeaches.issue636.Provider\" android:exported=\"false\" android:grantUriPermissions=\"true\" android:label=\"@string/app_name\" android:multiprocess=\"false\" android:name=\"com.ibotpeaches.issue636.Provider\"/>\n"
-                + "        <provider android:authorities=\"com.ibotpeaches.issue636.ProviderTwo\" android:exported=\"false\" android:grantUriPermissions=\"true\" android:label=\"@string/app_name\" android:multiprocess=\"false\" android:name=\"com.ibotpeaches.issue636.ProviderTwo\"/>\n"
-                + "    </application>\n"
-                + "</manifest>";
+        String expected =
+            "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+          + "<manifest package=\"com.ibotpeaches.issue636\" platformBuildVersionCode=\"22\" platformBuildVersionName=\"5.1-1756733\"\n"
+          + "  xmlns:android=\"http://schemas.android.com/apk/res/android\">\n"
+          + "    <application android:allowBackup=\"true\" android:debuggable=\"true\" android:icon=\"@mipmap/ic_launcher\" android:label=\"@string/app_name\" android:theme=\"@style/AppTheme\">\n"
+          + "        <provider android:authorities=\"com.ibotpeaches.issue636.Provider\" android:exported=\"false\" android:grantUriPermissions=\"true\" android:label=\"@string/app_name\" android:multiprocess=\"false\" android:name=\"com.ibotpeaches.issue636.Provider\"/>\n"
+          + "        <provider android:authorities=\"com.ibotpeaches.issue636.ProviderTwo\" android:exported=\"false\" android:grantUriPermissions=\"true\" android:label=\"@string/app_name\" android:multiprocess=\"false\" android:name=\"com.ibotpeaches.issue636.ProviderTwo\"/>\n"
+          + "    </application>\n"
+          + "</manifest>";
 
         String obtained = readTextFile(new File(newDir, "AndroidManifest.xml"));
 

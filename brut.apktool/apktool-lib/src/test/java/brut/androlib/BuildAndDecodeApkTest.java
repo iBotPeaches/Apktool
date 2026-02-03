@@ -40,16 +40,16 @@ public class BuildAndDecodeApkTest extends BaseTest {
         sTestOrigDir = new File(sTmpDir, "testapp-orig");
         sTestNewDir = new File(sTmpDir, "testapp-new");
 
-        LOGGER.info("Unpacking testapp...");
+        log("Unpacking testapp...");
         copyResourceDir(BuildAndDecodeApkTest.class, "testapp", sTestOrigDir);
 
         sConfig.setVerbose(true);
 
-        LOGGER.info("Building testapp.apk...");
+        log("Building testapp.apk...");
         sTestApk = new ExtFile(sTmpDir, "testapp.apk");
         new ApkBuilder(sTestOrigDir, sConfig).build(sTestApk);
 
-        LOGGER.info("Decoding testapp.apk...");
+        log("Decoding testapp.apk...");
         new ApkDecoder(sTestApk, sConfig).decode(sTestNewDir);
     }
 
@@ -228,9 +228,10 @@ public class BuildAndDecodeApkTest extends BaseTest {
 
     @Test
     public void qualifiersTest() throws Exception {
-        compareValuesFiles("values-mcc004-mnc04-en-rUS-ldrtl-sw100dp-w200dp-h300dp"
-                + "-long-round-highdr-land-desk-night-xhdpi-finger-keyssoft-12key"
-                + "-navhidden-dpad-v26/strings.xml");
+        compareValuesFiles(
+            "values-mcc004-mnc04-en-rUS-ldrtl-sw100dp-w200dp-h300dp"
+          + "-long-round-highdr-land-desk-night-xhdpi-finger-keyssoft-12key"
+          + "-navhidden-dpad-v26/strings.xml");
     }
 
     @Test
@@ -506,11 +507,11 @@ public class BuildAndDecodeApkTest extends BaseTest {
     @Test
     public void robust9patchTest() throws Exception {
         String[] ninePatches = {
-                "ic_notification_overlay.9.png",
-                "status_background.9.png",
-                "search_bg_transparent.9.png",
-                "screenshot_panel.9.png",
-                "recents_lower_gradient.9.png",
+            "ic_notification_overlay.9.png",
+            "status_background.9.png",
+            "search_bg_transparent.9.png",
+            "screenshot_panel.9.png",
+            "recents_lower_gradient.9.png",
         };
 
         for (String ninePatch : ninePatches) {
@@ -531,7 +532,7 @@ public class BuildAndDecodeApkTest extends BaseTest {
                     assertTrue(isTransparent(testImage.getRGB(i, 0)));
                 } else {
                     assertEquals("Image lost npTc chunk on image " + ninePatch + " at (x, y) (" + i + "," + 0 + ")",
-                            controlImage.getRGB(i, 0), testImage.getRGB(i, 0));
+                        controlImage.getRGB(i, 0), testImage.getRGB(i, 0));
                 }
             }
 
@@ -541,14 +542,14 @@ public class BuildAndDecodeApkTest extends BaseTest {
                     assertTrue(isTransparent(testImage.getRGB(0, i)));
                 } else {
                     assertEquals("Image lost npTc chunk on image " + ninePatch + " at (x, y) (" + 0 + "," + i + ")",
-                            controlImage.getRGB(0, i), testImage.getRGB(0, i));
+                        controlImage.getRGB(0, i), testImage.getRGB(0, i));
                 }
             }
         }
     }
 
     private static boolean isTransparent(int pixel) {
-        return pixel >> 24 == 0;
+        return (pixel >> 24) == 0;
     }
 
     @Test

@@ -29,17 +29,17 @@ public class DebuggableTrueAddedTest extends BaseTest {
         sTestOrigDir = new File(sTmpDir, "issue2328-debuggable-missing-orig");
         sTestNewDir = new File(sTmpDir, "issue2328-debuggable-missing-new");
 
-        LOGGER.info("Unpacking issue2328-debuggable-missing...");
+        log("Unpacking issue2328-debuggable-missing...");
         copyResourceDir(DebuggableTrueAddedTest.class, "issue2328/debuggable-missing", sTestOrigDir);
 
         sConfig.setDebuggable(true);
         sConfig.setVerbose(true);
 
-        LOGGER.info("Building issue2328-debuggable-missing.apk...");
+        log("Building issue2328-debuggable-missing.apk...");
         File testApk = new File(sTmpDir, "issue2328-debuggable-missing.apk");
         new ApkBuilder(sTestOrigDir, sConfig).build(testApk);
 
-        LOGGER.info("Decoding issue2328-debuggable-missing.apk...");
+        log("Decoding issue2328-debuggable-missing.apk...");
         new ApkDecoder(testApk, sConfig).decode(sTestNewDir);
     }
 
@@ -50,11 +50,12 @@ public class DebuggableTrueAddedTest extends BaseTest {
 
     @Test
     public void debugIsTruePriorToBeingFalseTest() throws Exception {
-        String expected = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
-                + "<manifest package=\"com.ibotpeaches.issue2328\" platformBuildVersionCode=\"20\" platformBuildVersionName=\"4.4W.2-1537038\"\n"
-                + "  xmlns:android=\"http://schemas.android.com/apk/res/android\">\n"
-                + "    <application android:debuggable=\"true\"/>\n"
-                + "</manifest>";
+        String expected =
+            "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+          + "<manifest package=\"com.ibotpeaches.issue2328\" platformBuildVersionCode=\"20\" platformBuildVersionName=\"4.4W.2-1537038\"\n"
+          + "  xmlns:android=\"http://schemas.android.com/apk/res/android\">\n"
+          + "    <application android:debuggable=\"true\"/>\n"
+          + "</manifest>";
 
         String obtained = readTextFile(new File(sTestNewDir, "AndroidManifest.xml"));
 

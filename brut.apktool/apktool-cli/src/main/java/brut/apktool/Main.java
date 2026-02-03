@@ -797,37 +797,28 @@ public class Main {
         System.out.println(props.getVersion());
     }
 
-    private static void setupLogging(final Verbosity verbosity) {
-        Logger logger = Logger.getLogger("");
-        for (Handler handler : logger.getHandlers()) {
-            logger.removeHandler(handler);
-        }
+    private static void setupLogging(Verbosity verbosity) {
         LogManager.getLogManager().reset();
+        Logger logger = Logger.getLogger("");
 
         if (verbosity == Verbosity.QUIET) {
+            logger.setLevel(Level.OFF);
             return;
         }
 
         Handler handler = new Handler() {
             @Override
             public void publish(LogRecord record) {
-                if (getFormatter() == null) {
-                    setFormatter(new Formatter() {
-                        @Override
-                        public String format(LogRecord record) {
-                            return record.getLevel().toString().charAt(0) + ": "
-                                    + record.getMessage() + System.lineSeparator();
-                        }
-                    });
+                if (!isLoggable(record)) {
+                    return;
                 }
-
                 try {
                     String message = getFormatter().format(record);
                     int level = record.getLevel().intValue();
                     if (level >= Level.WARNING.intValue()) {
-                        System.err.write(message.getBytes());
-                    } else if (level >= Level.INFO.intValue() || verbosity == Verbosity.VERBOSE) {
-                        System.out.write(message.getBytes());
+                        System.err.println(message);
+                    } else {
+                        System.out.println(message);
                     }
                 } catch (Exception ex) {
                     reportError(null, ex, ErrorManager.FORMAT_FAILURE);
@@ -835,20 +826,35 @@ public class Main {
             }
 
             @Override
-            public void close() throws SecurityException {
+            public void flush() {
+                System.out.flush();
+                System.err.flush();
             }
 
             @Override
-            public void flush() {
+            public void close() throws SecurityException {
+                flush();
             }
         };
-
+        handler.setFormatter(new Formatter() {
+            @Override
+            public String format(LogRecord record) {
+                String prefix;
+                int level = record.getLevel().intValue();
+                if (level >= Level.SEVERE.intValue()) {
+                    prefix = "E";
+                } else if (level >= Level.WARNING.intValue()) {
+                    prefix = "W";
+                } else if (level >= Level.INFO.intValue()) {
+                    prefix = "I";
+                } else {
+                    prefix = "D";
+                }
+                return prefix + ": " + record.getMessage();
+            }
+        });
         logger.addHandler(handler);
-
-        if (verbosity == Verbosity.VERBOSE) {
-            handler.setLevel(Level.ALL);
-            logger.setLevel(Level.ALL);
-        }
+        logger.setLevel(verbosity == Verbosity.VERBOSE ? Level.ALL : Level.INFO);
     }
 
     private static class Props extends Properties {

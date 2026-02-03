@@ -16,8 +16,6 @@
  */
 package brut.androlib.res.table.value;
 
-import java.util.Objects;
-
 public class ResFileReference extends ResValue {
     private final String mPath;
 
@@ -42,13 +40,13 @@ public class ResFileReference extends ResValue {
         }
         if (obj instanceof ResFileReference) {
             ResFileReference other = (ResFileReference) obj;
-            return Objects.equals(mPath, other.mPath);
+            return mPath.equals(other.mPath);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(mPath);
+        return mPath.hashCode();
     }
 }

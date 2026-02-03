@@ -37,16 +37,16 @@ public class NonStandardPkgIdTest extends BaseTest {
         sTestOrigDir = new File(sTmpDir, "pkgid8-orig");
         sTestNewDir = new File(sTmpDir, "pkgid8-new");
 
-        LOGGER.info("Unpacking pkgid8...");
+        log("Unpacking pkgid8...");
         copyResourceDir(NonStandardPkgIdTest.class, "pkgid8", sTestOrigDir);
 
         sConfig.setVerbose(true);
 
-        LOGGER.info("Building pkgid8.apk...");
+        log("Building pkgid8.apk...");
         sTestApk = new ExtFile(sTmpDir, "pkgid8.apk");
         new ApkBuilder(sTestOrigDir, sConfig).build(sTestApk);
 
-        LOGGER.info("Decoding pkgid8.apk...");
+        log("Decoding pkgid8.apk...");
         ApkInfo testInfo = new ApkInfo();
         testInfo.setApkFile(sTestApk);
         ResDecoder resDecoder = new ResDecoder(testInfo, sConfig);
@@ -80,8 +80,8 @@ public class NonStandardPkgIdTest extends BaseTest {
     public void confirmResourcesAreFromPkgId8() throws Exception {
         assertEquals(0x80, sTable.getMainPackage().getId());
 
-        assertEquals(0x80, sTable.getEntrySpec(ResId.of(0x80020000)).getPackage().getId());
-        assertEquals(0x80, sTable.getEntrySpec(ResId.of(0x80020001)).getPackage().getId());
-        assertEquals(0x80, sTable.getEntrySpec(ResId.of(0x80030000)).getPackage().getId());
+        assertEquals(0x80, sTable.resolve(ResId.of(0x80020000)).getPackage().getId());
+        assertEquals(0x80, sTable.resolve(ResId.of(0x80020001)).getPackage().getId());
+        assertEquals(0x80, sTable.resolve(ResId.of(0x80030000)).getPackage().getId());
     }
 }

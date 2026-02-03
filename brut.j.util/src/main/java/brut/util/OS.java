@@ -17,6 +17,7 @@
 package brut.util;
 
 import brut.common.BrutException;
+import brut.common.Log;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -29,10 +30,9 @@ import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
 
 public final class OS {
-    private static final Logger LOGGER = Logger.getLogger("");
+    private static final String TAG = "";
 
     private OS() {
         // Private constructor for utility class.
@@ -166,7 +166,7 @@ public final class OS {
             executor.shutdownNow();
 
             if (!executor.awaitTermination(5, TimeUnit.SECONDS)) {
-                LOGGER.warning("Stream collector did not terminate.");
+                Log.w(TAG, "Stream collector did not terminate.");
             }
             return collector.get();
         } catch (IOException | InterruptedException ignored) {
@@ -207,9 +207,9 @@ public final class OS {
                 String line;
                 while ((line = reader.readLine()) != null) {
                     if (mType.equals("OUTPUT")) {
-                        LOGGER.info(line);
+                        Log.i(TAG, line);
                     } else {
-                        LOGGER.warning(line);
+                        Log.w(TAG, line);
                     }
                 }
             } catch (IOException ex) {

@@ -27,7 +27,7 @@ public class SparseFlagTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        LOGGER.info("Unpacking sparse.apk && not-sparse.apk...");
+        log("Unpacking sparse.apk && not-sparse.apk...");
         copyResourceDir(SparseFlagTest.class, "sparse", sTmpDir);
     }
 
@@ -35,7 +35,7 @@ public class SparseFlagTest extends BaseTest {
     public void decodeWithExpectationOfSparseEntries() throws Exception {
         sConfig.setFrameworkTag("issue-3298");
 
-        LOGGER.info("Decoding sparse.apk...");
+        log("Decoding sparse.apk...");
         File testApk = new File(sTmpDir, "sparse.apk");
         File testDir = new File(testApk + ".out");
         ApkDecoder apkDecoder = new ApkDecoder(testApk, sConfig);
@@ -44,7 +44,7 @@ public class SparseFlagTest extends BaseTest {
 
         assertTrue("Expecting sparse entries", apkInfo.getResourcesInfo().isSparseEntries());
 
-        LOGGER.info("Building sparse.apk...");
+        log("Building sparse.apk...");
         new ApkBuilder(testDir, sConfig).build(null);
     }
 
@@ -52,7 +52,7 @@ public class SparseFlagTest extends BaseTest {
     public void decodeWithExpectationOfNoSparseEntries() throws Exception {
         sConfig.setFrameworkTag("issue-3298");
 
-        LOGGER.info("Decoding not-sparse.apk...");
+        log("Decoding not-sparse.apk...");
         File testApk = new File(sTmpDir, "not-sparse.apk");
         File testDir = new File(testApk + ".out");
         ApkDecoder apkDecoder = new ApkDecoder(testApk, sConfig);
@@ -61,7 +61,7 @@ public class SparseFlagTest extends BaseTest {
 
         assertFalse("Expecting not-sparse entries", apkInfo.getResourcesInfo().isSparseEntries());
 
-        LOGGER.info("Building not-sparse.apk...");
+        log("Building not-sparse.apk...");
         new ApkBuilder(testDir, sConfig).build(null);
     }
 }

@@ -22,7 +22,7 @@ import brut.androlib.res.table.ResEntrySpec;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
-import java.util.Objects;
+import java.util.Arrays;
 
 public class ResArray extends ResBag {
     private final ResItem[] mItems;
@@ -44,12 +44,10 @@ public class ResArray extends ResBag {
     }
 
     @Override
-    public void serializeToValuesXml(XmlSerializer serial, ResEntry entry)
-            throws AndrolibException, IOException {
+    public void serializeToValuesXml(XmlSerializer serial, ResEntry entry) throws AndrolibException, IOException {
         String format = resolveFormat();
 
-        // It's safe to use the format as the array type since the only typed
-        // arrays are string-array and integer-array.
+        // It's safe to use the format as the array type since the only typed arrays are string-array and integer-array.
         String tagName = "array";
         if (format != null) {
             switch (format) {
@@ -79,14 +77,13 @@ public class ResArray extends ResBag {
             String itemFormat = null;
 
             if (value instanceof ResReference) {
-                // The reference format is ambiguous. Since the only typed
-                // arrays are string-array and integer-array, we can infer a
-                // more specific format from the type of the referenced entry
-                // spec without mapping it explicitly to a format.
+                // The reference format is ambiguous. Since the only typed arrays are string-array and integer-array,
+                // we can infer a more specific format from the type of the referenced entry spec without mapping it
+                // explicitly to a format.
                 try {
                     ResEntrySpec spec = ((ResReference) value).resolve();
                     if (spec != null) {
-                        itemFormat = spec.getTypeName();
+                        itemFormat = spec.getTypeSpec().getName();
                     }
                 } catch (AndrolibException ignored) {
                 }
@@ -113,7 +110,7 @@ public class ResArray extends ResBag {
 
     @Override
     public String toString() {
-        return String.format("ResArray{parent=%s, items=%s}", mParent, mItems);
+        return String.format("ResArray{items=%s}", Arrays.toString(mItems));
     }
 
     @Override
@@ -123,14 +120,13 @@ public class ResArray extends ResBag {
         }
         if (obj instanceof ResArray) {
             ResArray other = (ResArray) obj;
-            return Objects.equals(mParent, other.mParent)
-                    && Objects.equals(mItems, other.mItems);
+            return Arrays.equals(mItems, other.mItems);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(mParent, mItems);
+        return Arrays.hashCode(mItems);
     }
 }

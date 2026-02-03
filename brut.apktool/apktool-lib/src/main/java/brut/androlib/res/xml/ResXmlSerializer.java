@@ -16,6 +16,7 @@
  */
 package brut.androlib.res.xml;
 
+import brut.common.Log;
 import brut.util.TextUtils;
 import brut.xml.XmlUtils;
 import org.xmlpull.v1.XmlSerializer;
@@ -26,12 +27,10 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.logging.Logger;
 
 public class ResXmlSerializer implements XmlSerializer {
-    private static final Logger LOGGER = Logger.getLogger(ResXmlSerializer.class.getName());
-
-    private static final String E_NOT_SUPPORTED = "Method is not supported.";
+    private static final String TAG = ResXmlSerializer.class.getName();
+    private static final String NOT_SUPPORTED = "Method is not supported.";
 
     private static final int BUFFER_SIZE = 8192;
 
@@ -61,7 +60,7 @@ public class ResXmlSerializer implements XmlSerializer {
 
     @Override
     public void setFeature(String name, boolean state) {
-        throw new IllegalStateException(E_NOT_SUPPORTED);
+        throw new IllegalStateException(NOT_SUPPORTED);
     }
 
     @Override
@@ -71,7 +70,7 @@ public class ResXmlSerializer implements XmlSerializer {
 
     @Override
     public void setProperty(String name, Object value) {
-        throw new IllegalStateException(E_NOT_SUPPORTED);
+        throw new IllegalStateException(NOT_SUPPORTED);
     }
 
     @Override
@@ -154,11 +153,9 @@ public class ResXmlSerializer implements XmlSerializer {
         }
     }
 
-    private String getPrefix(String namespace, boolean includeDefault, boolean generatePrefix)
-            throws IOException {
+    private String getPrefix(String namespace, boolean includeDefault, boolean generatePrefix) throws IOException {
         for (int i = mNamespaceCounts[mDepth + 1] * 2 - 2; i >= 0; i -= 2) {
-            if (mNamespaceStack[i + 1].equals(namespace)
-                    && (includeDefault || !mNamespaceStack[i].isEmpty())) {
+            if (mNamespaceStack[i + 1].equals(namespace) && (includeDefault || !mNamespaceStack[i].isEmpty())) {
                 String candidate = mNamespaceStack[i];
                 for (int j = i + 2; j < mNamespaceCounts[mDepth + 1] * 2; j++) {
                     if (mNamespaceStack[j].equals(candidate)) {
@@ -232,8 +229,7 @@ public class ResXmlSerializer implements XmlSerializer {
         if (namespace != null && namespace.isEmpty()) {
             for (int j = mNamespaceCounts[mDepth]; j < mNamespaceCounts[mDepth + 1]; j++) {
                 if (mNamespaceStack[j * 2].isEmpty() && !mNamespaceStack[j * 2 + 1].isEmpty()) {
-                    throw new IllegalStateException(
-                        "Could not set default namespace for elements in no namespace.");
+                    throw new IllegalStateException("Could not set default namespace for elements in no namespace.");
                 }
             }
         }
@@ -262,8 +258,7 @@ public class ResXmlSerializer implements XmlSerializer {
         if ((namespace == null && mElementStack[mDepth * 3] != null)
                 || (namespace != null && !namespace.equals(mElementStack[mDepth * 3]))
                 || !mElementStack[mDepth * 3 + 2].equals(name)) {
-            throw new IllegalArgumentException(
-                "</{" + namespace + "}" + name + "> does not match start.");
+            throw new IllegalArgumentException("</{" + namespace + "}" + name + "> does not match start.");
         }
 
         if (mPending) {
@@ -332,32 +327,32 @@ public class ResXmlSerializer implements XmlSerializer {
 
     @Override
     public void cdsect(String text) {
-        throw new IllegalStateException(E_NOT_SUPPORTED);
+        throw new IllegalStateException(NOT_SUPPORTED);
     }
 
     @Override
     public void entityRef(String text) {
-        throw new IllegalStateException(E_NOT_SUPPORTED);
+        throw new IllegalStateException(NOT_SUPPORTED);
     }
 
     @Override
     public void processingInstruction(String text) {
-        throw new IllegalStateException(E_NOT_SUPPORTED);
+        throw new IllegalStateException(NOT_SUPPORTED);
     }
 
     @Override
     public void comment(String text) {
-        throw new IllegalStateException(E_NOT_SUPPORTED);
+        throw new IllegalStateException(NOT_SUPPORTED);
     }
 
     @Override
     public void docdecl(String text) {
-        throw new IllegalStateException(E_NOT_SUPPORTED);
+        throw new IllegalStateException(NOT_SUPPORTED);
     }
 
     @Override
     public void ignorableWhitespace(String text) {
-        throw new IllegalStateException(E_NOT_SUPPORTED);
+        throw new IllegalStateException(NOT_SUPPORTED);
     }
 
     @Override
@@ -395,8 +390,7 @@ public class ResXmlSerializer implements XmlSerializer {
                 write(':');
                 write(prefix);
             } else if (getNamespace().isEmpty() && !uri.isEmpty()) {
-                throw new IllegalStateException(
-                    "Could not set default namespace for elements in no namespace.");
+                throw new IllegalStateException("Could not set default namespace for elements in no namespace.");
             }
             write("=\"");
             if (mAutoEscape) {
@@ -528,14 +522,11 @@ public class ResXmlSerializer implements XmlSerializer {
                     write(low);
                     i++;
                 } else {
-                    LOGGER.warning(
-                        "Bad surrogate pair (U+" + Integer.toHexString((int) ch)
-                            + " U+" + Integer.toHexString((int) low) + ")");
+                    Log.w(TAG, "Bad surrogate pair (U+%04x U+%04x)", (int) ch, (int) low);
                 }
                 continue;
             } else {
-                LOGGER.warning(
-                    "Illegal character (U+" + Integer.toHexString((int) ch) + ")");
+                Log.w(TAG, "Illegal character (U+%04x)", (int) ch);
                 continue;
             }
             write(ch);

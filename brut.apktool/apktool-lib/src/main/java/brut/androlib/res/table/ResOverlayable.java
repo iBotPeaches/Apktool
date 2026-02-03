@@ -17,6 +17,7 @@
 package brut.androlib.res.table;
 
 import brut.androlib.exceptions.UndefinedResObjectException;
+import brut.common.Log;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
@@ -24,10 +25,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.List;
-import java.util.logging.Logger;
 
 public class ResOverlayable {
-    private static final Logger LOGGER = Logger.getLogger(ResOverlayable.class.getName());
+    private static final String TAG = ResOverlayable.class.getName();
 
     private static final int FLAG_NONE = 0;
     private static final int FLAG_PUBLIC = 1 << 0; // 0x0001
@@ -41,13 +41,11 @@ public class ResOverlayable {
     private static final int FLAG_CONFIG_SIGNATURE = 1 << 8; // 0x0100
 
     private static final int[] FLAG_MASKS = {
-        FLAG_PUBLIC, FLAG_SYSTEM_PARTITION, FLAG_VENDOR_PARTITION, FLAG_PRODUCT_PARTITION,
-        FLAG_SIGNATURE, FLAG_ODM_PARTITION, FLAG_OEM_PARTITION, FLAG_ACTOR_SIGNATURE,
-        FLAG_CONFIG_SIGNATURE
+        FLAG_PUBLIC, FLAG_SYSTEM_PARTITION, FLAG_VENDOR_PARTITION, FLAG_PRODUCT_PARTITION, FLAG_SIGNATURE,
+        FLAG_ODM_PARTITION, FLAG_OEM_PARTITION, FLAG_ACTOR_SIGNATURE, FLAG_CONFIG_SIGNATURE
     };
     private static final String[] FLAG_NAMES = {
-        "public", "system", "vendor", "product", "signature", "odm", "oem", "actor",
-        "config_signature"
+        "public", "system", "vendor", "product", "signature", "odm", "oem", "actor", "config_signature"
     };
 
     private final ResPackage mPackage;
@@ -86,7 +84,7 @@ public class ResOverlayable {
 
         serial.startTag(null, "overlayable");
         serial.attribute(null, "name", mName);
-        if (mActor != null && !mActor.isEmpty()) {
+        if (!mActor.isEmpty()) {
             serial.attribute(null, "actor", mActor);
         }
 
@@ -102,7 +100,7 @@ public class ResOverlayable {
 
             for (ResEntrySpec entrySpec : entrySpecs) {
                 serial.startTag(null, "item");
-                serial.attribute(null, "type", entrySpec.getTypeName());
+                serial.attribute(null, "type", entrySpec.getTypeSpec().getName());
                 serial.attribute(null, "name", entrySpec.getName());
                 serial.endTag(null, "item");
             }
@@ -141,16 +139,16 @@ public class ResOverlayable {
         int entrySpecsCount = 0;
 
         for (int i = 0; i < entries.length; i++) {
-            ResId id = entries[i];
-            if (id == ResId.NULL) {
+            ResId resId = entries[i];
+            if (resId == ResId.NULL) {
                 continue;
             }
 
             ResEntrySpec entrySpec;
             try {
-                entrySpec = mPackage.getEntrySpec(id);
+                entrySpec = mPackage.getEntrySpec(resId.typeId(), resId.entryId());
             } catch (UndefinedResObjectException ignored) {
-                LOGGER.warning("Unresolved overlayable entry ID: " + id);
+                Log.w(TAG, "Unresolved overlayable entry ID: " + resId);
                 continue;
             }
 
@@ -166,8 +164,7 @@ public class ResOverlayable {
 
     @Override
     public String toString() {
-        return String.format("ResOverlayable{pkg=%s, name=%s, actor=%s, policies=%s}",
-            mPackage, mName, mActor, mPolicies);
+        return String.format("ResOverlayable{pkg=%s, name=%s, actor=%s}", mPackage, mName, mActor);
     }
 
     @Override
@@ -177,9 +174,9 @@ public class ResOverlayable {
         }
         if (obj instanceof ResOverlayable) {
             ResOverlayable other = (ResOverlayable) obj;
-            return Objects.equals(mPackage, other.mPackage)
-                    && Objects.equals(mName, other.mName)
-                    && Objects.equals(mActor, other.mActor);
+            return mPackage.equals(other.mPackage)
+                && mName.equals(other.mName)
+                && mActor.equals(other.mActor);
         }
         return false;
     }

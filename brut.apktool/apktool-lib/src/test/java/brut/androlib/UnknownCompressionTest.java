@@ -31,12 +31,12 @@ public class UnknownCompressionTest extends BaseTest {
 
         sConfig.setFrameworkDirectory(sTmpDir.getAbsolutePath());
 
-        LOGGER.info("Building unknown_compression.apk...");
+        log("Building unknown_compression.apk...");
         sTestApk = new ExtFile(sTmpDir, "unknown_compression.apk");
         ExtFile testDir = new ExtFile(sTestApk + ".out");
         new ApkDecoder(sTestApk, sConfig).decode(testDir);
 
-        LOGGER.info("Decoding unknown_compression.apk...");
+        log("Decoding unknown_compression.apk...");
         new ApkBuilder(testDir, sConfig).build(null);
         sNewApk = new ExtFile(testDir, "dist/" + sTestApk.getName());
     }

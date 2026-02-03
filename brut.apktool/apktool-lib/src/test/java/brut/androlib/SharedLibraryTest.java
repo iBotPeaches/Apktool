@@ -16,8 +16,6 @@
  */
 package brut.androlib;
 
-import brut.androlib.res.Framework;
-
 import java.io.File;
 
 import org.junit.*;
@@ -29,33 +27,11 @@ public class SharedLibraryTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        copyResourceDir(SharedLibraryTest.class, "shared_libraries", sTmpDir);
-    }
-
-    @Test
-    public void isFrameworkTaggingWorking() throws Exception {
-        sConfig.setFrameworkDirectory(sTmpDir.getAbsolutePath());
-        sConfig.setFrameworkTag("building");
-
-        File libraryApk = new File(sTmpDir, LIBRARY_APK);
-        new Framework(sConfig).install(libraryApk);
-
-        assertTrue(new File(sTmpDir, "0-building.apk").exists());
-    }
-
-    @Test
-    public void isFrameworkInstallingWorking() throws Exception {
-        sConfig.setFrameworkDirectory(sTmpDir.getAbsolutePath());
-
-        File libraryApk = new File(sTmpDir, LIBRARY_APK);
-        new Framework(sConfig).install(libraryApk);
-
-        assertTrue(new File(sTmpDir, "0.apk").exists());
+        copyResourceDir(SharedLibraryTest.class, "shared_library", sTmpDir);
     }
 
     @Test
     public void isSharedResourceDecodingAndRebuildingWorking() throws Exception {
-        sConfig.setFrameworkDirectory(sTmpDir.getAbsolutePath());
         sConfig.setLibraryFiles(new String[] {
             "com.google.android.test.shared_library:" + new File(sTmpDir, LIBRARY_APK).getAbsolutePath()
         });

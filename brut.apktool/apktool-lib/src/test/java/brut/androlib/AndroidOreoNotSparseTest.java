@@ -28,14 +28,14 @@ public class AndroidOreoNotSparseTest extends BaseTest {
         sTestOrigDir = new File(sTmpDir, "issue1594-orig");
         sTestNewDir = new File(sTmpDir, "issue1594-new");
 
-        LOGGER.info("Unpacking not_sparse.apk...");
+        log("Unpacking not_sparse.apk...");
         copyResourceDir(AndroidOreoNotSparseTest.class, "issue1594", sTestOrigDir);
 
-        LOGGER.info("Decoding not_sparse.apk...");
+        log("Decoding not_sparse.apk...");
         File testApk = new File(sTestOrigDir, "not_sparse.apk");
         new ApkDecoder(testApk, sConfig).decode(sTestNewDir);
 
-        LOGGER.info("Building not_sparse.apk...");
+        log("Building not_sparse.apk...");
         new ApkBuilder(sTestNewDir, sConfig).build(testApk);
     }
 

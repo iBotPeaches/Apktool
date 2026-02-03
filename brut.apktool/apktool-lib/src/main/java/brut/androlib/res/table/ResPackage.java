@@ -25,43 +25,44 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 public class ResPackage {
-    private final ResTable mTable;
-    private final int mId;
-    private final String mName;
+    private final ResPackageGroup mGroup;
     private final Map<Integer, ResTypeSpec> mTypeSpecs;
     private final Map<Pair<Integer, ResConfig>, ResType> mTypes;
     private final Map<ResId, ResEntrySpec> mEntrySpecs;
-    private final Map<Integer, Set<String>> mEntryNames;
     private final Map<Pair<ResId, ResConfig>, ResEntry> mEntries;
     private final Map<String, ResOverlayable> mOverlayables;
+    private final Map<ResId, ResId> mAliases;
+    private final Set<String> mNameRegistry;
 
-    public ResPackage(ResTable table, int id, String name) {
-        assert table != null && name != null;
-        mTable = table;
-        mId = id;
-        mName = name;
+    public ResPackage(ResPackageGroup owner) {
+        assert owner != null;
+        mGroup = owner;
         mTypeSpecs = new HashMap<>();
         mTypes = new HashMap<>();
         mEntrySpecs = new HashMap<>();
-        mEntryNames = new HashMap<>();
         mEntries = new HashMap<>();
         mOverlayables = new HashMap<>();
+        mAliases = new HashMap<>();
+        mNameRegistry = new HashSet<>();
     }
 
     public ResTable getTable() {
-        return mTable;
+        return mGroup.getTable();
+    }
+
+    public ResPackageGroup getGroup() {
+        return mGroup;
     }
 
     public int getId() {
-        return mId;
+        return mGroup.getId();
     }
 
     public String getName() {
-        return mName;
+        return mGroup.getName();
     }
 
     public boolean hasTypeSpec(int typeId) {
@@ -71,8 +72,8 @@ public class ResPackage {
     public ResTypeSpec getTypeSpec(int typeId) throws UndefinedResObjectException {
         ResTypeSpec typeSpec = mTypeSpecs.get(typeId);
         if (typeSpec == null) {
-            throw new UndefinedResObjectException(String.format(
-                "type spec: typeId=0x%02x", typeId));
+            throw new UndefinedResObjectException(
+                String.format("type spec: pkgId=0x%02x, typeId=0x%02x", getId(), typeId));
         }
         return typeSpec;
     }
@@ -80,8 +81,9 @@ public class ResPackage {
     public ResTypeSpec addTypeSpec(int typeId, String typeName) throws AndrolibException {
         ResTypeSpec typeSpec = mTypeSpecs.get(typeId);
         if (typeSpec != null) {
-            throw new AndrolibException(String.format(
-                "Repeated type spec: typeId=0x%02x, typeName=%s", typeId, typeName));
+            throw new AndrolibException(
+                String.format("Repeated type spec: pkgId=0x%02x, typeId=0x%02x, typeName=%s",
+                    getId(), typeId, typeName));
         }
 
         typeSpec = new ResTypeSpec(this, typeId, typeName);
@@ -97,19 +99,31 @@ public class ResPackage {
         return mTypeSpecs.values();
     }
 
+    public boolean hasType(int typeId) {
+        return hasType(typeId, ResConfig.DEFAULT);
+    }
+
     public boolean hasType(int typeId, ResConfig config) {
         Pair<Integer, ResConfig> typeKey = Pair.of(typeId, config);
         return mTypes.containsKey(typeKey);
+    }
+
+    public ResType getType(int typeId) throws UndefinedResObjectException {
+        return getType(typeId, ResConfig.DEFAULT);
     }
 
     public ResType getType(int typeId, ResConfig config) throws UndefinedResObjectException {
         Pair<Integer, ResConfig> typeKey = Pair.of(typeId, config);
         ResType type = mTypes.get(typeKey);
         if (type == null) {
-            throw new UndefinedResObjectException(String.format(
-                "type: typeId=0x%02x, config=%s", typeId, config));
+            throw new UndefinedResObjectException(
+                String.format("type: pkgId=0x%02x, typeId=0x%02x, config=%s", getId(), typeId, config));
         }
         return type;
+    }
+
+    public ResType addType(int typeId) throws UndefinedResObjectException {
+        return addType(typeId, ResConfig.DEFAULT);
     }
 
     public ResType addType(int typeId, ResConfig config) throws UndefinedResObjectException {
@@ -134,43 +148,61 @@ public class ResPackage {
         return mTypes.values();
     }
 
-    public boolean hasEntrySpec(ResId id) {
-        return mEntrySpecs.containsKey(id);
+    public boolean hasEntrySpec(int typeId, int entryId) {
+        ResId resId = ResId.of(getId(), typeId, entryId);
+        if (mAliases.containsKey(resId)) {
+            resId = mAliases.get(resId);
+            typeId = resId.typeId();
+            entryId = resId.entryId();
+        }
+
+        return mEntrySpecs.containsKey(resId);
     }
 
-    public ResEntrySpec getEntrySpec(ResId id) throws UndefinedResObjectException {
-        ResEntrySpec entrySpec = mEntrySpecs.get(id);
+    public ResEntrySpec getEntrySpec(int typeId, int entryId) throws UndefinedResObjectException {
+        ResId resId = ResId.of(getId(), typeId, entryId);
+        if (mAliases.containsKey(resId)) {
+            resId = mAliases.get(resId);
+            typeId = resId.typeId();
+            entryId = resId.entryId();
+        }
+
+        ResEntrySpec entrySpec = mEntrySpecs.get(resId);
         if (entrySpec == null) {
-            throw new UndefinedResObjectException(String.format("entry spec: id=%s", id));
+            throw new UndefinedResObjectException(
+                String.format("entry spec: pkgId=0x%02x, typeId=0x%02x, entryId=0x%04x", getId(), typeId, entryId));
         }
         return entrySpec;
     }
 
-    public ResEntrySpec addEntrySpec(ResId id, String name) throws AndrolibException {
-        ResEntrySpec entrySpec = mEntrySpecs.get(id);
-        if (entrySpec != null) {
-            throw new AndrolibException(String.format("Repeated entry spec: id=%s", id));
+    public ResEntrySpec addEntrySpec(int typeId, int entryId, String name) throws AndrolibException {
+        ResId resId = ResId.of(getId(), typeId, entryId);
+        if (mAliases.containsKey(resId)) {
+            resId = mAliases.get(resId);
+            typeId = resId.typeId();
+            entryId = resId.entryId();
         }
 
-        int typeId = id.getTypeId();
+        ResEntrySpec entrySpec = mEntrySpecs.get(resId);
+        if (entrySpec != null) {
+            throw new AndrolibException(
+                String.format("Repeated entry spec: pkgId=0x%02x, typeId=0x%02x, entryId=0x%04x",
+                    getId(), typeId, entryId));
+        }
+
         ResTypeSpec typeSpec = getTypeSpec(typeId);
 
-        // Obfuscation can cause specs to be generated using existing names.
-        // Enforce uniqueness by renaming the spec when that happens.
-        Set<String> entryNames = mEntryNames.get(typeId);
-        if (entryNames == null) {
-            entryNames = new HashSet<>();
-            mEntryNames.put(typeId, entryNames);
-        } else if (entryNames.contains(name)) {
-            // Clear the name to force a rename.
+        // Some apps had their entry names obfuscated or collapsed to a single value in the key string pool.
+        // Enforce uniqueness by forcing a rename when that happens.
+        if (name != null && mNameRegistry.contains(typeSpec.getName() + "/" + name)) {
             name = "";
         }
 
-        entrySpec = new ResEntrySpec(typeSpec, id, name);
-        mEntrySpecs.put(id, entrySpec);
+        entrySpec = new ResEntrySpec(typeSpec, entryId, name);
+        mEntrySpecs.put(resId, entrySpec);
 
-        // Record the name to enforce uniqueness.
-        entryNames.add(entrySpec.getName());
+        // Register the name to enforce uniqueness.
+        mNameRegistry.add(typeSpec.getName() + "/" + entrySpec.getName());
 
         return entrySpec;
     }
@@ -183,34 +215,65 @@ public class ResPackage {
         return mEntrySpecs.values();
     }
 
-    public boolean hasEntry(ResId id, ResConfig config) {
-        return mEntries.containsKey(Pair.of(id, config));
+    public boolean hasEntry(int typeId, int entryId) {
+        return hasEntry(typeId, entryId, ResConfig.DEFAULT);
     }
 
-    public ResEntry getDefaultEntry(ResId id) throws UndefinedResObjectException {
-        return getEntry(id, ResConfig.DEFAULT);
+    public boolean hasEntry(int typeId, int entryId, ResConfig config) {
+        ResId resId = ResId.of(getId(), typeId, entryId);
+        if (mAliases.containsKey(resId)) {
+            resId = mAliases.get(resId);
+            typeId = resId.typeId();
+            entryId = resId.entryId();
+        }
+
+        Pair<ResId, ResConfig> entryKey = Pair.of(resId, config);
+        return mEntries.containsKey(entryKey);
     }
 
-    public ResEntry getEntry(ResId id, ResConfig config) throws UndefinedResObjectException {
-        Pair<ResId, ResConfig> entryKey = Pair.of(id, config);
+    public ResEntry getEntry(int typeId, int entryId) throws UndefinedResObjectException {
+        return getEntry(typeId, entryId, ResConfig.DEFAULT);
+    }
+
+    public ResEntry getEntry(int typeId, int entryId, ResConfig config) throws UndefinedResObjectException {
+        ResId resId = ResId.of(getId(), typeId, entryId);
+        if (mAliases.containsKey(resId)) {
+            resId = mAliases.get(resId);
+            typeId = resId.typeId();
+            entryId = resId.entryId();
+        }
+
+        Pair<ResId, ResConfig> entryKey = Pair.of(resId, config);
         ResEntry entry = mEntries.get(entryKey);
         if (entry == null) {
-            throw new UndefinedResObjectException(String.format(
-                "entry: id=%s, config=%s", id, config));
+            throw new UndefinedResObjectException(
+                String.format("entry: pkgId=0x%02x, typeId=0x%02x, entryId=0x%04x, config=%s",
+                    getId(), typeId, entryId, config));
         }
         return entry;
     }
 
-    public ResEntry addEntry(ResId id, ResConfig config, ResValue value) throws AndrolibException {
-        Pair<ResId, ResConfig> entryKey = Pair.of(id, config);
-        ResEntry entry = mEntries.get(entryKey);
-        if (entry != null) {
-            throw new AndrolibException(String.format(
-                "Repeated entry: id=%s, config=%s", id, config));
+    public ResEntry addEntry(int typeId, int entryId, ResValue value) throws AndrolibException {
+        return addEntry(typeId, entryId, ResConfig.DEFAULT, value);
+    }
+
+    public ResEntry addEntry(int typeId, int entryId, ResConfig config, ResValue value) throws AndrolibException {
+        ResId resId = ResId.of(getId(), typeId, entryId);
+        if (mAliases.containsKey(resId)) {
+            resId = mAliases.get(resId);
+            typeId = resId.typeId();
+            entryId = resId.entryId();
         }
 
-        ResEntrySpec entrySpec = getEntrySpec(id);
-        int typeId = id.getTypeId();
+        Pair<ResId, ResConfig> entryKey = Pair.of(resId, config);
+        ResEntry entry = mEntries.get(entryKey);
+        if (entry != null) {
+            throw new AndrolibException(
+                String.format("Repeated entry: pkgId=0x%02x, typeId=0x%02x, entryId=0x%04x, config=%s",
+                    getId(), typeId, entryId, config));
+        }
+
+        ResEntrySpec entrySpec = getEntrySpec(typeId, entryId);
         Pair<Integer, ResConfig> typeKey = Pair.of(typeId, config);
         ResType type = mTypes.get(typeKey);
         if (type == null) {
@@ -240,7 +303,8 @@ public class ResPackage {
     public ResOverlayable getOverlayable(String name) throws UndefinedResObjectException {
         ResOverlayable overlayable = mOverlayables.get(name);
         if (overlayable == null) {
-            throw new UndefinedResObjectException(String.format("overlayable: name=%s", name));
+            throw new UndefinedResObjectException(
+                String.format("overlayable: pkgId=0x%02x, name=%s", getId(), name));
         }
         return overlayable;
     }
@@ -248,7 +312,8 @@ public class ResPackage {
     public ResOverlayable addOverlayable(String name, String actor) throws AndrolibException {
         ResOverlayable overlayable = mOverlayables.get(name);
         if (overlayable != null) {
-            throw new AndrolibException(String.format("Repeated overlayable: name=%s", name));
+            throw new AndrolibException(
+                String.format("Repeated overlayable: pkgId=0x%02x, name=%s", getId(), name));
         }
 
         overlayable = new ResOverlayable(this, name, actor);
@@ -264,9 +329,39 @@ public class ResPackage {
         return mOverlayables.values();
     }
 
+    public boolean isAlias(ResId resId) {
+        return mAliases.containsKey(resId);
+    }
+
+    public ResId resolveAlias(ResId aliasId) throws UndefinedResObjectException {
+        ResId resId = mAliases.get(aliasId);
+        if (resId == null) {
+            throw new UndefinedResObjectException(
+                String.format("alias: pkgId=0x%02x, aliasId=%s", getId(), aliasId));
+        }
+        return resId;
+    }
+
+    public void addAlias(ResId aliasId, ResId finalId) throws AndrolibException {
+        if (mAliases.containsKey(aliasId)) {
+            throw new AndrolibException(
+                String.format("Repeated alias: pkgId=0x%02x, aliasId=%s", getId(), aliasId));
+        }
+
+        mAliases.put(aliasId, finalId);
+    }
+
+    public int getAliasCount() {
+        return mAliases.size();
+    }
+
+    public Map<ResId, ResId> getAliases() {
+        return mAliases;
+    }
+
     @Override
     public String toString() {
-        return String.format("ResPackage{id=0x%02x, name=%s}", mId, mName);
+        return String.format("ResPackage{id=0x%02x, name=%s}", getId(), getName());
     }
 
     @Override
@@ -276,15 +371,13 @@ public class ResPackage {
         }
         if (obj instanceof ResPackage) {
             ResPackage other = (ResPackage) obj;
-            return Objects.equals(mTable, other.mTable)
-                    && mId == other.mId
-                    && Objects.equals(mName, other.mName);
+            return mGroup.equals(other.mGroup);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(mTable, mId, mName);
+        return mGroup.hashCode();
     }
 }

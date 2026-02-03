@@ -34,16 +34,16 @@ public class NetworkConfigTest extends BaseTest {
         sTestOrigDir = new File(sTmpDir, "network_config-orig");
         sTestNewDir = new File(sTmpDir, "network_config-new");
 
-        LOGGER.info("Unpacking network_config...");
+        log("Unpacking network_config...");
         copyResourceDir(NetworkConfigTest.class, "network_config/existing", sTestOrigDir);
 
         sConfig.setNetSecConf(true);
 
-        LOGGER.info("Building network_config.apk...");
+        log("Building network_config.apk...");
         File testApk = new File(sTmpDir, "network_config.apk");
         new ApkBuilder(sTestOrigDir, sConfig).build(testApk);
 
-        LOGGER.info("Decoding network_config.apk...");
+        log("Decoding network_config.apk...");
         new ApkDecoder(testApk, sConfig).decode(sTestNewDir);
     }
 
@@ -54,7 +54,7 @@ public class NetworkConfigTest extends BaseTest {
 
     @Test
     public void netSecConfGeneric() throws Exception {
-        LOGGER.info("Verifying network security configuration file contains user and system certificates...");
+        log("Verifying network security configuration file contains user and system certificates...");
 
         // Load the XML document
         Document doc = XmlUtils.loadDocument(new File(sTestNewDir, "res/xml/network_security_config.xml"));
@@ -72,7 +72,7 @@ public class NetworkConfigTest extends BaseTest {
 
     @Test
     public void netSecConfInManifest() throws Exception {
-        LOGGER.info("Validating network security config in Manifest...");
+        log("Validating network security config in Manifest...");
 
         // Load the XML document
         Document doc = XmlUtils.loadDocument(new File(sTestNewDir, "AndroidManifest.xml"));

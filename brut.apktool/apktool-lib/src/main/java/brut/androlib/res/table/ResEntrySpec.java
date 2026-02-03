@@ -23,18 +23,17 @@ public class ResEntrySpec {
     public static final String RENAMED_PREFIX = "APKTOOL_RENAMED_";
 
     private final ResTypeSpec mTypeSpec;
-    private final ResId mId;
+    private final int mId;
+    private final ResId mResId;
     private final String mName;
 
-    public ResEntrySpec(ResTypeSpec typeSpec, ResId id, String name) {
-        assert typeSpec != null && id != null && name != null;
-        assert typeSpec.getPackage().getId() == id.getPackageId();
-        assert typeSpec.getId() == id.getTypeId();
+    public ResEntrySpec(ResTypeSpec typeSpec, int id, String name) {
+        assert typeSpec != null && id >= 0 && name != null;
         mTypeSpec = typeSpec;
         mId = id;
-        // Some apps had their entry names obfuscated or collapsed to a single
-        // value in the key string pool.
-        mName = isValidEntryName(name) ? name : RENAMED_PREFIX + id;
+        mResId = ResId.of(typeSpec.getPackage().getId(), typeSpec.getId(), id);
+        // Some apps had their entry names obfuscated or collapsed to a single value in the key string pool.
+        mName = isValidEntryName(name) ? name : RENAMED_PREFIX + mResId;
     }
 
     private static boolean isValidEntryName(String name) {
@@ -47,8 +46,7 @@ public class ResEntrySpec {
         if (!Character.isJavaIdentifierStart(name.charAt(0))) {
             return false;
         }
-        // The rest must be valid Java identifier part characters or any of the
-        // whitelisted special characters.
+        // The rest must be valid Java identifier part characters or any of the whitelisted special characters.
         for (int i = 1; i < len; i++) {
             char ch = name.charAt(i);
             if (!Character.isJavaIdentifierPart(ch) && ch != '.' && ch != '-') {
@@ -58,20 +56,20 @@ public class ResEntrySpec {
         return true;
     }
 
-    public ResTypeSpec getTypeSpec() {
-        return mTypeSpec;
-    }
-
     public ResPackage getPackage() {
         return mTypeSpec.getPackage();
     }
 
-    public String getTypeName() {
-        return mTypeSpec.getName();
+    public ResTypeSpec getTypeSpec() {
+        return mTypeSpec;
     }
 
-    public ResId getId() {
+    public int getId() {
         return mId;
+    }
+
+    public ResId getResId() {
+        return mResId;
     }
 
     public String getName() {
@@ -80,8 +78,7 @@ public class ResEntrySpec {
 
     @Override
     public String toString() {
-        return String.format("ResEntrySpec{typeSpec=%s, id=%s, name=%s}",
-            mTypeSpec, mId, mName);
+        return String.format("ResEntrySpec{typeSpec=%s, id=0x%04x, name=%s}", mTypeSpec, mId, mName);
     }
 
     @Override
@@ -91,9 +88,9 @@ public class ResEntrySpec {
         }
         if (obj instanceof ResEntrySpec) {
             ResEntrySpec other = (ResEntrySpec) obj;
-            return Objects.equals(mTypeSpec, other.mTypeSpec)
-                    && Objects.equals(mId, other.mId)
-                    && Objects.equals(mName, other.mName);
+            return mTypeSpec.equals(other.mTypeSpec)
+                && mId == other.mId
+                && mName.equals(other.mName);
         }
         return false;
     }

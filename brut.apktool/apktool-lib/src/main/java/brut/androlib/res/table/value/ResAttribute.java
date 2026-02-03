@@ -21,14 +21,14 @@ import brut.androlib.res.table.ResEntry;
 import brut.androlib.res.table.ResId;
 import brut.androlib.res.table.ResPackage;
 import brut.androlib.res.xml.ResStringEncoder;
+import brut.common.Log;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
 import java.util.Objects;
-import java.util.logging.Logger;
 
 public class ResAttribute extends ResBag {
-    private static final Logger LOGGER = Logger.getLogger(ResAttribute.class.getName());
+    private static final String TAG = ResAttribute.class.getName();
 
     private static final int ATTR_TYPE = 0x01000000;
     private static final int ATTR_MIN = 0x01000001;
@@ -48,8 +48,8 @@ public class ResAttribute extends ResBag {
     public static final int ATTR_TYPE_FLAGS = 1 << 17; // 0x00020000
 
     private static final int[] ATTR_TYPE_MASKS = {
-        ATTR_TYPE_STRING, ATTR_TYPE_INTEGER, ATTR_TYPE_BOOLEAN, ATTR_TYPE_COLOR,
-        ATTR_TYPE_FLOAT, ATTR_TYPE_DIMENSION, ATTR_TYPE_FRACTION, ATTR_TYPE_REFERENCE
+        ATTR_TYPE_STRING, ATTR_TYPE_INTEGER, ATTR_TYPE_BOOLEAN, ATTR_TYPE_COLOR, ATTR_TYPE_FLOAT,
+        ATTR_TYPE_DIMENSION, ATTR_TYPE_FRACTION, ATTR_TYPE_REFERENCE
     };
     private static final String[] ATTR_TYPE_NAMES = {
         "string", "integer", "boolean", "color", "float", "dimension", "fraction", "reference"
@@ -125,7 +125,7 @@ public class ResAttribute extends ResBag {
         } else if ((type & ATTR_TYPE_FLAGS) != 0) {
             return new ResFlags(parent, type, min, max, l10n, symbols);
         } else {
-            LOGGER.warning(String.format("Invalid attribute type: 0x%08x", type));
+            Log.w(TAG, "Invalid attribute type: 0x%08x", type);
             return new ResAttribute(parent, type, min, max, l10n);
         }
     }
@@ -224,8 +224,7 @@ public class ResAttribute extends ResBag {
     }
 
     @Override
-    public void serializeToValuesXml(XmlSerializer serial, ResEntry entry)
-            throws AndrolibException, IOException {
+    public void serializeToValuesXml(XmlSerializer serial, ResEntry entry) throws AndrolibException, IOException {
         String tagName = "attr";
         serial.startTag(null, tagName);
         serial.attribute(null, "name", entry.getName());
@@ -272,8 +271,7 @@ public class ResAttribute extends ResBag {
 
     @Override
     public String toString() {
-        return String.format("ResAttribute{parent=%s, type=0x%04x, min=%d, max=%d, l10n=%d}",
-            mParent, mType, mMin, mMax, mL10n);
+        return String.format("ResAttribute{type=0x%04x, min=%s, max=%s, l10n=%s}", mType, mMin, mMax, mL10n);
     }
 
     @Override
@@ -283,17 +281,16 @@ public class ResAttribute extends ResBag {
         }
         if (obj instanceof ResAttribute) {
             ResAttribute other = (ResAttribute) obj;
-            return Objects.equals(mParent, other.mParent)
-                    && mType == other.mType
-                    && mMin == other.mMin
-                    && mMax == other.mMax
-                    && mL10n == other.mL10n;
+            return mType == other.mType
+                && mMin == other.mMin
+                && mMax == other.mMax
+                && mL10n == other.mL10n;
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(mParent, mType, mMin, mMax, mL10n);
+        return Objects.hash(mType, mMin, mMax, mL10n);
     }
 }

@@ -131,9 +131,9 @@ public class ResChunkPullParser {
 
             if (chunkHeader.headerSize < ResChunkHeader.SIZE
                     || chunkHeader.size < chunkHeader.headerSize) {
-                throw new IOException(String.format(
-                    "Invalid chunk header: type=0x%04x, headerSize=%d, size=%d",
-                    chunkHeader.type, chunkHeader.headerSize, chunkHeader.size));
+                throw new IOException(
+                    String.format("Invalid chunk header: type=0x%04x, headerSize=%s, size=%s",
+                        chunkHeader.type, chunkHeader.headerSize, chunkHeader.size));
             }
 
             mChunkHeader = chunkHeader;

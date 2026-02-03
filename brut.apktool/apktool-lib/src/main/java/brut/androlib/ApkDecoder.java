@@ -22,6 +22,7 @@ import brut.androlib.exceptions.OutDirExistsException;
 import brut.androlib.meta.ApkInfo;
 import brut.androlib.res.ResDecoder;
 import brut.androlib.smali.SmaliDecoder;
+import brut.common.Log;
 import brut.directory.Directory;
 import brut.directory.DirectoryException;
 import brut.directory.ExtFile;
@@ -33,15 +34,14 @@ import org.apache.commons.io.FilenameUtils;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 public class ApkDecoder {
-    private static final Logger LOGGER = Logger.getLogger(ApkDecoder.class.getName());
+    private static final String TAG = ApkDecoder.class.getName();
 
     private static final Pattern NO_COMPRESS_EXT_PATTERN = Pattern.compile(
         "dex|arsc|so|jpg|jpeg|png|gif|wav|mp2|mp3|ogg|aac|mpg|mpeg|mid|midi|smf|jet|"
-            + "rtttl|imy|xmf|mp4|m4a|m4v|3gp|3gpp|3g2|3gpp2|amr|awb|wma|wmv|webm|webp|mkv");
+      + "rtttl|imy|xmf|mp4|m4a|m4v|3gp|3gpp|3g2|3gpp2|amr|awb|wma|wmv|webm|webp|mkv");
 
     private final ExtFile mApkFile;
     private final Config mConfig;
@@ -78,8 +78,8 @@ public class ApkDecoder {
             OS.rmdir(outDir);
             OS.mkdir(outDir);
 
-            LOGGER.info("Using Apktool " + mConfig.getVersion() + " on " + mApkFile.getName()
-                    + (mWorker != null ? " with " + mConfig.getJobs() + " threads" : ""));
+            Log.i(TAG, "Using Apktool " + mConfig.getVersion() + " on " + mApkFile.getName()
+                     + (mWorker != null ? " with " + mConfig.getJobs() + " threads" : ""));
 
             decodeSources(outDir);
             decodeResources(outDir);
@@ -123,8 +123,7 @@ public class ApkDecoder {
             boolean noSrc = mConfig.isDecodeSourcesNone();
 
             for (String fileName : in.getFiles(allSrc)) {
-                if (allSrc ? !fileName.endsWith(".dex")
-                        : !ApkInfo.CLASSES_FILES_PATTERN.matcher(fileName).matches()) {
+                if (allSrc ? !fileName.endsWith(".dex") : !ApkInfo.CLASSES_FILES_PATTERN.matcher(fileName).matches()) {
                     continue;
                 }
 
@@ -134,8 +133,7 @@ public class ApkDecoder {
                 }
 
                 String dirName = "smali" + (!fileName.equals("classes.dex")
-                    ? "_" + fileName.substring(0, fileName.lastIndexOf('.'))
-                        .replace(in.separatorChar, '@') : "");
+                    ? "_" + fileName.substring(0, fileName.lastIndexOf('.')).replace(in.separatorChar, '@') : "");
 
                 decodeSourcesSmali(new File(outDir, dirName), fileName);
             }
@@ -145,7 +143,7 @@ public class ApkDecoder {
     }
 
     private void copySourcesRaw(File outDir, String fileName) throws AndrolibException {
-        LOGGER.info("Copying raw " + fileName + "...");
+        Log.i(TAG, "Copying raw " + fileName + "...");
         try {
             Directory in = mApkFile.getDirectory();
 
@@ -172,7 +170,7 @@ public class ApkDecoder {
     }
 
     private void decodeSourcesSmaliJob(File outDir, String fileName) throws AndrolibException {
-        LOGGER.info("Baksmaling " + fileName + "...");
+        Log.i(TAG, "Baksmaling " + fileName + "...");
         mSmaliDecoder.decode(fileName, outDir);
     }
 
@@ -189,7 +187,7 @@ public class ApkDecoder {
     }
 
     private void copyResourcesRaw(File outDir) throws AndrolibException {
-        LOGGER.info("Copying raw resources.arsc...");
+        Log.i(TAG, "Copying raw resources.arsc...");
         try {
             Directory in = mApkFile.getDirectory();
 
@@ -212,7 +210,7 @@ public class ApkDecoder {
     }
 
     private void copyManifestRaw(File outDir) throws AndrolibException {
-        LOGGER.info("Copying raw AndroidManifest.xml...");
+        Log.i(TAG, "Copying raw AndroidManifest.xml...");
         try {
             Directory in = mApkFile.getDirectory();
 
@@ -234,12 +232,11 @@ public class ApkDecoder {
                     continue;
                 }
 
-                LOGGER.info("Copying " + dirName + "...");
+                Log.i(TAG, "Copying " + dirName + "...");
                 for (String fileName : in.getDir(dirName).getFiles(true)) {
                     fileName = dirName + in.separator + fileName;
                     if (!ApkInfo.ORIGINAL_FILES_PATTERN.matcher(fileName).matches()
-                            && !dexFiles.contains(fileName)
-                            && !resFileMap.containsKey(fileName)) {
+                            && !dexFiles.contains(fileName) && !resFileMap.containsKey(fileName)) {
                         in.copyToDir(outDir, fileName);
                     }
                 }
@@ -252,7 +249,7 @@ public class ApkDecoder {
     private void copyOriginalFiles(File outDir) throws AndrolibException {
         File originalDir = new File(outDir, "original");
 
-        LOGGER.info("Copying original files...");
+        Log.i(TAG, "Copying original files...");
         try {
             Directory in = mApkFile.getDirectory();
 
@@ -269,15 +266,14 @@ public class ApkDecoder {
     private void copyUnknownFiles(File outDir) throws AndrolibException {
         File unknownDir = new File(outDir, "unknown");
 
-        LOGGER.info("Copying unknown files...");
+        Log.i(TAG, "Copying unknown files...");
         try {
             Directory in = mApkFile.getDirectory();
             Set<String> dexFiles = mSmaliDecoder.getDexFiles();
             Map<String, String> resFileMap = mResDecoder.getResFileMap();
 
             for (String fileName : in.getFiles(true)) {
-                if (!ApkInfo.STANDARD_FILES_PATTERN.matcher(fileName).matches()
-                        && !dexFiles.contains(fileName)
+                if (!ApkInfo.STANDARD_FILES_PATTERN.matcher(fileName).matches() && !dexFiles.contains(fileName)
                         && !resFileMap.containsKey(fileName)) {
                     in.copyToDir(unknownDir, fileName);
                 }
@@ -306,8 +302,7 @@ public class ApkDecoder {
             for (String fileName : in.getFiles(true)) {
                 if (in.getCompressionLevel(fileName) == 0) {
                     String ext;
-                    if (in.getSize(fileName) > 0
-                            && !(ext = FilenameUtils.getExtension(fileName)).isEmpty()
+                    if (in.getSize(fileName) > 0 && !(ext = FilenameUtils.getExtension(fileName)).isEmpty()
                             && NO_COMPRESS_EXT_PATTERN.matcher(ext).matches()) {
                         uncompressedExts.add(ext);
                     } else {

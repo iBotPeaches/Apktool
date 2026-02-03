@@ -17,11 +17,11 @@
 package brut.androlib.res.table.value;
 
 import brut.androlib.exceptions.AndrolibException;
-import brut.androlib.res.table.ResConfig;
 import brut.androlib.res.table.ResEntry;
 import brut.androlib.res.table.ResEntrySpec;
 import brut.androlib.res.table.ResId;
 import brut.androlib.res.table.ResPackage;
+import brut.common.Log;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
@@ -29,10 +29,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.logging.Logger;
 
 public class ResEnum extends ResAttribute {
-    private static final Logger LOGGER = Logger.getLogger(ResEnum.class.getName());
+    private static final String TAG = ResEnum.class.getName();
 
     private final Symbol[] mSymbols;
     private Map<Integer, Symbol[]> mSymbolsCache;
@@ -55,17 +54,16 @@ public class ResEnum extends ResAttribute {
                 continue;
             }
 
-            ResId entryId = key.getId();
+            ResId keyId = key.getResId();
 
             // #2836 - Skip item if the resource cannot be resolved.
-            if (skipUnresolved || entryId.getPackageId() != pkg.getId()) {
-                LOGGER.warning(String.format(
-                    "Unresolved enum reference: key=%s, value=%s", key, symbol.getValue()));
+            if (skipUnresolved || keyId.pkgId() != pkg.getId()) {
+                Log.w(TAG, "Unresolved enum reference: key=%s, value=%s", key, symbol.getValue());
                 continue;
             }
 
-            pkg.addEntrySpec(entryId, ResEntrySpec.DUMMY_PREFIX + entryId);
-            pkg.addEntry(entryId, ResConfig.DEFAULT, ResCustom.ID);
+            pkg.addEntrySpec(keyId.typeId(), keyId.entryId(), ResEntrySpec.DUMMY_PREFIX + keyId);
+            pkg.addEntry(keyId.typeId(), keyId.entryId(), ResCustom.ID);
         }
     }
 
@@ -172,8 +170,8 @@ public class ResEnum extends ResAttribute {
 
     @Override
     public String toString() {
-        return String.format("ResEnum{parent=%s, type=0x%04x, min=%d, max=%d, l10n=%d, symbols=%s}",
-            mParent, mType, mMin, mMax, mL10n, mSymbols);
+        return String.format("ResEnum{parent=%s, type=0x%04x, min=%s, max=%s, l10n=%s, symbols=%s}",
+            mParent, mType, mMin, mMax, mL10n, Arrays.toString(mSymbols));
     }
 
     @Override
@@ -183,18 +181,18 @@ public class ResEnum extends ResAttribute {
         }
         if (obj instanceof ResEnum) {
             ResEnum other = (ResEnum) obj;
-            return Objects.equals(mParent, other.mParent)
-                    && mType == other.mType
-                    && mMin == other.mMin
-                    && mMax == other.mMax
-                    && mL10n == other.mL10n
-                    && Objects.equals(mSymbols, other.mSymbols);
+            return mParent.equals(other.mParent)
+                && mType == other.mType
+                && mMin == other.mMin
+                && mMax == other.mMax
+                && mL10n == other.mL10n
+                && Arrays.equals(mSymbols, other.mSymbols);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(mParent, mType, mMin, mMax, mL10n, mSymbols);
+        return Objects.hash(mParent, mType, mMin, mMax, mL10n, Arrays.hashCode(mSymbols));
     }
 }

@@ -20,18 +20,17 @@ import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.table.ResId;
 import brut.androlib.res.table.ResPackage;
 import brut.androlib.res.xml.ValuesXmlSerializable;
+import brut.common.Log;
 import com.google.common.collect.Sets;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
 
 public abstract class ResItem extends ResValue implements ValuesXmlSerializable {
-    private static final Logger LOGGER = Logger.getLogger(ResItem.class.getName());
+    private static final String TAG = ResItem.class.getName();
 
     protected static final Map<String, Set<String>> STANDARD_TYPE_FORMATS = new HashMap<>();
-
     static {
         STANDARD_TYPE_FORMATS.put("bool", Sets.newHashSet("boolean"));
         STANDARD_TYPE_FORMATS.put("color", Sets.newHashSet("color"));
@@ -68,7 +67,7 @@ public abstract class ResItem extends ResValue implements ValuesXmlSerializable 
         if (type >= TYPE_FIRST_INT && type <= TYPE_LAST_INT) {
             return new ResPrimitive(type, data);
         }
-        LOGGER.warning(String.format("Invalid value type: 0x%02x", type));
+        Log.w(TAG, "Invalid value type: 0x%02x", type);
         return null;
     }
 
@@ -102,7 +101,7 @@ public abstract class ResItem extends ResValue implements ValuesXmlSerializable 
         if (mType >= TYPE_FIRST_INT && mType <= TYPE_LAST_INT) {
             return "integer";
         }
-        LOGGER.warning(String.format("Unexpected value type: 0x%02x", mType));
+        Log.w(TAG, "Unexpected value type: 0x%02x", mType);
         return null;
     }
 

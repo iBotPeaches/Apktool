@@ -21,16 +21,16 @@ import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.meta.*;
 import brut.androlib.res.Framework;
 import brut.common.BrutException;
+import brut.common.Log;
 import brut.util.OS;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 public class AaptInvoker {
-    private static final Logger LOGGER = Logger.getLogger(AaptInvoker.class.getName());
+    private static final String TAG = AaptInvoker.class.getName();
 
     private final ApkInfo mApkInfo;
     private final Config mConfig;
@@ -51,7 +51,7 @@ public class AaptInvoker {
                 aaptPath = AaptManager.getBinaryFile().getPath();
             } catch (AndrolibException ex) {
                 aaptPath = AaptManager.getBinaryName();
-                LOGGER.warning(aaptPath + ": " + ex.getMessage() + " (defaulting to $PATH binary)");
+                Log.w(TAG, aaptPath + ": " + ex.getMessage() + " (defaulting to $PATH binary)");
             }
         }
 
@@ -85,8 +85,7 @@ public class AaptInvoker {
 
             try {
                 OS.exec(cmd.toArray(new String[0]));
-                LOGGER.fine("aapt2 compile command ran: ");
-                LOGGER.fine(cmd.toString());
+                Log.d(TAG, "aapt2 compile command ran: " + cmd.toString());
             } catch (BrutException ex) {
                 throw new AndrolibException(ex);
             }
@@ -116,16 +115,16 @@ public class AaptInvoker {
             cmd.add("--target-sdk-version");
             cmd.add(sdkInfo.getTargetSdkVersion());
         }
-        if (versionInfo.getVersionCode() != null) {
+        if (versionInfo.getVersionCode() >= 0) {
             cmd.add("--version-code");
-            cmd.add(versionInfo.getVersionCode());
+            cmd.add(Integer.toString(versionInfo.getVersionCode()));
         }
         if (versionInfo.getVersionName() != null) {
             cmd.add("--version-name");
             cmd.add(versionInfo.getVersionName());
         }
-        if (resourcesInfo.getPackageId() != null) {
-            int pkgId = Integer.parseInt(resourcesInfo.getPackageId());
+        if (resourcesInfo.getPackageId() >= 0) {
+            int pkgId = resourcesInfo.getPackageId();
             if (pkgId == 0) {
                 cmd.add("--shared-lib");
             } else if (pkgId > 1) {
@@ -181,8 +180,7 @@ public class AaptInvoker {
 
         try {
             OS.exec(cmd.toArray(new String[0]));
-            LOGGER.fine("aapt2 link command ran: ");
-            LOGGER.fine(cmd.toString());
+            Log.d(TAG, "aapt2 link command ran: " + cmd.toString());
         } catch (BrutException ex) {
             throw new AndrolibException(ex);
         }
@@ -218,7 +216,7 @@ public class AaptInvoker {
                 if (libFile != null) {
                     files.add(libFile);
                 } else {
-                    LOGGER.warning("Shared library was not provided: " + name);
+                    Log.w(TAG, "Shared library was not provided: " + name);
                 }
             }
         }

@@ -16,6 +16,7 @@
  */
 package brut.xml;
 
+import brut.common.Log;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -47,10 +48,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.logging.Logger;
 
 public final class XmlUtils {
-    private static final Logger LOGGER = Logger.getLogger("");
+    private static final String TAG = "";
 
     public static final String XML_PROLOG = "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
     public static final String XML_PREFIX = "xml";
@@ -79,7 +79,7 @@ public final class XmlUtils {
             factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
             factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
         } catch (IllegalArgumentException ignored) {
-            LOGGER.warning("JAXP 1.5 Support is required to validate XML");
+            Log.w(TAG, "JAXP 1.5 Support is required to validate XML");
         }
 
         return factory.newDocumentBuilder();
@@ -89,13 +89,11 @@ public final class XmlUtils {
         return newDocument(false);
     }
 
-    public static Document newDocument(boolean nsAware)
-            throws SAXException, ParserConfigurationException {
+    public static Document newDocument(boolean nsAware) throws SAXException, ParserConfigurationException {
         return newDocumentBuilder(nsAware).newDocument();
     }
 
-    public static Document parseDocument(String xml)
-            throws IOException, SAXException, ParserConfigurationException {
+    public static Document parseDocument(String xml) throws IOException, SAXException, ParserConfigurationException {
         return parseDocument(xml, false);
     }
 
@@ -106,8 +104,7 @@ public final class XmlUtils {
         return builder.parse(new InputSource(reader));
     }
 
-    public static Document loadDocument(File file)
-            throws IOException, SAXException, ParserConfigurationException {
+    public static Document loadDocument(File file) throws IOException, SAXException, ParserConfigurationException {
         return loadDocument(file, false);
     }
 

@@ -23,8 +23,6 @@ import brut.util.OS;
 import brut.util.OSDetection;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 public final class AaptManager {
 
@@ -81,11 +79,7 @@ public final class AaptManager {
     public static int getBinaryVersion(File binFile) throws AndrolibException {
         setBinaryExecutable(binFile);
 
-        List<String> cmd = new ArrayList<>();
-        cmd.add(binFile.getPath());
-        cmd.add("version");
-
-        String versionStr = OS.execAndReturn(cmd.toArray(new String[0]));
+        String versionStr = OS.execAndReturn(new String[] { binFile.getPath(), "version" });
         if (versionStr == null) {
             throw new AndrolibException("Could not execute aapt binary at location: " + binFile.getPath());
         }
@@ -96,12 +90,13 @@ public final class AaptManager {
     public static int getVersionFromString(String versionStr) throws AndrolibException {
         if (versionStr.startsWith("Android Asset Packaging Tool (aapt) 2:")) {
             return 2;
-        } else if (versionStr.startsWith("Android Asset Packaging Tool (aapt) 2.")) {
+        }
+        if (versionStr.startsWith("Android Asset Packaging Tool (aapt) 2.")) {
             return 2; // Prior to Android SDK 26.0.2
-        } else if (versionStr.startsWith("Android Asset Packaging Tool, v0.")) {
+        }
+        if (versionStr.startsWith("Android Asset Packaging Tool, v0.")) {
             return 1;
         }
-
         throw new AndrolibException("Could not identify aapt binary version: " + versionStr);
     }
 }

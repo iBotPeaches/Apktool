@@ -28,14 +28,14 @@ public class BuildAndDecodeJarTest extends BaseTest {
         sTestOrigDir = new File(sTmpDir, "testjar-orig");
         sTestNewDir = new File(sTmpDir, "testjar-new");
 
-        LOGGER.info("Unpacking testjar...");
+        log("Unpacking testjar...");
         copyResourceDir(BuildAndDecodeJarTest.class, "testjar", sTestOrigDir);
 
-        LOGGER.info("Building testjar.jar...");
+        log("Building testjar.jar...");
         File testJar = new File(sTmpDir, "testjar.jar");
         new ApkBuilder(sTestOrigDir, sConfig).build(testJar);
 
-        LOGGER.info("Decoding testjar.jar...");
+        log("Decoding testjar.jar...");
         new ApkDecoder(testJar, sConfig).decode(sTestNewDir);
     }
 

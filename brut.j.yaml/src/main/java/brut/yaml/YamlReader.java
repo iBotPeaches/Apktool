@@ -206,6 +206,14 @@ public class YamlReader {
             });
     }
 
+    public void readIntMap(Map<String, Integer> map) {
+        readObject(map, line -> line.hasColon,
+            (items, reader) -> {
+                YamlLine line = reader.getLine();
+                items.put(line.getKey(), line.getValueInt());
+            });
+    }
+
     public void readBoolMap(Map<String, Boolean> map) {
         readObject(map, line -> line.hasColon,
             (items, reader) -> {

@@ -17,13 +17,13 @@
 package brut.androlib.res.decoder;
 
 import brut.androlib.exceptions.AndrolibException;
-import brut.androlib.exceptions.FrameworkNotFoundException;
 import brut.androlib.exceptions.UndefinedResObjectException;
 import brut.androlib.res.data.ResChunkHeader;
 import brut.androlib.res.data.ResStringPool;
 import brut.androlib.res.table.*;
 import brut.androlib.res.table.value.*;
 import brut.androlib.res.xml.ResXmlUtils;
+import brut.common.Log;
 import brut.util.BinaryDataInputStream;
 import com.google.common.io.BaseEncoding;
 import org.xmlpull.v1.XmlPullParser;
@@ -32,15 +32,10 @@ import org.xmlpull.v1.XmlPullParserException;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.logging.Logger;
 
 public class BinaryXmlResourceParser implements XmlPullParser {
-    private static final Logger LOGGER = Logger.getLogger(BinaryXmlResourceParser.class.getName());
-
-    private static final String E_NOT_SUPPORTED = "Method is not supported.";
-
-    private static final int ANDROID_PKG_ID = 0x01;
-    private static final int PRIVATE_PKG_ID = 0x7F;
+    private static final String TAG = BinaryXmlResourceParser.class.getName();
+    private static final String NOT_SUPPORTED = "Method is not supported.";
 
     private final ResTable mTable;
     private final boolean mIgnoreRawValues;
@@ -71,6 +66,10 @@ public class BinaryXmlResourceParser implements XmlPullParser {
         resetEventInfo();
     }
 
+    public boolean hasRawValues() {
+        return mHasRawValues;
+    }
+
     public AndrolibException getFirstError() {
         return mFirstError;
     }
@@ -79,7 +78,7 @@ public class BinaryXmlResourceParser implements XmlPullParser {
 
     @Override
     public void setFeature(String name, boolean state) throws XmlPullParserException {
-        throw new XmlPullParserException(E_NOT_SUPPORTED);
+        throw new XmlPullParserException(NOT_SUPPORTED);
     }
 
     @Override
@@ -89,7 +88,7 @@ public class BinaryXmlResourceParser implements XmlPullParser {
 
     @Override
     public void setProperty(String name, Object value) throws XmlPullParserException {
-        throw new XmlPullParserException(E_NOT_SUPPORTED);
+        throw new XmlPullParserException(NOT_SUPPORTED);
     }
 
     @Override
@@ -99,14 +98,13 @@ public class BinaryXmlResourceParser implements XmlPullParser {
 
     @Override
     public void setInput(Reader in) throws XmlPullParserException {
-        throw new XmlPullParserException(E_NOT_SUPPORTED);
+        throw new XmlPullParserException(NOT_SUPPORTED);
     }
 
     @Override
-    public void setInput(InputStream inputStream, String inputEncoding)
-            throws XmlPullParserException {
+    public void setInput(InputStream inputStream, String inputEncoding) throws XmlPullParserException {
         if (inputEncoding != null) {
-            throw new XmlPullParserException(E_NOT_SUPPORTED);
+            throw new XmlPullParserException(NOT_SUPPORTED);
         }
 
         reset();
@@ -116,12 +114,12 @@ public class BinaryXmlResourceParser implements XmlPullParser {
             if (!nextChunk()) {
                 throw new IOException("Input file is empty.");
             }
-
             if (mParser.chunkType() != ResChunkHeader.RES_XML_TYPE) {
-                throw new IOException("Unexpected chunk: " + mParser.chunkName()
-                        + " (expected: RES_XML_TYPE)");
+                throw new IOException("Unexpected chunk: " + mParser.chunkName() + " (expected: RES_XML_TYPE)");
             }
         } catch (IOException ex) {
+            mIn = null;
+            mParser = null;
             throw new XmlPullParserException("Could not initialize parser.", this, ex);
         }
 
@@ -134,9 +132,8 @@ public class BinaryXmlResourceParser implements XmlPullParser {
     }
 
     @Override
-    public void defineEntityReplacementText(String entityName, String replacementText)
-            throws XmlPullParserException {
-        throw new XmlPullParserException(E_NOT_SUPPORTED);
+    public void defineEntityReplacementText(String entityName, String replacementText) throws XmlPullParserException {
+        throw new XmlPullParserException(NOT_SUPPORTED);
     }
 
     @Override
@@ -164,7 +161,7 @@ public class BinaryXmlResourceParser implements XmlPullParser {
 
     @Override
     public String getNamespace(String prefix) {
-        throw new RuntimeException(E_NOT_SUPPORTED);
+        throw new RuntimeException(NOT_SUPPORTED);
     }
 
     @Override
@@ -190,8 +187,7 @@ public class BinaryXmlResourceParser implements XmlPullParser {
     @Override
     public boolean isWhitespace() throws XmlPullParserException {
         if (mEventType != TEXT) {
-            throw new XmlPullParserException(
-                "Parser must be on TEXT to get text.", this, null);
+            throw new XmlPullParserException("Parser must be on TEXT to get text.", this, null);
         }
         String text = getText();
         if (text == null) {
@@ -274,29 +270,27 @@ public class BinaryXmlResourceParser implements XmlPullParser {
         }
 
         ResId nameId = getAttributeNameResourceId(index);
-        int pkgId = nameId.getPackageId();
 
-        // #2972 - If the namespace index is -1, the attribute is not present, but if the
-        // attribute is from system we can resolve it to the default namespace.
-        // This may prove to be too aggressive as we scope the entire system namespace,
-        // but it's better than not resolving it at all.
+        // #2972 - If the namespace index is -1, the attribute is not present, but if the attribute is from system we
+        // can resolve it to the default namespace. This may prove to be too aggressive as we scope the entire system
+        // namespace, but it's better than not resolving it at all.
         if (attr.ns < 0) {
-            if (pkgId == PRIVATE_PKG_ID) {
+            if (nameId.pkgId() == ResTable.APP_PACKAGE_ID) {
                 return getNonDefaultNamespaceUri(index);
             }
-            if (pkgId == ANDROID_PKG_ID) {
+            if (nameId.pkgId() == ResTable.SYS_PACKAGE_ID) {
                 return ResXmlUtils.ANDROID_RES_NS;
             }
             return NO_NAMESPACE;
         }
 
-        // Minifiers like removing the namespace, so we will fall back to default namespace
-        // unless the package ID of the resource is private. We will grab the non-standard one.
+        // Minifiers like removing the namespace, so we will fall back to default namespace unless the package ID of
+        // the resource is private. We will grab the non-standard one.
         String uri = mStringPool != null ? mStringPool.getString(attr.ns) : null;
         if (uri != null && !uri.isEmpty()) {
             return uri;
         }
-        if (pkgId == PRIVATE_PKG_ID) {
+        if (nameId.pkgId() == ResTable.APP_PACKAGE_ID) {
             return getNonDefaultNamespaceUri(index);
         }
         return ResXmlUtils.ANDROID_RES_NS;
@@ -317,17 +311,15 @@ public class BinaryXmlResourceParser implements XmlPullParser {
         // Are improperly decoded when trusting the string pool.
         // Leveraging the resource table allows us to get the proper value.
         // <item android:state_enabled="true" app:d2="false" app:d3="true">
-        String name;
-        try {
-            name = resolveResourceName(nameId);
-            if (name != null) {
-                return name;
+        if (nameId != ResId.NULL) {
+            try {
+                return mTable.resolve(nameId).getName();
+            } catch (AndrolibException ignored) {
             }
-        } catch (AndrolibException ignored) {
         }
 
         // Couldn't decode from resource table, fall back to string pool.
-        name = mStringPool != null ? mStringPool.getString(attr.name) : null;
+        String name = mStringPool != null ? mStringPool.getString(attr.name) : null;
         if (name == null) {
             name = "";
         }
@@ -337,27 +329,29 @@ public class BinaryXmlResourceParser implements XmlPullParser {
         if (nameId != ResId.NULL) {
             try {
                 ResPackage pkg = mTable.getMainPackage();
+                if (pkg == null) {
+                    // If no main package, we load "android" package instead.
+                    pkg = mTable.resolvePackageGroup(1).getBasePackage();
+                }
 
                 // #2836 - Skip item if the resource cannot be resolved.
-                if (mSkipUnresolved || nameId.getPackageId() != pkg.getId()) {
-                    LOGGER.warning(String.format(
-                        "Unresolved attr reference: ns=%s, name=%s, id=%s",
-                        getAttributePrefix(index), name, nameId));
+                if (mSkipUnresolved || nameId.pkgId() != pkg.getId()) {
+                    Log.w(TAG, "Unresolved attr reference: ns=%s, name=%s, id=%s",
+                        getAttributePrefix(index), name, nameId);
                     return name;
                 }
 
                 if (name.isEmpty()) {
                     name = ResEntrySpec.DUMMY_PREFIX + nameId;
                 }
-                name = pkg.addEntrySpec(nameId, name).getName();
-                pkg.addEntry(nameId, ResConfig.DEFAULT, ResAttribute.DEFAULT);
+                name = pkg.addEntrySpec(nameId.typeId(), nameId.entryId(), name).getName();
+                pkg.addEntry(nameId.typeId(), nameId.entryId(), ResAttribute.DEFAULT);
             } catch (AndrolibException ex) {
                 if (mFirstError == null) {
                     mFirstError = ex;
                 }
-                LOGGER.warning(String.format(
-                    "Could not add missing attr: ns=%s, name=%s, id=%s",
-                    getAttributePrefix(index), name, nameId));
+                Log.w(TAG, "Could not add missing attr: ns=%s, name=%s, id=%s",
+                    getAttributePrefix(index), name, nameId);
             }
         }
 
@@ -414,12 +408,11 @@ public class BinaryXmlResourceParser implements XmlPullParser {
             ResPackage pkg = mTable.getMainPackage();
             if (pkg == null) {
                 // If no main package, we load "android" package instead.
-                pkg = mTable.getPackage(1);
+                pkg = mTable.resolvePackageGroup(1).getBasePackage();
             }
 
             if (attr.valueType == ResValue.TYPE_STRING) {
-                CharSequence strValue = mStringPool != null
-                    ? mStringPool.getText(attr.valueData) : null;
+                CharSequence strValue = mStringPool != null ? mStringPool.getText(attr.valueData) : null;
                 value = strValue != null ? new ResString(strValue) : null;
             } else {
                 value = ResItem.parse(pkg, attr.valueType, attr.valueData);
@@ -430,12 +423,10 @@ public class BinaryXmlResourceParser implements XmlPullParser {
                 if (nameId != ResId.NULL) {
                     // We need the attribute entry's value to format this value.
                     try {
-                        ResEntry nameEntry = mTable.getDefaultEntry(nameId);
-                        ResEntrySpec nameSpec = nameEntry.getSpec();
-                        name = nameSpec.getName();
-                        ResValue nameValue = nameEntry.getValue();
-                        if (nameValue instanceof ResAttribute) {
-                            ResAttribute nameAttr = (ResAttribute) nameValue;
+                        ResEntry nameEntry = mTable.resolveEntry(nameId);
+                        name = nameEntry.getName();
+                        if (nameEntry.getValue() instanceof ResAttribute) {
+                            ResAttribute nameValue = (ResAttribute) nameEntry.getValue();
 
                             // Add the value type to the attribute if needed.
                             boolean isExplicitType;
@@ -451,13 +442,13 @@ public class BinaryXmlResourceParser implements XmlPullParser {
                                     isExplicitType = true;
                                     break;
                             }
-                            if (isExplicitType && !nameAttr.hasSymbolsForValue(value)) {
-                                nameAttr.addValueType(attr.valueType);
+                            if (isExplicitType && !nameValue.hasSymbolsForValue(value)) {
+                                nameValue.addValueType(attr.valueType);
                             }
 
-                            decoded = nameAttr.formatAsAttributeValue(value);
+                            decoded = nameValue.formatAsAttributeValue(value);
                         } else {
-                            LOGGER.warning("Unexpected attribute name spec: " + nameSpec);
+                            Log.w(TAG, "Unexpected attribute name: " + nameEntry);
                         }
                     } catch (UndefinedResObjectException ignored) {
                     }
@@ -477,9 +468,8 @@ public class BinaryXmlResourceParser implements XmlPullParser {
                 name = mStringPool != null ? mStringPool.getString(attr.name) : null;
             }
 
-            LOGGER.warning(String.format(
-                "Could not decode attribute value: ns=%s, name=%s, type=0x%02x, value=0x%08x",
-                getAttributePrefix(index), name, attr.valueType, attr.valueData));
+            Log.w(TAG, "Could not decode attribute value: ns=%s, name=%s, type=0x%02x, value=0x%08x",
+                getAttributePrefix(index), name, attr.valueType, attr.valueData);
 
             if (value != null) {
                 // Format the value with the default attribute.
@@ -549,22 +539,19 @@ public class BinaryXmlResourceParser implements XmlPullParser {
     @Override
     public String nextText() throws XmlPullParserException, IOException {
         if (mEventType != START_TAG) {
-            throw new XmlPullParserException(
-                "Parser must be on START_TAG to read next text.", this, null);
+            throw new XmlPullParserException("Parser must be on START_TAG to read next text.", this, null);
         }
         int eventType = next();
         if (eventType == END_TAG) {
             return "";
         }
         if (eventType != TEXT) {
-            throw new XmlPullParserException(
-                "Parser must be on TEXT or END_TAG to read text.", this, null);
+            throw new XmlPullParserException("Parser must be on TEXT or END_TAG to read text.", this, null);
         }
         String result = getText();
         eventType = next();
         if (eventType != END_TAG) {
-            throw new XmlPullParserException(
-                "Event TEXT must be immediately followed by END_TAG.", this, null);
+            throw new XmlPullParserException("Event TEXT must be immediately followed by END_TAG.", this, null);
         }
         return result;
     }
@@ -601,9 +588,9 @@ public class BinaryXmlResourceParser implements XmlPullParser {
             throw new IndexOutOfBoundsException("Parser must be on START_TAG to get attributes.");
         }
         if (mAttributes == null || index < 0 || index >= mAttributes.length) {
-            throw new IndexOutOfBoundsException(String.format(
-                "Attribute index out of range: index=%d, length=%d",
-                index, mAttributes != null ? mAttributes.length : 0));
+            throw new IndexOutOfBoundsException(
+                String.format("Attribute index out of range: index=%s, length=%s",
+                    index, mAttributes != null ? mAttributes.length : 0));
         }
         return mAttributes[index];
     }
@@ -617,16 +604,6 @@ public class BinaryXmlResourceParser implements XmlPullParser {
             return ResId.NULL;
         }
         return mResourceMap[attr.name];
-    }
-
-    private String resolveResourceName(ResId id) throws AndrolibException {
-        if (id != ResId.NULL) {
-            try {
-                return mTable.getEntrySpec(id).getName();
-            } catch (UndefinedResObjectException | FrameworkNotFoundException ignored) {
-            }
-        }
-        return null;
     }
 
     private void reset() {
@@ -654,9 +631,7 @@ public class BinaryXmlResourceParser implements XmlPullParser {
         if (mParser.isChunk()) {
             int skipped = mParser.skipChunk();
             if (skipped > 0) {
-                LOGGER.fine(String.format(
-                    "Skipped unknown %d bytes at end of %s chunk.",
-                    skipped, mParser.chunkName()));
+                Log.d(TAG, "Skipped unknown %s bytes at end of %s chunk.", skipped, mParser.chunkName());
             }
         }
 
@@ -676,17 +651,15 @@ public class BinaryXmlResourceParser implements XmlPullParser {
         while (mParser.next()) {
             // Skip unknown or unsupported chunks.
             if (mParser.chunkType() == ResChunkHeader.RES_NULL_TYPE) {
-                LOGGER.fine(String.format(
-                    "Skipping unknown chunk (%s) of %d bytes at 0x%08x.",
-                    mParser.chunkName(), mParser.chunkSize(), mParser.chunkStart()));
+                Log.d(TAG, "Skipping unknown chunk (%s) of %s bytes at 0x%08x.",
+                    mParser.chunkName(), mParser.chunkSize(), mParser.chunkStart());
                 mParser.skipChunk();
                 continue;
             }
 
             // Return this chunk.
-            LOGGER.fine(String.format(
-                "Chunk at 0x%08x: %s (%d bytes)",
-                mParser.chunkStart(), mParser.chunkName(), mParser.chunkSize()));
+            Log.d(TAG, "Chunk at 0x%08x: %s (%s bytes)",
+                mParser.chunkStart(), mParser.chunkName(), mParser.chunkSize());
             return true;
         }
 
@@ -770,8 +743,7 @@ public class BinaryXmlResourceParser implements XmlPullParser {
 
                         if (attributeSize > Attribute.SIZE) {
                             int skipped = mIn.skipBytes(attributeSize - Attribute.SIZE);
-                            LOGGER.fine(String.format(
-                                "Skipped unknown %d bytes in attribute.", skipped));
+                            Log.d(TAG, "Skipped unknown %s bytes in attribute.", skipped);
                         }
 
                         // Check if the app preserved raw attribute values.
@@ -807,25 +779,18 @@ public class BinaryXmlResourceParser implements XmlPullParser {
             }
         }
 
-        LOGGER.fine(String.format("End of chunks at 0x%08x", mIn.position()));
+        Log.d(TAG, "End of chunks at 0x%08x", mIn.position());
 
         if (mIn.available() > 0) {
-            LOGGER.fine(String.format(
-                "Ignoring trailing data at 0x%08x.", mIn.position()));
-        }
-
-        // Flag the app if it preserved raw attribute values.
-        if (mHasRawValues && !mIgnoreRawValues) {
-            mTable.getApkInfo().getResourcesInfo().setKeepRawValues(true);
+            Log.d(TAG, "Ignoring trailing data at 0x%08x.", mIn.position());
         }
 
         return mEventType = END_DOCUMENT;
     }
 
     private void skipUnexpectedChunk() throws IOException {
-        LOGGER.warning(String.format(
-            "Skipping unexpected %s chunk of %d bytes at 0x%08x.",
-            mParser.chunkName(), mParser.chunkSize(), mParser.chunkStart()));
+        Log.w(TAG, "Skipping unexpected %s chunk of %s bytes at 0x%08x.",
+            mParser.chunkName(), mParser.chunkSize(), mParser.chunkStart());
         mParser.skipChunk();
     }
 
@@ -843,9 +808,8 @@ public class BinaryXmlResourceParser implements XmlPullParser {
             byte[] buf = mIn.readBytes(bytesExceeding);
             for (int i = 0; i < buf.length; i++) {
                 if (buf[i] != 0) {
-                    LOGGER.warning(String.format(
-                        "%s size: %d bytes, read: %d bytes. Exceeding bytes: %s",
-                        name, size, bytesRead, BaseEncoding.base16().encode(buf)));
+                    Log.w(TAG, "%s size: %s bytes, read: %s bytes. Exceeding bytes: %s",
+                        name, size, bytesRead, BaseEncoding.base16().encode(buf));
                     return buf;
                 }
             }
