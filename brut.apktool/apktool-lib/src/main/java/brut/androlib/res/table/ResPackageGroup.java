@@ -38,7 +38,7 @@ public class ResPackageGroup {
         mId = id;
         mName = name;
         mPackages = new ArrayList<>();
-        mPackages.add(new ResPackage(this));
+        mPackages.add(new ResPackage(this, 0));
     }
 
     public ResTable getTable() {
@@ -70,7 +70,7 @@ public class ResPackageGroup {
     }
 
     public ResPackage addSubPackage() {
-        ResPackage pkg = new ResPackage(this);
+        ResPackage pkg = new ResPackage(this, mPackages.size());
         mPackages.add(pkg);
         return pkg;
     }

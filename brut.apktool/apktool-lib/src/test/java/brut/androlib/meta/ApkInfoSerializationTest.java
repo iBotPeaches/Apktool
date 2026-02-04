@@ -37,7 +37,7 @@ public class ApkInfoSerializationTest extends BaseTest {
         assertEquals("testapp.apk", apkInfo.getApkFileName());
         assertNotNull(apkInfo.getUsesFramework());
         assertEquals(1, apkInfo.getUsesFramework().getIds().size());
-        assertEquals(1, (int) apkInfo.getUsesFramework().getIds().get(0));
+        assertEquals(1, apkInfo.getUsesFramework().getIds().get(0).intValue());
         assertNotNull(apkInfo.getResourcesInfo());
         assertEquals(127, apkInfo.getResourcesInfo().getPackageId());
         assertNotNull(apkInfo.getVersionInfo());

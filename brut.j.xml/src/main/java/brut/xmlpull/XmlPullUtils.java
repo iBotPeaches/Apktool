@@ -114,9 +114,8 @@ public final class XmlPullUtils {
     }
 
     /**
-     * Some parsers may return an empty string when a namespace in unsupported,
-     * which can confuse serializers. This method normalizes empty strings to
-     * be null.
+     * Some parsers may return an empty string when a namespace in unsupported, which can confuse serializers.
+     * This method normalizes empty strings to be null.
      */
     private static String normalizeNamespace(String namespace) {
         return (namespace != null && !namespace.isEmpty()) ? namespace : null;

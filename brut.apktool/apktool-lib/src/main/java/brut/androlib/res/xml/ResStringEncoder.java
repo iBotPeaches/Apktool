@@ -218,6 +218,7 @@ public final class ResStringEncoder {
                         out.append("&gt;");
                         continue;
                     }
+                    // fallthrough
                 }
                 out.append(ch);
                 continue;
@@ -360,16 +361,16 @@ public final class ResStringEncoder {
         }
 
         int[][] specs = findFormatSpecifiers(str);
-        int[] seq = specs[0];
-        int[] pos = specs[1];
-        if (seq.length == 0 || seq.length + pos.length < 2) {
+        int[] sequential = specs[0];
+        int[] positional = specs[1];
+        if (sequential.length == 0 || sequential.length + positional.length < 2) {
             return str;
         }
 
-        StringBuilder out = new StringBuilder(len + seq.length * 2);
+        StringBuilder out = new StringBuilder(len + sequential.length * 2);
         int i = 0;
         int count = 0;
-        for (int j : seq) {
+        for (int j : sequential) {
             out.append(str, i, ++j).append(++count).append('$');
             i = j;
         }
@@ -379,10 +380,9 @@ public final class ResStringEncoder {
     }
 
     /**
-     * Returns a pair of:
-     * 1. An array of offsets of sequential format specifiers.
-     * (Sequential is any "%" which is neither "%%" nor "%\d+\$")
-     * 2. An array of offsets of positional format specifiers.
+     * Returns a pair of int arrays:
+     * 1. Offsets of sequential format specifiers. (e.g. %s, %d, etc.)
+     * 2. Offsets of positional format specifiers. (e.g. %1$s, %2$d, etc.)
      */
     public static int[][] findFormatSpecifiers(String str) {
         int[] sequential = new int[4];

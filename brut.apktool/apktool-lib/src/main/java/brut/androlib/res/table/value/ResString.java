@@ -85,7 +85,7 @@ public class ResString extends ResItem {
         int[][] specs = ResStringEncoder.findFormatSpecifiers(mValue.toString());
         int[] sequential = specs[0];
         int[] positional = specs[1];
-        return specs[0].length == 0 || specs[0].length + specs[1].length <= 1;
+        return sequential.length == 0 || sequential.length + positional.length <= 1;
     }
 
     @Override
