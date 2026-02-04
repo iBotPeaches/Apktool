@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 public class ResPackage {
@@ -377,6 +378,6 @@ public class ResPackage {
 
     @Override
     public int hashCode() {
-        return mGroup.hashCode();
+        return Objects.hash(mGroup, mIndex);
     }
 }
