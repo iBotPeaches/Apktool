@@ -25,10 +25,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 public class ResPackage {
     private final ResPackageGroup mGroup;
+    private final int mIndex;
     private final Map<Integer, ResTypeSpec> mTypeSpecs;
     private final Map<Pair<Integer, ResConfig>, ResType> mTypes;
     private final Map<ResId, ResEntrySpec> mEntrySpecs;
@@ -37,9 +39,10 @@ public class ResPackage {
     private final Map<ResId, ResId> mAliases;
     private final Set<String> mNameRegistry;
 
-    public ResPackage(ResPackageGroup group) {
-        assert group != null;
+    public ResPackage(ResPackageGroup group, int index) {
+        assert group != null && index >= 0;
         mGroup = group;
+        mIndex = index;
         mTypeSpecs = new HashMap<>();
         mTypes = new HashMap<>();
         mEntrySpecs = new HashMap<>();
@@ -63,6 +66,10 @@ public class ResPackage {
 
     public String getName() {
         return mGroup.getName();
+    }
+
+    public int getIndex() {
+        return mIndex;
     }
 
     public boolean hasTypeSpec(int typeId) {
@@ -150,11 +157,7 @@ public class ResPackage {
 
     public boolean hasEntrySpec(int typeId, int entryId) {
         ResId resId = ResId.of(getId(), typeId, entryId);
-        if (mAliases.containsKey(resId)) {
-            resId = mAliases.get(resId);
-            typeId = resId.typeId();
-            entryId = resId.entryId();
-        }
+        resId = mAliases.getOrDefault(resId, resId);
 
         return mEntrySpecs.containsKey(resId);
     }
@@ -194,7 +197,7 @@ public class ResPackage {
 
         // Some apps had their entry names obfuscated or collapsed to a single value in the key string pool.
         // Enforce uniqueness by forcing a rename when that happens.
-        if (name != null && mNameRegistry.contains(typeSpec.getName() + "/" + name)) {
+        if (mNameRegistry.contains(typeSpec.getName() + "/" + name)) {
             name = "";
         }
 
@@ -221,11 +224,7 @@ public class ResPackage {
 
     public boolean hasEntry(int typeId, int entryId, ResConfig config) {
         ResId resId = ResId.of(getId(), typeId, entryId);
-        if (mAliases.containsKey(resId)) {
-            resId = mAliases.get(resId);
-            typeId = resId.typeId();
-            entryId = resId.entryId();
-        }
+        resId = mAliases.getOrDefault(resId, resId);
 
         Pair<ResId, ResConfig> entryKey = Pair.of(resId, config);
         return mEntries.containsKey(entryKey);
@@ -371,13 +370,14 @@ public class ResPackage {
         }
         if (obj instanceof ResPackage) {
             ResPackage other = (ResPackage) obj;
-            return mGroup.equals(other.mGroup);
+            return mGroup.equals(other.mGroup)
+                && mIndex == other.mIndex;
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return mGroup.hashCode();
+        return Objects.hash(mGroup, mIndex);
     }
 }

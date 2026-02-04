@@ -191,8 +191,7 @@ public class ResStringPool {
         }
 
         // In some cases, Android uses 3-byte UTF-8 sequences instead of 4-bytes.
-        // If decoding failed, we try to use CESU-8 decoder, which is closer to what Android
-        // actually uses.
+        // If decoding failed, we try to use CESU-8 decoder, which is closer to what Android actually uses.
         try {
             ByteBuffer buffer = ByteBuffer.wrap(mStrings, offset, length);
             return CESU8_DECODER.decode(buffer).toString();
@@ -232,9 +231,9 @@ public class ResStringPool {
 
     /**
      * Returns style information as an array of int triplets:
-     * First int is index of tag name ('b','i', etc.).
-     * Second int is tag start index in string.
-     * Third int is tag end index in string.
+     * 1. Index of tag name ('b','i', etc.).
+     * 2. Index of tag start in the string.
+     * 3. Index of tag end in the string.
      */
     private int[] getStyle(int index) {
         if (index < 0 || index >= mStyleOffsets.length || mStyles.length == 0) {

@@ -357,8 +357,8 @@ public class BinaryResourceParser {
             mSparseEntries = true;
         }
 
-        // #3778 - In some apps the res entries are unordered and might have to jump
-        // backwards. We simply pre-sort them by offset.
+        // #3778 - In some apps the res entries are unordered and might have to jump backwards.
+        // We simply pre-sort them by offset.
         Map<Integer, List<Integer>> entryOffsets = new TreeMap<>();
         for (int i = 0; i < entryCount; i++) {
             int index, offset;
@@ -407,12 +407,11 @@ public class BinaryResourceParser {
             int offset = entryOffset.getKey();
             indexes = entryOffset.getValue();
 
-            // #3428 - In some apps the res entries are padded for alignment, but in #3778
-            // it made sense to align to the start of the entries to handle all cases.
+            // #3428 - In some apps the res entries are padded for alignment, but in #3778 it made sense to align
+            // to the start of the entries to handle all cases.
             long entryStart = parser.chunkStart() + entriesStart + offset;
 
-            // As seen in some recent APKs - there are more entries reported than can fit
-            // in the chunk.
+            // As seen in some recent APKs - there are more entries reported than can fit in the chunk.
             if (entryStart >= parser.chunkEnd()) {
                 Log.w(TAG, "End of chunk hit. Skipping remaining %s entries in type: %s", entryCount, typeName);
                 break;
@@ -430,8 +429,8 @@ public class BinaryResourceParser {
                 for (int index : indexes) {
                     ResId resId = ResId.of(mPackage.getId(), id, index);
 
-                    // #2824 - In some apps the res entries are duplicated with the 2nd being
-                    // malformed. AOSP skips this, so we will do the same.
+                    // #2824 - In some apps the res entries are duplicated with the 2nd being malformed.
+                    // AOSP skips this, so we will do the same.
                     if (value == null) {
                         if (!mPackage.hasEntrySpec(id, index)) {
                             mMissingEntrySpecs.add(resId);
