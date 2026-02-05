@@ -11,26 +11,22 @@ defaultTasks("build", "shadowJar", "proguard")
 
 // Functions
 val gitDescribe: String? by lazy {
-    val stdout = ByteArrayOutputStream()
     try {
-        rootProject.exec {
+        val result = providers.exec {
             commandLine("git", "describe", "--tags")
-            standardOutput = stdout
         }
-        stdout.toString().trim().replace("-g", "-")
+        result.standardOutput.asText.get().trim().replace("-g", "-")
     } catch (e: Exception) {
         null
     }
 }
 
 val gitBranch: String? by lazy {
-    val stdout = ByteArrayOutputStream()
     try {
-        rootProject.exec {
+        val result = providers.exec {
             commandLine("git", "rev-parse", "--abbrev-ref", "HEAD")
-            standardOutput = stdout
         }
-        stdout.toString().trim()
+        result.standardOutput.asText.get().trim()
     } catch (e: Exception) {
         null
     }
@@ -95,7 +91,7 @@ subprojects {
     }
 }
 
-task("release") {
+tasks.register("release") {
     // Used for official releases.
 }
 
