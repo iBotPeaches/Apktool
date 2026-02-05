@@ -10,7 +10,7 @@ r8 = "8.13.19"
 smali = "b6365a84f4" # https://github.com/google/smali/issues/100
 xmlpull = "1.1.3.1"
 xmlunit = "2.11.0"
-maven-publish = "0.33.0"
+maven-publish = "0.36.0"
 
 [libraries]
 baksmali = { module = "com.github.iBotPeaches.smali:smali-baksmali", version.ref = "baksmali" }
