@@ -129,13 +129,9 @@ public class ApkDecoder {
 
                 if (noSrc) {
                     copySourcesRaw(outDir, fileName);
-                    continue;
+                } else {
+                    decodeSourcesSmali(outDir, fileName);
                 }
-
-                String dirName = "smali" + (!fileName.equals("classes.dex")
-                    ? "_" + fileName.substring(0, fileName.lastIndexOf('.')).replace(in.separatorChar, '@') : "");
-
-                decodeSourcesSmali(new File(outDir, dirName), fileName);
             }
         } catch (DirectoryException ex) {
             throw new AndrolibException(ex);
