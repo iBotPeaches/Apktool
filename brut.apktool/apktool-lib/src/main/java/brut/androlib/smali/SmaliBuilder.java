@@ -57,12 +57,29 @@ public class SmaliBuilder {
             DexBuilder dexBuilder = new DexBuilder(mApiLevel > 0 ? Opcodes.forApi(mApiLevel) : Opcodes.getDefault());
 
             for (String fileName : new FileDirectory(smaliDir).getFiles(true)) {
+                File smaliFile = new File(smaliDir, fileName);
+
                 if (!fileName.endsWith(".smali")) {
-                    Log.w(TAG, "Unknown file type, ignoring: " + fileName);
+                    Log.w(TAG, "Unknown file type, ignoring: " + smaliFile);
                     continue;
                 }
 
-                buildFile(smaliDir, fileName, dexBuilder);
+                boolean success;
+                Exception cause;
+                try {
+                    success = buildFile(smaliFile, dexBuilder);
+                    cause = null;
+                } catch (Exception ex) {
+                    success = false;
+                    cause = ex;
+                }
+                if (!success) {
+                    AndrolibException ex = new AndrolibException("Could not smali file: " + smaliFile);
+                    if (cause != null) {
+                        ex.initCause(cause);
+                    }
+                    throw ex;
+                }
             }
 
             if (dexFile.exists()) {
@@ -77,26 +94,6 @@ public class SmaliBuilder {
             dexBuilder.writeTo(new FileDataStore(dexFile));
         } catch (DirectoryException | IOException | RuntimeException ex) {
             throw new AndrolibException("Could not smali folder: " + smaliDir.getName(), ex);
-        }
-    }
-
-    private void buildFile(File smaliDir, String dexName, DexBuilder dexBuilder) throws AndrolibException {
-        boolean success;
-        Exception cause;
-        try {
-            File smaliFile = new File(smaliDir, dexName);
-            success = buildFile(smaliFile, dexBuilder);
-            cause = null;
-        } catch (Exception ex) {
-            success = false;
-            cause = ex;
-        }
-        if (!success) {
-            AndrolibException ex = new AndrolibException("Could not smali file: " + dexName);
-            if (cause != null) {
-                ex.initCause(cause);
-            }
-            throw ex;
         }
     }
 
