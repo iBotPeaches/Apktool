@@ -9,7 +9,7 @@ Apktool is a tool for reverse engineering third-party, closed, binary, Android a
 Apktool is **NOT** intended for piracy and other non-legal uses. It could be used for localizing and adding features, adding support for custom platforms, and other GOOD purposes. Just try to be fair with the authors of an app, that you use and probably like.
 
 ### Branches
-- `main` - In-development Apktool 3.x branch
+- `main` - Apktool 3.x branch
 - `2.x` - Maintenance branch for Apktool 2.x releases
 
 #### Support
@@ -41,7 +41,7 @@ Special thanks goes to the following sponsors:
 
 <a href="https://www.sourcetoad.com" alt="Sourcetoad">
     <picture>
-        <img src="https://github.com/ibotpeaches/apktool/raw/master/.github/assets/sponsors/sourcetoad-horizontal.svg">
+        <img src="https://github.com/ibotpeaches/apktool/raw/main/.github/assets/sponsors/sourcetoad-horizontal.svg">
     </picture>
 </a>
 
@@ -51,8 +51,8 @@ Special thanks goes to the following sponsors:
 
 <a href="https://www.emergetools.com" alt="Emerge Tools">
     <picture>
-        <source media="(prefers-color-scheme: dark)" srcset="https://github.com/ibotpeaches/apktool/raw/master/.github/assets/sponsors/emerge-tools-vertical-white.svg">
-        <source media="(prefers-color-scheme: light)" srcset="https://github.com/ibotpeaches/apktool/raw/master/.github/assets/sponsors/emerge-tools-vertical-black.svg">
-        <img src="https://github.com/ibotpeaches/apktool/raw/master/.github/assets/sponsors/emerge-tools-vertical-black.svg">
+        <source media="(prefers-color-scheme: dark)" srcset="https://github.com/ibotpeaches/apktool/raw/main/.github/assets/sponsors/emerge-tools-vertical-white.svg">
+        <source media="(prefers-color-scheme: light)" srcset="https://github.com/ibotpeaches/apktool/raw/main/.github/assets/sponsors/emerge-tools-vertical-black.svg">
+        <img src="https://github.com/ibotpeaches/apktool/raw/main/.github/assets/sponsors/emerge-tools-vertical-black.svg">
     </picture>
 </a>
