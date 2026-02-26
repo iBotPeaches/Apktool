@@ -24,7 +24,6 @@ import org.xmlpull.v1.XmlSerializer;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.Set;
 
 public class ResPrimitive extends ResItem {
     private static final String TAG = ResPrimitive.class.getName();
@@ -173,10 +172,8 @@ public class ResPrimitive extends ResItem {
     public void serializeToValuesXml(XmlSerializer serial, ResEntry entry) throws AndrolibException, IOException {
         String typeName = entry.getType().getName();
 
-        // Specify format for <item> tags when the resource type doesn't directly support this value's format.
-        Set<String> stdFormats = STANDARD_TYPE_FORMATS.get(typeName);
-        String format = stdFormats != null ? getFormat() : null;
-        boolean asItem = format != null && !stdFormats.contains(format);
+        // Serialize as an <item> tag when the resource type doesn't directly support this value's format.
+        boolean asItem = !entry.getType().getSpec().isValueCompatible(this);
 
         String tagName = asItem ? "item" : typeName;
         serial.startTag(null, tagName);
@@ -185,7 +182,7 @@ public class ResPrimitive extends ResItem {
         }
         serial.attribute(null, "name", entry.getName());
         if (asItem) {
-            serial.attribute(null, "format", format);
+            serial.attribute(null, "format", getFormat());
         }
         serial.text(toXmlTextValue());
         serial.endTag(null, tagName);

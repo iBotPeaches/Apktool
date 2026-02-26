@@ -130,10 +130,10 @@ public class ResTable {
 
                 // Only flag the app for the main package.
                 if (isMainPackage) {
-                    if (parser.isSparseEntries()) {
+                    if (parser.hasSparseEntries()) {
                         mApkInfo.getResourcesInfo().setSparseEntries(true);
                     }
-                    if (parser.isCompactEntries()) {
+                    if (parser.hasCompactEntries()) {
                         mApkInfo.getResourcesInfo().setCompactEntries(true);
                     }
                 }

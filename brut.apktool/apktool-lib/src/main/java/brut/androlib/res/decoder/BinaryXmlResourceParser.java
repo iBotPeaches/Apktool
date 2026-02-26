@@ -779,6 +779,7 @@ public class BinaryXmlResourceParser implements XmlPullParser {
 
         Log.d(TAG, "End of chunks at 0x%08x", mIn.position());
 
+        // We can't use remaining() here, the length of the main stream is unknown.
         if (mIn.available() > 0) {
             Log.d(TAG, "Ignoring trailing data at 0x%08x.", mIn.position());
         }

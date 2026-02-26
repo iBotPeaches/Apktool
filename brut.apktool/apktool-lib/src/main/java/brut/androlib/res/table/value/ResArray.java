@@ -74,8 +74,12 @@ public class ResArray extends ResBag {
         String format = null;
 
         for (ResItem value : mItems) {
-            String itemFormat = null;
+            // Ignore @null and @empty.
+            if (value.getType() == TYPE_NULL) {
+                continue;
+            }
 
+            String itemFormat = null;
             if (value instanceof ResReference) {
                 // The reference format is ambiguous. Since the only typed arrays are string-array and integer-array,
                 // we can infer a more specific format from the type of the referenced entry spec without mapping it
@@ -91,12 +95,9 @@ public class ResArray extends ResBag {
                 itemFormat = value.getFormat();
             }
 
-            // Ignore @null and @empty.
             if (itemFormat == null) {
                 continue;
-            }
-
-            if (format == null) {
+            } else if (format == null) {
                 format = itemFormat;
             } else if (!format.equals(itemFormat)) {
                 // Items with differing formats imply the array is generic.

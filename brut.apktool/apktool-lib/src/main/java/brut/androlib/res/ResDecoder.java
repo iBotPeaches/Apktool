@@ -196,9 +196,8 @@ public class ResDecoder {
         }
 
         // Collect and sort all entry specs defined in sub-packages.
-        List<ResPackage> subPkgs = Lists.newArrayList(pkg.getGroup().listSubPackages());
         List<ResEntrySpec> subSpecs = new ArrayList<>();
-        for (ResPackage subPkg : subPkgs) {
+        for (ResPackage subPkg : pkg.getGroup().listSubPackages()) {
             subSpecs.addAll(subPkg.listEntrySpecs());
         }
         subSpecs.sort(Comparator.comparing(ResEntrySpec::getResId));
