@@ -44,10 +44,6 @@ public class ResType {
         return mSpec.getName();
     }
 
-    public boolean isBagType() {
-        return mSpec.isBagType();
-    }
-
     public ResConfig getConfig() {
         return mConfig;
     }

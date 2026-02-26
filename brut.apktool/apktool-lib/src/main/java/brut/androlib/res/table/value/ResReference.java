@@ -104,9 +104,8 @@ public class ResReference extends ResItem {
     public void serializeToValuesXml(XmlSerializer serial, ResEntry entry) throws AndrolibException, IOException {
         String typeName = entry.getType().getName();
 
-        // A bag type with a reference value must be an <item> tag.
-        // Otherwise, when the decoded app is rebuilt, the reference will be lost.
-        boolean asItem = entry.getType().isBagType();
+        // Serialize as an <item> tag when the resource type doesn't directly support this value's format.
+        boolean asItem = !entry.getType().getSpec().isValueCompatible(this);
 
         // Only set body if not @null or the entry is a <string> tag.
         // @null is the default value for all item types except string.

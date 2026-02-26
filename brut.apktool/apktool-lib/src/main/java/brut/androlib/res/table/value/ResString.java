@@ -22,7 +22,6 @@ import brut.androlib.res.xml.ResStringEncoder;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
-import java.util.Set;
 
 public class ResString extends ResItem {
     public static final ResString EMPTY = new ResString("");
@@ -53,10 +52,8 @@ public class ResString extends ResItem {
     public void serializeToValuesXml(XmlSerializer serial, ResEntry entry) throws AndrolibException, IOException {
         String typeName = entry.getType().getName();
 
-        // Specify format for <item> tags when the resource type doesn't directly support this value's format.
-        Set<String> stdFormats = STANDARD_TYPE_FORMATS.get(typeName);
-        String format = stdFormats != null ? getFormat() : null;
-        boolean asItem = format != null && !stdFormats.contains(format);
+        // Serialize as an <item> tag when the resource type doesn't directly support this value's format.
+        boolean asItem = !entry.getType().getSpec().isValueCompatible(this);
 
         String tagName = asItem ? "item" : typeName;
         serial.startTag(null, tagName);
@@ -65,7 +62,7 @@ public class ResString extends ResItem {
         }
         serial.attribute(null, "name", entry.getName());
         if (asItem) {
-            serial.attribute(null, "format", format);
+            serial.attribute(null, "format", getFormat());
         }
         if (!asItem && !isFormatted()) {
             serial.attribute(null, "formatted", "false");

@@ -21,25 +21,9 @@ import brut.androlib.res.table.ResId;
 import brut.androlib.res.table.ResPackage;
 import brut.androlib.res.xml.ValuesXmlSerializable;
 import brut.common.Log;
-import com.google.common.collect.Sets;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 public abstract class ResItem extends ResValue implements ValuesXmlSerializable {
     private static final String TAG = ResItem.class.getName();
-
-    protected static final Map<String, Set<String>> STANDARD_TYPE_FORMATS = new HashMap<>();
-    static {
-        STANDARD_TYPE_FORMATS.put("bool", Sets.newHashSet("boolean"));
-        STANDARD_TYPE_FORMATS.put("color", Sets.newHashSet("color"));
-        STANDARD_TYPE_FORMATS.put("dimen", Sets.newHashSet("float", "fraction", "dimension"));
-        STANDARD_TYPE_FORMATS.put("drawable", Sets.newHashSet("color"));
-        STANDARD_TYPE_FORMATS.put("fraction", Sets.newHashSet("float", "fraction", "dimension"));
-        STANDARD_TYPE_FORMATS.put("integer", Sets.newHashSet("integer"));
-        STANDARD_TYPE_FORMATS.put("string", Sets.newHashSet("string"));
-    }
 
     protected final int mType;
 
@@ -78,7 +62,6 @@ public abstract class ResItem extends ResValue implements ValuesXmlSerializable 
     public String getFormat() {
         switch (mType) {
             case TYPE_NULL:
-                return null;
             case TYPE_REFERENCE:
             case TYPE_DYNAMIC_REFERENCE:
             case TYPE_ATTRIBUTE:
