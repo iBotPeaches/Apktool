@@ -12,4 +12,10 @@
     <string name="styled_string_issue_2815">Quickly zoom in on the screen to display content more clearly.<br/><br/> <b>To zoom in:</b><br/> 1. Use shortcut to start magnification<br/> 2. Tap the screen<br/> 3. Drag 2 fingers to move around screen<br/> 4. Pinch with 2 fingers to adjust zoom<br/> 5. Use shortcut to stop magnification<br/><br/> <b>To zoom in temporarily:</b><br/> 1. Use shortcut to start magnification<br/> 2. Touch &amp; hold anywhere on the screen<br/> 3. Drag finger to move around screen<br/> 4. Lift finger to stop magnification</string>
     <string name="test_formatting1" />
     <string name="test_formatting2" />
+    <string name="styled_string_issue_3588_1"><paragraph style="font–size:16px;">Paragraph</paragraph></string>
+    <string name="styled_string_issue_3588_2"><paragraph style="color:#00a652;">Paragraph</paragraph></string>
+    <string name="styled_string_issue_3588_3"><paragraph style="font–size:16px;color:#00a652;">Paragraph</paragraph></string>
+    <string name="styled_string_issue_3588_4"><paragraph style="color:#00a652;font–size:16px;">Paragraph</paragraph></string>
+    <string name="styled_string_issue_3588_5"><paragraph style="font–size:16px; color:#00a652;">Paragraph</paragraph></string>
+    <string name="styled_string_issue_3588_6"><paragraph style="color:#00a652; font–size:16px;">Paragraph</paragraph></string>
 </resources>
