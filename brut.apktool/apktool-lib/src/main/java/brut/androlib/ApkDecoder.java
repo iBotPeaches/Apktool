@@ -28,7 +28,6 @@ import brut.directory.DirectoryException;
 import brut.directory.ExtFile;
 import brut.util.BackgroundWorker;
 import brut.util.OS;
-import com.google.common.annotations.VisibleForTesting;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.*;
@@ -107,8 +106,7 @@ public class ApkDecoder {
         }
     }
 
-    @VisibleForTesting
-    ApkInfo getApkInfo() {
+    public ApkInfo getApkInfo() {
         return mApkInfo;
     }
 
