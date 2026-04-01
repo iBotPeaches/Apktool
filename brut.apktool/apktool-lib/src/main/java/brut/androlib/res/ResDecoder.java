@@ -141,8 +141,8 @@ public class ResDecoder {
             List<ResEntry> entries = mapEntry.getValue();
             entries.sort(Comparator.comparing(ResEntry::getResId));
 
-            String outFileName = "res/values" + qualifiers + "/"
-                               + (typeName.endsWith("s") ? typeName : typeName + "s") + ".xml";
+            String outFileName = "res/values" + qualifiers + "/" + (typeName.endsWith("s") ? typeName
+                : typeName.equals("^attr-private") ? "attrs-private" : typeName + "s") + ".xml";
             try (OutputStream out = outDir.getFileOutput(outFileName)) {
                 serial.setOutput(out, null);
                 serial.startDocument(null, null);
