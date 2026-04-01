@@ -44,7 +44,40 @@ public class ResTypeSpec {
         assert pkg != null && id > 0 && name != null;
         mPackage = pkg;
         mId = id;
-        mName = name;
+        // Some apps may have obfuscated or malicious type names.
+        mName = isValidTypeName(name) ? name : String.format("invalid%02X", id);
+    }
+
+    private static boolean isValidTypeName(String name) {
+        switch (name) {
+            case "anim":
+            case "animator":
+            case "array":
+            case "attr":
+            case "^attr-private":
+            case "bool":
+            case "color":
+            case "dimen":
+            case "drawable":
+            case "font":
+            case "fraction":
+            case "id":
+            case "integer":
+            case "interpolator":
+            case "layout":
+            case "menu":
+            case "mipmap":
+            case "navigation":
+            case "plurals":
+            case "raw":
+            case "string":
+            case "style":
+            case "transition":
+            case "xml":
+                return true;
+            default:
+                return false;
+        }
     }
 
     public ResPackage getPackage() {
@@ -61,9 +94,9 @@ public class ResTypeSpec {
 
     public boolean isBagType() {
         switch (mName) {
+            case "array":
             case "attr":
             case "^attr-private":
-            case "array":
             case "plurals":
             case "style":
                 return true;

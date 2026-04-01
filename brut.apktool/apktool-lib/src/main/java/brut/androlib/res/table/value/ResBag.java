@@ -31,11 +31,11 @@ public abstract class ResBag extends ResValue implements ValuesXmlSerializable {
 
     public static ResBag parse(String typeName, ResReference parent, RawItem[] rawItems) {
         switch (typeName) {
+            case "array":
+                return ResArray.parse(parent, rawItems);
             case "attr":
             case "^attr-private":
                 return ResAttribute.parse(parent, rawItems);
-            case "array":
-                return ResArray.parse(parent, rawItems);
             case "plurals":
                 return ResPlural.parse(parent, rawItems);
             case "style":
