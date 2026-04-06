@@ -27,6 +27,7 @@ import brut.directory.DirectoryException;
 import brut.directory.ExtFile;
 import brut.directory.ZipRODirectory;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.io.IOException;
@@ -122,7 +123,7 @@ public class ResTable {
                 throw new AndrolibException("Could not find resources.arsc in file: " + apkFile);
             }
 
-            try (InputStream in = zipDir.getFileInput("resources.arsc")) {
+            try (InputStream in = new BufferedInputStream(zipDir.getFileInput("resources.arsc"))) {
                 BinaryResourceParser parser = isMainPackage
                     ? new BinaryResourceParser(this, mConfig.isKeepBrokenResources(), mConfig.isDecodeResolveGreedy())
                     : new BinaryResourceParser(this, true, true);
