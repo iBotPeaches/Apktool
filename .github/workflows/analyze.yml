@@ -22,6 +22,8 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6.1.0
+        with:
+          cache-provider: basic
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v4

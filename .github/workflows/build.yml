@@ -78,6 +78,8 @@ jobs:
           java-version: ${{ matrix.java }}
 
       - uses: gradle/actions/setup-gradle@v6.1.0
+        with:
+          cache-provider: basic
 
       - name: Build (Linux/Mac)
         if: runner.os != 'Windows'
@@ -105,6 +107,7 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v6.1.0
         with:
+          cache-provider: basic
           dependency-graph: generate-and-submit
 
       - name: Build (Linux/Mac)
