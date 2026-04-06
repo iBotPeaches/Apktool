@@ -77,7 +77,9 @@ jobs:
           distribution: 'zulu'
           java-version: ${{ matrix.java }}
 
-      - uses: gradle/actions/setup-gradle@v5.0.2
+      - uses: gradle/actions/setup-gradle@v6.1.0
+        with:
+          cache-provider: basic
 
       - name: Build (Linux/Mac)
         if: runner.os != 'Windows'
@@ -103,8 +105,9 @@ jobs:
           distribution: 'zulu'
           java-version: 17
 
-      - uses: gradle/actions/setup-gradle@v5.0.2
+      - uses: gradle/actions/setup-gradle@v6.1.0
         with:
+          cache-provider: basic
           dependency-graph: generate-and-submit
 
       - name: Build (Linux/Mac)
