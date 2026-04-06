@@ -354,7 +354,7 @@ public class ResDecoder {
                      + "...");
 
             try (
-                InputStream in = inDir.getFileInput("AndroidManifest.xml");
+                InputStream in = new BufferedInputStream(inDir.getFileInput("AndroidManifest.xml"));
                 OutputStream out = outDir.getFileOutput("AndroidManifest.xml")
             ) {
                 decoder.decode(in, out);

@@ -28,6 +28,7 @@ import brut.directory.Directory;
 import brut.directory.DirectoryException;
 import org.apache.commons.io.FilenameUtils;
 
+import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -113,7 +114,9 @@ public class ResFileDecoder {
 
         boolean success = false;
         try (
-            InputStream in = inDir.getFileInput(inFileName);
+            InputStream in = type == Type.BINARY_XML
+                ? new BufferedInputStream(inDir.getFileInput(inFileName))
+                : inDir.getFileInput(inFileName);
             OutputStream out = outDir.getFileOutput(outFileName)
         ) {
             decoder.decode(in, out);
