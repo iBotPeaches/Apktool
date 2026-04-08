@@ -155,7 +155,6 @@ public class ResDecoder {
 
                 serial.endTag(null, "resources");
                 serial.endDocument();
-                serial.flush();
             } catch (DirectoryException | IOException ex) {
                 throw new AndrolibException("Could not generate: " + outFileName, ex);
             }
@@ -183,7 +182,6 @@ public class ResDecoder {
 
             serial.endTag(null, "resources");
             serial.endDocument();
-            serial.flush();
         } catch (DirectoryException | IOException ex) {
             throw new AndrolibException("Could not generate: " + outFileName, ex);
         }
@@ -257,7 +255,6 @@ public class ResDecoder {
 
                 serial.endTag(null, "resources");
                 serial.endDocument();
-                serial.flush();
             } catch (DirectoryException | IOException ex) {
                 throw new AndrolibException("Could not generate: " + outFileName, ex);
             }
@@ -298,7 +295,6 @@ public class ResDecoder {
 
                 serial.endTag(null, "resources");
                 serial.endDocument();
-                serial.flush();
             } catch (DirectoryException | IOException ex) {
                 throw new AndrolibException("Could not generate: " + outFileName, ex);
             }
@@ -326,7 +322,6 @@ public class ResDecoder {
 
             serial.endTag(null, "resources");
             serial.endDocument();
-            serial.flush();
         } catch (DirectoryException | IOException ex) {
             throw new AndrolibException("Could not generate: " + outFileName, ex);
         }
@@ -354,7 +349,7 @@ public class ResDecoder {
                      + "...");
 
             try (
-                InputStream in = new BufferedInputStream(inDir.getFileInput("AndroidManifest.xml"));
+                InputStream in = inDir.getFileInput("AndroidManifest.xml");
                 OutputStream out = outDir.getFileOutput("AndroidManifest.xml")
             ) {
                 decoder.decode(in, out);

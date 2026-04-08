@@ -29,6 +29,7 @@ import com.google.common.io.BaseEncoding;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
+import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.Reader;
@@ -108,7 +109,7 @@ public class BinaryXmlResourceParser implements XmlPullParser {
         }
 
         reset();
-        mIn = new BinaryDataInputStream(inputStream);
+        mIn = new BinaryDataInputStream(new BufferedInputStream(inputStream));
         mParser = new ResChunkPullParser(mIn);
         try {
             if (!nextChunk()) {

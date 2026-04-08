@@ -35,8 +35,7 @@ public class YamlWriter implements Closeable {
     private int mIndent;
 
     public YamlWriter(OutputStream out) {
-        mWriter = new PrintWriter(new BufferedWriter(
-            new OutputStreamWriter(out, StandardCharsets.UTF_8)));
+        mWriter = new PrintWriter(new BufferedWriter(new OutputStreamWriter(out, StandardCharsets.UTF_8)));
     }
 
     @Override

@@ -199,26 +199,23 @@ public class YamlReader {
     }
 
     public void readStringMap(Map<String, String> map) {
-        readObject(map, line -> line.hasColon,
-            (items, reader) -> {
-                YamlLine line = reader.getLine();
-                items.put(line.getKey(), line.getValue());
-            });
+        readObject(map, line -> line.hasColon, (items, reader) -> {
+            YamlLine line = reader.getLine();
+            items.put(line.getKey(), line.getValue());
+        });
     }
 
     public void readIntMap(Map<String, Integer> map) {
-        readObject(map, line -> line.hasColon,
-            (items, reader) -> {
-                YamlLine line = reader.getLine();
-                items.put(line.getKey(), line.getValueInt());
-            });
+        readObject(map, line -> line.hasColon, (items, reader) -> {
+            YamlLine line = reader.getLine();
+            items.put(line.getKey(), line.getValueInt());
+        });
     }
 
     public void readBoolMap(Map<String, Boolean> map) {
-        readObject(map, line -> line.hasColon,
-            (items, reader) -> {
-                YamlLine line = reader.getLine();
-                items.put(line.getKey(), line.getValueBool());
-            });
+        readObject(map, line -> line.hasColon, (items, reader) -> {
+            YamlLine line = reader.getLine();
+            items.put(line.getKey(), line.getValueBool());
+        });
     }
 }
