@@ -71,7 +71,7 @@ tasks.register<JavaExec>("proguard") {
     val originalJar = shadowJar.map { it.outputs.files.singleFile }
 
     inputs.files(originalJar, proguardRules)
-    outputs.file("build/libs/apktool-$apktoolVersion.jar")
+    outputs.file("build/libs/apktool_$apktoolVersion.jar")
 
     classpath(r8)
     mainClass.set("com.android.tools.r8.R8")
