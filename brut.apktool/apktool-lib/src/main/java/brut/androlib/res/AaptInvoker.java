@@ -201,18 +201,9 @@ public class AaptInvoker {
 
         List<String> usesLibrary = mApkInfo.getUsesLibrary();
         if (!usesLibrary.isEmpty()) {
-            String[] libFiles = mConfig.getLibraryFiles();
+            Map<String, File> libraryApkFiles = mConfig.getLibraryApkFileMap();
             for (String name : usesLibrary) {
-                File libFile = null;
-                if (libFiles != null) {
-                    for (String libEntry : libFiles) {
-                        String[] parts = libEntry.split(":", 2);
-                        if (parts.length == 2 && name.equals(parts[0])) {
-                            libFile = new File(parts[1]);
-                            break;
-                        }
-                    }
-                }
+                File libFile = libraryApkFiles.get(name);
                 if (libFile != null) {
                     files.add(libFile);
                 } else {

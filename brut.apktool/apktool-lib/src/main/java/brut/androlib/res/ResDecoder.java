@@ -92,14 +92,14 @@ public class ResDecoder {
         ResPackage pkg = mTable.getMainPackage();
 
         Log.i(TAG, "Decoding value resources...");
-        for (ResEntry entry : Lists.newArrayList(pkg.getGroup().listEntries())) {
+        for (ResEntry entry : Lists.newArrayList(getDecodeEntries(pkg))) {
             if (entry.getValue() instanceof ResBag) {
                 ((ResBag) entry.getValue()).resolveKeys();
             }
         }
 
         Log.i(TAG, "Decoding file resources...");
-        for (ResEntry entry : Lists.newArrayList(pkg.getGroup().listEntries())) {
+        for (ResEntry entry : Lists.newArrayList(getDecodeEntries(pkg))) {
             if (entry.getValue() instanceof ResFileReference) {
                 fileDecoder.decode(entry, inDir, outDir, mResFileMap);
             }
@@ -122,9 +122,10 @@ public class ResDecoder {
 
     private void generateValuesXmls(ResPackage pkg, Directory outDir, ResXmlSerializer serial)
             throws AndrolibException {
-        // Group entries by type name + qualifiers, ignoring alias duplicates in sub-packages.
+        // Group entries by type name + qualifiers. When library APKs are preloaded for reference
+        // resolution, keep the generated values scoped to the main decoded package only.
         Map<Pair<String, String>, List<ResEntry>> entriesMap = new HashMap<>();
-        for (ResEntry entry : pkg.getGroup().listEntries()) {
+        for (ResEntry entry : getDecodeEntries(pkg)) {
             if (entry.getValue() instanceof ValuesXmlSerializable && !pkg.isAlias(entry.getResId())) {
                 ResType type = entry.getType();
                 Pair<String, String> key = Pair.of(type.getName(), type.getConfig().toQualifiers());
@@ -189,7 +190,7 @@ public class ResDecoder {
 
     private void generateStagingXmls(ResPackage pkg, Directory outDir, ResXmlSerializer serial)
             throws AndrolibException {
-        if (pkg.getGroup().getPackageCount() <= 1) {
+        if (pkg.getGroup().getPackageCount() <= 1 || isDecodingWithLibraryApks()) {
             return;
         }
 
@@ -299,6 +300,14 @@ public class ResDecoder {
                 throw new AndrolibException("Could not generate: " + outFileName, ex);
             }
         }
+    }
+
+    private Iterable<ResEntry> getDecodeEntries(ResPackage pkg) {
+        return isDecodingWithLibraryApks() ? pkg.listEntries() : pkg.getGroup().listEntries();
+    }
+
+    private boolean isDecodingWithLibraryApks() {
+        return mConfig.hasLibraryFiles();
     }
 
     private void generateOverlayableXml(ResPackage pkg, Directory outDir, ResXmlSerializer serial)
@@ -431,14 +440,25 @@ public class ResDecoder {
                 usesFramework.setTag(mConfig.getFrameworkTag());
             }
 
-            // Record library package names used by the resource table.
+            // Record library package names used by the resource table. If library APKs were
+            // preloaded explicitly for decode-time reference resolution, preserve those names so
+            // the same includes can be passed back to aapt2 during rebuild.
+            LinkedHashSet<String> usesLibrary = new LinkedHashSet<>(mApkInfo.getUsesLibrary());
+
             List<Integer> libPackageIds = Lists.newArrayList(mTable.getLibPackageIds());
-            if (!libPackageIds.isEmpty()) {
-                List<String> usesLibrary = mApkInfo.getUsesLibrary();
-                libPackageIds.sort(null);
-                for (int id : libPackageIds) {
-                    usesLibrary.add(mTable.getDynamicRefPackageName(id));
-                }
+            libPackageIds.sort(null);
+            for (int id : libPackageIds) {
+                usesLibrary.add(mTable.getDynamicRefPackageName(id));
+            }
+
+            if (isDecodingWithLibraryApks()) {
+                usesLibrary.addAll(mConfig.getLibraryApkFileMap().keySet());
+            }
+
+            if (!usesLibrary.isEmpty()) {
+                List<String> apkUsesLibrary = mApkInfo.getUsesLibrary();
+                apkUsesLibrary.clear();
+                apkUsesLibrary.addAll(usesLibrary);
             }
         } else {
             // Renaming not possible: manifest decoded without resources.

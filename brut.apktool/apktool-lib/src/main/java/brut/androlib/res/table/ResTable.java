@@ -98,21 +98,35 @@ public class ResTable {
         }
 
         loadPackagesFromApk(apkFile, zipDir, true);
+        mMainPackage = selectMainPackageGroup().getBasePackage();
+        preloadLibraryApks();
+    }
 
-        ResPackageGroup pkgGroup;
+    private ResPackageGroup selectMainPackageGroup() {
         if (mPackageGroups.isEmpty()) {
             // Empty resources.arsc, create a dummy package group.
-            pkgGroup = new ResPackageGroup(this, 0, "");
+            ResPackageGroup pkgGroup = new ResPackageGroup(this, 0, "");
             mPackageGroups.put(0, pkgGroup);
-        } else if (mPackageGroups.containsKey(APP_PACKAGE_ID)) {
-            // Prefer the standard app package group.
-            pkgGroup = mPackageGroups.get(APP_PACKAGE_ID);
-        } else {
-            // Fall back to the first package group in the table.
-            pkgGroup = mPackageGroups.values().iterator().next();
+            return pkgGroup;
         }
 
-        mMainPackage = pkgGroup.getBasePackage();
+        if (mPackageGroups.containsKey(APP_PACKAGE_ID)) {
+            // Prefer the standard app package group.
+            return mPackageGroups.get(APP_PACKAGE_ID);
+        }
+
+        // Fall back to the first package group in the table.
+        return mPackageGroups.values().iterator().next();
+    }
+
+    private void preloadLibraryApks() throws AndrolibException {
+        if (!mConfig.hasLibraryFiles()) {
+            return;
+        }
+
+        for (File apkFile : mConfig.getUniqueLibraryApkFiles()) {
+            loadPackagesFromApk(apkFile);
+        }
     }
 
     private void loadPackagesFromApk(File apkFile, ZipRODirectory zipDir, boolean isMainPackage)
@@ -197,19 +211,11 @@ public class ResTable {
 
     private ResPackageGroup loadLibraryById(int id) throws AndrolibException {
         String name = mDynamicRefTable.get(id);
-        String[] libFiles = mConfig.getLibraryFiles();
-        if (name == null || libFiles == null) {
+        if (name == null) {
             return null;
         }
 
-        File apkFile = null;
-        for (String libEntry : libFiles) {
-            String[] parts = libEntry.split(":", 2);
-            if (parts.length == 2 && name.equals(parts[0])) {
-                apkFile = new File(parts[1]);
-                break;
-            }
-        }
+        File apkFile = mConfig.getLibraryApkFileMap().get(name);
         if (apkFile == null) {
             return null;
         }

@@ -16,6 +16,13 @@
  */
 package brut.androlib;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+
 public class Config {
     public enum DecodeSources { FULL, ONLY_MAIN_CLASSES, NONE }
     public enum DecodeResources { FULL, ONLY_MANIFEST, NONE }
@@ -116,6 +123,39 @@ public class Config {
 
     public void setLibraryFiles(String[] libraryFiles) {
         mLibraryFiles = libraryFiles;
+    }
+
+    public boolean hasLibraryFiles() {
+        return mLibraryFiles != null && mLibraryFiles.length > 0;
+    }
+
+    public Map<String, File> getLibraryApkFileMap() {
+        Map<String, File> apkFiles = new LinkedHashMap<>();
+        if (!hasLibraryFiles()) {
+            return apkFiles;
+        }
+
+        for (String libEntry : mLibraryFiles) {
+            String[] parts = libEntry.split(":", 2);
+            if (parts.length != 2 || parts[0].isEmpty() || parts[1].isEmpty()) {
+                continue;
+            }
+
+            apkFiles.putIfAbsent(parts[0], new File(parts[1]));
+        }
+        return apkFiles;
+    }
+
+    public Collection<File> getUniqueLibraryApkFiles() {
+        Collection<File> files = new ArrayList<>();
+        LinkedHashSet<String> seenPaths = new LinkedHashSet<>();
+        for (File apkFile : getLibraryApkFileMap().values()) {
+            String apkPath = apkFile.getAbsolutePath();
+            if (seenPaths.add(apkPath)) {
+                files.add(apkFile);
+            }
+        }
+        return files;
     }
 
     public boolean isForced() {
