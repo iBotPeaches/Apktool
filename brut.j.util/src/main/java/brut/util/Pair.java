@@ -18,7 +18,7 @@ package brut.util;
 
 import java.util.Objects;
 
-public class Pair<L, R> {
+public final class Pair<L, R> {
     private final L mLeft;
     private final R mRight;
 
