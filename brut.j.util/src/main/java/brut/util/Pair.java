@@ -7,13 +7,9 @@ public final class Pair<L, R> {
     private final L mLeft;
     private final R mRight;
 
-    private Pair(L left, R right) {
+    public Pair(L left, R right) {
         mLeft = left;
         mRight = right;
-    }
-
-    public static <A, B> Pair<A, B> of(A left, B right) {
-        return new Pair<>(left, right);
     }
 
     public L getLeft() {
@@ -22,6 +18,10 @@ public final class Pair<L, R> {
 
     public R getRight() {
         return mRight;
+    }
+
+    public static <A, B> Pair<A, B> of(A left, B right) {
+        return new Pair<>(left, right);
     }
 
     @Override
