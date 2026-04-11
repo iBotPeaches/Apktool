@@ -138,8 +138,9 @@ public class ResTable {
 
             try (InputStream in = zipDir.getFileInput("resources.arsc")) {
                 BinaryResourceParser parser = isMainPackage
-                    ? new BinaryResourceParser(this, mConfig.isKeepBrokenResources(), mConfig.isDecodeResolveGreedy())
-                    : new BinaryResourceParser(this, true, true);
+                    ? new BinaryResourceParser(
+                        this, mConfig.isKeepBrokenResources(), mConfig.isDecodeResolveGreedy(), apkFile)
+                    : new BinaryResourceParser(this, true, true, apkFile);
                 parser.parse(in);
 
                 // Only flag the app for the main package.

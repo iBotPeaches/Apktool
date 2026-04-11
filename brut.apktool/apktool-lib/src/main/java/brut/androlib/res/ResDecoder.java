@@ -34,6 +34,7 @@ import brut.common.Log;
 import brut.directory.Directory;
 import brut.directory.DirectoryException;
 import brut.directory.FileDirectory;
+import brut.directory.ZipRODirectory;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -99,9 +100,21 @@ public class ResDecoder {
         }
 
         Log.i(TAG, "Decoding file resources...");
-        for (ResEntry entry : Lists.newArrayList(getDecodeEntries(pkg))) {
-            if (entry.getValue() instanceof ResFileReference) {
-                fileDecoder.decode(entry, inDir, outDir, mResFileMap);
+        Map<File, ZipRODirectory> splitInDirs = new HashMap<>();
+        try {
+            for (ResEntry entry : Lists.newArrayList(getDecodeEntries(pkg))) {
+                if (entry.getValue() instanceof ResFileReference) {
+                    Directory entryInDir = getInputDirectory(entry, inDir, splitInDirs);
+                    fileDecoder.decode(entry, entryInDir, outDir, mResFileMap);
+                }
+            }
+        } finally {
+            for (ZipRODirectory splitInDir : splitInDirs.values()) {
+                try {
+                    splitInDir.close();
+                } catch (DirectoryException ex) {
+                    Log.w(TAG, "Could not close split resource directory: %s", ex.getMessage());
+                }
             }
         }
 
@@ -122,8 +135,9 @@ public class ResDecoder {
 
     private void generateValuesXmls(ResPackage pkg, Directory outDir, ResXmlSerializer serial)
             throws AndrolibException {
-        // Group entries by type name + qualifiers. When library APKs are preloaded for reference
-        // resolution, keep the generated values scoped to the main decoded package only.
+        // Group entries by type name + qualifiers. When same-package split APKs are preloaded for
+        // reference resolution, keep their real resources in the decoded output while filtering out
+        // parser-created dummy placeholders.
         Map<Pair<String, String>, List<ResEntry>> entriesMap = new HashMap<>();
         for (ResEntry entry : getDecodeEntries(pkg)) {
             if (entry.getValue() instanceof ValuesXmlSerializable && !pkg.isAlias(entry.getResId())) {
@@ -164,7 +178,7 @@ public class ResDecoder {
 
     private void generatePublicXml(ResPackage pkg, Directory outDir, ResXmlSerializer serial)
             throws AndrolibException {
-        List<ResEntrySpec> specs = Lists.newArrayList(pkg.listEntrySpecs());
+        List<ResEntrySpec> specs = Lists.newArrayList(getDecodeEntrySpecs(pkg));
         specs.sort(Comparator.comparing(ResEntrySpec::getResId));
 
         String outFileName = "res/values/public.xml";
@@ -303,7 +317,62 @@ public class ResDecoder {
     }
 
     private Iterable<ResEntry> getDecodeEntries(ResPackage pkg) {
-        return isDecodingWithLibraryApks() ? pkg.listEntries() : pkg.getGroup().listEntries();
+        if (!isDecodingWithLibraryApks()) {
+            return pkg.getGroup().listEntries();
+        }
+
+        List<ResEntry> entries = new ArrayList<>();
+        for (ResEntry entry : pkg.getGroup().listEntries()) {
+            if (shouldDecodeEntry(entry)) {
+                entries.add(entry);
+            }
+        }
+        return entries;
+    }
+
+    private Iterable<ResEntrySpec> getDecodeEntrySpecs(ResPackage pkg) {
+        if (!isDecodingWithLibraryApks()) {
+            return pkg.getGroup().listEntrySpecs();
+        }
+
+        List<ResEntrySpec> specs = new ArrayList<>();
+        Set<ResId> seenSpecs = new HashSet<>();
+        for (ResEntrySpec spec : pkg.getGroup().listEntrySpecs()) {
+            if (shouldDecodeEntrySpec(spec) && seenSpecs.add(spec.getResId())) {
+                specs.add(spec);
+            }
+        }
+        return specs;
+    }
+
+    private boolean shouldDecodeEntry(ResEntry entry) {
+        return shouldDecodeEntrySpec(entry.getSpec());
+    }
+
+    private boolean shouldDecodeEntrySpec(ResEntrySpec spec) {
+        return !spec.getName().startsWith(ResEntrySpec.DUMMY_PREFIX)
+            || spec.getPackage().isSyntheticEntrySpec(spec);
+    }
+
+    private Directory getInputDirectory(ResEntry entry, Directory mainInDir, Map<File, ZipRODirectory> splitInDirs)
+            throws AndrolibException {
+        File sourceApkFile = entry.getPackage().getSourceApkFile();
+        if (sourceApkFile == null || sourceApkFile.equals(mApkInfo.getApkFile())) {
+            return mainInDir;
+        }
+
+        ZipRODirectory splitInDir = splitInDirs.get(sourceApkFile);
+        if (splitInDir != null) {
+            return splitInDir;
+        }
+
+        try {
+            splitInDir = new ZipRODirectory(sourceApkFile);
+        } catch (DirectoryException ex) {
+            throw new AndrolibException("Could not open split resource file: " + sourceApkFile, ex);
+        }
+        splitInDirs.put(sourceApkFile, splitInDir);
+        return splitInDir;
     }
 
     private boolean isDecodingWithLibraryApks() {
@@ -448,11 +517,18 @@ public class ResDecoder {
             List<Integer> libPackageIds = Lists.newArrayList(mTable.getLibPackageIds());
             libPackageIds.sort(null);
             for (int id : libPackageIds) {
-                usesLibrary.add(mTable.getDynamicRefPackageName(id));
+                String packageName = mTable.getDynamicRefPackageName(id);
+                if (packageName != null && !packageName.equals(pkg.getName())) {
+                    usesLibrary.add(packageName);
+                }
             }
 
             if (isDecodingWithLibraryApks()) {
-                usesLibrary.addAll(mConfig.getLibraryApkFileMap().keySet());
+                for (String packageName : mConfig.getLibraryApkFileMap().keySet()) {
+                    if (!packageName.equals(pkg.getName())) {
+                        usesLibrary.add(packageName);
+                    }
+                }
             }
 
             if (!usesLibrary.isEmpty()) {

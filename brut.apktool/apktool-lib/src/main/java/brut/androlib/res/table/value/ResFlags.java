@@ -64,8 +64,7 @@ public class ResFlags extends ResAttribute {
                 continue;
             }
 
-            pkg.addEntrySpec(keyId.typeId(), keyId.entryId(), ResEntrySpec.DUMMY_PREFIX + keyId);
-            pkg.addEntry(keyId.typeId(), keyId.entryId(), ResCustom.ID);
+            pkg.addSyntheticEntry(keyId.typeId(), keyId.entryId(), ResEntrySpec.DUMMY_PREFIX + keyId, ResCustom.ID);
         }
     }
 

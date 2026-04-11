@@ -28,6 +28,7 @@ import com.google.common.io.BaseEncoding;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.InputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -81,6 +82,7 @@ public class BinaryResourceParser {
     private final ResTable mTable;
     private final boolean mKeepBrokenResources;
     private final boolean mAllowDummyEntrySpecs;
+    private final File mSourceApkFile;
     private final Set<ResId> mMissingEntrySpecs;
     private final Set<ResConfig> mInvalidConfigs;
 
@@ -96,9 +98,15 @@ public class BinaryResourceParser {
     private List<Pair<Long, Integer>> mEntrySpecFlagsOffsets;
 
     public BinaryResourceParser(ResTable table, boolean keepBrokenResources, boolean allowDummyEntrySpecs) {
+        this(table, keepBrokenResources, allowDummyEntrySpecs, null);
+    }
+
+    public BinaryResourceParser(ResTable table, boolean keepBrokenResources, boolean allowDummyEntrySpecs,
+            File sourceApkFile) {
         mTable = table;
         mKeepBrokenResources = keepBrokenResources;
         mAllowDummyEntrySpecs = allowDummyEntrySpecs;
+        mSourceApkFile = sourceApkFile;
         mMissingEntrySpecs = new HashSet<>();
         mInvalidConfigs = new HashSet<>();
     }
@@ -261,6 +269,7 @@ public class BinaryResourceParser {
         } finally {
             mPackageCount++;
         }
+        mPackage.setSourceApkFile(mSourceApkFile);
 
         parser = new ResChunkPullParser(mIn, parser.dataSize());
         while (nextChunk(parser)) {

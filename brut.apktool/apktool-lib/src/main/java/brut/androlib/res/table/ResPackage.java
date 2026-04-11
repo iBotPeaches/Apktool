@@ -21,6 +21,7 @@ import brut.androlib.exceptions.UndefinedResObjectException;
 import brut.androlib.res.table.value.ResValue;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -38,6 +39,9 @@ public class ResPackage {
     private final Map<String, ResOverlayable> mOverlayables;
     private final Map<ResId, ResId> mAliases;
     private final Set<String> mNameRegistry;
+    private final Set<Pair<ResId, ResConfig>> mSyntheticEntries;
+    private final Set<ResId> mSyntheticSpecs;
+    private File mSourceApkFile;
 
     public ResPackage(ResPackageGroup group, int index) {
         assert group != null && index >= 0;
@@ -50,6 +54,8 @@ public class ResPackage {
         mOverlayables = new HashMap<>();
         mAliases = new HashMap<>();
         mNameRegistry = new HashSet<>();
+        mSyntheticEntries = new HashSet<>();
+        mSyntheticSpecs = new HashSet<>();
     }
 
     public ResTable getTable() {
@@ -70,6 +76,14 @@ public class ResPackage {
 
     public int getIndex() {
         return mIndex;
+    }
+
+    public File getSourceApkFile() {
+        return mSourceApkFile;
+    }
+
+    public void setSourceApkFile(File sourceApkFile) {
+        mSourceApkFile = sourceApkFile;
     }
 
     public boolean hasTypeSpec(int typeId) {
@@ -256,6 +270,21 @@ public class ResPackage {
         return addEntry(typeId, entryId, ResConfig.DEFAULT, value);
     }
 
+    public ResEntry addSyntheticEntry(int typeId, int entryId, String name, ResValue value) throws AndrolibException {
+        if (!hasEntrySpec(typeId, entryId)) {
+            addEntrySpec(typeId, entryId, name);
+        }
+
+        if (!hasEntry(typeId, entryId)) {
+            addEntry(typeId, entryId, value);
+        }
+
+        ResEntry entry = getEntry(typeId, entryId);
+        mSyntheticEntries.add(Pair.of(entry.getResId(), entry.getType().getConfig()));
+        mSyntheticSpecs.add(entry.getResId());
+        return entry;
+    }
+
     public ResEntry addEntry(int typeId, int entryId, ResConfig config, ResValue value) throws AndrolibException {
         ResId resId = ResId.of(getId(), typeId, entryId);
         if (mAliases.containsKey(resId)) {
@@ -293,6 +322,10 @@ public class ResPackage {
 
     public Collection<ResEntry> listEntries() {
         return mEntries.values();
+    }
+
+    public boolean isSyntheticEntrySpec(ResEntrySpec spec) {
+        return mSyntheticSpecs.contains(spec.getResId());
     }
 
     public boolean hasOverlayable(String name) {

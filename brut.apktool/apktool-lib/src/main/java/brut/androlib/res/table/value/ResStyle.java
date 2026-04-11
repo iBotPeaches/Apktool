@@ -21,6 +21,7 @@ import brut.androlib.res.table.ResEntry;
 import brut.androlib.res.table.ResEntrySpec;
 import brut.androlib.res.table.ResId;
 import brut.androlib.res.table.ResPackage;
+import brut.androlib.res.table.ResTypeSpec;
 import brut.common.Log;
 import org.xmlpull.v1.XmlSerializer;
 
@@ -96,8 +97,21 @@ public class ResStyle extends ResBag {
                 continue;
             }
 
-            pkg.addEntrySpec(keyId.typeId(), keyId.entryId(), ResEntrySpec.DUMMY_PREFIX + keyId);
-            pkg.addEntry(keyId.typeId(), keyId.entryId(), ResAttribute.DEFAULT);
+            // Some split APKs reference types not present in their partial resources table.
+            // Ensure we don't abort decoding when we can't inject a dummy spec.
+            ResTypeSpec keyType = null;
+            try {
+                keyType = pkg.getGroup().getTypeSpec(keyId.typeId());
+            } catch (AndrolibException ex) {
+                Log.w(TAG, "Unresolved style reference (missing type spec): key=%s, value=%s", key, item.getValue());
+            }
+            if (keyType == null) {
+                continue;
+            }
+
+            ResPackage keyPkg = keyType.getPackage();
+            keyPkg.addSyntheticEntry(
+                keyId.typeId(), keyId.entryId(), ResEntrySpec.DUMMY_PREFIX + keyId, ResAttribute.DEFAULT);
         }
     }
 
