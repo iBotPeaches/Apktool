@@ -67,6 +67,21 @@ public final class TextUtils {
         // Private constructor for utility class.
     }
 
+    public static int countMatches(CharSequence text, char ch) {
+        int len = text.length();
+        if (len == 0) {
+            return 0;
+        }
+
+        int count = 0;
+        for (int i = 0; i < len; i++) {
+            if (ch == text.charAt(i)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
     public static String matchSuffix(CharSequence text, String... suffixes) {
         int len = text.length();
         if (len == 0 || suffixes.length == 0) {

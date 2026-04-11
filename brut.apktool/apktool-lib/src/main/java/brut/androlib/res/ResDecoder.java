@@ -34,8 +34,8 @@ import brut.common.Log;
 import brut.directory.Directory;
 import brut.directory.DirectoryException;
 import brut.directory.FileDirectory;
-import com.google.common.collect.Lists;
 import brut.util.Pair;
+import com.google.common.collect.Lists;
 
 import java.io.*;
 import java.util.*;

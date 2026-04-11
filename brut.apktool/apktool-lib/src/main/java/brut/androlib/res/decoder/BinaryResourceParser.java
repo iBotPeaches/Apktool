@@ -24,8 +24,8 @@ import brut.androlib.res.table.*;
 import brut.androlib.res.table.value.*;
 import brut.common.Log;
 import brut.util.BinaryDataInputStream;
-import com.google.common.io.BaseEncoding;
 import brut.util.Pair;
+import com.google.common.io.BaseEncoding;
 
 import java.io.BufferedInputStream;
 import java.io.InputStream;
