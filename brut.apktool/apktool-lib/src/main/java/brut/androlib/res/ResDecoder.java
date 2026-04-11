@@ -35,7 +35,7 @@ import brut.directory.Directory;
 import brut.directory.DirectoryException;
 import brut.directory.FileDirectory;
 import com.google.common.collect.Lists;
-import org.apache.commons.lang3.tuple.Pair;
+import brut.util.Pair;
 
 import java.io.*;
 import java.util.*;
