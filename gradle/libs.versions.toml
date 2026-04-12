@@ -2,7 +2,6 @@
 baksmali = "b6365a84f4" # https://github.com/google/smali/issues/100
 commons_io = "2.21.0"
 commons_cli = "1.11.0"
-commons_lang3 = "3.20.0"
 commons_text = "1.15.0"
 guava = "33.5.0-jre"
 junit = "4.13.2"
@@ -16,7 +15,6 @@ maven-publish = "0.33.0"
 baksmali = { module = "com.github.iBotPeaches.smali:smali-baksmali", version.ref = "baksmali" }
 commons_cli = { module = "commons-cli:commons-cli", version.ref = "commons_cli"}
 commons_io = { module = "commons-io:commons-io", version.ref = "commons_io" }
-commons_lang3 = { module = "org.apache.commons:commons-lang3", version.ref = "commons_lang3" }
 commons_text = { module = "org.apache.commons:commons-text", version.ref = "commons_text" }
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
 junit = { module = "junit:junit", version.ref = "junit" }

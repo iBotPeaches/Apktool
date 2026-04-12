@@ -26,7 +26,7 @@ import brut.common.Log;
 import brut.util.BrutIO;
 import brut.util.OS;
 import brut.util.OSDetection;
-import org.apache.commons.lang3.tuple.Pair;
+import brut.util.Pair;
 
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -127,8 +127,8 @@ public class Framework {
         // Publicize all entry specs.
         ByteBuffer buffer = ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN);
         for (Pair<Long, Integer> pair : parser.getEntrySpecFlagsOffsets()) {
-            int position = pair.getKey().intValue();
-            int count = pair.getValue();
+            int position = pair.getLeft().intValue();
+            int count = pair.getRight();
             for (int i = 0; i < count; i++, position += 4) {
                 int flags = buffer.getInt(position);
                 buffer.putInt(position, flags | 0x40000000); // ResTable_typeSpec::SPEC_PUBLIC

@@ -19,7 +19,7 @@ package brut.androlib.res.table;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.exceptions.UndefinedResObjectException;
 import brut.androlib.res.table.value.ResValue;
-import org.apache.commons.lang3.tuple.Pair;
+import brut.util.Pair;
 
 import java.io.File;
 import java.util.Collection;

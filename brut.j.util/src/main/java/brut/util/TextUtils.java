@@ -92,6 +92,16 @@ public final class TextUtils {
         return null;
     }
 
+    public static int countMatches(CharSequence text, char ch) {
+        int count = 0;
+        for (int i = 0, n = text.length(); i < n; i++) {
+            if (ch == text.charAt(i)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
     public static boolean isPrintableChar(char ch) {
         return (ch >= 0x20 && ch <= 0x7E) || (ch >= 0xA0 && ch <= 0xD7FF)
             || (ch >= 0xE000 && ch <= 0xFDCF) || (ch >= 0xFDF0 && ch <= 0xFFFD);
