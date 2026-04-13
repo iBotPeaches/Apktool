@@ -7,7 +7,7 @@ on:
       - '**.java'
       - '**.kts'
       - '.github/workflows/benchmark.yml'
-      - '.github/scripts/compare-benchmarks.py'
+      - '.github/scripts/compare-benchmarks.sh'
   push:
     branches:
       - main
@@ -88,7 +88,7 @@ jobs:
       - name: Compare Benchmarks
         if: github.event_name == 'pull_request'
         run: |
-          python3 .github/scripts/compare-benchmarks.py \
+          bash .github/scripts/compare-benchmarks.sh \
             base-benchmark.json head-benchmark.json > comment.md
 
       - name: Post Benchmark Comment

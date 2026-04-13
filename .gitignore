@@ -25,7 +25,3 @@ gradle.properties
 
 # Patches
 *.patch
-
-# Python
-__pycache__/
-*.pyc
