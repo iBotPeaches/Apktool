@@ -23,6 +23,8 @@ tasks.register("benchmarkJar", Jar::class) {
     manifest.attributes["Main-Class"] = "org.openjdk.jmh.Main"
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
-    from(configurations.runtimeClasspath.get().map(::zipTree))
+    // Use lazy provider so Gradle defers classpath resolution to execution time and
+    // automatically schedules :apktool-lib:jar (and other dependency JARs) before this task.
+    from(configurations.runtimeClasspath.map { classpath -> classpath.map(::zipTree) })
     with(tasks.jar.get())
 }
