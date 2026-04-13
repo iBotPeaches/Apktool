@@ -17,7 +17,7 @@
 package brut.androlib;
 
 import brut.androlib.meta.ApkInfo;
-import org.apache.commons.lang3.StringUtils;
+import brut.util.TextUtils;
 
 import java.io.File;
 
@@ -40,7 +40,7 @@ public class DoubleExtensionUnknownFileTest extends BaseTest {
 
         ApkInfo testInfo = ApkInfo.load(testDir);
         for (String path : testInfo.getDoNotCompress()) {
-            if (StringUtils.countMatches(path, '.') > 1) {
+            if (TextUtils.countMatches(path, '.') > 1) {
                 assertTrue(path.equals("assets/bin/Data/sharedassets1.assets.split0"));
             }
         }
