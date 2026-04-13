@@ -1,0 +1,134 @@
+name: Benchmark
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '**.java'
+      - '**.kts'
+      - '.github/workflows/benchmark.yml'
+      - '.github/scripts/compare-benchmarks.py'
+  push:
+    branches:
+      - main
+    paths:
+      - '**.java'
+      - '**.kts'
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  benchmark:
+    name: Benchmark
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      # Check out the PR head (or the pushed commit) into the working directory.
+      - name: Checkout Head
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      # For pull_request events, also check out the base branch to compare against.
+      - name: Checkout Base Branch
+        if: github.event_name == 'pull_request'
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: base
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: zulu
+          java-version: 17
+
+      - uses: gradle/actions/setup-gradle@v6.1.0
+        with:
+          cache-provider: basic
+
+      # ── Build & run benchmarks for the PR head / pushed commit ──────────────
+
+      - name: Build Benchmark JAR (Head)
+        run: ./gradlew :brut.apktool:apktool-benchmarks:benchmarkJar
+
+      - name: Run Benchmarks (Head)
+        run: |
+          java \
+            -Djdk.util.zip.disableZip64ExtraFieldValidation=true \
+            -Djava.awt.headless=true \
+            -jar brut.apktool/apktool-benchmarks/build/libs/apktool-benchmarks.jar \
+            -rf json -rff head-benchmark.json \
+            -prof gc \
+            -jvmArgs "-Djdk.util.zip.disableZip64ExtraFieldValidation=true -Djava.awt.headless=true"
+
+      # ── Build & run benchmarks for the base branch (PRs only) ───────────────
+
+      - name: Build Benchmark JAR (Base)
+        if: github.event_name == 'pull_request'
+        working-directory: base
+        run: ./gradlew :brut.apktool:apktool-benchmarks:benchmarkJar
+
+      - name: Run Benchmarks (Base)
+        if: github.event_name == 'pull_request'
+        run: |
+          java \
+            -Djdk.util.zip.disableZip64ExtraFieldValidation=true \
+            -Djava.awt.headless=true \
+            -jar base/brut.apktool/apktool-benchmarks/build/libs/apktool-benchmarks.jar \
+            -rf json -rff base-benchmark.json \
+            -prof gc \
+            -jvmArgs "-Djdk.util.zip.disableZip64ExtraFieldValidation=true -Djava.awt.headless=true"
+
+      # ── Compare results and post / update the PR comment ────────────────────
+
+      - name: Compare Benchmarks
+        if: github.event_name == 'pull_request'
+        run: |
+          python3 .github/scripts/compare-benchmarks.py \
+            base-benchmark.json head-benchmark.json > comment.md
+
+      - name: Post Benchmark Comment
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const body = fs.readFileSync('comment.md', 'utf8');
+
+            // Delete any existing benchmark comment before posting a new one.
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const existing = comments.find(
+              c => c.user.type === 'Bot' && c.body.includes('## Benchmark Results')
+            );
+            if (existing) {
+              await github.rest.issues.deleteComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+              });
+            }
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body,
+            });
+
+      # ── Store baseline artifact on pushes to main ────────────────────────────
+
+      - name: Upload Baseline
+        if: github.event_name == 'push'
+        uses: actions/upload-artifact@v7
+        with:
+          name: benchmark-baseline
+          path: head-benchmark.json
+          retention-days: 90
