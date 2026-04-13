@@ -5,4 +5,5 @@
     <layout name="test_layout2">@android:layout/browser_link_context_header</layout>
     <layout name="test_layout3">@android:layout/simple_list_item_1</layout>
     <layout name="test_layout4">@android:layout/simple_spinner_item</layout>
+    <item type="layout" name="issue_4096" format="string">TEST</item>
 </resources>
