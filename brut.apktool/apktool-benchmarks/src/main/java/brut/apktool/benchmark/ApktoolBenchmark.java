@@ -40,6 +40,7 @@ import org.openjdk.jmh.annotations.Warmup;
 import java.io.File;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.file.Files;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -99,9 +100,7 @@ public class ApktoolBenchmark {
      */
     @Benchmark
     public void decodeTestApp() throws Exception {
-        File outDir = File.createTempFile("decode", null, mTempDir);
-        outDir.delete();
-        outDir.mkdirs();
+        File outDir = Files.createTempDirectory(mTempDir.toPath(), "decode").toFile();
         try {
             new ApkDecoder(new ExtFile(mTestApk), mConfig).decode(outDir);
         } finally {
@@ -114,8 +113,7 @@ public class ApktoolBenchmark {
      */
     @Benchmark
     public void buildTestApp() throws Exception {
-        File outApk = File.createTempFile("build", ".apk", mTempDir);
-        outApk.delete();
+        File outApk = Files.createTempFile(mTempDir.toPath(), "build", ".apk").toFile();
         try {
             new ApkBuilder(mDecodedDir, mConfig).build(new ExtFile(outApk));
         } finally {

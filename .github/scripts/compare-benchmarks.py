@@ -79,7 +79,8 @@ def main():
             print(f"| `{name}` | {base_str} | {head_str} | {emoji} {change} |")
 
     # Memory allocation section (populated when -prof gc is used).
-    mem_key = "\u00b7gc.alloc.rate.norm"
+    # The middle dot (·) is JMH's metric namespace separator in secondary metric names.
+    mem_key = "·gc.alloc.rate.norm"
     base_mem_data = {
         name: r["secondary"].get(mem_key, {}).get("score")
         for name, r in base_results.items()
