@@ -39,7 +39,6 @@ public class ResPackage {
     private final Map<String, ResOverlayable> mOverlayables;
     private final Map<ResId, ResId> mAliases;
     private final Set<String> mNameRegistry;
-    private final Set<Pair<ResId, ResConfig>> mSyntheticEntries;
     private final Set<ResId> mSyntheticSpecs;
     private File mSourceApkFile;
 
@@ -54,7 +53,6 @@ public class ResPackage {
         mOverlayables = new HashMap<>();
         mAliases = new HashMap<>();
         mNameRegistry = new HashSet<>();
-        mSyntheticEntries = new HashSet<>();
         mSyntheticSpecs = new HashSet<>();
     }
 
@@ -280,7 +278,6 @@ public class ResPackage {
         }
 
         ResEntry entry = getEntry(typeId, entryId);
-        mSyntheticEntries.add(Pair.of(entry.getResId(), entry.getType().getConfig()));
         mSyntheticSpecs.add(entry.getResId());
         return entry;
     }
