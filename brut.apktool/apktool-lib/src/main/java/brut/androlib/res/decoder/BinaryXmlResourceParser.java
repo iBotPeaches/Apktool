@@ -342,6 +342,12 @@ public class BinaryXmlResourceParser implements XmlPullParser {
                     return name;
                 }
 
+                Log.d(TAG, "Injecting dummy for unresolved attr reference: ns=%s, name=%s, id=%s",
+                    getAttributePrefix(index), name, nameId);
+                if (!pkg.hasTypeSpec(nameId.typeId())) {
+                    pkg.addTypeSpec(nameId.typeId(), "attr");
+                    pkg.addType(nameId.typeId(), ResConfig.DEFAULT);
+                }
                 if (name.isEmpty()) {
                     name = ResEntrySpec.DUMMY_PREFIX + nameId;
                 }

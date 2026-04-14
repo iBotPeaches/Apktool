@@ -167,7 +167,9 @@ public class ResTable {
         if (id == 0 && mMainPackage != null) {
             id = getDynamicRefPackageId(name);
             if (id == 0) {
-                id = mNextPackageId++;
+                do {
+                    id = mNextPackageId++;
+                } while (mDynamicRefTable.containsKey(id));
             }
         }
 
@@ -185,36 +187,44 @@ public class ResTable {
     }
 
     public ResPackageGroup resolvePackageGroup(int id) throws AndrolibException {
-        ResPackageGroup pkgGroup = mPackageGroups.get(id);
-        if (pkgGroup == null) {
-            pkgGroup = loadLibraryById(id);
-            if (pkgGroup == null) {
-                pkgGroup = loadFrameworkById(id);
+        if (id != SYS_PACKAGE_ID && mMainPackage != null) {
+            ResPackageGroup pkgGroup = loadLibraryById(id);
+            if (pkgGroup != null) {
+                return pkgGroup;
             }
         }
-        return pkgGroup;
+
+        ResPackageGroup pkgGroup = mPackageGroups.get(id);
+        if (pkgGroup != null) {
+            return pkgGroup;
+        }
+
+        return loadFrameworkById(id);
     }
 
     private ResPackageGroup loadLibraryById(int id) throws AndrolibException {
-        String name = mDynamicRefTable.get(id);
-        String[] libFiles = mConfig.getLibraryFiles();
-        if (name == null || libFiles == null) {
-            return null;
+        if (mLibPackageIds.contains(id)) {
+            return mPackageGroups.get(id);
         }
 
-        File apkFile = null;
-        for (String libEntry : libFiles) {
-            String[] parts = libEntry.split(":", 2);
-            if (parts.length == 2 && name.equals(parts[0])) {
-                apkFile = new File(parts[1]);
-                break;
+        String name;
+        if (id == mMainPackage.getId()) {
+            name = mMainPackage.getName();
+        } else {
+            name = mDynamicRefTable.get(id);
+            if (name == null) {
+                return null;
             }
         }
-        if (apkFile == null) {
+
+        String[] fileNames = mConfig.getLibraryFiles().get(name);
+        if (fileNames == null) {
             return null;
         }
 
-        loadPackagesFromApk(apkFile);
+        for (String fileName : fileNames) {
+            loadPackagesFromApk(new File(fileName));
+        }
 
         ResPackageGroup pkgGroup = mPackageGroups.get(id);
         if (pkgGroup == null) {
@@ -226,8 +236,11 @@ public class ResTable {
     }
 
     private ResPackageGroup loadFrameworkById(int id) throws AndrolibException {
-        File apkFile = new Framework(mConfig).getApkFile(id);
-        loadPackagesFromApk(apkFile);
+        if (mFramePackageIds.contains(id)) {
+            return mPackageGroups.get(id);
+        }
+
+        loadPackagesFromApk(new Framework(mConfig).getApkFile(id));
 
         ResPackageGroup pkgGroup = mPackageGroups.get(id);
         if (pkgGroup == null) {
@@ -240,7 +253,6 @@ public class ResTable {
 
     private void loadPackagesFromApk(File apkFile) throws AndrolibException {
         Log.i(TAG, "Loading resource table from file: " + apkFile);
-
         try (ZipRODirectory zipDir = new ZipRODirectory(apkFile)) {
             loadPackagesFromApk(apkFile, zipDir, false);
         } catch (DirectoryException ex) {

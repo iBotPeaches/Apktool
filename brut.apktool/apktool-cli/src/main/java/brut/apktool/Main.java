@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.*;
 
@@ -423,7 +424,13 @@ public class Main {
             config.setFrameworkTag(cli.getOptionValue(frameTagOption));
         }
         if (cli.hasOption(libOption)) {
-            config.setLibraryFiles(cli.getOptionValues(libOption));
+            Map<String, String[]> libraryFiles = config.getLibraryFiles();
+            for (String entry : cli.getOptionValues(libOption)) {
+                String[] parts = entry.split(":", 2);
+                if (parts.length == 2) {
+                    libraryFiles.put(parts[0], parts[1].split(","));
+                }
+            }
         }
         if (cli.hasOption(decodeForceOption)) {
             config.setForced(true);
@@ -545,7 +552,13 @@ public class Main {
             config.setFrameworkDirectory(cli.getOptionValue(frameDirOption));
         }
         if (cli.hasOption(libOption)) {
-            config.setLibraryFiles(cli.getOptionValues(libOption));
+            Map<String, String[]> libraryFiles = config.getLibraryFiles();
+            for (String entry : cli.getOptionValues(libOption)) {
+                String[] parts = entry.split(":", 2);
+                if (parts.length == 2) {
+                    libraryFiles.put(parts[0], parts[1].split(","));
+                }
+            }
         }
         if (cli.hasOption(buildForceOption)) {
             config.setForced(true);

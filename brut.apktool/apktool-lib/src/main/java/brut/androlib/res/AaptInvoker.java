@@ -20,6 +20,7 @@ import brut.androlib.Config;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.meta.*;
 import brut.androlib.res.Framework;
+import brut.androlib.res.table.ResTable;
 import brut.common.BrutException;
 import brut.common.Log;
 import brut.util.OS;
@@ -127,10 +128,10 @@ public class AaptInvoker {
             int pkgId = resourcesInfo.getPackageId();
             if (pkgId == 0) {
                 cmd.add("--shared-lib");
-            } else if (pkgId > 1) {
+            } else if (pkgId > ResTable.SYS_PACKAGE_ID) {
                 cmd.add("--package-id");
                 cmd.add(Integer.toString(pkgId));
-                if (pkgId < 0x7F) {
+                if (pkgId < ResTable.APP_PACKAGE_ID) {
                     cmd.add("--allow-reserved-package-id");
                 }
             }
@@ -201,20 +202,13 @@ public class AaptInvoker {
 
         List<String> usesLibrary = mApkInfo.getUsesLibrary();
         if (!usesLibrary.isEmpty()) {
-            String[] libFiles = mConfig.getLibraryFiles();
+            Map<String, String[]> libraryFiles = mConfig.getLibraryFiles();
             for (String name : usesLibrary) {
-                File libFile = null;
-                if (libFiles != null) {
-                    for (String libEntry : libFiles) {
-                        String[] parts = libEntry.split(":", 2);
-                        if (parts.length == 2 && name.equals(parts[0])) {
-                            libFile = new File(parts[1]);
-                            break;
-                        }
+                String[] fileNames = libraryFiles.get(name);
+                if (fileNames != null) {
+                    for (String fileName : fileNames) {
+                        files.add(new File(fileName));
                     }
-                }
-                if (libFile != null) {
-                    files.add(libFile);
                 } else {
                     Log.w(TAG, "Shared library was not provided: " + name);
                 }
