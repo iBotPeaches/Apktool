@@ -23,11 +23,21 @@ import brut.androlib.res.Framework;
 import brut.common.BrutException;
 import brut.common.Log;
 import brut.util.OS;
+import brut.xml.XmlUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import javax.xml.parsers.ParserConfigurationException;
 
 public class AaptInvoker {
     private static final String TAG = AaptInvoker.class.getName();
@@ -57,6 +67,7 @@ public class AaptInvoker {
 
         List<String> cmd = new ArrayList<>();
         File resZip = null;
+        File stableIdsFile = null;
 
         if (resDir != null) {
             resZip = new File(resDir.getParent(), "build/resources.zip");
@@ -96,6 +107,8 @@ public class AaptInvoker {
         if (manifest == null) {
             return;
         }
+
+        stableIdsFile = createStableIdsFile(resDir);
 
         // Link resources to the final apk.
         cmd.add(aaptPath);
@@ -174,6 +187,10 @@ public class AaptInvoker {
         if (mConfig.isVerbose()) {
             cmd.add("-v");
         }
+        if (stableIdsFile != null) {
+            cmd.add("--stable-ids");
+            cmd.add(stableIdsFile.getPath());
+        }
         if (resZip != null) {
             cmd.add(resZip.getPath());
         }
@@ -183,6 +200,8 @@ public class AaptInvoker {
             Log.d(TAG, "aapt2 link command ran: " + cmd.toString());
         } catch (BrutException ex) {
             throw new AndrolibException(ex);
+        } finally {
+            deleteTempFile(stableIdsFile);
         }
     }
 
@@ -213,5 +232,68 @@ public class AaptInvoker {
         }
 
         return files;
+    }
+
+    private File createStableIdsFile(File resDir) throws AndrolibException {
+        if (resDir == null) {
+            return null;
+        }
+
+        String packageName = mApkInfo.getResourcesInfo().getPackageName();
+        if (packageName == null || packageName.isEmpty()) {
+            return null;
+        }
+
+        File publicXml = new File(resDir, "values/public.xml");
+        if (!publicXml.isFile()) {
+            return null;
+        }
+
+        try {
+            Document doc = XmlUtils.loadDocument(publicXml);
+            NodeList children = doc.getDocumentElement().getChildNodes();
+            List<String> stableIds = new ArrayList<>();
+            for (int i = 0; i < children.getLength(); i++) {
+                Node child = children.item(i);
+                if (child.getNodeType() != Node.ELEMENT_NODE) {
+                    continue;
+                }
+
+                Element element = (Element) child;
+                if (!element.getTagName().equals("public")) {
+                    continue;
+                }
+
+                String type = element.getAttribute("type");
+                String name = element.getAttribute("name");
+                String id = element.getAttribute("id");
+                if (type.isEmpty() || name.isEmpty() || id.isEmpty()) {
+                    continue;
+                }
+                stableIds.add(packageName + ":" + type + "/" + name + " = " + id);
+            }
+
+            if (stableIds.isEmpty()) {
+                return null;
+            }
+
+            File stableIdsFile = File.createTempFile("APKTOOL", ".ids");
+            Files.write(stableIdsFile.toPath(), stableIds, StandardCharsets.UTF_8);
+            return stableIdsFile;
+        } catch (IOException | SAXException | ParserConfigurationException ex) {
+            throw new AndrolibException(ex);
+        }
+    }
+
+    private void deleteTempFile(File file) {
+        if (file == null) {
+            return;
+        }
+
+        try {
+            Files.deleteIfExists(file.toPath());
+        } catch (IOException ex) {
+            Log.w(TAG, "Could not delete temp stable-ids file: %s", ex.getMessage());
+        }
     }
 }

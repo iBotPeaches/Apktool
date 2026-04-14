@@ -48,6 +48,7 @@ public class ApkInfo implements YamlSerializable {
     private String mApkFileName;
     private final UsesFramework mUsesFramework;
     private final List<String> mUsesLibrary;
+    private final List<String> mLibraryFiles;
     private final SdkInfo mSdkInfo;
     private final VersionInfo mVersionInfo;
     private final ResourcesInfo mResourcesInfo;
@@ -62,6 +63,7 @@ public class ApkInfo implements YamlSerializable {
         mApkFileName = null;
         mUsesFramework = new UsesFramework();
         mUsesLibrary = new ArrayList<>();
+        mLibraryFiles = new ArrayList<>();
         mSdkInfo = new SdkInfo();
         mVersionInfo = new VersionInfo();
         mResourcesInfo = new ResourcesInfo();
@@ -113,6 +115,10 @@ public class ApkInfo implements YamlSerializable {
                 mUsesLibrary.clear();
                 reader.readStringList(mUsesLibrary);
                 break;
+            case "libraryFiles":
+                mLibraryFiles.clear();
+                reader.readStringList(mLibraryFiles);
+                break;
             case "sdkInfo":
                 mSdkInfo.clear();
                 reader.readObject(mSdkInfo);
@@ -145,6 +151,9 @@ public class ApkInfo implements YamlSerializable {
         }
         if (!mUsesLibrary.isEmpty()) {
             writer.writeList("usesLibrary", mUsesLibrary);
+        }
+        if (!mLibraryFiles.isEmpty()) {
+            writer.writeList("libraryFiles", mLibraryFiles);
         }
         if (!mSdkInfo.isEmpty()) {
             writer.writeObject("sdkInfo", mSdkInfo);
@@ -185,6 +194,10 @@ public class ApkInfo implements YamlSerializable {
 
     public List<String> getUsesLibrary() {
         return mUsesLibrary;
+    }
+
+    public List<String> getLibraryFiles() {
+        return mLibraryFiles;
     }
 
     public SdkInfo getSdkInfo() {

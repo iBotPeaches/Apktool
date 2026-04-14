@@ -510,8 +510,6 @@ public class ResDecoder {
             }
 
             // Record library package names used by the resource table. If library APKs were
-            // preloaded explicitly for decode-time reference resolution, preserve those names so
-            // the same includes can be passed back to aapt2 during rebuild.
             LinkedHashSet<String> usesLibrary = new LinkedHashSet<>(mApkInfo.getUsesLibrary());
 
             List<Integer> libPackageIds = Lists.newArrayList(mTable.getLibPackageIds());
@@ -525,9 +523,7 @@ public class ResDecoder {
 
             if (isDecodingWithLibraryApks()) {
                 for (String packageName : mConfig.getLibraryApkFileMap().keySet()) {
-                    if (!packageName.equals(pkg.getName())) {
-                        usesLibrary.add(packageName);
-                    }
+                    usesLibrary.add(packageName);
                 }
             }
 

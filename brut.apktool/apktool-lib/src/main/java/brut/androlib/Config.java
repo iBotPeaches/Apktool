@@ -158,6 +158,24 @@ public class Config {
         return files;
     }
 
+    public void setLibraryApkFileMap(Map<String, File> libraryApkFiles) {
+        if (libraryApkFiles == null || libraryApkFiles.isEmpty()) {
+            mLibraryFiles = null;
+            return;
+        }
+
+        Collection<String> libraryFiles = new ArrayList<>();
+        for (Map.Entry<String, File> entry : libraryApkFiles.entrySet()) {
+            String packageName = entry.getKey();
+            File apkFile = entry.getValue();
+            if (packageName == null || packageName.isEmpty() || apkFile == null) {
+                continue;
+            }
+            libraryFiles.add(packageName + ":" + apkFile.getPath());
+        }
+        mLibraryFiles = libraryFiles.toArray(new String[0]);
+    }
+
     public boolean isForced() {
         return mForced;
     }

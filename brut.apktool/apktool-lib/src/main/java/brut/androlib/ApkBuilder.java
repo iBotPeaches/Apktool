@@ -68,6 +68,7 @@ public class ApkBuilder {
         }
         try {
             mApkInfo = ApkInfo.load(mApkDir);
+            resolveStoredLibraryFiles();
             String minSdkVersion = mApkInfo.getSdkInfo().getMinSdkVersion();
             mSmaliBuilder = new SmaliBuilder(minSdkVersion != null ? SdkInfo.parseSdkInt(minSdkVersion) : 0);
             mAaptInvoker = new AaptInvoker(mApkInfo, mConfig);
@@ -437,5 +438,35 @@ public class ApkBuilder {
 
     private boolean isFileNewer(File file, File reference) {
         return !reference.exists() || BrutIO.recursiveModifiedTime(file) > BrutIO.recursiveModifiedTime(reference);
+    }
+
+    private void resolveStoredLibraryFiles() {
+        if (mConfig.hasLibraryFiles()) {
+            return;
+        }
+
+        List<String> storedLibraryFiles = mApkInfo.getLibraryFiles();
+        if (storedLibraryFiles.isEmpty()) {
+            return;
+        }
+
+        List<String> resolvedLibraryFiles = new ArrayList<>();
+        for (String libraryFile : storedLibraryFiles) {
+            String[] parts = libraryFile.split(":", 2);
+            if (parts.length != 2 || parts[0].isEmpty() || parts[1].isEmpty()) {
+                continue;
+            }
+
+            File apkFile = new File(mApkDir, parts[1]);
+            if (!apkFile.isFile()) {
+                Log.w(TAG, "Stored shared library was not found: " + apkFile);
+                continue;
+            }
+            resolvedLibraryFiles.add(parts[0] + ":" + apkFile.getPath());
+        }
+
+        if (!resolvedLibraryFiles.isEmpty()) {
+            mConfig.setLibraryFiles(resolvedLibraryFiles.toArray(new String[0]));
+        }
     }
 }

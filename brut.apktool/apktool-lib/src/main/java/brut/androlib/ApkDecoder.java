@@ -21,6 +21,7 @@ import brut.androlib.exceptions.InFileNotFoundException;
 import brut.androlib.exceptions.OutDirExistsException;
 import brut.androlib.meta.ApkInfo;
 import brut.androlib.res.ResDecoder;
+import brut.common.BrutException;
 import brut.androlib.smali.SmaliDecoder;
 import brut.common.Log;
 import brut.directory.Directory;
@@ -333,7 +334,38 @@ public class ApkDecoder {
             throw new AndrolibException(ex);
         }
 
+        persistLibraryFiles(outDir);
+
         // Serialize apk info to file.
         mApkInfo.save(outDir);
+    }
+
+    private void persistLibraryFiles(File outDir) throws AndrolibException {
+        List<String> apkLibraryFiles = mApkInfo.getLibraryFiles();
+        apkLibraryFiles.clear();
+
+        Map<String, File> libraryApkFiles = mConfig.getLibraryApkFileMap();
+        if (libraryApkFiles.isEmpty()) {
+            return;
+        }
+
+        File libraryDir = new File(outDir, "original/apktool-libs");
+        OS.mkdir(libraryDir);
+
+        for (Map.Entry<String, File> entry : libraryApkFiles.entrySet()) {
+            String packageName = entry.getKey();
+            File libraryApk = entry.getValue();
+            if (packageName == null || packageName.isEmpty() || libraryApk == null || !libraryApk.isFile()) {
+                continue;
+            }
+
+            File outFile = new File(libraryDir, packageName + ".apk");
+            try {
+                OS.cpfile(libraryApk, outFile);
+            } catch (BrutException ex) {
+                throw new AndrolibException(ex);
+            }
+            apkLibraryFiles.add(packageName + ":original/apktool-libs/" + outFile.getName());
+        }
     }
 }

@@ -121,11 +121,74 @@ public class ResTable {
 
     private void preloadLibraryApks() throws AndrolibException {
         if (!mConfig.hasLibraryFiles()) {
+            discoverSiblingLibraryApk();
+            if (!mConfig.hasLibraryFiles()) {
+                return;
+            }
+        }
+
+        File mainApkFile = mApkInfo.getApkFile();
+        for (File apkFile : mConfig.getUniqueLibraryApkFiles()) {
+            if (mainApkFile != null && mainApkFile.getAbsoluteFile().equals(apkFile.getAbsoluteFile())) {
+                continue;
+            }
+            loadPackagesFromApk(apkFile);
+        }
+    }
+
+    private void discoverSiblingLibraryApk() throws AndrolibException {
+        File mainApkFile = mApkInfo.getApkFile();
+        if (mainApkFile == null || mainApkFile.getParentFile() == null || mApkInfo.hasSources()) {
+            return;
+        }
+        if (!mainApkFile.getName().toLowerCase().startsWith("config.")) {
             return;
         }
 
-        for (File apkFile : mConfig.getUniqueLibraryApkFiles()) {
-            loadPackagesFromApk(apkFile);
+        String packageName = mMainPackage != null ? mMainPackage.getName() : null;
+        if (packageName == null || packageName.isEmpty()) {
+            return;
+        }
+
+        File libraryApk = findSiblingLibraryApk(mainApkFile);
+        if (libraryApk == null) {
+            return;
+        }
+
+        Map<String, File> libraryApkFiles = new LinkedHashMap<>();
+        libraryApkFiles.put(packageName, libraryApk);
+        mConfig.setLibraryApkFileMap(libraryApkFiles);
+    }
+
+    private File findSiblingLibraryApk(File mainApkFile) {
+        File parentDir = mainApkFile.getParentFile();
+        File[] apkFiles = parentDir.listFiles((dir, name) -> name.endsWith(".apk"));
+        if (apkFiles == null) {
+            return null;
+        }
+
+        File fallbackApk = null;
+        for (File apkFile : apkFiles) {
+            if (mainApkFile.getAbsoluteFile().equals(apkFile.getAbsoluteFile()) || !apkContainsFile(apkFile, "resources.arsc")) {
+                continue;
+            }
+
+            if (apkContainsFile(apkFile, "classes.dex")) {
+                return apkFile;
+            }
+
+            if (fallbackApk == null) {
+                fallbackApk = apkFile;
+            }
+        }
+        return fallbackApk;
+    }
+
+    private boolean apkContainsFile(File apkFile, String fileName) {
+        try (ZipRODirectory zipDir = new ZipRODirectory(apkFile)) {
+            return zipDir.containsFile(fileName);
+        } catch (DirectoryException ignored) {
+            return false;
         }
     }
 
