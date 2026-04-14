@@ -20,7 +20,12 @@ import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.exceptions.InFileNotFoundException;
 import brut.androlib.exceptions.OutDirExistsException;
 import brut.androlib.meta.ApkInfo;
+import brut.androlib.meta.SdkInfo;
 import brut.androlib.res.ResDecoder;
+import brut.androlib.res.decoder.BinaryXmlResourceParser;
+import brut.androlib.res.decoder.ManifestPullEventHandler;
+import brut.androlib.res.decoder.ResXmlPullStreamDecoder;
+import brut.androlib.res.xml.ResXmlSerializer;
 import brut.common.BrutException;
 import brut.androlib.smali.SmaliDecoder;
 import brut.common.Log;
@@ -334,10 +339,69 @@ public class ApkDecoder {
             throw new AndrolibException(ex);
         }
 
+        inheritMissingSdkInfoFromLibraries();
         persistLibraryFiles(outDir);
 
         // Serialize apk info to file.
         mApkInfo.save(outDir);
+    }
+
+    private void inheritMissingSdkInfoFromLibraries() throws AndrolibException {
+        SdkInfo sdkInfo = mApkInfo.getSdkInfo();
+        if (!sdkInfo.isEmpty()) {
+            return;
+        }
+
+        Map<String, File> libraryApkFiles = mConfig.getLibraryApkFileMap();
+        if (libraryApkFiles.isEmpty()) {
+            return;
+        }
+
+        for (File libraryApkFile : libraryApkFiles.values()) {
+            if (libraryApkFile == null || !libraryApkFile.isFile()) {
+                continue;
+            }
+
+            SdkInfo librarySdkInfo = loadSdkInfoFromApk(libraryApkFile);
+            if (!librarySdkInfo.isEmpty()) {
+                sdkInfo.setMinSdkVersion(librarySdkInfo.getMinSdkVersion());
+                sdkInfo.setTargetSdkVersion(librarySdkInfo.getTargetSdkVersion());
+                sdkInfo.setMaxSdkVersion(librarySdkInfo.getMaxSdkVersion());
+                return;
+            }
+        }
+    }
+
+    private SdkInfo loadSdkInfoFromApk(File apkFile) throws AndrolibException {
+        ApkInfo apkInfo = new ApkInfo();
+        apkInfo.setApkFile(new ExtFile(apkFile));
+
+        ResDecoder decoder = new ResDecoder(apkInfo, mConfig);
+        BinaryXmlResourceParser parser = new BinaryXmlResourceParser(
+            decoder.getTable(), mConfig.isIgnoreRawValues(), mConfig.isDecodeResolveLazy());
+        ResXmlSerializer serial = new ResXmlSerializer(true);
+        ManifestPullEventHandler handler = new ManifestPullEventHandler(apkInfo, false);
+        ResXmlPullStreamDecoder streamDecoder = new ResXmlPullStreamDecoder(parser, serial, handler);
+
+        try {
+            decoder.getTable().load();
+            Directory inDir = apkInfo.getApkFile().getDirectory();
+            try (
+                InputStream in = inDir.getFileInput("AndroidManifest.xml");
+                OutputStream out = OutputStream.nullOutputStream()
+            ) {
+                streamDecoder.decode(in, out);
+            }
+        } catch (DirectoryException | IOException ex) {
+            throw new AndrolibException(ex);
+        } finally {
+            try {
+                apkInfo.getApkFile().close();
+            } catch (DirectoryException ignored) {
+            }
+        }
+
+        return apkInfo.getSdkInfo();
     }
 
     private void persistLibraryFiles(File outDir) throws AndrolibException {
