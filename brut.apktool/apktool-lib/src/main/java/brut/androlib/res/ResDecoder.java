@@ -509,23 +509,7 @@ public class ResDecoder {
                 usesFramework.setTag(mConfig.getFrameworkTag());
             }
 
-            // Record library package names used by the resource table. If library APKs were
-            LinkedHashSet<String> usesLibrary = new LinkedHashSet<>(mApkInfo.getUsesLibrary());
-
-            List<Integer> libPackageIds = Lists.newArrayList(mTable.getLibPackageIds());
-            libPackageIds.sort(null);
-            for (int id : libPackageIds) {
-                String packageName = mTable.getDynamicRefPackageName(id);
-                if (packageName != null && !packageName.equals(pkg.getName())) {
-                    usesLibrary.add(packageName);
-                }
-            }
-
-            if (isDecodingWithLibraryApks()) {
-                for (String packageName : mConfig.getLibraryApkFileMap().keySet()) {
-                    usesLibrary.add(packageName);
-                }
-            }
+            LinkedHashSet<String> usesLibrary = collectUsesLibrary(pkg);
 
             if (!usesLibrary.isEmpty()) {
                 List<String> apkUsesLibrary = mApkInfo.getUsesLibrary();
@@ -559,5 +543,24 @@ public class ResDecoder {
                 featureFlags.put(flag, value);
             }
         }
+    }
+
+    private LinkedHashSet<String> collectUsesLibrary(ResPackage pkg) {
+        LinkedHashSet<String> usesLibrary = new LinkedHashSet<>(mApkInfo.getUsesLibrary());
+        String mainPackageName = pkg.getName();
+
+        List<Integer> libPackageIds = Lists.newArrayList(mTable.getLibPackageIds());
+        libPackageIds.sort(null);
+        for (int id : libPackageIds) {
+            String packageName = mTable.getDynamicRefPackageName(id);
+            if (packageName != null && !packageName.equals(mainPackageName)) {
+                usesLibrary.add(packageName);
+            }
+        }
+
+        if (isDecodingWithLibraryApks()) {
+            usesLibrary.addAll(mConfig.getLibraryApkFileMap().keySet());
+        }
+        return usesLibrary;
     }
 }
