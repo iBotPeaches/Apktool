@@ -22,8 +22,6 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 public class SharedLibraryTest extends BaseTest {
-    private static final String LIBRARY_APK = "library.apk";
-    private static final String CLIENT_APK = "client.apk";
 
     @BeforeClass
     public static void beforeClass() throws Exception {
@@ -32,24 +30,23 @@ public class SharedLibraryTest extends BaseTest {
 
     @Test
     public void isSharedResourceDecodingAndRebuildingWorking() throws Exception {
-        sConfig.setLibraryFiles(new String[] {
-            "com.google.android.test.shared_library:" + new File(sTmpDir, LIBRARY_APK).getAbsolutePath()
-        });
-
         // decode library.apk
-        File libraryApk = new File(sTmpDir, LIBRARY_APK);
+        File libraryApk = new File(sTmpDir, "library.apk");
         File libraryDir = new File(libraryApk + ".out");
         new ApkDecoder(libraryApk, sConfig).decode(libraryDir);
-
-        // decode client.apk
-        File clientApk = new File(sTmpDir, CLIENT_APK);
-        File clientDir = new File(clientApk + ".out");
-        new ApkDecoder(clientApk, sConfig).decode(clientDir);
 
         // build library.apk
         new ApkBuilder(libraryDir, sConfig).build(null);
 
         assertTrue(new File(libraryDir, "dist/" + libraryApk.getName()).exists());
+
+        // include library.apk as a shared library
+        sConfig.getLibraryFiles().put("com.google.android.test.shared_library", new String[] { libraryApk.getAbsolutePath() });
+
+        // decode client.apk
+        File clientApk = new File(sTmpDir, "client.apk");
+        File clientDir = new File(clientApk + ".out");
+        new ApkDecoder(clientApk, sConfig).decode(clientDir);
 
         // build client.apk
         new ApkBuilder(clientDir, sConfig).build(null);

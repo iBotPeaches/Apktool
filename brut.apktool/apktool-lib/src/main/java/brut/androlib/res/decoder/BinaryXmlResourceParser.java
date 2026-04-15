@@ -332,7 +332,7 @@ public class BinaryXmlResourceParser implements XmlPullParser {
                 ResPackage pkg = mTable.getMainPackage();
                 if (pkg == null) {
                     // If no main package, we load "android" package instead.
-                    pkg = mTable.resolvePackageGroup(1).getBasePackage();
+                    pkg = mTable.resolvePackageGroup(ResTable.SYS_PACKAGE_ID).getBasePackage();
                 }
 
                 // #2836 - Skip item if the resource cannot be resolved.
@@ -342,6 +342,12 @@ public class BinaryXmlResourceParser implements XmlPullParser {
                     return name;
                 }
 
+                Log.d(TAG, "Injecting dummy for unresolved attr reference: ns=%s, name=%s, id=%s",
+                    getAttributePrefix(index), name, nameId);
+                if (!pkg.hasTypeSpec(nameId.typeId())) {
+                    pkg.addTypeSpec(nameId.typeId(), "attr");
+                    pkg.addType(nameId.typeId(), ResConfig.DEFAULT);
+                }
                 if (name.isEmpty()) {
                     name = ResEntrySpec.DUMMY_PREFIX + nameId;
                 }
@@ -409,7 +415,7 @@ public class BinaryXmlResourceParser implements XmlPullParser {
             ResPackage pkg = mTable.getMainPackage();
             if (pkg == null) {
                 // If no main package, we load "android" package instead.
-                pkg = mTable.resolvePackageGroup(1).getBasePackage();
+                pkg = mTable.resolvePackageGroup(ResTable.SYS_PACKAGE_ID).getBasePackage();
             }
 
             if (attr.valueType == ResValue.TYPE_STRING) {

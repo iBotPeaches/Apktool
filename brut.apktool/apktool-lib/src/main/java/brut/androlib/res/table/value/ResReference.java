@@ -22,12 +22,15 @@ import brut.androlib.res.table.ResEntry;
 import brut.androlib.res.table.ResEntrySpec;
 import brut.androlib.res.table.ResId;
 import brut.androlib.res.table.ResPackage;
+import brut.common.Log;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
 import java.util.Objects;
 
 public class ResReference extends ResItem {
+    private static final String TAG = ResReference.class.getName();
+
     private final ResPackage mPackage;
     private final ResId mResId;
     private final boolean mAsAttr;
@@ -87,6 +90,9 @@ public class ResReference extends ResItem {
     public String toXmlTextValue() throws AndrolibException {
         ResEntrySpec spec = resolve();
         if (spec == null) {
+            if (mResId != ResId.NULL) {
+                Log.w(TAG, "Unresolved resource reference: " + this);
+            }
             // @null is a special primitive, not a true reference, but we have to fall back to it if we can't
             // resolve the reference.
             return "@null";

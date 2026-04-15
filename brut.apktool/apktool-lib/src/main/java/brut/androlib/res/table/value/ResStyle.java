@@ -17,6 +17,7 @@
 package brut.androlib.res.table.value;
 
 import brut.androlib.exceptions.AndrolibException;
+import brut.androlib.res.table.ResConfig;
 import brut.androlib.res.table.ResEntry;
 import brut.androlib.res.table.ResEntrySpec;
 import brut.androlib.res.table.ResId;
@@ -92,10 +93,15 @@ public class ResStyle extends ResBag {
 
             // #2836 - Skip item if the resource cannot be resolved.
             if (skipUnresolved || keyId.pkgId() != pkg.getId()) {
-                Log.w(TAG, "Unresolved style reference: key=%s, value=%s", key, item.getValue());
+                Log.w(TAG, "Unresolved style item reference: " + key);
                 continue;
             }
 
+            Log.d(TAG, "Injecting dummy for unresolved style item reference: " + key);
+            if (!pkg.hasTypeSpec(keyId.typeId())) {
+                pkg.addTypeSpec(keyId.typeId(), "attr");
+                pkg.addType(keyId.typeId(), ResConfig.DEFAULT);
+            }
             pkg.addEntrySpec(keyId.typeId(), keyId.entryId(), ResEntrySpec.DUMMY_PREFIX + keyId);
             pkg.addEntry(keyId.typeId(), keyId.entryId(), ResAttribute.DEFAULT);
         }
