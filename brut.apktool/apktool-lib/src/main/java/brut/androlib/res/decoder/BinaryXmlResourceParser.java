@@ -332,7 +332,7 @@ public class BinaryXmlResourceParser implements XmlPullParser {
                 ResPackage pkg = mTable.getMainPackage();
                 if (pkg == null) {
                     // If no main package, we load "android" package instead.
-                    pkg = mTable.resolvePackageGroup(1).getBasePackage();
+                    pkg = mTable.resolvePackageGroup(ResTable.SYS_PACKAGE_ID).getBasePackage();
                 }
 
                 // #2836 - Skip item if the resource cannot be resolved.
@@ -415,7 +415,7 @@ public class BinaryXmlResourceParser implements XmlPullParser {
             ResPackage pkg = mTable.getMainPackage();
             if (pkg == null) {
                 // If no main package, we load "android" package instead.
-                pkg = mTable.resolvePackageGroup(1).getBasePackage();
+                pkg = mTable.resolvePackageGroup(ResTable.SYS_PACKAGE_ID).getBasePackage();
             }
 
             if (attr.valueType == ResValue.TYPE_STRING) {
