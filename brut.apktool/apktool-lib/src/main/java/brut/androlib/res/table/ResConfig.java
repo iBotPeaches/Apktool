@@ -616,6 +616,106 @@ public class ResConfig {
         return sb.toString();
     }
 
+    public int getMcc() {
+        return mMcc;
+    }
+
+    public int getMnc() {
+        return mMnc;
+    }
+
+    public String getLanguage() {
+        return mLanguage;
+    }
+
+    public String getRegion() {
+        return mRegion;
+    }
+
+    public int getOrientation() {
+        return mOrientation;
+    }
+
+    public int getTouchscreen() {
+        return mTouchscreen;
+    }
+
+    public int getDensity() {
+        return mDensity;
+    }
+
+    public int getKeyboard() {
+        return mKeyboard;
+    }
+
+    public int getNavigation() {
+        return mNavigation;
+    }
+
+    public int getInputFlags() {
+        return mInputFlags;
+    }
+
+    public int getGrammaticalInflection() {
+        return mGrammaticalInflection;
+    }
+
+    public int getScreenWidth() {
+        return mScreenWidth;
+    }
+
+    public int getScreenHeight() {
+        return mScreenHeight;
+    }
+
+    public int getSdkVersion() {
+        return mSdkVersion;
+    }
+
+    public int getMinorVersion() {
+        return mMinorVersion;
+    }
+
+    public int getScreenLayout() {
+        return mScreenLayout;
+    }
+
+    public int getUiMode() {
+        return mUiMode;
+    }
+
+    public int getSmallestScreenWidthDp() {
+        return mSmallestScreenWidthDp;
+    }
+
+    public int getScreenWidthDp() {
+        return mScreenWidthDp;
+    }
+
+    public int getScreenHeightDp() {
+        return mScreenHeightDp;
+    }
+
+    public String getLocaleScript() {
+        return mLocaleScript;
+    }
+
+    public String getLocaleVariant() {
+        return mLocaleVariant;
+    }
+
+    public int getScreenLayout2() {
+        return mScreenLayout2;
+    }
+
+    public int getColorMode() {
+        return mColorMode;
+    }
+
+    public byte[] getUnknown() {
+        return mUnknown;
+    }
+
     public boolean isInvalid() {
         return mIsInvalid;
     }

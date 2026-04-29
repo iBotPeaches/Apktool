@@ -104,6 +104,11 @@ public class ApkInfo implements YamlSerializable {
                 break;
             case "apkFileName":
                 mApkFileName = line.getValue();
+                // Sanity check for potential malicious input.
+                if (mApkFileName.equals(".") || mApkFileName.equals("..") || mApkFileName.indexOf('/') != -1
+                        || mApkFileName.indexOf('\\') != -1) {
+                    throw new SecurityException("Malicious value for apkFileName: " + mApkFileName);
+                }
                 break;
             case "usesFramework":
                 mUsesFramework.clear();
