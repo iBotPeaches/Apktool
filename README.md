@@ -31,6 +31,13 @@ If you discover a security vulnerability within Apktool, please send an e-mail t
 - [Source (GitHub)](https://github.com/iBotPeaches/Apktool)
 - [Source (Bitbucket)](https://bitbucket.org/iBotPeaches/apktool/)
 
+### Android (in-app)
+
+For running decode/build **inside an Android app** with bundled **ARM/x86 `aapt2`**
+binaries, see the community-maintained
+[apktool-android](https://github.com/anirudhmalik/apktool-android) project. It is not
+part of this repository; use it for on-device workflows rather than the desktop CLI.
+
 
 ## Sponsors
 
