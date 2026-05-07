@@ -39,7 +39,7 @@ public class ResStringPool {
 
     private static final int UTF8_FLAG = 0x00000100;
 
-    private static final String NULL_MARKER = "";
+    private static final String MALFORMED_MARKER = "";
 
     private final int[] mStringOffsets;
     private final byte[] mStrings;
@@ -166,9 +166,9 @@ public class ResStringPool {
         if (mDecodedStrings != null) {
             String cached = mDecodedStrings[index];
             if (cached != null) {
-                // Reference equality used to check for not-yet-decoded strings.
+                // Reference equality used to check for malformed strings, marked by a single sentinel string.
                 // noinspection StringEquality
-                return cached == NULL_MARKER ? null : cached;
+                return cached == MALFORMED_MARKER ? null : cached;
             }
         }
 
@@ -189,7 +189,7 @@ public class ResStringPool {
         if (mDecodedStrings == null) {
             mDecodedStrings = new String[mStringOffsets.length];
         }
-        mDecodedStrings[index] = string != null ? string : NULL_MARKER;
+        mDecodedStrings[index] = string != null ? string : MALFORMED_MARKER;
 
         return string;
     }
