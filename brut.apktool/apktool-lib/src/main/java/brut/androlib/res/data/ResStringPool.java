@@ -35,6 +35,7 @@ import java.util.Map;
 public class ResStringPool {
     private static final String TAG = ResStringPool.class.getName();
 
+    private static final CharsetDecoder UTF16LE_DECODER = StandardCharsets.UTF_16LE.newDecoder();
     private static final CharsetDecoder CESU8_DECODER = Charset.forName("CESU8").newDecoder();
 
     private static final int UTF8_FLAG = 0x00000100;
@@ -202,7 +203,13 @@ public class ResStringPool {
         }
 
         if (!mIsUtf8) {
-            return new String(mStrings, offset, length, StandardCharsets.UTF_16LE);
+            try {
+                ByteBuffer buffer = ByteBuffer.wrap(mStrings, offset, length);
+                return UTF16LE_DECODER.decode(buffer).toString();
+            } catch (CharacterCodingException ignored) {
+                Log.w(TAG, "Failed to decode a string at offset %s of length %s", offset, length);
+                return null;
+            }
         }
 
         String string = new String(mStrings, offset, length, StandardCharsets.UTF_8);
