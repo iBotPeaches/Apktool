@@ -28,22 +28,25 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ResStringPool {
     private static final String TAG = ResStringPool.class.getName();
 
     private static final CharsetDecoder UTF16LE_DECODER = StandardCharsets.UTF_16LE.newDecoder();
-    private static final CharsetDecoder UTF8_DECODER = StandardCharsets.UTF_8.newDecoder();
     private static final CharsetDecoder CESU8_DECODER = Charset.forName("CESU8").newDecoder();
 
     private static final int UTF8_FLAG = 0x00000100;
-    private static final int HEADER_SIZE = 28;
+    private static final String MALFORMED_MARKER = "";
 
     private final int[] mStringOffsets;
     private final byte[] mStrings;
     private final int[] mStyleOffsets;
     private final int[] mStyles;
     private final boolean mIsUtf8;
+    private String[] mDecodedStrings;
+    private Map<String, Integer> mStringToIndex;
 
     private ResStringPool(int[] stringOffsets, byte[] strings, int[] styleOffsets, int[] styles, boolean isUtf8) {
         mStringOffsets = stringOffsets;
@@ -159,39 +162,63 @@ public class ResStringPool {
             return null;
         }
 
-        int offset = mStringOffsets[index];
-        int[] val;
-        if (mIsUtf8) {
-            val = getUtf8(mStrings, offset);
-            offset = val[0];
-        } else {
-            val = getUtf16(mStrings, offset);
-            offset += val[0];
+        if (mDecodedStrings != null) {
+            String cached = mDecodedStrings[index];
+            if (cached != null) {
+                // Reference equality used to check for malformed strings, marked by a single sentinel string.
+                //noinspection StringEquality
+                return cached == MALFORMED_MARKER ? null : cached;
+            }
         }
 
-        int length = val[1];
-        return decodeString(offset, length);
+        int offset = mStringOffsets[index];
+        long val;
+
+        if (mIsUtf8) {
+            val = getUtf8(mStrings, offset);
+            offset = (int) (val >>> 32);
+        } else {
+            val = getUtf16(mStrings, offset);
+            offset += (int) (val >>> 32);
+        }
+
+        int length = (int) val;
+        String string = decodeString(offset, length);
+
+        if (mDecodedStrings == null) {
+            mDecodedStrings = new String[mStringOffsets.length];
+        }
+        mDecodedStrings[index] = string != null ? string : MALFORMED_MARKER;
+
+        return string;
     }
 
     @VisibleForTesting
     String decodeString(int offset, int length) {
-        try {
-            ByteBuffer buffer = ByteBuffer.wrap(mStrings, offset, length);
-            return (mIsUtf8 ? UTF8_DECODER : UTF16LE_DECODER).decode(buffer).toString();
-        } catch (CharacterCodingException ignored) {
-            if (!mIsUtf8) {
+        if (offset < 0 || length < 0 || offset > mStrings.length - length) {
+            Log.w(TAG, "String extends outside of pool at %s of length %s", offset, length);
+            return null;
+        }
+
+        if (!mIsUtf8) {
+            try {
+                ByteBuffer buffer = ByteBuffer.wrap(mStrings, offset, length);
+                return UTF16LE_DECODER.decode(buffer).toString();
+            } catch (CharacterCodingException ignored) {
                 Log.w(TAG, "Failed to decode a string at offset %s of length %s", offset, length);
-                return null;
-            }
-        } catch (IndexOutOfBoundsException ignored) {
-            if (!mIsUtf8) {
-                Log.w(TAG, "String extends outside of pool at %s of length %s", offset, length);
                 return null;
             }
         }
 
-        // In some cases, Android uses 3-byte UTF-8 sequences instead of 4-bytes.
-        // If decoding failed, we try to use CESU-8 decoder, which is closer to what Android actually uses.
+        String string = new String(mStrings, offset, length, StandardCharsets.UTF_8);
+
+        // In some cases, Android uses 3-byte UTF-8 sequences (CESU-8) instead of 4-bytes.
+        // If decoding failed (byte 0xFFFD corresponds to the replacement character when decoding fails),
+        // this check fails, and we try to use CESU-8 decoder, which is closer to what Android actually uses.
+        if (string.indexOf(0xFFFD) == -1) {
+            return string;
+        }
+
         try {
             ByteBuffer buffer = ByteBuffer.wrap(mStrings, offset, length);
             return CESU8_DECODER.decode(buffer).toString();
@@ -206,27 +233,19 @@ public class ResStringPool {
             return -1;
         }
 
-        int len = string.length();
-        for (int i = 0; i < mStringOffsets.length; i++) {
-            int offset = mStringOffsets[i];
-            int length = getShort(mStrings, offset);
-            if (length != len) {
-                continue;
-            }
-
-            int j = 0;
-            for (; j < length; j++) {
-                offset += 2;
-                if (string.charAt(j) != getShort(mStrings, offset)) {
-                    break;
+        if (mStringToIndex == null) {
+            Map<String, Integer> stringToIndex = new HashMap<>(mStringOffsets.length, 1f);
+            for (int i = 0; i < mStringOffsets.length; i++) {
+                String value = getString(i);
+                if (value != null) {
+                    stringToIndex.putIfAbsent(value, i);
                 }
             }
-            if (j == length) {
-                return i;
-            }
+            mStringToIndex = stringToIndex;
         }
 
-        return -1;
+        Integer index = mStringToIndex.get(string);
+        return index != null ? index : -1;
     }
 
     /**
@@ -258,11 +277,7 @@ public class ResStringPool {
         return style;
     }
 
-    private static int getShort(byte[] array, int offset) {
-        return ((array[offset + 1] & 0xFF) << 8) | (array[offset] & 0xFF);
-    }
-
-    private static int[] getUtf8(byte[] array, int offset) {
+    private static long getUtf8(byte[] array, int offset) {
         int val = array[offset];
 
         // Skip the UTF-16 length of the string.
@@ -284,19 +299,19 @@ public class ResStringPool {
             length = val;
         }
 
-        return new int[] { offset, length };
+        return ((long) offset << 32) | (length & 0xFFFFFFFFL);
     }
 
-    private static int[] getUtf16(byte[] array, int offset) {
+    private static long getUtf16(byte[] array, int offset) {
         int val = ((array[offset + 1] & 0xFF) << 8) | (array[offset] & 0xFF);
 
         if ((val & 0x8000) != 0) {
             int high = (array[offset + 3] & 0xFF) << 8;
             int low = array[offset + 2] & 0xFF;
             int len_value = ((val & 0x7FFF) << 16) + high + low;
-            return new int[] { 4, len_value * 2 };
+            return (4L << 32) | ((len_value * 2) & 0xFFFFFFFFL);
         }
 
-        return new int[] { 2, val * 2 };
+        return (2L << 32) | ((val * 2) & 0xFFFFFFFFL);
     }
 }
