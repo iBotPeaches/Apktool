@@ -310,10 +310,10 @@ public class ResStringPool {
             int high = (array[offset + 3] & 0xFF) << 8;
             int low = array[offset + 2] & 0xFF;
             int len_value = ((val & 0x7FFF) << 16) + high + low;
-            return ((long) 4 << 32) | ((len_value * 2) & 0xFFFFFFFFL);
+            return (4L << 32) | ((len_value * 2) & 0xFFFFFFFFL);
         }
 
-        return ((long) 2 << 32) | (val * 2 & 0xFFFFFFFFL);
+        return (2L << 32) | ((val * 2) & 0xFFFFFFFFL);
     }
 
 }
