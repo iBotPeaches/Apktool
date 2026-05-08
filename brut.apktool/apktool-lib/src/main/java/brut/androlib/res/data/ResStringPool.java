@@ -38,7 +38,6 @@ public class ResStringPool {
     private static final CharsetDecoder CESU8_DECODER = Charset.forName("CESU8").newDecoder();
 
     private static final int UTF8_FLAG = 0x00000100;
-
     private static final String MALFORMED_MARKER = "";
 
     private final int[] mStringOffsets;
@@ -167,7 +166,7 @@ public class ResStringPool {
             String cached = mDecodedStrings[index];
             if (cached != null) {
                 // Reference equality used to check for malformed strings, marked by a single sentinel string.
-                // noinspection StringEquality
+                //noinspection StringEquality
                 return cached == MALFORMED_MARKER ? null : cached;
             }
         }
@@ -216,7 +215,7 @@ public class ResStringPool {
         // In some cases, Android uses 3-byte UTF-8 sequences (CESU-8) instead of 4-bytes.
         // If decoding failed (byte 0xFFFD corresponds to the replacement character when decoding fails),
         // this check fails, and we try to use CESU-8 decoder, which is closer to what Android actually uses.
-        if (string.indexOf(0xFFFD) < 0) {
+        if (string.indexOf(0xFFFD) == -1) {
             return string;
         }
 
@@ -315,5 +314,4 @@ public class ResStringPool {
 
         return (2L << 32) | ((val * 2) & 0xFFFFFFFFL);
     }
-
 }
