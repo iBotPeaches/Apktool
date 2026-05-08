@@ -19,7 +19,6 @@ package brut.androlib.res.data;
 import brut.androlib.res.decoder.ResChunkPullParser;
 import brut.common.Log;
 import brut.util.BinaryDataInputStream;
-import brut.util.PackedValue;
 import com.google.common.annotations.VisibleForTesting;
 
 import java.io.IOException;
@@ -178,13 +177,13 @@ public class ResStringPool {
 
         if (mIsUtf8) {
             val = getUtf8(mStrings, offset);
-            offset = PackedValue.unpackFirst(val);
+            offset = (int) (val >>> 32);
         } else {
             val = getUtf16(mStrings, offset);
-            offset += PackedValue.unpackFirst(val);
+            offset += (int) (val >>> 32);
         }
 
-        int length = PackedValue.unpackSecond(val);
+        int length = (int) val;
         String string = decodeString(offset, length);
 
         if (mDecodedStrings == null) {
@@ -301,7 +300,7 @@ public class ResStringPool {
             length = val;
         }
 
-        return PackedValue.packInts(offset, length);
+        return ((long) offset << 32) | (length & 0xFFFFFFFFL);
     }
 
     private static long getUtf16(byte[] array, int offset) {
@@ -311,10 +310,10 @@ public class ResStringPool {
             int high = (array[offset + 3] & 0xFF) << 8;
             int low = array[offset + 2] & 0xFF;
             int len_value = ((val & 0x7FFF) << 16) + high + low;
-            return PackedValue.packInts(4, len_value * 2);
+            return ((long) 4 << 32) | ((len_value * 2) & 0xFFFFFFFFL);
         }
 
-        return PackedValue.packInts(2, val * 2);
+        return ((long) 2 << 32) | (val * 2 & 0xFFFFFFFFL);
     }
 
 }
