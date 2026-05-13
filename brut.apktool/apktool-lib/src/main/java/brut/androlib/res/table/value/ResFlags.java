@@ -139,6 +139,12 @@ public class ResFlags extends ResAttribute {
                 }
             }
 
+            // Stop early if any of the flags are missing a symbol.
+            if (mask != data) {
+                mSymbolsCache.put(data, null);
+                return null;
+            }
+
             // Filter out redundant flags.
             if (symbolsCount > 2) {
                 Symbol[] filtered = new Symbol[symbolsCount];
@@ -170,9 +176,7 @@ public class ResFlags extends ResAttribute {
             }
         }
 
-        if (symbolsCount == 0) {
-            symbols = null;
-        } else if (symbolsCount < symbols.length) {
+        if (symbolsCount < symbols.length) {
             symbols = Arrays.copyOf(symbols, symbolsCount);
         }
 

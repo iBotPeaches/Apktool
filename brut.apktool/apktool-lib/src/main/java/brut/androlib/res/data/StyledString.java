@@ -98,5 +98,10 @@ public class StyledString implements CharSequence {
         public int getLastChar() {
             return mLastChar;
         }
+
+        @Override
+        public String toString() {
+            return String.format("Span{tag=%s, firstChar=%s, lastChar=%s}", mTag, mFirstChar, mLastChar);
+        }
     }
 }

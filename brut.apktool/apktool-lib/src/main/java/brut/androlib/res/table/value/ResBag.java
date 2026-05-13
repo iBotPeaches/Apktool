@@ -63,6 +63,11 @@ public abstract class ResBag extends ResValue implements ValuesXmlSerializable {
         public ResItem getValue() {
             return mValue;
         }
+
+        @Override
+        public String toString() {
+            return String.format("RawItem{key=0x%08x, value=%s}", mKey, mValue);
+        }
     }
 
     public void resolveKeys() throws AndrolibException {
