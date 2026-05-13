@@ -277,7 +277,7 @@ public class BinaryXmlResourceParser implements XmlPullParser {
         // namespace, but it's better than not resolving it at all.
         if (attr.ns < 0) {
             if (nameId.pkgId() == ResTable.APP_PACKAGE_ID) {
-                return getNonDefaultNamespaceUri(index);
+                return ResXmlUtils.ANDROID_RES_NS_AUTO;
             }
             if (nameId.pkgId() == ResTable.SYS_PACKAGE_ID) {
                 return ResXmlUtils.ANDROID_RES_NS;
@@ -292,7 +292,7 @@ public class BinaryXmlResourceParser implements XmlPullParser {
             return uri;
         }
         if (nameId.pkgId() == ResTable.APP_PACKAGE_ID) {
-            return getNonDefaultNamespaceUri(index);
+            return ResXmlUtils.ANDROID_RES_NS_AUTO;
         }
         return ResXmlUtils.ANDROID_RES_NS;
     }
@@ -576,17 +576,6 @@ public class BinaryXmlResourceParser implements XmlPullParser {
     }
 
     // Utility methods
-
-    private String getNonDefaultNamespaceUri(int pos) {
-        String prefix = getNamespacePrefix(pos);
-        if (prefix == null) {
-            // If we are here, there is some clever obfuscation going on.
-            // Our reference points to the namespace are gone. We have the namespaces that can't be touched in the
-            // opening tag, though no known way to correlate them at this time, so return the res-auto namespace.
-            return ResXmlUtils.ANDROID_RES_NS_AUTO;
-        }
-        return getNamespaceUri(pos);
-    }
 
     private Attribute getAttribute(int index) {
         if (mEventType != START_TAG) {
