@@ -76,6 +76,11 @@ public class ResStyle extends ResBag {
         public ResItem getValue() {
             return mValue;
         }
+
+        @Override
+        public String toString() {
+            return String.format("Item{key=%s, value=%s}", mKey, mValue);
+        }
     }
 
     @Override

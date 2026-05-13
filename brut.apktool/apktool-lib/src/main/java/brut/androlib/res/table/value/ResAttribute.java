@@ -146,6 +146,11 @@ public class ResAttribute extends ResBag {
         public ResPrimitive getValue() {
             return mValue;
         }
+
+        @Override
+        public String toString() {
+            return String.format("Symbol{key=%s, value=%s}", mKey, mValue);
+        }
     }
 
     public void addValueType(int valueType) {

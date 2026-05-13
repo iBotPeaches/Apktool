@@ -109,9 +109,13 @@ public class ResEnum extends ResAttribute {
             }
         }
 
+        // Stop early if the value is missing a symbol.
         if (symbolsCount == 0) {
-            symbols = null;
-        } else if (symbolsCount < symbols.length) {
+            mSymbolsCache.put(data, null);
+            return null;
+        }
+
+        if (symbolsCount < symbols.length) {
             symbols = Arrays.copyOf(symbols, symbolsCount);
         }
 
