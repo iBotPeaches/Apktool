@@ -18,8 +18,6 @@ package brut.androlib;
 
 import brut.xml.XmlUtils;
 import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
 
 import java.io.File;
 
@@ -76,13 +74,9 @@ public class NoNetworkConfigTest extends BaseTest {
     public void netSecConfInManifest() throws Exception {
         log("Validating network security config in Manifest...");
 
-        // Load the XML document
-        Document doc = XmlUtils.loadDocument(new File(sTestNewDir, "AndroidManifest.xml"));
-
-        // Check if network security config attribute is set correctly
-        Node application = doc.getElementsByTagName("application").item(0);
-        NamedNodeMap attrs = application.getAttributes();
-        Node netSecConfAttr = attrs.getNamedItem("android:networkSecurityConfig");
-        assertEquals("@xml/network_security_config", netSecConfAttr.getNodeValue());
+        Document doc = XmlUtils.loadDocument(new File(sTestNewDir, "AndroidManifest.xml"), true);
+        String expression = "/manifest/application/@android:networkSecurityConfig";
+        String value = XmlUtils.evaluateXPath(doc, expression, String.class);
+        assertEquals("@xml/network_security_config", value);
     }
 }

@@ -18,30 +18,30 @@ package brut.androlib;
 
 import brut.xml.XmlUtils;
 import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
+import org.w3c.dom.Node;
 
 import java.io.File;
 
 import org.junit.*;
 import static org.junit.Assert.*;
 
-public class LargeCompactResourceTest extends BaseTest {
-    private static final String TEST_APK = "issue3705.apk";
+public class StrippedNamespaceTest extends BaseTest {
+    private static final String TEST_APK = "issue3533.apk";
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        copyResourceDir(CompactResourceTest.class, "issue3705", sTmpDir);
+        copyResourceDir(StrippedNamespaceTest.class, "issue3533", sTmpDir);
     }
 
     @Test
-    public void checkIfDecodeSucceeds() throws Exception {
+    public void checkAssignedNamespaceTest() throws Exception {
         File testApk = new File(sTmpDir, TEST_APK);
         File testDir = new File(testApk + ".out");
         new ApkDecoder(testApk, sConfig).decode(testDir);
 
-        Document doc = XmlUtils.loadDocument(new File(testDir, "res/values/strings.xml"));
-        String expression = "/resources/string[contains(@name, 'APKTOOL')]";
-        NodeList nodes = XmlUtils.evaluateXPath(doc, expression, NodeList.class);
-        assertEquals(0, nodes.getLength());
+        Document doc = XmlUtils.loadDocument(new File(testDir, "res/drawable/trap.xml"), true);
+        String expression = "/selector/item/@test:is_obfuscated";
+        Node node = XmlUtils.evaluateXPath(doc, expression, Node.class);
+        assertNotNull(node);
     }
 }

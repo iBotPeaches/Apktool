@@ -18,9 +18,7 @@ package brut.androlib;
 
 import brut.xml.XmlUtils;
 import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import java.io.File;
 
@@ -56,31 +54,26 @@ public class NetworkConfigTest extends BaseTest {
     public void netSecConfGeneric() throws Exception {
         log("Verifying network security configuration file contains user and system certificates...");
 
-        // Load the XML document
         Document doc = XmlUtils.loadDocument(new File(sTestNewDir, "res/xml/network_security_config.xml"));
 
         // Check if 'system' certificate exists
         String systemCertExpr = "/network-security-config/base-config/trust-anchors/certificates[@src='system']";
-        NodeList systemCertNodes = XmlUtils.evaluateXPath(doc, systemCertExpr, NodeList.class);
-        assertTrue(systemCertNodes.getLength() > 0);
+        Node systemCertNode = XmlUtils.evaluateXPath(doc, systemCertExpr, Node.class);
+        assertNotNull(systemCertNode);
 
         // Check if 'user' certificate exists
         String userCertExpr = "/network-security-config/base-config/trust-anchors/certificates[@src='user']";
-        NodeList userCertNodes = XmlUtils.evaluateXPath(doc, userCertExpr, NodeList.class);
-        assertTrue(userCertNodes.getLength() > 0);
+        Node userCertNode = XmlUtils.evaluateXPath(doc, userCertExpr, Node.class);
+        assertNotNull(userCertNode);
     }
 
     @Test
     public void netSecConfInManifest() throws Exception {
         log("Validating network security config in Manifest...");
 
-        // Load the XML document
-        Document doc = XmlUtils.loadDocument(new File(sTestNewDir, "AndroidManifest.xml"));
-
-        // Check if network security config attribute is set correctly
-        Node application = doc.getElementsByTagName("application").item(0);
-        NamedNodeMap attrs = application.getAttributes();
-        Node netSecConfAttr = attrs.getNamedItem("android:networkSecurityConfig");
-        assertEquals("@xml/network_security_config", netSecConfAttr.getNodeValue());
+        Document doc = XmlUtils.loadDocument(new File(sTestNewDir, "AndroidManifest.xml"), true);
+        String expression = "/manifest/application/@android:networkSecurityConfig";
+        String value = XmlUtils.evaluateXPath(doc, expression, String.class);
+        assertEquals("@xml/network_security_config", value);
     }
 }

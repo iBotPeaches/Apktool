@@ -21,7 +21,6 @@ import brut.directory.ExtFile;
 import brut.util.OSDetection;
 import brut.xml.XmlUtils;
 import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 import javax.imageio.ImageIO;
@@ -90,20 +89,22 @@ public class BuildAndDecodeApkTest extends BaseTest {
     @Test
     public void confirmPlatformManifestValuesTest() throws Exception {
         Document doc = XmlUtils.loadDocument(new File(sTestNewDir, "AndroidManifest.xml"));
-        Node application = doc.getElementsByTagName("manifest").item(0);
-        NamedNodeMap attrs = application.getAttributes();
 
-        Node platformBuildVersionNameAttr = attrs.getNamedItem("platformBuildVersionName");
-        assertEquals("6.0-2438415", platformBuildVersionNameAttr.getNodeValue());
+        String platformBuildVersionNameExpr = "/manifest/@platformBuildVersionName";
+        String platformBuildVersionNameValue = XmlUtils.evaluateXPath(doc, platformBuildVersionNameExpr, String.class);
+        assertEquals("6.0-2438415", platformBuildVersionNameValue);
 
-        Node platformBuildVersionCodeAttr = attrs.getNamedItem("platformBuildVersionCode");
-        assertEquals("23", platformBuildVersionCodeAttr.getNodeValue());
+        String platformBuildVersionCodeExpr = "/manifest/@platformBuildVersionCode";
+        String platformBuildVersionCodeValue = XmlUtils.evaluateXPath(doc, platformBuildVersionCodeExpr, String.class);
+        assertEquals("23", platformBuildVersionCodeValue);
 
-        Node compileSdkVersionAttr = attrs.getNamedItem("compileSdkVersion");
-        assertNull("compileSdkVersion should have been stripped", compileSdkVersionAttr);
+        String compileSdkVersionExpr = "/manifest/@compileSdkVersion";
+        Node compileSdkVersionNode = XmlUtils.evaluateXPath(doc, compileSdkVersionExpr, Node.class);
+        assertNull("compileSdkVersion should have been stripped", compileSdkVersionNode);
 
-        Node compileSdkVersionCodenameAttr = attrs.getNamedItem("compileSdkVersionCodename");
-        assertNull("compileSdkVersionCodename should have been stripped", compileSdkVersionCodenameAttr);
+        String compileSdkVersionCodenameExpr = "/manifest/@compileSdkVersionCodename";
+        Node compileSdkVersionCodenameNode = XmlUtils.evaluateXPath(doc, compileSdkVersionCodenameExpr, Node.class);
+        assertNull("compileSdkVersionCodename should have been stripped", compileSdkVersionCodenameNode);
     }
 
     @Test
@@ -199,8 +200,8 @@ public class BuildAndDecodeApkTest extends BaseTest {
         // valuesExtraLongTest covers this scenario, but we want a specific test
         // for such an edge case.
         String expression = "/resources/string[@name='long_string_32767']/text()";
-        String str = XmlUtils.evaluateXPath(doc, expression, String.class);
-        assertEquals(0x7FFF, str.length());
+        String value = XmlUtils.evaluateXPath(doc, expression, String.class);
+        assertEquals(0x7FFF, value.length());
     }
 
     @Test

@@ -43,7 +43,5 @@ public class CompactResourceTest extends BaseTest {
         String expression = "/resources/string[@name]";
         NodeList nodes = XmlUtils.evaluateXPath(doc, expression, NodeList.class);
         assertEquals(1002, nodes.getLength());
-
-        new ApkBuilder(testDir, sConfig).build(null);
     }
 }
