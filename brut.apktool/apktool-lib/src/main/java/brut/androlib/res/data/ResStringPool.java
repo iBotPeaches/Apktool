@@ -106,6 +106,9 @@ public class ResStringPool {
     }
 
     private static int[] readIntArraySafe(BinaryDataInputStream in, int len, long maxPosition) throws IOException {
+        if (len < 0 || len > 1000000) {
+            return new int[0];
+        }
         int[] arr = new int[len];
         for (int i = 0; i < len; i++) {
             // #3236 - Some apps have more strings than can fit into the block. This function takes an expected max

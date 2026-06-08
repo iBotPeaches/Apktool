@@ -247,6 +247,9 @@ public final class ResStringEncoder {
 
     private static boolean isAmbiguousString(CharSequence text, int attrType) {
         int len = text.length();
+        if (len == 0) {
+            return false;
+        }
         char ch = text.charAt(0);
 
         // Check for a reference.
@@ -398,7 +401,7 @@ public final class ResStringEncoder {
                 if (sequentialCount == sequential.length) {
                     sequential = Arrays.copyOf(sequential, sequential.length + 4);
                 }
-                sequential[sequentialCount++] = i - 1;
+                sequential[sequentialCount++] = i;
                 break;
             }
 

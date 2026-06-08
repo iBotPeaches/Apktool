@@ -162,9 +162,13 @@ public final class OS {
             Process process = builder.start();
             StreamCollector collector = new StreamCollector(process.getInputStream());
             executor.execute(collector);
-            process.waitFor(15, TimeUnit.SECONDS);
+            boolean finished = process.waitFor(15, TimeUnit.SECONDS);
             executor.shutdownNow();
 
+            if (!finished) {
+                process.destroyForcibly();
+                Log.w(TAG, "Process timed out after 15 seconds.");
+            }
             if (!executor.awaitTermination(5, TimeUnit.SECONDS)) {
                 Log.w(TAG, "Stream collector did not terminate.");
             }
@@ -176,17 +180,7 @@ public final class OS {
 
     public static File createTempDirectory() throws BrutException {
         try {
-            File tmp = File.createTempFile("BRUT", null);
-            tmp.deleteOnExit();
-
-            if (!tmp.delete()) {
-                throw new BrutException("Could not delete tmp file: " + tmp.getAbsolutePath());
-            }
-            if (!tmp.mkdir()) {
-                throw new BrutException("Could not create tmp dir: " + tmp.getAbsolutePath());
-            }
-
-            return tmp;
+            return Files.createTempDirectory("BRUT").toFile();
         } catch (IOException ex) {
             throw new BrutException("Could not create tmp dir", ex);
         }
@@ -199,6 +193,7 @@ public final class OS {
         public StreamForwarder(InputStream in, String type) {
             mIn = in;
             mType = type;
+            setDaemon(true);
         }
 
         @Override
