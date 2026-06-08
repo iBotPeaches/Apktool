@@ -204,7 +204,11 @@ public final class TextUtils {
         }
 
         if (i + 1 < end && text.charAt(i) == '0' && (text.charAt(i + 1) == 'x' || text.charAt(i + 1) == 'X')) {
-            if (negative || (i += 2) == end) {
+            if (negative) {
+                throw new NumberFormatException();
+            }
+            i += 2;
+            if (i == end) {
                 throw new NumberFormatException();
             }
             return parseIntHex(text, i, end);
@@ -264,7 +268,7 @@ public final class TextUtils {
             throw new NumberFormatException();
         }
 
-        int i = 0;
+        int i = start;
         boolean negative = text.charAt(i) == '-';
         if ((negative || text.charAt(i) == '+') && ++i == end) {
             throw new NumberFormatException();

@@ -64,7 +64,7 @@ public class YamlLine {
                 value = line.substring(1).trim();
             } else {
                 // split line to key - value
-                String[] parts = line.split(":");
+                String[] parts = line.split(":", 2);
                 if (parts.length > 0) {
                     key = parts[0].trim();
                     if (parts.length > 1) {

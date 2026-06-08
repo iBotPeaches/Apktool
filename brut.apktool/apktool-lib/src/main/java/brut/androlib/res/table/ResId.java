@@ -16,13 +16,13 @@
  */
 package brut.androlib.res.table;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ResId extends Number implements Comparable<ResId> {
     public static final ResId NULL = new ResId(0);
 
-    private static final Map<Integer, ResId> sCache = new HashMap<>();
+    private static final Map<Integer, ResId> sCache = new ConcurrentHashMap<>();
 
     private final int mId;
 

@@ -105,7 +105,9 @@ public class SmaliDecoder {
 
                 String dirName = "smali";
                 if (dexNum > 1 || !dexName.equals("classes.dex")) {
-                    dirName += "_" + dexName.substring(0, dexName.lastIndexOf('.')).replace('/', '@');
+                    int lastDot = dexName.lastIndexOf('.');
+                    String baseName = lastDot > 0 ? dexName.substring(0, lastDot) : dexName;
+                    dirName += "_" + baseName.replace('/', '@');
                     if (dexNum > 1) {
                         dirName += dexNum;
                     }

@@ -271,7 +271,7 @@ public class ResTable {
     public String getDynamicRefPackageName(int id) {
         String name = mDynamicRefTable.get(id);
         if (name == null) {
-            Log.w(TAG, "Dynamic ref package name not defined for package ID: 0x02x", id);
+            Log.w(TAG, "Dynamic ref package name not defined for package ID: %02x", id);
         }
         return name;
     }

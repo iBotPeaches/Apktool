@@ -101,7 +101,9 @@ tasks.wrapper {
 
 tasks.withType<JavaCompile> {
     options.compilerArgs.add("-Xlint:-options")
-    options.compilerArgs.add("--release 8")
+    if (JavaVersion.current().isJava9Compatible) {
+        options.compilerArgs.add("--release 8")
+    }
 
     options.encoding = "UTF-8"
 }

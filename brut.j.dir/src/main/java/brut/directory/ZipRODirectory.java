@@ -66,7 +66,7 @@ public class ZipRODirectory extends Directory {
             ZipEntry entry = entries.nextElement();
             String name = entry.getName();
 
-            if (name.equals(mPath) || !name.startsWith(mPath) || name.contains(".." + separator)) {
+            if (name.equals(mPath) || !name.startsWith(mPath) || name.contains("../") || name.equals("..")) {
                 continue;
             }
 

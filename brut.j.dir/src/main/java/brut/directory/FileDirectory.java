@@ -48,6 +48,9 @@ public class FileDirectory extends Directory {
         mDirs = new LinkedHashMap<>();
 
         File[] files = mDir.listFiles();
+        if (files == null) {
+            return;
+        }
         Arrays.sort(files, Comparator.comparing(File::getName));
 
         for (File file : files) {

@@ -216,7 +216,11 @@ public class Framework {
         String suffix = ignoreTag ? getApkSuffix(null) : getApkSuffix();
         List<File> apkFiles = new ArrayList<>();
 
-        for (File file : getDirectory().listFiles()) {
+        File[] files = getDirectory().listFiles();
+        if (files == null) {
+            return apkFiles;
+        }
+        for (File file : files) {
             if (file.isFile() && isValidApkName(file.getName(), suffix, ignoreTag)) {
                 apkFiles.add(file);
             }

@@ -23,12 +23,12 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
 public final class Jar {
-    private static final Map<String, File> sExtracted = new HashMap<>();
+    private static final Map<String, File> sExtracted = new ConcurrentHashMap<>();
 
     private Jar() {
         // Private constructor for utility class.

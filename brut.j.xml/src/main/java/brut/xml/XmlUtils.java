@@ -121,6 +121,14 @@ public final class XmlUtils {
     public static void saveDocument(Document doc, File file)
             throws IOException, SAXException, ParserConfigurationException, TransformerException {
         TransformerFactory factory = TransformerFactory.newInstance();
+        factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+
+        try {
+            factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+            factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+        } catch (IllegalArgumentException ignored) {
+        }
+
         Transformer transformer = factory.newTransformer();
         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
 
@@ -153,7 +161,9 @@ public final class XmlUtils {
             throw new IllegalArgumentException("Unexpected return type: " + returnType.getName());
         }
 
-        XPath xPath = XPathFactory.newInstance().newXPath();
+        XPathFactory xPathFactory = XPathFactory.newInstance();
+        xPathFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        XPath xPath = xPathFactory.newXPath();
         xPath.setNamespaceContext(new NamespaceContext() {
             @Override
             public String getNamespaceURI(String prefix) {

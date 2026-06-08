@@ -142,7 +142,7 @@ public class ResReference extends ResItem {
         }
         if (obj instanceof ResReference) {
             ResReference other = (ResReference) obj;
-            return mPackage.equals(other.mPackage)
+            return Objects.equals(mPackage, other.mPackage)
                 && mResId == other.mResId
                 && mAsAttr == other.mAsAttr;
         }

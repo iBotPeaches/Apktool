@@ -77,6 +77,13 @@ else
 fi
 
 # add current location to path for aapt
-PATH=$PATH:`pwd`;
+if [ -x "$progdir/aapt2" ]; then
+    aaptPath="$progdir"
+elif [ -x "$progdir/aapt" ]; then
+    aaptPath="$progdir"
+else
+    aaptPath="$PATH"
+fi
+PATH="$PATH:$aaptPath";
 export PATH;
-exec java $javaOpts -jar "$jarpath" "$@"
+exec java $javaOpts -Djava.awt.headless=true -jar "$jarpath" "$@"

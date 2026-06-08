@@ -54,6 +54,26 @@ public class YamlWriter implements Closeable {
         return YamlStringEscapeUtils.escapeString(value);
     }
 
+    private static boolean needsYamlQuoting(String value) {
+        if (value == null || value.isEmpty()) {
+            return true;
+        }
+        char first = value.charAt(0);
+        if (first == '-' || first == '?' || first == ':' || first == ','
+                || first == '{' || first == '}' || first == '[' || first == ']'
+                || first == '&' || first == '*' || first == '!' || first == '|'
+                || first == '>' || first == '%' || first == '@' || first == '`'
+                || first == '#' || first == '\'' || first == '"'
+                || Character.isWhitespace(first)) {
+            return true;
+        }
+        if (value.contains(": ") || value.contains(" #")) {
+            return true;
+        }
+        char last = value.charAt(value.length() - 1);
+        return Character.isWhitespace(last);
+    }
+
     public void nextIndent() {
         mIndent += 2;
     }
@@ -79,7 +99,7 @@ public class YamlWriter implements Closeable {
             val = "null";
         } else {
             val = escape(value);
-            if (quoted) {
+            if (quoted || needsYamlQuoting(escape(value))) {
                 val = QUOTE + val + QUOTE;
             }
         }
@@ -104,10 +124,12 @@ public class YamlWriter implements Closeable {
         }
         writeIndent();
         mWriter.println(escape(key) + ":");
+        nextIndent();
         for (T item : list) {
             writeIndent();
-            mWriter.println("- " + item);
+            mWriter.println("- " + escape(String.valueOf(item)));
         }
+        prevIndent();
     }
 
     public <T> void writeMap(String key, Map<String, T> map) {

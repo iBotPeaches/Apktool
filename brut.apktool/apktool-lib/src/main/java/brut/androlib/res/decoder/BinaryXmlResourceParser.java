@@ -735,6 +735,10 @@ public class BinaryXmlResourceParser implements XmlPullParser {
                     for (int i = 0; i < attributeCount; i++) {
                         Attribute attr = Attribute.read(mIn);
 
+                        if (attr == null) {
+                            continue;
+                        }
+
                         if (attributeSize > Attribute.SIZE) {
                             int skipped = mIn.skipBytes(attributeSize - Attribute.SIZE);
                             Log.d(TAG, "Skipped unknown %s bytes in attribute.", skipped);

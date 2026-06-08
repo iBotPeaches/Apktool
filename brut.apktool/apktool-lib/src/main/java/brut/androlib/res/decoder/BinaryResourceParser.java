@@ -626,6 +626,13 @@ public class BinaryResourceParser {
         int parentId = mIn.readInt();
         int count = mIn.readInt();
 
+        if (count < 0) {
+            throw new AndrolibException("Invalid bag item count: " + count);
+        }
+        if (count > 1000000) {
+            throw new AndrolibException("Bag item count exceeds maximum. Payload blocked: " + count);
+        }
+
         // Some apps store ID resource values generated for enum/flag items in attribute resources as empty maps.
         // Replace with a placeholder value.
         if (typeName.equals("id")) {
@@ -746,6 +753,10 @@ public class BinaryResourceParser {
             // ResTable_overlayable_policy_header
             int flags = mIn.readInt();
             int entryCount = mIn.readInt();
+
+            if (entryCount < 0 || entryCount > 1000000) {
+                throw new AndrolibException("Invalid overlayable entry count: " + entryCount);
+            }
 
             skipUnreadHeader(parser);
 

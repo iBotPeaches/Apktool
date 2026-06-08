@@ -65,10 +65,12 @@ public final class BrutIO {
         long modified = file.lastModified();
         if (file.isDirectory()) {
             File[] subfiles = file.listFiles();
-            for (File subfile : subfiles) {
-                long submodified = recursiveModifiedTime(subfile);
-                if (submodified > modified) {
-                    modified = submodified;
+            if (subfiles != null) {
+                for (File subfile : subfiles) {
+                    long submodified = recursiveModifiedTime(subfile);
+                    if (submodified > modified) {
+                        modified = submodified;
+                    }
                 }
             }
         }

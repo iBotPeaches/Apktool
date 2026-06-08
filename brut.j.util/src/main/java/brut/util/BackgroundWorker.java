@@ -17,6 +17,7 @@
 package brut.util;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -31,26 +32,30 @@ public class BackgroundWorker {
 
     public BackgroundWorker(int threads) {
         mExecutor = Executors.newFixedThreadPool(threads);
-        mWorkerFutures = new ArrayList<>();
+        mWorkerFutures = Collections.synchronizedList(new ArrayList<>());
         mSubmitAllowed = true;
     }
 
-    public void waitForFinish() {
+    public synchronized void waitForFinish() {
         checkState();
         mSubmitAllowed = false;
-        for (Future<?> future : mWorkerFutures) {
-            try {
-                future.get();
-            } catch (InterruptedException | ExecutionException ex) {
-                throw new RuntimeException(ex);
+        synchronized (mWorkerFutures) {
+            for (Future<?> future : mWorkerFutures) {
+                try {
+                    future.get();
+                } catch (InterruptedException | ExecutionException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
+            mWorkerFutures.clear();
         }
-        mWorkerFutures.clear();
         mSubmitAllowed = true;
     }
 
     public void clearFutures() {
-        mWorkerFutures.clear();
+        synchronized (mWorkerFutures) {
+            mWorkerFutures.clear();
+        }
     }
 
     private void checkState() {

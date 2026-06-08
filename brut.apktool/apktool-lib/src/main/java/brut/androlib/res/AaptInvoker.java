@@ -46,6 +46,16 @@ public class AaptInvoker {
         VersionInfo versionInfo = mApkInfo.getVersionInfo();
         ResourcesInfo resourcesInfo = mApkInfo.getResourcesInfo();
 
+        if (sdkInfo == null) {
+            throw new AndrolibException("Missing SDK info in APK metadata.");
+        }
+        if (versionInfo == null) {
+            throw new AndrolibException("Missing version info in APK metadata.");
+        }
+        if (resourcesInfo == null) {
+            throw new AndrolibException("Missing resources info in APK metadata.");
+        }
+
         String aaptPath = mConfig.getAaptBinary();
         if (aaptPath == null || aaptPath.isEmpty()) {
             try {

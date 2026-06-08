@@ -27,8 +27,6 @@ public class YamlReader {
     private int mCurrent;
 
     public YamlReader(InputStream in) {
-        mLines = new ArrayList<>();
-        mLines.add(new YamlLine(null));
         read(in);
     }
 
@@ -39,10 +37,11 @@ public class YamlReader {
     }
 
     public void read(InputStream in) {
-        Scanner scanner = new Scanner(in);
         mLines = new ArrayList<>();
-        while (scanner.hasNextLine()) {
-            mLines.add(new YamlLine(scanner.nextLine()));
+        try (Scanner scanner = new Scanner(in)) {
+            while (scanner.hasNextLine()) {
+                mLines.add(new YamlLine(scanner.nextLine()));
+            }
         }
         mLines.add(new YamlLine(null));
     }

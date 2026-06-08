@@ -32,7 +32,9 @@ public abstract class ResItem extends ResValue implements ValuesXmlSerializable 
     }
 
     public static ResItem parse(ResPackage pkg, int type, int data) {
-        assert type != TYPE_STRING;
+        if (type == TYPE_STRING) {
+            throw new IllegalArgumentException("TYPE_STRING is not supported in ResItem.parse()");
+        }
         switch (type) {
             case TYPE_NULL:
                 return data == DATA_NULL_EMPTY ? ResPrimitive.EMPTY : ResPrimitive.NULL;
