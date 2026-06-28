@@ -18,8 +18,9 @@ package brut.androlib.res.table;
 
 import java.util.Arrays;
 import java.util.Locale;
+import java.util.Objects;
 
-public class ResConfig {
+public final class ResConfig {
     public static final int SDK_BASE = 1;
     public static final int SDK_BASE_1_1 = 2;
     public static final int SDK_CUPCAKE = 3;
@@ -196,8 +197,9 @@ public class ResConfig {
     private final int mColorMode;
     private final byte[] mUnknown;
 
-    private final String mQualifiers;
+    private String mQualifiers;
     private final boolean mIsInvalid;
+    private final int mHashCode;
 
     private ResConfig() {
         mMcc = 0;
@@ -225,8 +227,9 @@ public class ResConfig {
         mScreenLayout2 = 0;
         mColorMode = COLOR_MODE_WIDECG_ANY | COLOR_MODE_HDR_ANY;
         mUnknown = null;
-        mQualifiers = "";
+        mQualifiers = null;
         mIsInvalid = false;
+        mHashCode = computeHashCode();
     }
 
     public ResConfig(int mcc, int mnc, String language, String region, int orientation, int touchscreen, int density,
@@ -259,12 +262,12 @@ public class ResConfig {
         mScreenLayout2 = screenLayout2;
         mColorMode = colorMode;
         mUnknown = unknown;
-        boolean[] isInvalid = new boolean[1];
-        mQualifiers = computeQualifiers(isInvalid);
-        mIsInvalid = isInvalid[0];
+        mQualifiers = null;
+        mIsInvalid = computeIsInvalid();
+        mHashCode = computeHashCode();
     }
 
-    private String computeQualifiers(boolean[] isInvalid) {
+    private String computeQualifiers() {
         StringBuilder sb = new StringBuilder();
         if (mMcc != 0) {
             sb.append("-mcc").append(String.format(Locale.ROOT, "%03d", mMcc));
@@ -308,7 +311,6 @@ public class ResConfig {
                 break;
             default:
                 sb.append("-grammaticalGender=").append(mGrammaticalInflection & MASK_GRAMMATICAL_GENDER);
-                isInvalid[0] = true;
                 break;
         }
         switch (mScreenLayout & MASK_LAYOUTDIR) {
@@ -322,7 +324,6 @@ public class ResConfig {
                 break;
             default:
                 sb.append("-layoutDir=").append(mScreenLayout & MASK_LAYOUTDIR);
-                isInvalid[0] = true;
                 break;
         }
         if (mSmallestScreenWidthDp != 0) {
@@ -351,7 +352,6 @@ public class ResConfig {
                 break;
             default:
                 sb.append("-screenSize=").append(mScreenLayout & MASK_SCREENSIZE);
-                isInvalid[0] = true;
                 break;
         }
         switch (mScreenLayout & MASK_SCREENLONG) {
@@ -365,7 +365,6 @@ public class ResConfig {
                 break;
             default:
                 sb.append("-screenLong=").append(mScreenLayout & MASK_SCREENLONG);
-                isInvalid[0] = true;
                 break;
         }
         switch (mScreenLayout2 & MASK_SCREENROUND) {
@@ -379,7 +378,6 @@ public class ResConfig {
                 break;
             default:
                 sb.append("-screenRound=").append(mScreenLayout2 & MASK_SCREENROUND);
-                isInvalid[0] = true;
                 break;
         }
         switch (mColorMode & MASK_COLOR_MODE_WIDECG) {
@@ -393,7 +391,6 @@ public class ResConfig {
                 break;
             default:
                 sb.append("-colorModeWideCG=").append(mColorMode & MASK_COLOR_MODE_WIDECG);
-                isInvalid[0] = true;
                 break;
         }
         switch (mColorMode & MASK_COLOR_MODE_HDR) {
@@ -407,7 +404,6 @@ public class ResConfig {
                 break;
             default:
                 sb.append("-colorModeHdr=").append(mColorMode & MASK_COLOR_MODE_HDR);
-                isInvalid[0] = true;
                 break;
         }
         switch (mOrientation) {
@@ -424,7 +420,6 @@ public class ResConfig {
                 break;
             default:
                 sb.append("-orientation=").append(mOrientation);
-                isInvalid[0] = true;
                 break;
         }
         switch (mUiMode & MASK_UI_MODE_TYPE) {
@@ -466,7 +461,6 @@ public class ResConfig {
                 break;
             default:
                 sb.append("-uiModeType=").append(mUiMode & MASK_UI_MODE_TYPE);
-                isInvalid[0] = true;
                 break;
         }
         switch (mUiMode & MASK_UI_MODE_NIGHT) {
@@ -480,7 +474,6 @@ public class ResConfig {
                 break;
             default:
                 sb.append("-uiModeNight=").append(mUiMode & MASK_UI_MODE_NIGHT);
-                isInvalid[0] = true;
                 break;
         }
         switch (mDensity) {
@@ -531,7 +524,6 @@ public class ResConfig {
                 break;
             default:
                 sb.append("-touchscreen=").append(mTouchscreen);
-                isInvalid[0] = true;
                 break;
         }
         switch (mInputFlags & MASK_KEYSHIDDEN) {
@@ -548,7 +540,6 @@ public class ResConfig {
                 break;
             default:
                 sb.append("-keysHidden=").append(mInputFlags & MASK_KEYSHIDDEN);
-                isInvalid[0] = true;
                 break;
         }
         switch (mKeyboard) {
@@ -565,7 +556,6 @@ public class ResConfig {
                 break;
             default:
                 sb.append("-keyboard=").append(mKeyboard);
-                isInvalid[0] = true;
                 break;
         }
         switch (mInputFlags & MASK_NAVHIDDEN) {
@@ -579,7 +569,6 @@ public class ResConfig {
                 break;
             default:
                 sb.append("-navHidden=").append(mInputFlags & MASK_NAVHIDDEN);
-                isInvalid[0] = true;
                 break;
         }
         switch (mNavigation) {
@@ -599,7 +588,6 @@ public class ResConfig {
                 break;
             default:
                 sb.append("-navigation=").append(mNavigation);
-                isInvalid[0] = true;
                 break;
         }
         if (mScreenWidth != 0 && mScreenHeight != 0) {
@@ -611,9 +599,173 @@ public class ResConfig {
         if (mUnknown != null) {
             // We have to separate unknown resources to avoid conflicts.
             sb.append("-unk").append(String.format("%08X", Arrays.hashCode(mUnknown)));
-            isInvalid[0] = true;
         }
         return sb.toString();
+    }
+
+    private boolean computeIsInvalid() {
+        boolean isInvalid = false;
+
+        switch (mGrammaticalInflection & MASK_GRAMMATICAL_GENDER) {
+            case GRAMMATICAL_GENDER_ANY:
+            case GRAMMATICAL_GENDER_NEUTER:
+            case GRAMMATICAL_GENDER_FEMININE:
+            case GRAMMATICAL_GENDER_MASCULINE:
+                break;
+            default:
+                isInvalid = true;
+                break;
+        }
+        switch (mScreenLayout & MASK_LAYOUTDIR) {
+            case LAYOUTDIR_ANY:
+            case LAYOUTDIR_LTR:
+            case LAYOUTDIR_RTL:
+                break;
+            default:
+                isInvalid = true;
+                break;
+        }
+        switch (mScreenLayout & MASK_SCREENSIZE) {
+            case SCREENSIZE_ANY:
+            case SCREENSIZE_SMALL:
+            case SCREENSIZE_NORMAL:
+            case SCREENSIZE_LARGE:
+            case SCREENSIZE_XLARGE:
+                break;
+            default:
+                isInvalid = true;
+                break;
+        }
+        switch (mScreenLayout & MASK_SCREENLONG) {
+            case SCREENLONG_ANY:
+            case SCREENLONG_NO:
+            case SCREENLONG_YES:
+                break;
+            default:
+                isInvalid = true;
+                break;
+        }
+        switch (mScreenLayout2 & MASK_SCREENROUND) {
+            case SCREENROUND_ANY:
+            case SCREENROUND_NO:
+            case SCREENROUND_YES:
+                break;
+            default:
+                isInvalid = true;
+                break;
+        }
+        switch (mColorMode & MASK_COLOR_MODE_WIDECG) {
+            case COLOR_MODE_WIDECG_ANY:
+            case COLOR_MODE_WIDECG_NO:
+            case COLOR_MODE_WIDECG_YES:
+                break;
+            default:
+                isInvalid = true;
+                break;
+        }
+        switch (mColorMode & MASK_COLOR_MODE_HDR) {
+            case COLOR_MODE_HDR_ANY:
+            case COLOR_MODE_HDR_NO:
+            case COLOR_MODE_HDR_YES:
+                break;
+            default:
+                isInvalid = true;
+                break;
+        }
+        switch (mOrientation) {
+            case ORIENTATION_ANY:
+            case ORIENTATION_PORT:
+            case ORIENTATION_LAND:
+            case ORIENTATION_SQUARE:
+                break;
+            default:
+                isInvalid = true;
+                break;
+        }
+        switch (mUiMode & MASK_UI_MODE_TYPE) {
+            case UI_MODE_TYPE_ANY:
+            case UI_MODE_TYPE_NORMAL:
+            case UI_MODE_TYPE_DESK:
+            case UI_MODE_TYPE_CAR:
+            case UI_MODE_TYPE_TELEVISION:
+            case UI_MODE_TYPE_APPLIANCE:
+            case UI_MODE_TYPE_WATCH:
+            case UI_MODE_TYPE_VR_HEADSET:
+            case UI_MODE_TYPE_GODZILLAUI:
+            case UI_MODE_TYPE_SMALLUI:
+            case UI_MODE_TYPE_MEDIUMUI:
+            case UI_MODE_TYPE_LARGEUI:
+            case UI_MODE_TYPE_HUGEUI:
+                break;
+            default:
+                isInvalid = true;
+                break;
+        }
+        switch (mUiMode & MASK_UI_MODE_NIGHT) {
+            case UI_MODE_NIGHT_ANY:
+            case UI_MODE_NIGHT_NO:
+            case UI_MODE_NIGHT_YES:
+                break;
+            default:
+                isInvalid = true;
+                break;
+        }
+        switch (mTouchscreen) {
+            case TOUCHSCREEN_ANY:
+            case TOUCHSCREEN_NOTOUCH:
+            case TOUCHSCREEN_STYLUS:
+            case TOUCHSCREEN_FINGER:
+                break;
+            default:
+                isInvalid = true;
+                break;
+        }
+        switch (mInputFlags & MASK_KEYSHIDDEN) {
+            case KEYSHIDDEN_ANY:
+            case KEYSHIDDEN_NO:
+            case KEYSHIDDEN_YES:
+            case KEYSHIDDEN_SOFT:
+                break;
+            default:
+                isInvalid = true;
+                break;
+        }
+        switch (mKeyboard) {
+            case KEYBOARD_ANY:
+            case KEYBOARD_NOKEYS:
+            case KEYBOARD_QWERTY:
+            case KEYBOARD_12KEY:
+                break;
+            default:
+                isInvalid = true;
+                break;
+        }
+        switch (mInputFlags & MASK_NAVHIDDEN) {
+            case NAVHIDDEN_ANY:
+            case NAVHIDDEN_NO:
+            case NAVHIDDEN_YES:
+                break;
+            default:
+                isInvalid = true;
+                break;
+        }
+        switch (mNavigation) {
+            case NAVIGATION_ANY:
+            case NAVIGATION_NONAV:
+            case NAVIGATION_DPAD:
+            case NAVIGATION_TRACKBALL:
+            case NAVIGATION_WHEEL:
+                break;
+            default:
+                isInvalid = true;
+                break;
+        }
+
+        if (mUnknown != null) {
+            isInvalid = true;
+        }
+
+        return isInvalid;
     }
 
     public int getMcc() {
@@ -716,33 +868,87 @@ public class ResConfig {
         return mUnknown;
     }
 
+    public String toQualifiers() {
+        if (mQualifiers == null) {
+            mQualifiers = computeQualifiers();
+        }
+
+        return mQualifiers;
+    }
+
     public boolean isInvalid() {
         return mIsInvalid;
     }
 
-    public String toQualifiers() {
-        return mQualifiers;
-    }
-
     @Override
     public String toString() {
-        return "[" + (!mQualifiers.isEmpty() ? mQualifiers.substring(1) : "DEFAULT") + "]";
+        String qualifiers = toQualifiers();
+        return "[" + (!qualifiers.isEmpty() ? qualifiers.substring(1) : "DEFAULT") + "]";
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (obj == this) {
-            return true;
-        }
-        if (obj instanceof ResConfig) {
-            ResConfig other = (ResConfig) obj;
-            return mQualifiers.equals(other.mQualifiers);
-        }
-        return false;
+    public boolean equals(Object o) {
+        if (o == this) return true;
+        if (!(o instanceof ResConfig)) return false;
+        ResConfig resConfig = (ResConfig) o;
+        return mMcc == resConfig.mMcc
+            && mMnc == resConfig.mMnc
+            && mOrientation == resConfig.mOrientation
+            && mTouchscreen == resConfig.mTouchscreen
+            && mDensity == resConfig.mDensity
+            && mKeyboard == resConfig.mKeyboard
+            && mNavigation == resConfig.mNavigation
+            && mInputFlags == resConfig.mInputFlags
+            && mGrammaticalInflection == resConfig.mGrammaticalInflection
+            && mScreenWidth == resConfig.mScreenWidth
+            && mScreenHeight == resConfig.mScreenHeight
+            && mSdkVersion == resConfig.mSdkVersion
+            && mMinorVersion == resConfig.mMinorVersion
+            && mScreenLayout == resConfig.mScreenLayout
+            && mUiMode == resConfig.mUiMode
+            && mSmallestScreenWidthDp == resConfig.mSmallestScreenWidthDp
+            && mScreenWidthDp == resConfig.mScreenWidthDp
+            && mScreenHeightDp == resConfig.mScreenHeightDp
+            && mScreenLayout2 == resConfig.mScreenLayout2
+            && mColorMode == resConfig.mColorMode
+            && Objects.equals(mLanguage, resConfig.mLanguage)
+            && Objects.equals(mRegion, resConfig.mRegion)
+            && Objects.equals(mLocaleScript, resConfig.mLocaleScript)
+            && Objects.equals(mLocaleVariant, resConfig.mLocaleVariant)
+            && Arrays.equals(mUnknown, resConfig.mUnknown);
     }
 
     @Override
     public int hashCode() {
-        return mQualifiers.hashCode();
+        return mHashCode;
+    }
+
+    private int computeHashCode() {
+        int result = mMcc;
+        result = 31 * result + mMnc;
+        result = 31 * result + mLanguage.hashCode();
+        result = 31 * result + mRegion.hashCode();
+        result = 31 * result + mOrientation;
+        result = 31 * result + mTouchscreen;
+        result = 31 * result + mDensity;
+        result = 31 * result + mKeyboard;
+        result = 31 * result + mNavigation;
+        result = 31 * result + mInputFlags;
+        result = 31 * result + mGrammaticalInflection;
+        result = 31 * result + mScreenWidth;
+        result = 31 * result + mScreenHeight;
+        result = 31 * result + mSdkVersion;
+        result = 31 * result + mMinorVersion;
+        result = 31 * result + mScreenLayout;
+        result = 31 * result + mUiMode;
+        result = 31 * result + mSmallestScreenWidthDp;
+        result = 31 * result + mScreenWidthDp;
+        result = 31 * result + mScreenHeightDp;
+        result = 31 * result + mLocaleScript.hashCode();
+        result = 31 * result + mLocaleVariant.hashCode();
+        result = 31 * result + mScreenLayout2;
+        result = 31 * result + mColorMode;
+        result = 31 * result + Arrays.hashCode(mUnknown);
+        return result;
     }
 }
