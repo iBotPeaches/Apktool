@@ -42,11 +42,14 @@ signing.keyId={gpgKeyId}
 signing.password={gpgPassphrase}
 signing.secretKeyRingFile={gpgSecretKingRingLocation}
 
-ossrhUsername={sonatypeUsername}
-ossrhPassword={sonatypePassword}
+mavenCentralUsername={sonatypeUsername}
+mavenCentralPassword={sonatypePassword}
 ```
 
 Release with maven with `./gradlew build shadowJar release publish`.
+
+* Generate secret key ring - `gpg --export-secret-keys -o ~/.gnupg/secring.gpg`
+* Generate Maven password - `https://central.sonatype.com/usertoken`
 
 ### Building the binary.
 
