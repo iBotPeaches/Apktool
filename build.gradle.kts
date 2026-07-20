@@ -1,7 +1,7 @@
 import java.io.ByteArrayOutputStream
 
-val version = "3.0.3"
-val suffix = ""
+val version = "3.1.0"
+val suffix = "SNAPSHOT"
 
 // Strings embedded into the build.
 var gitRevision by extra("")
