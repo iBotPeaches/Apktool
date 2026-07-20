@@ -64,18 +64,18 @@ jobs:
       - analyze-mac-aapt
       - analyze-linux-aapt
       - analyze-windows-aapt
-    name: Build/Test (JDK ${{ matrix.java }}, ${{ matrix.os }})
+    name: Build (JDK 17) / Test (JDK ${{ matrix.test-java }}, ${{ matrix.os }})
     strategy:
       fail-fast: true
       matrix:
         os: [ ubuntu-latest, macOS-latest, windows-latest ]
-        java: [ 8, 11, 17, 21 ]
+        test-java: [ 8, 11, 17, 21 ]
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-java@v5
         with:
           distribution: 'zulu'
-          java-version: ${{ matrix.java }}
+          java-version: 17
 
       - uses: gradle/actions/setup-gradle@v6.2.0
         with:
@@ -83,11 +83,11 @@ jobs:
 
       - name: Build (Linux/Mac)
         if: runner.os != 'Windows'
-        run: ./gradlew build shadowJar proguard
+        run: ./gradlew build shadowJar proguard -PtestJdkVersion=${{ matrix.test-java }}
 
       - name: Build (Windows)
         if: runner.os == 'Windows'
-        run: ./gradlew.bat build shadowJar proguard
+        run: ./gradlew.bat build shadowJar proguard -PtestJdkVersion=${{ matrix.test-java }}
 
   upload-artifact:
     runs-on: ubuntu-latest
