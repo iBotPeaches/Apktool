@@ -264,7 +264,7 @@ public final class TextUtils {
             throw new NumberFormatException();
         }
 
-        int i = 0;
+        int i = start;
         boolean negative = text.charAt(i) == '-';
         if ((negative || text.charAt(i) == '+') && ++i == end) {
             throw new NumberFormatException();

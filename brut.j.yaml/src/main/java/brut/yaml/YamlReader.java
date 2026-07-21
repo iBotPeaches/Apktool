@@ -24,28 +24,22 @@ import java.util.Map;
 import java.util.Scanner;
 
 public class YamlReader {
-    private List<YamlLine> mLines;
+    private final List<YamlLine> mLines;
     private int mCurrent;
 
     public YamlReader(InputStream in) {
         mLines = new ArrayList<>();
+        Scanner scanner = new Scanner(in, StandardCharsets.UTF_8.name());
+        while (scanner.hasNextLine()) {
+            mLines.add(new YamlLine(scanner.nextLine()));
+        }
         mLines.add(new YamlLine(null));
-        read(in);
     }
 
     public void pushLine() {
         if (mCurrent > 0) {
             mCurrent--;
         }
-    }
-
-    public void read(InputStream in) {
-        Scanner scanner = new Scanner(in, StandardCharsets.UTF_8.name());
-        mLines = new ArrayList<>();
-        while (scanner.hasNextLine()) {
-            mLines.add(new YamlLine(scanner.nextLine()));
-        }
-        mLines.add(new YamlLine(null));
     }
 
     public YamlLine getLine() {

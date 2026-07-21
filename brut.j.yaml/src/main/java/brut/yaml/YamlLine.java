@@ -58,19 +58,21 @@ public class YamlLine {
             value = line.substring(1).trim();
         } else {
             // value line
-            hasColon = line.indexOf(':') != -1;
+            int keyEnd = line.indexOf(':');
+            hasColon = keyEnd != -1;
             if (isItem) {
                 // array item line has only the value
                 value = line.substring(1).trim();
-            } else {
+            } else if (hasColon) {
                 // split line to key - value
-                String[] parts = line.split(":");
-                if (parts.length > 0) {
-                    key = parts[0].trim();
-                    if (parts.length > 1) {
-                        value = parts[1].trim();
-                    }
+                key = line.substring(0, keyEnd).trim();
+                int valueEnd = line.indexOf(':', keyEnd + 1);
+                if (valueEnd == -1) {
+                    valueEnd = line.length();
                 }
+                value = line.substring(keyEnd + 1, valueEnd).trim();
+            } else {
+                key = line;
             }
         }
     }
