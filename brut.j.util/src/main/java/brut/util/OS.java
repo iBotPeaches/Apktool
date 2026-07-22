@@ -61,6 +61,10 @@ public final class OS {
     }
 
     public static void rmdir(File dir) {
+        if (Files.isSymbolicLink(dir.toPath())) {
+            rmfile(dir);
+            return;
+        }
         if (!dir.isDirectory()) {
             return;
         }
@@ -71,7 +75,7 @@ public final class OS {
         }
 
         for (File file : files) {
-            if (file.isDirectory()) {
+            if (!Files.isSymbolicLink(file.toPath()) && file.isDirectory()) {
                 rmdir(file);
             } else {
                 rmfile(file);
