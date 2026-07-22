@@ -40,6 +40,7 @@ import brut.util.ZipUtils;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.zip.ZipOutputStream;
@@ -129,6 +130,11 @@ public class ApkBuilder {
                     fileName = "classes.dex";
                 } else if (dirName.startsWith("smali_")) {
                     fileName = dirName.substring(dirName.indexOf('_') + 1).replace('@', File.separatorChar) + ".dex";
+                    try {
+                        BrutIO.sanitizePath(outDir, fileName);
+                    } catch (InvalidPathException | IOException ex) {
+                        throw new AndrolibException("Smali folder name leads to invalid dex path: " + dirName, ex);
+                    }
                 } else {
                     continue;
                 }
