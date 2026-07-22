@@ -81,6 +81,14 @@ subprojects {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 
+    tasks.withType<JavaCompile>().configureEach {
+        options.encoding = "UTF-8"
+
+        if (JavaVersion.current().isJava9Compatible) {
+            options.release.set(8)
+        }
+    }
+
     val mavenProjects = arrayOf(
         "brut.j.common", "brut.j.util", "brut.j.dir", "brut.j.xml", "brut.j.yaml",
         "apktool-lib", "apktool-cli"
@@ -97,11 +105,4 @@ tasks.register("release") {
 
 tasks.wrapper {
     distributionType = Wrapper.DistributionType.ALL
-}
-
-tasks.withType<JavaCompile> {
-    options.compilerArgs.add("-Xlint:-options")
-    options.compilerArgs.add("--release 8")
-
-    options.encoding = "UTF-8"
 }

@@ -17,6 +17,7 @@
 package brut.yaml;
 
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +29,7 @@ public class YamlReader {
 
     public YamlReader(InputStream in) {
         mLines = new ArrayList<>();
-        Scanner scanner = new Scanner(in);
+        Scanner scanner = new Scanner(in, StandardCharsets.UTF_8.name());
         while (scanner.hasNextLine()) {
             mLines.add(new YamlLine(scanner.nextLine()));
         }
