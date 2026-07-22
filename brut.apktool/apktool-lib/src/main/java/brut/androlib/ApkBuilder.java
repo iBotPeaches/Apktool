@@ -133,7 +133,8 @@ public class ApkBuilder {
                     try {
                         BrutIO.sanitizePath(outDir, fileName);
                     } catch (InvalidPathException | IOException ex) {
-                        throw new AndrolibException("Smali folder name leads to invalid dex path: " + dirName, ex);
+                        throw new AndrolibException("Smali folder name leads to invalid dex path: "
+                            + dirName + " -> " + fileName, ex);
                     }
                 } else {
                     continue;
