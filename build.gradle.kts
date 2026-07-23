@@ -84,15 +84,13 @@ subprojects {
         }
     }
 
-    tasks.withType<JavaCompile> {
-        // Built with JDK 17, but emit Java 8 compatible bytecode against the Java 8 API.
-        options.release = 8
-        options.compilerArgs.add("-Xlint:-options")
-
+    tasks.withType<JavaCompile>().configureEach {
         options.encoding = "UTF-8"
+        // Build with JDK 17, but emit Java 8 compatible bytecode against the Java 8 API.
+        options.release.set(8)
     }
 
-    tasks.withType<Test> {
+    tasks.withType<Test>().configureEach {
         testLogging {
             events("failed", "skipped")
         }
@@ -113,9 +111,9 @@ subprojects {
 
     // CI passes -PtestJdkVersion to run the test suite on an older JVM (8/11)
     // while the build itself stays on JDK 17.
-    (findProperty("testJdkVersion") as String?)?.toIntOrNull()?.let { testJdkVersion ->
+    providers.gradleProperty("testJdkVersion").orNull?.toIntOrNull()?.let { testJdkVersion ->
         val toolchains = extensions.getByType<JavaToolchainService>()
-        tasks.withType<Test> {
+        tasks.withType<Test>().configureEach {
             javaLauncher = toolchains.launcherFor {
                 languageVersion = JavaLanguageVersion.of(testJdkVersion)
                 // Zulu ships JDK 8 builds for every OS/arch we test on, including mac arm64.
@@ -130,14 +128,6 @@ subprojects {
                     launcher.metadata.javaRuntimeVersion
                 )
             }
-        }
-    }
-
-    tasks.withType<JavaCompile>().configureEach {
-        options.encoding = "UTF-8"
-
-        if (JavaVersion.current().isJava9Compatible) {
-            options.release.set(8)
         }
     }
 
