@@ -92,6 +92,25 @@ subprojects {
         options.encoding = "UTF-8"
     }
 
+    tasks.withType<Test> {
+        testLogging {
+            events("failed", "skipped")
+        }
+        afterSuite(KotlinClosure2<TestDescriptor, TestResult, Unit>({ descriptor, result ->
+            // Only print the summary for the top-level suite (the task itself, not individual classes).
+            if (descriptor.parent == null) {
+                logger.lifecycle(
+                    "[{}] Tests: {} passed, {} failed, {} skipped (total: {})",
+                    project.name,
+                    result.successfulTestCount,
+                    result.failedTestCount,
+                    result.skippedTestCount,
+                    result.testCount
+                )
+            }
+        }))
+    }
+
     // CI passes -PtestJdkVersion to run the test suite on an older JVM (8/11)
     // while the build itself stays on JDK 17.
     (findProperty("testJdkVersion") as String?)?.toIntOrNull()?.let { testJdkVersion ->
