@@ -102,6 +102,15 @@ subprojects {
                 // Zulu ships JDK 8 builds for every OS/arch we test on, including mac arm64.
                 vendor = JvmVendorSpec.AZUL
             }
+            doFirst {
+                val launcher = javaLauncher.get()
+                logger.lifecycle(
+                    "[{}] Test JVM: {} (runtime: {})",
+                    project.name,
+                    launcher.executablePath,
+                    launcher.metadata.javaRuntimeVersion
+                )
+            }
         }
     }
 
