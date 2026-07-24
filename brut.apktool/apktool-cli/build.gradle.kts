@@ -1,6 +1,6 @@
-val gitRevision: String by rootProject.extra
-val apktoolVersion: String by rootProject.extra
-val r8: Configuration by configurations.creating
+val gitRevision = rootProject.extra["gitRevision"] as String
+val apktoolVersion = rootProject.extra["apktoolVersion"] as String
+val r8: Configuration = configurations.create("r8")
 
 plugins {
     application
