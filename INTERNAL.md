@@ -40,18 +40,21 @@ need a `gradle.properties` file in root with the structure:
 ```
 signing.keyId={gpgKeyId}
 signing.password={gpgPassphrase}
-signing.secretKeyRingFile={gpgSecretKingRingLocation}
+signing.secretKeyRingFile={gpgSecretKeyRingLocation}
 
-ossrhUsername={sonatypeUsername}
-ossrhPassword={sonatypePassword}
+mavenCentralUsername={sonatypeUsername}
+mavenCentralPassword={sonatypePassword}
 ```
 
-Release with maven with `./gradlew build shadowJar release publish`.
+Release to Maven with `./gradlew build shadowJar release publish`.
+
+* Generate secret key ring - `gpg --export-secret-keys -o ~/.gnupg/secring.gpg`
+* Generate Maven password - `https://central.sonatype.com/usertoken`
 
 ### Building the binary.
 
 > [!IMPORTANT]
-> In order to publish Maven artifacts you need JDK 11+.
+> Building Apktool (and publishing Maven artifacts) requires JDK 17+.
 
 In order to maintain a clean slate. Run `gradlew clean` to start from a clean slate. Now lets build
 the new binary version. We should not have any new commits since the tagged commit.

@@ -9,6 +9,10 @@ var apktoolVersion by extra("")
 
 defaultTasks("build", "shadowJar", "proguard")
 
+require(JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_17)) {
+    "Building Apktool requires JDK 17 or newer, but Gradle is running on JDK ${JavaVersion.current()}."
+}
+
 // Functions
 val gitDescribe: String? by lazy {
     try {
@@ -52,9 +56,7 @@ if ("release" !in gradle.startParameter.taskNames) {
 
 plugins {
     `java-library`
-    if (JavaVersion.current().isJava11Compatible) {
-        alias(libs.plugins.vanniktech.maven.publish) apply false
-    }
+    alias(libs.plugins.vanniktech.maven.publish) apply false
 }
 
 allprojects {
@@ -77,15 +79,55 @@ subprojects {
     apply(plugin = "java-library")
 
     java {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(17)
+        }
     }
 
     tasks.withType<JavaCompile>().configureEach {
         options.encoding = "UTF-8"
+        // Build with JDK 17, but emit Java 8 compatible bytecode against the Java 8 API.
+        options.release.set(8)
+    }
 
-        if (JavaVersion.current().isJava9Compatible) {
-            options.release.set(8)
+    tasks.withType<Test>().configureEach {
+        testLogging {
+            events("failed", "skipped")
+        }
+        afterSuite(KotlinClosure2<TestDescriptor, TestResult, Unit>({ descriptor, result ->
+            // Only print the summary for the top-level suite (the task itself, not individual classes).
+            if (descriptor.parent == null) {
+                logger.lifecycle(
+                    "[{}] Tests: {} passed, {} failed, {} skipped (total: {})",
+                    project.name,
+                    result.successfulTestCount,
+                    result.failedTestCount,
+                    result.skippedTestCount,
+                    result.testCount
+                )
+            }
+        }))
+    }
+
+    // CI passes -PtestJdkVersion to run the test suite on an older JVM (8/11)
+    // while the build itself stays on JDK 17.
+    providers.gradleProperty("testJdkVersion").orNull?.toIntOrNull()?.let { testJdkVersion ->
+        val toolchains = extensions.getByType<JavaToolchainService>()
+        tasks.withType<Test>().configureEach {
+            javaLauncher = toolchains.launcherFor {
+                languageVersion = JavaLanguageVersion.of(testJdkVersion)
+                // Zulu ships JDK 8 builds for every OS/arch we test on, including mac arm64.
+                vendor = JvmVendorSpec.AZUL
+            }
+            doFirst {
+                val launcher = javaLauncher.get()
+                logger.lifecycle(
+                    "[{}] Test JVM: {} (runtime: {})",
+                    project.name,
+                    launcher.executablePath,
+                    launcher.metadata.javaRuntimeVersion
+                )
+            }
         }
     }
 
@@ -94,7 +136,7 @@ subprojects {
         "apktool-lib", "apktool-cli"
     )
 
-    if (project.name in mavenProjects && JavaVersion.current().isJava11Compatible) {
+    if (project.name in mavenProjects) {
         apply(from = "${rootProject.projectDir}/gradle/scripts/publishing.gradle")
     }
 }
