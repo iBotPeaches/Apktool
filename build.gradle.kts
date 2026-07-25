@@ -94,25 +94,25 @@ subprojects {
     }
 
     tasks.withType<Test>().configureEach {
+        val projectName = project.name;
+
         testLogging {
             events("failed", "skipped")
         }
         addTestListener(object : TestListener {
-            override fun beforeSuite(suite: TestDescriptor) {}
-            override fun beforeTest(testDescriptor: TestDescriptor) {}
-            override fun afterTest(testDescriptor: TestDescriptor, result: TestResult) {}
             override fun afterSuite(suite: TestDescriptor, result: TestResult) {
-                // Only print the summary for the top-level suite (the task itself, not individual classes).
-                if (suite.parent == null) {
-                    logger.lifecycle(
-                        "[{}] Tests: {} passed, {} failed, {} skipped (total: {})",
-                        project.name,
-                        result.successfulTestCount,
-                        result.failedTestCount,
-                        result.skippedTestCount,
-                        result.testCount
-                    )
+                if (suite.parent != null) {
+                    return;
                 }
+
+                logger.lifecycle(
+                    "[{}] Tests: {} passed, {} failed, {} skipped (total: {})",
+                    projectName,
+                    result.successfulTestCount,
+                    result.failedTestCount,
+                    result.skippedTestCount,
+                    result.testCount
+                )
             }
         })
     }
