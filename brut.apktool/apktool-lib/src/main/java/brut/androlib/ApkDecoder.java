@@ -58,9 +58,11 @@ public class ApkDecoder {
     }
 
     public void decode(File outDir) throws AndrolibException {
-        File[] outDirFiles = outDir.listFiles();
-        if (!mConfig.isForced() && outDir.exists() && outDirFiles != null && outDirFiles.length > 0) {
-            throw new OutDirExistsException(outDir.getPath());
+        if (!mConfig.isForced() && outDir.exists()) {
+            File[] outDirFiles = outDir.isDirectory() ? outDir.listFiles() : null;
+            if (!outDir.isDirectory() || outDirFiles == null || outDirFiles.length > 0) {
+                throw new OutDirExistsException(outDir.getPath());
+            }
         }
         if (!mApkFile.isFile() || !mApkFile.canRead()) {
             throw new InFileNotFoundException(mApkFile.getPath());
