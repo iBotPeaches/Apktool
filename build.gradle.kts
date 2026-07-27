@@ -4,8 +4,8 @@ val version = "3.1.0"
 val suffix = "SNAPSHOT"
 
 // Strings embedded into the build.
-var gitRevision by extra("")
-var apktoolVersion by extra("")
+var gitRevision = ""
+var apktoolVersion = ""
 
 defaultTasks("build", "shadowJar", "proguard")
 
@@ -54,6 +54,9 @@ if ("release" !in gradle.startParameter.taskNames) {
     project.logger.lifecycle("Building RELEASE ($gitBranch): $apktoolVersion")
 }
 
+extra.set("gitRevision", gitRevision)
+extra.set("apktoolVersion", apktoolVersion)
+
 plugins {
     `java-library`
     alias(libs.plugins.vanniktech.maven.publish) apply false
@@ -91,22 +94,27 @@ subprojects {
     }
 
     tasks.withType<Test>().configureEach {
+        val projectName = project.name;
+
         testLogging {
             events("failed", "skipped")
         }
-        afterSuite(KotlinClosure2<TestDescriptor, TestResult, Unit>({ descriptor, result ->
-            // Only print the summary for the top-level suite (the task itself, not individual classes).
-            if (descriptor.parent == null) {
+        addTestListener(object : TestListener {
+            override fun afterSuite(suite: TestDescriptor, result: TestResult) {
+                if (suite.parent != null) {
+                    return;
+                }
+
                 logger.lifecycle(
                     "[{}] Tests: {} passed, {} failed, {} skipped (total: {})",
-                    project.name,
+                    projectName,
                     result.successfulTestCount,
                     result.failedTestCount,
                     result.skippedTestCount,
                     result.testCount
                 )
             }
-        }))
+        })
     }
 
     // CI passes -PtestJdkVersion to run the test suite on an older JVM (8/11)
