@@ -35,11 +35,3 @@ tasks {
         systemProperty("java.awt.headless", true)
     }
 }
-
-// Exclude prebuilt native binaries from the sources JAR - they are not source code
-// and would inflate the sources artifact by ~14MB unnecessarily.
-tasks.withType<Jar>().configureEach {
-    if (archiveClassifier.orNull == "sources") {
-        exclude("prebuilt/")
-    }
-}

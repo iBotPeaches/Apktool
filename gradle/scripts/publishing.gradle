@@ -1,16 +1,8 @@
-import com.vanniktech.maven.publish.JavaLibrary
-import com.vanniktech.maven.publish.JavadocJar
-
 apply plugin: 'com.vanniktech.maven.publish'
 
 mavenPublishing {
     publishToMavenCentral()
     signAllPublications()
-
-    // Publish a thin JAR with an empty javadoc stub. JDK 17's javadoc generates
-    // several MB of CSS/JS boilerplate even for tiny libraries; using Empty() avoids
-    // running the javadoc task entirely and keeps the Maven deployment under 80MB.
-    configure(new JavaLibrary(new JavadocJar.Empty(), true))
 
     coordinates("org.apktool", project.name, project.apktoolVersion)
 
@@ -43,4 +35,8 @@ mavenPublishing {
             url = "https://github.com/iBotPeaches/Apktool"
         }
     }
+}
+
+tasks.withType(Javadoc) {
+    options.addStringOption('Xdoclint:none', '-quiet')
 }
