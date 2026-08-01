@@ -1,6 +1,6 @@
-val gitRevision: String by rootProject.extra
-val apktoolVersion: String by rootProject.extra
-val r8: Configuration by configurations.creating
+val gitRevision = rootProject.extra["gitRevision"] as String
+val apktoolVersion = rootProject.extra["apktoolVersion"] as String
+val r8: Configuration = configurations.create("r8")
 
 plugins {
     application
@@ -82,16 +82,4 @@ tasks.register<JavaExec>("proguard") {
         "--pg-conf", proguardRules.toString(),
         originalJar.get().toString()
     )
-}
-
-tasks.withType<org.gradle.api.publish.maven.tasks.PublishToMavenRepository> {
-    dependsOn(tasks.named("shadowJar"))
-}
-
-tasks.withType<org.gradle.plugins.signing.Sign> {
-    dependsOn(tasks.named("shadowJar"))
-}
-
-tasks.withType<org.gradle.api.publish.tasks.GenerateModuleMetadata> {
-    dependsOn(tasks.named("shadowJar"))
 }
