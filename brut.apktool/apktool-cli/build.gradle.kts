@@ -83,15 +83,3 @@ tasks.register<JavaExec>("proguard") {
         originalJar.get().toString()
     )
 }
-
-tasks.withType<org.gradle.api.publish.maven.tasks.PublishToMavenRepository> {
-    dependsOn(tasks.named("shadowJar"))
-}
-
-tasks.withType<org.gradle.plugins.signing.Sign> {
-    dependsOn(tasks.named("shadowJar"))
-}
-
-tasks.withType<org.gradle.api.publish.tasks.GenerateModuleMetadata> {
-    dependsOn(tasks.named("shadowJar"))
-}
