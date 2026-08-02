@@ -132,7 +132,7 @@ public class ApkBuilder {
                     fileName = dirName.substring(dirName.indexOf('_') + 1).replace('@', File.separatorChar) + ".dex";
                     try {
                         fileName = BrutIO.sanitizePath(outDir, fileName);
-                    } catch (InvalidPathException | IOException ex) {
+                    } catch (InvalidPathException ex) {
                         Log.w(TAG, "Smali folder name resolves to invalid dex path: %s -> %s", dirName, fileName);
                         continue;
                     }
@@ -144,7 +144,7 @@ public class ApkBuilder {
                     buildSourcesSmali(outDir, dirName, fileName);
                 }
             }
-        } catch (DirectoryException ex) {
+        } catch (DirectoryException | IOException ex) {
             throw new AndrolibException(ex);
         }
     }
