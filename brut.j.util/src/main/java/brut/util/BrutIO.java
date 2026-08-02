@@ -87,12 +87,12 @@ public final class BrutIO {
 
     public static String sanitizePath(File baseDir, String path) throws InvalidPathException, IOException {
         if (path == null || path.isEmpty()) {
-            throw new InvalidPathException(path, "Path is null or empty.");
+            throw new InvalidPathException(path, "Path is null or empty");
         }
 
         Path origPath = Paths.get(path);
         if (origPath.isAbsolute()) {
-            throw new InvalidPathException(path, "Absolute paths are not allowed.");
+            throw new InvalidPathException(path, "Absolute paths are not allowed");
         }
 
         Path basePath = Paths.get(baseDir.getCanonicalPath());
