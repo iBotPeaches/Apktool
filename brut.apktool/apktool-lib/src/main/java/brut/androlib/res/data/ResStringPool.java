@@ -86,12 +86,19 @@ public class ResStringPool {
             size = stylesOffset - stringsOffset;
         }
 
+        if (size < 0) {
+            throw new IOException("Invalid string pool: negative strings block size (" + size + ")");
+        }
+
         byte[] strings = in.readBytes(size);
 
         // #3236 - Some apps give a styles offset, but have 0 styles. Make this check more robust.
         int[] styles;
         if (stylesOffset > 0 && styleCount > 0) {
             size = parser.chunkSize() - stylesOffset;
+            if (size < 0) {
+                throw new IOException("Invalid string pool: negative styles block size (" + size + ")");
+            }
             styles = in.readIntArray(size / 4);
         } else {
             styles = new int[0];
@@ -106,6 +113,16 @@ public class ResStringPool {
     }
 
     private static int[] readIntArraySafe(BinaryDataInputStream in, int len, long maxPosition) throws IOException {
+        if (len < 0) {
+            Log.w(TAG, "Bad string block: negative count %d", len);
+            return new int[0];
+        }
+        // Cap the allocation to what could possibly fit between current position and maxPosition.
+        long maxCount = (maxPosition - in.position()) / 4;
+        if (len > maxCount) {
+            Log.w(TAG, "Bad string block: count %d exceeds available space, capping to %d", len, maxCount);
+            len = (int) Math.max(0, maxCount);
+        }
         int[] arr = new int[len];
         for (int i = 0; i < len; i++) {
             // #3236 - Some apps have more strings than can fit into the block. This function takes an expected max

@@ -333,7 +333,7 @@ public class BinaryResourceParser {
         mIn.skipShort(); // reserved
         int entryCount = mIn.readInt();
         int entriesStart = mIn.readInt();
-        ResConfig config = parseConfig();
+        ResConfig config = parseConfig(parser);
 
         skipUnreadHeader(parser);
 
@@ -466,12 +466,15 @@ public class BinaryResourceParser {
         }
     }
 
-    private ResConfig parseConfig() throws AndrolibException, IOException {
+    private ResConfig parseConfig(ResChunkPullParser parser) throws AndrolibException, IOException {
         long startPosition = mIn.position();
         // ResTable_config
         int size = mIn.readInt();
         if (size < 8) {
             throw new AndrolibException("Config size < 8");
+        }
+        if (startPosition + size > parser.chunkEnd()) {
+            throw new IOException(String.format("Config size %d exceeds chunk end at %d", size, parser.chunkEnd()));
         }
 
         int mcc = mIn.readUnsignedShort();
@@ -797,6 +800,10 @@ public class BinaryResourceParser {
     private byte[] readExceedingBytes(String name, int size, int bytesRead) throws IOException {
         int bytesExceeding = size - bytesRead;
         if (bytesExceeding > 0) {
+            if (bytesExceeding > mIn.remaining()) {
+                throw new IOException(String.format("%s size %d exceeds available data (%d bytes remaining)",
+                    name, size, mIn.remaining()));
+            }
             byte[] buf = mIn.readBytes(bytesExceeding);
             for (int i = 0; i < buf.length; i++) {
                 if (buf[i] != 0) {

@@ -113,12 +113,18 @@ public class BinaryDataInputStream extends FilterInputStream implements DataInpu
     }
 
     public byte[] readBytes(int len) throws IOException {
+        if (len < 0) {
+            throw new IOException("Negative array size: " + len);
+        }
         byte[] buf = new byte[len];
         readFully(buf);
         return buf;
     }
 
     public short[] readShortArray(int len) throws IOException {
+        if (len < 0) {
+            throw new IOException("Negative array size: " + len);
+        }
         short[] arr = new short[len];
         for (int i = 0; i < len; i++) {
             arr[i] = readShort();
@@ -127,6 +133,9 @@ public class BinaryDataInputStream extends FilterInputStream implements DataInpu
     }
 
     public int[] readIntArray(int len) throws IOException {
+        if (len < 0) {
+            throw new IOException("Negative array size: " + len);
+        }
         int[] arr = new int[len];
         for (int i = 0; i < len; i++) {
             arr[i] = readInt();
@@ -135,6 +144,9 @@ public class BinaryDataInputStream extends FilterInputStream implements DataInpu
     }
 
     public long[] readLongArray(int len) throws IOException {
+        if (len < 0) {
+            throw new IOException("Negative array size: " + len);
+        }
         long[] arr = new long[len];
         for (int i = 0; i < len; i++) {
             arr[i] = readLong();
