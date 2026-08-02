@@ -86,19 +86,12 @@ public class ResStringPool {
             size = stylesOffset - stringsOffset;
         }
 
-        if (size < 0) {
-            throw new IOException("Invalid string pool: negative strings block size (" + size + ")");
-        }
-
         byte[] strings = in.readBytes(size);
 
         // #3236 - Some apps give a styles offset, but have 0 styles. Make this check more robust.
         int[] styles;
         if (stylesOffset > 0 && styleCount > 0) {
             size = parser.chunkSize() - stylesOffset;
-            if (size < 0) {
-                throw new IOException("Invalid string pool: negative styles block size (" + size + ")");
-            }
             styles = in.readIntArray(size / 4);
         } else {
             styles = new int[0];
