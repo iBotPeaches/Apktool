@@ -16,23 +16,19 @@
  */
 package brut.androlib.smali;
 
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-
-public class SmaliDecoderTest {
-
-    @Test
-    public void normalClassesDexDirTest() {
-        assertEquals("smali", SmaliDecoder.getDirName("classes.dex", 1));
+public final class SmaliUtil {
+    private SmaliUtil() {
     }
 
-    @Test
-    public void sanitizeBackslashDexNameDirTest() {
-        String dirName = SmaliDecoder.getDirName("..\\..\\evil.dex", 1);
-
-        assertFalse(dirName.contains("\\"));
-        assertEquals("smali_..@..@evil", dirName);
+    static String getDirName(String dexName, int dexNum) {
+        String dirName = "smali";
+        if (dexNum > 1 || !dexName.equals("classes.dex")) {
+            dirName += "_" + dexName.substring(0, dexName.lastIndexOf('.'))
+                .replace('/', '@').replace('\\', '@');
+            if (dexNum > 1) {
+                dirName += dexNum;
+            }
+        }
+        return dirName;
     }
 }

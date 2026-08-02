@@ -103,7 +103,7 @@ public class SmaliDecoder {
                     throw new AndrolibException("Cannot disassemble an odex file without deodexing it: " + dexName);
                 }
 
-                decodeFile(dexFile, new File(outDir, getDirName(dexName, dexNum)));
+                decodeFile(dexFile, new File(outDir, SmaliUtil.getDirName(dexName, dexNum)));
             }
 
             mDexFiles.add(dexName);
@@ -140,15 +140,4 @@ public class SmaliDecoder {
         mInferredApiLevel.updateAndGet(cur -> (cur == 0 || cur > apiLevel) ? apiLevel : cur);
     }
 
-    static String getDirName(String dexName, int dexNum) {
-        String dirName = "smali";
-        if (dexNum > 1 || !dexName.equals("classes.dex")) {
-            dirName += "_" + dexName.substring(0, dexName.lastIndexOf('.'))
-                .replace('/', '@').replace('\\', '@');
-            if (dexNum > 1) {
-                dirName += dexNum;
-            }
-        }
-        return dirName;
-    }
 }
