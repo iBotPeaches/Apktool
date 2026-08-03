@@ -121,7 +121,7 @@ public class ApkDecoder {
             boolean noSrc = mConfig.isDecodeSourcesNone();
 
             for (String fileName : in.getFiles(allSrc)) {
-                if (allSrc ? !fileName.endsWith(".dex") : !ApkInfo.CLASSES_FILES_PATTERN.matcher(fileName).matches()) {
+                if (!ApkInfo.CLASSES_FILES_PATTERN.matcher(fileName).matches()) {
                     continue;
                 }
 
