@@ -205,6 +205,12 @@ public class Framework {
     }
 
     public void cleanDirectory() throws AndrolibException {
+        File dir = getDirectory();
+        if (Files.isSymbolicLink(dir.toPath())) {
+            Log.i(TAG, "Removing framework directory symlink: " + dir);
+            OS.rmfile(dir);
+            return;
+        }
         for (File apkFile : listDirectory()) {
             Log.i(TAG, "Removing framework file: " + apkFile.getName());
             OS.rmfile(apkFile);
