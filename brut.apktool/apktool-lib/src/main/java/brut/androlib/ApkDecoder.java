@@ -27,10 +27,13 @@ import brut.directory.Directory;
 import brut.directory.DirectoryException;
 import brut.directory.ExtFile;
 import brut.util.BackgroundWorker;
+import brut.util.BrutIO;
 import brut.util.OS;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
@@ -58,12 +61,24 @@ public class ApkDecoder {
     }
 
     public void decode(File outDir) throws AndrolibException {
-        if (!mConfig.isForced() && outDir.exists()) {
-            throw new OutDirExistsException(outDir.getPath());
-        }
         if (!mApkFile.isFile() || !mApkFile.canRead()) {
             throw new InFileNotFoundException(mApkFile.getPath());
         }
+        // We don't follow symlinks here for safety reasons.
+        boolean outExists = Files.exists(outDir.toPath(), LinkOption.NOFOLLOW_LINKS);
+        boolean outIsDirectory = Files.isDirectory(outDir.toPath(), LinkOption.NOFOLLOW_LINKS);
+        if (!mConfig.isForced() && outExists && (!outIsDirectory || BrutIO.isNonEmptyDirectory(outDir))) {
+            throw new OutDirExistsException(outDir.getPath());
+        }
+        if (outExists) {
+            if (outIsDirectory) {
+                OS.rmdir(outDir);
+            } else {
+                OS.rmfile(outDir);
+            }
+        }
+        OS.mkdir(outDir);
+
         if (mConfig.getJobs() > 1) {
             mWorker = new BackgroundWorker(mConfig.getJobs() - 1);
         }
@@ -73,9 +88,6 @@ public class ApkDecoder {
             mApkInfo.setApkFile(mApkFile);
             mSmaliDecoder = new SmaliDecoder(mApkFile, mConfig.isBaksmaliDebugMode());
             mResDecoder = new ResDecoder(mApkInfo, mConfig);
-
-            OS.rmdir(outDir);
-            OS.mkdir(outDir);
 
             Log.i(TAG, "Using Apktool " + mConfig.getVersion() + " on " + mApkFile.getName()
                      + (mWorker != null ? " with " + mConfig.getJobs() + " threads" : ""));

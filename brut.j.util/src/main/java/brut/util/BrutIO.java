@@ -22,6 +22,8 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -47,6 +49,17 @@ public final class BrutIO {
         } finally {
             IOUtils.closeQuietly(in);
             IOUtils.closeQuietly(out);
+        }
+    }
+
+    public static boolean isNonEmptyDirectory(File file) {
+        if (!file.isDirectory()) {
+            return false;
+        }
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(file.toPath())) {
+            return stream.iterator().hasNext();
+        } catch (IOException ignored) {
+            return true;
         }
     }
 
