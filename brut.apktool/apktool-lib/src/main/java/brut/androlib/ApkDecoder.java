@@ -65,15 +65,16 @@ public class ApkDecoder {
             throw new InFileNotFoundException(mApkFile.getPath());
         }
         // We don't follow symlinks here for safety reasons.
-        boolean outExists = Files.exists(outDir.toPath(), LinkOption.NOFOLLOW_LINKS);
-        boolean outIsDirectory = Files.isDirectory(outDir.toPath(), LinkOption.NOFOLLOW_LINKS);
-        if (!mConfig.isForced() && outExists && (!outIsDirectory || BrutIO.isNonEmptyDirectory(outDir))) {
-            throw new OutDirExistsException(outDir.getPath());
-        }
-        if (outExists) {
-            if (outIsDirectory) {
+        if (Files.exists(outDir.toPath(), LinkOption.NOFOLLOW_LINKS)) {
+            if (Files.isDirectory(outDir.toPath(), LinkOption.NOFOLLOW_LINKS)) {
+                if (!mConfig.isForced() && BrutIO.isNonEmptyDirectory(outDir)) {
+                    throw new OutDirExistsException(outDir.getPath());
+                }
                 OS.rmdir(outDir);
             } else {
+                if (!mConfig.isForced()) {
+                    throw new OutDirExistsException(outDir.getPath());
+                }
                 OS.rmfile(outDir);
             }
         }
