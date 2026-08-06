@@ -111,7 +111,7 @@ public final class BrutIO {
         }
 
         Path basePath = baseDir.getCanonicalFile().toPath();
-        Path resolvedPath = basePath.resolve(path).normalize().toFile().getCanonicalFile().toPath();
+        Path resolvedPath = basePath.resolve(path).toFile().getCanonicalFile().toPath();
         if (!resolvedPath.startsWith(basePath)) {
             throw new InvalidPathException(path, "Path traverses outside the base directory");
         }
