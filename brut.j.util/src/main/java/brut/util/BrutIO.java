@@ -27,9 +27,11 @@ import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.regex.Pattern;
 import java.util.zip.CRC32;
 
 public final class BrutIO {
+    private static final Pattern WINDOWS_DRIVE_PATH = Pattern.compile("^[a-zA-Z]:[\\\\/].*");
 
     private BrutIO() {
         // Private constructor for utility class.
@@ -103,14 +105,13 @@ public final class BrutIO {
             throw new InvalidPathException(path, "Path is null or empty");
         }
 
-        Path basePath = baseDir.getCanonicalFile().toPath();
-        Path resolvedPath = basePath.resolve(path).normalize().toFile().getCanonicalFile().toPath();
-
-        String root = resolvedPath.getRoot() == null ? null : resolvedPath.getRoot().toString();
-        if (root != null && path.regionMatches(true, 0, root, 0, root.length())) {
+        Path origPath = Paths.get(path);
+        if (origPath.isAbsolute() || WINDOWS_DRIVE_PATH.matcher(path).matches()) {
             throw new InvalidPathException(path, "Absolute paths are not allowed");
         }
 
+        Path basePath = baseDir.getCanonicalFile().toPath();
+        Path resolvedPath = basePath.resolve(path).normalize().toFile().getCanonicalFile().toPath();
         if (!resolvedPath.startsWith(basePath)) {
             throw new InvalidPathException(path, "Path traverses outside the base directory");
         }
