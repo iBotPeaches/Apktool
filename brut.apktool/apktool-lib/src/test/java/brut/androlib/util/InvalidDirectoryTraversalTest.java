@@ -22,6 +22,7 @@ import brut.util.OSDetection;
 
 import java.io.File;
 import java.nio.file.InvalidPathException;
+import java.nio.file.Files;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -67,5 +68,17 @@ public class InvalidDirectoryTraversalTest extends BaseTest {
         String fileName = "dir" + File.separator + "file";
         String validFileName = BrutIO.sanitizePath(sTmpDir, fileName);
         assertEquals(fileName, validFileName);
+    }
+
+    @Test
+    public void validFileFromSymlinkBaseTest() throws Exception {
+        Assume.assumeFalse(OSDetection.isWindows());
+
+        File actualDir = Files.createDirectory(sTmpDir.toPath().resolve("actual")).toFile();
+        File symlinkDir = sTmpDir.toPath().resolve("subst").toFile();
+        Files.createSymbolicLink(symlinkDir.toPath(), actualDir.toPath());
+
+        String validFileName = BrutIO.sanitizePath(symlinkDir, "file");
+        assertEquals("file", validFileName);
     }
 }

@@ -103,13 +103,14 @@ public final class BrutIO {
             throw new InvalidPathException(path, "Path is null or empty");
         }
 
-        Path origPath = Paths.get(path);
-        if (origPath.isAbsolute()) {
+        Path basePath = baseDir.getCanonicalFile().toPath();
+        Path resolvedPath = basePath.resolve(path).normalize().toFile().getCanonicalFile().toPath();
+
+        String root = resolvedPath.getRoot() == null ? null : resolvedPath.getRoot().toString();
+        if (root != null && path.regionMatches(true, 0, root, 0, root.length())) {
             throw new InvalidPathException(path, "Absolute paths are not allowed");
         }
 
-        Path basePath = Paths.get(baseDir.getCanonicalPath());
-        Path resolvedPath = basePath.resolve(origPath).normalize();
         if (!resolvedPath.startsWith(basePath)) {
             throw new InvalidPathException(path, "Path traverses outside the base directory");
         }
