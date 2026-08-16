@@ -29,6 +29,7 @@ import brut.directory.ExtFile;
 import brut.util.BackgroundWorker;
 import brut.util.BrutIO;
 import brut.util.OS;
+import brut.util.ZipUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.*;
@@ -55,7 +56,13 @@ public class ApkDecoder {
     private BackgroundWorker mWorker;
 
     public ApkDecoder(File apkFile, Config config) {
-        mApkFile = new ExtFile(apkFile);
+        File readableApk = apkFile;
+        try {
+            readableApk = ZipUtils.openReadableZip(apkFile);
+        } catch (IOException ignored) {
+            // Unreadable archives fail later with the underlying zip error.
+        }
+        mApkFile = new ExtFile(readableApk);
         mConfig = config;
         mFirstError = new AtomicReference<>();
     }
