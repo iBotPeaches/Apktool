@@ -54,7 +54,13 @@ public final class ZipUtils {
      * Copies {@code source} and repairs central-directory / local-header fields that AOSP tolerates
      * but {@code java.util.zip.ZipFile} rejects (spurious encrypted bit, non-DEFLATE/STORE methods).
      */
+    public static void ensureZipSystemProperties() {
+        // Match brut.apktool.Main — needed when ApkDecoder is used without the CLI wrapper.
+        System.setProperty("jdk.util.zip.disableZip64ExtraFieldValidation", "true");
+    }
+
     public static File openReadableZip(File source) throws IOException {
+        ensureZipSystemProperties();
         try (ZipFile zip = new ZipFile(source)) {
             return source;
         } catch (ZipException ex) {

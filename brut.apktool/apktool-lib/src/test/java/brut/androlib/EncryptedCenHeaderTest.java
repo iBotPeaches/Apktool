@@ -58,6 +58,11 @@ public class EncryptedCenHeaderTest extends BaseTest {
         File outDir = new File(sTmpDir, "encrypted_cen.out");
         new ApkDecoder(sCorruptedApk, sConfig).decode(outDir);
         assertTrue(new File(outDir, "AndroidManifest.xml").isFile());
+        assertTrue(readTextFile(new File(outDir, "apktool.yml")).contains("apkFileName: encrypted_cen.apk"));
+
+        ExtFile decodeDir = new ExtFile(outDir);
+        new ApkBuilder(decodeDir, sConfig).build(null);
+        assertTrue(new File(outDir, "dist/encrypted_cen.apk").isFile());
     }
 
     private static void setSpuriousEncryptedBit(File apk) throws IOException {

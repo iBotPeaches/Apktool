@@ -47,6 +47,8 @@ public class ApkDecoder {
       + "rtttl|imy|xmf|mp4|m4a|m4v|3gp|3gpp|3g2|3gpp2|amr|awb|wma|wmv|webm|webp|mkv");
 
     private final ExtFile mApkFile;
+    private final ExtFile mZipSource;
+    private final File mRepairCopy;
     private final Config mConfig;
     private final AtomicReference<AndrolibException> mFirstError;
 
@@ -56,13 +58,20 @@ public class ApkDecoder {
     private BackgroundWorker mWorker;
 
     public ApkDecoder(File apkFile, Config config) {
-        File readableApk = apkFile;
+        mApkFile = new ExtFile(apkFile);
+        File zipPath = apkFile;
+        File repairCopy = null;
         try {
-            readableApk = ZipUtils.openReadableZip(apkFile);
+            File opened = ZipUtils.openReadableZip(apkFile);
+            if (!opened.equals(apkFile)) {
+                repairCopy = opened;
+                zipPath = opened;
+            }
         } catch (IOException ignored) {
             // Unreadable archives fail later with the underlying zip error.
         }
-        mApkFile = new ExtFile(readableApk);
+        mZipSource = new ExtFile(zipPath);
+        mRepairCopy = repairCopy;
         mConfig = config;
         mFirstError = new AtomicReference<>();
     }
@@ -93,8 +102,9 @@ public class ApkDecoder {
         try {
             mApkInfo = new ApkInfo();
             mApkInfo.setVersion(mConfig.getVersion());
-            mApkInfo.setApkFile(mApkFile);
-            mSmaliDecoder = new SmaliDecoder(mApkFile, mConfig.isBaksmaliDebugMode());
+            mApkInfo.setApkFile(mZipSource);
+            mApkInfo.setApkFileName(mApkFile.getName());
+            mSmaliDecoder = new SmaliDecoder(mZipSource, mConfig.isBaksmaliDebugMode());
             mResDecoder = new ResDecoder(mApkInfo, mConfig);
 
             Log.i(TAG, "Using Apktool " + mConfig.getVersion() + " on " + mApkFile.getName()
@@ -120,8 +130,11 @@ public class ApkDecoder {
                 mWorker.shutdownNow();
             }
             try {
-                mApkFile.close();
+                mZipSource.close();
             } catch (DirectoryException ignored) {
+            }
+            if (mRepairCopy != null) {
+                OS.rmfile(mRepairCopy);
             }
         }
     }
@@ -136,7 +149,7 @@ public class ApkDecoder {
         }
 
         try {
-            Directory in = mApkFile.getDirectory();
+            Directory in = mZipSource.getDirectory();
             boolean allSrc = mConfig.isDecodeSourcesFull();
             boolean noSrc = mConfig.isDecodeSourcesNone();
 
@@ -159,7 +172,7 @@ public class ApkDecoder {
     private void copySourcesRaw(File outDir, String fileName) throws AndrolibException {
         Log.i(TAG, "Copying raw " + fileName + "...");
         try {
-            Directory in = mApkFile.getDirectory();
+            Directory in = mZipSource.getDirectory();
 
             in.copyToDir(outDir, fileName);
         } catch (DirectoryException ex) {
@@ -203,7 +216,7 @@ public class ApkDecoder {
     private void copyResourcesRaw(File outDir) throws AndrolibException {
         Log.i(TAG, "Copying raw resources.arsc...");
         try {
-            Directory in = mApkFile.getDirectory();
+            Directory in = mZipSource.getDirectory();
 
             in.copyToDir(outDir, "resources.arsc");
         } catch (DirectoryException ex) {
@@ -226,7 +239,7 @@ public class ApkDecoder {
     private void copyManifestRaw(File outDir) throws AndrolibException {
         Log.i(TAG, "Copying raw AndroidManifest.xml...");
         try {
-            Directory in = mApkFile.getDirectory();
+            Directory in = mZipSource.getDirectory();
 
             in.copyToDir(outDir, "AndroidManifest.xml");
         } catch (DirectoryException ex) {
@@ -236,7 +249,7 @@ public class ApkDecoder {
 
     private void copyRawFiles(File outDir) throws AndrolibException {
         try {
-            Directory in = mApkFile.getDirectory();
+            Directory in = mZipSource.getDirectory();
             Set<String> dexFiles = mSmaliDecoder.getDexFiles();
             Map<String, String> resFileMap = mResDecoder.getResFileMap();
             boolean noAssets = mConfig.isDecodeAssetsNone();
@@ -265,7 +278,7 @@ public class ApkDecoder {
 
         Log.i(TAG, "Copying original files...");
         try {
-            Directory in = mApkFile.getDirectory();
+            Directory in = mZipSource.getDirectory();
 
             for (String fileName : in.getFiles(true)) {
                 if (ApkInfo.ORIGINAL_FILES_PATTERN.matcher(fileName).matches()) {
@@ -282,7 +295,7 @@ public class ApkDecoder {
 
         Log.i(TAG, "Copying unknown files...");
         try {
-            Directory in = mApkFile.getDirectory();
+            Directory in = mZipSource.getDirectory();
             Set<String> dexFiles = mSmaliDecoder.getDexFiles();
             Map<String, String> resFileMap = mResDecoder.getResFileMap();
 
@@ -308,7 +321,7 @@ public class ApkDecoder {
 
         // Record uncompressed files.
         try {
-            Directory in = mApkFile.getDirectory();
+            Directory in = mZipSource.getDirectory();
             Map<String, String> resFileMap = mResDecoder.getResFileMap();
             Set<String> uncompressedExts = new HashSet<>();
             Set<String> uncompressedFiles = new HashSet<>();
