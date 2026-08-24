@@ -205,6 +205,9 @@ public class BinaryResourceParser {
                 case ResChunkHeader.RES_TABLE_PACKAGE_TYPE:
                     parsePackage(parser);
                     break;
+                case ResChunkHeader.RES_TABLE_FLAG_LIST:
+                    parseFlagList(parser);
+                    break;
                 default:
                     skipUnexpectedChunk(parser);
                     break;
@@ -283,6 +286,12 @@ public class BinaryResourceParser {
                 case ResChunkHeader.RES_TABLE_STAGED_ALIAS_TYPE:
                     parseStagedAliases(parser);
                     break;
+                case ResChunkHeader.RES_TABLE_FLAGGED:
+                    parseFlagged(parser);
+                    break;
+                case ResChunkHeader.RES_TABLE_FLAG_LIST:
+                    parseFlagList(parser);
+                    break;
                 default:
                     skipUnexpectedChunk(parser);
                     break;
@@ -317,6 +326,73 @@ public class BinaryResourceParser {
         mIn.skipBytes(entryCount * 4); // flags
 
         mPackage.addTypeSpec(id, mTypeStringPool.getString(id - 1));
+
+        // ResTable_flagged chunks holding values behind a feature flag may be contained
+        // within a type spec chunk.
+        long chunkEnd = parser.chunkEnd();
+        if (chunkEnd - mIn.position() >= ResChunkHeader.SIZE) {
+            parser = new ResChunkPullParser(mIn, (int) (chunkEnd - mIn.position()));
+            try {
+                while (nextChunk(parser)) {
+                    // Guard against trailing non-chunk data claiming to extend past the
+                    // end of the type spec chunk.
+                    if (parser.chunkEnd() > chunkEnd) {
+                        Log.d(TAG, "Ignoring trailing data at end of type spec chunk.");
+                        break;
+                    }
+                    switch (parser.chunkType()) {
+                        case ResChunkHeader.RES_TABLE_FLAGGED:
+                            parseFlagged(parser);
+                            break;
+                        default:
+                            skipUnexpectedChunk(parser);
+                            break;
+                    }
+                }
+            } catch (IOException ignored) {
+                // Trailing data was not valid chunk data. The stream is realigned with the
+                // end of the type spec chunk by the caller (see nextChunk).
+                Log.d(TAG, "Ignoring trailing data at end of type spec chunk.");
+            }
+        }
+    }
+
+    private void parseFlagged(ResChunkPullParser parser) throws AndrolibException, IOException {
+        // ResTable_flagged
+        int flagNameIndex = mIn.readInt();
+        boolean flagNegated = mIn.readUnsignedByte() != 0;
+        mIn.skipBytes(3); // padding
+
+        skipUnreadHeader(parser);
+
+        String flagName = mValueStringPool != null ? mValueStringPool.getString(flagNameIndex) : null;
+        Log.w(TAG, "Found resources behind feature flag: %s%s. Merging them with the default values.",
+            flagNegated ? "!" : "", flagName);
+
+        parser = new ResChunkPullParser(mIn, (int) (parser.chunkEnd() - mIn.position()));
+        while (nextChunk(parser)) {
+            switch (parser.chunkType()) {
+                case ResChunkHeader.RES_TABLE_TYPE_TYPE:
+                    parseType(parser);
+                    break;
+                default:
+                    skipUnexpectedChunk(parser);
+                    break;
+            }
+        }
+    }
+
+    private void parseFlagList(ResChunkPullParser parser) throws AndrolibException, IOException {
+        skipUnreadHeader(parser);
+
+        // ResTable_flag_list - an array of references to the names of all the
+        // read/write feature flags used in the file.
+        int count = parser.dataSize() / 4;
+        for (int i = 0; i < count; i++) {
+            int flagNameIndex = mIn.readInt();
+            String flagName = mValueStringPool != null ? mValueStringPool.getString(flagNameIndex) : null;
+            Log.d(TAG, "Found feature flag: %s", flagName);
+        }
     }
 
     private void parseType(ResChunkPullParser parser) throws AndrolibException, IOException {

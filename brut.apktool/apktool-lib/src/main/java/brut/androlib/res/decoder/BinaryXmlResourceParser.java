@@ -33,15 +33,24 @@ import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class BinaryXmlResourceParser implements XmlPullParser {
     private static final String TAG = BinaryXmlResourceParser.class.getName();
     private static final String NOT_SUPPORTED = "Method is not supported.";
 
+    // ResXMLTreeFlagExt descriptors:
+    // The extended element structure is padding.
+    private static final int FLAG_EXT_PADDING = 0x00;
+    // The extended element structure holds feature flag information.
+    private static final int FLAG_EXT_FLAG_INFO = 0x01;
+
     private final ResTable mTable;
     private final boolean mIgnoreRawValues;
     private final boolean mSkipUnresolved;
     private final NamespaceStack mNamespaces;
+    private final Map<String, Boolean> mFeatureFlags;
 
     private BinaryDataInputStream mIn;
     private ResChunkPullParser mParser;
@@ -58,17 +67,23 @@ public class BinaryXmlResourceParser implements XmlPullParser {
     private int mClassIndex;
     private int mStyleIndex;
     private Attribute[] mAttributes;
+    private String mFeatureFlag;
 
     public BinaryXmlResourceParser(ResTable table, boolean ignoreRawValues, boolean skipUnresolved) {
         mTable = table;
         mIgnoreRawValues = ignoreRawValues;
         mSkipUnresolved = skipUnresolved;
         mNamespaces = new NamespaceStack();
+        mFeatureFlags = new LinkedHashMap<>();
         resetEventInfo();
     }
 
     public boolean hasRawValues() {
         return mHasRawValues;
+    }
+
+    public Map<String, Boolean> getFeatureFlags() {
+        return mFeatureFlags;
     }
 
     public AndrolibException getFirstError() {
@@ -260,11 +275,17 @@ public class BinaryXmlResourceParser implements XmlPullParser {
         if (mEventType != START_TAG) {
             return -1;
         }
-        return mAttributes != null ? mAttributes.length : 0;
+        int count = mAttributes != null ? mAttributes.length : 0;
+        // The restored featureFlag attribute is appended as an extra attribute.
+        return mFeatureFlag != null ? count + 1 : count;
     }
 
     @Override
     public String getAttributeNamespace(int index) {
+        if (isFeatureFlagAttribute(index)) {
+            return ResXmlUtils.ANDROID_RES_NS;
+        }
+
         Attribute attr = getAttribute(index);
         if (attr == null) {
             return NO_NAMESPACE;
@@ -299,6 +320,10 @@ public class BinaryXmlResourceParser implements XmlPullParser {
 
     @Override
     public String getAttributeName(int index) {
+        if (isFeatureFlagAttribute(index)) {
+            return "featureFlag";
+        }
+
         Attribute attr = getAttribute(index);
         if (attr == null || attr.name < 0) {
             return "";
@@ -367,6 +392,9 @@ public class BinaryXmlResourceParser implements XmlPullParser {
 
     @Override
     public String getAttributePrefix(int index) {
+        if (isFeatureFlagAttribute(index)) {
+            return "android";
+        }
         if (mStringPool == null) {
             return "";
         }
@@ -394,6 +422,10 @@ public class BinaryXmlResourceParser implements XmlPullParser {
 
     @Override
     public String getAttributeValue(int index) {
+        if (isFeatureFlagAttribute(index)) {
+            return mFeatureFlag;
+        }
+
         Attribute attr = getAttribute(index);
         if (attr == null) {
             return "";
@@ -577,6 +609,10 @@ public class BinaryXmlResourceParser implements XmlPullParser {
 
     // Utility methods
 
+    private boolean isFeatureFlagAttribute(int index) {
+        return mFeatureFlag != null && mAttributes != null && index == mAttributes.length;
+    }
+
     private Attribute getAttribute(int index) {
         if (mEventType != START_TAG) {
             throw new IndexOutOfBoundsException("Parser must be on START_TAG to get attributes.");
@@ -618,6 +654,7 @@ public class BinaryXmlResourceParser implements XmlPullParser {
         mClassIndex = -1;
         mStyleIndex = -1;
         mAttributes = null;
+        mFeatureFlag = null;
     }
 
     private boolean nextChunk() throws IOException {
@@ -727,6 +764,28 @@ public class BinaryXmlResourceParser implements XmlPullParser {
                     mStyleIndex = mIn.readUnsignedShort();
 
                     skipUnreadHeader();
+
+                    // If the element is behind a feature flag, a ResXMLTreeFlagExt is stored
+                    // right after the ResXMLTree_attrExt. To determine if there is a flag ext,
+                    // we see if the offset to where attributes start is big enough to store
+                    // both a ResXMLTree_attrExt (20 bytes) and a ResXMLTreeFlagExt (8 bytes).
+                    if (attributeStart == 20 + 8) {
+                        // ResXMLTreeFlagExt
+                        int descriptor = mIn.readUnsignedByte();
+                        boolean flagNegated = mIn.readUnsignedByte() != 0;
+                        mIn.skipShort(); // reserved
+                        int flagNameIndex = mIn.readInt();
+
+                        if (descriptor == FLAG_EXT_FLAG_INFO && mStringPool != null) {
+                            String flagName = mStringPool.getString(flagNameIndex);
+                            if (flagName != null && !flagName.isEmpty()) {
+                                // aapt2 strips the featureFlag attribute when flattening,
+                                // so we restore it from the flag ext.
+                                mFeatureFlag = (flagNegated ? "!" : "") + flagName;
+                                mFeatureFlags.put(flagName, !flagNegated);
+                            }
+                        }
+                    }
 
                     // Align the stream with the start of the attributes.
                     mIn.jumpTo(startPosition + attributeStart);

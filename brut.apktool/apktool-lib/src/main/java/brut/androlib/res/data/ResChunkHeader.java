@@ -46,6 +46,8 @@ public final class ResChunkHeader {
     public static final int RES_TABLE_OVERLAYABLE_TYPE = 0x0204;
     public static final int RES_TABLE_OVERLAYABLE_POLICY_TYPE = 0x0205;
     public static final int RES_TABLE_STAGED_ALIAS_TYPE = 0x0206;
+    public static final int RES_TABLE_FLAGGED = 0x0207;
+    public static final int RES_TABLE_FLAG_LIST = 0x0208;
 
     public final int type;
     public final int headerSize;
@@ -102,6 +104,10 @@ public final class ResChunkHeader {
                 return "RES_TABLE_OVERLAYABLE_POLICY_TYPE";
             case RES_TABLE_STAGED_ALIAS_TYPE:
                 return "RES_TABLE_STAGED_ALIAS_TYPE";
+            case RES_TABLE_FLAGGED:
+                return "RES_TABLE_FLAGGED";
+            case RES_TABLE_FLAG_LIST:
+                return "RES_TABLE_FLAG_LIST";
             default:
                 return String.format("0x%04x", type);
         }
