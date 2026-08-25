@@ -265,7 +265,18 @@ public class BinaryResourceParser {
             mPackageCount++;
         }
 
-        parser = new ResChunkPullParser(mIn, parser.dataSize());
+        parsePackageChunks(new ResChunkPullParser(mIn, parser.dataSize()));
+
+        // Clean up.
+        injectDummyEntrySpecs();
+        mInvalidConfigs.clear();
+        mPackage = null;
+        mTypeIdOffset = 0;
+        mTypeStringPool = null;
+        mKeyStringPool = null;
+    }
+
+    private void parsePackageChunks(ResChunkPullParser parser) throws AndrolibException, IOException {
         while (nextChunk(parser)) {
             switch (parser.chunkType()) {
                 case ResChunkHeader.RES_STRING_POOL_TYPE:
@@ -297,14 +308,6 @@ public class BinaryResourceParser {
                     break;
             }
         }
-
-        // Clean up.
-        injectDummyEntrySpecs();
-        mInvalidConfigs.clear();
-        mPackage = null;
-        mTypeIdOffset = 0;
-        mTypeStringPool = null;
-        mKeyStringPool = null;
     }
 
     private void parseTypeSpec(ResChunkPullParser parser) throws AndrolibException, IOException {
@@ -329,26 +332,9 @@ public class BinaryResourceParser {
 
         // ResTable_flagged chunks holding values behind a feature flag may be contained
         // within a type spec chunk.
-        long chunkEnd = parser.chunkEnd();
-        if (chunkEnd - mIn.position() >= ResChunkHeader.SIZE) {
-            parser = new ResChunkPullParser(mIn, (int) (chunkEnd - mIn.position()));
+        if (parser.chunkEnd() - mIn.position() >= ResChunkHeader.SIZE) {
             try {
-                while (nextChunk(parser)) {
-                    // Guard against trailing non-chunk data claiming to extend past the
-                    // end of the type spec chunk.
-                    if (parser.chunkEnd() > chunkEnd) {
-                        Log.d(TAG, "Ignoring trailing data at end of type spec chunk.");
-                        break;
-                    }
-                    switch (parser.chunkType()) {
-                        case ResChunkHeader.RES_TABLE_FLAGGED:
-                            parseFlagged(parser);
-                            break;
-                        default:
-                            skipUnexpectedChunk(parser);
-                            break;
-                    }
-                }
+                parsePackageChunks(new ResChunkPullParser(mIn, (int) (parser.chunkEnd() - mIn.position())));
             } catch (IOException ignored) {
                 // Trailing data was not valid chunk data. The stream is realigned with the
                 // end of the type spec chunk by the caller (see nextChunk).
@@ -369,17 +355,8 @@ public class BinaryResourceParser {
         Log.w(TAG, "Found resources behind feature flag: %s%s. Merging them with the default values.",
             flagNegated ? "!" : "", flagName);
 
-        parser = new ResChunkPullParser(mIn, (int) (parser.chunkEnd() - mIn.position()));
-        while (nextChunk(parser)) {
-            switch (parser.chunkType()) {
-                case ResChunkHeader.RES_TABLE_TYPE_TYPE:
-                    parseType(parser);
-                    break;
-                default:
-                    skipUnexpectedChunk(parser);
-                    break;
-            }
-        }
+        // Per spec, a flagged chunk should only contain ResTable_type chunks.
+        parsePackageChunks(new ResChunkPullParser(mIn, (int) (parser.chunkEnd() - mIn.position())));
     }
 
     private void parseFlagList(ResChunkPullParser parser) throws AndrolibException, IOException {
