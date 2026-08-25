@@ -163,7 +163,7 @@ public final class ResStringEncoder {
         appendEscapedString(out, str, 0, len, attrType, false);
 
         // Raw strings might get encoded as typed values in edge cases. We skip this if the string has been quoted.
-        if (out.charAt(0) != '"' && isAmbiguousString(out, attrType)) {
+        if (out.length() > 0 && out.charAt(0) != '"' && isAmbiguousString(out, attrType)) {
             out.insert(0, '\\');
         }
 

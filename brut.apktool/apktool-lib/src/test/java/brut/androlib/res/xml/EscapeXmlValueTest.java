@@ -31,6 +31,7 @@ public class EscapeXmlValueTest extends BaseTest {
         assertEquals("foo&amp;bar", escape("foo&bar"));
         assertEquals("&lt;foo>", escape("<foo>"));
         assertEquals("&lt;![CDATA[foo]]&gt;", escape("<![CDATA[foo]]>"));
+        assertEquals("", escape("\u0000"));
     }
 
     private static String escape(String value) {
