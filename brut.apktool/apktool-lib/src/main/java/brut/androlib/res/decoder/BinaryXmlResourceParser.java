@@ -767,8 +767,7 @@ public class BinaryXmlResourceParser implements XmlPullParser {
 
                     // If the element is behind a feature flag, a ResXMLTreeFlagExt is stored
                     // right after the ResXMLTree_attrExt. To determine if there is a flag ext,
-                    // we see if the offset to where attributes start is big enough to store
-                    // both a ResXMLTree_attrExt and a ResXMLTreeFlagExt.
+                    // we see if the offset to where attributes start is big enough to store it.
                     if (attributeStart == ResChunkHeader.XML_ATTR_EXT_SIZE + ResChunkHeader.XML_FLAG_EXT_SIZE) {
                         // ResXMLTreeFlagExt
                         int descriptor = mIn.readUnsignedByte();
@@ -779,8 +778,6 @@ public class BinaryXmlResourceParser implements XmlPullParser {
                         if (descriptor == FLAG_EXT_FLAG_INFO && mStringPool != null) {
                             String flagName = mStringPool.getString(flagNameIndex);
                             if (flagName != null && !flagName.isEmpty()) {
-                                // aapt2 strips the featureFlag attribute when flattening,
-                                // so we restore it from the flag ext.
                                 mFeatureFlag = (flagNegated ? "!" : "") + flagName;
                                 mFeatureFlags.put(flagName, !flagNegated);
                             }

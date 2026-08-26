@@ -22,10 +22,7 @@ import java.io.IOException;
 
 public final class ResChunkHeader {
     public static final int SIZE = 8;
-
-    // sizeof(ResXMLTree_attrExt)
     public static final int XML_ATTR_EXT_SIZE = 20;
-    // sizeof(ResXMLTreeFlagExt)
     public static final int XML_FLAG_EXT_SIZE = 8;
 
     public static final int RES_NULL_TYPE = 0x0000;
