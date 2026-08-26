@@ -105,8 +105,7 @@ public class ResDecoder {
             }
         }
 
-        // Record feature flags restored from binary XML files, so they can be passed
-        // back to aapt on build.
+        // Record feature flags restored from binary XML files, to pass back to aapt2.
         if (!parser.getFeatureFlags().isEmpty()) {
             Map<String, Boolean> featureFlags = mApkInfo.getFeatureFlags();
             for (Map.Entry<String, Boolean> flag : parser.getFeatureFlags().entrySet()) {
