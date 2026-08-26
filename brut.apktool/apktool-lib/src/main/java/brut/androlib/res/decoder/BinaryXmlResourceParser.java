@@ -41,9 +41,6 @@ public class BinaryXmlResourceParser implements XmlPullParser {
     private static final String NOT_SUPPORTED = "Method is not supported.";
 
     // ResXMLTreeFlagExt descriptors:
-    // The extended element structure is padding.
-    private static final int FLAG_EXT_PADDING = 0x00;
-    // The extended element structure holds feature flag information.
     private static final int FLAG_EXT_FLAG_INFO = 0x01;
 
     private final ResTable mTable;
