@@ -331,13 +331,11 @@ public class BinaryResourceParser {
         mPackage.addTypeSpec(id, mTypeStringPool.getString(id - 1));
 
         // ResTable_flagged chunks holding values behind a feature flag may be contained
-        // within a type spec chunk.
+        // within a type spec chunk. We will look for it and gracefully skip if not found.
         if (parser.chunkEnd() - mIn.position() >= ResChunkHeader.SIZE) {
             try {
                 parsePackageChunks(new ResChunkPullParser(mIn, (int) (parser.chunkEnd() - mIn.position())));
             } catch (IOException ignored) {
-                // Trailing data was not valid chunk data. The stream is realigned with the
-                // end of the type spec chunk by the caller (see nextChunk).
                 Log.d(TAG, "Ignoring trailing data at end of type spec chunk.");
             }
         }
@@ -359,7 +357,7 @@ public class BinaryResourceParser {
         parsePackageChunks(new ResChunkPullParser(mIn, (int) (parser.chunkEnd() - mIn.position())));
     }
 
-    private void parseFlagList(ResChunkPullParser parser) throws AndrolibException, IOException {
+    private void parseFlagList(ResChunkPullParser parser) throws IOException {
         skipUnreadHeader(parser);
 
         // ResTable_flag_list - an array of references to the names of all the
