@@ -23,7 +23,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.RandomAccessFile;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.zip.ZipEntry;
@@ -45,6 +44,7 @@ public class RepairingZipFileTest {
     @Test
     public void spuriousEncryptedBitIsTolerated() throws IOException {
         File zip = buildZip(true);
+        byte[] source = Files.readAllBytes(zip.toPath());
         try {
             new java.util.zip.ZipFile(zip);
             fail("base ZipFile unexpectedly opens the corrupted archive");
@@ -54,8 +54,7 @@ public class RepairingZipFileTest {
             assertEquals(PAYLOAD, readEntry(file, "entry.txt"));
         }
         // The source archive keeps its bytes; only the removed temp copy was repaired.
-        assertTrue(zip.isFile());
-        assertEquals(PAYLOAD.length(), storedEntrySize(zip));
+        assertArrayEquals(source, Files.readAllBytes(zip.toPath()));
     }
 
     @Test
@@ -85,45 +84,28 @@ public class RepairingZipFileTest {
     }
 
     private static void setEncryptedBit(File zip) throws IOException {
-        try (RandomAccessFile f = new RandomAccessFile(zip, "rw")) {
-            long cdfhOff = findFirstCdfh(f);
-            f.seek(cdfhOff + 8);
-            writeFlagWithEncryptedBit(f);
-            // Re-read the LFH offset from the CDFH, then set the flag there too.
-            f.seek(cdfhOff + 42);
-            long rawLfhOff = readUInt(f);
-            f.seek(rawLfhOff + 6);
-            writeFlagWithEncryptedBit(f);
-        }
+        byte[] data = Files.readAllBytes(zip.toPath());
+        int cdfhOff = findFirstCdfh(data);
+        data[cdfhOff + 8] |= 0x1;
+        int lfhOff = readUInt(data, cdfhOff + 42);
+        data[lfhOff + 6] |= 0x1;
+        Files.write(zip.toPath(), data);
     }
 
-    private static void writeFlagWithEncryptedBit(RandomAccessFile f) throws IOException {
-        int flags = f.read() | (f.read() << 8);
-        f.seek(f.getFilePointer() - 2);
-        f.write((flags | 0x1) & 0xff);
-        f.write(((flags | 0x1) >> 8) & 0xff);
-    }
-
-    private static long findFirstCdfh(RandomAccessFile f) throws IOException {
-        long size = f.length();
-        int maxSearch = (int) Math.min(size, 22 + 0xFFFF);
-        f.seek(size - maxSearch);
-        byte[] data = new byte[maxSearch];
-        f.readFully(data);
+    private static int findFirstCdfh(byte[] data) throws IOException {
         for (int i = 0; i <= data.length - 4; i++) {
             if (data[i] == 0x50 && data[i + 1] == 0x4b && data[i + 2] == 0x01 && data[i + 3] == 0x02) {
-                return (size - maxSearch) + i;
+                return i;
             }
         }
         throw new IOException("central directory not found");
     }
 
-    private static long readUInt(RandomAccessFile f) throws IOException {
-        long b0 = f.read();
-        long b1 = f.read();
-        long b2 = f.read();
-        long b3 = f.read();
-        return b0 | (b1 << 8) | (b2 << 16) | (b3 << 24);
+    private static int readUInt(byte[] data, int offset) {
+        return (data[offset] & 0xff)
+            | ((data[offset + 1] & 0xff) << 8)
+            | ((data[offset + 2] & 0xff) << 16)
+            | ((data[offset + 3] & 0xff) << 24);
     }
 
     private static String readEntry(RepairingZipFile file, String name) throws IOException {
@@ -140,11 +122,4 @@ public class RepairingZipFileTest {
         return new String(out.toByteArray(), StandardCharsets.UTF_8);
     }
 
-    private static long storedEntrySize(File zip) throws IOException {
-        try (RandomAccessFile f = new RandomAccessFile(zip, "rw")) {
-            long cdfhOff = findFirstCdfh(f);
-            f.seek(cdfhOff + 24);
-            return readUInt(f);
-        }
-    }
 }
