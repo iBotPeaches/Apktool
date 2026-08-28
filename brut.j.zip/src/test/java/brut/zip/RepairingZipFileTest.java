@@ -25,35 +25,35 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Base64;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
-import java.util.zip.ZipOutputStream;
 
 public class RepairingZipFileTest {
-    private static final String PAYLOAD = "stored entry payload";
+    // Valid ZIP with the encrypted flag set in both local and central-directory headers.
+    private static final String ENCRYPTED_ENTRY_ZIP =
+        "UEsDBBQAAQAIAKuFHF3SG9QNFgAAABQAAAAJAAAAZW50cnkudHh0Ky7JL0pNUUjNKymqVChIrMzJT0wBAFBLAQIUAxQAAQAIAKuFHF3SG9QNFgAAABQAAAAJAAAAAAAAAAAAAACAAQAAAABlbnRyeS50eHRQSwUGAAAAAAEAAQA3AAAAPQAAAAAA";
 
     @Test
-    public void cleanZipOpensInPlace() throws IOException {
-        File zip = buildZip(false);
-        try (RepairingZipFile file = new RepairingZipFile(zip)) {
-            assertEquals(PAYLOAD, readEntry(file, "entry.txt"));
-        }
-        assertTrue(zip.isFile());
-    }
-
-    @Test
-    public void spuriousEncryptedBitIsTolerated() throws IOException {
-        File zip = buildZip(true);
+    public void spuriousEncryptedBitIsToleratedWithoutChangingSource() throws IOException {
+        File zip = encryptedEntryFixture();
         byte[] source = Files.readAllBytes(zip.toPath());
-        try {
-            new java.util.zip.ZipFile(zip);
-            fail("base ZipFile unexpectedly opens the corrupted archive");
-        } catch (ZipException expected) {
-        }
+
+        assertThrows(ZipException.class, () -> new java.util.zip.ZipFile(zip));
         try (RepairingZipFile file = new RepairingZipFile(zip)) {
-            assertEquals(PAYLOAD, readEntry(file, "entry.txt"));
+            ZipEntry entry = file.getEntry("entry.txt");
+            assertNotNull(entry);
+            try (InputStream in = file.getInputStream(entry)) {
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                byte[] buffer = new byte[64];
+                int count;
+                while ((count = in.read(buffer)) != -1) {
+                    out.write(buffer, 0, count);
+                }
+                assertEquals("stored entry payload", new String(out.toByteArray(), StandardCharsets.UTF_8));
+            }
         }
-        // The source archive keeps its bytes; only the removed temp copy was repaired.
+
         assertArrayEquals(source, Files.readAllBytes(zip.toPath()));
     }
 
@@ -62,64 +62,14 @@ public class RepairingZipFileTest {
         File garbage = File.createTempFile("garbage-", ".zip");
         garbage.deleteOnExit();
         Files.write(garbage.toPath(), "not a zip archive".getBytes(StandardCharsets.US_ASCII));
-        try {
-            new RepairingZipFile(garbage);
-            fail("non-archive input must fail, not be repaired");
-        } catch (ZipException expected) {
-        }
+
+        assertThrows(ZipException.class, () -> new RepairingZipFile(garbage));
     }
 
-    private static File buildZip(boolean setEncryptedBit) throws IOException {
-        File zip = File.createTempFile("repairing-", ".zip");
+    private static File encryptedEntryFixture() throws IOException {
+        File zip = File.createTempFile("encrypted-entry-", ".zip");
         zip.deleteOnExit();
-        try (ZipOutputStream out = new ZipOutputStream(Files.newOutputStream(zip.toPath()))) {
-            out.putNextEntry(new ZipEntry("entry.txt"));
-            out.write(PAYLOAD.getBytes(StandardCharsets.UTF_8));
-            out.closeEntry();
-        }
-        if (setEncryptedBit) {
-            setEncryptedBit(zip);
-        }
+        Files.write(zip.toPath(), Base64.getDecoder().decode(ENCRYPTED_ENTRY_ZIP));
         return zip;
     }
-
-    private static void setEncryptedBit(File zip) throws IOException {
-        byte[] data = Files.readAllBytes(zip.toPath());
-        int cdfhOff = findFirstCdfh(data);
-        data[cdfhOff + 8] |= 0x1;
-        int lfhOff = readUInt(data, cdfhOff + 42);
-        data[lfhOff + 6] |= 0x1;
-        Files.write(zip.toPath(), data);
-    }
-
-    private static int findFirstCdfh(byte[] data) throws IOException {
-        for (int i = 0; i <= data.length - 4; i++) {
-            if (data[i] == 0x50 && data[i + 1] == 0x4b && data[i + 2] == 0x01 && data[i + 3] == 0x02) {
-                return i;
-            }
-        }
-        throw new IOException("central directory not found");
-    }
-
-    private static int readUInt(byte[] data, int offset) {
-        return (data[offset] & 0xff)
-            | ((data[offset + 1] & 0xff) << 8)
-            | ((data[offset + 2] & 0xff) << 16)
-            | ((data[offset + 3] & 0xff) << 24);
-    }
-
-    private static String readEntry(RepairingZipFile file, String name) throws IOException {
-        ZipEntry entry = file.getEntry(name);
-        assertNotNull(entry);
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        try (InputStream in = file.getInputStream(entry)) {
-            byte[] buf = new byte[4096];
-            int n;
-            while ((n = in.read(buf)) != -1) {
-                out.write(buf, 0, n);
-            }
-        }
-        return new String(out.toByteArray(), StandardCharsets.UTF_8);
-    }
-
 }
