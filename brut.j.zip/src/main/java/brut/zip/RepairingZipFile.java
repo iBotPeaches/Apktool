@@ -26,12 +26,12 @@ import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 /**
- * A {@link ZipFile} that tolerates central-directory / local-header fields AOSP accepts but
- * {@code java.util.zip.ZipFile} rejects, such as a spurious encrypted bit or an unknown
- * compression method on entries that are stored verbatim.
+ * A {@link ZipFile} that tolerates the spurious encrypted-entry bit some producers
+ * leave on central-directory and local file headers. AOSP reads such archives
+ * unencrypted while {@code java.util.zip.ZipFile} rejects them.
  *
  * <p>An archive that opens cleanly is read in place. A repairable one is copied to a temporary
- * file, repaired there, and opened from the copy; the copy is removed on {@link #close()}.
+ * file, the flag is cleared there, and the copy is opened; the copy is removed on {@link #close()}.
  */
 public class RepairingZipFile extends ZipFile {
     private static final int EOCD_SIG = 0x06054b50;
@@ -128,18 +128,15 @@ public class RepairingZipFile extends ZipFile {
     }
 
     private static void fixHeaderFields(RandomAccessFile f) throws IOException {
+        // Only the spurious encrypted bit is cleared (issue #4028): AOSP reads
+        // these entries unencrypted, and the payload bytes need no re-interpretation.
+        // Unknown compression methods are left alone — relabeling them as stored
+        // would corrupt entries whose bytes are actually deflated.
         long flagsPos = f.getFilePointer();
         int flags = readUShort(f);
         if ((flags & 0x1) != 0) {
             f.seek(flagsPos);
             writeUShort(f, flags & ~0x1);
-        }
-        long comprPos = flagsPos + 2;
-        f.seek(comprPos);
-        int compr = readUShort(f);
-        if (compr != 0 && compr != 8) {
-            f.seek(comprPos);
-            writeUShort(f, 0);
         }
     }
 

@@ -111,7 +111,7 @@ public class RepairingZipFileTest {
         byte[] data = new byte[maxSearch];
         f.readFully(data);
         for (int i = 0; i <= data.length - 4; i++) {
-            if (data[i] == 0x50 && data[i + 1] == 0x4b && data[i + 2] == 0x02 && data[i + 3] == 0x01) {
+            if (data[i] == 0x50 && data[i + 1] == 0x4b && data[i + 2] == 0x01 && data[i + 3] == 0x02) {
                 return (size - maxSearch) + i;
             }
         }
