@@ -16,8 +16,7 @@
  */
 package brut.directory;
 
-import brut.util.OS;
-import brut.util.ZipUtils;
+import brut.zip.RepairingZipFile;
 
 import java.io.File;
 import java.io.InputStream;
@@ -31,7 +30,6 @@ import java.util.zip.ZipFile;
 public class ZipRODirectory extends Directory {
     private final ZipFile mZipFile;
     private final String mPath;
-    private final File mRepairCopy;
 
     public ZipRODirectory(String fileName) throws DirectoryException {
         this(fileName, "");
@@ -46,30 +44,17 @@ public class ZipRODirectory extends Directory {
     }
 
     public ZipRODirectory(File file, String path) throws DirectoryException {
-        File repairCopy = null;
-        ZipFile zipFile;
         try {
-            zipFile = new ZipFile(file);
+            mZipFile = new RepairingZipFile(file);
         } catch (IOException ex) {
-            if (!ZipUtils.isRepairableCenHeader(ex)) {
-                throw new DirectoryException(ex);
-            }
-            try {
-                repairCopy = ZipUtils.repairInvalidCenHeadersCopy(file);
-                zipFile = new ZipFile(repairCopy);
-            } catch (IOException repairEx) {
-                throw new DirectoryException(repairEx);
-            }
+            throw new DirectoryException(ex);
         }
-        mZipFile = zipFile;
-        mRepairCopy = repairCopy;
         mPath = path;
     }
 
     private ZipRODirectory(ZipFile zipFile, String path) {
         mZipFile = zipFile;
         mPath = path;
-        mRepairCopy = null;
     }
 
     @Override
@@ -146,9 +131,6 @@ public class ZipRODirectory extends Directory {
             mZipFile.close();
         } catch (IOException ex) {
             throw new DirectoryException(ex);
-        }
-        if (mRepairCopy != null) {
-            OS.rmfile(mRepairCopy);
         }
     }
 }
