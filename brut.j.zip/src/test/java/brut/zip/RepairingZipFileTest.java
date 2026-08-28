@@ -30,9 +30,9 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 
 public class RepairingZipFileTest {
-    // Valid ZIP with the encrypted flag set in both local and central-directory headers.
+    // Prefixed ZIP with encrypted flags and a misleading EOCD signature in its comment.
     private static final String ENCRYPTED_ENTRY_ZIP =
-        "UEsDBBQAAQAIAKuFHF3SG9QNFgAAABQAAAAJAAAAZW50cnkudHh0Ky7JL0pNUUjNKymqVChIrMzJT0wBAFBLAQIUAxQAAQAIAKuFHF3SG9QNFgAAABQAAAAJAAAAAAAAAAAAAACAAQAAAABlbnRyeS50eHRQSwUGAAAAAAEAAQA3AAAAPQAAAAAA";
+        "U0ZYUFJFRklYUEsDBBQAAQAIAGaGHF3SG9QNFgAAABQAAAAJAAAAZW50cnkudHh0Ky7JL0pNUUjNKymqVChIrMzJT0wBAFBLAQIUAxQAAQAIAGaGHF3SG9QNFgAAABQAAAAJAAAAAAAAAAAAAACAAQAAAABlbnRyeS50eHRQSwUGAAAAAAEAAQA3AAAAPQAAACIAcHJlZml4UEsFBnh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eA==";
 
     @Test
     public void spuriousEncryptedBitIsToleratedWithoutChangingSource() throws IOException {

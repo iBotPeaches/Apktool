@@ -27,8 +27,8 @@ import java.util.zip.ZipFile;
 
 /**
  * A {@link ZipFile} that tolerates the spurious encrypted-entry bit some producers
- * leave on central-directory and local file headers. AOSP reads such archives
- * unencrypted while {@code java.util.zip.ZipFile} rejects them.
+ * leave on central-directory and local file headers of classic single-disk ZIPs.
+ * AOSP reads such archives unencrypted while {@code java.util.zip.ZipFile} rejects them.
  *
  * <p>An archive that opens cleanly is read in place. A repairable one is copied to a temporary
  * file, the flag is cleared there, and the copy is opened; the copy is removed on {@link #close()}.
@@ -55,34 +55,75 @@ public class RepairingZipFile extends ZipFile {
 
     @Override
     public void close() throws IOException {
-        super.close();
+        IOException failure = null;
+        try {
+            super.close();
+        } catch (IOException ex) {
+            failure = ex;
+        }
         if (repairCopy != null) {
-            Files.deleteIfExists(repairCopy.toPath());
+            try {
+                Files.deleteIfExists(repairCopy.toPath());
+            } catch (IOException ex) {
+                if (failure == null) {
+                    failure = ex;
+                } else {
+                    failure.addSuppressed(ex);
+                }
+            }
+        }
+        if (failure != null) {
+            throw failure;
         }
     }
 
     private static OpenTarget openTarget(File source) throws IOException {
-        // Match brut.apktool.Main — needed when this library is used without the CLI wrapper.
-        System.setProperty("jdk.util.zip.disableZip64ExtraFieldValidation", "true");
         try (ZipFile ignored = new ZipFile(source)) {
             return new OpenTarget(source, null);
         } catch (ZipException ex) {
-            if (ex.getMessage() == null || !ex.getMessage().contains("invalid CEN header")) {
+            if (ex.getMessage() == null || !ex.getMessage().contains("invalid CEN header (encrypted entry)")) {
                 throw ex;
             }
         }
         File dest = Files.createTempFile("apktool-zip-repair-", ".zip").toFile();
         dest.deleteOnExit();
-        Files.copy(source.toPath(), dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
-        repairInvalidCenHeaders(dest);
-        return new OpenTarget(dest, dest);
+        try {
+            Files.copy(source.toPath(), dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            repairInvalidCenHeaders(dest);
+            try (ZipFile ignored = new ZipFile(dest)) {
+                return new OpenTarget(dest, dest);
+            }
+        } catch (IOException | RuntimeException ex) {
+            try {
+                Files.deleteIfExists(dest.toPath());
+            } catch (IOException cleanup) {
+                ex.addSuppressed(cleanup);
+            }
+            throw ex;
+        }
     }
 
     private static void repairInvalidCenHeaders(File file) throws IOException {
         try (RandomAccessFile f = new RandomAccessFile(file, "rw")) {
-            byte[] eocdData = findEocd(f);
+            EndRecord eocd = findEocd(f);
+            byte[] eocdData = eocd.data;
+            int disk = readUShort(eocdData, 4);
+            int centralDirectoryDisk = readUShort(eocdData, 6);
+            int diskEntryCount = readUShort(eocdData, 8);
             int cdfhCnt = readUShort(eocdData, 10);
-            int cdOff = readUInt(eocdData, 16);
+            long cdSize = readUInt(eocdData, 12);
+            long storedCdOff = readUInt(eocdData, 16);
+            if (disk != 0 || centralDirectoryDisk != 0 || diskEntryCount != cdfhCnt) {
+                throw new ZipException("multi-disk ZIP repair is not supported");
+            }
+            if (cdfhCnt == 0xffff || cdSize == 0xffffffffL || storedCdOff == 0xffffffffL) {
+                throw new ZipException("ZIP64 repair is not supported");
+            }
+            long cdOff = eocd.offset - cdSize;
+            long prefixLength = cdOff - storedCdOff;
+            if (cdOff < 0 || prefixLength < 0) {
+                throw new ZipException("invalid central directory offset");
+            }
             f.seek(cdOff);
             int cdfhIdx = 0;
             while (cdfhIdx < cdfhCnt) {
@@ -99,7 +140,7 @@ public class RepairingZipFile extends ZipFile {
                 int commentLen = readUShort(f);
                 f.seek(cdfhOff + 42);
                 long lfhOff = readUInt(f);
-                f.seek(lfhOff);
+                f.seek(prefixLength + lfhOff);
                 long lfhSig = readUInt(f);
                 if (lfhSig != LFH_SIG) {
                     throw new IOException("invalid local file header signature");
@@ -112,19 +153,22 @@ public class RepairingZipFile extends ZipFile {
         }
     }
 
-    private static byte[] findEocd(RandomAccessFile f) throws IOException {
+    private static EndRecord findEocd(RandomAccessFile f) throws IOException {
         long size = f.length();
         int maxSearch = (int) Math.min(size, EOCD_MAX_SEARCH);
-        f.seek(size - maxSearch);
+        long searchStart = size - maxSearch;
+        f.seek(searchStart);
         byte[] data = new byte[maxSearch];
         f.readFully(data);
-        int idx = lastIndexOf(data, EOCD_SIG);
-        if (idx < 0) {
-            throw new IOException("end of central directory record not found");
+        for (int idx = data.length - EOCD_MIN_LEN; idx >= 0; idx--) {
+            if (hasSignature(data, idx, EOCD_SIG)
+                && readUShort(data, idx + 20) == data.length - idx - EOCD_MIN_LEN) {
+                byte[] eocd = new byte[EOCD_MIN_LEN];
+                System.arraycopy(data, idx, eocd, 0, EOCD_MIN_LEN);
+                return new EndRecord(eocd, searchStart + idx);
+            }
         }
-        byte[] eocd = new byte[EOCD_MIN_LEN];
-        System.arraycopy(data, idx, eocd, 0, EOCD_MIN_LEN);
-        return eocd;
+        throw new IOException("end of central directory record not found");
     }
 
     private static void fixHeaderFields(RandomAccessFile f) throws IOException {
@@ -140,17 +184,13 @@ public class RepairingZipFile extends ZipFile {
         }
     }
 
-    private static int lastIndexOf(byte[] data, int value) {
+    private static boolean hasSignature(byte[] data, int offset, int value) {
         int b0 = value & 0xff;
         int b1 = (value >> 8) & 0xff;
         int b2 = (value >> 16) & 0xff;
         int b3 = (value >> 24) & 0xff;
-        for (int i = data.length - 4; i >= 0; i--) {
-            if (data[i] == b0 && data[i + 1] == b1 && data[i + 2] == b2 && data[i + 3] == b3) {
-                return i;
-            }
-        }
-        return -1;
+        return data[offset] == b0 && data[offset + 1] == b1
+            && data[offset + 2] == b2 && data[offset + 3] == b3;
     }
 
     private static int readUShort(RandomAccessFile f) throws IOException {
@@ -179,14 +219,14 @@ public class RepairingZipFile extends ZipFile {
     }
 
     private static int readUShort(byte[] data, int offset) {
-        return (data[offset + 1] << 8) | (data[offset] & 0xff);
+        return ((data[offset + 1] & 0xff) << 8) | (data[offset] & 0xff);
     }
 
-    private static int readUInt(byte[] data, int offset) {
-        return (data[offset] & 0xff)
-            | ((data[offset + 1] & 0xff) << 8)
-            | ((data[offset + 2] & 0xff) << 16)
-            | ((data[offset + 3] & 0xff) << 24);
+    private static long readUInt(byte[] data, int offset) {
+        return (data[offset] & 0xffL)
+            | ((data[offset + 1] & 0xffL) << 8)
+            | ((data[offset + 2] & 0xffL) << 16)
+            | ((data[offset + 3] & 0xffL) << 24);
     }
 
     private static final class OpenTarget {
@@ -196,6 +236,16 @@ public class RepairingZipFile extends ZipFile {
         OpenTarget(File file, File repairCopy) {
             this.file = file;
             this.repairCopy = repairCopy;
+        }
+    }
+
+    private static final class EndRecord {
+        final byte[] data;
+        final long offset;
+
+        EndRecord(byte[] data, long offset) {
+            this.data = data;
+            this.offset = offset;
         }
     }
 }
