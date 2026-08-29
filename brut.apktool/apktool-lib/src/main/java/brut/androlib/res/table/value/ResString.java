@@ -17,8 +17,10 @@
 package brut.androlib.res.table.value;
 
 import brut.androlib.exceptions.AndrolibException;
+import brut.androlib.res.data.FeatureFlag;
 import brut.androlib.res.table.ResEntry;
 import brut.androlib.res.xml.ResStringEncoder;
+import brut.androlib.res.xml.ResXmlUtils;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
@@ -67,6 +69,10 @@ public class ResString extends ResItem {
         if (!asItem && !isFormatted()) {
             serial.attribute(null, "formatted", "false");
         }
+        FeatureFlag flag = entry.getType().getFlag();
+        if (flag != null) {
+            serial.attribute(ResXmlUtils.ANDROID_RES_NS, "featureFlag", flag.toString());
+        }
         String body = toXmlTextValue();
         if (!body.isEmpty()) {
             serial.text(body);
@@ -95,11 +101,11 @@ public class ResString extends ResItem {
         if (obj == this) {
             return true;
         }
-        if (obj instanceof ResString) {
-            ResString other = (ResString) obj;
-            return mValue.equals(other.mValue);
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
         }
-        return false;
+        ResString other = (ResString) obj;
+        return mValue.equals(other.mValue);
     }
 
     @Override

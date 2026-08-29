@@ -36,7 +36,7 @@ import static org.junit.Assert.assertTrue;
 import org.custommonkey.xmlunit.*;
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 
-public class BaseTest {
+public abstract class BaseTest {
     private static final String TAG = "TEST";
 
     protected static Config sConfig;

@@ -27,9 +27,9 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 public class ApkInfo implements YamlSerializable {
@@ -51,7 +51,7 @@ public class ApkInfo implements YamlSerializable {
     private final SdkInfo mSdkInfo;
     private final VersionInfo mVersionInfo;
     private final ResourcesInfo mResourcesInfo;
-    private final Map<String, Boolean> mFeatureFlags;
+    private final Set<String> mFeatureFlags;
     private final List<String> mDoNotCompress;
 
     // Only set when loaded from a file (not a stream).
@@ -65,7 +65,7 @@ public class ApkInfo implements YamlSerializable {
         mSdkInfo = new SdkInfo();
         mVersionInfo = new VersionInfo();
         mResourcesInfo = new ResourcesInfo();
-        mFeatureFlags = new LinkedHashMap<>();
+        mFeatureFlags = new TreeSet<>();
         mDoNotCompress = new ArrayList<>();
     }
 
@@ -132,7 +132,7 @@ public class ApkInfo implements YamlSerializable {
                 break;
             case "featureFlags":
                 mFeatureFlags.clear();
-                reader.readBoolMap(mFeatureFlags);
+                reader.readStringList(mFeatureFlags);
                 break;
             case "doNotCompress":
                 mDoNotCompress.clear();
@@ -161,7 +161,7 @@ public class ApkInfo implements YamlSerializable {
             writer.writeObject("resourcesInfo", mResourcesInfo);
         }
         if (!mFeatureFlags.isEmpty()) {
-            writer.writeMap("featureFlags", mFeatureFlags);
+            writer.writeList("featureFlags", mFeatureFlags);
         }
         if (!mDoNotCompress.isEmpty()) {
             writer.writeList("doNotCompress", mDoNotCompress);
@@ -204,7 +204,7 @@ public class ApkInfo implements YamlSerializable {
         return mResourcesInfo;
     }
 
-    public Map<String, Boolean> getFeatureFlags() {
+    public Set<String> getFeatureFlags() {
         return mFeatureFlags;
     }
 

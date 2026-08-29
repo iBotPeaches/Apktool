@@ -40,28 +40,33 @@ public class ResStringPool {
     private static final int UTF8_FLAG = 0x00000100;
     private static final String MALFORMED_MARKER = "";
 
-    private final int[] mStringOffsets;
-    private final byte[] mStrings;
-    private final int[] mStyleOffsets;
-    private final int[] mStyles;
-    private final boolean mIsUtf8;
+    private int[] mStringOffsets;
+    private byte[] mStrings;
+    private int[] mStyleOffsets;
+    private int[] mStyles;
+    private boolean mIsUtf8;
+    private boolean mIsLoaded;
     private String[] mDecodedStrings;
     private Map<String, Integer> mStringToIndex;
 
-    private ResStringPool(int[] stringOffsets, byte[] strings, int[] styleOffsets, int[] styles, boolean isUtf8) {
-        mStringOffsets = stringOffsets;
-        mStrings = strings;
-        mStyleOffsets = styleOffsets;
-        mStyles = styles;
-        mIsUtf8 = isUtf8;
+    public ResStringPool() {
+        reset();
     }
 
     @VisibleForTesting
     ResStringPool(byte[] strings, boolean isUtf8) {
-        this(new int[0], strings, new int[0], new int[0], isUtf8);
+        this();
+        mStrings = strings;
+        mIsUtf8 = isUtf8;
+        mIsLoaded = true;
     }
 
-    public static ResStringPool parse(ResChunkPullParser parser) throws IOException {
+    public boolean isLoaded() {
+        return mIsLoaded;
+    }
+
+    public void parse(ResChunkPullParser parser) throws IOException {
+        reset();
         BinaryDataInputStream in = parser.stream();
         // ResStringPool_header
         int stringCount = in.readInt();
@@ -76,8 +81,8 @@ public class ResStringPool {
             Log.d(TAG, "Skipped unknown %s bytes at end of %s chunk header.", skipped, parser.chunkName());
         }
 
-        int[] stringOffsets = readIntArraySafe(in, stringCount, parser.chunkStart() + stringsOffset);
-        int[] styleOffsets = readIntArraySafe(in, styleCount, parser.chunkStart() + stylesOffset);
+        mStringOffsets = readIntArraySafe(in, stringCount, parser.chunkStart() + stringsOffset);
+        mStyleOffsets = readIntArraySafe(in, styleCount, parser.chunkStart() + stylesOffset);
 
         // If we have both strings and even just a lying style offset - let's calculate the size of the strings without
         // accidentally parsing all the styles.
@@ -86,23 +91,19 @@ public class ResStringPool {
             size = stylesOffset - stringsOffset;
         }
 
-        byte[] strings = in.readBytes(size);
+        mStrings = in.readBytes(size);
 
         // #3236 - Some apps give a styles offset, but have 0 styles. Make this check more robust.
-        int[] styles;
         if (stylesOffset > 0 && styleCount > 0) {
             size = parser.chunkSize() - stylesOffset;
-            styles = in.readIntArray(size / 4);
-        } else {
-            styles = new int[0];
+            mStyles = in.readIntArray(size / 4);
         }
 
         // In case we aren't 4 byte aligned we need to skip the padding bytes.
         in.skipBytes(size % 4);
 
-        boolean isUtf8 = (flags & UTF8_FLAG) != 0;
-
-        return new ResStringPool(stringOffsets, strings, styleOffsets, styles, isUtf8);
+        mIsUtf8 = (flags & UTF8_FLAG) != 0;
+        mIsLoaded = true;
     }
 
     private static int[] readIntArraySafe(BinaryDataInputStream in, int len, long maxPosition) throws IOException {
@@ -118,6 +119,17 @@ public class ResStringPool {
             arr[i] = in.readInt();
         }
         return arr;
+    }
+
+    public void reset() {
+        mStringOffsets = new int[0];
+        mStrings = new byte[0];
+        mStyleOffsets = new int[0];
+        mStyles = new int[0];
+        mIsUtf8 = false;
+        mIsLoaded = false;
+        mDecodedStrings = null;
+        mStringToIndex = null;
     }
 
     public CharSequence getText(int index) {

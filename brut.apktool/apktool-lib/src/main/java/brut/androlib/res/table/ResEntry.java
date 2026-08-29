@@ -18,18 +18,16 @@ package brut.androlib.res.table;
 
 import brut.androlib.res.table.value.ResValue;
 
-import java.util.Objects;
-
 public class ResEntry {
     private final ResType mType;
     private final ResEntrySpec mSpec;
     private ResValue mValue; // might be updated later
 
     public ResEntry(ResType type, ResEntrySpec spec, ResValue value) {
-        assert type != null && spec != null && type.getSpec() == spec.getTypeSpec() && value != null;
+        assert type != null && spec != null && type.getSpec() == spec.getTypeSpec();
         mType = type;
         mSpec = spec;
-        mValue = value;
+        setValue(value);
     }
 
     public ResPackage getPackage() {
@@ -61,6 +59,7 @@ public class ResEntry {
     }
 
     public void setValue(ResValue value) {
+        assert value != null;
         mValue = value;
     }
 
@@ -74,16 +73,16 @@ public class ResEntry {
         if (obj == this) {
             return true;
         }
-        if (obj instanceof ResEntry) {
-            ResEntry other = (ResEntry) obj;
-            return mType.equals(other.mType)
-                && mSpec.equals(other.mSpec);
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
         }
-        return false;
+        ResEntry other = (ResEntry) obj;
+        return mType.equals(other.mType)
+            && mSpec.equals(other.mSpec);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(mType, mSpec);
+        return 31 * mType.hashCode() + mSpec.hashCode();
     }
 }

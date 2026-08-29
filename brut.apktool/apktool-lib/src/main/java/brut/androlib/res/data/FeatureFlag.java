@@ -14,34 +14,25 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.util;
+package brut.androlib.res.data;
 
-import java.util.Objects;
+public final class FeatureFlag {
+    public final String mName;
+    public final boolean mNegated;
 
-public final class Pair<L, R> {
-    private final L mLeft;
-    private final R mRight;
-
-    private Pair(L left, R right) {
-        mLeft = left;
-        mRight = right;
+    public FeatureFlag(String name, boolean negated) {
+        assert name != null;
+        mName = name;
+        mNegated = negated;
     }
 
-    public static <L, R> Pair<L, R> of(L left, R right) {
-        return new Pair<>(left, right);
-    }
-
-    public L getLeft() {
-        return mLeft;
-    }
-
-    public R getRight() {
-        return mRight;
+    public static String toString(String name, boolean negated) {
+        return negated ? "!" + name : name;
     }
 
     @Override
     public String toString() {
-        return "(" + String.valueOf(mLeft) + "," + String.valueOf(mRight) + ")";
+        return toString(mName, mNegated);
     }
 
     @Override
@@ -52,13 +43,13 @@ public final class Pair<L, R> {
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        Pair<?, ?> other = (Pair<?, ?>) obj;
-        return Objects.equals(mLeft, other.mLeft)
-            && Objects.equals(mRight, other.mRight);
+        FeatureFlag other = (FeatureFlag) obj;
+        return mName.equals(other.mName)
+            && mNegated == other.mNegated;
     }
 
     @Override
     public int hashCode() {
-        return 31 * Objects.hashCode(mLeft) + Objects.hashCode(mRight);
+        return 31 * mName.hashCode() + Boolean.hashCode(mNegated);
     }
 }

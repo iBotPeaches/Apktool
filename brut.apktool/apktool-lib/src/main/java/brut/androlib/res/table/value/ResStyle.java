@@ -17,18 +17,18 @@
 package brut.androlib.res.table.value;
 
 import brut.androlib.exceptions.AndrolibException;
-import brut.androlib.res.table.ResConfig;
+import brut.androlib.res.data.FeatureFlag;
 import brut.androlib.res.table.ResEntry;
 import brut.androlib.res.table.ResEntrySpec;
 import brut.androlib.res.table.ResId;
 import brut.androlib.res.table.ResPackage;
+import brut.androlib.res.xml.ResXmlUtils;
 import brut.common.Log;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 public class ResStyle extends ResBag {
@@ -105,7 +105,7 @@ public class ResStyle extends ResBag {
             Log.d(TAG, "Injecting dummy for unresolved style item reference: " + key);
             if (!pkg.hasTypeSpec(keyId.typeId())) {
                 pkg.addTypeSpec(keyId.typeId(), "attr");
-                pkg.addType(keyId.typeId(), ResConfig.DEFAULT);
+                pkg.addType(keyId.typeId());
             }
             pkg.addEntrySpec(keyId.typeId(), keyId.entryId(), ResEntrySpec.DUMMY_PREFIX + keyId);
             pkg.addEntry(keyId.typeId(), keyId.entryId(), ResAttribute.DEFAULT);
@@ -121,6 +121,10 @@ public class ResStyle extends ResBag {
             serial.attribute(null, "parent", mParent.toXmlAttributeValue());
         } else if (entry.getName().indexOf('.') != -1) {
             serial.attribute(null, "parent", "");
+        }
+        FeatureFlag flag = entry.getType().getFlag();
+        if (flag != null) {
+            serial.attribute(ResXmlUtils.ANDROID_RES_NS, "featureFlag", flag.toString());
         }
 
         ResPackage pkg = mParent.getPackage();
@@ -176,16 +180,16 @@ public class ResStyle extends ResBag {
         if (obj == this) {
             return true;
         }
-        if (obj instanceof ResStyle) {
-            ResStyle other = (ResStyle) obj;
-            return mParent.equals(other.mParent)
-                && Arrays.equals(mItems, other.mItems);
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
         }
-        return false;
+        ResStyle other = (ResStyle) obj;
+        return mParent.equals(other.mParent)
+            && Arrays.equals(mItems, other.mItems);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(mParent, Arrays.hashCode(mItems));
+        return 31 * mParent.hashCode() + Arrays.hashCode(mItems);
     }
 }

@@ -197,30 +197,6 @@ public final class ResXmlUtils {
     }
 
     /**
-     * Finds all feature flags set on permissions in AndroidManifest.xml.
-     *
-     * @param file File for AndroidManifest.xml
-     * @return String[]|null
-     */
-    public static String[] pullManifestFeatureFlags(File file) {
-        try {
-            Document doc = XmlUtils.loadDocument(file, true);
-            String expression = "/manifest//@android:featureFlag";
-            NodeList nodes = XmlUtils.evaluateXPath(doc, expression, NodeList.class);
-
-            String[] featureFlags = new String[nodes.getLength()];
-
-            for (int i = 0; i < featureFlags.length; i++) {
-                featureFlags[i] = nodes.item(i).getNodeValue();
-            }
-
-            return featureFlags;
-        } catch (IOException | SAXException | ParserConfigurationException | XPathExpressionException ignored) {
-            return null;
-        }
-    }
-
-    /**
      * Any @string reference in a provider value in AndroidManifest.xml will break on
      * build, thus preventing the application from installing. This is from a bug/error
      * in AOSP where public resources cannot be part of an authorities attribute within

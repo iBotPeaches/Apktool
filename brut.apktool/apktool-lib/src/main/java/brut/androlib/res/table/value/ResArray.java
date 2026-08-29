@@ -17,8 +17,10 @@
 package brut.androlib.res.table.value;
 
 import brut.androlib.exceptions.AndrolibException;
+import brut.androlib.res.data.FeatureFlag;
 import brut.androlib.res.table.ResEntry;
 import brut.androlib.res.table.ResEntrySpec;
+import brut.androlib.res.xml.ResXmlUtils;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
@@ -60,6 +62,10 @@ public class ResArray extends ResBag {
 
         serial.startTag(null, tagName);
         serial.attribute(null, "name", entry.getName());
+        FeatureFlag flag = entry.getType().getFlag();
+        if (flag != null) {
+            serial.attribute(ResXmlUtils.ANDROID_RES_NS, "featureFlag", flag.toString());
+        }
 
         for (ResItem value : mItems) {
             serial.startTag(null, "item");
@@ -119,11 +125,11 @@ public class ResArray extends ResBag {
         if (obj == this) {
             return true;
         }
-        if (obj instanceof ResArray) {
-            ResArray other = (ResArray) obj;
-            return Arrays.equals(mItems, other.mItems);
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
         }
-        return false;
+        ResArray other = (ResArray) obj;
+        return Arrays.equals(mItems, other.mItems);
     }
 
     @Override

@@ -17,7 +17,6 @@
 package brut.androlib.res.table.value;
 
 import brut.androlib.exceptions.AndrolibException;
-import brut.androlib.res.table.ResConfig;
 import brut.androlib.res.table.ResEntry;
 import brut.androlib.res.table.ResEntrySpec;
 import brut.androlib.res.table.ResId;
@@ -29,7 +28,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 public class ResEnum extends ResAttribute {
     private static final String TAG = ResEnum.class.getName();
@@ -66,7 +64,7 @@ public class ResEnum extends ResAttribute {
             Log.d(TAG, "Injecting dummy for unresolved enum symbol reference: " + key);
             if (!pkg.hasTypeSpec(keyId.typeId())) {
                 pkg.addTypeSpec(keyId.typeId(), "id");
-                pkg.addType(keyId.typeId(), ResConfig.DEFAULT);
+                pkg.addType(keyId.typeId());
             }
             pkg.addEntrySpec(keyId.typeId(), keyId.entryId(), ResEntrySpec.DUMMY_PREFIX + keyId);
             pkg.addEntry(keyId.typeId(), keyId.entryId(), ResCustom.ID);
@@ -189,20 +187,26 @@ public class ResEnum extends ResAttribute {
         if (obj == this) {
             return true;
         }
-        if (obj instanceof ResEnum) {
-            ResEnum other = (ResEnum) obj;
-            return mParent.equals(other.mParent)
-                && mType == other.mType
-                && mMin == other.mMin
-                && mMax == other.mMax
-                && mL10n == other.mL10n
-                && Arrays.equals(mSymbols, other.mSymbols);
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
         }
-        return false;
+        ResEnum other = (ResEnum) obj;
+        return mParent.equals(other.mParent)
+            && mType == other.mType
+            && mMin == other.mMin
+            && mMax == other.mMax
+            && mL10n == other.mL10n
+            && Arrays.equals(mSymbols, other.mSymbols);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(mParent, mType, mMin, mMax, mL10n, Arrays.hashCode(mSymbols));
+        int result = mParent.hashCode();
+        result = 31 * result + Integer.hashCode(mType);
+        result = 31 * result + Integer.hashCode(mMin);
+        result = 31 * result + Integer.hashCode(mMax);
+        result = 31 * result + Integer.hashCode(mL10n);
+        result = 31 * result + Arrays.hashCode(mSymbols);
+        return result;
     }
 }

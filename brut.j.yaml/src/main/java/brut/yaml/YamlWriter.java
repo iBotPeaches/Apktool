@@ -23,8 +23,8 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -98,7 +98,7 @@ public class YamlWriter implements Closeable {
         mWriter.println(escape(key) + ": " + val);
     }
 
-    public <T> void writeList(String key, List<T> list) {
+    public <T> void writeList(String key, Collection<T> list) {
         if (Objects.isNull(list)) {
             return;
         }

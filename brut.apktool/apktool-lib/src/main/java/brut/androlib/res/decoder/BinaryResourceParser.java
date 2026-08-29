@@ -18,6 +18,7 @@ package brut.androlib.res.decoder;
 
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.exceptions.UndefinedResObjectException;
+import brut.androlib.res.data.FeatureFlag;
 import brut.androlib.res.data.ResChunkHeader;
 import brut.androlib.res.data.ResStringPool;
 import brut.androlib.res.table.*;
@@ -34,6 +35,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -74,23 +76,25 @@ public class BinaryResourceParser {
     private static final int ENTRY_FLAG_WEAK = 0x0004;
     // If set, this is a compact entry with data type and value directly encoded in the entry.
     private static final int ENTRY_FLAG_COMPACT = 0x0008;
-    // If set, this resource relies on an android feature flag.
+    // If set, this entry relies on read/write android feature flags.
     // This should not be encountered in most cases (#3993)
-    private static final int ENTRY_FLAG_FEATUREFLAG = 0x0010;
+    private static final int ENTRY_FLAG_USES_FEATURE_FLAGS = 0x0010;
 
     private final ResTable mTable;
     private final boolean mKeepBrokenResources;
     private final boolean mAllowDummyEntrySpecs;
+    private final ResStringPool mValueStringPool;
+    private final ResStringPool mTypeStringPool;
+    private final ResStringPool mKeyStringPool;
     private final Set<ResId> mMissingEntrySpecs;
     private final Set<ResConfig> mInvalidConfigs;
 
     private BinaryDataInputStream mIn;
-    private ResStringPool mValueStringPool;
+    private Map<Integer, String> mFlagMap;
     private int mPackageCount;
     private ResPackage mPackage;
     private int mTypeIdOffset;
-    private ResStringPool mTypeStringPool;
-    private ResStringPool mKeyStringPool;
+    private FeatureFlag mFlag;
     private boolean mHasSparseEntries;
     private boolean mHasCompactEntries;
     private List<Pair<Long, Integer>> mEntrySpecFlagsOffsets;
@@ -99,6 +103,9 @@ public class BinaryResourceParser {
         mTable = table;
         mKeepBrokenResources = keepBrokenResources;
         mAllowDummyEntrySpecs = allowDummyEntrySpecs;
+        mValueStringPool = new ResStringPool();
+        mTypeStringPool = new ResStringPool();
+        mKeyStringPool = new ResStringPool();
         mMissingEntrySpecs = new HashSet<>();
         mInvalidConfigs = new HashSet<>();
     }
@@ -109,6 +116,10 @@ public class BinaryResourceParser {
 
     public boolean hasCompactEntries() {
         return mHasCompactEntries;
+    }
+
+    public Collection<String> getFlags() {
+        return mFlagMap != null ? mFlagMap.values() : null;
     }
 
     public void enableCollectFlagsOffsets() {
@@ -147,14 +158,16 @@ public class BinaryResourceParser {
 
     public void reset() {
         mIn = null;
+        mValueStringPool.reset();
+        mTypeStringPool.reset();
+        mKeyStringPool.reset();
         mMissingEntrySpecs.clear();
         mInvalidConfigs.clear();
-        mValueStringPool = null;
+        mFlagMap = null;
         mPackageCount = 0;
         mPackage = null;
         mTypeIdOffset = 0;
-        mTypeStringPool = null;
-        mKeyStringPool = null;
+        mFlag = null;
         mHasSparseEntries = false;
         mHasCompactEntries = false;
         if (mEntrySpecFlagsOffsets != null) {
@@ -202,6 +215,9 @@ public class BinaryResourceParser {
                 case ResChunkHeader.RES_STRING_POOL_TYPE:
                     parseStringPool(parser);
                     break;
+                case ResChunkHeader.RES_TABLE_FLAG_LIST:
+                    parseFlagList(parser);
+                    break;
                 case ResChunkHeader.RES_TABLE_PACKAGE_TYPE:
                     parsePackage(parser);
                     break;
@@ -217,16 +233,40 @@ public class BinaryResourceParser {
     }
 
     private void parseStringPool(ResChunkPullParser parser) throws AndrolibException, IOException {
-        ResStringPool stringPool = ResStringPool.parse(parser);
-
-        if (mValueStringPool == null) {
-            mValueStringPool = stringPool;
-        } else if (mTypeStringPool == null) {
-            mTypeStringPool = stringPool;
-        } else if (mKeyStringPool == null) {
-            mKeyStringPool = stringPool;
+        if (!mValueStringPool.isLoaded()) {
+            mValueStringPool.parse(parser);
+        } else if (!mTypeStringPool.isLoaded()) {
+            mTypeStringPool.parse(parser);
+        } else if (!mKeyStringPool.isLoaded()) {
+            mKeyStringPool.parse(parser);
         } else {
             skipUnexpectedChunk(parser);
+        }
+    }
+
+    private void parseFlagList(ResChunkPullParser parser) throws AndrolibException, IOException {
+        // ResTable_flag_list
+        int count = parser.dataSize() / 4;
+        if (count == 0) {
+            return;
+        }
+        if (mFlagMap != null) {
+            skipUnexpectedChunk(parser);
+            return;
+        }
+        if (!mValueStringPool.isLoaded()) {
+            throw new AndrolibException("Missing value string pool.");
+        }
+
+        skipUnreadHeader(parser);
+
+        mFlagMap = new HashMap<>();
+
+        // An array of indexes of names for all used read/write feature flags.
+        for (int i = 0; i < count; i++) {
+            int flagNameIndex = mIn.readInt();
+
+            mFlagMap.put(flagNameIndex, mValueStringPool.getString(flagNameIndex));
         }
     }
 
@@ -274,6 +314,9 @@ public class BinaryResourceParser {
                 case ResChunkHeader.RES_TABLE_TYPE_TYPE:
                     parseType(parser);
                     break;
+                case ResChunkHeader.RES_TABLE_FLAGGED:
+                    parseFlagged(parser);
+                    break;
                 case ResChunkHeader.RES_TABLE_LIBRARY_TYPE:
                     parseLibrary(parser);
                     break;
@@ -291,15 +334,15 @@ public class BinaryResourceParser {
 
         // Clean up.
         injectDummyEntrySpecs();
+        mTypeStringPool.reset();
+        mKeyStringPool.reset();
         mInvalidConfigs.clear();
         mPackage = null;
         mTypeIdOffset = 0;
-        mTypeStringPool = null;
-        mKeyStringPool = null;
     }
 
     private void parseTypeSpec(ResChunkPullParser parser) throws AndrolibException, IOException {
-        if (mTypeStringPool == null) {
+        if (!mTypeStringPool.isLoaded()) {
             throw new AndrolibException("Missing type string pool.");
         }
 
@@ -320,10 +363,10 @@ public class BinaryResourceParser {
     }
 
     private void parseType(ResChunkPullParser parser) throws AndrolibException, IOException {
-        if (mTypeStringPool == null) {
+        if (!mTypeStringPool.isLoaded()) {
             throw new AndrolibException("Missing type string pool.");
         }
-        if (mKeyStringPool == null) {
+        if (!mKeyStringPool.isLoaded()) {
             throw new AndrolibException("Missing key string pool");
         }
 
@@ -349,14 +392,16 @@ public class BinaryResourceParser {
         ResType type;
         if (mInvalidConfigs.contains(config)) {
             if (mKeepBrokenResources) {
-                Log.w(TAG, "Invalid resource config detected: %s %s", typeName, config);
-                type = mPackage.addType(id, config);
+                Log.w(TAG, "Keeping resources for invalid resource config: typeName=%s, config=%s, flag=%s",
+                    typeName, config, mFlag);
+                type = mPackage.addType(id, config, mFlag);
             } else {
-                Log.w(TAG, "Invalid resource config detected. Dropping resources: %s %s", typeName, config);
+                Log.w(TAG, "Dropping resources for invalid resource config: typeName=%s, config=%s, flag=%s",
+                    typeName, config, mFlag);
                 type = null;
             }
         } else {
-            type = mPackage.addType(id, config);
+            type = mPackage.addType(id, config, mFlag);
         }
 
         boolean isOffset16 = (flags & TYPE_FLAG_OFFSET16) != 0;
@@ -448,8 +493,8 @@ public class BinaryResourceParser {
                     }
 
                     // The same entry can never be added more than once.
-                    if (mPackage.hasEntry(id, index, config)) {
-                        Log.w(TAG, "Ignoring repeated entry: id=%s, config=%s", resId, config);
+                    if (mPackage.hasEntry(id, index, config, mFlag)) {
+                        Log.w(TAG, "Ignoring repeated entry: id=%s, config=%s, flag=%s", resId, config, mFlag);
                         continue;
                     }
 
@@ -457,7 +502,7 @@ public class BinaryResourceParser {
                         mPackage.addEntrySpec(id, index, mKeyStringPool.getString(key));
                         mMissingEntrySpecs.remove(resId);
                     }
-                    mPackage.addEntry(id, index, config, value);
+                    mPackage.addEntry(id, index, config, mFlag, value);
                 }
             }
 
@@ -681,7 +726,7 @@ public class BinaryResourceParser {
 
         // Special handling for strings and file references.
         if (type == ResValue.TYPE_STRING) {
-            if (mValueStringPool == null) {
+            if (!mValueStringPool.isLoaded()) {
                 throw new AndrolibException("Missing value string pool.");
             }
 
@@ -697,6 +742,40 @@ public class BinaryResourceParser {
         }
 
         return ResItem.parse(mPackage, type, data);
+    }
+
+    private void parseFlagged(ResChunkPullParser parser) throws AndrolibException, IOException {
+        if (!mValueStringPool.isLoaded()) {
+            throw new AndrolibException("Missing value string pool.");
+        }
+
+        // ResTable_flagged
+        int flagNameIndex = mIn.readInt();
+        boolean flagNegated = mIn.readBoolean();
+        mIn.skipBytes(3); // padding
+
+        skipUnreadHeader(parser);
+
+        String flagName = mFlagMap.get(flagNameIndex);
+        if (flagName == null) {
+            Log.d(TAG, "Skipping chunk with undeclared feature flag with index 0x%08x.", flagNameIndex);
+            parser.skipChunk();
+            return;
+        }
+
+        mFlag = new FeatureFlag(flagName, flagNegated);
+
+        parser = new ResChunkPullParser(mIn, parser.dataSize());
+        while (nextChunk(parser)) {
+            if (parser.chunkType() == ResChunkHeader.RES_TABLE_TYPE_TYPE) {
+                parseType(parser);
+            } else {
+                skipUnexpectedChunk(parser);
+            }
+        }
+
+        // Clean up.
+        mFlag = null;
     }
 
     private void parseLibrary(ResChunkPullParser parser) throws IOException {

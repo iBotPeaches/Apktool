@@ -17,6 +17,7 @@
 package brut.androlib.res.table;
 
 import brut.androlib.exceptions.UndefinedResObjectException;
+import brut.androlib.res.data.FeatureFlag;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,7 +25,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 
 public class ResPackageGroup {
     private final ResTable mTable;
@@ -100,8 +100,12 @@ public class ResPackageGroup {
     }
 
     public boolean hasType(int typeId, ResConfig config) {
+        return hasType(typeId, config, null);
+    }
+
+    public boolean hasType(int typeId, ResConfig config, FeatureFlag flag) {
         for (ResPackage pkg : mPackages) {
-            if (pkg.hasType(typeId, config)) {
+            if (pkg.hasType(typeId, config, flag)) {
                 return true;
             }
         }
@@ -113,14 +117,18 @@ public class ResPackageGroup {
     }
 
     public ResType getType(int typeId, ResConfig config) throws UndefinedResObjectException {
+        return getType(typeId, config, null);
+    }
+
+    public ResType getType(int typeId, ResConfig config, FeatureFlag flag) throws UndefinedResObjectException {
         for (ResPackage pkg : mPackages) {
             try {
-                return pkg.getType(typeId, config);
+                return pkg.getType(typeId, config, flag);
             } catch (UndefinedResObjectException ignored) {
             }
         }
         throw new UndefinedResObjectException(
-            String.format("type: pkgId=0x%02x, typeId=0x%02x, config=%s", mId, typeId, config));
+            String.format("type: pkgId=0x%02x, typeId=0x%02x, config=%s, flag=%s", mId, typeId, config, flag));
     }
 
     public boolean hasEntrySpec(int typeId, int entryId) {
@@ -171,8 +179,12 @@ public class ResPackageGroup {
     }
 
     public boolean hasEntry(int typeId, int entryId, ResConfig config) {
+        return hasEntry(typeId, entryId, config, null);
+    }
+
+    public boolean hasEntry(int typeId, int entryId, ResConfig config, FeatureFlag flag) {
         for (ResPackage pkg : mPackages) {
-            if (pkg.hasEntry(typeId, entryId, config)) {
+            if (pkg.hasEntry(typeId, entryId, config, flag)) {
                 return true;
             }
         }
@@ -184,15 +196,20 @@ public class ResPackageGroup {
     }
 
     public ResEntry getEntry(int typeId, int entryId, ResConfig config) throws UndefinedResObjectException {
+        return getEntry(typeId, entryId, config, null);
+    }
+
+    public ResEntry getEntry(int typeId, int entryId, ResConfig config, FeatureFlag flag)
+            throws UndefinedResObjectException {
         for (ResPackage pkg : mPackages) {
             try {
-                return pkg.getEntry(typeId, entryId, config);
+                return pkg.getEntry(typeId, entryId, config, flag);
             } catch (UndefinedResObjectException ignored) {
             }
         }
         throw new UndefinedResObjectException(
-            String.format("entry: pkgId=0x%02x, typeId=0x%02x, entryId=0x%04x, config=%s",
-                mId, typeId, entryId, config));
+            String.format("entry: pkgId=0x%02x, typeId=0x%02x, entryId=0x%04x, config=%s, flag=%s",
+                mId, typeId, entryId, config, flag));
     }
 
     public Iterable<ResEntry> listEntries() {
@@ -228,16 +245,16 @@ public class ResPackageGroup {
         if (obj == this) {
             return true;
         }
-        if (obj instanceof ResPackageGroup) {
-            ResPackageGroup other = (ResPackageGroup) obj;
-            return mId == other.mId
-                && mName.equals(other.mName);
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
         }
-        return false;
+        ResPackageGroup other = (ResPackageGroup) obj;
+        return mId == other.mId
+            && mName.equals(other.mName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(mId, mName);
+        return 31 * Integer.hashCode(mId) + mName.hashCode();
     }
 }

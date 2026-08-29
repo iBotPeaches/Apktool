@@ -18,6 +18,7 @@ package brut.androlib.res.decoder;
 
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.exceptions.UndefinedResObjectException;
+import brut.androlib.res.data.FeatureFlag;
 import brut.androlib.res.data.ResChunkHeader;
 import brut.androlib.res.data.ResStringPool;
 import brut.androlib.res.table.*;
@@ -41,11 +42,11 @@ public class BinaryXmlResourceParser implements XmlPullParser {
     private final ResTable mTable;
     private final boolean mIgnoreRawValues;
     private final boolean mSkipUnresolved;
+    private final ResStringPool mStringPool;
     private final NamespaceStack mNamespaces;
 
     private BinaryDataInputStream mIn;
     private ResChunkPullParser mParser;
-    private ResStringPool mStringPool;
     private ResId[] mResourceMap;
     private boolean mHasRawValues;
     private AndrolibException mFirstError;
@@ -57,12 +58,14 @@ public class BinaryXmlResourceParser implements XmlPullParser {
     private int mIdIndex;
     private int mClassIndex;
     private int mStyleIndex;
+    private FlagExt mFlagExt;
     private Attribute[] mAttributes;
 
     public BinaryXmlResourceParser(ResTable table, boolean ignoreRawValues, boolean skipUnresolved) {
         mTable = table;
         mIgnoreRawValues = ignoreRawValues;
         mSkipUnresolved = skipUnresolved;
+        mStringPool = new ResStringPool();
         mNamespaces = new NamespaceStack();
         resetEventInfo();
     }
@@ -144,18 +147,12 @@ public class BinaryXmlResourceParser implements XmlPullParser {
 
     @Override
     public String getNamespacePrefix(int pos) {
-        if (mStringPool == null) {
-            return null;
-        }
         int prefixIdx = mNamespaces.getPrefix(pos);
         return mStringPool.getString(prefixIdx);
     }
 
     @Override
     public String getNamespaceUri(int pos) {
-        if (mStringPool == null) {
-            return null;
-        }
         int uriIdx = mNamespaces.getUri(pos);
         return mStringPool.getString(uriIdx);
     }
@@ -205,7 +202,7 @@ public class BinaryXmlResourceParser implements XmlPullParser {
 
     @Override
     public String getText() {
-        if (mStringPool == null || mEventType != TEXT) {
+        if (mEventType != TEXT) {
             return null;
         }
         return mStringPool.getString(mNameIndex);
@@ -227,7 +224,7 @@ public class BinaryXmlResourceParser implements XmlPullParser {
 
     @Override
     public String getNamespace() {
-        if (mStringPool == null || (mEventType != START_TAG && mEventType != END_TAG)) {
+        if (mEventType != START_TAG && mEventType != END_TAG) {
             return null;
         }
         return mStringPool.getString(mNamespaceIndex);
@@ -235,7 +232,7 @@ public class BinaryXmlResourceParser implements XmlPullParser {
 
     @Override
     public String getName() {
-        if (mStringPool == null || (mEventType != START_TAG && mEventType != END_TAG)) {
+        if (mEventType != START_TAG && mEventType != END_TAG) {
             return null;
         }
         return mStringPool.getString(mNameIndex);
@@ -243,7 +240,7 @@ public class BinaryXmlResourceParser implements XmlPullParser {
 
     @Override
     public String getPrefix() {
-        if (mStringPool == null || (mEventType != START_TAG && mEventType != END_TAG)) {
+        if (mEventType != START_TAG && mEventType != END_TAG) {
             return null;
         }
         int prefixIdx = mNamespaces.findPrefix(mNamespaceIndex);
@@ -260,11 +257,17 @@ public class BinaryXmlResourceParser implements XmlPullParser {
         if (mEventType != START_TAG) {
             return -1;
         }
-        return mAttributes != null ? mAttributes.length : 0;
+        int count = mAttributes != null ? mAttributes.length : 0;
+        // The restored featureFlag attribute is appended as an extra attribute.
+        return mFlagExt != null ? count + 1 : count;
     }
 
     @Override
     public String getAttributeNamespace(int index) {
+        if (isFlagExtAttribute(index)) {
+            return ResXmlUtils.ANDROID_RES_NS;
+        }
+
         Attribute attr = getAttribute(index);
         if (attr == null) {
             return NO_NAMESPACE;
@@ -287,7 +290,7 @@ public class BinaryXmlResourceParser implements XmlPullParser {
 
         // Minifiers like removing the namespace, so we will fall back to default namespace unless the package ID of
         // the resource is private. We will grab the non-standard one.
-        String uri = mStringPool != null ? mStringPool.getString(attr.ns) : null;
+        String uri = mStringPool.getString(attr.ns);
         if (uri != null && !uri.isEmpty()) {
             return uri;
         }
@@ -299,6 +302,10 @@ public class BinaryXmlResourceParser implements XmlPullParser {
 
     @Override
     public String getAttributeName(int index) {
+        if (isFlagExtAttribute(index)) {
+            return "featureFlag";
+        }
+
         Attribute attr = getAttribute(index);
         if (attr == null || attr.name < 0) {
             return "";
@@ -320,7 +327,7 @@ public class BinaryXmlResourceParser implements XmlPullParser {
         }
 
         // Couldn't decode from resource table, fall back to string pool.
-        String name = mStringPool != null ? mStringPool.getString(attr.name) : null;
+        String name = mStringPool.getString(attr.name);
         if (name == null) {
             name = "";
         }
@@ -346,7 +353,7 @@ public class BinaryXmlResourceParser implements XmlPullParser {
                     getAttributePrefix(index), name, nameId);
                 if (!pkg.hasTypeSpec(nameId.typeId())) {
                     pkg.addTypeSpec(nameId.typeId(), "attr");
-                    pkg.addType(nameId.typeId(), ResConfig.DEFAULT);
+                    pkg.addType(nameId.typeId());
                 }
                 if (name.isEmpty()) {
                     name = ResEntrySpec.DUMMY_PREFIX + nameId;
@@ -367,8 +374,8 @@ public class BinaryXmlResourceParser implements XmlPullParser {
 
     @Override
     public String getAttributePrefix(int index) {
-        if (mStringPool == null) {
-            return "";
+        if (isFlagExtAttribute(index)) {
+            return "android";
         }
         Attribute attr = getAttribute(index);
         if (attr == null || attr.ns < 0) {
@@ -394,6 +401,11 @@ public class BinaryXmlResourceParser implements XmlPullParser {
 
     @Override
     public String getAttributeValue(int index) {
+        if (isFlagExtAttribute(index)) {
+            String flagName = mStringPool.getString(mFlagExt.flagNameIndex);
+            return flagName != null ? FeatureFlag.toString(flagName, mFlagExt.flagNegated) : null;
+        }
+
         Attribute attr = getAttribute(index);
         if (attr == null) {
             return "";
@@ -401,7 +413,7 @@ public class BinaryXmlResourceParser implements XmlPullParser {
 
         // Use the raw value if preserved (rare for modern apps).
         if (mHasRawValues && !mIgnoreRawValues) {
-            String rawValue = mStringPool != null ? mStringPool.getString(attr.rawValue) : null;
+            String rawValue = mStringPool.getString(attr.rawValue);
             if (rawValue != null) {
                 return rawValue;
             }
@@ -419,7 +431,7 @@ public class BinaryXmlResourceParser implements XmlPullParser {
             }
 
             if (attr.valueType == ResValue.TYPE_STRING) {
-                CharSequence strValue = mStringPool != null ? mStringPool.getText(attr.valueData) : null;
+                CharSequence strValue = mStringPool.getText(attr.valueData);
                 value = strValue != null ? new ResString(strValue) : null;
             } else {
                 value = ResItem.parse(pkg, attr.valueType, attr.valueData);
@@ -472,7 +484,7 @@ public class BinaryXmlResourceParser implements XmlPullParser {
 
         if (decoded == null) {
             if (name == null) {
-                name = mStringPool != null ? mStringPool.getString(attr.name) : null;
+                name = mStringPool.getString(attr.name);
             }
 
             Log.w(TAG, "Could not decode attribute value: ns=%s, name=%s, type=0x%02x, value=0x%08x",
@@ -498,7 +510,7 @@ public class BinaryXmlResourceParser implements XmlPullParser {
         if (mEventType != START_TAG) {
             throw new IndexOutOfBoundsException("Parser must be on START_TAG to get attributes.");
         }
-        if (mAttributes == null || mStringPool == null || name == null) {
+        if (mAttributes == null || name == null) {
             return "";
         }
         int uriIdx = mStringPool.findString(namespace);
@@ -577,6 +589,13 @@ public class BinaryXmlResourceParser implements XmlPullParser {
 
     // Utility methods
 
+    private boolean isFlagExtAttribute(int index) {
+        if (mEventType != START_TAG) {
+            throw new IndexOutOfBoundsException("Parser must be on START_TAG to get attributes.");
+        }
+        return mFlagExt != null && mAttributes != null && index == mAttributes.length;
+    }
+
     private Attribute getAttribute(int index) {
         if (mEventType != START_TAG) {
             throw new IndexOutOfBoundsException("Parser must be on START_TAG to get attributes.");
@@ -603,10 +622,10 @@ public class BinaryXmlResourceParser implements XmlPullParser {
     private void reset() {
         mIn = null;
         mParser = null;
-        mStringPool = null;
         mResourceMap = null;
         resetEventInfo();
         mNamespaces.reset();
+        mStringPool.reset();
     }
 
     private void resetEventInfo() {
@@ -617,6 +636,7 @@ public class BinaryXmlResourceParser implements XmlPullParser {
         mIdIndex = -1;
         mClassIndex = -1;
         mStyleIndex = -1;
+        mFlagExt = null;
         mAttributes = null;
     }
 
@@ -636,8 +656,7 @@ public class BinaryXmlResourceParser implements XmlPullParser {
         }
 
         // Stop if all root-level namespaces were popped.
-        if (lastEventType == END_TAG && mNamespaces.getDepth() == 0
-                && mNamespaces.getCurrentCount() == 0) {
+        if (lastEventType == END_TAG && mNamespaces.getDepth() == 0 && mNamespaces.getCurrentCount() == 0) {
             return false;
         }
 
@@ -672,7 +691,7 @@ public class BinaryXmlResourceParser implements XmlPullParser {
         while (nextChunk()) {
             switch (mParser.chunkType()) {
                 case ResChunkHeader.RES_STRING_POOL_TYPE:
-                    mStringPool = ResStringPool.parse(mParser);
+                    mStringPool.parse(mParser);
                     continue;
                 case ResChunkHeader.RES_XML_RESOURCE_MAP_TYPE:
                     skipUnreadHeader();
@@ -694,13 +713,14 @@ public class BinaryXmlResourceParser implements XmlPullParser {
             mLineNumber = mIn.readInt();
             mIn.skipInt(); // comment
 
+            skipUnreadHeader();
+
+            // Extended node data comes after ResXMLTree_node.
             switch (mParser.chunkType()) {
                 case ResChunkHeader.RES_XML_START_NAMESPACE_TYPE: {
                     // ResXMLTree_namespaceExt
                     int prefix = mIn.readInt();
                     int uri = mIn.readInt();
-
-                    skipUnreadHeader();
 
                     mNamespaces.push(prefix, uri);
                     continue;
@@ -709,8 +729,6 @@ public class BinaryXmlResourceParser implements XmlPullParser {
                     // ResXMLTree_namespaceExt
                     mIn.skipInt(); // prefix
                     mIn.skipInt(); // uri
-
-                    skipUnreadHeader();
 
                     mNamespaces.pop();
                     continue;
@@ -726,7 +744,16 @@ public class BinaryXmlResourceParser implements XmlPullParser {
                     mClassIndex = mIn.readUnsignedShort();
                     mStyleIndex = mIn.readUnsignedShort();
 
-                    skipUnreadHeader();
+                    // If there is a flag, it is stored in a ResXMLTreeFlagExt after the ResXMLTree_attrExt.
+                    // We determine it by checking if the offset to where attributes start is big enough to store
+                    // both a ResXMLTree_attrExt and a ResXMLTreeFlagExt.
+                    if (attributeStart == mIn.position() - startPosition + FlagExt.SIZE) {
+                        FlagExt flagExt = FlagExt.read(mIn);
+
+                        if (flagExt.descriptor == FlagExt.FLAG_INFO) {
+                            mFlagExt = flagExt;
+                        }
+                    }
 
                     // Align the stream with the start of the attributes.
                     mIn.jumpTo(startPosition + attributeStart);
@@ -757,7 +784,6 @@ public class BinaryXmlResourceParser implements XmlPullParser {
                     mNamespaceIndex = mIn.readInt();
                     mNameIndex = mIn.readInt();
 
-                    skipUnreadHeader();
                     return mEventType = END_TAG;
                 case ResChunkHeader.RES_XML_CDATA_TYPE:
                     // ResXMLTree_cdataExt
@@ -765,7 +791,6 @@ public class BinaryXmlResourceParser implements XmlPullParser {
                     mIn.skipInt(); // size, res0, type
                     mIn.skipInt(); // data
 
-                    skipUnreadHeader();
                     return mEventType = TEXT;
                 default:
                     skipUnexpectedChunk();
@@ -974,6 +999,33 @@ public class BinaryXmlResourceParser implements XmlPullParser {
                 }
             }
             return -1;
+        }
+    }
+
+    private static final class FlagExt {
+        public static final int SIZE = 8;
+
+        public static final int PADDING = 0x00;
+        public static final int FLAG_INFO = 0x01;
+
+        public final int descriptor;
+        public final boolean flagNegated;
+        public final int flagNameIndex;
+
+        public FlagExt(int descriptor, boolean flagNegated, int flagNameIndex) {
+            this.descriptor = descriptor;
+            this.flagNegated = flagNegated;
+            this.flagNameIndex = flagNameIndex;
+        }
+
+        public static FlagExt read(BinaryDataInputStream in) throws IOException {
+            // ResXMLTreeFlagExt
+            int descriptor = in.readUnsignedByte();
+            boolean flagNegated = in.readBoolean();
+            in.skipShort(); // reserved
+            int flagNameIndex = in.readInt();
+
+            return new FlagExt(descriptor, flagNegated, flagNameIndex);
         }
     }
 

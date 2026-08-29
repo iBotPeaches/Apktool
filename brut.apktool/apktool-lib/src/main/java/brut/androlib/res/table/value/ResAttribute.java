@@ -17,15 +17,16 @@
 package brut.androlib.res.table.value;
 
 import brut.androlib.exceptions.AndrolibException;
+import brut.androlib.res.data.FeatureFlag;
 import brut.androlib.res.table.ResEntry;
 import brut.androlib.res.table.ResId;
 import brut.androlib.res.table.ResPackage;
 import brut.androlib.res.xml.ResStringEncoder;
+import brut.androlib.res.xml.ResXmlUtils;
 import brut.common.Log;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
-import java.util.Objects;
 
 public class ResAttribute extends ResBag {
     private static final String TAG = ResAttribute.class.getName();
@@ -245,6 +246,10 @@ public class ResAttribute extends ResBag {
         if (mL10n == ATTR_L10N_SUGGESTED) {
             serial.attribute(null, "localization", "suggested");
         }
+        FeatureFlag flag = entry.getType().getFlag();
+        if (flag != null) {
+            serial.attribute(ResXmlUtils.ANDROID_RES_NS, "featureFlag", flag.toString());
+        }
         serializeSymbolsToValuesXml(serial, entry);
         serial.endTag(null, tagName);
     }
@@ -283,18 +288,22 @@ public class ResAttribute extends ResBag {
         if (obj == this) {
             return true;
         }
-        if (obj instanceof ResAttribute) {
-            ResAttribute other = (ResAttribute) obj;
-            return mType == other.mType
-                && mMin == other.mMin
-                && mMax == other.mMax
-                && mL10n == other.mL10n;
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
         }
-        return false;
+        ResAttribute other = (ResAttribute) obj;
+        return mType == other.mType
+            && mMin == other.mMin
+            && mMax == other.mMax
+            && mL10n == other.mL10n;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(mType, mMin, mMax, mL10n);
+        int result = Integer.hashCode(mType);
+        result = 31 * result + Integer.hashCode(mMin);
+        result = 31 * result + Integer.hashCode(mMax);
+        result = 31 * result + Integer.hashCode(mL10n);
+        return result;
     }
 }

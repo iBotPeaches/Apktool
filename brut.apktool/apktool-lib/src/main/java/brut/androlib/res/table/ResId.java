@@ -81,11 +81,11 @@ public class ResId extends Number implements Comparable<ResId> {
         if (obj == this) {
             return true;
         }
-        if (obj instanceof ResId) {
-            ResId other = (ResId) obj;
-            return mId == other.mId;
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
         }
-        return false;
+        ResId other = (ResId) obj;
+        return mId == other.mId;
     }
 
     @Override

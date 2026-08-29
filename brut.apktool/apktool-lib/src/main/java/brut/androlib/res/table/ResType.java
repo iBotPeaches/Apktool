@@ -16,16 +16,20 @@
  */
 package brut.androlib.res.table;
 
+import brut.androlib.res.data.FeatureFlag;
+
 import java.util.Objects;
 
 public class ResType {
     private final ResTypeSpec mSpec;
     private final ResConfig mConfig;
+    private final FeatureFlag mFlag;
 
-    public ResType(ResTypeSpec spec, ResConfig config) {
+    public ResType(ResTypeSpec spec, ResConfig config, FeatureFlag flag) {
         assert spec != null && config != null;
         mSpec = spec;
         mConfig = config;
+        mFlag = flag;
     }
 
     public ResPackage getPackage() {
@@ -48,9 +52,13 @@ public class ResType {
         return mConfig;
     }
 
+    public FeatureFlag getFlag() {
+        return mFlag;
+    }
+
     @Override
     public String toString() {
-        return String.format("ResType{spec=%s, config=%s}", mSpec, mConfig);
+        return String.format("ResType{spec=%s, config=%s, flag=%s}", mSpec, mConfig, mFlag);
     }
 
     @Override
@@ -58,16 +66,20 @@ public class ResType {
         if (obj == this) {
             return true;
         }
-        if (obj instanceof ResType) {
-            ResType other = (ResType) obj;
-            return mSpec.equals(other.mSpec)
-                && mConfig.equals(other.mConfig);
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
         }
-        return false;
+        ResType other = (ResType) obj;
+        return mSpec.equals(other.mSpec)
+            && mConfig.equals(other.mConfig)
+            && Objects.equals(mFlag, other.mFlag);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(mSpec, mConfig);
+        int result = mSpec.hashCode();
+        result = 31 * result + mConfig.hashCode();
+        result = 31 * result + Objects.hashCode(mFlag);
+        return result;
     }
 }

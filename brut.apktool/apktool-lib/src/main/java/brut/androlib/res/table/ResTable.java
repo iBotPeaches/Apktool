@@ -84,7 +84,7 @@ public class ResTable {
 
     public void load() throws AndrolibException {
         if (mMainPackage != null) {
-            return;
+            throw new AndrolibException("The resource table has already been loaded.");
         }
 
         Log.i(TAG, "Loading resource table...");
@@ -128,13 +128,16 @@ public class ResTable {
                     : new BinaryResourceParser(this, true, true);
                 parser.parse(in);
 
-                // Only flag the app for the main package.
+                // Only update apk info for the main package.
                 if (isMainPackage) {
                     if (parser.hasSparseEntries()) {
                         mApkInfo.getResourcesInfo().setSparseEntries(true);
                     }
                     if (parser.hasCompactEntries()) {
                         mApkInfo.getResourcesInfo().setCompactEntries(true);
+                    }
+                    if (parser.getFlags() != null) {
+                        mApkInfo.getFeatureFlags().addAll(parser.getFlags());
                     }
                 }
             }

@@ -23,7 +23,6 @@ import org.xmlpull.v1.XmlSerializer;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Objects;
 import java.util.List;
 
 public class ResOverlayable {
@@ -172,18 +171,21 @@ public class ResOverlayable {
         if (obj == this) {
             return true;
         }
-        if (obj instanceof ResOverlayable) {
-            ResOverlayable other = (ResOverlayable) obj;
-            return mPackage.equals(other.mPackage)
-                && mName.equals(other.mName)
-                && mActor.equals(other.mActor);
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
         }
-        return false;
+        ResOverlayable other = (ResOverlayable) obj;
+        return mPackage.equals(other.mPackage)
+            && mName.equals(other.mName)
+            && mActor.equals(other.mActor);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(mPackage, mName, mActor);
+        int result = mPackage.hashCode();
+        result = 31 * result + mName.hashCode();
+        result = 31 * result + mActor.hashCode();
+        return result;
     }
 
     private static class Policy {
@@ -201,6 +203,11 @@ public class ResOverlayable {
 
         public ResId[] getEntries() {
             return mEntries;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("Policy{flags=0x%08x, entries=%s}", mFlags, Arrays.toString(mEntries));
         }
     }
 }

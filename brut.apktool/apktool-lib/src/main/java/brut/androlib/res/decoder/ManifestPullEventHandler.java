@@ -21,47 +21,42 @@ import brut.androlib.meta.ResourcesInfo;
 import brut.androlib.meta.SdkInfo;
 import brut.androlib.meta.VersionInfo;
 import brut.androlib.res.xml.ResXmlUtils;
-import brut.xmlpull.XmlPullUtils;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlSerializer;
 
-public class ManifestPullEventHandler implements XmlPullUtils.EventHandler {
-    private final ApkInfo mApkInfo;
+public class ManifestPullEventHandler extends ResXmlPullEventHandler {
     private final boolean mHideSdkInfo;
 
     public ManifestPullEventHandler(ApkInfo apkInfo, boolean hideSdkInfo) {
-        mApkInfo = apkInfo;
+        super(apkInfo);
         mHideSdkInfo = hideSdkInfo;
     }
 
     @Override
     public boolean onEvent(XmlPullParser in, XmlSerializer out) throws XmlPullParserException {
+        int depth = in.getDepth();
         int type = in.getEventType();
 
-        if (type == XmlPullParser.START_TAG) {
-            String name = in.getName();
-
-            if (name.equals("manifest")) {
-                parseManifest(in);
-            } else if (name.equals("uses-sdk")) {
-                parseUsesSdk(in);
-
-                if (mHideSdkInfo) {
-                    return true;
+        if (depth == 1) {
+            if (type == XmlPullParser.START_TAG) {
+                if (in.getName().equals("manifest")) {
+                    parseManifest(in);
+                    return false;
                 }
             }
-        } else if (type == XmlPullParser.END_TAG) {
-            String name = in.getName();
-
-            if (name.equals("uses-sdk")) {
-                if (mHideSdkInfo) {
-                    return true;
+        } else if (depth == 2) {
+            if (type == XmlPullParser.START_TAG || type == XmlPullParser.END_TAG) {
+                if (in.getName().equals("uses-sdk")) {
+                    if (type == XmlPullParser.START_TAG) {
+                        parseUsesSdk(in);
+                    }
+                    return mHideSdkInfo;
                 }
             }
         }
 
-        return false;
+        return super.onEvent(in, out);
     }
 
     private void parseManifest(XmlPullParser in) {
@@ -70,25 +65,21 @@ public class ManifestPullEventHandler implements XmlPullUtils.EventHandler {
 
         for (int i = 0; i < in.getAttributeCount(); i++) {
             String ns = in.getAttributeNamespace(i);
-            String name = in.getAttributeName(i);
-            String value = in.getAttributeValue(i);
 
-            if (value.isEmpty()) {
-                continue;
-            }
             if (ns.isEmpty()) {
+                String name = in.getAttributeName(i);
+
                 if (name.equals("package")) {
                     // This is temporary and will be compared to actual resources package later.
-                    resourcesInfo.setPackageName(value);
+                    resourcesInfo.setPackageName(in.getAttributeValue(i));
                 }
             } else if (ns.equals(ResXmlUtils.ANDROID_RES_NS)) {
-                switch (name) {
-                    case "versionCode":
-                        versionInfo.setVersionCode(Integer.parseInt(value));
-                        break;
-                    case "versionName":
-                        versionInfo.setVersionName(value);
-                        break;
+                String name = in.getAttributeName(i);
+
+                if (name.equals("versionCode")) {
+                    versionInfo.setVersionCode(Integer.parseInt(in.getAttributeValue(i)));
+                } else if (name.equals("versionName")) {
+                    versionInfo.setVersionName(in.getAttributeValue(i));
                 }
             }
         }
@@ -99,23 +90,16 @@ public class ManifestPullEventHandler implements XmlPullUtils.EventHandler {
 
         for (int i = 0; i < in.getAttributeCount(); i++) {
             String ns = in.getAttributeNamespace(i);
-            String name = in.getAttributeName(i);
-            String value = in.getAttributeValue(i);
 
-            if (value.isEmpty()) {
-                continue;
-            }
             if (ns.equals(ResXmlUtils.ANDROID_RES_NS)) {
-                switch (name) {
-                    case "minSdkVersion":
-                        sdkInfo.setMinSdkVersion(value);
-                        break;
-                    case "targetSdkVersion":
-                        sdkInfo.setTargetSdkVersion(value);
-                        break;
-                    case "maxSdkVersion":
-                        sdkInfo.setMaxSdkVersion(value);
-                        break;
+                String name = in.getAttributeName(i);
+
+                if (name.equals("minSdkVersion")) {
+                    sdkInfo.setMinSdkVersion(in.getAttributeValue(i));
+                } else if (name.equals("targetSdkVersion")) {
+                    sdkInfo.setTargetSdkVersion(in.getAttributeValue(i));
+                } else if (name.equals("maxSdkVersion")) {
+                    sdkInfo.setMaxSdkVersion(in.getAttributeValue(i));
                 }
             }
         }

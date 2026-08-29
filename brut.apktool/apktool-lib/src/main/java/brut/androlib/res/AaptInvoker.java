@@ -67,21 +67,29 @@ public class AaptInvoker {
             cmd.add(aaptPath);
             cmd.add("compile");
 
+            if (mConfig.isVerbose()) {
+                cmd.add("-v");
+            }
+
+            cmd.add("-o");
+            cmd.add(resZip.getPath());
+
             cmd.add("--dir");
             cmd.add(resDir.getPath());
 
             // Treats error that used to be valid in aapt1 as warnings in aapt2.
             cmd.add("--legacy");
 
-            cmd.add("-o");
-            cmd.add(resZip.getPath());
-
-            if (mConfig.isVerbose()) {
-                cmd.add("-v");
-            }
-
             if (mConfig.isNoCrunch()) {
                 cmd.add("--no-crunch");
+            }
+            if (!mApkInfo.getFeatureFlags().isEmpty()) {
+                List<String> featureFlags = new ArrayList<>();
+                for (String flag : mApkInfo.getFeatureFlags()) {
+                    featureFlags.add(flag + "=true");
+                }
+                cmd.add("--feature-flags");
+                cmd.add(String.join(",", featureFlags));
             }
 
             try {
@@ -101,6 +109,10 @@ public class AaptInvoker {
         // Link resources to the final apk.
         cmd.add(aaptPath);
         cmd.add("link");
+
+        if (mConfig.isVerbose()) {
+            cmd.add("-v");
+        }
 
         cmd.add("-o");
         cmd.add(outApk.getPath());
@@ -151,8 +163,8 @@ public class AaptInvoker {
         }
         if (!mApkInfo.getFeatureFlags().isEmpty()) {
             List<String> featureFlags = new ArrayList<>();
-            for (Map.Entry<String, Boolean> entry : mApkInfo.getFeatureFlags().entrySet()) {
-                featureFlags.add(entry.getKey() + "=" + entry.getValue());
+            for (String flag : mApkInfo.getFeatureFlags()) {
+                featureFlags.add(flag + "=true");
             }
             cmd.add("--feature-flags");
             cmd.add(String.join(",", featureFlags));
@@ -171,9 +183,6 @@ public class AaptInvoker {
         for (File includeFile : getIncludeFiles()) {
             cmd.add("-I");
             cmd.add(includeFile.getPath());
-        }
-        if (mConfig.isVerbose()) {
-            cmd.add("-v");
         }
         if (resZip != null) {
             cmd.add(resZip.getPath());

@@ -21,7 +21,6 @@ import com.google.common.collect.Sets;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 public class ResTypeSpec {
@@ -132,17 +131,20 @@ public class ResTypeSpec {
         if (obj == this) {
             return true;
         }
-        if (obj instanceof ResTypeSpec) {
-            ResTypeSpec other = (ResTypeSpec) obj;
-            return mPackage.equals(other.mPackage)
-                && mId == other.mId
-                && mName.equals(other.mName);
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
         }
-        return false;
+        ResTypeSpec other = (ResTypeSpec) obj;
+        return mPackage.equals(other.mPackage)
+            && mId == other.mId
+            && mName.equals(other.mName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(mPackage, mId, mName);
+        int result = mPackage.hashCode();
+        result = 31 * result + Integer.hashCode(mId);
+        result = 31 * result + mName.hashCode();
+        return result;
     }
 }
