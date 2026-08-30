@@ -266,7 +266,14 @@ public class BinaryResourceParser {
         for (int i = 0; i < count; i++) {
             int flagNameIndex = mIn.readInt();
 
-            mFlagMap.put(flagNameIndex, mValueStringPool.getString(flagNameIndex));
+            // Obfuscators can abuse feature flags by injecting fake indexes.
+            String flagName = mValueStringPool.getString(flagNameIndex);
+            if (flagName == null) {
+                Log.d(TAG, "Skipping invalid declared feature flag index: 0x%08x", flagNameIndex);
+                continue;
+            }
+
+            mFlagMap.put(flagNameIndex, flagName);
         }
     }
 
@@ -367,7 +374,7 @@ public class BinaryResourceParser {
             throw new AndrolibException("Missing type string pool.");
         }
         if (!mKeyStringPool.isLoaded()) {
-            throw new AndrolibException("Missing key string pool");
+            throw new AndrolibException("Missing key string pool.");
         }
 
         // ResTable_type
@@ -745,10 +752,6 @@ public class BinaryResourceParser {
     }
 
     private void parseFlagged(ResChunkPullParser parser) throws AndrolibException, IOException {
-        if (!mValueStringPool.isLoaded()) {
-            throw new AndrolibException("Missing value string pool.");
-        }
-
         // ResTable_flagged
         int flagNameIndex = mIn.readInt();
         boolean flagNegated = mIn.readBoolean();
@@ -756,9 +759,10 @@ public class BinaryResourceParser {
 
         skipUnreadHeader(parser);
 
+        // Obfuscators can abuse feature flags by injecting fake indexes.
         String flagName = mFlagMap.get(flagNameIndex);
         if (flagName == null) {
-            Log.d(TAG, "Skipping chunk with undeclared feature flag with index 0x%08x.", flagNameIndex);
+            Log.d(TAG, "Skipping flagged chunk with undeclared feature flag index: 0x%08x", flagNameIndex);
             parser.skipChunk();
             return;
         }
