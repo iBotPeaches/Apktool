@@ -129,7 +129,11 @@ public class SdkInfo implements YamlSerializable {
                 return ResConfig.SDK_VANILLA_ICE_CREAM;
             case "BAKLAVA":
                 return ResConfig.SDK_BAKLAVA;
+            case "CINNAMON_BUN":
+                return ResConfig.SDK_CINNAMON_BUN;
             case "SDK_CUR_DEVELOPMENT":
+            case "DEV":
+            case "CANARY":
                 return ResConfig.SDK_DEVELOPMENT;
             default:
                 return Integer.parseInt(sdkVersion);

@@ -55,6 +55,7 @@ public class ResConfig {
     public static final int SDK_UPSIDEDOWN_CAKE = 34;
     public static final int SDK_VANILLA_ICE_CREAM = 35;
     public static final int SDK_BAKLAVA = 36;
+    public static final int SDK_CINNAMON_BUN = 37;
 
     // AOSP has this as 10,000 for dev purposes.
     // platform_frameworks_base/commit/c7a1109a1fe0771d4c9b572dcf178e2779fc4f2d
