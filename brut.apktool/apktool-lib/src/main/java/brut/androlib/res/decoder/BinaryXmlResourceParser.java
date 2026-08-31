@@ -403,7 +403,7 @@ public class BinaryXmlResourceParser implements XmlPullParser {
     public String getAttributeValue(int index) {
         if (isFlagExtAttribute(index)) {
             String flagName = mStringPool.getString(mFlagExt.flagNameIndex);
-            return flagName != null ? FeatureFlag.toString(flagName, mFlagExt.flagNegated) : null;
+            return flagName != null ? FeatureFlag.toString(flagName, mFlagExt.flagNegated) : "";
         }
 
         Attribute attr = getAttribute(index);
@@ -512,6 +512,10 @@ public class BinaryXmlResourceParser implements XmlPullParser {
         }
         if (mAttributes == null || name == null) {
             return "";
+        }
+        if (mFlagExt != null && ResXmlUtils.ANDROID_RES_NS.equals(namespace) && name.equals("featureFlag")) {
+            String flagName = mStringPool.getString(mFlagExt.flagNameIndex);
+            return flagName != null ? FeatureFlag.toString(flagName, mFlagExt.flagNegated) : "";
         }
         int uriIdx = mStringPool.findString(namespace);
         int nameIdx = mStringPool.findString(name);
