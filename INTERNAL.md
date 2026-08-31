@@ -235,8 +235,9 @@ First step is using the [platform_frameworks_base](https://github.com/iBotPeache
 While previously unorganized, the repo now follows the branch naming convention depending on the current Android version.
 So `apktool_7.1` corresponds to the 7.1 Android release. This branch should work for all `android-7.1.x` tags for AOSP.
 
-We didn't follow this naming convention until Android 7.1. So don't go looking for older versions. The current version
-is `apktool-9.0.0`, which corresponds to the Android 9.0 (Pie) release.
+We didn't follow this naming convention until Android 7.1. So don't go looking for older versions. We also didn't keep it for long,
+so `apktool_14.0.0` was the last one to refer based on Android release. Versions generally are now `apktool-x.y.z` corresponding
+to the version of Apktool that iteration is intended for.
 
 This repo has a variety of changes applied. These changes range from disabling optimizations to lessening the rules
 that aapt regularly has. We do this because apktool's job is to not fix apks, but rather keep them as close to the
@@ -257,7 +258,7 @@ we aren't building the entire AOSP package, the initial build is to just see if 
 
 We check out a certain tag or branch. Currently, we use
 
- * aapt2 - `android-16-release`
+ * aapt2 - `android-17-release`
 
 ### Including our modified `frameworks/base` package.
 
