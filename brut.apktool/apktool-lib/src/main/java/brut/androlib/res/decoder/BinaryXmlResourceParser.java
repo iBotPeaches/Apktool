@@ -510,12 +510,12 @@ public class BinaryXmlResourceParser implements XmlPullParser {
         if (mEventType != START_TAG) {
             throw new IndexOutOfBoundsException("Parser must be on START_TAG to get attributes.");
         }
-        if (mAttributes == null || name == null) {
-            return "";
-        }
-        if (mFlagExt != null && ResXmlUtils.ANDROID_RES_NS.equals(namespace) && name.equals("featureFlag")) {
+        if (mFlagExt != null && ResXmlUtils.ANDROID_RES_NS.equals(namespace) && "featureFlag".equals(name)) {
             String flagName = mStringPool.getString(mFlagExt.flagNameIndex);
             return flagName != null ? FeatureFlag.toString(flagName, mFlagExt.flagNegated) : "";
+        }
+        if (mAttributes == null || name == null) {
+            return "";
         }
         int uriIdx = mStringPool.findString(namespace);
         int nameIdx = mStringPool.findString(name);
@@ -597,7 +597,7 @@ public class BinaryXmlResourceParser implements XmlPullParser {
         if (mEventType != START_TAG) {
             throw new IndexOutOfBoundsException("Parser must be on START_TAG to get attributes.");
         }
-        return mFlagExt != null && mAttributes != null && index == mAttributes.length;
+        return mFlagExt != null && index == (mAttributes != null ? mAttributes.length : 0);
     }
 
     private Attribute getAttribute(int index) {
@@ -627,9 +627,9 @@ public class BinaryXmlResourceParser implements XmlPullParser {
         mIn = null;
         mParser = null;
         mResourceMap = null;
-        resetEventInfo();
-        mNamespaces.reset();
         mStringPool.reset();
+        mNamespaces.reset();
+        resetEventInfo();
     }
 
     private void resetEventInfo() {
