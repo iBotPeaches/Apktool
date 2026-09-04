@@ -65,8 +65,8 @@ public class BuildAndDecodeApkTest extends BaseTest {
     @Test
     public void confirmFeatureFlagsRecorded() throws Exception {
         ApkInfo testInfo = ApkInfo.load(sTestNewDir);
-        assertTrue(testInfo.getFeatureFlags().get("brut.feature.permission"));
-        assertTrue(testInfo.getFeatureFlags().get("brut.feature.activity"));
+        assertTrue(testInfo.getFeatureFlags().contains("brut.feature.permission"));
+        assertTrue(testInfo.getFeatureFlags().contains("brut.feature.activity"));
     }
 
     @Test
@@ -156,6 +156,7 @@ public class BuildAndDecodeApkTest extends BaseTest {
 
     @Test
     public void valuesIntegersTest() throws Exception {
+        compareValuesFiles("values/integers.xml");
         compareValuesFiles("values-mcc001/integers.xml");
     }
 

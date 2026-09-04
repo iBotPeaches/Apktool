@@ -18,8 +18,8 @@ package brut.androlib.res.table;
 
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.exceptions.UndefinedResObjectException;
+import brut.androlib.res.data.FeatureFlag;
 import brut.androlib.res.table.value.ResValue;
-import brut.util.Pair;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -32,9 +32,9 @@ public class ResPackage {
     private final ResPackageGroup mGroup;
     private final int mIndex;
     private final Map<Integer, ResTypeSpec> mTypeSpecs;
-    private final Map<Pair<Integer, ResConfig>, ResType> mTypes;
+    private final Map<TypeKey, ResType> mTypes;
     private final Map<ResId, ResEntrySpec> mEntrySpecs;
-    private final Map<Pair<ResId, ResConfig>, ResEntry> mEntries;
+    private final Map<EntryKey, ResEntry> mEntries;
     private final Map<String, ResOverlayable> mOverlayables;
     private final Map<ResId, ResId> mAliases;
     private final Set<String> mNameRegistry;
@@ -111,7 +111,11 @@ public class ResPackage {
     }
 
     public boolean hasType(int typeId, ResConfig config) {
-        Pair<Integer, ResConfig> typeKey = Pair.of(typeId, config);
+        return hasType(typeId, config, null);
+    }
+
+    public boolean hasType(int typeId, ResConfig config, FeatureFlag flag) {
+        TypeKey typeKey = new TypeKey(typeId, config, flag);
         return mTypes.containsKey(typeKey);
     }
 
@@ -120,7 +124,11 @@ public class ResPackage {
     }
 
     public ResType getType(int typeId, ResConfig config) throws UndefinedResObjectException {
-        Pair<Integer, ResConfig> typeKey = Pair.of(typeId, config);
+        return getType(typeId, config, null);
+    }
+
+    public ResType getType(int typeId, ResConfig config, FeatureFlag flag) throws UndefinedResObjectException {
+        TypeKey typeKey = new TypeKey(typeId, config, flag);
         ResType type = mTypes.get(typeKey);
         if (type == null) {
             throw new UndefinedResObjectException(
@@ -134,7 +142,11 @@ public class ResPackage {
     }
 
     public ResType addType(int typeId, ResConfig config) throws UndefinedResObjectException {
-        Pair<Integer, ResConfig> typeKey = Pair.of(typeId, config);
+        return addType(typeId, config, null);
+    }
+
+    public ResType addType(int typeId, ResConfig config, FeatureFlag flag) throws UndefinedResObjectException {
+        TypeKey typeKey = new TypeKey(typeId, config, flag);
         ResType type = mTypes.get(typeKey);
         if (type != null) {
             // We can safely skip adding existing types.
@@ -142,7 +154,7 @@ public class ResPackage {
         }
 
         ResTypeSpec typeSpec = getTypeSpec(typeId);
-        type = new ResType(typeSpec, config);
+        type = new ResType(typeSpec, config, flag);
         mTypes.put(typeKey, type);
         return type;
     }
@@ -164,11 +176,9 @@ public class ResPackage {
 
     public ResEntrySpec getEntrySpec(int typeId, int entryId) throws UndefinedResObjectException {
         ResId resId = ResId.of(getId(), typeId, entryId);
-        if (mAliases.containsKey(resId)) {
-            resId = mAliases.get(resId);
-            typeId = resId.typeId();
-            entryId = resId.entryId();
-        }
+        resId = mAliases.getOrDefault(resId, resId);
+        typeId = resId.typeId();
+        entryId = resId.entryId();
 
         ResEntrySpec entrySpec = mEntrySpecs.get(resId);
         if (entrySpec == null) {
@@ -180,11 +190,9 @@ public class ResPackage {
 
     public ResEntrySpec addEntrySpec(int typeId, int entryId, String name) throws AndrolibException {
         ResId resId = ResId.of(getId(), typeId, entryId);
-        if (mAliases.containsKey(resId)) {
-            resId = mAliases.get(resId);
-            typeId = resId.typeId();
-            entryId = resId.entryId();
-        }
+        resId = mAliases.getOrDefault(resId, resId);
+        typeId = resId.typeId();
+        entryId = resId.entryId();
 
         ResEntrySpec entrySpec = mEntrySpecs.get(resId);
         if (entrySpec != null) {
@@ -223,10 +231,16 @@ public class ResPackage {
     }
 
     public boolean hasEntry(int typeId, int entryId, ResConfig config) {
+        return hasEntry(typeId, entryId, config, null);
+    }
+
+    public boolean hasEntry(int typeId, int entryId, ResConfig config, FeatureFlag flag) {
         ResId resId = ResId.of(getId(), typeId, entryId);
         resId = mAliases.getOrDefault(resId, resId);
+        typeId = resId.typeId();
 
-        Pair<ResId, ResConfig> entryKey = Pair.of(resId, config);
+        TypeKey typeKey = new TypeKey(typeId, config, flag);
+        EntryKey entryKey = new EntryKey(resId, typeKey);
         return mEntries.containsKey(entryKey);
     }
 
@@ -235,14 +249,18 @@ public class ResPackage {
     }
 
     public ResEntry getEntry(int typeId, int entryId, ResConfig config) throws UndefinedResObjectException {
-        ResId resId = ResId.of(getId(), typeId, entryId);
-        if (mAliases.containsKey(resId)) {
-            resId = mAliases.get(resId);
-            typeId = resId.typeId();
-            entryId = resId.entryId();
-        }
+        return getEntry(typeId, entryId, config, null);
+    }
 
-        Pair<ResId, ResConfig> entryKey = Pair.of(resId, config);
+    public ResEntry getEntry(int typeId, int entryId, ResConfig config, FeatureFlag flag)
+            throws UndefinedResObjectException {
+        ResId resId = ResId.of(getId(), typeId, entryId);
+        resId = mAliases.getOrDefault(resId, resId);
+        typeId = resId.typeId();
+        entryId = resId.entryId();
+
+        TypeKey typeKey = new TypeKey(typeId, config, flag);
+        EntryKey entryKey = new EntryKey(resId, typeKey);
         ResEntry entry = mEntries.get(entryKey);
         if (entry == null) {
             throw new UndefinedResObjectException(
@@ -257,14 +275,18 @@ public class ResPackage {
     }
 
     public ResEntry addEntry(int typeId, int entryId, ResConfig config, ResValue value) throws AndrolibException {
-        ResId resId = ResId.of(getId(), typeId, entryId);
-        if (mAliases.containsKey(resId)) {
-            resId = mAliases.get(resId);
-            typeId = resId.typeId();
-            entryId = resId.entryId();
-        }
+        return addEntry(typeId, entryId, config, null, value);
+    }
 
-        Pair<ResId, ResConfig> entryKey = Pair.of(resId, config);
+    public ResEntry addEntry(int typeId, int entryId, ResConfig config, FeatureFlag flag, ResValue value)
+            throws AndrolibException {
+        ResId resId = ResId.of(getId(), typeId, entryId);
+        resId = mAliases.getOrDefault(resId, resId);
+        typeId = resId.typeId();
+        entryId = resId.entryId();
+
+        TypeKey typeKey = new TypeKey(typeId, config, flag);
+        EntryKey entryKey = new EntryKey(resId, typeKey);
         ResEntry entry = mEntries.get(entryKey);
         if (entry != null) {
             throw new AndrolibException(
@@ -273,12 +295,11 @@ public class ResPackage {
         }
 
         ResEntrySpec entrySpec = getEntrySpec(typeId, entryId);
-        Pair<Integer, ResConfig> typeKey = Pair.of(typeId, config);
         ResType type = mTypes.get(typeKey);
         if (type == null) {
             // We can safely create the type if it's missing.
             ResTypeSpec typeSpec = getTypeSpec(typeId);
-            type = new ResType(typeSpec, config);
+            type = new ResType(typeSpec, config, flag);
             mTypes.put(typeKey, type);
         }
 
@@ -368,16 +389,110 @@ public class ResPackage {
         if (obj == this) {
             return true;
         }
-        if (obj instanceof ResPackage) {
-            ResPackage other = (ResPackage) obj;
-            return mGroup.equals(other.mGroup)
-                && mIndex == other.mIndex;
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
         }
-        return false;
+        ResPackage other = (ResPackage) obj;
+        return mGroup.equals(other.mGroup)
+            && mIndex == other.mIndex;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(mGroup, mIndex);
+        return 31 * mGroup.hashCode() + Integer.hashCode(mIndex);
+    }
+
+    private static class TypeKey {
+        private final int mTypeId;
+        private final ResConfig mConfig;
+        private final FeatureFlag mFlag;
+
+        public TypeKey(int typeId, ResConfig config, FeatureFlag flag) {
+            assert typeId > 0 && config != null;
+            mTypeId = typeId;
+            mConfig = config;
+            mFlag = flag;
+        }
+
+        public int getTypeId() {
+            return mTypeId;
+        }
+
+        public ResConfig getConfig() {
+            return mConfig;
+        }
+
+        public FeatureFlag getFlag() {
+            return mFlag;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("TypeKey{typeId=0x%02x, config=%s, flag=%s}", mTypeId, mConfig, mFlag);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) {
+                return true;
+            }
+            if (obj == null || getClass() != obj.getClass()) {
+                return false;
+            }
+            TypeKey other = (TypeKey) obj;
+            return mTypeId == other.mTypeId
+                && mConfig.equals(other.mConfig)
+                && Objects.equals(mFlag, other.mFlag);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = Integer.hashCode(mTypeId);
+            result = 31 * result + mConfig.hashCode();
+            result = 31 * result + Objects.hashCode(mFlag);
+            return result;
+        }
+    }
+
+    private static class EntryKey {
+        private final ResId mResId;
+        private final TypeKey mTypeKey;
+
+        public EntryKey(ResId resId, TypeKey typeKey) {
+            assert resId != null && typeKey != null;
+            mResId = resId;
+            mTypeKey = typeKey;
+        }
+
+        public ResId getResId() {
+            return mResId;
+        }
+
+        public TypeKey getTypeKey() {
+            return mTypeKey;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("EntryKey{resId=%s, typeKey=%s}", mResId, mTypeKey);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) {
+                return true;
+            }
+            if (obj == null || getClass() != obj.getClass()) {
+                return false;
+            }
+            EntryKey other = (EntryKey) obj;
+            return mResId == other.mResId
+                && mTypeKey.equals(other.mTypeKey);
+        }
+
+        @Override
+        public int hashCode() {
+            return 31 * mResId.hashCode() + mTypeKey.hashCode();
+        }
     }
 }

@@ -16,8 +16,6 @@
  */
 package brut.androlib.res.table;
 
-import java.util.Objects;
-
 public class ResEntrySpec {
     public static final String DUMMY_PREFIX = "APKTOOL_DUMMY_";
     public static final String RENAMED_PREFIX = "APKTOOL_RENAMED_";
@@ -86,17 +84,20 @@ public class ResEntrySpec {
         if (obj == this) {
             return true;
         }
-        if (obj instanceof ResEntrySpec) {
-            ResEntrySpec other = (ResEntrySpec) obj;
-            return mTypeSpec.equals(other.mTypeSpec)
-                && mId == other.mId
-                && mName.equals(other.mName);
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
         }
-        return false;
+        ResEntrySpec other = (ResEntrySpec) obj;
+        return mTypeSpec.equals(other.mTypeSpec)
+            && mId == other.mId
+            && mName.equals(other.mName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(mTypeSpec, mId, mName);
+        int result = mTypeSpec.hashCode();
+        result = 31 * result + Integer.hashCode(mId);
+        result = 31 * result + mName.hashCode();
+        return result;
     }
 }

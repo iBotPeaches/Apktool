@@ -17,8 +17,10 @@
 package brut.androlib.res.table.value;
 
 import brut.androlib.exceptions.AndrolibException;
+import brut.androlib.res.data.FeatureFlag;
 import brut.androlib.res.table.ResEntry;
 import brut.androlib.res.xml.ResStringEncoder;
+import brut.androlib.res.xml.ResXmlUtils;
 import brut.common.Log;
 import org.xmlpull.v1.XmlSerializer;
 
@@ -52,6 +54,10 @@ public class ResPlural extends ResBag {
         String tagName = "plurals";
         serial.startTag(null, tagName);
         serial.attribute(null, "name", entry.getName());
+        FeatureFlag flag = entry.getType().getFlag();
+        if (flag != null) {
+            serial.attribute(ResXmlUtils.ANDROID_RES_NS, "featureFlag", flag.toString());
+        }
 
         for (RawItem item : mItems) {
             int key = item.getKey();
@@ -105,11 +111,11 @@ public class ResPlural extends ResBag {
         if (obj == this) {
             return true;
         }
-        if (obj instanceof ResPlural) {
-            ResPlural other = (ResPlural) obj;
-            return Arrays.equals(mItems, other.mItems);
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
         }
-        return false;
+        ResPlural other = (ResPlural) obj;
+        return Arrays.equals(mItems, other.mItems);
     }
 
     @Override

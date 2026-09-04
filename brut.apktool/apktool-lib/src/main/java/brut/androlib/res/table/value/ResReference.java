@@ -18,15 +18,16 @@ package brut.androlib.res.table.value;
 
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.exceptions.UndefinedResObjectException;
+import brut.androlib.res.data.FeatureFlag;
 import brut.androlib.res.table.ResEntry;
 import brut.androlib.res.table.ResEntrySpec;
 import brut.androlib.res.table.ResId;
 import brut.androlib.res.table.ResPackage;
+import brut.androlib.res.xml.ResXmlUtils;
 import brut.common.Log;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
-import java.util.Objects;
 
 public class ResReference extends ResItem {
     private static final String TAG = ResReference.class.getName();
@@ -124,6 +125,10 @@ public class ResReference extends ResItem {
             serial.attribute(null, "type", typeName);
         }
         serial.attribute(null, "name", entry.getName());
+        FeatureFlag flag = entry.getType().getFlag();
+        if (flag != null) {
+            serial.attribute(ResXmlUtils.ANDROID_RES_NS, "featureFlag", flag.toString());
+        }
         if (needsBody) {
             serial.text(toXmlTextValue());
         }
@@ -140,17 +145,20 @@ public class ResReference extends ResItem {
         if (obj == this) {
             return true;
         }
-        if (obj instanceof ResReference) {
-            ResReference other = (ResReference) obj;
-            return mPackage.equals(other.mPackage)
-                && mResId == other.mResId
-                && mAsAttr == other.mAsAttr;
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
         }
-        return false;
+        ResReference other = (ResReference) obj;
+        return mPackage.equals(other.mPackage)
+            && mResId == other.mResId
+            && mAsAttr == other.mAsAttr;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(mPackage, mResId, mAsAttr);
+        int result = mPackage.hashCode();
+        result = 31 * result + mResId.hashCode();
+        result = 31 * result + Boolean.hashCode(mAsAttr);
+        return result;
     }
 }

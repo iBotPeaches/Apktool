@@ -10,8 +10,9 @@ resourcesInfo:
   packageId: 127
   sparseEntries: false
 featureFlags:
-  brut.feature.permission: true
-  brut.feature.activity: true
+- brut.feature.permission
+- brut.feature.activity
+- brut.feature.resource
 doNotCompress:
 - assets/0byte_file.jpg
 - arsc

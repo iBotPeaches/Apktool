@@ -17,7 +17,6 @@
 package brut.androlib.res.data;
 
 import java.util.Arrays;
-import java.util.Objects;
 
 public class StyledString implements CharSequence {
     private final String mValue;
@@ -62,17 +61,17 @@ public class StyledString implements CharSequence {
         if (obj == this) {
             return true;
         }
-        if (obj instanceof StyledString) {
-            StyledString other = (StyledString) obj;
-            return mValue.equals(other.mValue)
-                && Arrays.equals(mSpans, other.mSpans);
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
         }
-        return false;
+        StyledString other = (StyledString) obj;
+        return mValue.equals(other.mValue)
+            && Arrays.equals(mSpans, other.mSpans);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(mValue, Arrays.hashCode(mSpans));
+        return 31 * mValue.hashCode() + Arrays.hashCode(mSpans);
     }
 
     public static class Span {

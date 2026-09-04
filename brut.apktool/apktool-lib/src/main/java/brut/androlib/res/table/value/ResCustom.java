@@ -17,7 +17,9 @@
 package brut.androlib.res.table.value;
 
 import brut.androlib.exceptions.AndrolibException;
+import brut.androlib.res.data.FeatureFlag;
 import brut.androlib.res.table.ResEntry;
+import brut.androlib.res.xml.ResXmlUtils;
 import brut.androlib.res.xml.ValuesXmlSerializable;
 import org.xmlpull.v1.XmlSerializer;
 
@@ -58,6 +60,10 @@ public class ResCustom extends ResValue implements ValuesXmlSerializable {
             serial.attribute(null, "type", mType);
         }
         serial.attribute(null, "name", entry.getName());
+        FeatureFlag flag = entry.getType().getFlag();
+        if (flag != null) {
+            serial.attribute(ResXmlUtils.ANDROID_RES_NS, "featureFlag", flag.toString());
+        }
         if (mValue != null) {
             serial.text(mValue.toString());
         }
@@ -74,17 +80,20 @@ public class ResCustom extends ResValue implements ValuesXmlSerializable {
         if (obj == this) {
             return true;
         }
-        if (obj instanceof ResCustom) {
-            ResCustom other = (ResCustom) obj;
-            return mType.equals(other.mType)
-                && Objects.equals(mValue, other.mValue)
-                && mAsItem == other.mAsItem;
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
         }
-        return false;
+        ResCustom other = (ResCustom) obj;
+        return mType.equals(other.mType)
+            && Objects.equals(mValue, other.mValue)
+            && mAsItem == other.mAsItem;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(mType, mValue, mAsItem);
+        int result = mType.hashCode();
+        result = 31 * result + Objects.hashCode(mValue);
+        result = 31 * result + Boolean.hashCode(mAsItem);
+        return result;
     }
 }

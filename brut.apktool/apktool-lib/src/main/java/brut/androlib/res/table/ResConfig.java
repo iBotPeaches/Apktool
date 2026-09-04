@@ -608,6 +608,9 @@ public class ResConfig {
         }
         if (mSdkVersion != 0) {
             sb.append("-v").append(mSdkVersion);
+            if (mMinorVersion != 0) {
+                sb.append('.').append(mMinorVersion);
+            }
         }
         if (mUnknown != null) {
             // We have to separate unknown resources to avoid conflicts.
@@ -735,11 +738,11 @@ public class ResConfig {
         if (obj == this) {
             return true;
         }
-        if (obj instanceof ResConfig) {
-            ResConfig other = (ResConfig) obj;
-            return mQualifiers.equals(other.mQualifiers);
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
         }
-        return false;
+        ResConfig other = (ResConfig) obj;
+        return mQualifiers.equals(other.mQualifiers);
     }
 
     @Override

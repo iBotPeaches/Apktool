@@ -77,7 +77,8 @@ public class ResDecoder {
         BinaryXmlResourceParser parser = new BinaryXmlResourceParser(
             mTable, mConfig.isIgnoreRawValues(), mConfig.isDecodeResolveLazy());
         ResXmlSerializer serial = new ResXmlSerializer(true);
-        decoders.put(ResFileDecoder.Type.BINARY_XML, new ResXmlPullStreamDecoder(parser, serial));
+        ResXmlPullEventHandler handler = new ResXmlPullEventHandler(mApkInfo);
+        decoders.put(ResFileDecoder.Type.BINARY_XML, new ResXmlPullStreamDecoder(parser, serial, handler));
 
         ResFileDecoder fileDecoder = new ResFileDecoder(decoders);
         Directory inDir, outDir;
@@ -127,12 +128,17 @@ public class ResDecoder {
     private void generateValuesXmls(ResPackage pkg, Directory outDir, ResXmlSerializer serial)
             throws AndrolibException {
         // Group entries by type name + qualifiers, ignoring alias duplicates in sub-packages.
+        // Also, decide for each group whether the android namespace should be written.
         Map<Pair<String, String>, List<ResEntry>> entriesMap = new HashMap<>();
+        Set<Pair<String, String>> needsNamespace = new HashSet<>();
         for (ResEntry entry : listEntries(pkg)) {
             if (entry.getValue() instanceof ValuesXmlSerializable && !pkg.isAlias(entry.getResId())) {
                 ResType type = entry.getType();
                 Pair<String, String> key = Pair.of(type.getName(), type.getConfig().toQualifiers());
                 entriesMap.computeIfAbsent(key, t -> new ArrayList<>()).add(entry);
+                if (type.getFlag() != null) {
+                    needsNamespace.add(key);
+                }
             }
         }
 
@@ -150,6 +156,9 @@ public class ResDecoder {
             try (OutputStream out = outDir.getFileOutput(outFileName)) {
                 serial.setOutput(out, null);
                 serial.startDocument(null, null);
+                if (needsNamespace.contains(key)) {
+                    serial.setPrefix("android", ResXmlUtils.ANDROID_RES_NS);
+                }
                 serial.startTag(null, "resources");
 
                 for (ResEntry entry : entries) {
@@ -456,22 +465,6 @@ public class ResDecoder {
         if (!mConfig.isAnalysisMode()) {
             // Remove versionCode and versionName, it will be passed to aapt as a parameter via apktool.yml.
             ResXmlUtils.removeManifestVersions(manifest);
-        }
-
-        // Record feature flags.
-        String[] flags = ResXmlUtils.pullManifestFeatureFlags(manifest);
-        if (flags != null) {
-            Map<String, Boolean> featureFlags = mApkInfo.getFeatureFlags();
-            for (String flag : flags) {
-                boolean value;
-                if (flag.startsWith("!")) {
-                    flag = flag.substring(1);
-                    value = false;
-                } else {
-                    value = true;
-                }
-                featureFlags.put(flag, value);
-            }
         }
     }
 }

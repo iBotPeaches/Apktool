@@ -38,11 +38,11 @@ public class ResFileReference extends ResValue {
         if (obj == this) {
             return true;
         }
-        if (obj instanceof ResFileReference) {
-            ResFileReference other = (ResFileReference) obj;
-            return mPath.equals(other.mPath);
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
         }
-        return false;
+        ResFileReference other = (ResFileReference) obj;
+        return mPath.equals(other.mPath);
     }
 
     @Override

@@ -17,13 +17,14 @@
 package brut.androlib.res.table.value;
 
 import brut.androlib.exceptions.AndrolibException;
+import brut.androlib.res.data.FeatureFlag;
 import brut.androlib.res.table.ResEntry;
+import brut.androlib.res.xml.ResXmlUtils;
 import brut.common.Log;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
 import java.util.Locale;
-import java.util.Objects;
 
 public class ResPrimitive extends ResItem {
     private static final String TAG = ResPrimitive.class.getName();
@@ -184,6 +185,10 @@ public class ResPrimitive extends ResItem {
         if (asItem) {
             serial.attribute(null, "format", getFormat());
         }
+        FeatureFlag flag = entry.getType().getFlag();
+        if (flag != null) {
+            serial.attribute(ResXmlUtils.ANDROID_RES_NS, "featureFlag", flag.toString());
+        }
         serial.text(toXmlTextValue());
         serial.endTag(null, tagName);
     }
@@ -198,16 +203,16 @@ public class ResPrimitive extends ResItem {
         if (obj == this) {
             return true;
         }
-        if (obj instanceof ResPrimitive) {
-            ResPrimitive other = (ResPrimitive) obj;
-            return mType == other.mType
-                && mData == other.mData;
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
         }
-        return false;
+        ResPrimitive other = (ResPrimitive) obj;
+        return mType == other.mType
+            && mData == other.mData;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(mType, mData);
+        return 31 * Integer.hashCode(mType) + Integer.hashCode(mData);
     }
 }
