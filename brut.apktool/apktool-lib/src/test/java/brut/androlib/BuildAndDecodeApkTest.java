@@ -156,6 +156,7 @@ public class BuildAndDecodeApkTest extends BaseTest {
 
     @Test
     public void valuesIntegersTest() throws Exception {
+        compareValuesFiles("values/integers.xml");
         compareValuesFiles("values-mcc001/integers.xml");
     }
 
