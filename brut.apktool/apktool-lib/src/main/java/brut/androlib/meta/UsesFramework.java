@@ -18,6 +18,7 @@ package brut.androlib.meta;
 
 import brut.yaml.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,26 +42,25 @@ public class UsesFramework implements YamlSerializable {
     }
 
     @Override
-    public void readItem(YamlReader reader) {
-        YamlLine line = reader.getLine();
-        switch (line.getKey()) {
+    public void onEntry(YamlPullParser parser) throws IOException {
+        switch (parser.getKey()) {
             case "ids":
                 mIds.clear();
-                reader.readIntList(mIds);
+                parser.readIntSeq(mIds);
                 break;
             case "tag":
-                mTag = line.getValue();
+                mTag = parser.getString();
                 break;
         }
     }
 
     @Override
-    public void write(YamlWriter writer) {
+    public void serialize(YamlSerializer serial) throws IOException {
         if (!mIds.isEmpty()) {
-            writer.writeList("ids", mIds);
+            serial.writeIntSeq("ids", mIds);
         }
         if (mTag != null) {
-            writer.writeString("tag", mTag);
+            serial.writeString("tag", mTag);
         }
     }
 

@@ -299,8 +299,8 @@ public class ApkDecoder {
             }
         }
 
-        // Record uncompressed files.
         try {
+            // Record uncompressed files.
             Directory in = mApkFile.getDirectory();
             Map<String, String> resFileMap = mResDecoder.getResFileMap();
             Set<String> uncompressedExts = new HashSet<>();
@@ -342,11 +342,11 @@ public class ApkDecoder {
                 uncompressedFilesList.sort(null);
                 doNotCompress.addAll(uncompressedFilesList);
             }
-        } catch (DirectoryException ex) {
+
+            // Serialize apk info to file.
+            mApkInfo.save(new File(outDir, "apktool.yml"));
+        } catch (DirectoryException | IOException ex) {
             throw new AndrolibException(ex);
         }
-
-        // Serialize apk info to file.
-        mApkInfo.save(outDir);
     }
 }

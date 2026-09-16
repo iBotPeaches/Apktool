@@ -18,6 +18,8 @@ package brut.androlib.meta;
 
 import brut.yaml.*;
 
+import java.io.IOException;
+
 public class VersionInfo implements YamlSerializable {
     private Integer mVersionCode;
     private String mVersionName;
@@ -37,25 +39,24 @@ public class VersionInfo implements YamlSerializable {
     }
 
     @Override
-    public void readItem(YamlReader reader) {
-        YamlLine line = reader.getLine();
-        switch (line.getKey()) {
+    public void onEntry(YamlPullParser parser) throws IOException {
+        switch (parser.getKey()) {
             case "versionCode":
-                mVersionCode = line.getValueInt();
+                mVersionCode = parser.getInt();
                 break;
             case "versionName":
-                mVersionName = line.getValue();
+                mVersionName = parser.getString();
                 break;
         }
     }
 
     @Override
-    public void write(YamlWriter writer) {
+    public void serialize(YamlSerializer serial) throws IOException {
         if (mVersionCode != null) {
-            writer.writeInt("versionCode", mVersionCode);
+            serial.writeInt("versionCode", mVersionCode);
         }
         if (mVersionName != null) {
-            writer.writeString("versionName", mVersionName);
+            serial.writeString("versionName", mVersionName);
         }
     }
 

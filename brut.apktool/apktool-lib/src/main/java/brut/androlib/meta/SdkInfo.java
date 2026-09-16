@@ -19,6 +19,8 @@ package brut.androlib.meta;
 import brut.androlib.res.table.ResConfig;
 import brut.yaml.*;
 
+import java.io.IOException;
+
 public class SdkInfo implements YamlSerializable {
     private String mMinSdkVersion;
     private String mTargetSdkVersion;
@@ -41,31 +43,30 @@ public class SdkInfo implements YamlSerializable {
     }
 
     @Override
-    public void readItem(YamlReader reader) {
-        YamlLine line = reader.getLine();
-        switch (line.getKey()) {
+    public void onEntry(YamlPullParser parser) throws IOException {
+        switch (parser.getKey()) {
             case "minSdkVersion":
-                mMinSdkVersion = line.getValue();
+                mMinSdkVersion = parser.getString();
                 break;
             case "targetSdkVersion":
-                mTargetSdkVersion = line.getValue();
+                mTargetSdkVersion = parser.getString();
                 break;
             case "maxSdkVersion":
-                mMaxSdkVersion = line.getValue();
+                mMaxSdkVersion = parser.getString();
                 break;
         }
     }
 
     @Override
-    public void write(YamlWriter writer) {
+    public void serialize(YamlSerializer serial) throws IOException {
         if (mMinSdkVersion != null) {
-            writer.writeString("minSdkVersion", mMinSdkVersion);
+            serial.writeString("minSdkVersion", mMinSdkVersion);
         }
         if (mTargetSdkVersion != null) {
-            writer.writeString("targetSdkVersion", mTargetSdkVersion);
+            serial.writeString("targetSdkVersion", mTargetSdkVersion);
         }
         if (mMaxSdkVersion != null) {
-            writer.writeString("maxSdkVersion", mMaxSdkVersion);
+            serial.writeString("maxSdkVersion", mMaxSdkVersion);
         }
     }
 

@@ -38,7 +38,7 @@ public class DoubleExtensionUnknownFileTest extends BaseTest {
         File testDir = new File(testApk + ".out");
         new ApkDecoder(testApk, sConfig).decode(testDir);
 
-        ApkInfo testInfo = ApkInfo.load(testDir);
+        ApkInfo testInfo = ApkInfo.load(new File(testDir, "apktool.yml"));
         for (String path : testInfo.getDoNotCompress()) {
             if (TextUtils.countMatches(path, '.') > 1) {
                 assertTrue(path.equals("assets/bin/Data/sharedassets1.assets.split0"));

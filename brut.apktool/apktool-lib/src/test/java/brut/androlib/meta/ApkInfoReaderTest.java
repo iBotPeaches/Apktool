@@ -17,6 +17,7 @@
 package brut.androlib.meta;
 
 import brut.androlib.BaseTest;
+import brut.yaml.YamlSyntaxException;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -37,16 +38,16 @@ public class ApkInfoReaderTest extends BaseTest {
         assertEquals("2.8.1", apkInfo.getVersion());
     }
 
-    @Test
-    public void testSkipIncorrectIndent() throws Exception {
-        ApkInfo apkInfo = ApkInfo.load(getClass().getResourceAsStream("/meta/skip_incorrect_indent.yml"));
+    @Test(expected = YamlSyntaxException.class)
+    public void testIncorrectIndentFirst() throws Exception {
+        ApkInfo apkInfo = ApkInfo.load(getClass().getResourceAsStream("/meta/incorrect_indent_first.yml"));
         checkStandard(apkInfo);
         assertNotEquals("2.0.0", apkInfo.getVersion());
     }
 
-    @Test
-    public void testFirstIncorrectIndent() throws Exception {
-        ApkInfo apkInfo = ApkInfo.load(getClass().getResourceAsStream("/meta/first_incorrect_indent.yml"));
+    @Test(expected = YamlSyntaxException.class)
+    public void testIncorrectIndentMiddle() throws Exception {
+        ApkInfo apkInfo = ApkInfo.load(getClass().getResourceAsStream("/meta/incorrect_indent_middle.yml"));
         checkStandard(apkInfo);
         assertNotEquals("2.0.0", apkInfo.getVersion());
     }

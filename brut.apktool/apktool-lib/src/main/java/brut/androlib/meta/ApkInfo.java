@@ -69,41 +69,37 @@ public class ApkInfo implements YamlSerializable {
         mDoNotCompress = new ArrayList<>();
     }
 
-    public static ApkInfo load(File apkDir) throws AndrolibException {
-        File file = new File(apkDir, "apktool.yml");
-        try (InputStream in = Files.newInputStream(file.toPath())) {
-            return load(in);
-        } catch (IOException ex) {
-            throw new AndrolibException(ex);
+    @VisibleForTesting
+    static ApkInfo load(InputStream in) throws IOException {
+        try (YamlPullParser parser = new YamlPullParser(in)) {
+            ApkInfo apkInfo = new ApkInfo();
+            parser.readObject(apkInfo);
+            return apkInfo;
         }
     }
 
-    @VisibleForTesting
-    static ApkInfo load(InputStream in) {
-        YamlReader reader = new YamlReader(in);
-        ApkInfo apkInfo = new ApkInfo();
-        reader.readRoot(apkInfo);
-        return apkInfo;
+    public static ApkInfo load(File file) throws IOException {
+        try (YamlPullParser parser = new YamlPullParser(Files.newInputStream(file.toPath()))) {
+            ApkInfo apkInfo = new ApkInfo();
+            parser.readObject(apkInfo);
+            return apkInfo;
+        }
     }
 
-    public void save(File apkDir) throws AndrolibException {
-        File file = new File(apkDir, "apktool.yml");
-        try (YamlWriter writer = new YamlWriter(Files.newOutputStream(file.toPath()))) {
-            write(writer);
-        } catch (IOException ex) {
-            throw new AndrolibException(ex);
+    public void save(File file) throws IOException {
+        try (YamlSerializer serial = new YamlSerializer(Files.newOutputStream(file.toPath()))) {
+            serialize(serial);
         }
     }
 
     @Override
-    public void readItem(YamlReader reader) {
-        YamlLine line = reader.getLine();
-        switch (line.getKey()) {
+    public void onEntry(YamlPullParser parser) throws IOException {
+        switch (parser.getKey()) {
             case "version":
-                mVersion = line.getValue();
+                mVersion = parser.getString();
                 break;
             case "apkFileName":
-                mApkFileName = line.getValue();
+                mApkFileName = parser.getString();
                 // Sanity check for potential malicious input.
                 if (mApkFileName.equals(".") || mApkFileName.equals("..") || mApkFileName.indexOf('/') != -1
                         || mApkFileName.indexOf('\\') != -1) {
@@ -112,59 +108,59 @@ public class ApkInfo implements YamlSerializable {
                 break;
             case "usesFramework":
                 mUsesFramework.clear();
-                reader.readObject(mUsesFramework);
+                parser.readObject(mUsesFramework);
                 break;
             case "usesLibrary":
                 mUsesLibrary.clear();
-                reader.readStringList(mUsesLibrary);
+                parser.readStringSeq(mUsesLibrary);
                 break;
             case "sdkInfo":
                 mSdkInfo.clear();
-                reader.readObject(mSdkInfo);
+                parser.readObject(mSdkInfo);
                 break;
             case "versionInfo":
                 mVersionInfo.clear();
-                reader.readObject(mVersionInfo);
+                parser.readObject(mVersionInfo);
                 break;
             case "resourcesInfo":
                 mResourcesInfo.clear();
-                reader.readObject(mResourcesInfo);
+                parser.readObject(mResourcesInfo);
                 break;
             case "featureFlags":
                 mFeatureFlags.clear();
-                reader.readStringList(mFeatureFlags);
+                parser.readStringSeq(mFeatureFlags);
                 break;
             case "doNotCompress":
                 mDoNotCompress.clear();
-                reader.readStringList(mDoNotCompress);
+                parser.readStringSeq(mDoNotCompress);
                 break;
         }
     }
 
     @Override
-    public void write(YamlWriter writer) {
-        writer.writeString("version", mVersion);
-        writer.writeString("apkFileName", mApkFileName);
+    public void serialize(YamlSerializer serial) throws IOException {
+        serial.writeString("version", mVersion);
+        serial.writeString("apkFileName", mApkFileName);
         if (!mUsesFramework.isEmpty()) {
-            writer.writeObject("usesFramework", mUsesFramework);
+            serial.writeObject("usesFramework", mUsesFramework);
         }
         if (!mUsesLibrary.isEmpty()) {
-            writer.writeList("usesLibrary", mUsesLibrary);
+            serial.writeStringSeq("usesLibrary", mUsesLibrary);
         }
         if (!mSdkInfo.isEmpty()) {
-            writer.writeObject("sdkInfo", mSdkInfo);
+            serial.writeObject("sdkInfo", mSdkInfo);
         }
         if (!mVersionInfo.isEmpty()) {
-            writer.writeObject("versionInfo", mVersionInfo);
+            serial.writeObject("versionInfo", mVersionInfo);
         }
         if (!mResourcesInfo.isEmpty()) {
-            writer.writeObject("resourcesInfo", mResourcesInfo);
+            serial.writeObject("resourcesInfo", mResourcesInfo);
         }
         if (!mFeatureFlags.isEmpty()) {
-            writer.writeList("featureFlags", mFeatureFlags);
+            serial.writeStringSeq("featureFlags", mFeatureFlags);
         }
         if (!mDoNotCompress.isEmpty()) {
-            writer.writeList("doNotCompress", mDoNotCompress);
+            serial.writeStringSeq("doNotCompress", mDoNotCompress);
         }
     }
 
