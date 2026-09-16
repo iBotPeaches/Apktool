@@ -45,11 +45,7 @@ public class YamlSerializer implements Closeable {
         if (key == null) {
             throw new IllegalArgumentException("Key is null.");
         }
-        key = key.trim();
-        if (key.isEmpty()) {
-            throw new IllegalArgumentException("Key is empty.");
-        }
-        return YamlUtils.escapeString(key);
+        return YamlUtils.escapeString(key.trim());
     }
 
     private static String escapeValue(String value) {
