@@ -53,14 +53,7 @@ public class YamlSerializer implements Closeable {
     }
 
     private static String escapeValue(String value) {
-        if (value == null) {
-            return "null";
-        }
-        value = value.trim();
-        if (value.isEmpty()) {
-            return "\"\"";
-        }
-        return YamlUtils.escapeString(value);
+        return value != null ? YamlUtils.escapeString(value.trim()) : "null";
     }
 
     private void writeIndent() throws IOException {

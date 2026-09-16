@@ -30,7 +30,7 @@ public final class YamlUtils {
         }
         int len = str.length();
         if (len == 0) {
-            return str;
+            return "\"\"";
         }
         StringBuilder sb = new StringBuilder(len * 2);
         boolean quote = false;
