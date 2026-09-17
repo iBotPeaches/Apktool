@@ -24,33 +24,28 @@ import static org.junit.Assert.*;
 
 public class ApkInfoReaderTest extends BaseTest {
 
-    @Test
-    public void testStandard() throws Exception {
-        ApkInfo apkInfo = ApkInfo.load(getClass().getResourceAsStream("/meta/standard.yml"));
-        checkStandard(apkInfo);
-        assertEquals("2.8.1", apkInfo.getVersion());
-    }
-
-    @Test
-    public void testUnknownFields() throws Exception {
-        ApkInfo apkInfo = ApkInfo.load(getClass().getResourceAsStream("/meta/unknown_fields.yml"));
-        checkStandard(apkInfo);
-        assertEquals("2.8.1", apkInfo.getVersion());
-    }
-
     @Test(expected = YamlSyntaxException.class)
     public void testIncorrectIndentFirst() throws Exception {
-        ApkInfo apkInfo = ApkInfo.load(getClass().getResourceAsStream("/meta/incorrect_indent_first.yml"));
-        checkStandard(apkInfo);
+        ApkInfo.load(getClass().getResourceAsStream("/meta/incorrect_indent_first.yml"));
     }
 
     @Test(expected = YamlSyntaxException.class)
     public void testIncorrectIndentMiddle() throws Exception {
-        ApkInfo apkInfo = ApkInfo.load(getClass().getResourceAsStream("/meta/incorrect_indent_middle.yml"));
-        checkStandard(apkInfo);
+        ApkInfo.load(getClass().getResourceAsStream("/meta/incorrect_indent_middle.yml"));
+    }
+
+    @Test
+    public void testStandard() throws Exception {
+        checkStandard(ApkInfo.load(getClass().getResourceAsStream("/meta/standard.yml")));
+    }
+
+    @Test
+    public void testUnknownFields() throws Exception {
+        checkStandard(ApkInfo.load(getClass().getResourceAsStream("/meta/unknown_fields.yml")));
     }
 
     private void checkStandard(ApkInfo apkInfo) {
+        assertEquals("2.8.1", apkInfo.getVersion());
         assertEquals("standard.apk", apkInfo.getApkFileName());
         assertEquals(1, apkInfo.getDoNotCompress().size());
         assertEquals("arsc", apkInfo.getDoNotCompress().get(0));
