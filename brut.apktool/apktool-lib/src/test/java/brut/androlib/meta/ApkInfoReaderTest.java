@@ -42,14 +42,12 @@ public class ApkInfoReaderTest extends BaseTest {
     public void testIncorrectIndentFirst() throws Exception {
         ApkInfo apkInfo = ApkInfo.load(getClass().getResourceAsStream("/meta/incorrect_indent_first.yml"));
         checkStandard(apkInfo);
-        assertNotEquals("2.0.0", apkInfo.getVersion());
     }
 
     @Test(expected = YamlSyntaxException.class)
     public void testIncorrectIndentMiddle() throws Exception {
         ApkInfo apkInfo = ApkInfo.load(getClass().getResourceAsStream("/meta/incorrect_indent_middle.yml"));
         checkStandard(apkInfo);
-        assertNotEquals("2.0.0", apkInfo.getVersion());
     }
 
     private void checkStandard(ApkInfo apkInfo) {
