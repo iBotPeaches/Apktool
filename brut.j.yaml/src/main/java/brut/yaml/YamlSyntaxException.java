@@ -16,10 +16,9 @@
  */
 package brut.yaml;
 
-import java.io.IOException;
+public class YamlSyntaxException extends RuntimeException {
 
-public interface YamlSerializable {
-    void onEntry(YamlPullParser parser) throws IOException;
-
-    void serialize(YamlSerializer serial) throws IOException;
+    public YamlSyntaxException(int line, String message) {
+        super("YAML syntax error on line " + line + ": " + message);
+    }
 }

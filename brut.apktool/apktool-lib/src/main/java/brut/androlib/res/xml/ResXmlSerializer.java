@@ -514,7 +514,7 @@ public class ResXmlSerializer implements XmlSerializer {
                 // fallthrough
             } else if (TextUtils.isPrintableChar(ch)) {
                 // fallthrough
-            } else if (Character.isHighSurrogate(ch) && i < n - 1) {
+            } else if (Character.isHighSurrogate(ch) && i + 1 < n) {
                 // Is this high surrogate followed by a valid low surrogate?
                 char low = str.charAt(i + 1);
                 if (Character.isLowSurrogate(low)) {

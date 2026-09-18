@@ -51,7 +51,7 @@ public final class ResStringEncoder {
         StyledString.Span[] spans = styledStr.getSpans();
         int len = str.length();
         if (len == 0 && spans.length == 0) {
-            return "";
+            return str;
         }
 
         StringBuilder out = new StringBuilder(len * 2);
@@ -156,7 +156,7 @@ public final class ResStringEncoder {
     private static String encodeRawString(String str, int attrType) {
         int len = str.length();
         if (len == 0) {
-            return "";
+            return str;
         }
 
         StringBuilder out = new StringBuilder(len * 2);
@@ -222,12 +222,11 @@ public final class ResStringEncoder {
                 }
                 out.append(ch);
                 continue;
-            } else if (Character.isHighSurrogate(ch) && i < end - 1) {
+            } else if (Character.isHighSurrogate(ch) && i + 1 < end) {
                 // Is this high surrogate followed by a valid low surrogate?
                 char low = str.charAt(i + 1);
                 if (Character.isLowSurrogate(low)) {
-                    out.append(ch);
-                    out.append(low);
+                    out.append(ch).append(low);
                     i++;
                     continue;
                 }
@@ -238,7 +237,11 @@ public final class ResStringEncoder {
                 break;
             }
             // Java-style Unicode escape the non-printable character.
-            out.append(String.format("\\u%04x", (int) ch));
+            out.append("\\u")
+                .append(Character.forDigit(ch >>> 12, 16))
+                .append(Character.forDigit(ch >>> 8 & 0xF, 16))
+                .append(Character.forDigit(ch >>> 4 & 0xF, 16))
+                .append(Character.forDigit(ch & 0xF, 16));
         }
         if (quote) {
             out.insert(offset, '"').append('"');

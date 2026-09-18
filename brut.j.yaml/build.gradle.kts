@@ -1,3 +1,3 @@
 dependencies {
-    implementation(libs.commons.text)
+    implementation(project(":brut.j.util"))
 }

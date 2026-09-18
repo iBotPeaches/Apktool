@@ -17,41 +17,35 @@
 package brut.androlib.meta;
 
 import brut.androlib.BaseTest;
+import brut.yaml.YamlSyntaxException;
 
 import org.junit.*;
 import static org.junit.Assert.*;
 
 public class ApkInfoReaderTest extends BaseTest {
 
+    @Test(expected = YamlSyntaxException.class)
+    public void testIncorrectIndentFirst() throws Exception {
+        ApkInfo.load(getClass().getResourceAsStream("/meta/incorrect_indent_first.yml"));
+    }
+
+    @Test(expected = YamlSyntaxException.class)
+    public void testIncorrectIndentMiddle() throws Exception {
+        ApkInfo.load(getClass().getResourceAsStream("/meta/incorrect_indent_middle.yml"));
+    }
+
     @Test
     public void testStandard() throws Exception {
-        ApkInfo apkInfo = ApkInfo.load(getClass().getResourceAsStream("/meta/standard.yml"));
-        checkStandard(apkInfo);
-        assertEquals("2.8.1", apkInfo.getVersion());
+        checkStandard(ApkInfo.load(getClass().getResourceAsStream("/meta/standard.yml")));
     }
 
     @Test
     public void testUnknownFields() throws Exception {
-        ApkInfo apkInfo = ApkInfo.load(getClass().getResourceAsStream("/meta/unknown_fields.yml"));
-        checkStandard(apkInfo);
-        assertEquals("2.8.1", apkInfo.getVersion());
-    }
-
-    @Test
-    public void testSkipIncorrectIndent() throws Exception {
-        ApkInfo apkInfo = ApkInfo.load(getClass().getResourceAsStream("/meta/skip_incorrect_indent.yml"));
-        checkStandard(apkInfo);
-        assertNotEquals("2.0.0", apkInfo.getVersion());
-    }
-
-    @Test
-    public void testFirstIncorrectIndent() throws Exception {
-        ApkInfo apkInfo = ApkInfo.load(getClass().getResourceAsStream("/meta/first_incorrect_indent.yml"));
-        checkStandard(apkInfo);
-        assertNotEquals("2.0.0", apkInfo.getVersion());
+        checkStandard(ApkInfo.load(getClass().getResourceAsStream("/meta/unknown_fields.yml")));
     }
 
     private void checkStandard(ApkInfo apkInfo) {
+        assertEquals("2.8.1", apkInfo.getVersion());
         assertEquals("standard.apk", apkInfo.getApkFileName());
         assertEquals(1, apkInfo.getDoNotCompress().size());
         assertEquals("arsc", apkInfo.getDoNotCompress().get(0));

@@ -18,6 +18,8 @@ package brut.androlib.meta;
 
 import brut.androlib.BaseTest;
 
+import java.io.File;
+
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -27,9 +29,10 @@ public class ApkInfoSerializationTest extends BaseTest {
     public void checkApkInfoSerialization() throws Exception {
         ApkInfo control = ApkInfo.load(getClass().getResourceAsStream("/meta/unknown_files.yml"));
         check(control);
-        control.save(sTmpDir);
-
-        check(ApkInfo.load(sTmpDir));
+        File testFile = new File(sTmpDir, "unknown_files.yml");
+        control.save(testFile);
+        ApkInfo test = ApkInfo.load(testFile);
+        check(test);
     }
 
     private void check(ApkInfo apkInfo) {

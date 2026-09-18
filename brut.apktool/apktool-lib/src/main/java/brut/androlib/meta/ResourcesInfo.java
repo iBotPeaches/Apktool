@@ -18,6 +18,8 @@ package brut.androlib.meta;
 
 import brut.yaml.*;
 
+import java.io.IOException;
+
 public class ResourcesInfo implements YamlSerializable {
     private Integer mPackageId;
     private String mPackageName;
@@ -46,43 +48,42 @@ public class ResourcesInfo implements YamlSerializable {
     }
 
     @Override
-    public void readItem(YamlReader reader) {
-        YamlLine line = reader.getLine();
-        switch (line.getKey()) {
+    public void onEntry(YamlPullParser parser) throws IOException {
+        switch (parser.getKey()) {
             case "packageId":
-                mPackageId = line.getValueInt();
+                mPackageId = parser.getInt();
                 break;
             case "packageName":
-                mPackageName = line.getValue();
+                mPackageName = parser.getString();
                 break;
             case "sparseEntries":
-                mSparseEntries = line.getValueBool();
+                mSparseEntries = parser.getBool();
                 break;
             case "compactEntries":
-                mCompactEntries = line.getValueBool();
+                mCompactEntries = parser.getBool();
                 break;
             case "keepRawValues":
-                mKeepRawValues = line.getValueBool();
+                mKeepRawValues = parser.getBool();
                 break;
         }
     }
 
     @Override
-    public void write(YamlWriter writer) {
+    public void serialize(YamlSerializer serial) throws IOException {
         if (mPackageId != null) {
-            writer.writeInt("packageId", mPackageId);
+            serial.writeInt("packageId", mPackageId);
         }
         if (mPackageName != null) {
-            writer.writeString("packageName", mPackageName);
+            serial.writeString("packageName", mPackageName);
         }
         if (mSparseEntries != null) {
-            writer.writeBool("sparseEntries", mSparseEntries);
+            serial.writeBool("sparseEntries", mSparseEntries);
         }
         if (mCompactEntries != null) {
-            writer.writeBool("compactEntries", mCompactEntries);
+            serial.writeBool("compactEntries", mCompactEntries);
         }
         if (mKeepRawValues != null) {
-            writer.writeBool("keepRawValues", mKeepRawValues);
+            serial.writeBool("keepRawValues", mKeepRawValues);
         }
     }
 

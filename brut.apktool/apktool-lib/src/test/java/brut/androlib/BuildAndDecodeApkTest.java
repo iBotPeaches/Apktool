@@ -64,20 +64,20 @@ public class BuildAndDecodeApkTest extends BaseTest {
 
     @Test
     public void confirmFeatureFlagsRecorded() throws Exception {
-        ApkInfo testInfo = ApkInfo.load(sTestNewDir);
+        ApkInfo testInfo = ApkInfo.load(new File(sTestNewDir, "apktool.yml"));
         assertTrue(testInfo.getFeatureFlags().contains("brut.feature.permission"));
         assertTrue(testInfo.getFeatureFlags().contains("brut.feature.activity"));
     }
 
     @Test
     public void confirmZeroByteFileExtensionIsNotStored() throws Exception {
-        ApkInfo testInfo = ApkInfo.load(sTestNewDir);
+        ApkInfo testInfo = ApkInfo.load(new File(sTestNewDir, "apktool.yml"));
         assertFalse(testInfo.getDoNotCompress().contains("jpg"));
     }
 
     @Test
     public void confirmZeroByteFileIsStored() throws Exception {
-        ApkInfo testInfo = ApkInfo.load(sTestNewDir);
+        ApkInfo testInfo = ApkInfo.load(new File(sTestNewDir, "apktool.yml"));
         assertTrue(testInfo.getDoNotCompress().contains("assets/0byte_file.jpg"));
     }
 

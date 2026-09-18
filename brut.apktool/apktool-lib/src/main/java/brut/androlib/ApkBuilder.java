@@ -68,7 +68,7 @@ public class ApkBuilder {
             mWorker = new BackgroundWorker(mConfig.getJobs() - 1);
         }
         try {
-            mApkInfo = ApkInfo.load(mApkDir);
+            mApkInfo = ApkInfo.load(new File(mApkDir, "apktool.yml"));
             String minSdkVersion = mApkInfo.getSdkInfo().getMinSdkVersion();
             mSmaliBuilder = new SmaliBuilder(minSdkVersion != null ? SdkInfo.parseSdkInt(minSdkVersion) : 0);
             mAaptInvoker = new AaptInvoker(mApkInfo, mConfig);
@@ -103,6 +103,8 @@ public class ApkBuilder {
             if (outApk != null) {
                 buildApkFile(outDir, outApk);
             }
+        } catch (IOException ex) {
+            throw new AndrolibException(ex);
         } finally {
             if (mWorker != null) {
                 mWorker.shutdownNow();

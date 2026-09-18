@@ -654,13 +654,13 @@ public class BinaryXmlResourceParser implements XmlPullParser {
         }
 
         // Reset previous event data.
-        int lastEventType = mEventType;
-        if (lastEventType != -1) {
+        int prevEventType = mEventType;
+        if (prevEventType != -1) {
             resetEventInfo();
         }
 
         // Stop if all root-level namespaces were popped.
-        if (lastEventType == END_TAG && mNamespaces.getDepth() == 0 && mNamespaces.getCurrentCount() == 0) {
+        if (prevEventType == END_TAG && mNamespaces.getDepth() == 0 && mNamespaces.getCurrentCount() == 0) {
             return false;
         }
 

@@ -37,7 +37,7 @@ public class MissingVersionManifestTest extends BaseTest {
         File testDir = new File(testApk + ".out");
         new ApkDecoder(testApk, sConfig).decode(testDir);
 
-        ApkInfo testInfo = ApkInfo.load(testDir);
+        ApkInfo testInfo = ApkInfo.load(new File(testDir, "apktool.yml"));
         assertNull(testInfo.getVersionInfo().getVersionName());
     }
 }

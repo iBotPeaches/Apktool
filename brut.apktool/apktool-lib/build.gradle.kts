@@ -9,7 +9,6 @@ dependencies {
     implementation(libs.smali)
     implementation(libs.guava)
     implementation(libs.commons.io)
-    implementation(libs.commons.text)
 
     testImplementation(libs.junit)
     testImplementation(libs.xmlunit)

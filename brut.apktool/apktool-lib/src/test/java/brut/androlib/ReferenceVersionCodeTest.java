@@ -37,7 +37,7 @@ public class ReferenceVersionCodeTest extends BaseTest {
         File testDir = new File(testApk + ".out");
         new ApkDecoder(testApk, sConfig).decode(testDir);
 
-        ApkInfo testInfo = ApkInfo.load(testDir);
+        ApkInfo testInfo = ApkInfo.load(new File(testDir, "apktool.yml"));
         assertEquals("v1.0.0", testInfo.getVersionInfo().getVersionName());
     }
 }
