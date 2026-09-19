@@ -93,7 +93,7 @@ public class Framework {
                 out.write(data);
                 out.closeEntry();
 
-                // Write fake AndroidManifest.xml file to support original aapt.
+                // Write fake AndroidManifest.xml file to support legacy aapt.
                 entry = zip.getEntry("AndroidManifest.xml");
                 if (entry != null) {
                     byte[] manifest = BrutIO.readAndClose(zip.getInputStream(entry));

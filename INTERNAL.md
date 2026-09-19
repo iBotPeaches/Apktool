@@ -240,7 +240,7 @@ so `apktool_14.0.0` was the last one to refer based on Android release. Versions
 to the version of Apktool that iteration is intended for.
 
 This repo has a variety of changes applied. These changes range from disabling optimizations to lessening the rules
-that aapt regularly has. We do this because apktool's job is to not fix apks, but rather keep them as close to the
+that aapt2 regularly has. We do this because apktool's job is to not fix apks, but rather keep them as close to the
 original as they were.
 
 ### First we need the AOSP source
@@ -297,10 +297,10 @@ The steps below are different per flavor and operating system.
 1. `m aapt2`
 1. `strip out/host/darwin-x86/bin/aapt2_64`
 
-#### Confirming aapt/aapt2 builds are static
+#### Confirming aapt2 builds are static
 
 There are some issues with some dependencies (namely `libc++`) in which they are built in the shared state. This is
-alright in the scope and context of AOSP/Android Studio, but once you leave those two behind and start using aapt on
+alright in the scope and context of AOSP/Android Studio, but once you leave those two behind and start using aapt2 on
 its own, you encounter some issues. The key is to force `libc++` to be built statically which takes some tweaks with the
 AOSP build systems as that dependency isn't standard like `libz` and others.
 

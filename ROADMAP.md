@@ -41,7 +41,7 @@ Suggestions: [#1366](https://github.com/iBotPeaches/Apktool/issues/1366)
 
 ## Android Support
 Folks have requested running Apktool on device itself. This has been a challenge due to the arch requirements
-that would be placed on the aapt2/aapt binaries.
+that would be placed on the aapt2 binaries.
 
 Suggestions: [#2811](https://github.com/iBotPeaches/Apktool/issues/2811)
 

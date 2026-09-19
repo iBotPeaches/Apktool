@@ -70,6 +70,16 @@ public class ResDecoder {
 
         mTable.load();
 
+        Directory inDir, outDir;
+        try {
+            inDir = mApkInfo.getApkFile().getDirectory();
+            outDir = new FileDirectory(apkDir);
+        } catch (DirectoryException ex) {
+            throw new AndrolibException(ex);
+        }
+
+        ResPackage pkg = mTable.getMainPackage();
+
         Map<ResFileDecoder.Type, ResStreamDecoder> decoders = new HashMap<>();
         decoders.put(ResFileDecoder.Type.UNKNOWN, new ResRawStreamDecoder());
         decoders.put(ResFileDecoder.Type.PNG_9PATCH, new ResNinePatchStreamDecoder());
@@ -81,16 +91,6 @@ public class ResDecoder {
         decoders.put(ResFileDecoder.Type.BINARY_XML, new ResXmlPullStreamDecoder(parser, serial, handler));
 
         ResFileDecoder fileDecoder = new ResFileDecoder(decoders);
-        Directory inDir, outDir;
-
-        try {
-            inDir = mApkInfo.getApkFile().getDirectory();
-            outDir = new FileDirectory(apkDir);
-        } catch (DirectoryException ex) {
-            throw new AndrolibException(ex);
-        }
-
-        ResPackage pkg = mTable.getMainPackage();
 
         Log.i(TAG, "Decoding value resources...");
         for (ResEntry entry : Lists.newArrayList(listEntries(pkg))) {
@@ -106,6 +106,11 @@ public class ResDecoder {
             }
         }
 
+        AndrolibException ex = parser.getFirstError();
+        if (ex != null) {
+            throw ex;
+        }
+
         // Disable auto-escaping in generated XMLs.
         serial = new ResXmlSerializer(false);
 
@@ -114,11 +119,6 @@ public class ResDecoder {
         generatePublicXml(pkg, outDir, serial);
         generateStagingXmls(pkg, outDir, serial);
         generateOverlayableXml(pkg, outDir, serial);
-
-        AndrolibException ex = parser.getFirstError();
-        if (ex != null) {
-            throw ex;
-        }
     }
 
     private static Iterable<ResEntry> listEntries(ResPackage pkg) {
@@ -348,32 +348,33 @@ public class ResDecoder {
             return;
         }
 
+        Directory inDir, outDir;
+        try {
+            inDir = mApkInfo.getApkFile().getDirectory();
+            outDir = new FileDirectory(apkDir);
+        } catch (DirectoryException ex) {
+            throw new AndrolibException(ex);
+        }
+
+        ResPackage pkg = mTable.getMainPackage();
+
         BinaryXmlResourceParser parser = new BinaryXmlResourceParser(
             mTable, mConfig.isIgnoreRawValues(), mConfig.isDecodeResolveLazy());
         ResXmlSerializer serial = new ResXmlSerializer(true);
         ManifestPullEventHandler handler = new ManifestPullEventHandler(mApkInfo, !mConfig.isAnalysisMode());
         ResXmlPullStreamDecoder decoder = new ResXmlPullStreamDecoder(parser, serial, handler);
 
-        ResPackage pkg = mTable.getMainPackage();
-
-        Directory inDir, outDir;
-        try {
-            inDir = mApkInfo.getApkFile().getDirectory();
-            outDir = new FileDirectory(apkDir);
-
-            Log.i(TAG, "Decoding AndroidManifest.xml with " + (pkg != null ? "resources" : "only framework resources")
-                     + "...");
-            try (
-                InputStream in = inDir.getFileInput("AndroidManifest.xml");
-                OutputStream out = outDir.getFileOutput("AndroidManifest.xml")
-            ) {
-                decoder.decode(in, out);
-            }
+        Log.i(TAG, "Decoding AndroidManifest.xml with " + (pkg != null ? "resources" : "only framework resources")
+                 + "...");
+        try (
+            InputStream in = inDir.getFileInput("AndroidManifest.xml");
+            OutputStream out = outDir.getFileOutput("AndroidManifest.xml")
+        ) {
+            decoder.decode(in, out);
         } catch (DirectoryException | IOException ex) {
             throw new AndrolibException(ex);
         }
 
-        // Update apk info.
         ResourcesInfo resourcesInfo = mApkInfo.getResourcesInfo();
 
         // Flag the app if it preserved raw attribute values.
@@ -463,7 +464,7 @@ public class ResDecoder {
         File manifest = new File(apkDir, "AndroidManifest.xml");
 
         if (!mConfig.isAnalysisMode()) {
-            // Remove versionCode and versionName, it will be passed to aapt as a parameter via apktool.yml.
+            // Remove versionCode and versionName, they will be passed to aapt2 as parameters via apktool.yml.
             ResXmlUtils.removeManifestVersions(manifest);
         }
     }

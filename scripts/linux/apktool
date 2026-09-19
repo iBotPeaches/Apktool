@@ -76,7 +76,7 @@ else
     jarpath="$libdir/$jarfile"
 fi
 
-# add current location to path for aapt
+# add current location to path for aapt2
 PATH=$PATH:`pwd`;
 export PATH;
 exec java $javaOpts -jar "$jarpath" "$@"

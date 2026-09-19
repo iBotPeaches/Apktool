@@ -20,47 +20,6 @@ import java.util.Arrays;
 import java.util.Locale;
 
 public class ResConfig {
-    public static final int SDK_BASE = 1;
-    public static final int SDK_BASE_1_1 = 2;
-    public static final int SDK_CUPCAKE = 3;
-    public static final int SDK_DONUT = 4;
-    public static final int SDK_ECLAIR = 5;
-    public static final int SDK_ECLAIR_0_1 = 6;
-    public static final int SDK_ECLAIR_MR1 = 7;
-    public static final int SDK_FROYO = 8;
-    public static final int SDK_GINGERBREAD = 9;
-    public static final int SDK_GINGERBREAD_MR1 = 10;
-    public static final int SDK_HONEYCOMB = 11;
-    public static final int SDK_HONEYCOMB_MR1 = 12;
-    public static final int SDK_HONEYCOMB_MR2 = 13;
-    public static final int SDK_ICE_CREAM_SANDWICH = 14;
-    public static final int SDK_ICE_CREAM_SANDWICH_MR1 = 15;
-    public static final int SDK_JELLY_BEAN = 16;
-    public static final int SDK_JELLY_BEAN_MR1 = 17;
-    public static final int SDK_JELLY_BEAN_MR2 = 18;
-    public static final int SDK_KITKAT = 19;
-    public static final int SDK_LOLLIPOP = 21;
-    public static final int SDK_LOLLIPOP_MR1 = 22;
-    public static final int SDK_MNC = 23;
-    public static final int SDK_NOUGAT = 24;
-    public static final int SDK_NOUGAT_MR1 = 25;
-    public static final int SDK_OREO = 26;
-    public static final int SDK_OREO_MR1 = 27;
-    public static final int SDK_P = 28;
-    public static final int SDK_Q = 29;
-    public static final int SDK_R = 30;
-    public static final int SDK_S = 31;
-    public static final int SDK_S_V2 = 32;
-    public static final int SDK_TIRAMISU = 33;
-    public static final int SDK_UPSIDEDOWN_CAKE = 34;
-    public static final int SDK_VANILLA_ICE_CREAM = 35;
-    public static final int SDK_BAKLAVA = 36;
-    public static final int SDK_CINNAMON_BUN = 37;
-
-    // AOSP has this as 10,000 for dev purposes.
-    // platform_frameworks_base/commit/c7a1109a1fe0771d4c9b572dcf178e2779fc4f2d
-    public static final int SDK_DEVELOPMENT = 10000;
-
     public static final int MNC_ZERO = 0xFFFF;
 
     public static final int ORIENTATION_ANY = 0x00;

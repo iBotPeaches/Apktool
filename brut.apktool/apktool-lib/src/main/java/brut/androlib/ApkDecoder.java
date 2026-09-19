@@ -60,6 +60,10 @@ public class ApkDecoder {
         mFirstError = new AtomicReference<>();
     }
 
+    public ApkInfo getApkInfo() {
+        return mApkInfo;
+    }
+
     public void decode(File outDir) throws AndrolibException {
         if (!mApkFile.isFile() || !mApkFile.canRead()) {
             throw new InFileNotFoundException(mApkFile.getPath());
@@ -117,10 +121,6 @@ public class ApkDecoder {
             } catch (DirectoryException ignored) {
             }
         }
-    }
-
-    public ApkInfo getApkInfo() {
-        return mApkInfo;
     }
 
     private void decodeSources(File outDir) throws AndrolibException {
@@ -323,8 +323,7 @@ public class ApkDecoder {
                 Iterator<String> it = uncompressedFiles.iterator();
                 while (it.hasNext()) {
                     String fileName = it.next();
-                    String ext = FilenameUtils.getExtension(fileName);
-                    if (uncompressedExts.contains(ext)) {
+                    if (uncompressedExts.contains(FilenameUtils.getExtension(fileName))) {
                         it.remove();
                     }
                 }

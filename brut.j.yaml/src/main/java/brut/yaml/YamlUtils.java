@@ -32,70 +32,89 @@ public final class YamlUtils {
         if (len == 0) {
             return "\"\"";
         }
-        StringBuilder sb = new StringBuilder(len * 2);
+        // Scan for characters that force quoting.
         boolean quote = false;
         for (int i = 0; i < len; i++) {
             char ch = str.charAt(i);
+            // No-Break Space, Line Separator, and Paragraph Separator are printable but must be escaped.
+            if (ch == '\u00A0' || ch == '\u2028' || ch == '\u2029') {
+                quote = true;
+                break;
+            }
+            if (TextUtils.isPrintableChar(ch)) {
+                continue;
+            }
+            // Is this a high surrogate followed by a valid low surrogate?
+            if (Character.isHighSurrogate(ch) && i + 1 < len && Character.isLowSurrogate(str.charAt(i + 1))) {
+                i++;
+                continue;
+            }
+            // A non-printable character must be escaped.
+            quote = true;
+            break;
+        }
+        // If nothing forced quoting, return the string as-is.
+        if (!quote) {
+            return str;
+        }
+        // Quoting is needed: escape \, ", and non-printable characters.
+        StringBuilder sb = new StringBuilder(len * 2 + 2);
+        sb.append('"');
+        for (int i = 0; i < len; i++) {
+            char ch = str.charAt(i);
             switch (ch) {
+                case '\\':
+                    sb.append("\\\\");
+                    continue;
+                case '"':
+                    sb.append("\\\"");
+                    continue;
                 case '\0': // Null
                     sb.append("\\0");
-                    quote = true;
                     continue;
                 case '\u0007': // Bell
                     sb.append("\\a");
-                    quote = true;
                     continue;
                 case '\b': // Backspace
                     sb.append("\\b");
-                    quote = true;
                     continue;
                 case '\t': // Character Tabulation
                     sb.append("\\t");
-                    quote = true;
                     continue;
                 case '\n': // Line Feed
                     sb.append("\\n");
-                    quote = true;
                     continue;
                 case '\u000B': // Line Tabulation
                     sb.append("\\v");
-                    quote = true;
                     continue;
                 case '\f': // Form Feed
                     sb.append("\\f");
-                    quote = true;
                     continue;
                 case '\r': // Carriage Return
                     sb.append("\\r");
-                    quote = true;
                     continue;
                 case '\u001B': // Escape
                     sb.append("\\e");
-                    quote = true;
                     continue;
                 case '\u0085': // Next Line
                     sb.append("\\N");
-                    quote = true;
                     continue;
                 case '\u00A0': // No-Break Space
                     sb.append("\\_");
-                    quote = true;
                     continue;
                 case '\u2028': // Line Separator
                     sb.append("\\L");
-                    quote = true;
                     continue;
                 case '\u2029': // Paragraph Separator
                     sb.append("\\P");
-                    quote = true;
                     continue;
             }
             if (TextUtils.isPrintableChar(ch)) {
                 sb.append(ch);
                 continue;
             }
+            // Is this a high surrogate followed by a valid low surrogate?
             if (Character.isHighSurrogate(ch) && i + 1 < len) {
-                // Is this high surrogate followed by a valid low surrogate?
                 char low = str.charAt(i + 1);
                 if (Character.isLowSurrogate(low)) {
                     sb.append(ch).append(low);
@@ -110,22 +129,8 @@ public final class YamlUtils {
                 .append(Character.forDigit(ch >>> 8 & 0xF, 16))
                 .append(Character.forDigit(ch >>> 4 & 0xF, 16))
                 .append(Character.forDigit(ch & 0xF, 16));
-            quote = true;
         }
-        if (quote) {
-            str = sb.toString();
-            len = str.length();
-            sb = new StringBuilder(len * 2);
-            sb.append('"');
-            for (int i = 0; i < len; i++) {
-                char ch = str.charAt(i);
-                if (ch == '\\' || ch == '"') {
-                    sb.append('\\');
-                }
-                sb.append(ch);
-            }
-            sb.append('"');
-        }
+        sb.append('"');
         return sb.toString();
     }
 

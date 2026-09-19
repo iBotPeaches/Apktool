@@ -16,12 +16,50 @@
  */
 package brut.androlib.meta;
 
-import brut.androlib.res.table.ResConfig;
 import brut.yaml.*;
 
 import java.io.IOException;
 
 public class SdkInfo implements YamlSerializable {
+    public static final int SDK_BASE = 1;
+    public static final int SDK_BASE_1_1 = 2;
+    public static final int SDK_CUPCAKE = 3;
+    public static final int SDK_DONUT = 4;
+    public static final int SDK_ECLAIR = 5;
+    public static final int SDK_ECLAIR_0_1 = 6;
+    public static final int SDK_ECLAIR_MR1 = 7;
+    public static final int SDK_FROYO = 8;
+    public static final int SDK_GINGERBREAD = 9;
+    public static final int SDK_GINGERBREAD_MR1 = 10;
+    public static final int SDK_HONEYCOMB = 11;
+    public static final int SDK_HONEYCOMB_MR1 = 12;
+    public static final int SDK_HONEYCOMB_MR2 = 13;
+    public static final int SDK_ICE_CREAM_SANDWICH = 14;
+    public static final int SDK_ICE_CREAM_SANDWICH_MR1 = 15;
+    public static final int SDK_JELLY_BEAN = 16;
+    public static final int SDK_JELLY_BEAN_MR1 = 17;
+    public static final int SDK_JELLY_BEAN_MR2 = 18;
+    public static final int SDK_KITKAT = 19;
+    public static final int SDK_KITKAT_WATCH = 20;
+    public static final int SDK_LOLLIPOP = 21;
+    public static final int SDK_LOLLIPOP_MR1 = 22;
+    public static final int SDK_MARSHMALLOW = 23;
+    public static final int SDK_NOUGAT = 24;
+    public static final int SDK_NOUGAT_MR1 = 25;
+    public static final int SDK_O = 26;
+    public static final int SDK_O_MR1 = 27;
+    public static final int SDK_P = 28;
+    public static final int SDK_Q = 29;
+    public static final int SDK_R = 30;
+    public static final int SDK_S = 31;
+    public static final int SDK_S_V2 = 32;
+    public static final int SDK_TIRAMISU = 33;
+    public static final int SDK_UPSIDE_DOWN_CAKE = 34;
+    public static final int SDK_VANILLA_ICE_CREAM = 35;
+    public static final int SDK_BAKLAVA = 36;
+    public static final int SDK_CINNAMON_BUN = 37;
+    public static final int SDK_CUR_DEVELOPMENT = 10000;
+
     private String mMinSdkVersion;
     private String mTargetSdkVersion;
     private String mMaxSdkVersion;
@@ -74,6 +112,10 @@ public class SdkInfo implements YamlSerializable {
         return mMinSdkVersion;
     }
 
+    public int getMinSdkVersionInt() {
+        return toSdkVersionInt(mMinSdkVersion);
+    }
+
     public void setMinSdkVersion(String minSdkVersion) {
         mMinSdkVersion = minSdkVersion;
     }
@@ -82,11 +124,8 @@ public class SdkInfo implements YamlSerializable {
         return mTargetSdkVersion;
     }
 
-    public String getTargetSdkVersionBounded() {
-        int target = parseSdkInt(mTargetSdkVersion);
-        int min = mMinSdkVersion != null ? parseSdkInt(mMinSdkVersion) : 0;
-        int max = mMaxSdkVersion != null ? parseSdkInt(mMaxSdkVersion) : target;
-        return Integer.toString(Math.max(min, Math.min(max, target)));
+    public int getTargetSdkVersionInt() {
+        return toSdkVersionInt(mTargetSdkVersion);
     }
 
     public void setTargetSdkVersion(String targetSdkVersion) {
@@ -97,47 +136,111 @@ public class SdkInfo implements YamlSerializable {
         return mMaxSdkVersion;
     }
 
+    public int getMaxSdkVersionInt() {
+        return toSdkVersionInt(mMaxSdkVersion);
+    }
+
     public void setMaxSdkVersion(String maxSdkVersion) {
         mMaxSdkVersion = maxSdkVersion;
     }
 
-    public static int parseSdkInt(String sdkVersion) {
-        switch (sdkVersion.toUpperCase()) {
+    private static int toSdkVersionInt(String sdkVersion) {
+        if (sdkVersion == null || sdkVersion.isEmpty()) {
+            return 0;
+        }
+        char first = sdkVersion.charAt(0);
+        if (first < 'A' || first > 'Z') {
+            long versionInt;
+            try {
+                versionInt = Long.parseLong(sdkVersion);
+            } catch (NumberFormatException ignored) {
+                throw new IllegalArgumentException("Invalid version: " + sdkVersion);
+            }
+            if (versionInt < 0) {
+                throw new IllegalArgumentException("Negative version: " + sdkVersion);
+            }
+            if (versionInt > Integer.MAX_VALUE) {
+                throw new IllegalArgumentException("Version too large: " + sdkVersion);
+            }
+            return (int) versionInt;
+        }
+        switch (sdkVersion) {
+            case "Base":
+                return SDK_BASE;
+            case "Base11":
+                return SDK_BASE_1_1;
+            case "Cupcake":
+                return SDK_CUPCAKE;
+            case "Donut":
+                return SDK_DONUT;
+            case "Eclair":
+                return SDK_ECLAIR;
+            case "Eclair01":
+                return SDK_ECLAIR_0_1;
+            case "EclairMr1":
+                return SDK_ECLAIR_MR1;
+            case "Froyo":
+                return SDK_FROYO;
+            case "Gingerbread":
+                return SDK_GINGERBREAD;
+            case "GingerbreadMr1":
+                return SDK_GINGERBREAD_MR1;
+            case "Honeycomb":
+                return SDK_HONEYCOMB;
+            case "HoneycombMr1":
+                return SDK_HONEYCOMB_MR1;
+            case "HoneycombMr2":
+                return SDK_HONEYCOMB_MR2;
+            case "IceCreamSandwich":
+                return SDK_ICE_CREAM_SANDWICH;
+            case "IceCreamSandwichMr1":
+                return SDK_ICE_CREAM_SANDWICH_MR1;
+            case "JellyBean":
+                return SDK_JELLY_BEAN;
+            case "JellyBeanMr1":
+                return SDK_JELLY_BEAN_MR1;
+            case "JellyBeanMr2":
+                return SDK_JELLY_BEAN_MR2;
+            case "Kitkat":
+                return SDK_KITKAT;
+            case "KitkatWatch":
+                return SDK_KITKAT_WATCH;
+            case "Lollipop":
+                return SDK_LOLLIPOP;
+            case "LollipopMr1":
+                return SDK_LOLLIPOP_MR1;
             case "M":
-                return ResConfig.SDK_MNC;
+                return SDK_MARSHMALLOW;
             case "N":
-                return ResConfig.SDK_NOUGAT;
+                return SDK_NOUGAT;
+            case "NMr1":
+                return SDK_NOUGAT_MR1;
             case "O":
-                return ResConfig.SDK_OREO;
+                return SDK_O;
+            case "OMr1":
+                return SDK_O_MR1;
             case "P":
-                return ResConfig.SDK_P;
+                return SDK_P;
             case "Q":
-                return ResConfig.SDK_Q;
+                return SDK_Q;
             case "R":
-                return ResConfig.SDK_R;
+                return SDK_R;
             case "S":
-                return ResConfig.SDK_S;
-            case "SV2":
-                return ResConfig.SDK_S_V2;
-            case "T":
-            case "TIRAMISU":
-                return ResConfig.SDK_TIRAMISU;
-            case "UPSIDEDOWNCAKE":
-            case "UPSIDE_DOWN_CAKE":
-                return ResConfig.SDK_UPSIDEDOWN_CAKE;
-            case "VANILLAICECREAM":
-            case "VANILLA_ICE_CREAM":
-                return ResConfig.SDK_VANILLA_ICE_CREAM;
-            case "BAKLAVA":
-                return ResConfig.SDK_BAKLAVA;
-            case "CINNAMON_BUN":
-                return ResConfig.SDK_CINNAMON_BUN;
-            case "SDK_CUR_DEVELOPMENT":
-            case "DEV":
-            case "CANARY":
-                return ResConfig.SDK_DEVELOPMENT;
+                return SDK_S;
+            case "Sv2":
+                return SDK_S_V2;
+            case "Tiramisu":
+                return SDK_TIRAMISU;
+            case "UpsideDownCake":
+                return SDK_UPSIDE_DOWN_CAKE;
+            case "VanillaIceCream":
+                return SDK_VANILLA_ICE_CREAM;
+            case "Baklava":
+                return SDK_BAKLAVA;
+            case "CinnamonBun":
+                return SDK_CINNAMON_BUN;
             default:
-                return Integer.parseInt(sdkVersion);
+                return SDK_CUR_DEVELOPMENT;
         }
     }
 }
