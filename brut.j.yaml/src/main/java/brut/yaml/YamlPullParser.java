@@ -309,7 +309,7 @@ public class YamlPullParser implements Closeable {
         readMap(map, YamlPullParser::getBool);
     }
 
-    private <T> void readSeq(Collection<T> collection, Function<YamlPullParser, T> mapper) throws IOException {
+    private <T> void readSeq(Collection<T> coll, Function<YamlPullParser, T> mapper) throws IOException {
         if (mClosed || mCurrent == null || mCurrent.key == null) {
             throw new IllegalStateException();
         }
@@ -327,16 +327,16 @@ public class YamlPullParser implements Closeable {
             if (mCurrent.key != null) {
                 throw new YamlSyntaxException(mPosition, "Expected a sequence item, found a mapping entry.");
             }
-            collection.add(mapper.apply(this));
+            coll.add(mapper.apply(this));
         }
     }
 
-    public void readStringSeq(Collection<String> collection) throws IOException {
-        readSeq(collection, YamlPullParser::getString);
+    public void readStringSeq(Collection<String> coll) throws IOException {
+        readSeq(coll, YamlPullParser::getString);
     }
 
-    public void readIntSeq(Collection<Integer> collection) throws IOException {
-        readSeq(collection, YamlPullParser::getInt);
+    public void readIntSeq(Collection<Integer> coll) throws IOException {
+        readSeq(coll, YamlPullParser::getInt);
     }
 
     private static final class Block {

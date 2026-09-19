@@ -47,7 +47,7 @@ public abstract class ResItem extends ResValue implements ValuesXmlSerializable 
             case TYPE_FRACTION:
                 return new ResPrimitive(type, data);
         }
-        // Handle integer, boolean and color.
+        // Handle integer, boolean, and color.
         if (type >= TYPE_FIRST_INT && type <= TYPE_LAST_INT) {
             return new ResPrimitive(type, data);
         }

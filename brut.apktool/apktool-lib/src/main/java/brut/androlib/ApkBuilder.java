@@ -22,7 +22,6 @@ import brut.androlib.meta.SdkInfo;
 import brut.androlib.res.AaptInvoker;
 import brut.androlib.res.AaptManager;
 import brut.androlib.res.data.ResChunkHeader;
-import brut.androlib.res.table.ResConfig;
 import brut.androlib.res.xml.ResXmlUtils;
 import brut.androlib.smali.SmaliBuilder;
 import brut.common.BrutException;
@@ -69,8 +68,7 @@ public class ApkBuilder {
         }
         try {
             mApkInfo = ApkInfo.load(new File(mApkDir, "apktool.yml"));
-            String minSdkVersion = mApkInfo.getSdkInfo().getMinSdkVersion();
-            mSmaliBuilder = new SmaliBuilder(minSdkVersion != null ? SdkInfo.parseSdkInt(minSdkVersion) : 0);
+            mSmaliBuilder = new SmaliBuilder(mApkInfo.getSdkInfo().getMinSdkVersionInt());
             mAaptInvoker = new AaptInvoker(mApkInfo, mConfig);
 
             String apkName = mApkInfo.getApkFileName();
@@ -83,7 +81,11 @@ public class ApkBuilder {
                 outApk = new File(mApkDir, "dist/" + apkName);
             }
 
-            File outDir = new File(mApkDir, "build/apk");
+            File buildDir = new File(mApkDir, "build");
+            File outDir = new File(buildDir, "apk");
+            if (mConfig.isForced()) {
+                OS.rmdir(buildDir);
+            }
             OS.mkdir(outDir);
 
             Log.i(TAG, "Using Apktool " + mConfig.getVersion() + " on " + apkName
@@ -154,8 +156,7 @@ public class ApkBuilder {
     private void copySourcesRaw(File outDir, String fileName) throws AndrolibException {
         File inFile = new File(mApkDir, fileName);
         File outFile = new File(outDir, fileName);
-
-        if (!mConfig.isForced() && !isFileNewer(inFile, outFile)) {
+        if (!isFileNewer(inFile, outFile)) {
             Log.i(TAG, fileName + " has not changed.");
             return;
         }
@@ -187,8 +188,7 @@ public class ApkBuilder {
     private void buildSourcesSmaliJob(File outDir, String dirName, String fileName) throws AndrolibException {
         File smaliDir = new File(mApkDir, dirName);
         File dexFile = new File(outDir, fileName);
-
-        if (!mConfig.isForced() && !isFileNewer(smaliDir, dexFile)) {
+        if (!isFileNewer(smaliDir, dexFile)) {
             Log.i(TAG, dirName + " has not changed.");
             return;
         }
@@ -240,7 +240,7 @@ public class ApkBuilder {
     }
 
     private void copyManifestRaw(File outDir, File manifest) throws AndrolibException {
-        if (!mConfig.isForced() && !isFileNewer(manifest, new File(outDir, "AndroidManifest.xml"))) {
+        if (!isFileNewer(manifest, new File(outDir, "AndroidManifest.xml"))) {
             Log.i(TAG, "AndroidManifest.xml has not changed.");
             return;
         }
@@ -256,7 +256,7 @@ public class ApkBuilder {
     }
 
     private void copyResourcesRaw(File outDir, File arscFile) throws AndrolibException {
-        if (!mConfig.isForced() && !isFileNewer(arscFile, new File(outDir, "resources.arsc"))) {
+        if (!isFileNewer(arscFile, new File(outDir, "resources.arsc"))) {
             Log.i(TAG, "resources.arsc has not changed.");
             return;
         }
@@ -272,7 +272,7 @@ public class ApkBuilder {
     }
 
     private void buildManifestOnly(File outDir, File manifest) throws AndrolibException {
-        if (!mConfig.isForced() && !isFileNewer(manifest, new File(outDir, "AndroidManifest.xml"))) {
+        if (!isFileNewer(manifest, new File(outDir, "AndroidManifest.xml"))) {
             Log.i(TAG, "AndroidManifest.xml has not changed.");
             return;
         }
@@ -320,7 +320,7 @@ public class ApkBuilder {
     }
 
     private void buildResourcesFully(File outDir, File manifest, File resDir) throws AndrolibException {
-        if (!mConfig.isForced() && !isFileNewer(manifest, new File(outDir, "AndroidManifest.xml"))
+        if (!isFileNewer(manifest, new File(outDir, "AndroidManifest.xml"))
                 && !isFileNewer(resDir, new File(outDir, "res"))) {
             Log.i(TAG, "AndroidManifest.xml and resources have not changed.");
             return;
@@ -348,8 +348,7 @@ public class ApkBuilder {
             ResXmlUtils.modNetworkSecurityConfig(netSecConfOrig);
             ResXmlUtils.setNetworkSecurityConfig(manifest);
 
-            String targetSdkVersion = mApkInfo.getSdkInfo().getTargetSdkVersion();
-            if (targetSdkVersion != null && SdkInfo.parseSdkInt(targetSdkVersion) < ResConfig.SDK_NOUGAT) {
+            if (mApkInfo.getSdkInfo().getTargetSdkVersionInt() < SdkInfo.SDK_NOUGAT) {
                 Log.w(TAG, "Target SDK version is lower than 24, Network Security Configuration might be ignored!");
             }
         }
@@ -420,7 +419,7 @@ public class ApkBuilder {
 
         Log.i(TAG, "Building apk file...");
         try (ZipOutputStream out = new ZipOutputStream(Files.newOutputStream(outApk.toPath()))) {
-            // Zip aapt output files.
+            // Zip aapt2 output files.
             ZipUtils.zipDir(outDir, out, doNotCompress);
 
             // Zip standard raw files.

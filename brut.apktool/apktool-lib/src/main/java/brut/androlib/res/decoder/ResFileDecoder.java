@@ -108,7 +108,7 @@ public class ResFileDecoder {
             throws AndrolibException {
         ResStreamDecoder decoder = mDecoders.get(type);
         if (decoder == null) {
-            throw new AndrolibException("Undefined decoder for type: " + type);
+            throw new IllegalStateException("Undefined decoder for type: " + type);
         }
 
         boolean success = false;

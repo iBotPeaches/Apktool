@@ -398,14 +398,14 @@ public class Main {
     private static void cmdDecode(String[] args) throws AndrolibException {
         CommandLine cli = parseOptions(decodeOptions, args);
         List<String> argList = cli.getArgList();
-        String apkName;
+        File apkFile;
         switch (argList.size()) {
             case 0:
                 System.err.println("Input apk file was not specified.");
                 System.exit(1);
                 return;
             case 1:
-                apkName = argList.get(0);
+                apkFile = new File(argList.get(0));
                 break;
             default:
                 System.err.println("Invalid arguments.");
@@ -514,13 +514,17 @@ public class Main {
         if (cli.hasOption(decodeOutputOption)) {
             outDir = new File(cli.getOptionValue(decodeOutputOption));
         } else {
-            outDir = new File(apkName.endsWith(".apk")
-                ? apkName.substring(0, apkName.length() - 4).trim()
-                : apkName + ".out");
+            String outName = apkFile.getName();
+            if (outName.endsWith(".apk")) {
+                outName = outName.substring(0, outName.length() - 4).trim();
+            } else {
+                outName += ".out";
+            }
+            outDir = new File(apkFile.getParent(), outName);
         }
 
         try {
-            new ApkDecoder(new File(apkName), config).decode(outDir);
+            new ApkDecoder(apkFile, config).decode(outDir);
         } catch (InFileNotFoundException | OutDirExistsException | FrameworkNotFoundException ex) {
             System.err.println(ex.getMessage());
             System.exit(1);
@@ -530,13 +534,13 @@ public class Main {
     private static void cmdBuild(String[] args) throws AndrolibException {
         CommandLine cli = parseOptions(buildOptions, args);
         List<String> argList = cli.getArgList();
-        String apkDirName;
+        File apkDir;
         switch (argList.size()) {
             case 0:
-                apkDirName = "."; // current directory
+                apkDir = new File("."); // current directory
                 break;
             case 1:
-                apkDirName = argList.get(0);
+                apkDir = new File(argList.get(0));
                 break;
             default:
                 System.err.println("Invalid arguments.");
@@ -573,10 +577,18 @@ public class Main {
             config.setCopyOriginal(true);
         }
         if (cli.hasOption(buildDebuggableOption)) {
-            config.setDebuggable(true);
+            if (cli.hasOption(buildCopyOriginalOption)) {
+                printOptionConflict(buildDebuggableOption, buildCopyOriginalOption);
+            } else {
+                config.setDebuggable(true);
+            }
         }
         if (cli.hasOption(buildNetSecConfOption)) {
-            config.setNetSecConf(true);
+            if (cli.hasOption(buildCopyOriginalOption)) {
+                printOptionConflict(buildNetSecConfOption, buildCopyOriginalOption);
+            } else {
+                config.setNetSecConf(true);
+            }
         }
         if (cli.hasOption(buildAaptOption)) {
             try {
@@ -602,20 +614,20 @@ public class Main {
             }
         }
 
-        new ApkBuilder(new File(apkDirName), config).build(outFile);
+        new ApkBuilder(apkDir, config).build(outFile);
     }
 
     private static void cmdInstallFramework(String[] args) throws AndrolibException {
         CommandLine cli = parseOptions(installFrameworkOptions, args);
         List<String> argList = cli.getArgList();
-        String apkName;
+        File apkFile;
         switch (argList.size()) {
             case 0:
                 System.err.println("Input apk file was not specified.");
                 System.exit(1);
                 return;
             case 1:
-                apkName = argList.get(0);
+                apkFile = new File(argList.get(0));
                 break;
             default:
                 System.err.println("Invalid arguments.");
@@ -631,13 +643,12 @@ public class Main {
             config.setFrameworkTag(cli.getOptionValue(frameFrameTagOption));
         }
 
-        new Framework(config).install(new File(apkName));
+        new Framework(config).install(apkFile);
     }
 
     private static void cmdCleanFrameworks(String[] args) throws AndrolibException {
         CommandLine cli = parseOptions(cleanFrameworksOptions, args);
-        List<String> argList = cli.getArgList();
-        if (!argList.isEmpty()) {
+        if (!cli.getArgList().isEmpty()) {
             System.err.println("Invalid arguments.");
             printUsage();
             System.exit(1);
@@ -663,8 +674,7 @@ public class Main {
 
     private static void cmdListFrameworks(String[] args) throws AndrolibException {
         CommandLine cli = parseOptions(listFrameworksOptions, args);
-        List<String> argList = cli.getArgList();
-        if (!argList.isEmpty()) {
+        if (!cli.getArgList().isEmpty()) {
             System.err.println("Invalid arguments.");
             printUsage();
             System.exit(1);
@@ -693,14 +703,14 @@ public class Main {
     private static void cmdPublicizeResources(String[] args) throws AndrolibException {
         CommandLine cli = parseOptions(publicizeResourcesOptions, args);
         List<String> argList = cli.getArgList();
-        String arscName;
+        File arscFile;
         switch (argList.size()) {
             case 0:
                 System.err.println("Input arsc file was not specified.");
                 System.exit(1);
                 return;
             case 1:
-                arscName = argList.get(0);
+                arscFile = new File(argList.get(0));
                 break;
             default:
                 System.err.println("Invalid arguments.");
@@ -709,7 +719,7 @@ public class Main {
                 return;
         }
 
-        new Framework(config).publicizeResources(new File(arscName));
+        new Framework(config).publicizeResources(arscFile);
     }
 
     private static void printOptionConflict(Option option, Option conflict) {

@@ -27,9 +27,9 @@ public class ApkInfoSerializationTest extends BaseTest {
 
     @Test
     public void checkApkInfoSerialization() throws Exception {
-        ApkInfo control = ApkInfo.load(getClass().getResourceAsStream("/meta/unknown_files.yml"));
+        ApkInfo control = ApkInfo.load(getClass().getResourceAsStream("/meta/serialization.yml"));
         check(control);
-        File testFile = new File(sTmpDir, "unknown_files.yml");
+        File testFile = new File(sTmpDir, "serialization.yml");
         control.save(testFile);
         ApkInfo test = ApkInfo.load(testFile);
         check(test);
@@ -47,11 +47,12 @@ public class ApkInfoSerializationTest extends BaseTest {
         assertEquals(1, apkInfo.getVersionInfo().getVersionCode());
         assertEquals("1.0", apkInfo.getVersionInfo().getVersionName());
         assertNotNull(apkInfo.getDoNotCompress());
-        assertEquals(5, apkInfo.getDoNotCompress().size());
+        assertEquals(6, apkInfo.getDoNotCompress().size());
         assertEquals("assets/0byte_file.jpg", apkInfo.getDoNotCompress().get(0));
         assertEquals("arsc", apkInfo.getDoNotCompress().get(1));
         assertEquals("png", apkInfo.getDoNotCompress().get(2));
         assertEquals("mp3", apkInfo.getDoNotCompress().get(3));
         assertEquals("stored.file", apkInfo.getDoNotCompress().get(4));
+        assertEquals("surrogate/pair/😊.test", apkInfo.getDoNotCompress().get(5));
     }
 }

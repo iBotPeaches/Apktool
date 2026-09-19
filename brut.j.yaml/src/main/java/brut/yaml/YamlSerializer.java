@@ -122,7 +122,7 @@ public class YamlSerializer implements Closeable {
         writeMap(key, map, val -> val ? "true" : "false");
     }
 
-    public <T> void writeSeq(String key, Collection<T> list, Function<T, String> mapper) throws IOException {
+    public <T> void writeSeq(String key, Collection<T> coll, Function<T, String> mapper) throws IOException {
         if (mClosed) {
             throw new IllegalStateException();
         }
@@ -130,7 +130,7 @@ public class YamlSerializer implements Closeable {
         mWriter.write(escapeKey(key));
         mWriter.write(':');
         mWriter.newLine();
-        for (T item : list) {
+        for (T item : coll) {
             writeIndent();
             mWriter.write("- ");
             mWriter.write(mapper.apply(item));
@@ -138,11 +138,11 @@ public class YamlSerializer implements Closeable {
         }
     }
 
-    public void writeStringSeq(String key, Collection<String> list) throws IOException {
-        writeSeq(key, list, val -> escapeValue(val));
+    public void writeStringSeq(String key, Collection<String> coll) throws IOException {
+        writeSeq(key, coll, val -> escapeValue(val));
     }
 
-    public void writeIntSeq(String key, Collection<Integer> list) throws IOException {
-        writeSeq(key, list, val -> val.toString());
+    public void writeIntSeq(String key, Collection<Integer> coll) throws IOException {
+        writeSeq(key, coll, val -> val.toString());
     }
 }

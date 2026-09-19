@@ -16,7 +16,6 @@
  */
 package brut.androlib.res.table.value;
 
-import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.data.FeatureFlag;
 import brut.androlib.res.table.ResEntry;
 import brut.androlib.res.xml.ResXmlUtils;
@@ -170,7 +169,7 @@ public class ResPrimitive extends ResItem {
     }
 
     @Override
-    public void serializeToValuesXml(XmlSerializer serial, ResEntry entry) throws AndrolibException, IOException {
+    public void serializeToValuesXml(XmlSerializer serial, ResEntry entry) throws IOException {
         String typeName = entry.getType().getName();
 
         // Serialize as an <item> tag when the resource type doesn't directly support this value's format.

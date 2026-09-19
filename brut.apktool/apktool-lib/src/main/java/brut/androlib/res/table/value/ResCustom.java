@@ -16,7 +16,6 @@
  */
 package brut.androlib.res.table.value;
 
-import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.res.data.FeatureFlag;
 import brut.androlib.res.table.ResEntry;
 import brut.androlib.res.xml.ResXmlUtils;
@@ -53,7 +52,7 @@ public class ResCustom extends ResValue implements ValuesXmlSerializable {
     }
 
     @Override
-    public void serializeToValuesXml(XmlSerializer serial, ResEntry entry) throws AndrolibException, IOException {
+    public void serializeToValuesXml(XmlSerializer serial, ResEntry entry) throws IOException {
         String tagName = mAsItem ? "item" : mType;
         serial.startTag(null, tagName);
         if (mAsItem) {
