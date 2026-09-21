@@ -32,106 +32,126 @@ public final class YamlUtils {
         if (len == 0) {
             return "\"\"";
         }
-        // Scan for characters that force quoting.
-        boolean quote = false;
-        for (int i = 0; i < len; i++) {
-            char ch = str.charAt(i);
-            // No-Break Space, Line Separator, and Paragraph Separator are printable but must be escaped.
-            if (ch == '\u00A0' || ch == '\u2028' || ch == '\u2029') {
-                quote = true;
-                break;
-            }
-            if (TextUtils.isPrintableChar(ch)) {
-                continue;
-            }
-            // Is this a high surrogate followed by a valid low surrogate?
-            if (Character.isHighSurrogate(ch) && i + 1 < len && Character.isLowSurrogate(str.charAt(i + 1))) {
-                i++;
-                continue;
-            }
-            // A non-printable character must be escaped.
-            quote = true;
-            break;
-        }
-        // If nothing forced quoting, return the string as-is.
-        if (!quote) {
-            return str;
-        }
-        // Quoting is needed: escape \, ", and non-printable characters.
-        StringBuilder sb = new StringBuilder(len * 2 + 2);
-        sb.append('"');
-        for (int i = 0; i < len; i++) {
-            char ch = str.charAt(i);
-            switch (ch) {
-                case '\\':
-                    sb.append("\\\\");
+        // If starts with a quote, quote the rest using the opposite quote character.
+        char ch = str.charAt(0);
+        char quote;
+        if (ch == '\'') {
+            quote = '"';
+        } else {
+            quote = ch == '"' ? '\'' : 0;
+            // Scan for characters that force double-quoting.
+            for (int i = 0; i < len; i++) {
+                ch = str.charAt(i);
+                // No-Break Space, Line Separator, and Paragraph Separator are printable but must be escaped.
+                if (ch == '\u00A0' || ch == '\u2028' || ch == '\u2029') {
+                    quote = '"';
+                    break;
+                }
+                if (TextUtils.isPrintableChar(ch)) {
                     continue;
-                case '"':
-                    sb.append("\\\"");
-                    continue;
-                case '\0': // Null
-                    sb.append("\\0");
-                    continue;
-                case '\u0007': // Bell
-                    sb.append("\\a");
-                    continue;
-                case '\b': // Backspace
-                    sb.append("\\b");
-                    continue;
-                case '\t': // Character Tabulation
-                    sb.append("\\t");
-                    continue;
-                case '\n': // Line Feed
-                    sb.append("\\n");
-                    continue;
-                case '\u000B': // Line Tabulation
-                    sb.append("\\v");
-                    continue;
-                case '\f': // Form Feed
-                    sb.append("\\f");
-                    continue;
-                case '\r': // Carriage Return
-                    sb.append("\\r");
-                    continue;
-                case '\u001B': // Escape
-                    sb.append("\\e");
-                    continue;
-                case '\u0085': // Next Line
-                    sb.append("\\N");
-                    continue;
-                case '\u00A0': // No-Break Space
-                    sb.append("\\_");
-                    continue;
-                case '\u2028': // Line Separator
-                    sb.append("\\L");
-                    continue;
-                case '\u2029': // Paragraph Separator
-                    sb.append("\\P");
-                    continue;
-            }
-            if (TextUtils.isPrintableChar(ch)) {
-                sb.append(ch);
-                continue;
-            }
-            // Is this a high surrogate followed by a valid low surrogate?
-            if (Character.isHighSurrogate(ch) && i + 1 < len) {
-                char low = str.charAt(i + 1);
-                if (Character.isLowSurrogate(low)) {
-                    sb.append(ch).append(low);
+                }
+                // Is this a high surrogate followed by a valid low surrogate?
+                if (Character.isHighSurrogate(ch) && i + 1 < len && Character.isLowSurrogate(str.charAt(i + 1))) {
                     i++;
                     continue;
                 }
-                // fallthrough
+                // A non-printable character must be escaped.
+                quote = '"';
+                break;
             }
-            // Java-style Unicode escape the non-printable character.
-            sb.append("\\u")
-                .append(Character.forDigit(ch >>> 12, 16))
-                .append(Character.forDigit(ch >>> 8 & 0xF, 16))
-                .append(Character.forDigit(ch >>> 4 & 0xF, 16))
-                .append(Character.forDigit(ch & 0xF, 16));
         }
-        sb.append('"');
-        return sb.toString();
+        if (quote == '"') {
+            // Double-quote: escape \, ", and non-printable characters.
+            StringBuilder sb = new StringBuilder(len * 2 + 2);
+            sb.append('"');
+            for (int i = 0; i < len; i++) {
+                ch = str.charAt(i);
+                switch (ch) {
+                    case '\\':
+                        sb.append("\\\\");
+                        continue;
+                    case '"':
+                        sb.append("\\\"");
+                        continue;
+                    case '\0': // Null
+                        sb.append("\\0");
+                        continue;
+                    case '\u0007': // Bell
+                        sb.append("\\a");
+                        continue;
+                    case '\b': // Backspace
+                        sb.append("\\b");
+                        continue;
+                    case '\t': // Character Tabulation
+                        sb.append("\\t");
+                        continue;
+                    case '\n': // Line Feed
+                        sb.append("\\n");
+                        continue;
+                    case '\u000B': // Line Tabulation
+                        sb.append("\\v");
+                        continue;
+                    case '\f': // Form Feed
+                        sb.append("\\f");
+                        continue;
+                    case '\r': // Carriage Return
+                        sb.append("\\r");
+                        continue;
+                    case '\u001B': // Escape
+                        sb.append("\\e");
+                        continue;
+                    case '\u0085': // Next Line
+                        sb.append("\\N");
+                        continue;
+                    case '\u00A0': // No-Break Space
+                        sb.append("\\_");
+                        continue;
+                    case '\u2028': // Line Separator
+                        sb.append("\\L");
+                        continue;
+                    case '\u2029': // Paragraph Separator
+                        sb.append("\\P");
+                        continue;
+                }
+                if (TextUtils.isPrintableChar(ch)) {
+                    sb.append(ch);
+                    continue;
+                }
+                // Is this a high surrogate followed by a valid low surrogate?
+                if (Character.isHighSurrogate(ch) && i + 1 < len) {
+                    char low = str.charAt(i + 1);
+                    if (Character.isLowSurrogate(low)) {
+                        sb.append(ch).append(low);
+                        i++;
+                        continue;
+                    }
+                    // fallthrough
+                }
+                // Java-style Unicode escape the non-printable character.
+                sb.append("\\u")
+                    .append(Character.forDigit(ch >>> 12, 16))
+                    .append(Character.forDigit(ch >>> 8 & 0xF, 16))
+                    .append(Character.forDigit(ch >>> 4 & 0xF, 16))
+                    .append(Character.forDigit(ch & 0xF, 16));
+            }
+            sb.append('"');
+            str = sb.toString();
+        } else if (quote == '\'') {
+            // Single-quote: escape ' by doubling it.
+            StringBuilder sb = new StringBuilder(len * 2 + 2);
+            sb.append('\'');
+            for (int i = 0; i < len; i++) {
+                ch = str.charAt(i);
+                if (ch == '\'') {
+                    sb.append("''");
+                } else {
+                    sb.append(ch);
+                }
+            }
+            sb.append('\'');
+            str = sb.toString();
+        }
+        return str;
     }
 
     public static String unescapeString(String str) {

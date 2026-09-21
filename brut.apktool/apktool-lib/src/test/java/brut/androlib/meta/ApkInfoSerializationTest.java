@@ -47,12 +47,16 @@ public class ApkInfoSerializationTest extends BaseTest {
         assertEquals(1, apkInfo.getVersionInfo().getVersionCode());
         assertEquals("1.0", apkInfo.getVersionInfo().getVersionName());
         assertNotNull(apkInfo.getDoNotCompress());
-        assertEquals(6, apkInfo.getDoNotCompress().size());
+        assertEquals(10, apkInfo.getDoNotCompress().size());
         assertEquals("assets/0byte_file.jpg", apkInfo.getDoNotCompress().get(0));
         assertEquals("arsc", apkInfo.getDoNotCompress().get(1));
         assertEquals("png", apkInfo.getDoNotCompress().get(2));
         assertEquals("mp3", apkInfo.getDoNotCompress().get(3));
         assertEquals("stored.file", apkInfo.getDoNotCompress().get(4));
         assertEquals("surrogate/pair/😊.test", apkInfo.getDoNotCompress().get(5));
+        assertEquals("'double-quoted", apkInfo.getDoNotCompress().get(6));
+        assertEquals("\"single-quoted", apkInfo.getDoNotCompress().get(7));
+        assertEquals("\\\"single-quoted-with-\\tab", apkInfo.getDoNotCompress().get(8));
+        assertEquals("\"double-quoted-with-\tab", apkInfo.getDoNotCompress().get(9));
     }
 }
