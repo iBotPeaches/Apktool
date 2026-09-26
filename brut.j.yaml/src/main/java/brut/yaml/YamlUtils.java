@@ -24,7 +24,7 @@ public final class YamlUtils {
         // Private constructor for utility class.
     }
 
-    public static String escapeString(String str) {
+    public static String encodeString(String str) {
         if (str == null) {
             return null;
         }
@@ -150,7 +150,7 @@ public final class YamlUtils {
         return str;
     }
 
-    public static String unescapeString(String str) {
+    public static String decodeString(String str) {
         if (str == null) {
             return null;
         }

@@ -41,15 +41,15 @@ public class YamlSerializer implements Closeable {
         mClosed = true;
     }
 
-    private static String escapeKey(String key) {
+    private static String encodeKey(String key) {
         if (key == null) {
             throw new IllegalArgumentException("Key is null.");
         }
-        return YamlUtils.escapeString(key);
+        return YamlUtils.encodeString(key);
     }
 
-    private static String escapeValue(String value) {
-        return value != null ? YamlUtils.escapeString(value) : "null";
+    private static String encodeValue(String value) {
+        return value != null ? YamlUtils.encodeString(value) : "null";
     }
 
     private void writeIndent() throws IOException {
@@ -63,14 +63,14 @@ public class YamlSerializer implements Closeable {
             throw new IllegalStateException();
         }
         writeIndent();
-        mWriter.write(escapeKey(key));
+        mWriter.write(encodeKey(key));
         mWriter.write(": ");
         mWriter.write(mapper.apply(value));
         mWriter.newLine();
     }
 
     public void writeString(String key, String value) throws IOException {
-        writeEntry(key, value, val -> escapeValue(val));
+        writeEntry(key, value, val -> encodeValue(val));
     }
 
     public void writeInt(String key, int value) throws IOException {
@@ -90,7 +90,7 @@ public class YamlSerializer implements Closeable {
             throw new IllegalStateException();
         }
         writeIndent();
-        mWriter.write(escapeKey(key));
+        mWriter.write(encodeKey(key));
         mWriter.write(':');
         mWriter.newLine();
         mDepth++;
@@ -111,7 +111,7 @@ public class YamlSerializer implements Closeable {
     }
 
     public void writeStringMap(String key, Map<String, String> map) throws IOException {
-        writeMap(key, map, val -> escapeValue(val));
+        writeMap(key, map, val -> encodeValue(val));
     }
 
     public void writeIntMap(String key, Map<String, Integer> map) throws IOException {
@@ -127,7 +127,7 @@ public class YamlSerializer implements Closeable {
             throw new IllegalStateException();
         }
         writeIndent();
-        mWriter.write(escapeKey(key));
+        mWriter.write(encodeKey(key));
         mWriter.write(':');
         mWriter.newLine();
         for (T item : coll) {
@@ -139,7 +139,7 @@ public class YamlSerializer implements Closeable {
     }
 
     public void writeStringSeq(String key, Collection<String> coll) throws IOException {
-        writeSeq(key, coll, val -> escapeValue(val));
+        writeSeq(key, coll, val -> encodeValue(val));
     }
 
     public void writeIntSeq(String key, Collection<Integer> coll) throws IOException {

@@ -217,7 +217,7 @@ public class YamlPullParser implements Closeable {
         if (mClosed || mCurrent == null || (key = mCurrent.key) == null) {
             throw new IllegalStateException();
         }
-        return YamlUtils.unescapeString(key);
+        return YamlUtils.decodeString(key);
     }
 
     public String getString() {
@@ -228,7 +228,7 @@ public class YamlPullParser implements Closeable {
         if (value == null || value.equals("null")) {
             return null;
         }
-        return YamlUtils.unescapeString(value);
+        return YamlUtils.decodeString(value);
     }
 
     public int getInt() {
