@@ -15,7 +15,9 @@ doNotCompress:
 - mp3
 - stored.file
 - surrogate/pair/😊.test
-- "'double-quoted"
+- '''single-quoted'
 - '"single-quoted'
+- ' single-quoted'
+- 'single-quoted '
 - '\"single-quoted-with-\tab'
 - "\"double-quoted-with-\tab"

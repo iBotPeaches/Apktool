@@ -45,11 +45,11 @@ public class YamlSerializer implements Closeable {
         if (key == null) {
             throw new IllegalArgumentException("Key is null.");
         }
-        return YamlUtils.escapeString(key.trim());
+        return YamlUtils.escapeString(key);
     }
 
     private static String escapeValue(String value) {
-        return value != null ? YamlUtils.escapeString(value.trim()) : "null";
+        return value != null ? YamlUtils.escapeString(value) : "null";
     }
 
     private void writeIndent() throws IOException {

@@ -30,37 +30,47 @@ public final class YamlUtils {
         }
         int len = str.length();
         if (len == 0) {
-            return "\"\"";
+            return "''";
         }
-        // If starts with a quote, quote the rest using the opposite quote character.
+        // If the string starts with a quote or has leading/trailing whitespace, it must be quoted.
         char ch = str.charAt(0);
-        char quote;
-        if (ch == '\'') {
-            quote = '"';
-        } else {
-            quote = ch == '"' ? '\'' : 0;
-            // Scan for characters that force double-quoting.
-            for (int i = 0; i < len; i++) {
-                ch = str.charAt(i);
-                // No-Break Space, Line Separator, and Paragraph Separator are printable but must be escaped.
-                if (ch == '\u00A0' || ch == '\u2028' || ch == '\u2029') {
-                    quote = '"';
-                    break;
-                }
-                if (TextUtils.isPrintableChar(ch)) {
-                    continue;
-                }
-                // Is this a high surrogate followed by a valid low surrogate?
-                if (Character.isHighSurrogate(ch) && i + 1 < len && Character.isLowSurrogate(str.charAt(i + 1))) {
-                    i++;
-                    continue;
-                }
-                // A non-printable character must be escaped.
+        char quote = (ch == '\'' || ch == '"' || Character.isWhitespace(ch)
+            || (len > 1 && Character.isWhitespace(str.charAt(len - 1)))) ? '\'' : 0;
+        // Scan for characters that force double-quoting.
+        for (int i = 0; i < len; i++) {
+            ch = str.charAt(i);
+            // No-Break Space, Line Separator, and Paragraph Separator are printable but must be escaped.
+            if (ch == '\u00A0' || ch == '\u2028' || ch == '\u2029') {
                 quote = '"';
                 break;
             }
+            if (TextUtils.isPrintableChar(ch)) {
+                continue;
+            }
+            // Is this a high surrogate followed by a valid low surrogate?
+            if (Character.isHighSurrogate(ch) && i + 1 < len && Character.isLowSurrogate(str.charAt(i + 1))) {
+                i++;
+                continue;
+            }
+            // A non-printable character must be escaped.
+            quote = '"';
+            break;
         }
-        if (quote == '"') {
+        if (quote == '\'') {
+            // Single-quote: escape ' by doubling it.
+            StringBuilder sb = new StringBuilder(len * 2 + 2);
+            sb.append('\'');
+            for (int i = 0; i < len; i++) {
+                ch = str.charAt(i);
+                if (ch == '\'') {
+                    sb.append("''");
+                } else {
+                    sb.append(ch);
+                }
+            }
+            sb.append('\'');
+            str = sb.toString();
+        } else if (quote == '"') {
             // Double-quote: escape \, ", and non-printable characters.
             StringBuilder sb = new StringBuilder(len * 2 + 2);
             sb.append('"');
@@ -135,20 +145,6 @@ public final class YamlUtils {
                     .append(Character.forDigit(ch & 0xF, 16));
             }
             sb.append('"');
-            str = sb.toString();
-        } else if (quote == '\'') {
-            // Single-quote: escape ' by doubling it.
-            StringBuilder sb = new StringBuilder(len * 2 + 2);
-            sb.append('\'');
-            for (int i = 0; i < len; i++) {
-                ch = str.charAt(i);
-                if (ch == '\'') {
-                    sb.append("''");
-                } else {
-                    sb.append(ch);
-                }
-            }
-            sb.append('\'');
             str = sb.toString();
         }
         return str;
