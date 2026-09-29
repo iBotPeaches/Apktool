@@ -16,6 +16,8 @@
  */
 package brut.directory;
 
+import brut.zip.RepairingZipFile;
+
 import java.io.File;
 import java.io.InputStream;
 import java.io.IOException;
@@ -43,7 +45,7 @@ public class ZipRODirectory extends Directory {
 
     public ZipRODirectory(File file, String path) throws DirectoryException {
         try {
-            mZipFile = new ZipFile(file);
+            mZipFile = new RepairingZipFile(file);
         } catch (IOException ex) {
             throw new DirectoryException(ex);
         }
