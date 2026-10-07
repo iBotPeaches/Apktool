@@ -16,7 +16,8 @@
  */
 package brut.androlib;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -25,14 +26,14 @@ public class AndroidOreoSparseTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        sTestOrigDir = new File(sTmpDir, "issue1594-orig");
-        sTestNewDir = new File(sTmpDir, "issue1594-new");
+        sTestOrigDir = sTmpDir.resolve("issue1594-orig");
+        sTestNewDir = sTmpDir.resolve("issue1594-new");
 
         log("Unpacking sparse.apk...");
         copyResourceDir(AndroidOreoSparseTest.class, "issue1594", sTestOrigDir);
 
         log("Decoding sparse.apk...");
-        File testApk = new File(sTestOrigDir, "sparse.apk");
+        Path testApk = sTestOrigDir.resolve("sparse.apk");
         new ApkDecoder(testApk, sConfig).decode(sTestNewDir);
 
         log("Building sparse.apk...");
@@ -41,12 +42,12 @@ public class AndroidOreoSparseTest extends BaseTest {
 
     @Test
     public void buildAndDecodeTest() {
-        assertTrue(sTestNewDir.isDirectory());
-        assertTrue(sTestOrigDir.isDirectory());
+        assertTrue(Files.isDirectory(sTestNewDir));
+        assertTrue(Files.isDirectory(sTestOrigDir));
     }
 
     @Test
     public void ensureStringsOreoTest() {
-        assertTrue(new File(sTestNewDir, "res/values-v26/strings.xml").isFile());
+        assertTrue(Files.isRegularFile(sTestNewDir.resolve("res/values-v26/strings.xml")));
     }
 }

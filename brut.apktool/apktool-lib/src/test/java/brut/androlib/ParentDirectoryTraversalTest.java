@@ -16,13 +16,13 @@
  */
 package brut.androlib;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.*;
 import static org.junit.Assert.*;
 
 public class ParentDirectoryTraversalTest extends BaseTest {
-    private static final String apk = "issue1498.apk";
+    private static final String TEST_APK = "issue1498.apk";
 
     @BeforeClass
     public static void beforeClass() throws Exception {
@@ -33,8 +33,8 @@ public class ParentDirectoryTraversalTest extends BaseTest {
     public void checkIfDrawableFileDecodesProperly() throws Exception {
         sConfig.setDecodeResources(Config.DecodeResources.NONE);
 
-        File testApk = new File(sTmpDir, apk);
-        File testDir = new File(testApk + ".out");
+        Path testApk = sTmpDir.resolve(TEST_APK);
+        Path testDir = sTmpDir.resolve(testApk.getFileName() + ".out");
         new ApkDecoder(testApk, sConfig).decode(testDir);
     }
 }

@@ -16,28 +16,29 @@
  */
 package brut.androlib;
 
+import brut.androlib.ApkFile;
 import brut.androlib.meta.ApkInfo;
-import brut.directory.ExtFile;
-import brut.util.OSDetection;
+import brut.util.SystemUtils;
 import brut.xml.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.junit.*;
 import static org.junit.Assert.*;
 import static org.junit.Assume.assumeTrue;
 
 public class BuildAndDecodeApkTest extends BaseTest {
-    private static ExtFile sTestApk;
+    private static ApkFile sTestApk;
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        sTestOrigDir = new File(sTmpDir, "testapp-orig");
-        sTestNewDir = new File(sTmpDir, "testapp-new");
+        sTestOrigDir = sTmpDir.resolve("testapp-orig");
+        sTestNewDir = sTmpDir.resolve("testapp-new");
 
         log("Unpacking testapp...");
         copyResourceDir(BuildAndDecodeApkTest.class, "testapp", sTestOrigDir);
@@ -45,11 +46,13 @@ public class BuildAndDecodeApkTest extends BaseTest {
         sConfig.setVerbose(true);
 
         log("Building testapp.apk...");
-        sTestApk = new ExtFile(sTmpDir, "testapp.apk");
-        new ApkBuilder(sTestOrigDir, sConfig).build(sTestApk);
+        Path apkFile = sTmpDir.resolve("testapp.apk");
+        new ApkBuilder(sTestOrigDir, sConfig).build(apkFile);
 
         log("Decoding testapp.apk...");
-        new ApkDecoder(sTestApk, sConfig).decode(sTestNewDir);
+        new ApkDecoder(apkFile, sConfig).decode(sTestNewDir);
+
+        sTestApk = new ApkFile(apkFile);
     }
 
     @AfterClass
@@ -59,25 +62,25 @@ public class BuildAndDecodeApkTest extends BaseTest {
 
     @Test
     public void buildAndDecodeTest() {
-        assertTrue(sTestNewDir.isDirectory());
+        assertTrue(Files.isDirectory(sTestNewDir));
     }
 
     @Test
     public void confirmFeatureFlagsRecorded() throws Exception {
-        ApkInfo testInfo = ApkInfo.load(new File(sTestNewDir, "apktool.yml"));
+        ApkInfo testInfo = ApkInfo.load(sTestNewDir.resolve("apktool.yml"));
         assertTrue(testInfo.getFeatureFlags().contains("brut.feature.permission"));
         assertTrue(testInfo.getFeatureFlags().contains("brut.feature.activity"));
     }
 
     @Test
     public void confirmZeroByteFileExtensionIsNotStored() throws Exception {
-        ApkInfo testInfo = ApkInfo.load(new File(sTestNewDir, "apktool.yml"));
+        ApkInfo testInfo = ApkInfo.load(sTestNewDir.resolve("apktool.yml"));
         assertFalse(testInfo.getDoNotCompress().contains("jpg"));
     }
 
     @Test
     public void confirmZeroByteFileIsStored() throws Exception {
-        ApkInfo testInfo = ApkInfo.load(new File(sTestNewDir, "apktool.yml"));
+        ApkInfo testInfo = ApkInfo.load(sTestNewDir.resolve("apktool.yml"));
         assertTrue(testInfo.getDoNotCompress().contains("assets/0byte_file.jpg"));
     }
 
@@ -88,7 +91,7 @@ public class BuildAndDecodeApkTest extends BaseTest {
 
     @Test
     public void confirmPlatformManifestValuesTest() throws Exception {
-        Document doc = XmlUtils.loadDocument(new File(sTestNewDir, "AndroidManifest.xml"));
+        Document doc = XmlUtils.loadDocument(sTestNewDir.resolve("AndroidManifest.xml"));
 
         String platformBuildVersionNameExpr = "/manifest/@platformBuildVersionName";
         String platformBuildVersionNameValue = XmlUtils.evaluateXPath(doc, platformBuildVersionNameExpr, String.class);
@@ -193,7 +196,7 @@ public class BuildAndDecodeApkTest extends BaseTest {
 
     @Test
     public void valuesMaxLengthTest() throws Exception {
-        Document doc = XmlUtils.loadDocument(new File(sTestNewDir, "res/values-en/strings.xml"));
+        Document doc = XmlUtils.loadDocument(sTestNewDir.resolve("res/values-en/strings.xml"));
 
         // long_string_32767 should be exactly 0x7FFF chars of "a",
         // which is the longest allowed length for UTF-8 strings.
@@ -283,7 +286,7 @@ public class BuildAndDecodeApkTest extends BaseTest {
 
     @Test
     public void twoLetterNotHandledAsBcpTest() {
-        assertTrue(new File(sTestNewDir, "res/values-fr").isDirectory());
+        assertTrue(Files.isDirectory(sTestNewDir.resolve("res/values-fr")));
     }
 
     @Test
@@ -347,16 +350,16 @@ public class BuildAndDecodeApkTest extends BaseTest {
 
     @Test
     public void fontTest() throws Exception {
-        File fontXml = new File(sTestNewDir, "res/font/lobster.xml");
-        File fontFile = new File(sTestNewDir, "res/font/lobster_regular.otf");
+        Path fontXml = sTestNewDir.resolve("res/font/lobster.xml");
+        Path fontFile = sTestNewDir.resolve("res/font/lobster_regular.otf");
 
         // Per #1662, ensure font file is not encoded.
-        assertTrue(fontXml.isFile());
+        assertTrue(Files.isRegularFile(fontXml));
         compareXmlFiles("res/font/lobster.xml");
 
         // If we properly skipped decoding the font (otf) file, this file should not exist
-        assertFalse(new File(sTestNewDir, "res/values/fonts.xml").isFile());
-        assertTrue(fontFile.isFile());
+        assertFalse(Files.isRegularFile(sTestNewDir.resolve("res/values/fonts.xml")));
+        assertTrue(Files.isRegularFile(fontFile));
     }
 
     @Test
@@ -448,11 +451,11 @@ public class BuildAndDecodeApkTest extends BaseTest {
     public void ninePatchImageColorTest() throws Exception {
         String fileName = "res/drawable-xhdpi/ninepatch.9.png";
 
-        File control = new File(sTestOrigDir, fileName);
-        File test = new File(sTestNewDir, fileName);
+        Path control = sTestOrigDir.resolve(fileName);
+        Path test = sTestNewDir.resolve(fileName);
 
-        BufferedImage controlImage = ImageIO.read(control);
-        BufferedImage testImage = ImageIO.read(test);
+        BufferedImage controlImage = ImageIO.read(control.toFile());
+        BufferedImage testImage = ImageIO.read(test.toFile());
 
         // lets start with 0,0 - empty
         assertEquals(controlImage.getRGB(0, 0), testImage.getRGB(0, 0));
@@ -468,11 +471,11 @@ public class BuildAndDecodeApkTest extends BaseTest {
     public void issue1508Test() throws Exception {
         String fileName = "res/drawable-xhdpi/btn_zoom_up_normal.9.png";
 
-        File control = new File(sTestOrigDir, fileName);
-        File test = new File(sTestNewDir, fileName);
+        Path control = sTestOrigDir.resolve(fileName);
+        Path test = sTestNewDir.resolve(fileName);
 
-        BufferedImage controlImage = ImageIO.read(control);
-        BufferedImage testImage = ImageIO.read(test);
+        BufferedImage controlImage = ImageIO.read(control.toFile());
+        BufferedImage testImage = ImageIO.read(test.toFile());
 
         // 0, 0 = clear
         assertEquals(controlImage.getRGB(0, 0), testImage.getRGB(0, 0));
@@ -488,11 +491,11 @@ public class BuildAndDecodeApkTest extends BaseTest {
     public void issue1511Test() throws Exception {
         String fileName = "res/drawable-xxhdpi/textfield_activated_holo_dark.9.png";
 
-        File control = new File(sTestOrigDir, fileName);
-        File test = new File(sTestNewDir, fileName);
+        Path control = sTestOrigDir.resolve(fileName);
+        Path test = sTestNewDir.resolve(fileName);
 
-        BufferedImage controlImage = ImageIO.read(control);
-        BufferedImage testImage = ImageIO.read(test);
+        BufferedImage controlImage = ImageIO.read(control.toFile());
+        BufferedImage testImage = ImageIO.read(test.toFile());
 
         // Check entire image as we cannot mess this up
         int w = controlImage.getWidth();
@@ -519,11 +522,11 @@ public class BuildAndDecodeApkTest extends BaseTest {
         for (String ninePatch : ninePatches) {
             String fileName = "res/drawable-xxhdpi/" + ninePatch;
 
-            File control = new File(sTestOrigDir, fileName);
-            File test = new File(sTestNewDir, fileName);
+            Path control = sTestOrigDir.resolve(fileName);
+            Path test = sTestNewDir.resolve(fileName);
 
-            BufferedImage controlImage = ImageIO.read(control);
-            BufferedImage testImage = ImageIO.read(test);
+            BufferedImage controlImage = ImageIO.read(control.toFile());
+            BufferedImage testImage = ImageIO.read(test.toFile());
 
             int w = controlImage.getWidth();
             int h = controlImage.getHeight();
@@ -576,7 +579,7 @@ public class BuildAndDecodeApkTest extends BaseTest {
 
     @Test
     public void storedMp3FilesAreNotCompressedTest() throws Exception {
-        assertEquals(0, sTestApk.getDirectory().getCompressionLevel("res/raw/rain.mp3"));
+        assertEquals(0, sTestApk.getFile("res/raw/rain.mp3").getMethod());
     }
 
     @Test
@@ -591,7 +594,7 @@ public class BuildAndDecodeApkTest extends BaseTest {
 
     @Test
     public void unicodeAssetTest() throws Exception {
-        assumeTrue(!OSDetection.isWindows());
+        assumeTrue(!SystemUtils.isWindows());
         compareBinaryFolder("assets/unicode-txt");
     }
 
@@ -604,13 +607,13 @@ public class BuildAndDecodeApkTest extends BaseTest {
     public void multipleDexTest() throws Exception {
         compareBinaryFolder("smali_classes2");
         compareBinaryFolder("smali_classes3");
-        assertTrue(new File(sTestOrigDir, "build/apk/classes2.dex").isFile());
-        assertTrue(new File(sTestOrigDir, "build/apk/classes3.dex").isFile());
+        assertTrue(Files.isRegularFile(sTestOrigDir.resolve("build/apk/classes2.dex")));
+        assertTrue(Files.isRegularFile(sTestOrigDir.resolve("build/apk/classes3.dex")));
     }
 
     @Test
     public void singleDexTest() throws Exception {
         compareBinaryFolder("smali");
-        assertTrue(new File(sTestOrigDir, "build/apk/classes.dex").isFile());
+        assertTrue(Files.isRegularFile(sTestOrigDir.resolve("build/apk/classes.dex")));
     }
 }

@@ -34,6 +34,7 @@ public class YamlPullParser implements Closeable {
     private int mPosition;
     private Entry mCurrent;
     private Entry mLookahead;
+    private boolean mEnded;
     private boolean mClosed;
 
     public YamlPullParser(InputStream in) {
@@ -44,12 +45,14 @@ public class YamlPullParser implements Closeable {
 
     @Override
     public void close() throws IOException {
-        mReader.close();
-        mClosed = true;
+        if (!mClosed) {
+            mReader.close();
+            mClosed = true;
+        }
     }
 
     private boolean nextLine() throws IOException {
-        if (mClosed) {
+        if (mEnded) {
             return false;
         }
         if (mLookahead != null) {
@@ -208,20 +211,20 @@ public class YamlPullParser implements Closeable {
             mCurrent = new Entry(depth, key, value);
             return true;
         }
-        mClosed = true;
+        mEnded = true;
         return false;
     }
 
     public String getKey() {
         String key;
-        if (mClosed || mCurrent == null || (key = mCurrent.key) == null) {
+        if (mClosed || mEnded || mCurrent == null || (key = mCurrent.key) == null) {
             throw new IllegalStateException();
         }
         return YamlUtils.decodeString(key);
     }
 
     public String getString() {
-        if (mClosed || mCurrent == null) {
+        if (mClosed || mEnded || mCurrent == null) {
             throw new IllegalStateException();
         }
         String value = mCurrent.value;
@@ -232,7 +235,7 @@ public class YamlPullParser implements Closeable {
     }
 
     public int getInt() {
-        if (mClosed || mCurrent == null) {
+        if (mClosed || mEnded || mCurrent == null) {
             throw new IllegalStateException();
         }
         String value = mCurrent.value;
@@ -246,7 +249,7 @@ public class YamlPullParser implements Closeable {
     }
 
     public boolean getBool() {
-        if (mClosed || mCurrent == null) {
+        if (mClosed || mEnded || mCurrent == null) {
             throw new IllegalStateException();
         }
         String value = mCurrent.value;
@@ -266,7 +269,7 @@ public class YamlPullParser implements Closeable {
     }
 
     private <T> void readObject(T obj, Consumer<T> consumer) throws IOException {
-        if (mClosed || (mCurrent != null && mCurrent.key == null)) {
+        if (mClosed || mEnded || (mCurrent != null && mCurrent.key == null)) {
             throw new IllegalStateException();
         }
         int blockDepth = mDepth + 1;
@@ -292,9 +295,7 @@ public class YamlPullParser implements Closeable {
     }
 
     private <T> void readMap(Map<String, T> map, Function<YamlPullParser, T> mapper) throws IOException {
-        readObject(map, (obj, parser) -> {
-            obj.put(parser.mCurrent.key, mapper.apply(parser));
-        });
+        readObject(map, (obj, parser) -> obj.put(parser.mCurrent.key, mapper.apply(parser)));
     }
 
     public void readStringMap(Map<String, String> map) throws IOException {
@@ -310,7 +311,7 @@ public class YamlPullParser implements Closeable {
     }
 
     private <T> void readSeq(Collection<T> coll, Function<YamlPullParser, T> mapper) throws IOException {
-        if (mClosed || mCurrent == null || mCurrent.key == null) {
+        if (mClosed || mEnded || mCurrent == null || mCurrent.key == null) {
             throw new IllegalStateException();
         }
         int blockDepth = mDepth + 1;

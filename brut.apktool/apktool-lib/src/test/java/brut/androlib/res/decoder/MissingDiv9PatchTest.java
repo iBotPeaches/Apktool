@@ -24,8 +24,8 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.io.File;
 import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -39,10 +39,10 @@ public class MissingDiv9PatchTest extends BaseTest {
 
     @Test
     public void assertMissingDivAdded() throws Exception {
-        File file = new File(sTmpDir, "pip_dismiss_scrim.9.png");
+        Path file = sTmpDir.resolve("pip_dismiss_scrim.9.png");
         byte[] data;
 
-        try (InputStream in = Files.newInputStream(file.toPath())) {
+        try (InputStream in = Files.newInputStream(file)) {
             ResNinePatchStreamDecoder decoder = new ResNinePatchStreamDecoder();
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             decoder.decode(in, out);

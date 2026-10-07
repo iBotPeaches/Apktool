@@ -18,7 +18,7 @@ package brut.androlib;
 
 import brut.androlib.meta.ApkInfo;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -36,8 +36,8 @@ public class SparseFlagTest extends BaseTest {
         sConfig.setFrameworkTag("issue-3298");
 
         log("Decoding sparse.apk...");
-        File testApk = new File(sTmpDir, "sparse.apk");
-        File testDir = new File(testApk + ".out");
+        Path testApk = sTmpDir.resolve("sparse.apk");
+        Path testDir = sTmpDir.resolve(testApk.getFileName() + ".out");
         ApkDecoder apkDecoder = new ApkDecoder(testApk, sConfig);
         apkDecoder.decode(testDir);
         ApkInfo apkInfo = apkDecoder.getApkInfo();
@@ -53,8 +53,8 @@ public class SparseFlagTest extends BaseTest {
         sConfig.setFrameworkTag("issue-3298");
 
         log("Decoding not-sparse.apk...");
-        File testApk = new File(sTmpDir, "not-sparse.apk");
-        File testDir = new File(testApk + ".out");
+        Path testApk = sTmpDir.resolve("not-sparse.apk");
+        Path testDir = sTmpDir.resolve(testApk.getFileName() + ".out");
         ApkDecoder apkDecoder = new ApkDecoder(testApk, sConfig);
         apkDecoder.decode(testDir);
         ApkInfo apkInfo = apkDecoder.getApkInfo();

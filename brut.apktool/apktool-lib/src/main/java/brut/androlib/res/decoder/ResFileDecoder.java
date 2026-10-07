@@ -16,6 +16,7 @@
  */
 package brut.androlib.res.decoder;
 
+import brut.androlib.ApkFile;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.exceptions.NinePatchNotFoundException;
 import brut.androlib.exceptions.RawXmlEncounteredException;
@@ -24,13 +25,14 @@ import brut.androlib.res.table.value.ResFileReference;
 import brut.androlib.res.table.value.ResPrimitive;
 import brut.androlib.res.table.value.ResString;
 import brut.common.Log;
-import brut.directory.Directory;
-import brut.directory.DirectoryException;
-import org.apache.commons.io.FilenameUtils;
+import brut.util.IOUtils;
 
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Locale;
 import java.util.Map;
 
 public class ResFileDecoder {
@@ -38,24 +40,27 @@ public class ResFileDecoder {
 
     public enum Type { UNKNOWN, BINARY_XML, PNG_9PATCH }
 
+    private final ApkFile mApkFile;
     private final Map<Type, ResStreamDecoder> mDecoders;
 
-    public ResFileDecoder(Map<Type, ResStreamDecoder> decoders) {
+    public ResFileDecoder(ApkFile apkFile, Map<Type, ResStreamDecoder> decoders) {
+        mApkFile = apkFile;
         mDecoders = decoders;
     }
 
-    public void decode(ResEntry entry, Directory inDir, Directory outDir, Map<String, String> resFileMap) {
-        String inFileName = ((ResFileReference) entry.getValue()).getPath();
+    public void decode(ResEntry entry, Path outDir, Map<String, String> resFileMap) throws AndrolibException {
+        String fileName = ((ResFileReference) entry.getValue()).getPath();
 
         // Some apps have string values where they shouldn't be.
         // We assumed that they are file references, but if no such file then fall back to a string value.
-        if (!inDir.containsFile(inFileName)) {
-            entry.setValue(new ResString(inFileName));
+        if (!mApkFile.containsFile(fileName)) {
+            entry.setValue(new ResString(fileName));
             return;
         }
 
         // Get input file extension.
-        String ext = inFileName.endsWith(".9.png") ? "9.png" : FilenameUtils.getExtension(inFileName).toLowerCase();
+        String ext = fileName.endsWith(".9.png") ? "9.png"
+            : IOUtils.getFileExtension(fileName).toLowerCase(Locale.ROOT);
 
         // Use aapt2-like logic to determine which decoder to use.
         // TODO: Determine by magic bytes and fill in stripped extensions?
@@ -77,53 +82,55 @@ public class ResFileDecoder {
                            + "/" + entry.getName() + (ext.isEmpty() ? "" : "." + ext);
 
         // Map input file name to output file name.
-        resFileMap.put(inFileName, outFileName);
+        resFileMap.put(fileName, outFileName);
 
-        Log.d(TAG, "Decoding file " + inFileName + " to " + outFileName);
-
+        Log.d(TAG, "Decoding file " + fileName + " to " + outFileName);
         try {
+            Path outFile = outDir.resolve(outFileName);
+
             if (type != Type.UNKNOWN) {
                 try {
-                    decode(type, inDir, inFileName, outDir, outFileName);
+                    decode(type, fileName, outFile);
                     return;
                 } catch (RawXmlEncounteredException ignored) {
                     // Assume the file is a raw XML.
-                    Log.d(TAG, "Could not decode binary XML file: " + inFileName);
+                    Log.d(TAG, "Could not decode binary XML file: " + fileName);
                 } catch (NinePatchNotFoundException ignored) {
                     // Assume the file is a raw PNG.
                     // Some apps contain unprocessed dummy 3x3 9-patch PNGs.
                     // Extract them as-is, let aapt2 process them properly later.
-                    Log.d(TAG, "Could not find 9-patch chunk in file: " + inFileName);
+                    Log.d(TAG, "Could not find 9-patch chunk in file: " + fileName);
                 }
             }
 
-            decode(Type.UNKNOWN, inDir, inFileName, outDir, outFileName);
-        } catch (AndrolibException ignored) {
-            Log.w(TAG, "Could not decode file, replacing by NULL value: " + inFileName);
+            decode(Type.UNKNOWN, fileName, outFile);
+        } catch (AndrolibException | IOException ignored) {
+            Log.w(TAG, "Could not decode file, replacing with NULL value: " + fileName);
             entry.setValue(ResPrimitive.NULL);
         }
     }
 
-    private void decode(Type type, Directory inDir, String inFileName, Directory outDir, String outFileName)
-            throws AndrolibException {
+    private void decode(Type type, String fileName, Path outFile) throws AndrolibException, IOException {
         ResStreamDecoder decoder = mDecoders.get(type);
         if (decoder == null) {
-            throw new IllegalStateException("Undefined decoder for type: " + type);
+            throw new IllegalStateException("Undefined decoder for file type: " + type);
         }
 
-        boolean success = false;
+        if (!Files.deleteIfExists(outFile)) {
+            IOUtils.createParentDirectories(outFile);
+        }
         try (
-            InputStream in = inDir.getFileInput(inFileName);
-            OutputStream out = outDir.getFileOutput(outFileName)
+            InputStream in = mApkFile.getFile(fileName).getInputStream();
+            OutputStream out = Files.newOutputStream(outFile)
         ) {
             decoder.decode(in, out);
-            success = true;
-        } catch (DirectoryException | IOException ex) {
-            throw new AndrolibException(ex);
-        } finally {
-            if (!success) {
-                outDir.removeFile(outFileName);
+        } catch (AndrolibException | IOException ex) {
+            try {
+                Files.deleteIfExists(outFile);
+            } catch (IOException suppressed) {
+                ex.addSuppressed(suppressed);
             }
+            throw ex;
         }
     }
 }

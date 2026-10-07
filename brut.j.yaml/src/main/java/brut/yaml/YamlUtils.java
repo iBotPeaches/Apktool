@@ -20,9 +20,7 @@ import brut.util.TextUtils;
 
 public final class YamlUtils {
 
-    private YamlUtils() {
-        // Private constructor for utility class.
-    }
+    private YamlUtils() {}
 
     public static String encodeString(String str) {
         if (str == null) {

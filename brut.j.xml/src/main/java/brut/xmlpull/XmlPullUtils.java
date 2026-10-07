@@ -16,30 +16,29 @@
  */
 package brut.xmlpull;
 
+import brut.xml.XmlUtils;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public final class XmlPullUtils {
     private static final String PROPERTY_XMLDECL_STANDALONE
             = "http://xmlpull.org/v1/doc/properties.html#xmldecl-standalone";
 
-    public interface EventHandler {
-        boolean onEvent(XmlPullParser in, XmlSerializer out) throws XmlPullParserException;
-    }
-
-    private XmlPullUtils() {
-        // Private constructor for utility class.
-    }
+    private XmlPullUtils() {}
 
     public static void copy(XmlPullParser in, XmlSerializer out) throws XmlPullParserException, IOException {
-        copy(in, out, null);
+        copy(in, out, new SimpleXmlPullEventHandler());
     }
 
-    public static void copy(XmlPullParser in, XmlSerializer out, EventHandler handler)
+    public static void copy(XmlPullParser in, XmlSerializer out, XmlPullEventHandler handler)
             throws XmlPullParserException, IOException {
+        Objects.requireNonNull(in, "in");
+        Objects.requireNonNull(out, "out");
+        Objects.requireNonNull(handler, "handler");
         Boolean standalone = (Boolean) in.getProperty(PROPERTY_XMLDECL_STANDALONE);
 
         // Some parsers may have already consumed the event that starts the document, so we manually emit that
@@ -61,7 +60,7 @@ public final class XmlPullUtils {
                 out.startDocument(in.getInputEncoding(), standalone);
                 continue;
             }
-            if (handler != null && handler.onEvent(in, out)) {
+            if (handler.onEvent(in, out)) {
                 continue;
             }
             switch (event) {
@@ -75,16 +74,21 @@ public final class XmlPullUtils {
                             out.setPrefix(prefix, ns);
                         }
                     }
-                    out.startTag(normalizeNamespace(in.getNamespace()), in.getName());
+                    out.startTag(XmlUtils.normalizeNamespace(in.getNamespace()), in.getName());
+                    handler.beforeAttributes(in, out);
                     for (int i = 0; i < in.getAttributeCount(); i++) {
-                        String ns = normalizeNamespace(in.getAttributeNamespace(i));
+                        String ns = XmlUtils.normalizeNamespace(in.getAttributeNamespace(i));
                         String name = in.getAttributeName(i);
                         String value = in.getAttributeValue(i);
+                        if (handler.onAttribute(in, out, ns, name, value)) {
+                            continue;
+                        }
                         out.attribute(ns, name, value);
                     }
+                    handler.afterAttributes(in, out);
                     break;
                 case XmlPullParser.END_TAG:
-                    out.endTag(normalizeNamespace(in.getNamespace()), in.getName());
+                    out.endTag(XmlUtils.normalizeNamespace(in.getNamespace()), in.getName());
                     break;
                 case XmlPullParser.TEXT:
                     out.text(in.getText());
@@ -111,13 +115,5 @@ public final class XmlPullUtils {
                     throw new IllegalStateException("Unknown event: " + event);
             }
         }
-    }
-
-    /**
-     * Some parsers may return an empty string when a namespace in unsupported, which can confuse serializers.
-     * This method normalizes empty strings to be null.
-     */
-    private static String normalizeNamespace(String namespace) {
-        return (namespace != null && !namespace.isEmpty()) ? namespace : null;
     }
 }

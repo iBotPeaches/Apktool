@@ -18,7 +18,7 @@ package brut.androlib;
 
 import brut.androlib.meta.ApkInfo;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -33,11 +33,11 @@ public class MissingVersionManifestTest extends BaseTest {
 
     @Test
     public void missingVersionParsesCorrectlyTest() throws Exception {
-        File testApk = new File(sTmpDir, TEST_APK);
-        File testDir = new File(testApk + ".out");
+        Path testApk = sTmpDir.resolve(TEST_APK);
+        Path testDir = sTmpDir.resolve(testApk.getFileName() + ".out");
         new ApkDecoder(testApk, sConfig).decode(testDir);
 
-        ApkInfo testInfo = ApkInfo.load(new File(testDir, "apktool.yml"));
+        ApkInfo testInfo = ApkInfo.load(testDir.resolve("apktool.yml"));
         assertNull(testInfo.getVersionInfo().getVersionName());
     }
 }

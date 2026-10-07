@@ -16,7 +16,7 @@
  */
 package brut.androlib;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -25,8 +25,8 @@ public class DexStaticFieldValueTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        sTestOrigDir = new File(sTmpDir, "issue2543-orig");
-        sTestNewDir = new File(sTmpDir, "issue2543-new");
+        sTestOrigDir = sTmpDir.resolve("issue2543-orig");
+        sTestNewDir = sTmpDir.resolve("issue2543-new");
 
         log("Unpacking issue2543...");
         copyResourceDir(DexStaticFieldValueTest.class, "issue2543", sTestOrigDir);
@@ -34,7 +34,7 @@ public class DexStaticFieldValueTest extends BaseTest {
         sConfig.setBaksmaliDebugMode(false);
 
         log("Building issue2543.jar...");
-        File testJar = new File(sTmpDir, "issue2543.jar");
+        Path testJar = sTmpDir.resolve("issue2543.jar");
         new ApkBuilder(sTestOrigDir, sConfig).build(testJar);
 
         log("Decoding issue2543.jar...");
@@ -61,7 +61,7 @@ public class DexStaticFieldValueTest extends BaseTest {
           + "    return-void\n"
           + ".end method";
 
-        String obtained = readTextFile(new File(sTestNewDir, "smali/HelloWorld.smali"));
+        String obtained = readTextFile(sTestNewDir.resolve("smali/HelloWorld.smali"));
 
         assertEquals(replaceNewlines(expected), replaceNewlines(obtained));
     }

@@ -16,7 +16,8 @@
  */
 package brut.androlib;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -31,10 +32,10 @@ public class ProtectedChunksTest extends BaseTest {
 
     @Test
     public void checkIfDecodeWorksWithoutCrash() throws Exception {
-        File testApk = new File(sTmpDir, TEST_APK);
-        File testDir = new File(testApk + ".out");
+        Path testApk = sTmpDir.resolve(TEST_APK);
+        Path testDir = sTmpDir.resolve(testApk.getFileName() + ".out");
         new ApkDecoder(testApk, sConfig).decode(testDir);
 
-        assertTrue(new File(testDir, "res/values/strings.xml").isFile());
+        assertTrue(Files.isRegularFile(testDir.resolve("res/values/strings.xml")));
     }
 }

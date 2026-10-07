@@ -16,7 +16,7 @@
  */
 package brut.androlib;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -31,14 +31,14 @@ public class LargeIntsInManifestTest extends BaseTest {
 
     @Test
     public void checkIfLargeIntsAreHandledTest() throws Exception {
-        File testApk = new File(sTmpDir, TEST_APK);
-        File testDir = new File(testApk + ".out");
+        Path testApk = sTmpDir.resolve(TEST_APK);
+        Path testDir = sTmpDir.resolve(testApk.getFileName() + ".out");
         new ApkDecoder(testApk, sConfig).decode(testDir);
 
         new ApkBuilder(testDir, sConfig).build(null);
 
-        File newApk = new File(testDir, "dist/" + testApk.getName());
-        File newDir = new File(testApk + ".out.new");
+        Path newApk = testDir.resolve("dist/" + testApk.getFileName());
+        Path newDir = sTmpDir.resolve(testApk.getFileName() + ".out.new");
         new ApkDecoder(newApk, sConfig).decode(newDir);
 
         compareXmlFiles(testDir, newDir, "AndroidManifest.xml");

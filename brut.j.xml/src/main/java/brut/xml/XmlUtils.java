@@ -18,6 +18,7 @@ package brut.xml;
 
 import brut.common.Log;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
@@ -39,19 +40,20 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-import java.io.File;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.function.Predicate;
 
 public final class XmlUtils {
-    private static final String TAG = "";
-
     public static final String XML_PROLOG = "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
     public static final String XML_PREFIX = "xml";
     public static final String XML_URI = "http://www.w3.org/XML/1998/namespace";
@@ -63,9 +65,7 @@ public final class XmlUtils {
     private static final String FEATURE_LOAD_EXTERNAL_DTD =
         "http://apache.org/xml/features/nonvalidating/load-external-dtd";
 
-    private XmlUtils() {
-        // Private constructor for utility class.
-    }
+    private XmlUtils() {}
 
     private static DocumentBuilder newDocumentBuilder(boolean nsAware)
             throws SAXException, ParserConfigurationException {
@@ -79,7 +79,7 @@ public final class XmlUtils {
             factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
             factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
         } catch (IllegalArgumentException ignored) {
-            Log.w(TAG, "JAXP 1.5 Support is required to validate XML");
+            Log.w(Log.ROOT, "JAXP 1.5 Support is required to validate XML");
         }
 
         return factory.newDocumentBuilder();
@@ -99,27 +99,29 @@ public final class XmlUtils {
 
     public static Document parseDocument(String xml, boolean nsAware)
             throws IOException, SAXException, ParserConfigurationException {
+        Objects.requireNonNull(xml, "xml");
         DocumentBuilder builder = newDocumentBuilder(nsAware);
         StringReader reader = new StringReader(xml);
         return builder.parse(new InputSource(reader));
     }
 
-    public static Document loadDocument(File file) throws IOException, SAXException, ParserConfigurationException {
-        return loadDocument(file, false);
+    public static Document loadDocument(Path path) throws IOException, SAXException, ParserConfigurationException {
+        return loadDocument(path, false);
     }
 
-    public static Document loadDocument(File file, boolean nsAware)
+    public static Document loadDocument(Path path, boolean nsAware)
             throws IOException, SAXException, ParserConfigurationException {
+        Objects.requireNonNull(path, "path");
         DocumentBuilder builder = newDocumentBuilder(nsAware);
-        // Not using the parse(File) method on purpose, so that we can control when to close it.
-        // Somehow parse(File) does not seem to close the file in all cases.
-        try (InputStream in = Files.newInputStream(file.toPath())) {
+        try (InputStream in = Files.newInputStream(path)) {
             return builder.parse(new InputSource(in));
         }
     }
 
-    public static void saveDocument(Document doc, File file)
+    public static void saveDocument(Document doc, Path path)
             throws IOException, SAXException, ParserConfigurationException, TransformerException {
+        Objects.requireNonNull(doc, "doc");
+        Objects.requireNonNull(path, "path");
         TransformerFactory factory = TransformerFactory.newInstance();
         Transformer transformer = factory.newTransformer();
         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
@@ -127,7 +129,7 @@ public final class XmlUtils {
         byte[] xmlDecl = XML_PROLOG.getBytes(StandardCharsets.US_ASCII);
         byte[] newLine = System.lineSeparator().getBytes(StandardCharsets.US_ASCII);
 
-        try (OutputStream out = Files.newOutputStream(file.toPath())) {
+        try (OutputStream out = Files.newOutputStream(path)) {
             out.write(xmlDecl);
             out.write(newLine);
             transformer.transform(new DOMSource(doc), new StreamResult(out));
@@ -135,9 +137,91 @@ public final class XmlUtils {
         }
     }
 
+    public static Iterable<Element> getChildElements(Element parent) {
+        return getChildElements(parent, element -> true);
+    }
+
+    public static Iterable<Element> getChildElements(Element parent, String name) {
+        Objects.requireNonNull(name, "name");
+        return getChildElements(parent, element -> name.equals(element.getTagName()));
+    }
+
+    public static Iterable<Element> getChildElements(Element parent, String ns, String name) {
+        Objects.requireNonNull(name, "name");
+        String normalizedNs = normalizeNamespace(ns);
+        return getChildElements(parent, element ->
+            Objects.equals(normalizedNs, normalizeNamespace(element.getNamespaceURI()))
+                && name.equals(element.getLocalName()));
+    }
+
+    public static Iterable<Element> getChildElements(Element parent, Predicate<Element> filter) {
+        Objects.requireNonNull(parent, "parent");
+        Objects.requireNonNull(filter, "filter");
+        return () -> new Iterator<Element>() {
+            private Node current = parent.getFirstChild();
+            private Element next = null;
+
+            @Override
+            public boolean hasNext() {
+                while (next == null && current != null) {
+                    Node node = current;
+                    current = node.getNextSibling();
+                    if (node.getNodeType() == Node.ELEMENT_NODE) {
+                        Element element = (Element) node;
+                        if (filter.test(element)) {
+                            next = element;
+                        }
+                    }
+                }
+                return next != null;
+            }
+
+            @Override
+            public Element next() {
+                if (!hasNext()) {
+                    throw new NoSuchElementException();
+                }
+                Element element = next;
+                next = null;
+                return element;
+            }
+        };
+    }
+
+    public static Element getFirstChildElement(Element parent) {
+        Iterator<Element> it = getChildElements(parent).iterator();
+        return it.hasNext() ? it.next() : null;
+    }
+
+    public static Element getFirstChildElement(Element parent, String name) {
+        Iterator<Element> it = getChildElements(parent, name).iterator();
+        return it.hasNext() ? it.next() : null;
+    }
+
+    public static Element getFirstChildElement(Element parent, String ns, String name) {
+        Iterator<Element> it = getChildElements(parent, ns, name).iterator();
+        return it.hasNext() ? it.next() : null;
+    }
+
+    public static Element getFirstChildElement(Element parent, Predicate<Element> filter) {
+        Iterator<Element> it = getChildElements(parent, filter).iterator();
+        return it.hasNext() ? it.next() : null;
+    }
+
+    /**
+     * Some parsers may return an empty string when a namespace is unsupported, which can confuse serializers.
+     * This method normalizes empty strings to be null.
+     */
+    public static String normalizeNamespace(String namespace) {
+        return (namespace != null && !namespace.isEmpty()) ? namespace : null;
+    }
+
     @SuppressWarnings("unchecked")
     public static <T> T evaluateXPath(Document doc, String expression, Class<T> returnType)
             throws XPathExpressionException {
+        Objects.requireNonNull(doc, "doc");
+        Objects.requireNonNull(expression, "expression");
+        Objects.requireNonNull(returnType, "returnType");
         QName type;
         if (returnType == Node.class) {
             type = XPathConstants.NODE;

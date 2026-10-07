@@ -20,7 +20,7 @@ import brut.xml.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -35,11 +35,11 @@ public class CompactResourceTest extends BaseTest {
 
     @Test
     public void checkIfDecodeSucceeds() throws Exception {
-        File testApk = new File(sTmpDir, TEST_APK);
-        File testDir = new File(testApk + ".out");
+        Path testApk = sTmpDir.resolve(TEST_APK);
+        Path testDir = sTmpDir.resolve(testApk.getFileName() + ".out");
         new ApkDecoder(testApk, sConfig).decode(testDir);
 
-        Document doc = XmlUtils.loadDocument(new File(testDir, "res/values/strings.xml"));
+        Document doc = XmlUtils.loadDocument(testDir.resolve("res/values/strings.xml"));
         String expression = "/resources/string[@name]";
         NodeList nodes = XmlUtils.evaluateXPath(doc, expression, NodeList.class);
         assertEquals(1002, nodes.getLength());

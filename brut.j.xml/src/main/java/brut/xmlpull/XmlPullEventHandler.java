@@ -14,23 +14,19 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.common;
+package brut.xmlpull;
 
-public class BrutException extends Exception {
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.XmlSerializer;
 
-    public BrutException() {
-        super();
-    }
+public interface XmlPullEventHandler {
+    boolean onEvent(XmlPullParser in, XmlSerializer out) throws XmlPullParserException;
 
-    public BrutException(String message) {
-        super(message);
-    }
+    void beforeAttributes(XmlPullParser in, XmlSerializer out) throws XmlPullParserException;
 
-    public BrutException(Throwable cause) {
-        super(cause);
-    }
+    boolean onAttribute(XmlPullParser in, XmlSerializer out, String ns, String name, String value)
+            throws XmlPullParserException;
 
-    public BrutException(String message, Throwable cause) {
-        super(message, cause);
-    }
+    void afterAttributes(XmlPullParser in, XmlSerializer out) throws XmlPullParserException;
 }

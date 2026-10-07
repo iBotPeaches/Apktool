@@ -16,7 +16,8 @@
  */
 package brut.androlib;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -25,14 +26,14 @@ public class BuildAndDecodeJarTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        sTestOrigDir = new File(sTmpDir, "testjar-orig");
-        sTestNewDir = new File(sTmpDir, "testjar-new");
+        sTestOrigDir = sTmpDir.resolve("testjar-orig");
+        sTestNewDir = sTmpDir.resolve("testjar-new");
 
         log("Unpacking testjar...");
         copyResourceDir(BuildAndDecodeJarTest.class, "testjar", sTestOrigDir);
 
         log("Building testjar.jar...");
-        File testJar = new File(sTmpDir, "testjar.jar");
+        Path testJar = sTmpDir.resolve("testjar.jar");
         new ApkBuilder(sTestOrigDir, sConfig).build(testJar);
 
         log("Decoding testjar.jar...");
@@ -41,6 +42,6 @@ public class BuildAndDecodeJarTest extends BaseTest {
 
     @Test
     public void buildAndDecodeTest() {
-        assertTrue(sTestNewDir.isDirectory());
+        assertTrue(Files.isDirectory(sTestNewDir));
     }
 }

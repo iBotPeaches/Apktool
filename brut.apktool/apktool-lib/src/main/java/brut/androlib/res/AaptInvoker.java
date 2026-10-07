@@ -18,14 +18,18 @@ package brut.androlib.res;
 
 import brut.androlib.Config;
 import brut.androlib.exceptions.AndrolibException;
-import brut.androlib.meta.*;
+import brut.androlib.meta.ApkInfo;
+import brut.androlib.meta.ResourcesInfo;
+import brut.androlib.meta.UsesFramework;
 import brut.androlib.res.Framework;
 import brut.androlib.res.table.ResTable;
-import brut.common.BrutException;
 import brut.common.Log;
-import brut.util.OS;
+import brut.util.SystemUtils;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -41,30 +45,33 @@ public class AaptInvoker {
         mConfig = config;
     }
 
-    public void invoke(File outApk, File manifest, File resDir) throws AndrolibException {
-        SdkInfo sdkInfo = mApkInfo.getSdkInfo();
-        VersionInfo versionInfo = mApkInfo.getVersionInfo();
-        ResourcesInfo resourcesInfo = mApkInfo.getResourcesInfo();
-
-        String aaptPath = mConfig.getAaptBinary();
-        if (aaptPath == null || aaptPath.isEmpty()) {
+    public void invoke(Path outFile, Path manifest, Path resDir) throws AndrolibException {
+        String binPath = mConfig.getAaptBinary();
+        Path binFile;
+        if (binPath != null && !binPath.isEmpty()) {
+            binFile = Paths.get(binPath);
+        } else {
             try {
-                aaptPath = AaptManager.getBinaryFile().getPath();
+                binFile = AaptManager.getBinaryFile();
             } catch (AndrolibException ex) {
-                aaptPath = AaptManager.getBinaryName();
-                Log.w(TAG, aaptPath + ": " + ex.getMessage() + " (defaulting to $PATH binary)");
+                binFile = Paths.get(AaptManager.getBinaryName());
+                Log.w(TAG, binFile + ": " + ex.getMessage() + " (defaulting to $PATH binary)");
             }
         }
 
         List<String> cmd = new ArrayList<>();
-        File resZip = null;
+        Path resZip = null;
 
         if (resDir != null) {
-            resZip = new File(resDir.getParent(), "build/resources.zip");
-            OS.rmfile(resZip);
+            resZip = resDir.resolveSibling("build/resources.zip");
+            try {
+                Files.deleteIfExists(resZip);
+            } catch (IOException ex) {
+                throw new AndrolibException(ex);
+            }
 
             // Compile the files into flat arsc files.
-            cmd.add(aaptPath);
+            cmd.add(binFile.toString());
             cmd.add("compile");
 
             if (mConfig.isVerbose()) {
@@ -72,10 +79,10 @@ public class AaptInvoker {
             }
 
             cmd.add("-o");
-            cmd.add(resZip.getPath());
+            cmd.add(resZip.toString());
 
             cmd.add("--dir");
-            cmd.add(resDir.getPath());
+            cmd.add(resDir.toString());
 
             // Treats error that used to be valid in aapt1 as warnings in aapt2.
             cmd.add("--legacy");
@@ -93,9 +100,9 @@ public class AaptInvoker {
             }
 
             try {
-                OS.exec(cmd.toArray(new String[0]));
+                SystemUtils.execute(cmd.toArray(new String[0]));
                 Log.d(TAG, "aapt2 compile command ran: " + cmd.toString());
-            } catch (BrutException ex) {
+            } catch (IOException | InterruptedException ex) {
                 throw new AndrolibException(ex);
             }
 
@@ -107,7 +114,7 @@ public class AaptInvoker {
         }
 
         // Link resources to the final apk.
-        cmd.add(aaptPath);
+        cmd.add(binFile.toString());
         cmd.add("link");
 
         if (mConfig.isVerbose()) {
@@ -115,27 +122,13 @@ public class AaptInvoker {
         }
 
         cmd.add("-o");
-        cmd.add(outApk.getPath());
+        cmd.add(outFile.toString());
 
         cmd.add("--manifest");
-        cmd.add(manifest.getPath());
+        cmd.add(manifest.toString());
 
-        if (sdkInfo.getMinSdkVersion() != null) {
-            cmd.add("--min-sdk-version");
-            cmd.add(sdkInfo.getMinSdkVersion());
-        }
-        if (sdkInfo.getTargetSdkVersion() != null) {
-            cmd.add("--target-sdk-version");
-            cmd.add(sdkInfo.getTargetSdkVersion());
-        }
-        if (versionInfo.getVersionCode() >= 0) {
-            cmd.add("--version-code");
-            cmd.add(Integer.toString(versionInfo.getVersionCode()));
-        }
-        if (versionInfo.getVersionName() != null) {
-            cmd.add("--version-name");
-            cmd.add(versionInfo.getVersionName());
-        }
+        ResourcesInfo resourcesInfo = mApkInfo.getResourcesInfo();
+
         if (resourcesInfo.getPackageId() >= 0) {
             int pkgId = resourcesInfo.getPackageId();
             if (pkgId == 0) {
@@ -180,24 +173,24 @@ public class AaptInvoker {
         // #3427 - Ignore stricter parsing during aapt2.
         cmd.add("--warn-manifest-validation");
 
-        for (File includeFile : getIncludeFiles()) {
+        for (Path includeFile : getIncludeFiles()) {
             cmd.add("-I");
-            cmd.add(includeFile.getPath());
+            cmd.add(includeFile.toString());
         }
         if (resZip != null) {
-            cmd.add(resZip.getPath());
+            cmd.add(resZip.toString());
         }
 
         try {
-            OS.exec(cmd.toArray(new String[0]));
+            SystemUtils.execute(cmd.toArray(new String[0]));
             Log.d(TAG, "aapt2 link command ran: " + cmd.toString());
-        } catch (BrutException ex) {
+        } catch (IOException | InterruptedException ex) {
             throw new AndrolibException(ex);
         }
     }
 
-    private List<File> getIncludeFiles() throws AndrolibException {
-        List<File> files = new ArrayList<>();
+    private List<Path> getIncludeFiles() throws AndrolibException {
+        List<Path> files = new ArrayList<>();
 
         UsesFramework usesFramework = mApkInfo.getUsesFramework();
         List<Integer> frameworkIds = usesFramework.getIds();
@@ -205,7 +198,7 @@ public class AaptInvoker {
             Framework framework = new Framework(mConfig);
             String tag = usesFramework.getTag();
             for (Integer id : frameworkIds) {
-                files.add(framework.getApkFile(id, tag));
+                files.add(framework.getFile(id, tag));
             }
         }
 
@@ -216,7 +209,7 @@ public class AaptInvoker {
                 String[] fileNames = libraryFiles.get(name);
                 if (fileNames != null) {
                     for (String fileName : fileNames) {
-                        files.add(new File(fileName));
+                        files.add(Paths.get(fileName));
                     }
                 } else {
                     Log.w(TAG, "Shared library was not provided: " + name);

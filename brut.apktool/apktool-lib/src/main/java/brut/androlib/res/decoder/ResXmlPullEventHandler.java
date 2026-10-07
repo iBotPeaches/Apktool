@@ -18,12 +18,12 @@ package brut.androlib.res.decoder;
 
 import brut.androlib.meta.ApkInfo;
 import brut.androlib.res.xml.ResXmlUtils;
-import brut.xmlpull.XmlPullUtils;
+import brut.xmlpull.SimpleXmlPullEventHandler;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlSerializer;
 
-public class ResXmlPullEventHandler implements XmlPullUtils.EventHandler {
+public class ResXmlPullEventHandler extends SimpleXmlPullEventHandler {
     protected final ApkInfo mApkInfo;
 
     public ResXmlPullEventHandler(ApkInfo apkInfo) {
@@ -31,34 +31,11 @@ public class ResXmlPullEventHandler implements XmlPullUtils.EventHandler {
     }
 
     @Override
-    public boolean onEvent(XmlPullParser in, XmlSerializer out) throws XmlPullParserException {
-        int depth = in.getDepth();
-        int type = in.getEventType();
-
-        if (depth > 1 && type == XmlPullParser.START_TAG) {
-            for (int i = 0; i < in.getAttributeCount(); i++) {
-                String ns = in.getAttributeNamespace(i);
-
-                if (ns.equals(ResXmlUtils.ANDROID_RES_NS)) {
-                    String name = in.getAttributeName(i);
-
-                    if (name.equals("featureFlag")) {
-                        String value = in.getAttributeValue(i);
-
-                        if (value.isEmpty()) {
-                            continue;
-                        }
-                        if (value.startsWith("!")) {
-                            value = value.substring(1);
-                            if (value.isEmpty()) {
-                                continue;
-                            }
-                        }
-
-                        mApkInfo.getFeatureFlags().add(value);
-                    }
-                }
-            }
+    public boolean onAttribute(XmlPullParser in, XmlSerializer out, String ns, String name, String value)
+            throws XmlPullParserException {
+        if (ResXmlUtils.ANDROID_RES_NS.equals(ns) && name.equals("featureFlag") && !value.isEmpty()
+                && (value.charAt(0) != '!' || !(value = value.substring(1)).isEmpty())) {
+            mApkInfo.getFeatureFlags().add(value);
         }
 
         return false;

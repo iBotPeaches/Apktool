@@ -292,7 +292,7 @@ public class ResXmlSerializer implements XmlSerializer {
         }
 
         write(' ');
-        String prefix = !namespace.isEmpty() ? getPrefix(namespace, false, true) : "";
+        String prefix = namespace.isEmpty() ? "" : getPrefix(namespace, false, true);
         if (!prefix.isEmpty()) {
             write(prefix);
             write(':');
