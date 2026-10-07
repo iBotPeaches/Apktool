@@ -31,15 +31,17 @@ public final class XmlPullUtils {
     private XmlPullUtils() {}
 
     public static void copy(XmlPullParser in, XmlSerializer out) throws XmlPullParserException, IOException {
-        copy(in, out, new SimpleXmlPullEventHandler());
+        copy(in, out, null);
     }
 
     public static void copy(XmlPullParser in, XmlSerializer out, XmlPullEventHandler handler)
             throws XmlPullParserException, IOException {
         Objects.requireNonNull(in, "in");
         Objects.requireNonNull(out, "out");
-        Objects.requireNonNull(handler, "handler");
         Boolean standalone = (Boolean) in.getProperty(PROPERTY_XMLDECL_STANDALONE);
+        if (handler == null) {
+            handler = new SimpleXmlPullEventHandler();
+        }
 
         // Some parsers may have already consumed the event that starts the document, so we manually emit that
         // event here for consistency.

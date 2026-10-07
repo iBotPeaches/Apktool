@@ -83,7 +83,7 @@ public final class ResXmlUtils {
             boolean changed = false;
 
             int versionCode = versionInfo.getVersionCode();
-            if (versionCode >= 0 && !root.getAttribute("android:versionCode").equals(versionCode)) {
+            if (versionCode >= 0 && !root.getAttribute("android:versionCode").equals(Integer.toString(versionCode))) {
                 root.setAttribute("android:versionCode", Integer.toString(versionCode));
                 changed = true;
             }

@@ -34,7 +34,8 @@ public final class ZipUtils {
             return name;
         }
         char ch = name.charAt(0);
-        if (ch == SEPARATOR_CHAR || ch == '\\') {
+        if (ch == SEPARATOR_CHAR || ch == '\\' || (len >= 2 && name.charAt(1) == ':'
+                && ((ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z')))) {
             throw new IllegalArgumentException("Name is an absolute path.");
         }
         StringBuilder sb = null; // lazily initialized

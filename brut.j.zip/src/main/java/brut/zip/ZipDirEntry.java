@@ -64,7 +64,7 @@ public final class ZipDirEntry implements Comparable<ZipDirEntry> {
     }
 
     public boolean isEmpty() {
-        return mDirs.isEmpty() && mFiles.isEmpty();
+        return (mDirs == null || mDirs.isEmpty()) && (mFiles == null || mFiles.isEmpty());
     }
 
     public Stream<ZipDirEntry> listDirs() {

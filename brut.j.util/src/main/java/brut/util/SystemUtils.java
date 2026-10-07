@@ -41,9 +41,10 @@ public final class SystemUtils {
             if (arch == null || arch.isEmpty()) {
                 arch = System.getenv("PROCESSOR_ARCHITECTURE");
             }
-            IS_64BIT = arch.endsWith("64");
+            IS_64BIT = arch != null && arch.endsWith("64");
         } else {
-            IS_64BIT = System.getProperty("sun.arch.data.model").equals("64");
+            String bitness = System.getProperty("sun.arch.data.model");
+            IS_64BIT = bitness != null && bitness.equals("64");
         }
     }
 
