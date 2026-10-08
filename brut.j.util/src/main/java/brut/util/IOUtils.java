@@ -108,7 +108,7 @@ public final class IOUtils {
         Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                Files.delete(file);
+                Files.deleteIfExists(file);
                 return FileVisitResult.CONTINUE;
             }
 
@@ -117,7 +117,7 @@ public final class IOUtils {
                 if (exc != null) {
                     throw exc;
                 }
-                Files.delete(dir);
+                Files.deleteIfExists(dir);
                 return FileVisitResult.CONTINUE;
             }
         });
@@ -160,12 +160,12 @@ public final class IOUtils {
                 if (exc != null) {
                     throw exc;
                 }
-                Files.delete(dir);
+                Files.deleteIfExists(dir);
                 return FileVisitResult.CONTINUE;
             }
         });
         if (Files.isSymbolicLink(src)) {
-            Files.delete(src);
+            Files.deleteIfExists(src);
         }
     }
 

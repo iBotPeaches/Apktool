@@ -27,6 +27,20 @@ import java.util.Map;
 public final class JarUtils {
     private static final Map<String, Path> sTmpCache = new HashMap<>();
 
+    static {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            synchronized (JarUtils.class) {
+                for (Path file : sTmpCache.values()) {
+                    try {
+                        Files.deleteIfExists(file);
+                    } catch (IOException ignored) {
+                        // best effort: JVM is exiting
+                    }
+                }
+            }
+        }));
+    }
+
     private JarUtils() {}
 
     public static InputStream getResourceAsStream(Class<?> clz, String name) throws IOException {
@@ -37,13 +51,17 @@ public final class JarUtils {
         return in;
     }
 
-    public static Path getResourceAsFile(Class<?> clz, String name, String prefix) throws IOException {
+    public static synchronized Path getResourceAsFile(Class<?> clz, String name, String prefix) throws IOException {
         Path file = sTmpCache.get(name);
         if (file == null) {
             try (InputStream in = getResourceAsStream(clz, name)) {
-                file = Files.createTempFile(prefix, ".tmp");
-                file.toFile().deleteOnExit();
-                Files.copy(in, file, StandardCopyOption.REPLACE_EXISTING);
+                file = Files.createTempFile(prefix, null);
+                try {
+                    Files.copy(in, file, StandardCopyOption.REPLACE_EXISTING);
+                } catch (IOException | RuntimeException ex) {
+                    Files.deleteIfExists(file);
+                    throw ex;
+                }
             }
             sTmpCache.put(name, file);
         }

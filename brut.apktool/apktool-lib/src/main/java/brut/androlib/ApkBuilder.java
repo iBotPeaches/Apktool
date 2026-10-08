@@ -274,13 +274,15 @@ public class ApkBuilder {
         Log.i(TAG, "Building AndroidManifest.xml with " + AaptManager.getBinaryName() + "...");
 
         Path tmpFile = Files.createTempFile("APKTOOL", null);
-        tmpFile.toFile().deleteOnExit();
+        try {
+            Files.deleteIfExists(outManifest);
+            mAaptInvoker.invoke(tmpFile, tmpManifest, null);
 
-        Files.deleteIfExists(outManifest);
-        mAaptInvoker.invoke(tmpFile, tmpManifest, null);
-
-        try (ZipArchive tmpZip = new ZipArchive(tmpFile)) {
-            tmpZip.extract(mOutDir, mOutDir.relativize(outManifest).toString());
+            try (ZipArchive tmpZip = new ZipArchive(tmpFile)) {
+                tmpZip.extract(mOutDir, mOutDir.relativize(outManifest).toString());
+            }
+        } finally {
+            Files.deleteIfExists(tmpFile);
         }
     }
 
@@ -317,16 +319,18 @@ public class ApkBuilder {
         Log.i(TAG, "Building resources with " + AaptManager.getBinaryName() + "...");
 
         Path tmpFile = Files.createTempFile("APKTOOL", null);
-        tmpFile.toFile().deleteOnExit();
+        try {
+            Files.deleteIfExists(outManifest);
+            Files.deleteIfExists(outArscFile);
+            IOUtils.deleteDirectory(outResDir);
+            mAaptInvoker.invoke(tmpFile, tmpManifest, resDir);
 
-        Files.deleteIfExists(outManifest);
-        Files.deleteIfExists(outArscFile);
-        IOUtils.deleteDirectory(outResDir);
-        mAaptInvoker.invoke(tmpFile, tmpManifest, resDir);
-
-        try (ZipArchive tmpZip = new ZipArchive(tmpFile)) {
-            tmpZip.extract(mOutDir, mOutDir.relativize(outManifest).toString(),
-                mOutDir.relativize(outArscFile).toString(), mOutDir.relativize(outResDir).toString());
+            try (ZipArchive tmpZip = new ZipArchive(tmpFile)) {
+                tmpZip.extract(mOutDir, mOutDir.relativize(outManifest).toString(),
+                    mOutDir.relativize(outArscFile).toString(), mOutDir.relativize(outResDir).toString());
+            }
+        } finally {
+            Files.deleteIfExists(tmpFile);
         }
     }
 
