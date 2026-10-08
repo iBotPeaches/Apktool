@@ -210,7 +210,7 @@ public class Framework {
         try {
             for (Path file : listDirectory()) {
                 Log.i(TAG, "Removing framework file: " + file.getFileName());
-                Files.delete(file);
+                Files.deleteIfExists(file);
             }
         } catch (IOException ex) {
             throw new AndrolibException(ex);

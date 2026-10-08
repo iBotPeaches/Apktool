@@ -94,7 +94,7 @@ public class ApkDecoder {
                     if (!mConfig.isForced()) {
                         throw new OutDirExistsException(outDir);
                     }
-                    Files.delete(outDir);
+                    Files.deleteIfExists(outDir);
                 }
             }
             Files.createDirectories(outDir);
