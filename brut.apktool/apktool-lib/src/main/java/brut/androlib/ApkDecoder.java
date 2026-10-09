@@ -80,12 +80,9 @@ public class ApkDecoder {
 
     public void decode(Path outDir) throws AndrolibException {
         try {
-            if (!mConfig.isDecodeSourcesNone()) {
-                mSmaliDecoder = new SmaliDecoder(mApkFile.getPath(), mConfig.isBaksmaliDebugMode());
-            }
-            if (!mConfig.isDecodeResourcesNone()) {
-                mResDecoder = new ResDecoder(mApkFile, mConfig);
-            }
+            mSmaliDecoder = !mConfig.isDecodeSourcesNone()
+                ? new SmaliDecoder(mApkFile.getPath(), mConfig.isBaksmaliDebugMode()) : null;
+            mResDecoder = !mConfig.isDecodeResourcesNone() ? new ResDecoder(mApkFile, mConfig) : null;
             mWorker = mConfig.getJobs() > 1 ? new BackgroundWorker(mConfig.getJobs() - 1) : null;
 
             // We don't follow symlinks here for safety reasons.
