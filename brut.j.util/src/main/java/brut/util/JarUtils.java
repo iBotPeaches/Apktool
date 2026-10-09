@@ -34,7 +34,7 @@ public final class JarUtils {
                     try {
                         Files.deleteIfExists(file);
                     } catch (IOException ignored) {
-                        // best effort: JVM is exiting
+                        // Best effort: JVM is exiting.
                     }
                 }
             }
@@ -59,7 +59,11 @@ public final class JarUtils {
                 try {
                     Files.copy(in, file, StandardCopyOption.REPLACE_EXISTING);
                 } catch (IOException | RuntimeException ex) {
-                    Files.deleteIfExists(file);
+                    try {
+                        Files.deleteIfExists(file);
+                    } catch (IOException suppressed) {
+                        ex.addSuppressed(suppressed);
+                    }
                     throw ex;
                 }
             }
