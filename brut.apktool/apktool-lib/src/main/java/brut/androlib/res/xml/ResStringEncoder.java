@@ -28,9 +28,7 @@ import java.util.regex.Pattern;
 public final class ResStringEncoder {
     private static final Pattern TAG_SPLIT_PATTERN = Pattern.compile(";(?=[\\p{L}_][\\p{L}\\p{N}_.-]*=)");
 
-    private ResStringEncoder() {
-        // Private constructor for utility class.
-    }
+    private ResStringEncoder() {}
 
     public static String encodeTextValue(CharSequence text) {
         return text instanceof StyledString
@@ -310,8 +308,7 @@ public final class ResStringEncoder {
         if (checkFloat || checkDimen || checkFraction) {
             int suffixLen = 0;
             if (checkDimen) {
-                String suffix = TextUtils.matchSuffix(
-                    text, "px", "dp", "dip", "sp", "pt", "in", "mm");
+                String suffix = TextUtils.matchSuffix(text, "px", "dp", "dip", "sp", "pt", "in", "mm");
                 if (suffix != null) {
                     suffixLen = suffix.length();
                 }

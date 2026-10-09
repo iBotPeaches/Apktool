@@ -14,24 +14,13 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.directory;
+package brut.androlib.exceptions;
 
-public class PathAlreadyExists extends DirectoryException {
-    private static final long serialVersionUID = 3776428251424428904L;
+import java.nio.file.Path;
 
-    public PathAlreadyExists() {
-        super();
-    }
+public class InDirNotFoundException extends AndrolibException {
 
-    public PathAlreadyExists(String message) {
-        super(message);
-    }
-
-    public PathAlreadyExists(Throwable cause) {
-        super(cause);
-    }
-
-    public PathAlreadyExists(String message, Throwable cause) {
-        super(message, cause);
+    public InDirNotFoundException(Path path) {
+        super("Input directory (" + path + ") was not found or was not readable.");
     }
 }

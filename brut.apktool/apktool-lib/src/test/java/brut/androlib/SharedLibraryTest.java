@@ -16,7 +16,8 @@
  */
 package brut.androlib;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -31,26 +32,26 @@ public class SharedLibraryTest extends BaseTest {
     @Test
     public void isSharedResourceDecodingAndRebuildingWorking() throws Exception {
         // decode library.apk
-        File libraryApk = new File(sTmpDir, "library.apk");
-        File libraryDir = new File(libraryApk + ".out");
+        Path libraryApk = sTmpDir.resolve("library.apk");
+        Path libraryDir = sTmpDir.resolve(libraryApk.getFileName() + ".out");
         new ApkDecoder(libraryApk, sConfig).decode(libraryDir);
 
         // build library.apk
         new ApkBuilder(libraryDir, sConfig).build(null);
 
-        assertTrue(new File(libraryDir, "dist/" + libraryApk.getName()).exists());
+        assertTrue(Files.isRegularFile(libraryDir.resolve("dist/" + libraryApk.getFileName())));
 
         // include library.apk as a shared library
-        sConfig.getLibraryFiles().put("com.google.android.test.shared_library", new String[] { libraryApk.getAbsolutePath() });
+        sConfig.getLibraryFiles().put("com.google.android.test.shared_library", new String[] { libraryApk.toAbsolutePath().toString() });
 
         // decode client.apk
-        File clientApk = new File(sTmpDir, "client.apk");
-        File clientDir = new File(clientApk + ".out");
+        Path clientApk = sTmpDir.resolve("client.apk");
+        Path clientDir = sTmpDir.resolve(clientApk.getFileName() + ".out");
         new ApkDecoder(clientApk, sConfig).decode(clientDir);
 
         // build client.apk
         new ApkBuilder(clientDir, sConfig).build(null);
 
-        assertTrue(new File(clientDir, "dist/" + clientApk.getName()).exists());
+        assertTrue(Files.isRegularFile(clientDir.resolve("dist/" + clientApk.getFileName())));
     }
 }

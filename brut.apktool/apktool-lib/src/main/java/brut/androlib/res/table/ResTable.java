@@ -16,6 +16,7 @@
  */
 package brut.androlib.res.table;
 
+import brut.androlib.ApkFile;
 import brut.androlib.Config;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.exceptions.UndefinedResObjectException;
@@ -23,11 +24,7 @@ import brut.androlib.meta.ApkInfo;
 import brut.androlib.res.Framework;
 import brut.androlib.res.decoder.BinaryResourceParser;
 import brut.common.Log;
-import brut.directory.DirectoryException;
-import brut.directory.ExtFile;
-import brut.directory.ZipRODirectory;
 
-import java.io.File;
 import java.io.InputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -42,7 +39,6 @@ public class ResTable {
     public static final int SYS_PACKAGE_ID = 0x01;
     public static final int APP_PACKAGE_ID = 0x7F;
 
-    private final ApkInfo mApkInfo;
     private final Config mConfig;
     private final Map<Integer, ResPackageGroup> mPackageGroups;
     private final List<Integer> mLibPackageIds;
@@ -51,19 +47,14 @@ public class ResTable {
     private int mNextPackageId;
     private ResPackage mMainPackage;
 
-    public ResTable(ApkInfo apkInfo, Config config) {
-        assert apkInfo != null && config != null;
-        mApkInfo = apkInfo;
+    public ResTable(Config config) {
+        assert config != null;
         mConfig = config;
         mPackageGroups = new LinkedHashMap<>();
         mLibPackageIds = new ArrayList<>();
         mFramePackageIds = new ArrayList<>();
         mDynamicRefTable = new LinkedHashMap<>();
         mNextPackageId = SYS_PACKAGE_ID + 1;
-    }
-
-    public ApkInfo getApkInfo() {
-        return mApkInfo;
     }
 
     public Config getConfig() {
@@ -82,22 +73,13 @@ public class ResTable {
         return mFramePackageIds;
     }
 
-    public void load() throws AndrolibException {
+    public void load(ApkFile apkFile) throws AndrolibException {
         if (mMainPackage != null) {
             throw new AndrolibException("The resource table has already been loaded.");
         }
 
         Log.i(TAG, "Loading resource table...");
-        ExtFile apkFile = mApkInfo.getApkFile();
-
-        ZipRODirectory zipDir;
-        try {
-            zipDir = (ZipRODirectory) apkFile.getDirectory();
-        } catch (DirectoryException ex) {
-            throw new AndrolibException("Could not open apk file: " + apkFile, ex);
-        }
-
-        loadPackagesFromApk(apkFile, zipDir, true);
+        loadPackagesFromApk(apkFile, true);
 
         ResPackageGroup pkgGroup;
         if (mPackageGroups.isEmpty()) {
@@ -115,34 +97,28 @@ public class ResTable {
         mMainPackage = pkgGroup.getBasePackage();
     }
 
-    private void loadPackagesFromApk(File apkFile, ZipRODirectory zipDir, boolean isMainPackage)
-            throws AndrolibException {
-        try {
-            if (!zipDir.containsFile("resources.arsc")) {
-                throw new AndrolibException("Could not find resources.arsc in file: " + apkFile);
-            }
+    private void loadPackagesFromApk(ApkFile apkFile, boolean isMainPackage) throws AndrolibException {
+        try (InputStream in = apkFile.getFile("resources.arsc").getInputStream()) {
+            BinaryResourceParser parser = isMainPackage
+                ? new BinaryResourceParser(this, mConfig.isKeepBrokenResources(), mConfig.isDecodeResolveGreedy())
+                : new BinaryResourceParser(this, true, true);
+            parser.parse(in);
 
-            try (InputStream in = zipDir.getFileInput("resources.arsc")) {
-                BinaryResourceParser parser = isMainPackage
-                    ? new BinaryResourceParser(this, mConfig.isKeepBrokenResources(), mConfig.isDecodeResolveGreedy())
-                    : new BinaryResourceParser(this, true, true);
-                parser.parse(in);
-
-                // Only update apk info for the main package.
-                if (isMainPackage) {
-                    if (parser.hasSparseEntries()) {
-                        mApkInfo.getResourcesInfo().setSparseEntries(true);
-                    }
-                    if (parser.hasCompactEntries()) {
-                        mApkInfo.getResourcesInfo().setCompactEntries(true);
-                    }
-                    if (parser.getFlags() != null) {
-                        mApkInfo.getFeatureFlags().addAll(parser.getFlags());
-                    }
+            // Only update apk info for the main package.
+            if (isMainPackage) {
+                ApkInfo apkInfo = apkFile.getApkInfo();
+                if (parser.hasSparseEntries()) {
+                    apkInfo.getResourcesInfo().setSparseEntries(true);
+                }
+                if (parser.hasCompactEntries()) {
+                    apkInfo.getResourcesInfo().setCompactEntries(true);
+                }
+                if (parser.getFlags() != null) {
+                    apkInfo.getFeatureFlags().addAll(parser.getFlags());
                 }
             }
-        } catch (DirectoryException | IOException ex) {
-            throw new AndrolibException("Could not load resources.arsc from file: " + apkFile, ex);
+        } catch (IOException ex) {
+            throw new AndrolibException(ex);
         }
     }
 
@@ -226,7 +202,12 @@ public class ResTable {
         }
 
         for (String fileName : fileNames) {
-            loadPackagesFromApk(new File(fileName));
+            try (ApkFile apkFile = new ApkFile(fileName)) {
+                Log.i(TAG, "Loading resource table from library: " + apkFile);
+                loadPackagesFromApk(apkFile, false);
+            } catch (IOException ex) {
+                throw new AndrolibException(ex);
+            }
         }
 
         ResPackageGroup pkgGroup = mPackageGroups.get(id);
@@ -243,7 +224,12 @@ public class ResTable {
             return mPackageGroups.get(id);
         }
 
-        loadPackagesFromApk(new Framework(mConfig).getApkFile(id));
+        try (ApkFile apkFile = new ApkFile(new Framework(mConfig).getFile(id))) {
+            Log.i(TAG, "Loading resource table from framework: " + apkFile);
+            loadPackagesFromApk(apkFile, false);
+        } catch (IOException ex) {
+            throw new AndrolibException(ex);
+        }
 
         ResPackageGroup pkgGroup = mPackageGroups.get(id);
         if (pkgGroup == null) {
@@ -252,15 +238,6 @@ public class ResTable {
 
         mFramePackageIds.add(id);
         return pkgGroup;
-    }
-
-    private void loadPackagesFromApk(File apkFile) throws AndrolibException {
-        Log.i(TAG, "Loading resource table from file: " + apkFile);
-        try (ZipRODirectory zipDir = new ZipRODirectory(apkFile)) {
-            loadPackagesFromApk(apkFile, zipDir, false);
-        } catch (DirectoryException ex) {
-            throw new AndrolibException("Could not open apk file: " + apkFile, ex);
-        }
     }
 
     public ResEntrySpec resolve(ResId resId) throws AndrolibException {

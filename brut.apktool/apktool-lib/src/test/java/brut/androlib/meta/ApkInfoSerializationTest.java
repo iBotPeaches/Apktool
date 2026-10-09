@@ -18,7 +18,7 @@ package brut.androlib.meta;
 
 import brut.androlib.BaseTest;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -29,7 +29,7 @@ public class ApkInfoSerializationTest extends BaseTest {
     public void checkApkInfoSerialization() throws Exception {
         ApkInfo control = ApkInfo.load(getClass().getResourceAsStream("/meta/serialization.yml"));
         check(control);
-        File testFile = new File(sTmpDir, "serialization.yml");
+        Path testFile = sTmpDir.resolve("serialization.yml");
         control.save(testFile);
         ApkInfo test = ApkInfo.load(testFile);
         check(test);

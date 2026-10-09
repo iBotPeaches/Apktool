@@ -16,7 +16,8 @@
  */
 package brut.androlib;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -33,23 +34,23 @@ public class SkipAssetTest extends BaseTest {
     public void checkIfEnablingSkipAssetWorks() throws Exception {
         sConfig.setDecodeAssets(Config.DecodeAssets.NONE);
 
-        File testApk = new File(sTmpDir, TEST_APK);
-        File testDir = new File(testApk + ".out.none");
+        Path testApk = sTmpDir.resolve(TEST_APK);
+        Path testDir = sTmpDir.resolve(testApk.getFileName() + ".out.none");
         new ApkDecoder(testApk, sConfig).decode(testDir);
 
-        assertFalse(new File(testDir, "assets/kotlin.kotlin_builtins").isFile());
-        assertFalse(new File(testDir, "assets/ranges/ranges.kotlin_builtins").isFile());
+        assertFalse(Files.isRegularFile(testDir.resolve("assets/kotlin.kotlin_builtins")));
+        assertFalse(Files.isRegularFile(testDir.resolve("assets/ranges/ranges.kotlin_builtins")));
     }
 
     @Test
     public void checkControl() throws Exception {
         sConfig.setDecodeAssets(Config.DecodeAssets.FULL);
 
-        File testApk = new File(sTmpDir, TEST_APK);
-        File testDir = new File(testApk + ".out.full");
+        Path testApk = sTmpDir.resolve(TEST_APK);
+        Path testDir = sTmpDir.resolve(testApk.getFileName() + ".out.full");
         new ApkDecoder(testApk, sConfig).decode(testDir);
 
-        assertTrue(new File(testDir, "assets/kotlin.kotlin_builtins").isFile());
-        assertTrue(new File(testDir, "assets/ranges/ranges.kotlin_builtins").isFile());
+        assertTrue(Files.isRegularFile(testDir.resolve("assets/kotlin.kotlin_builtins")));
+        assertTrue(Files.isRegularFile(testDir.resolve("assets/ranges/ranges.kotlin_builtins")));
     }
 }

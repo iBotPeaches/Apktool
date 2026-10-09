@@ -16,41 +16,25 @@
  */
 package brut.androlib;
 
-import java.io.File;
+import brut.androlib.exceptions.AndrolibException;
+import org.xml.sax.SAXException;
 
 import org.junit.*;
 import static org.junit.Assert.*;
-import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 
 public class ExternalEntityTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        sTestOrigDir = new File(sTmpDir, "doctype-orig");
-        sTestNewDir = new File(sTmpDir, "doctype-new");
-
-        log("Unpacking doctype...");
-        copyResourceDir(ExternalEntityTest.class, "doctype", sTestOrigDir);
-
-        log("Building doctype.apk...");
-        File testApk = new File(sTmpDir, "doctype.apk");
-        new ApkBuilder(sTestOrigDir, sConfig).build(testApk);
-
-        log("Decoding doctype.apk...");
-        new ApkDecoder(testApk, sConfig).decode(sTestNewDir);
+        copyResourceDir(ExternalEntityTest.class, "doctype", sTmpDir);
     }
 
     @Test
     public void doctypeTest() throws Exception {
-        String expected =
-            "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
-          + "<manifest hardwareAccelerated=\"true\" package=\"com.ibotpeaches.doctype\" platformBuildVersionCode=\"24\" platformBuildVersionName=\"6.0-2456767\"\n"
-          + "  xmlns:android=\"http://schemas.android.com/apk/res/android\">\n"
-          + "    <supports-screens android:anyDensity=\"true\" android:smallScreens=\"true\" android:normalScreens=\"true\" android:largeScreens=\"true\" android:resizeable=\"true\" android:xlargeScreens=\"true\" />\n"
-          + "</manifest>";
-
-        String obtained = readTextFile(new File(sTestNewDir, "AndroidManifest.xml"));
-
-        assertXMLEqual(expected, obtained);
+        AndrolibException ex = assertThrows(AndrolibException.class, () -> {
+            log("Building doctype.apk...");
+            new ApkBuilder(sTmpDir, sConfig).build(null);
+        });
+        assertTrue(ex.getCause() instanceof SAXException);
     }
 }

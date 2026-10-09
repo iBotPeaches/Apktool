@@ -14,26 +14,13 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package brut.directory;
+package brut.zip;
 
-import brut.common.BrutException;
+import java.util.zip.ZipException;
 
-public class DirectoryException extends BrutException {
-    private static final long serialVersionUID = -8871963042836625387L;
+public class ZipNoSuchEntryException extends ZipException {
 
-    public DirectoryException() {
-        super();
-    }
-
-    public DirectoryException(String message) {
-        super(message);
-    }
-
-    public DirectoryException(Throwable cause) {
-        super(cause);
-    }
-
-    public DirectoryException(String message, Throwable cause) {
-        super(message, cause);
+    public ZipNoSuchEntryException(String name) {
+        super("No such entry in zip archive: " + name);
     }
 }

@@ -17,7 +17,6 @@
 package brut.androlib.smali;
 
 import brut.androlib.exceptions.AndrolibException;
-import brut.util.OS;
 import com.android.tools.smali.baksmali.Baksmali;
 import com.android.tools.smali.baksmali.BaksmaliOptions;
 import com.android.tools.smali.dexlib2.analysis.InlineMethodResolver;
@@ -25,8 +24,9 @@ import com.android.tools.smali.dexlib2.dexbacked.DexBackedDexFile;
 import com.android.tools.smali.dexlib2.dexbacked.DexBackedOdexFile;
 import com.android.tools.smali.dexlib2.dexbacked.ZipDexContainer;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -39,8 +39,8 @@ public class SmaliDecoder {
     private final Set<String> mDexFiles;
     private final AtomicInteger mInferredApiLevel;
 
-    public SmaliDecoder(File apkFile, boolean debugMode) throws AndrolibException {
-        mDexContainer = new ZipDexContainer(apkFile, null);
+    public SmaliDecoder(Path apkFile, boolean debugMode) throws AndrolibException {
+        mDexContainer = new ZipDexContainer(apkFile.toFile(), null);
         // ZipDexContainer is lazily initialized and not thread-safe. Eagerly initialize on the constructing thread.
         try {
             mDexContainer.getEntry("");
@@ -60,7 +60,7 @@ public class SmaliDecoder {
         return mInferredApiLevel.get();
     }
 
-    public void decode(String dexName, File outDir) throws AndrolibException {
+    public void decode(String dexName, Path outDir) throws AndrolibException {
         try {
             // Fetch the requested dex file from the dex container.
             ZipDexContainer.DexEntry<DexBackedDexFile> dexEntry = mDexContainer.getEntry(dexName);
@@ -111,7 +111,7 @@ public class SmaliDecoder {
                     }
                 }
 
-                decodeFile(dexFile, new File(outDir, dirName));
+                decodeFile(dexFile, outDir.resolve(dirName));
             }
 
             mDexFiles.add(dexName);
@@ -120,7 +120,7 @@ public class SmaliDecoder {
         }
     }
 
-    private void decodeFile(DexBackedDexFile dexFile, File smaliDir) {
+    private void decodeFile(DexBackedDexFile dexFile, Path smaliDir) throws IOException {
         int jobs = Math.min(Runtime.getRuntime().availableProcessors(), 6);
 
         BaksmaliOptions options = new BaksmaliOptions();
@@ -141,8 +141,8 @@ public class SmaliDecoder {
                 ((DexBackedOdexFile) dexFile).getOdexVersion());
         }
 
-        OS.mkdir(smaliDir);
-        Baksmali.disassembleDexFile(dexFile, smaliDir, jobs, options);
+        Files.createDirectories(smaliDir);
+        Baksmali.disassembleDexFile(dexFile, smaliDir.toFile(), jobs, options);
 
         int apiLevel = dexFile.getOpcodes().api;
         mInferredApiLevel.updateAndGet(cur -> (cur == 0 || cur > apiLevel) ? apiLevel : cur);

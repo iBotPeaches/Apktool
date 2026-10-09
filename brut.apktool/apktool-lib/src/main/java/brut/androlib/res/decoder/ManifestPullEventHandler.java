@@ -17,20 +17,17 @@
 package brut.androlib.res.decoder;
 
 import brut.androlib.meta.ApkInfo;
-import brut.androlib.meta.ResourcesInfo;
-import brut.androlib.meta.SdkInfo;
-import brut.androlib.meta.VersionInfo;
 import brut.androlib.res.xml.ResXmlUtils;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlSerializer;
 
 public class ManifestPullEventHandler extends ResXmlPullEventHandler {
-    private final boolean mHideSdkInfo;
+    private final boolean mAnalysisMode;
 
-    public ManifestPullEventHandler(ApkInfo apkInfo, boolean hideSdkInfo) {
+    public ManifestPullEventHandler(ApkInfo apkInfo, boolean analysisMode) {
         super(apkInfo);
-        mHideSdkInfo = hideSdkInfo;
+        mAnalysisMode = analysisMode;
     }
 
     @Override
@@ -38,70 +35,59 @@ public class ManifestPullEventHandler extends ResXmlPullEventHandler {
         int depth = in.getDepth();
         int type = in.getEventType();
 
-        if (depth == 1) {
+        if (depth == 2 && (type == XmlPullParser.START_TAG || type == XmlPullParser.END_TAG)
+                && in.getName().equals("uses-sdk")) {
             if (type == XmlPullParser.START_TAG) {
-                if (in.getName().equals("manifest")) {
-                    parseManifest(in);
-                    return false;
+                for (int i = 0; i < in.getAttributeCount(); i++) {
+                    if (ResXmlUtils.ANDROID_RES_NS.equals(in.getAttributeNamespace(i))) {
+                        String name = in.getAttributeName(i);
+                        if (name.equals("minSdkVersion")) {
+                            mApkInfo.getSdkInfo().setMinSdkVersion(in.getAttributeValue(i));
+                        } else if (name.equals("targetSdkVersion")) {
+                            mApkInfo.getSdkInfo().setTargetSdkVersion(in.getAttributeValue(i));
+                        } else if (name.equals("maxSdkVersion")) {
+                            mApkInfo.getSdkInfo().setMaxSdkVersion(in.getAttributeValue(i));
+                        }
+                    }
                 }
             }
-        } else if (depth == 2) {
-            if (type == XmlPullParser.START_TAG || type == XmlPullParser.END_TAG) {
-                if (in.getName().equals("uses-sdk")) {
-                    if (type == XmlPullParser.START_TAG) {
-                        parseUsesSdk(in);
-                    }
-                    return mHideSdkInfo;
-                }
+            // Exclude the tag: injected in build time.
+            if (!mAnalysisMode) {
+                return true;
             }
         }
 
         return super.onEvent(in, out);
     }
 
-    private void parseManifest(XmlPullParser in) {
-        ResourcesInfo resourcesInfo = mApkInfo.getResourcesInfo();
-        VersionInfo versionInfo = mApkInfo.getVersionInfo();
+    @Override
+    public boolean onAttribute(XmlPullParser in, XmlSerializer out, String ns, String name, String value)
+            throws XmlPullParserException {
+        int depth = in.getDepth();
 
-        for (int i = 0; i < in.getAttributeCount(); i++) {
-            String ns = in.getAttributeNamespace(i);
-
-            if (ns.isEmpty()) {
-                String name = in.getAttributeName(i);
-
+        if (depth == 1 && in.getName().equals("manifest")) {
+            if (ns == null) {
                 if (name.equals("package")) {
                     // This is temporary and will be compared to actual resources package later.
-                    resourcesInfo.setPackageName(in.getAttributeValue(i));
+                    mApkInfo.getResourcesInfo().setPackageName(value);
                 }
-            } else if (ns.equals(ResXmlUtils.ANDROID_RES_NS)) {
-                String name = in.getAttributeName(i);
-
+            } else if (ResXmlUtils.ANDROID_RES_NS.equals(ns)) {
                 if (name.equals("versionCode")) {
-                    versionInfo.setVersionCode(Integer.parseInt(in.getAttributeValue(i)));
+                    mApkInfo.getVersionInfo().setVersionCode(Integer.parseInt(value));
+                    // Exclude the attribute: injected in build time.
+                    if (!mAnalysisMode) {
+                        return true;
+                    }
                 } else if (name.equals("versionName")) {
-                    versionInfo.setVersionName(in.getAttributeValue(i));
+                    mApkInfo.getVersionInfo().setVersionName(value);
+                    // Exclude the attribute: injected in build time.
+                    if (!mAnalysisMode) {
+                        return true;
+                    }
                 }
             }
         }
-    }
 
-    private void parseUsesSdk(XmlPullParser in) {
-        SdkInfo sdkInfo = mApkInfo.getSdkInfo();
-
-        for (int i = 0; i < in.getAttributeCount(); i++) {
-            String ns = in.getAttributeNamespace(i);
-
-            if (ns.equals(ResXmlUtils.ANDROID_RES_NS)) {
-                String name = in.getAttributeName(i);
-
-                if (name.equals("minSdkVersion")) {
-                    sdkInfo.setMinSdkVersion(in.getAttributeValue(i));
-                } else if (name.equals("targetSdkVersion")) {
-                    sdkInfo.setTargetSdkVersion(in.getAttributeValue(i));
-                } else if (name.equals("maxSdkVersion")) {
-                    sdkInfo.setMaxSdkVersion(in.getAttributeValue(i));
-                }
-            }
-        }
+        return super.onAttribute(in, out, ns, name, value);
     }
 }

@@ -1,0 +1,74 @@
+/*
+ *  Copyright (C) 2010 Ryszard Wiśniewski <brut.alll@gmail.com>
+ *  Copyright (C) 2010 Connor Tumbleson <connor.tumbleson@gmail.com>
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *       https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+package brut.util;
+
+import java.io.InputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.util.HashMap;
+import java.util.Map;
+
+public final class JarUtils {
+    private static final Map<String, Path> sTmpCache = new HashMap<>();
+
+    static {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            synchronized (JarUtils.class) {
+                for (Path file : sTmpCache.values()) {
+                    try {
+                        Files.deleteIfExists(file);
+                    } catch (IOException ignored) {
+                        // Best effort: JVM is exiting.
+                    }
+                }
+            }
+        }));
+    }
+
+    private JarUtils() {}
+
+    public static InputStream getResourceAsStream(Class<?> clz, String name) throws IOException {
+        InputStream in = clz.getResourceAsStream(name);
+        if (in == null) {
+            throw new IOException("JAR entry !" + name + " not found.");
+        }
+        return in;
+    }
+
+    public static synchronized Path getResourceAsFile(Class<?> clz, String name, String prefix) throws IOException {
+        Path file = sTmpCache.get(name);
+        if (file == null) {
+            try (InputStream in = getResourceAsStream(clz, name)) {
+                file = Files.createTempFile(prefix, null);
+                try {
+                    Files.copy(in, file, StandardCopyOption.REPLACE_EXISTING);
+                } catch (IOException | RuntimeException ex) {
+                    try {
+                        Files.deleteIfExists(file);
+                    } catch (IOException suppressed) {
+                        ex.addSuppressed(suppressed);
+                    }
+                    throw ex;
+                }
+            }
+            sTmpCache.put(name, file);
+        }
+        return file;
+    }
+}

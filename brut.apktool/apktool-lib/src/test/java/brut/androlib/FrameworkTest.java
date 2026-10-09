@@ -18,7 +18,8 @@ package brut.androlib;
 
 import brut.androlib.res.Framework;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -33,22 +34,22 @@ public class FrameworkTest extends BaseTest {
 
     @Test
     public void isFrameworkTaggingWorking() throws Exception {
-        sConfig.setFrameworkDirectory(sTmpDir.getAbsolutePath());
+        sConfig.setFrameworkDirectory(sTmpDir.toAbsolutePath().toString());
         sConfig.setFrameworkTag("building");
 
-        File frameApk = new File(sTmpDir, FRAMEWORK_APK);
+        Path frameApk = sTmpDir.resolve(FRAMEWORK_APK);
         new Framework(sConfig).install(frameApk);
 
-        assertTrue(new File(sTmpDir, "2-building.apk").exists());
+        assertTrue(Files.isRegularFile(sTmpDir.resolve("2-building.apk")));
     }
 
     @Test
     public void isFrameworkInstallingWorking() throws Exception {
-        sConfig.setFrameworkDirectory(sTmpDir.getAbsolutePath());
+        sConfig.setFrameworkDirectory(sTmpDir.toAbsolutePath().toString());
 
-        File frameApk = new File(sTmpDir, FRAMEWORK_APK);
+        Path frameApk = sTmpDir.resolve(FRAMEWORK_APK);
         new Framework(sConfig).install(frameApk);
 
-        assertTrue(new File(sTmpDir, "2.apk").exists());
+        assertTrue(Files.isRegularFile(sTmpDir.resolve("2.apk")));
     }
 }

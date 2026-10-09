@@ -689,7 +689,7 @@ public class ResConfig {
 
     @Override
     public String toString() {
-        return "[" + (!mQualifiers.isEmpty() ? mQualifiers.substring(1) : "DEFAULT") + "]";
+        return "[" + (mQualifiers.isEmpty() ? "DEFAULT" : mQualifiers.substring(1)) + "]";
     }
 
     @Override
