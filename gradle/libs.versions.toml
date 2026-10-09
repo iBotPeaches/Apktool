@@ -1,23 +1,23 @@
 [versions]
-baksmali = "b6365a84f4" # https://github.com/google/smali/issues/100
+baksmali = "3.0.10"
 commons_io = "2.22.0"
 commons_cli = "1.11.0"
 guava = "33.7.2-jre"
 junit = "4.13.2"
 r8 = "9.1.31"
-smali = "b6365a84f4" # https://github.com/google/smali/issues/100
+smali = "3.0.10"
 xmlpull = "1.1.3.1"
 xmlunit = "2.14.0"
 maven-publish = "0.37.0"
 
 [libraries]
-baksmali = { module = "com.github.iBotPeaches.smali:smali-baksmali", version.ref = "baksmali" }
+baksmali = { module = "com.android.tools.smali:smali-baksmali", version.ref = "baksmali" }
 commons_cli = { module = "commons-cli:commons-cli", version.ref = "commons_cli"}
 commons_io = { module = "commons-io:commons-io", version.ref = "commons_io" }
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
 junit = { module = "junit:junit", version.ref = "junit" }
 r8 = { module = "com.android.tools:r8", version.ref = "r8" }
-smali = { module = "com.github.iBotPeaches.smali:smali", version.ref = "smali" }
+smali = { module = "com.android.tools.smali:smali", version.ref = "smali" }
 xmlpull = { module = "xmlpull:xmlpull", version.ref = "xmlpull" }
 xmlunit = { module = "org.xmlunit:xmlunit-legacy", version.ref = "xmlunit" }
 
