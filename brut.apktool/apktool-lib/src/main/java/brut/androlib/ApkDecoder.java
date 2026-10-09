@@ -33,6 +33,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.LinkOption;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -79,8 +80,12 @@ public class ApkDecoder {
 
     public void decode(Path outDir) throws AndrolibException {
         try {
-            mSmaliDecoder = new SmaliDecoder(mApkFile.getPath(), mConfig.isBaksmaliDebugMode());
-            mResDecoder = new ResDecoder(mApkFile, mConfig);
+            if (!mConfig.isDecodeSourcesNone()) {
+                mSmaliDecoder = new SmaliDecoder(mApkFile.getPath(), mConfig.isBaksmaliDebugMode());
+            }
+            if (!mConfig.isDecodeResourcesNone()) {
+                mResDecoder = new ResDecoder(mApkFile, mConfig);
+            }
             mWorker = mConfig.getJobs() > 1 ? new BackgroundWorker(mConfig.getJobs() - 1) : null;
 
             // We don't follow symlinks here for safety reasons.
@@ -224,8 +229,8 @@ public class ApkDecoder {
     }
 
     private void copyRawFiles(Path outDir) throws AndrolibException, IOException {
-        Set<String> dexFiles = mSmaliDecoder.getDexFiles();
-        Map<String, String> resFileMap = mResDecoder.getResFileMap();
+        Set<String> dexFiles = mSmaliDecoder != null ? mSmaliDecoder.getDexFiles() : Collections.emptySet();
+        Map<String, String> resFileMap = mResDecoder != null ? mResDecoder.getResFileMap() : Collections.emptyMap();
         boolean noAssets = mConfig.isDecodeAssetsNone();
 
         for (String dirName : RAW_DIRS) {
@@ -247,8 +252,8 @@ public class ApkDecoder {
     }
 
     private void copyUnknownFiles(Path outDir) throws AndrolibException, IOException {
-        Set<String> dexFiles = mSmaliDecoder.getDexFiles();
-        Map<String, String> resFileMap = mResDecoder.getResFileMap();
+        Set<String> dexFiles = mSmaliDecoder != null ? mSmaliDecoder.getDexFiles() : Collections.emptySet();
+        Map<String, String> resFileMap = mResDecoder != null ? mResDecoder.getResFileMap() : Collections.emptyMap();
         Path unknownDir = outDir.resolve("unknown");
 
         Log.i(TAG, "Copying unknown files...");
@@ -268,15 +273,15 @@ public class ApkDecoder {
         apkInfo.setVersion(mConfig.getVersion());
 
         // If we did not decode the manifest, store the inferred dex opcode API level.
-        if (!mApkFile.containsFile("AndroidManifest.xml") || mConfig.isDecodeResourcesNone()) {
-            int apiLevel = mSmaliDecoder.getInferredApiLevel();
+        if (mConfig.isDecodeResourcesNone() || !mApkFile.containsFile("AndroidManifest.xml")) {
+            int apiLevel = mSmaliDecoder != null ? mSmaliDecoder.getInferredApiLevel() : 0;
             if (apiLevel > 0) {
                 apkInfo.getSdkInfo().setMinSdkVersion(Integer.toString(apiLevel));
             }
         }
 
         // Record uncompressed files.
-        Map<String, String> resFileMap = mResDecoder.getResFileMap();
+        Map<String, String> resFileMap = mResDecoder != null ? mResDecoder.getResFileMap() : Collections.emptyMap();
         Set<String> uncompressedExts = new HashSet<>();
         Set<String> uncompressedFiles = new HashSet<>();
 

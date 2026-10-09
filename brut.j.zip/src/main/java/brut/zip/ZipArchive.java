@@ -156,7 +156,7 @@ public class ZipArchive implements Closeable {
 
     @Override
     public String toString() {
-        return String.format("ZipArchive{name=%s}", mZip.getName());
+        return String.format("ZipArchive{path=%s}", mPath);
     }
 
     @Override
