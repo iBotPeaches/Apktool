@@ -16,29 +16,33 @@
  */
 package brut.androlib;
 
-import brut.directory.ExtFile;
+import brut.androlib.ApkFile;
+
+import java.nio.file.Path;
 
 import org.junit.*;
 import static org.junit.Assert.*;
 
 public class UnknownCompressionTest extends BaseTest {
-    private static ExtFile sTestApk;
-    private static ExtFile sNewApk;
+    private static ApkFile sTestApk;
+    private static ApkFile sNewApk;
 
     @BeforeClass
     public static void beforeClass() throws Exception {
         copyResourceDir(UnknownCompressionTest.class, "unknown_compression", sTmpDir);
 
-        sConfig.setFrameworkDirectory(sTmpDir.getAbsolutePath());
+        sConfig.setFrameworkDirectory(sTmpDir.toAbsolutePath().toString());
 
         log("Building unknown_compression.apk...");
-        sTestApk = new ExtFile(sTmpDir, "unknown_compression.apk");
-        ExtFile testDir = new ExtFile(sTestApk + ".out");
-        new ApkDecoder(sTestApk, sConfig).decode(testDir);
+        Path testApk = sTmpDir.resolve("unknown_compression.apk");
+        Path testDir = sTmpDir.resolve(testApk.getFileName() + ".out");
+        new ApkDecoder(testApk, sConfig).decode(testDir);
 
         log("Decoding unknown_compression.apk...");
         new ApkBuilder(testDir, sConfig).build(null);
-        sNewApk = new ExtFile(testDir, "dist/" + sTestApk.getName());
+
+        sTestApk = new ApkFile(testApk);
+        sNewApk = new ApkFile(testDir.resolve("dist/" + testApk.getFileName()));
     }
 
     @AfterClass
@@ -49,9 +53,9 @@ public class UnknownCompressionTest extends BaseTest {
 
     @Test
     public void pkmExtensionDeflatedTest() throws Exception {
-        String fileName = "assets/bin/Data/test.pkm";
-        int control = sTestApk.getDirectory().getCompressionLevel(fileName);
-        int rebuilt = sNewApk.getDirectory().getCompressionLevel(fileName);
+        String name = "assets/bin/Data/test.pkm";
+        int control = sTestApk.getFile(name).getMethod();
+        int rebuilt = sNewApk.getFile(name).getMethod();
 
         // Check that control = rebuilt (both deflated)
         // Add extra check for checking not equal to 0, just in case control gets broken
@@ -61,9 +65,9 @@ public class UnknownCompressionTest extends BaseTest {
 
     @Test
     public void doubleExtensionStoredTest() throws Exception {
-        String fileName = "assets/bin/Data/two.extension.file";
-        int control = sTestApk.getDirectory().getCompressionLevel(fileName);
-        int rebuilt = sNewApk.getDirectory().getCompressionLevel(fileName);
+        String name = "assets/bin/Data/two.extension.file";
+        int control = sTestApk.getFile(name).getMethod();
+        int rebuilt = sNewApk.getFile(name).getMethod();
 
         // Check that control = rebuilt (both stored)
         // Add extra check for checking = 0 to enforce check for stored just in case control breaks
@@ -73,9 +77,9 @@ public class UnknownCompressionTest extends BaseTest {
 
     @Test
     public void confirmJsonFileIsDeflatedTest() throws Exception {
-        String fileName = "test.json";
-        int control = sTestApk.getDirectory().getCompressionLevel(fileName);
-        int rebuilt = sNewApk.getDirectory().getCompressionLevel(fileName);
+        String name = "test.json";
+        int control = sTestApk.getFile(name).getMethod();
+        int rebuilt = sNewApk.getFile(name).getMethod();
 
         assertEquals(control, rebuilt);
         assertEquals(8, rebuilt);
@@ -83,9 +87,9 @@ public class UnknownCompressionTest extends BaseTest {
 
     @Test
     public void confirmPngFileIsStoredTest() throws Exception {
-        String fileName = "950x150.png";
-        int control = sTestApk.getDirectory().getCompressionLevel(fileName);
-        int rebuilt = sNewApk.getDirectory().getCompressionLevel(fileName);
+        String name = "950x150.png";
+        int control = sTestApk.getFile(name).getMethod();
+        int rebuilt = sNewApk.getFile(name).getMethod();
 
         assertNotEquals(control, rebuilt);
         assertEquals(0, rebuilt);

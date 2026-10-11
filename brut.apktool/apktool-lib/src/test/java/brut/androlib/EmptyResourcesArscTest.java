@@ -16,7 +16,8 @@
  */
 package brut.androlib;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -25,14 +26,14 @@ public class EmptyResourcesArscTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        sTestOrigDir = new File(sTmpDir, "issue1730-orig");
-        sTestNewDir = new File(sTmpDir, "issue1730-new");
+        sTestOrigDir = sTmpDir.resolve("issue1730-orig");
+        sTestNewDir = sTmpDir.resolve("issue1730-new");
 
         log("Unpacking issue1730.apk...");
         copyResourceDir(EmptyResourcesArscTest.class, "issue1730", sTestOrigDir);
 
         log("Decoding issue1730.apk...");
-        File testApk = new File(sTestOrigDir, "issue1730.apk");
+        Path testApk = sTestOrigDir.resolve("issue1730.apk");
         new ApkDecoder(testApk, sConfig).decode(sTestNewDir);
 
         log("Building issue1730.apk...");
@@ -41,7 +42,7 @@ public class EmptyResourcesArscTest extends BaseTest {
 
     @Test
     public void buildAndDecodeTest() {
-        assertTrue(sTestNewDir.isDirectory());
-        assertTrue(sTestOrigDir.isDirectory());
+        assertTrue(Files.isDirectory(sTestNewDir));
+        assertTrue(Files.isDirectory(sTestOrigDir));
     }
 }

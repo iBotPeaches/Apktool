@@ -16,7 +16,7 @@
  */
 package brut.androlib;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -35,8 +35,8 @@ public class DynamicDexTest extends BaseTest {
         sConfig.setDecodeSources(Config.DecodeSources.ONLY_MAIN_CLASSES);
 
         log("Decoding " + TEST_APK + "...");
-        File testApk = new File(sTmpDir, TEST_APK);
-        File testDir = new File(testApk + ".out.main");
+        Path testApk = sTmpDir.resolve(TEST_APK);
+        Path testDir = sTmpDir.resolve(testApk.getFileName() + ".out.main");
         new ApkDecoder(testApk, sConfig).decode(testDir);
 
         log("Building " + TEST_APK + "...");
@@ -48,8 +48,8 @@ public class DynamicDexTest extends BaseTest {
         sConfig.setDecodeSources(Config.DecodeSources.FULL);
 
         log("Decoding " + TEST_APK + "...");
-        File testApk = new File(sTmpDir, TEST_APK);
-        File testDir = new File(testApk + ".out.full");
+        Path testApk = sTmpDir.resolve(TEST_APK);
+        Path testDir = sTmpDir.resolve(testApk.getFileName() + ".out.full");
         new ApkDecoder(testApk, sConfig).decode(testDir);
 
         log("Building " + TEST_APK + "...");

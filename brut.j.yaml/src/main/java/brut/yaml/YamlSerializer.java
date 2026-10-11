@@ -37,8 +37,10 @@ public class YamlSerializer implements Closeable {
 
     @Override
     public void close() throws IOException {
-        mWriter.close();
-        mClosed = true;
+        if (!mClosed) {
+            mWriter.close();
+            mClosed = true;
+        }
     }
 
     private static String encodeKey(String key) {

@@ -16,26 +16,27 @@
  */
 package brut.androlib;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.junit.*;
 import static org.junit.Assert.*;
 
 public class OutsideOfDirectoryEntryTest extends BaseTest {
+    private static final String TEST_APK = "issue1589.apk";
 
     @BeforeClass
     public static void beforeClass() throws Exception {
         copyResourceDir(OutsideOfDirectoryEntryTest.class, "issue1589", sTmpDir);
-
-        File testApk = new File(sTmpDir, "issue1589.apk");
-        File testDir = new File(testApk + ".out");
-        new ApkDecoder(testApk, sConfig).decode(testDir);
-        sTestNewDir = testDir;
     }
 
     @Test
-    public void skippedDecodingOfInvalidFileTest() {
-        assertTrue(sTestNewDir.isDirectory());
-        assertFalse(new File(sTestNewDir, "assets").isDirectory());
+    public void skippedDecodingOfInvalidFileTest() throws Exception {
+        Path testApk = sTmpDir.resolve(TEST_APK);
+        Path testDir = sTmpDir.resolve(testApk.getFileName() + ".out");
+        new ApkDecoder(testApk, sConfig).decode(testDir);
+
+        assertTrue(Files.isDirectory(testDir));
+        assertFalse(Files.isDirectory(testDir.resolve("assets")));
     }
 }

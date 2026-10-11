@@ -16,7 +16,9 @@
  */
 package brut.androlib.meta;
 
-import brut.yaml.*;
+import brut.yaml.YamlPullParser;
+import brut.yaml.YamlSerializable;
+import brut.yaml.YamlSerializer;
 
 import java.io.IOException;
 import java.util.ArrayList;

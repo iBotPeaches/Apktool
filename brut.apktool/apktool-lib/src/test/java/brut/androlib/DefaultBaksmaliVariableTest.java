@@ -16,7 +16,7 @@
  */
 package brut.androlib;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -25,14 +25,14 @@ public class DefaultBaksmaliVariableTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        sTestOrigDir = new File(sTmpDir, "issue1481-orig");
-        sTestNewDir = new File(sTmpDir, "issue1481-new");
+        sTestOrigDir = sTmpDir.resolve("issue1481-orig");
+        sTestNewDir = sTmpDir.resolve("issue1481-new");
 
         log("Unpacking issue1481...");
         copyResourceDir(DefaultBaksmaliVariableTest.class, "issue1481", sTestOrigDir);
 
         log("Building issue1481.jar...");
-        File testJar = new File(sTmpDir, "issue1481.jar");
+        Path testJar = sTmpDir.resolve("issue1481.jar");
         new ApkBuilder(sTestOrigDir, sConfig).build(testJar);
 
         log("Decoding issue1481.jar...");
@@ -88,7 +88,7 @@ public class DefaultBaksmaliVariableTest extends BaseTest {
           + "    return-void\n"
           + ".end method";
 
-        String obtained = readTextFile(new File(sTestNewDir, "smali/com/ibotpeaches/issue1481/BuildConfig.smali"));
+        String obtained = readTextFile(sTestNewDir.resolve("smali/com/ibotpeaches/issue1481/BuildConfig.smali"));
 
         assertEquals(replaceNewlines(expected), replaceNewlines(obtained));
     }

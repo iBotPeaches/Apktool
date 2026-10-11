@@ -19,7 +19,8 @@ package brut.androlib;
 import brut.xml.XmlUtils;
 import org.w3c.dom.Document;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -36,19 +37,19 @@ public class DecodeResolveTest extends BaseTest {
     public void decodeResolveDefaultTest() throws Exception {
         sConfig.setDecodeResolve(Config.DecodeResolve.DEFAULT);
 
-        File testApk = new File(sTmpDir, TEST_APK);
-        File testDir = new File(testApk + ".out.default");
+        Path testApk = sTmpDir.resolve(TEST_APK);
+        Path testDir = sTmpDir.resolve(testApk.getFileName() + ".out.default");
         new ApkDecoder(testApk, sConfig).decode(testDir);
 
-        assertTrue(new File(testDir, "res/values/strings.xml").isFile());
+        assertTrue(Files.isRegularFile(testDir.resolve("res/values/strings.xml")));
 
-        Document attrDocument = XmlUtils.loadDocument(new File(testDir, "res/values/attrs.xml"));
+        Document attrDocument = XmlUtils.loadDocument(testDir.resolve("res/values/attrs.xml"));
         assertEquals(4, attrDocument.getElementsByTagName("enum").getLength());
 
-        Document colorDocument = XmlUtils.loadDocument(new File(testDir, "res/values/colors.xml"));
+        Document colorDocument = XmlUtils.loadDocument(testDir.resolve("res/values/colors.xml"));
         assertEquals(8, colorDocument.getElementsByTagName("color").getLength());
 
-        Document publicDocument = XmlUtils.loadDocument(new File(testDir, "res/values/public.xml"));
+        Document publicDocument = XmlUtils.loadDocument(testDir.resolve("res/values/public.xml"));
         assertEquals(22, publicDocument.getElementsByTagName("public").getLength());
     }
 
@@ -56,21 +57,21 @@ public class DecodeResolveTest extends BaseTest {
     public void decodeResolveGreedyTest() throws Exception {
         sConfig.setDecodeResolve(Config.DecodeResolve.GREEDY);
 
-        File testApk = new File(sTmpDir, TEST_APK);
-        File testDir = new File(testApk + ".out.greedy");
+        Path testApk = sTmpDir.resolve(TEST_APK);
+        Path testDir = sTmpDir.resolve(testApk.getFileName() + ".out.greedy");
         new ApkDecoder(testApk, sConfig).decode(testDir);
 
-        assertTrue(new File(testDir, "res/values/strings.xml").isFile());
+        assertTrue(Files.isRegularFile(testDir.resolve("res/values/strings.xml")));
 
-        File attrXml = new File(testDir, "res/values/attrs.xml");
+        Path attrXml = testDir.resolve("res/values/attrs.xml");
         Document attrDocument = XmlUtils.loadDocument(attrXml);
         assertEquals(4, attrDocument.getElementsByTagName("enum").getLength());
 
-        File colorXml = new File(testDir, "res/values/colors.xml");
+        Path colorXml = testDir.resolve("res/values/colors.xml");
         Document colorDocument = XmlUtils.loadDocument(colorXml);
         assertEquals(9, colorDocument.getElementsByTagName("color").getLength());
 
-        File publicXml = new File(testDir, "res/values/public.xml");
+        Path publicXml = testDir.resolve("res/values/public.xml");
         Document publicDocument = XmlUtils.loadDocument(publicXml);
         assertEquals(23, publicDocument.getElementsByTagName("public").getLength());
     }
@@ -79,21 +80,21 @@ public class DecodeResolveTest extends BaseTest {
     public void decodeResolveLazyTest() throws Exception {
         sConfig.setDecodeResolve(Config.DecodeResolve.LAZY);
 
-        File testApk = new File(sTmpDir, TEST_APK);
-        File testDir = new File(testApk + ".out.lazy");
+        Path testApk = sTmpDir.resolve(TEST_APK);
+        Path testDir = sTmpDir.resolve(testApk.getFileName() + ".out.lazy");
         new ApkDecoder(testApk, sConfig).decode(testDir);
 
-        assertTrue(new File(testDir, "res/values/strings.xml").isFile());
+        assertTrue(Files.isRegularFile(testDir.resolve("res/values/strings.xml")));
 
-        File attrXml = new File(testDir, "res/values/attrs.xml");
+        Path attrXml = testDir.resolve("res/values/attrs.xml");
         Document attrDocument = XmlUtils.loadDocument(attrXml);
         assertEquals(3, attrDocument.getElementsByTagName("enum").getLength());
 
-        File colorXml = new File(testDir, "res/values/colors.xml");
+        Path colorXml = testDir.resolve("res/values/colors.xml");
         Document colorDocument = XmlUtils.loadDocument(colorXml);
         assertEquals(8, colorDocument.getElementsByTagName("color").getLength());
 
-        File publicXml = new File(testDir, "res/values/public.xml");
+        Path publicXml = testDir.resolve("res/values/public.xml");
         Document publicDocument = XmlUtils.loadDocument(publicXml);
         assertEquals(21, publicDocument.getElementsByTagName("public").getLength());
     }

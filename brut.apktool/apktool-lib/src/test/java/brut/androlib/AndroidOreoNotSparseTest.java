@@ -16,7 +16,8 @@
  */
 package brut.androlib;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -25,14 +26,14 @@ public class AndroidOreoNotSparseTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        sTestOrigDir = new File(sTmpDir, "issue1594-orig");
-        sTestNewDir = new File(sTmpDir, "issue1594-new");
+        sTestOrigDir = sTmpDir.resolve("issue1594-orig");
+        sTestNewDir = sTmpDir.resolve("issue1594-new");
 
         log("Unpacking not_sparse.apk...");
         copyResourceDir(AndroidOreoNotSparseTest.class, "issue1594", sTestOrigDir);
 
         log("Decoding not_sparse.apk...");
-        File testApk = new File(sTestOrigDir, "not_sparse.apk");
+        Path testApk = sTestOrigDir.resolve("not_sparse.apk");
         new ApkDecoder(testApk, sConfig).decode(sTestNewDir);
 
         log("Building not_sparse.apk...");
@@ -41,7 +42,7 @@ public class AndroidOreoNotSparseTest extends BaseTest {
 
     @Test
     public void buildAndDecodeTest() {
-        assertTrue(sTestNewDir.isDirectory());
-        assertTrue(sTestOrigDir.isDirectory());
+        assertTrue(Files.isDirectory(sTestNewDir));
+        assertTrue(Files.isDirectory(sTestOrigDir));
     }
 }

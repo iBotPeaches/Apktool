@@ -16,7 +16,8 @@
  */
 package brut.androlib;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -31,21 +32,21 @@ public class AndResGuardTest extends BaseTest {
 
     @Test
     public void checkifAndResDecodeRemapsRFolder() throws Exception {
-        File testApk = new File(sTmpDir, TEST_APK);
-        File testDir = new File(testApk + ".out");
+        Path testApk = sTmpDir.resolve(TEST_APK);
+        Path testDir = sTmpDir.resolve(testApk.getFileName() + ".out");
         new ApkDecoder(testApk, sConfig).decode(testDir);
 
-        assertTrue(new File(testDir, "res/mipmap-hdpi-v4/a.png").isFile());
+        assertTrue(Files.isRegularFile(testDir.resolve("res/mipmap-hdpi-v4/a.png")));
     }
 
     @Test
     public void checkIfAndResDecodeIgnoresRFolderInRawMode() throws Exception {
         sConfig.setDecodeResources(Config.DecodeResources.NONE);
 
-        File testApk = new File(sTmpDir, TEST_APK);
-        File testDir = new File(testApk + ".out.raw");
+        Path testApk = sTmpDir.resolve(TEST_APK);
+        Path testDir = sTmpDir.resolve(testApk.getFileName() + ".out.raw");
         new ApkDecoder(testApk, sConfig).decode(testDir);
 
-        assertTrue(new File(testDir, "unknown/r/a/a.png").isFile());
+        assertTrue(Files.isRegularFile(testDir.resolve("unknown/r/a/a.png")));
     }
 }

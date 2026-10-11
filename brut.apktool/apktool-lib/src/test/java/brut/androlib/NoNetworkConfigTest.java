@@ -19,7 +19,8 @@ package brut.androlib;
 import brut.xml.XmlUtils;
 import org.w3c.dom.Document;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -29,8 +30,8 @@ public class NoNetworkConfigTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        sTestOrigDir = new File(sTmpDir, "network_config-orig");
-        sTestNewDir = new File(sTmpDir, "network_config-new");
+        sTestOrigDir = sTmpDir.resolve("network_config-orig");
+        sTestNewDir = sTmpDir.resolve("network_config-new");
 
         log("Unpacking network_config...");
         copyResourceDir(NoNetworkConfigTest.class, "network_config/none", sTestOrigDir);
@@ -38,7 +39,7 @@ public class NoNetworkConfigTest extends BaseTest {
         sConfig.setNetSecConf(true);
 
         log("Building network_config.apk...");
-        File testApk = new File(sTmpDir, "network_config.apk");
+        Path testApk = sTmpDir.resolve("network_config.apk");
         new ApkBuilder(sTestOrigDir, sConfig).build(testApk);
 
         log("Decoding network_config.apk...");
@@ -47,7 +48,7 @@ public class NoNetworkConfigTest extends BaseTest {
 
     @Test
     public void buildAndDecodeTest() {
-        assertTrue(sTestNewDir.isDirectory());
+        assertTrue(Files.isDirectory(sTestNewDir));
     }
 
     @Test
@@ -65,7 +66,7 @@ public class NoNetworkConfigTest extends BaseTest {
           + "    </base-config>\n"
           + "</network-security-config>";
 
-        String obtained = readTextFile(new File(sTestNewDir, "res/xml/network_security_config.xml"));
+        String obtained = readTextFile(sTestNewDir.resolve("res/xml/network_security_config.xml"));
 
         assertXMLEqual(expected, obtained);
     }
@@ -74,7 +75,7 @@ public class NoNetworkConfigTest extends BaseTest {
     public void netSecConfInManifest() throws Exception {
         log("Validating network security config in Manifest...");
 
-        Document doc = XmlUtils.loadDocument(new File(sTestNewDir, "AndroidManifest.xml"), true);
+        Document doc = XmlUtils.loadDocument(sTestNewDir.resolve("AndroidManifest.xml"), true);
         String expression = "/manifest/application/@android:networkSecurityConfig";
         String value = XmlUtils.evaluateXPath(doc, expression, String.class);
         assertEquals("@xml/network_security_config", value);

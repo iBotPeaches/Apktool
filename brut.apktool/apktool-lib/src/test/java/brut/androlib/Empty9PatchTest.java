@@ -16,7 +16,8 @@
  */
 package brut.androlib;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -31,12 +32,12 @@ public class Empty9PatchTest extends BaseTest {
 
     @Test
     public void decodeWithEmpty9PatchFile() throws Exception {
-        File testApk = new File(sTmpDir, TEST_APK);
-        File testDir = new File(testApk + ".out");
+        Path testApk = sTmpDir.resolve(TEST_APK);
+        Path testDir = sTmpDir.resolve(testApk.getFileName() + ".out");
         new ApkDecoder(testApk, sConfig).decode(testDir);
 
-        File aPng = new File(testDir, "res/drawable-xhdpi/empty.9.png");
-        assertTrue(aPng.isFile());
-        assertEquals(0, aPng.length());
+        Path file = testDir.resolve("res/drawable-xhdpi/empty.9.png");
+        assertTrue(Files.isRegularFile(file));
+        assertEquals(0, Files.size(file));
     }
 }

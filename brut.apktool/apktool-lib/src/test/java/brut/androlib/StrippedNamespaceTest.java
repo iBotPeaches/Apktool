@@ -20,7 +20,7 @@ import brut.xml.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -35,11 +35,11 @@ public class StrippedNamespaceTest extends BaseTest {
 
     @Test
     public void checkAssignedNamespaceTest() throws Exception {
-        File testApk = new File(sTmpDir, TEST_APK);
-        File testDir = new File(testApk + ".out");
+        Path testApk = sTmpDir.resolve(TEST_APK);
+        Path testDir = sTmpDir.resolve(testApk.getFileName() + ".out");
         new ApkDecoder(testApk, sConfig).decode(testDir);
 
-        Document doc = XmlUtils.loadDocument(new File(testDir, "res/drawable/trap.xml"), true);
+        Document doc = XmlUtils.loadDocument(testDir.resolve("res/drawable/trap.xml"), true);
         String expression = "/selector/item/@test:is_obfuscated";
         Node node = XmlUtils.evaluateXPath(doc, expression, Node.class);
         assertNotNull(node);
