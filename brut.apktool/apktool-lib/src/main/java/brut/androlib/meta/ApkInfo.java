@@ -16,34 +16,21 @@
  */
 package brut.androlib.meta;
 
-import brut.androlib.exceptions.AndrolibException;
-import brut.directory.DirectoryException;
-import brut.directory.ExtFile;
-import brut.yaml.*;
-import com.google.common.annotations.VisibleForTesting;
+import brut.yaml.YamlPullParser;
+import brut.yaml.YamlSerializable;
+import brut.yaml.YamlSerializer;
 
-import java.io.File;
 import java.io.InputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.regex.Pattern;
 
 public class ApkInfo implements YamlSerializable {
-    public static final String[] RAW_DIRS = { "assets", "lib" };
-
-    public static final Pattern CLASSES_FILES_PATTERN = Pattern.compile("classes([2-9]|[1-9][0-9]+)?\\.dex");
-
-    public static final Pattern ORIGINAL_FILES_PATTERN = Pattern.compile(
-        "AndroidManifest\\.xml|META-INF/[^/]+\\.(RSA|SF|MF)|stamp-cert-sha256");
-
-    public static final Pattern STANDARD_FILES_PATTERN = Pattern.compile(
-        "resources\\.arsc|(" + String.join("|", RAW_DIRS) + ")/.*|"
-      + CLASSES_FILES_PATTERN.pattern() + "|" + ORIGINAL_FILES_PATTERN.pattern());
-
     private String mVersion;
     private String mApkFileName;
     private final UsesFramework mUsesFramework;
@@ -53,9 +40,6 @@ public class ApkInfo implements YamlSerializable {
     private final ResourcesInfo mResourcesInfo;
     private final Set<String> mFeatureFlags;
     private final List<String> mDoNotCompress;
-
-    // Only set when loaded from a file (not a stream).
-    private ExtFile mApkFile;
 
     public ApkInfo() {
         mVersion = null;
@@ -69,8 +53,11 @@ public class ApkInfo implements YamlSerializable {
         mDoNotCompress = new ArrayList<>();
     }
 
-    @VisibleForTesting
-    static ApkInfo load(InputStream in) throws IOException {
+    public static ApkInfo load(Path file) throws IOException {
+        return load(Files.newInputStream(file));
+    }
+
+    public static ApkInfo load(InputStream in) throws IOException {
         try (YamlPullParser parser = new YamlPullParser(in)) {
             ApkInfo apkInfo = new ApkInfo();
             parser.readObject(apkInfo);
@@ -78,16 +65,12 @@ public class ApkInfo implements YamlSerializable {
         }
     }
 
-    public static ApkInfo load(File file) throws IOException {
-        try (YamlPullParser parser = new YamlPullParser(Files.newInputStream(file.toPath()))) {
-            ApkInfo apkInfo = new ApkInfo();
-            parser.readObject(apkInfo);
-            return apkInfo;
-        }
+    public void save(Path file) throws IOException {
+        save(Files.newOutputStream(file));
     }
 
-    public void save(File file) throws IOException {
-        try (YamlSerializer serial = new YamlSerializer(Files.newOutputStream(file.toPath()))) {
+    public void save(OutputStream out) throws IOException {
+        try (YamlSerializer serial = new YamlSerializer(out)) {
             serialize(serial);
         }
     }
@@ -206,49 +189,5 @@ public class ApkInfo implements YamlSerializable {
 
     public List<String> getDoNotCompress() {
         return mDoNotCompress;
-    }
-
-    public ExtFile getApkFile() {
-        return mApkFile;
-    }
-
-    public void setApkFile(ExtFile apkFile) {
-        mApkFile = apkFile;
-        if (mApkFileName == null) {
-            mApkFileName = apkFile.getName();
-        }
-    }
-
-    public boolean hasSources() throws AndrolibException {
-        if (mApkFile == null) {
-            return false;
-        }
-        try {
-            return mApkFile.getDirectory().containsFile("classes.dex");
-        } catch (DirectoryException ex) {
-            throw new AndrolibException(ex);
-        }
-    }
-
-    public boolean hasManifest() throws AndrolibException {
-        if (mApkFile == null) {
-            return false;
-        }
-        try {
-            return mApkFile.getDirectory().containsFile("AndroidManifest.xml");
-        } catch (DirectoryException ex) {
-            throw new AndrolibException(ex);
-        }
-    }
-
-    public boolean hasResources() throws AndrolibException {
-        if (mApkFile == null) {
-            return false;
-        }
-        try {
-            return mApkFile.getDirectory().containsFile("resources.arsc");
-        } catch (DirectoryException ex) {
-            throw new AndrolibException(ex);
-        }
     }
 }

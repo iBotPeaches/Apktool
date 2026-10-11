@@ -63,9 +63,7 @@ public final class TextUtils {
         -140, -143, -147, -150, -153, -157
     };
 
-    private TextUtils() {
-        // Private constructor for utility class.
-    }
+    private TextUtils() {}
 
     public static String matchSuffix(CharSequence text, String... suffixes) {
         int len = text.length();

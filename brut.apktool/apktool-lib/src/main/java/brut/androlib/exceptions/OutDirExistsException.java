@@ -16,9 +16,11 @@
  */
 package brut.androlib.exceptions;
 
+import java.nio.file.Path;
+
 public class OutDirExistsException extends AndrolibException {
 
-    public OutDirExistsException(String path) {
+    public OutDirExistsException(Path path) {
         super("Destination directory (" + path + ") already exists. Use -f option if you want to overwrite it.");
     }
 }

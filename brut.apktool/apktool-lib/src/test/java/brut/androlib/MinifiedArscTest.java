@@ -16,7 +16,7 @@
  */
 package brut.androlib;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -28,8 +28,8 @@ public class MinifiedArscTest extends BaseTest {
     public static void beforeClass() throws Exception {
         copyResourceDir(MinifiedArscTest.class, "issue1157", sTmpDir);
 
-        File testApk = new File(sTmpDir, "issue1157.apk");
-        sTestNewDir = new File(testApk + ".out");
+        Path testApk = sTmpDir.resolve("issue1157.apk");
+        sTestNewDir = sTmpDir.resolve(testApk.getFileName() + ".out");
 
         new ApkDecoder(testApk, sConfig).decode(sTestNewDir);
     }
@@ -42,7 +42,7 @@ public class MinifiedArscTest extends BaseTest {
           + "    <com.ibotpeaches.issue1157.MyCustomView n1:max=\"100\" n2:default_value=\"1.0\" n2:max_value=\"5.0\" n2:min_value=\"0.2\" xmlns:n2=\"http://schemas.android.com/apk/res-auto\" />\n"
           + "</LinearLayout>";
 
-        String obtained = readTextFile(new File(sTestNewDir, "res/xml/custom.xml"));
+        String obtained = readTextFile(sTestNewDir.resolve("res/xml/custom.xml"));
 
         assertXMLEqual(expected, obtained);
     }

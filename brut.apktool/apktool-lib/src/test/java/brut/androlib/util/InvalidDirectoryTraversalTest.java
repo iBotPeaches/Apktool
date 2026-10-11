@@ -17,55 +17,38 @@
 package brut.androlib.util;
 
 import brut.androlib.BaseTest;
-import brut.util.BrutIO;
-import brut.util.OSDetection;
+import brut.util.IOUtils;
 
-import java.io.File;
-import java.nio.file.InvalidPathException;
+import java.nio.file.Paths;
 
 import org.junit.*;
 import static org.junit.Assert.*;
 
 public class InvalidDirectoryTraversalTest extends BaseTest {
 
-    @BeforeClass
-    public static void beforeClass() throws Exception {
-        copyResourceDir(InvalidDirectoryTraversalTest.class, "util/traversal", sTmpDir);
+    @Test(expected = IllegalArgumentException.class)
+    public void emptyPathTest() throws Exception {
+        IOUtils.sanitizePath(sTmpDir, "");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void invalidTraversalTest() throws Exception {
+        IOUtils.sanitizePath(sTmpDir, Paths.get("..", "file").toString());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void invalidAbsoluteTest() throws Exception {
+        IOUtils.sanitizePath(sTmpDir, Paths.get("").toAbsolutePath().getRoot().resolve("file").toString());
     }
 
     @Test
     public void validFileTest() throws Exception {
-        String validFileName = BrutIO.sanitizePath(sTmpDir, "file");
-        assertEquals(validFileName, "file");
-        assertTrue(new File(sTmpDir, validFileName).isFile());
-    }
-
-    @Test(expected = InvalidPathException.class)
-    public void invalidBackwardFileTest() throws Exception {
-        BrutIO.sanitizePath(sTmpDir, "../file");
-    }
-
-    @Test(expected = InvalidPathException.class)
-    public void invalidRootFileTest() throws Exception {
-        String rootLocation = OSDetection.isWindows() ? "C:/" : File.separator;
-        BrutIO.sanitizePath(sTmpDir, rootLocation + "file");
-    }
-
-    @Test(expected = InvalidPathException.class)
-    public void noFilePassedTest() throws Exception {
-        BrutIO.sanitizePath(sTmpDir, "");
-    }
-
-    @Test(expected = InvalidPathException.class)
-    public void invalidBackwardPathOnWindows() throws Exception {
-        String invalidPath = OSDetection.isWindows() ? "..\\..\\app.exe" : "../../app";
-        BrutIO.sanitizePath(sTmpDir, invalidPath);
+        assertEquals("file", IOUtils.sanitizePath(sTmpDir, "file"));
     }
 
     @Test
-    public void validDirectoryFileTest() throws Exception {
-        String fileName = "dir" + File.separator + "file";
-        String validFileName = BrutIO.sanitizePath(sTmpDir, fileName);
-        assertEquals(fileName, validFileName);
+    public void validNestedFileTest() throws Exception {
+        String path = Paths.get("dir", "file").toString();
+        assertEquals(path, IOUtils.sanitizePath(sTmpDir, path));
     }
 }

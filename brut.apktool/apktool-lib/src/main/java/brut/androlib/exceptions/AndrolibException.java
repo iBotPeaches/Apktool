@@ -16,9 +16,7 @@
  */
 package brut.androlib.exceptions;
 
-import brut.common.BrutException;
-
-public class AndrolibException extends BrutException {
+public class AndrolibException extends Exception {
 
     public AndrolibException() {
         super();

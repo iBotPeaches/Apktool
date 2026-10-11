@@ -19,7 +19,7 @@ package brut.androlib;
 import brut.androlib.meta.ApkInfo;
 import brut.util.TextUtils;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -34,11 +34,11 @@ public class DoubleExtensionUnknownFileTest extends BaseTest {
 
     @Test
     public void multipleExtensionUnknownFileTest() throws Exception {
-        File testApk = new File(sTmpDir, TEST_APK);
-        File testDir = new File(testApk + ".out");
+        Path testApk = sTmpDir.resolve(TEST_APK);
+        Path testDir = sTmpDir.resolve(testApk.getFileName() + ".out");
         new ApkDecoder(testApk, sConfig).decode(testDir);
 
-        ApkInfo testInfo = ApkInfo.load(new File(testDir, "apktool.yml"));
+        ApkInfo testInfo = ApkInfo.load(testDir.resolve("apktool.yml"));
         for (String path : testInfo.getDoNotCompress()) {
             if (TextUtils.countMatches(path, '.') > 1) {
                 assertTrue(path.equals("assets/bin/Data/sharedassets1.assets.split0"));

@@ -22,11 +22,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public final class Log {
+    public static final String ROOT = "";
+
     private static final ConcurrentMap<String, Logger> sCache = new ConcurrentHashMap<>();
 
-    private Log() {
-        // Private constructor for utility class.
-    }
+    private Log() {}
 
     private static void log(Level level, String tag, String message) {
         Logger logger = sCache.computeIfAbsent(tag, Logger::getLogger);

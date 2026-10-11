@@ -19,6 +19,7 @@ package brut.androlib.res.decoder;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.exceptions.RawXmlEncounteredException;
 import brut.androlib.res.xml.ResXmlSerializer;
+import brut.xmlpull.XmlPullEventHandler;
 import brut.xmlpull.XmlPullUtils;
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -29,14 +30,14 @@ import java.io.OutputStream;
 public class ResXmlPullStreamDecoder implements ResStreamDecoder {
     private final BinaryXmlResourceParser mParser;
     private final ResXmlSerializer mSerial;
-    private final XmlPullUtils.EventHandler mHandler;
+    private final XmlPullEventHandler mHandler;
 
     public ResXmlPullStreamDecoder(BinaryXmlResourceParser parser, ResXmlSerializer serial) {
         this(parser, serial, null);
     }
 
     public ResXmlPullStreamDecoder(BinaryXmlResourceParser parser, ResXmlSerializer serial,
-                                   XmlPullUtils.EventHandler handler) {
+                                   XmlPullEventHandler handler) {
         mParser = parser;
         mSerial = serial;
         mHandler = handler;

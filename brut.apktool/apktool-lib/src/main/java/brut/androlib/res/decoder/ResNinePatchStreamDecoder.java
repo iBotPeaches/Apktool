@@ -21,7 +21,7 @@ import brut.androlib.exceptions.NinePatchNotFoundException;
 import brut.androlib.res.data.LayoutBounds;
 import brut.androlib.res.data.NinePatchData;
 import brut.util.BinaryDataInputStream;
-import org.apache.commons.io.IOUtils;
+import com.google.common.io.ByteStreams;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -39,7 +39,7 @@ public class ResNinePatchStreamDecoder implements ResStreamDecoder {
     @Override
     public void decode(InputStream in, OutputStream out) throws AndrolibException {
         try {
-            byte[] data = IOUtils.toByteArray(in);
+            byte[] data = ByteStreams.toByteArray(in);
             if (data.length == 0) {
                 return;
             }

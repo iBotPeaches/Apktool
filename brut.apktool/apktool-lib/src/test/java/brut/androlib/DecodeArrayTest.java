@@ -16,18 +16,17 @@
  */
 package brut.androlib;
 
-import brut.androlib.meta.ApkInfo;
+import brut.androlib.ApkFile;
 import brut.androlib.res.table.ResId;
 import brut.androlib.res.table.ResTable;
 import brut.androlib.res.table.value.ResArray;
 import brut.androlib.res.table.value.ResValue;
-import brut.directory.ExtFile;
 
 import org.junit.*;
 import static org.junit.Assert.*;
 
 public class DecodeArrayTest extends BaseTest {
-    private static ExtFile sTestApk;
+    private static ApkFile sTestApk;
     private static ResTable sTable;
 
     @BeforeClass
@@ -35,11 +34,9 @@ public class DecodeArrayTest extends BaseTest {
         copyResourceDir(MissingVersionManifestTest.class, "issue1994", sTmpDir);
 
         log("Decoding issue1994.apk...");
-        sTestApk = new ExtFile(sTmpDir, "issue1994.apk");
-        ApkInfo testInfo = new ApkInfo();
-        testInfo.setApkFile(sTestApk);
-        sTable = new ResTable(testInfo, sConfig);
-        sTable.load();
+        sTestApk = new ApkFile(sTmpDir.resolve("issue1994.apk"));
+        sTable = new ResTable(sConfig);
+        sTable.load(sTestApk);
     }
 
     @AfterClass

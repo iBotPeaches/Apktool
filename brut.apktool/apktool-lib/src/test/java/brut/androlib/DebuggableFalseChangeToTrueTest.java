@@ -16,7 +16,8 @@
  */
 package brut.androlib;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -26,8 +27,8 @@ public class DebuggableFalseChangeToTrueTest extends BaseTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        sTestOrigDir = new File(sTmpDir, "issue2328-debuggable-false-orig");
-        sTestNewDir = new File(sTmpDir, "issue2328-debuggable-false-new");
+        sTestOrigDir = sTmpDir.resolve("issue2328-debuggable-false-orig");
+        sTestNewDir = sTmpDir.resolve("issue2328-debuggable-false-new");
 
         log("Unpacking issue2328-debuggable-false...");
         copyResourceDir(DebuggableFalseChangeToTrueTest.class, "issue2328/debuggable-false", sTestOrigDir);
@@ -36,7 +37,7 @@ public class DebuggableFalseChangeToTrueTest extends BaseTest {
         sConfig.setVerbose(true);
 
         log("Building issue2328-debuggable-false.apk...");
-        File testApk = new File(sTmpDir, "issue2328-debuggable-false.apk");
+        Path testApk = sTmpDir.resolve("issue2328-debuggable-false.apk");
         new ApkBuilder(sTestOrigDir, sConfig).build(testApk);
 
         log("Decoding issue2328-debuggable-false.apk...");
@@ -45,7 +46,7 @@ public class DebuggableFalseChangeToTrueTest extends BaseTest {
 
     @Test
     public void buildAndDecodeTest() {
-        assertTrue(sTestNewDir.isDirectory());
+        assertTrue(Files.isDirectory(sTestNewDir));
     }
 
     @Test
@@ -57,7 +58,7 @@ public class DebuggableFalseChangeToTrueTest extends BaseTest {
           + "    <application android:debuggable=\"true\"/>\n"
           + "</manifest>";
 
-        String obtained = readTextFile(new File(sTestNewDir, "AndroidManifest.xml"));
+        String obtained = readTextFile(sTestNewDir.resolve("AndroidManifest.xml"));
 
         assertXMLEqual(expected, obtained);
     }

@@ -17,73 +17,79 @@
 package brut.androlib.res;
 
 import brut.androlib.exceptions.AndrolibException;
-import brut.common.BrutException;
-import brut.util.Jar;
-import brut.util.OS;
-import brut.util.OSDetection;
+import brut.util.JarUtils;
+import brut.util.SystemUtils;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.PosixFilePermission;
+import java.util.Set;
 
 public final class AaptManager {
 
-    private AaptManager() {
-        // Private constructor for utility class.
-    }
+    private AaptManager() {}
 
     public static String getBinaryName() {
         return "aapt2";
     }
 
-    public static File getBinaryFile() throws AndrolibException {
+    public static Path getBinaryFile() throws AndrolibException {
         String binName = getBinaryName();
 
-        if (!OSDetection.is64Bit()) {
+        if (!SystemUtils.is64Bit()) {
             throw new AndrolibException(binName + " binaries are not available for 32-bit platforms.");
         }
 
         StringBuilder binPath = new StringBuilder("/prebuilt/");
-        if (OSDetection.isUnix()) {
+        if (SystemUtils.isUnix()) {
             binPath.append("linux"); // ELF 64-bit LSB executable, x86-64
-        } else if (OSDetection.isMacOSX()) {
+        } else if (SystemUtils.isMac()) {
             binPath.append("macosx"); // fat binary x86_64 + arm64
-        } else if (OSDetection.isWindows()) {
+        } else if (SystemUtils.isWindows()) {
             binPath.append("windows"); // x86_64
         } else {
-            throw new AndrolibException("Could not identify platform: " + OSDetection.returnOS());
+            throw new AndrolibException("Could not identify platform: " + SystemUtils.getOSName());
         }
         binPath.append('/');
         binPath.append(binName);
-        if (OSDetection.isWindows()) {
+        if (SystemUtils.isWindows()) {
             binPath.append(".exe");
         }
 
-        File binFile;
+        Path binFile;
         try {
-            binFile = Jar.getResourceAsFile(AaptManager.class, binPath.toString(), binName + "_");
-        } catch (BrutException ex) {
+            binFile = JarUtils.getResourceAsFile(AaptManager.class, binPath.toString(), binName + "_");
+        } catch (IOException ex) {
             throw new AndrolibException(ex);
         }
         setBinaryExecutable(binFile);
         return binFile;
     }
 
-    private static void setBinaryExecutable(File binFile) throws AndrolibException {
-        if (!binFile.isFile() || !binFile.canRead()) {
-            throw new AndrolibException("Could not read aapt binary: " + binFile.getPath());
+    private static void setBinaryExecutable(Path binFile) throws AndrolibException {
+        if (!Files.isRegularFile(binFile) || !Files.isReadable(binFile)) {
+            throw new AndrolibException("Could not read aapt binary: " + binFile);
         }
-        if (!binFile.setExecutable(true)) {
-            throw new AndrolibException("Could not set aapt binary as executable: " + binFile.getPath());
+        try {
+            Set<PosixFilePermission> perms = Files.getPosixFilePermissions(binFile);
+            perms.add(PosixFilePermission.OWNER_EXECUTE);
+            Files.setPosixFilePermissions(binFile, perms);
+        } catch (IOException ex) {
+            throw new AndrolibException("Could not set aapt binary as executable: " + binFile);
+        } catch (UnsupportedOperationException ignored) {
+            // This is expected on Windows.
         }
     }
 
-    public static int getBinaryVersion(File binFile) throws AndrolibException {
+    public static int getBinaryVersion(Path binFile) throws AndrolibException {
         setBinaryExecutable(binFile);
-
-        String versionStr = OS.execAndReturn(new String[] { binFile.getPath(), "version" });
-        if (versionStr == null) {
-            throw new AndrolibException("Could not execute aapt binary at location: " + binFile.getPath());
+        String versionStr;
+        try {
+            versionStr = SystemUtils.executeAndReturn(new String[] { binFile.toString(), "version" });
+        } catch (IOException | InterruptedException ex) {
+            throw new AndrolibException("Could not execute aapt binary: " + binFile, ex);
         }
-
         return getVersionFromString(versionStr);
     }
 

@@ -21,18 +21,21 @@ import brut.androlib.ApkDecoder;
 import brut.androlib.Config;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.exceptions.FrameworkNotFoundException;
+import brut.androlib.exceptions.InDirNotFoundException;
 import brut.androlib.exceptions.InFileNotFoundException;
 import brut.androlib.exceptions.OutDirExistsException;
 import brut.androlib.res.AaptManager;
 import brut.androlib.res.Framework;
-import brut.util.OSDetection;
+import brut.util.IOUtils;
+import brut.util.JarUtils;
+import brut.util.SystemUtils;
 import org.apache.commons.cli.*;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -229,6 +232,12 @@ public class Main {
     private static Options loadedOptions = null;
     private static boolean advancedMode = false;
 
+    static {
+        // Configure the JVM to run in headless mode for AWT/X11 graphical operations.
+        // Required for ImageIO operations, such as 9-patch image processing.
+        System.setProperty("java.awt.headless", "true");
+    }
+
     private static void loadOptions(Options options, boolean advanced) {
         loadedOptions = options;
         advancedMode = advanced;
@@ -292,16 +301,7 @@ public class Main {
     }
 
     public static void main(String[] args) throws AndrolibException {
-        // Headless
-        System.setProperty("java.awt.headless", "true");
-
-        // Ignore stricter validation on zip files from java 11 onwards as this is a protection technique that
-        // applications use to thwart disassembly tools. We have protections in place for directory traversal
-        // and handling of bogus data in the zip header, so we can ignore this.
-        System.setProperty("jdk.nio.zipfs.allowDotZipEntry", "true");
-        System.setProperty("jdk.util.zip.disableZip64ExtraFieldValidation", "true");
-
-        if (!OSDetection.is64Bit()) {
+        if (!SystemUtils.is64Bit()) {
             System.err.println("Warning: Apktool no longer supports 32-bit platforms.");
         }
 
@@ -398,14 +398,14 @@ public class Main {
     private static void cmdDecode(String[] args) throws AndrolibException {
         CommandLine cli = parseOptions(decodeOptions, args);
         List<String> argList = cli.getArgList();
-        File apkFile;
+        Path apkFile;
         switch (argList.size()) {
             case 0:
                 System.err.println("Input apk file was not specified.");
                 System.exit(1);
                 return;
             case 1:
-                apkFile = new File(argList.get(0));
+                apkFile = Paths.get(argList.get(0));
                 break;
             default:
                 System.err.println("Invalid arguments.");
@@ -510,17 +510,14 @@ public class Main {
             config.setDecodeAssets(Config.DecodeAssets.NONE);
         }
 
-        File outDir;
+        Path outDir;
         if (cli.hasOption(decodeOutputOption)) {
-            outDir = new File(cli.getOptionValue(decodeOutputOption));
+            outDir = Paths.get(cli.getOptionValue(decodeOutputOption));
         } else {
-            String outName = apkFile.getName();
-            if (outName.endsWith(".apk")) {
-                outName = outName.substring(0, outName.length() - 4).trim();
-            } else {
-                outName += ".out";
-            }
-            outDir = new File(apkFile.getParent(), outName);
+            String outName = IOUtils.getFileExtension(apkFile).equals("apk")
+                ? IOUtils.getNameWithoutExtension(apkFile).trim()
+                : apkFile.getFileName() + ".out";
+            outDir = apkFile.resolveSibling(outName);
         }
 
         try {
@@ -534,13 +531,13 @@ public class Main {
     private static void cmdBuild(String[] args) throws AndrolibException {
         CommandLine cli = parseOptions(buildOptions, args);
         List<String> argList = cli.getArgList();
-        File apkDir;
+        Path apkDir;
         switch (argList.size()) {
             case 0:
-                apkDir = new File("."); // current directory
+                apkDir = Paths.get(""); // current directory
                 break;
             case 1:
-                apkDir = new File(argList.get(0));
+                apkDir = Paths.get(argList.get(0));
                 break;
             default:
                 System.err.println("Invalid arguments.");
@@ -593,7 +590,7 @@ public class Main {
         if (cli.hasOption(buildAaptOption)) {
             try {
                 String aaptBinary = cli.getOptionValue(buildAaptOption);
-                if (AaptManager.getBinaryVersion(new File(aaptBinary)) == 1) {
+                if (AaptManager.getBinaryVersion(Paths.get(aaptBinary)) == 1) {
                     throw new AndrolibException("Legacy aapt is no longer supported.");
                 }
 
@@ -605,29 +602,34 @@ public class Main {
             }
         }
 
-        File outFile = null;
+        Path outFile = null;
         if (cli.hasOption(buildOutputOption)) {
             if (cli.hasOption(buildNoApkOption)) {
                 printOptionConflict(buildOutputOption, buildNoApkOption);
             } else {
-                outFile = new File(cli.getOptionValue(buildOutputOption));
+                outFile = Paths.get(cli.getOptionValue(buildOutputOption));
             }
         }
 
-        new ApkBuilder(apkDir, config).build(outFile);
+        try {
+            new ApkBuilder(apkDir, config).build(outFile);
+        } catch (InDirNotFoundException ex) {
+            System.err.println(ex.getMessage());
+            System.exit(1);
+        }
     }
 
     private static void cmdInstallFramework(String[] args) throws AndrolibException {
         CommandLine cli = parseOptions(installFrameworkOptions, args);
         List<String> argList = cli.getArgList();
-        File apkFile;
+        Path apkFile;
         switch (argList.size()) {
             case 0:
                 System.err.println("Input apk file was not specified.");
                 System.exit(1);
                 return;
             case 1:
-                apkFile = new File(argList.get(0));
+                apkFile = Paths.get(argList.get(0));
                 break;
             default:
                 System.err.println("Invalid arguments.");
@@ -643,7 +645,12 @@ public class Main {
             config.setFrameworkTag(cli.getOptionValue(frameFrameTagOption));
         }
 
-        new Framework(config).install(apkFile);
+        try {
+            new Framework(config).install(apkFile);
+        } catch (InFileNotFoundException ex) {
+            System.err.println(ex.getMessage());
+            System.exit(1);
+        }
     }
 
     private static void cmdCleanFrameworks(String[] args) throws AndrolibException {
@@ -695,22 +702,22 @@ public class Main {
             }
         }
 
-        for (File file : new Framework(config).listDirectory()) {
-            System.out.println(file.getName());
+        for (Path file : new Framework(config).listDirectory()) {
+            System.out.println(file.getFileName());
         }
     }
 
     private static void cmdPublicizeResources(String[] args) throws AndrolibException {
         CommandLine cli = parseOptions(publicizeResourcesOptions, args);
         List<String> argList = cli.getArgList();
-        File arscFile;
+        Path arscFile;
         switch (argList.size()) {
             case 0:
                 System.err.println("Input arsc file was not specified.");
                 System.exit(1);
                 return;
             case 1:
-                arscFile = new File(argList.get(0));
+                arscFile = Paths.get(argList.get(0));
                 break;
             default:
                 System.err.println("Invalid arguments.");
@@ -719,7 +726,12 @@ public class Main {
                 return;
         }
 
-        new Framework(config).publicizeResources(arscFile);
+        try {
+            new Framework(config).publicizeResources(arscFile);
+        } catch (InFileNotFoundException ex) {
+            System.err.println(ex.getMessage());
+            System.exit(1);
+        }
     }
 
     private static void printOptionConflict(Option option, Option conflict) {
@@ -913,13 +925,10 @@ public class Main {
         }
 
         private void load(Properties props, String name) {
-            try (InputStream in = Main.class.getResourceAsStream(name)) {
-                if (in == null) {
-                    throw new FileNotFoundException(name);
-                }
+            try (InputStream in = JarUtils.getResourceAsStream(getClass(), name)) {
                 props.load(in);
-            } catch (IOException ignored) {
-                System.err.println("Could not load resource: " + name);
+            } catch (IOException ex) {
+                System.err.println(ex.getMessage());
             }
         }
     }

@@ -17,10 +17,8 @@
 package brut.androlib.smali;
 
 import brut.androlib.exceptions.AndrolibException;
-import brut.directory.DirectoryException;
-import brut.directory.FileDirectory;
 import brut.common.Log;
-import brut.util.OS;
+import brut.util.IOUtils;
 import com.android.tools.smali.dexlib2.Opcodes;
 import com.android.tools.smali.dexlib2.writer.builder.DexBuilder;
 import com.android.tools.smali.dexlib2.writer.io.FileDataStore;
@@ -33,11 +31,13 @@ import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
 
-import java.io.File;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Iterator;
+import java.util.stream.Stream;
 
 public class SmaliBuilder {
     private static final String TAG = SmaliBuilder.class.getName();
@@ -52,56 +52,53 @@ public class SmaliBuilder {
         mApiLevel = Math.min(apiLevel, 29);
     }
 
-    public void build(File smaliDir, File dexFile) throws AndrolibException {
+    public void build(Path smaliDir, Path dexFile) throws AndrolibException {
         try {
             DexBuilder dexBuilder = new DexBuilder(mApiLevel > 0 ? Opcodes.forApi(mApiLevel) : Opcodes.getDefault());
 
-            for (String fileName : new FileDirectory(smaliDir).getFiles(true)) {
-                File smaliFile = new File(smaliDir, fileName);
+            try (Stream<Path> stream = Files.walk(smaliDir)) {
+                Iterator<Path> it = stream.filter(Files::isRegularFile).iterator();
+                while (it.hasNext()) {
+                    Path smaliFile = it.next();
 
-                if (!fileName.endsWith(".smali")) {
-                    Log.w(TAG, "Unknown file type, ignoring: " + smaliFile);
-                    continue;
-                }
-
-                boolean success;
-                Exception cause;
-                try {
-                    success = buildFile(smaliFile, dexBuilder);
-                    cause = null;
-                } catch (Exception ex) {
-                    success = false;
-                    cause = ex;
-                }
-                if (!success) {
-                    AndrolibException ex = new AndrolibException("Could not smali file: " + smaliFile);
-                    if (cause != null) {
-                        ex.initCause(cause);
+                    if (!IOUtils.getFileExtension(smaliFile).equals("smali")) {
+                        Log.w(TAG, "Unknown file type, ignoring: " + smaliFile);
+                        continue;
                     }
-                    throw ex;
+
+                    boolean success;
+                    Throwable cause;
+                    try {
+                        success = buildFile(smaliFile, dexBuilder);
+                        cause = null;
+                    } catch (Exception ex) {
+                        success = false;
+                        cause = ex;
+                    }
+                    if (!success) {
+                        AndrolibException ex = new AndrolibException("Could not smali file: " + smaliFile);
+                        if (cause != null) {
+                            ex.initCause(cause);
+                        }
+                        throw ex;
+                    }
                 }
             }
 
-            if (dexFile.exists()) {
-                OS.rmfile(dexFile);
-            } else {
-                File parentDir = dexFile.getParentFile();
-                if (parentDir != null) {
-                    OS.mkdir(parentDir);
-                }
+            if (!Files.deleteIfExists(dexFile)) {
+                IOUtils.createParentDirectories(dexFile);
             }
-
-            dexBuilder.writeTo(new FileDataStore(dexFile));
-        } catch (DirectoryException | IOException | RuntimeException ex) {
-            throw new AndrolibException("Could not smali folder: " + smaliDir.getName(), ex);
+            dexBuilder.writeTo(new FileDataStore(dexFile.toFile()));
+        } catch (IOException | RuntimeException ex) {
+            throw new AndrolibException("Could not smali folder: " + smaliDir.getFileName(), ex);
         }
     }
 
-    private boolean buildFile(File smaliFile, DexBuilder dexBuilder) throws IOException, RecognitionException {
+    private boolean buildFile(Path smaliFile, DexBuilder dexBuilder) throws IOException, RecognitionException {
         try (InputStreamReader reader = new InputStreamReader(
-                Files.newInputStream(smaliFile.toPath()), StandardCharsets.UTF_8)) {
+                Files.newInputStream(smaliFile), StandardCharsets.UTF_8)) {
             smaliFlexLexer lexer = new smaliFlexLexer(reader, mApiLevel);
-            lexer.setSourceFile(smaliFile);
+            lexer.setSourceFile(smaliFile.toFile());
 
             CommonTokenStream tokens = new CommonTokenStream(lexer);
 

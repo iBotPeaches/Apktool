@@ -19,17 +19,16 @@ package brut.androlib;
 import brut.androlib.Config;
 import brut.androlib.res.Framework;
 import brut.common.Log;
-import brut.directory.FileDirectory;
-import brut.util.OS;
+import brut.util.IOUtils;
 
-import java.io.File;
-import java.io.FileReader;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.Reader;
-import java.net.URL;
-import java.net.URLDecoder;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Iterator;
+import java.util.stream.Stream;
 
 import org.junit.*;
 import static org.junit.Assert.assertTrue;
@@ -40,9 +39,9 @@ public abstract class BaseTest {
     private static final String TAG = "TEST";
 
     protected static Config sConfig;
-    protected static File sTmpDir;
-    protected static File sTestOrigDir;
-    protected static File sTestNewDir;
+    protected static Path sTmpDir;
+    protected static Path sTestOrigDir;
+    protected static Path sTestNewDir;
 
     static {
         XMLUnit.setEnableXXEProtection(true);
@@ -51,10 +50,7 @@ public abstract class BaseTest {
     }
 
     private static void cleanFrameworkFile() throws Exception {
-        File apkFile = new File(new Framework(sConfig).getDirectory(), "1.apk");
-        if (apkFile.isFile()) {
-            OS.rmfile(apkFile.getAbsolutePath());
-        }
+        Files.deleteIfExists(new Framework(sConfig).getDirectory().resolve("1.apk"));
     }
 
     @BeforeClass
@@ -62,7 +58,7 @@ public abstract class BaseTest {
         sConfig = new Config(TAG);
         cleanFrameworkFile();
 
-        sTmpDir = OS.createTempDirectory();
+        sTmpDir = Files.createTempDirectory("BRUT");
     }
 
     @AfterClass
@@ -70,7 +66,7 @@ public abstract class BaseTest {
         sTestOrigDir = null;
         sTestNewDir = null;
 
-        OS.rmdir(sTmpDir);
+        IOUtils.deleteDirectory(sTmpDir);
         sTmpDir = null;
 
         cleanFrameworkFile();
@@ -90,37 +86,19 @@ public abstract class BaseTest {
         Log.i(TAG, message, args);
     }
 
-    protected static void copyResourceDir(Class<?> clz, String dirPath, File outDir) throws Exception {
-        if (clz == null) {
-            clz = Class.class;
-        }
-
-        URL dirURL = clz.getClassLoader().getResource(dirPath);
-        if (dirURL != null && dirURL.getProtocol().equals("file")) {
-            String jarPath = URLDecoder.decode(dirURL.getFile(), "UTF-8");
-            new FileDirectory(jarPath).copyToDir(outDir);
-            return;
-        }
-
-        if (dirURL == null) {
-            String className = clz.getName().replace('.', '/') + ".class";
-            dirURL = clz.getClassLoader().getResource(className);
-        }
-
-        if (dirURL.getProtocol().equals("jar")) {
-            String jarPath = URLDecoder.decode(dirURL.getPath().substring(5, dirURL.getPath().indexOf('!')), "UTF-8");
-            new FileDirectory(jarPath).copyToDir(outDir);
-        }
+    protected static void copyResourceDir(Class<?> clz, String path, Path dest) throws Exception {
+        Path src = Paths.get(clz.getClassLoader().getResource(path).toURI());
+        IOUtils.copyDirectory(src, dest);
     }
 
-    protected static String readTextFile(File file) throws Exception {
-        return new String(Files.readAllBytes(file.toPath()));
+    protected static String readTextFile(Path file) throws Exception {
+        return new String(Files.readAllBytes(file));
     }
 
-    protected static byte[] readHeaderOfFile(File file, int size) throws Exception {
+    protected static byte[] readHeaderOfFile(Path file, int size) throws Exception {
         byte[] buffer = new byte[size];
 
-        try (InputStream in = Files.newInputStream(file.toPath())) {
+        try (InputStream in = Files.newInputStream(file)) {
             if (in.read(buffer) != buffer.length) {
                 throw new IOException("File size too small for buffer length: " + size);
             }
@@ -137,29 +115,25 @@ public abstract class BaseTest {
         compareBinaryFolder(sTestOrigDir, sTestNewDir, path);
     }
 
-    protected static void compareBinaryFolder(File controlDir, File testDir, String path) throws Exception {
-        File controlBase = new File(controlDir, path);
-        File testBase = new File(testDir, path);
+    protected static void compareBinaryFolder(Path controlDir, Path testDir, String path) throws Exception {
+        Path control = controlDir.resolve(path);
+        Path test = testDir.resolve(path);
 
-        boolean exists = true;
+        try (Stream<Path> stream = Files.walk(control)) {
+            Iterator<Path> it = stream.filter(Files::isRegularFile).iterator();
+            while (it.hasNext()) {
+                String fileName = control.relativize(it.next()).toString();
 
-        for (String fileName : new FileDirectory(controlBase).getFiles(true)) {
-            File control = new File(controlBase, fileName);
-            File test = new File(testBase, fileName);
-
-            if (!control.isFile() || !test.isFile()) {
-                exists = false;
+                assertTrue(Files.isRegularFile(test.resolve(fileName)));
             }
         }
-
-        assertTrue(exists);
     }
 
     protected static void compareValuesFiles(String path) throws Exception {
         compareValuesFiles(sTestOrigDir, sTestNewDir, path);
     }
 
-    protected static void compareValuesFiles(File controlDir, File testDir, String path) throws Exception {
+    protected static void compareValuesFiles(Path controlDir, Path testDir, String path) throws Exception {
         compareXmlFiles(controlDir, testDir, "res/" + path, new ElementNameAndAttributeQualifier("name"));
     }
 
@@ -167,14 +141,14 @@ public abstract class BaseTest {
         compareXmlFiles(sTestOrigDir, sTestNewDir, path, null);
     }
 
-    protected static void compareXmlFiles(File controlDir, File testDir, String path) throws Exception {
+    protected static void compareXmlFiles(Path controlDir, Path testDir, String path) throws Exception {
         compareXmlFiles(controlDir, testDir, path, null);
     }
 
-    private static void compareXmlFiles(File controlDir, File testDir, String path, ElementQualifier qualifier) throws Exception {
+    private static void compareXmlFiles(Path controlDir, Path testDir, String path, ElementQualifier qualifier) throws Exception {
         try (
-            Reader control = new FileReader(new File(controlDir, path));
-            Reader test = new FileReader(new File(testDir, path))
+            Reader control = Files.newBufferedReader(controlDir.resolve(path));
+            Reader test = Files.newBufferedReader(testDir.resolve(path))
         ) {
             if (qualifier == null) {
                 assertXMLEqual(control, test);

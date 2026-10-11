@@ -16,26 +16,25 @@
  */
 package brut.androlib;
 
-import brut.androlib.meta.ApkInfo;
+import brut.androlib.ApkFile;
 import brut.androlib.res.ResDecoder;
 import brut.androlib.res.table.ResId;
 import brut.androlib.res.table.ResTable;
-import brut.directory.ExtFile;
-import brut.util.OS;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.junit.*;
 import static org.junit.Assert.*;
 
 public class NonStandardPkgIdTest extends BaseTest {
-    private static ExtFile sTestApk;
+    private static ApkFile sTestApk;
     private static ResTable sTable;
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        sTestOrigDir = new File(sTmpDir, "pkgid8-orig");
-        sTestNewDir = new File(sTmpDir, "pkgid8-new");
+        sTestOrigDir = sTmpDir.resolve("pkgid8-orig");
+        sTestNewDir = sTmpDir.resolve("pkgid8-new");
 
         log("Unpacking pkgid8...");
         copyResourceDir(NonStandardPkgIdTest.class, "pkgid8", sTestOrigDir);
@@ -43,14 +42,13 @@ public class NonStandardPkgIdTest extends BaseTest {
         sConfig.setVerbose(true);
 
         log("Building pkgid8.apk...");
-        sTestApk = new ExtFile(sTmpDir, "pkgid8.apk");
-        new ApkBuilder(sTestOrigDir, sConfig).build(sTestApk);
+        Path testApk = sTmpDir.resolve("pkgid8.apk");
+        new ApkBuilder(sTestOrigDir, sConfig).build(testApk);
 
         log("Decoding pkgid8.apk...");
-        ApkInfo testInfo = new ApkInfo();
-        testInfo.setApkFile(sTestApk);
-        ResDecoder resDecoder = new ResDecoder(testInfo, sConfig);
-        OS.mkdir(sTestNewDir);
+        sTestApk = new ApkFile(testApk);
+        ResDecoder resDecoder = new ResDecoder(sTestApk, sConfig);
+        Files.createDirectories(sTestNewDir);
         resDecoder.decodeResources(sTestNewDir);
         resDecoder.decodeManifest(sTestNewDir);
         sTable = resDecoder.getTable();
@@ -63,7 +61,7 @@ public class NonStandardPkgIdTest extends BaseTest {
 
     @Test
     public void buildAndDecodeTest() {
-        assertTrue(sTestNewDir.isDirectory());
+        assertTrue(Files.isDirectory(sTestNewDir));
     }
 
     @Test
