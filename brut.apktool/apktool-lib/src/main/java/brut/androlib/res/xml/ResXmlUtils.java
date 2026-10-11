@@ -26,6 +26,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import javax.xml.xpath.XPath;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -262,16 +263,25 @@ public final class ResXmlUtils {
     }
 
     private static String pullValueFromXml(Path file, String type, String key) throws AndrolibException {
-        if (!Files.isRegularFile(file) || key == null || key.indexOf('@') == -1) {
+        if (!Files.isRegularFile(file) || key == null || key.isEmpty() || key.charAt(0) != '@') {
             return null;
         }
 
-        key = key.replace("@" + type + "/", "");
+        int slashPos = key.indexOf('/', 1);
+        if (slashPos == -1 || !type.equals(key.substring(1, slashPos))) {
+            return null;
+        }
+
+        String name = key.substring(slashPos + 1);
         try {
             Document doc = XmlUtils.loadDocument(file);
-            String expression = String.format("/resources/%s[@name='%s']/text()", type, key);
 
-            return XmlUtils.evaluateXPath(doc, expression, String.class);
+            String expression = "/resources/" + type + "[@name=$name]";
+            XPath xPath = XmlUtils.newXPath();
+            xPath.setXPathVariableResolver(varName -> varName.getLocalPart().equals("name") ? name : null);
+            Node node = XmlUtils.evaluateXPath(doc, expression, Node.class, xPath);
+
+            return node != null ? node.getTextContent() : null;
         } catch (Exception ex) {
             throw new AndrolibException(ex);
         }

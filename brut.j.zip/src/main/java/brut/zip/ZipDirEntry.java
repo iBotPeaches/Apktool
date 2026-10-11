@@ -91,9 +91,6 @@ public final class ZipDirEntry implements Comparable<ZipDirEntry> {
     }
 
     private ZipDirEntry resolveDir(String name) {
-        if (name.isEmpty()) {
-            throw new IllegalArgumentException("Name is empty.");
-        }
         ZipDirEntry dir = this;
         int len = name.length();
         for (int i = 0, segEnd; dir != null && i < len; i = segEnd + 1) {
@@ -131,9 +128,6 @@ public final class ZipDirEntry implements Comparable<ZipDirEntry> {
     }
 
     private ZipFileEntry resolveFile(String name) {
-        if (name.isEmpty()) {
-            throw new IllegalArgumentException("Name is empty.");
-        }
         ZipDirEntry dir = this;
         for (int i = 0, segEnd; dir != null; i = segEnd + 1) {
             segEnd = name.indexOf(ZipUtils.SEPARATOR_CHAR, i);

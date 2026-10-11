@@ -74,14 +74,12 @@ public final class XmlUtils {
         factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
         factory.setFeature(FEATURE_DISALLOW_DOCTYPE_DECL, true);
         factory.setFeature(FEATURE_LOAD_EXTERNAL_DTD, false);
-
         try {
             factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
             factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
         } catch (IllegalArgumentException ignored) {
             Log.w(Log.ROOT, "JAXP 1.5 Support is required to validate XML");
         }
-
         return factory.newDocumentBuilder();
     }
 
@@ -125,10 +123,8 @@ public final class XmlUtils {
         TransformerFactory factory = TransformerFactory.newInstance();
         Transformer transformer = factory.newTransformer();
         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-
         byte[] xmlDecl = XML_PROLOG.getBytes(StandardCharsets.US_ASCII);
         byte[] newLine = System.lineSeparator().getBytes(StandardCharsets.US_ASCII);
-
         try (OutputStream out = Files.newOutputStream(path)) {
             out.write(xmlDecl);
             out.write(newLine);
@@ -216,12 +212,21 @@ public final class XmlUtils {
         return (namespace != null && !namespace.isEmpty()) ? namespace : null;
     }
 
-    @SuppressWarnings("unchecked")
+    public static XPath newXPath() {
+        return XPathFactory.newInstance().newXPath();
+    }
+
     public static <T> T evaluateXPath(Document doc, String expression, Class<T> returnType)
+            throws XPathExpressionException {
+        return evaluateXPath(doc, expression, returnType, newXPath());
+    }
+
+    public static <T> T evaluateXPath(Document doc, String expression, Class<T> returnType, XPath xPath)
             throws XPathExpressionException {
         Objects.requireNonNull(doc, "doc");
         Objects.requireNonNull(expression, "expression");
         Objects.requireNonNull(returnType, "returnType");
+        Objects.requireNonNull(xPath, "xPath");
         QName type;
         if (returnType == Node.class) {
             type = XPathConstants.NODE;
@@ -236,26 +241,34 @@ public final class XmlUtils {
         } else {
             throw new IllegalArgumentException("Unexpected return type: " + returnType.getName());
         }
-
-        XPath xPath = XPathFactory.newInstance().newXPath();
         xPath.setNamespaceContext(new NamespaceContext() {
             @Override
             public String getNamespaceURI(String prefix) {
-                return doc.lookupNamespaceURI(prefix);
+                if (prefix == null) {
+                    throw new IllegalArgumentException("prefix is null");
+                }
+                if (prefix.equals(XMLConstants.XML_NS_PREFIX)) {
+                    return XMLConstants.XML_NS_URI;
+                }
+                if (prefix.equals(XMLConstants.XMLNS_ATTRIBUTE)) {
+                    return XMLConstants.XMLNS_ATTRIBUTE_NS_URI;
+                }
+                Element root = doc.getDocumentElement();
+                // DOM uses null (not empty string) to ask for the default namespace.
+                String uri = root != null ? root.lookupNamespaceURI(prefix.isEmpty() ? null : prefix) : null;
+                return uri != null ? uri : XMLConstants.NULL_NS_URI;
             }
 
             @Override
             public String getPrefix(String namespaceURI) {
-                return doc.lookupPrefix(namespaceURI);
+                throw new UnsupportedOperationException();
             }
 
             @Override
             public Iterator<String> getPrefixes(String namespaceURI) {
-                String prefix = getPrefix(namespaceURI);
-                return prefix != null ? Collections.singleton(prefix).iterator() : Collections.emptyIterator();
+                throw new UnsupportedOperationException();
             }
         });
-
-        return (T) xPath.evaluate(expression, doc, type);
+        return returnType.cast(xPath.evaluate(expression, doc, type));
     }
 }

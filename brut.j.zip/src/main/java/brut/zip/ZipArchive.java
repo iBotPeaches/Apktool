@@ -16,10 +16,13 @@
  */
 package brut.zip;
 
+import brut.common.Log;
+
 import java.io.Closeable;
 import java.io.InputStream;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Enumeration;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
@@ -71,10 +74,9 @@ public class ZipArchive implements Closeable {
             String name;
             try {
                 name = ZipUtils.normalize(entry.getName());
-            } catch (IllegalArgumentException ignored) {
-                continue;
-            }
-            if (name.isEmpty()) {
+                Paths.get(name); // throws InvalidPathException if the name is invalid on this file system
+            } catch (IllegalArgumentException ex) {
+                Log.w(Log.ROOT, "Skipping invalid ZIP entry: %s (%s)", entry.getName(), ex.getMessage());
                 continue;
             }
             ZipDirEntry dir = root;
