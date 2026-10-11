@@ -20,6 +20,8 @@ import brut.androlib.res.Framework;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -51,5 +53,20 @@ public class FrameworkTest extends BaseTest {
         new Framework(sConfig).install(frameApk);
 
         assertTrue(Files.isRegularFile(sTmpDir.resolve("2.apk")));
+    }
+
+    @Test
+    public void isFrameworkWithoutManifestInstallingWorking() throws Exception {
+        Path frameDir = sTmpDir.resolve("no-manifest");
+        Files.createDirectories(frameDir);
+        sConfig.setFrameworkDirectory(frameDir.toAbsolutePath().toString());
+
+        Map<String, byte[]> entries = new LinkedHashMap<>();
+        entries.put("resources.arsc", readZipEntries(sTmpDir.resolve(FRAMEWORK_APK)).get("resources.arsc"));
+        Path frameApk = sTmpDir.resolve("framework-no-manifest.apk");
+        writeZipEntries(frameApk, entries);
+        new Framework(sConfig).install(frameApk);
+
+        assertTrue(Files.isRegularFile(frameDir.resolve("2.apk")));
     }
 }

@@ -28,6 +28,7 @@ import org.w3c.dom.NodeList;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import javax.xml.xpath.XPathExpressionException;
 
 public final class ResXmlUtils {
     public static final String ANDROID_RES_NS = "http://schemas.android.com/apk/res/android";
@@ -272,6 +273,9 @@ public final class ResXmlUtils {
             String expression = String.format("/resources/%s[@name='%s']/text()", type, key);
 
             return XmlUtils.evaluateXPath(doc, expression, String.class);
+        } catch (XPathExpressionException ignored) {
+            // Key cannot be expressed as a valid XPath literal.
+            return null;
         } catch (Exception ex) {
             throw new AndrolibException(ex);
         }

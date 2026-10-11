@@ -345,7 +345,18 @@ public class ApkBuilder {
         }
 
         Log.i(TAG, "Copying original files...");
-        IOUtils.copyDirectory(originalDir, mOutDir);
+        try (Stream<Path> files = Files.walk(originalDir)) {
+            Iterator<Path> it = files.filter(Files::isRegularFile).iterator();
+            while (it.hasNext()) {
+                Path file = it.next();
+                String fileName = ZipUtils.normalize(originalDir.relativize(file).toString());
+                if (ApkDecoder.ORIGINAL_FILES_PATTERN.matcher(fileName).matches()) {
+                    Path outFile = mOutDir.resolve(fileName);
+                    IOUtils.createParentDirectories(outFile);
+                    Files.copy(file, outFile, StandardCopyOption.REPLACE_EXISTING);
+                }
+            }
+        }
     }
 
     private void buildApkFile(Path outFile) throws AndrolibException, IOException {

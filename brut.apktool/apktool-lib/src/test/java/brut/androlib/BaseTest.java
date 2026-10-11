@@ -20,6 +20,7 @@ import brut.androlib.Config;
 import brut.androlib.res.Framework;
 import brut.common.Log;
 import brut.util.IOUtils;
+import com.google.common.io.ByteStreams;
 
 import java.io.InputStream;
 import java.io.IOException;
@@ -27,8 +28,14 @@ import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.stream.Stream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
 
 import org.junit.*;
 import static org.junit.Assert.assertTrue;
@@ -89,6 +96,30 @@ public abstract class BaseTest {
     protected static void copyResourceDir(Class<?> clz, String path, Path dest) throws Exception {
         Path src = Paths.get(clz.getClassLoader().getResource(path).toURI());
         IOUtils.copyDirectory(src, dest);
+    }
+
+    protected static Map<String, byte[]> readZipEntries(Path file) throws Exception {
+        Map<String, byte[]> entries = new LinkedHashMap<>();
+        try (ZipFile zip = new ZipFile(file.toFile())) {
+            Enumeration<? extends ZipEntry> it = zip.entries();
+            while (it.hasMoreElements()) {
+                ZipEntry entry = it.nextElement();
+                try (InputStream in = zip.getInputStream(entry)) {
+                    entries.put(entry.getName(), ByteStreams.toByteArray(in));
+                }
+            }
+        }
+        return entries;
+    }
+
+    protected static void writeZipEntries(Path file, Map<String, byte[]> entries) throws Exception {
+        try (ZipOutputStream out = new ZipOutputStream(Files.newOutputStream(file))) {
+            for (Map.Entry<String, byte[]> entry : entries.entrySet()) {
+                out.putNextEntry(new ZipEntry(entry.getKey()));
+                out.write(entry.getValue());
+                out.closeEntry();
+            }
+        }
     }
 
     protected static String readTextFile(Path file) throws Exception {

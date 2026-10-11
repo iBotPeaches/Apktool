@@ -30,6 +30,7 @@ import com.google.common.collect.Sets;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.LinkOption;
 import java.util.ArrayList;
@@ -47,7 +48,7 @@ public class ApkDecoder {
 
     static final String[] RAW_DIRS = { "assets", "lib" };
     private static final Pattern CLASSES_FILES_PATTERN = Pattern.compile("classes([2-9]|[1-9][0-9]+)?\\.dex");
-    private static final Pattern ORIGINAL_FILES_PATTERN = Pattern.compile(
+    static final Pattern ORIGINAL_FILES_PATTERN = Pattern.compile(
         "AndroidManifest\\.xml|META-INF/[^/]+\\.(RSA|SF|MF)|stamp-cert-sha256");
     private static final Pattern STANDARD_FILES_PATTERN = Pattern.compile(
         "resources\\.arsc|(" + String.join("|", RAW_DIRS) + ")/.*|"
@@ -220,7 +221,7 @@ public class ApkDecoder {
             ZipFileEntry file = it.next();
             String fileName = file.getName();
             if (ORIGINAL_FILES_PATTERN.matcher(fileName).matches()) {
-                file.extract(originalDir.resolve(fileName));
+                extractFile(file, originalDir);
             }
         }
     }
@@ -242,7 +243,7 @@ public class ApkDecoder {
                 String fileName = file.getName();
                 if (!ORIGINAL_FILES_PATTERN.matcher(fileName).matches()
                         && !dexFiles.contains(fileName) && !resFileMap.containsKey(fileName)) {
-                    file.extract(outDir.resolve(fileName));
+                    extractFile(file, outDir);
                 }
             }
         }
@@ -260,8 +261,16 @@ public class ApkDecoder {
             String fileName = file.getName();
             if (!STANDARD_FILES_PATTERN.matcher(fileName).matches() && !dexFiles.contains(fileName)
                     && !resFileMap.containsKey(fileName)) {
-                file.extract(unknownDir.resolve(fileName));
+                extractFile(file, unknownDir);
             }
+        }
+    }
+
+    private static void extractFile(ZipFileEntry file, Path dir) throws IOException {
+        try {
+            file.extract(dir.resolve(file.getName()));
+        } catch (InvalidPathException ex) {
+            Log.w(TAG, "Skipping file %s (%s)", file.getName(), ex.getMessage());
         }
     }
 
