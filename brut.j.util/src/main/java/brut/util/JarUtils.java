@@ -29,7 +29,7 @@ public final class JarUtils {
 
     static {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            synchronized (JarUtils.class) {
+            synchronized (sTmpCache) {
                 for (Path file : sTmpCache.values()) {
                     try {
                         Files.deleteIfExists(file);
@@ -51,24 +51,26 @@ public final class JarUtils {
         return in;
     }
 
-    public static synchronized Path getResourceAsFile(Class<?> clz, String name, String prefix) throws IOException {
-        Path file = sTmpCache.get(name);
-        if (file == null) {
-            try (InputStream in = getResourceAsStream(clz, name)) {
-                file = Files.createTempFile(prefix, null);
-                try {
-                    Files.copy(in, file, StandardCopyOption.REPLACE_EXISTING);
-                } catch (IOException | RuntimeException ex) {
+    public static Path getResourceAsFile(Class<?> clz, String name, String prefix) throws IOException {
+        synchronized (sTmpCache) {
+            Path file = sTmpCache.get(name);
+            if (file == null) {
+                try (InputStream in = getResourceAsStream(clz, name)) {
+                    file = Files.createTempFile(prefix, null);
                     try {
-                        Files.deleteIfExists(file);
-                    } catch (IOException suppressed) {
-                        ex.addSuppressed(suppressed);
+                        Files.copy(in, file, StandardCopyOption.REPLACE_EXISTING);
+                    } catch (Throwable th) {
+                        try {
+                            Files.deleteIfExists(file);
+                        } catch (IOException suppressed) {
+                            th.addSuppressed(suppressed);
+                        }
+                        throw th;
                     }
-                    throw ex;
                 }
+                sTmpCache.put(name, file);
             }
-            sTmpCache.put(name, file);
+            return file;
         }
-        return file;
     }
 }
