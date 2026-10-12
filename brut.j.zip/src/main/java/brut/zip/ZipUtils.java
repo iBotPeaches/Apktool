@@ -31,17 +31,20 @@ public final class ZipUtils {
     public static String normalize(String name) {
         int len = name.length();
         if (len == 0) {
-            return name;
+            throw new IllegalArgumentException("Name is empty.");
         }
         char ch = name.charAt(0);
         if (ch == SEPARATOR_CHAR || ch == '\\' || (len >= 2 && name.charAt(1) == ':'
                 && ((ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z')))) {
-            throw new IllegalArgumentException("Name is an absolute path.");
+            throw new IllegalArgumentException("Name represents an absolute path.");
         }
         StringBuilder sb = null; // lazily initialized
         boolean prevSep = false;
         for (int i = 0; i < len; i++) {
             ch = name.charAt(i);
+            if (ch == 0) {
+                throw new IllegalArgumentException("Name contains a null character.");
+            }
             if (ch == SEPARATOR_CHAR || ch == '\\') {
                 // Repeated slashes are dropped and backslashes are rewritten as slashes.
                 if (sb == null && (prevSep || ch == '\\')) {
@@ -54,8 +57,8 @@ public final class ZipUtils {
                 continue;
             }
             if ((i == 0 || prevSep) && ch == '.') {
-                char next = i + 1 < len ? name.charAt(i + 1) : 0;
-                if (next == 0 || next == SEPARATOR_CHAR || next == '\\') {
+                int next = i + 1 < len ? name.charAt(i + 1) : -1;
+                if (next == -1 || next == SEPARATOR_CHAR || next == '\\') {
                     // "." segments are dropped.
                     if (sb == null) {
                         sb = new StringBuilder(len).append(name, 0, i);
@@ -65,26 +68,9 @@ public final class ZipUtils {
                     continue;
                 }
                 if (next == '.') {
-                    char afterNext = i + 2 < len ? name.charAt(i + 2) : 0;
-                    if (afterNext == 0 || afterNext == SEPARATOR_CHAR || afterNext == '\\') {
-                        // ".." segments pop the previous segment.
-                        if (i == 0 || (sb != null && sb.length() == 0)) {
-                            throw new IllegalArgumentException("Name traverses outside the base.");
-                        }
-                        if (sb == null) {
-                            sb = new StringBuilder(len).append(name, 0, i);
-                        }
-                        int lastSep = -1;
-                        for (int j = sb.length() - 2; j >= 0; j--) {
-                            if (sb.charAt(j) == SEPARATOR_CHAR) {
-                                lastSep = j;
-                                break;
-                            }
-                        }
-                        sb.setLength(lastSep + 1);
-                        prevSep = true;
-                        i += 2;
-                        continue;
+                    int afterNext = i + 2 < len ? name.charAt(i + 2) : -1;
+                    if (afterNext == -1 || afterNext == SEPARATOR_CHAR || afterNext == '\\') {
+                        throw new IllegalArgumentException("Name contains a '..' segment.");
                     }
                     // fallthrough
                 }
@@ -99,10 +85,13 @@ public final class ZipUtils {
         if (sb == null) {
             return prevSep ? name.substring(0, len - 1) : name;
         }
-        // Otherwise, trim a trailing slash, if present, and return the rebuilt path.
+        // Otherwise, trim a trailing slash, if present, and return the rebuilt name.
         len = sb.length();
         if (len > 0 && sb.charAt(len - 1) == SEPARATOR_CHAR) {
-            sb.setLength(len - 1);
+            sb.setLength(--len);
+        }
+        if (len == 0) {
+            throw new IllegalArgumentException("Name is effectively empty.");
         }
         return sb.toString();
     }

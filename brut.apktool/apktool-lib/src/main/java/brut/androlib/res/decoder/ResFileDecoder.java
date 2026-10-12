@@ -26,6 +26,7 @@ import brut.androlib.res.table.value.ResPrimitive;
 import brut.androlib.res.table.value.ResString;
 import brut.common.Log;
 import brut.util.IOUtils;
+import brut.zip.ZipUtils;
 
 import java.io.InputStream;
 import java.io.IOException;
@@ -49,12 +50,18 @@ public class ResFileDecoder {
     }
 
     public void decode(ResEntry entry, Path outDir, Map<String, String> resFileMap) throws AndrolibException {
-        String fileName = ((ResFileReference) entry.getValue()).getPath();
+        String value = ((ResFileReference) entry.getValue()).getPath();
 
         // Some apps have string values where they shouldn't be.
         // We assumed that they are file references, but if no such file then fall back to a string value.
-        if (!mApkFile.containsFile(fileName)) {
-            entry.setValue(new ResString(fileName));
+        String fileName;
+        try {
+            fileName = ZipUtils.normalize(value);
+        } catch (IllegalArgumentException ignored) {
+            fileName = null;
+        }
+        if (fileName == null || !mApkFile.containsFile(fileName)) {
+            entry.setValue(new ResString(value));
             return;
         }
 

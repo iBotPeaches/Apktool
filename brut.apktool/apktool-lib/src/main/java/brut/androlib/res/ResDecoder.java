@@ -124,8 +124,12 @@ public class ResDecoder {
         generateOverlayableXml(pkg, outDir, serial);
     }
 
+    private static boolean supportsStagedAliases(ResPackage pkg) {
+        return pkg.getId() == ResTable.SYS_PACKAGE_ID;
+    }
+
     private static Iterable<ResEntry> listEntries(ResPackage pkg) {
-        return pkg.getId() == ResTable.SYS_PACKAGE_ID ? pkg.getGroup().listEntries() : pkg.listEntries();
+        return supportsStagedAliases(pkg) ? pkg.getGroup().listEntries() : pkg.listEntries();
     }
 
     private static OutputStream createOutputStream(Path outFile) throws IOException {
@@ -209,7 +213,7 @@ public class ResDecoder {
     }
 
     private void generateStagingXmls(ResPackage pkg, Path outDir, ResXmlSerializer serial) throws AndrolibException {
-        if (pkg.getId() != ResTable.SYS_PACKAGE_ID) {
+        if (!supportsStagedAliases(pkg)) {
             return;
         }
 

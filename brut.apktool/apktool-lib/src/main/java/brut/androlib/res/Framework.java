@@ -102,18 +102,20 @@ public class Framework {
                 out.write(data);
                 out.closeEntry();
 
-                // Copy AndroidManifest.xml to support legacy aapt.
-                file = zip.getFile("AndroidManifest.xml");
-                try (InputStream in = file.getInputStream()) {
-                    data = ByteStreams.toByteArray(in);
+                // Copy AndroidManifest.xml, if available.
+                if (zip.containsFile("AndroidManifest.xml")) {
+                    file = zip.getFile("AndroidManifest.xml");
+                    try (InputStream in = file.getInputStream()) {
+                        data = ByteStreams.toByteArray(in);
+                    }
+                    entry = new ZipEntry("AndroidManifest.xml");
+                    entry.setTime(ApkFile.TIME_MILLIS);
+                    entry.setSize(data.length);
+                    entry.setCrc(ZipUtils.computeCrc(data));
+                    out.putNextEntry(entry);
+                    out.write(data);
+                    out.closeEntry();
                 }
-                entry = new ZipEntry("AndroidManifest.xml");
-                entry.setTime(ApkFile.TIME_MILLIS);
-                entry.setSize(data.length);
-                entry.setCrc(ZipUtils.computeCrc(data));
-                out.putNextEntry(entry);
-                out.write(data);
-                out.closeEntry();
             } catch (IOException ex) {
                 try {
                     Files.deleteIfExists(outFile);
