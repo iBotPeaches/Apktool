@@ -759,6 +759,12 @@ public class BinaryXmlResourceParser implements XmlPullParser {
                         }
                     }
 
+                    if (attributeSize < Attribute.SIZE) {
+                        Log.w(TAG, "Ignoring %s attributes: size of %s bytes is smaller than minimum of %s bytes.",
+                            attributeCount, attributeSize, Attribute.SIZE);
+                        attributeCount = 0;
+                    }
+
                     // Align the stream with the start of the attributes.
                     mIn.jumpTo(startPosition + attributeStart);
 
@@ -1056,10 +1062,7 @@ public class BinaryXmlResourceParser implements XmlPullParser {
             int name = in.readInt();
             int rawValue = in.readInt();
             // Res_value
-            int valueSize = in.readUnsignedShort();
-            if (valueSize < 8) {
-                return null;
-            }
+            in.skipShort(); // valueSize (assumed to be 8 and never verified)
             in.skipByte(); // res0
             int valueType = in.readUnsignedByte();
             int valueData = in.readInt();
