@@ -127,20 +127,30 @@ public class ResXmlSerializer implements XmlSerializer {
             namespace = "";
         }
 
-        // Ignore identical prefix definitions.
-        if (prefix.equals(getPrefix(namespace, true, false))) {
+        // Empty URI is only valid for default namespace.
+        if (!prefix.isEmpty() && namespace.isEmpty()) {
             return;
         }
 
-        int i = (mNamespaceCounts[mDepth + 1]++) << 1;
-        if (mNamespaceStack.length < i + 1) {
+        // Skip if the prefix is already bound to this URI.
+        for (int i = mNamespaceCounts[mDepth + 1] * 2 - 2; i >= 0; i -= 2) {
+            if (mNamespaceStack[i].equals(prefix)) {
+                if (mNamespaceStack[i + 1].equals(namespace)) {
+                    return;
+                }
+                break;
+            }
+        }
+
+        int i = (mNamespaceCounts[mDepth + 1]++) * 2;
+        if (mNamespaceStack.length <= i + 1) {
             String[] newStack = new String[mNamespaceStack.length + 16];
             System.arraycopy(mNamespaceStack, 0, newStack, 0, i);
             mNamespaceStack = newStack;
         }
 
-        mNamespaceStack[i++] = prefix;
-        mNamespaceStack[i] = namespace;
+        mNamespaceStack[i] = prefix;
+        mNamespaceStack[i + 1] = namespace;
     }
 
     @Override
@@ -157,7 +167,7 @@ public class ResXmlSerializer implements XmlSerializer {
         for (int i = mNamespaceCounts[mDepth + 1] * 2 - 2; i >= 0; i -= 2) {
             if (mNamespaceStack[i + 1].equals(namespace) && (includeDefault || !mNamespaceStack[i].isEmpty())) {
                 String candidate = mNamespaceStack[i];
-                for (int j = i + 2; j < mNamespaceCounts[mDepth + 1] * 2; j++) {
+                for (int j = i + 2; j < mNamespaceCounts[mDepth + 1] * 2; j += 2) {
                     if (mNamespaceStack[j].equals(candidate)) {
                         candidate = null;
                         break;
@@ -174,7 +184,7 @@ public class ResXmlSerializer implements XmlSerializer {
         }
 
         String prefix;
-        if (namespace.isEmpty()) {
+        if (namespace != null && namespace.isEmpty()) {
             prefix = "";
         } else {
             do {
@@ -219,7 +229,7 @@ public class ResXmlSerializer implements XmlSerializer {
         writeIndent();
 
         int i = mDepth * 3;
-        if (mElementStack.length < i + 3) {
+        if (mElementStack.length <= i + 2) {
             String[] newStack = new String[mElementStack.length + 12];
             System.arraycopy(mElementStack, 0, newStack, 0, i);
             mElementStack = newStack;
@@ -234,9 +244,9 @@ public class ResXmlSerializer implements XmlSerializer {
             }
         }
 
-        mElementStack[i++] = namespace;
-        mElementStack[i++] = prefix;
-        mElementStack[i] = name;
+        mElementStack[i] = namespace;
+        mElementStack[i + 1] = prefix;
+        mElementStack[i + 2] = name;
 
         write('<');
         if (!prefix.isEmpty()) {
@@ -389,8 +399,11 @@ public class ResXmlSerializer implements XmlSerializer {
             if (!prefix.isEmpty()) {
                 write(':');
                 write(prefix);
-            } else if (getNamespace().isEmpty() && !uri.isEmpty()) {
-                throw new IllegalStateException("Could not set default namespace for elements in no namespace.");
+            } else {
+                String namespace = getNamespace();
+                if (namespace != null && namespace.isEmpty() && !uri.isEmpty()) {
+                    throw new IllegalStateException("Could not set default namespace for elements in no namespace.");
+                }
             }
             write("=\"");
             if (mAutoEscape) {
