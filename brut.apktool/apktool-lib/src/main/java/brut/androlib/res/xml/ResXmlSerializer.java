@@ -127,12 +127,17 @@ public class ResXmlSerializer implements XmlSerializer {
             namespace = "";
         }
 
-        // Empty URI is only valid for default namespace.
-        if (!prefix.isEmpty() && namespace.isEmpty()) {
+        // Skip declarations that aapt2 rejects:
+        // 1. A non-empty prefix bound to an empty URI (only the default namespace may be undeclared).
+        // 2. The reserved prefixes "xml" and "xmlns".
+        // 3. The reserved URIs for "xml" and "xmlns", bound to any prefix.
+        if ((!prefix.isEmpty() && namespace.isEmpty())
+                || prefix.equals(XmlUtils.XML_PREFIX) || prefix.equals(XmlUtils.XMLNS_PREFIX)
+                || namespace.equals(XmlUtils.XML_URI) || namespace.equals(XmlUtils.XMLNS_URI)) {
             return;
         }
 
-        // Skip if the prefix is already bound to this URI.
+        // Skip declaration if the prefix is already bound to this URI.
         for (int i = mNamespaceCounts[mDepth + 1] * 2 - 2; i >= 0; i -= 2) {
             if (mNamespaceStack[i].equals(prefix)) {
                 if (mNamespaceStack[i + 1].equals(namespace)) {
