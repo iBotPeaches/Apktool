@@ -17,6 +17,7 @@
 package brut.androlib.smali;
 
 import brut.androlib.exceptions.AndrolibException;
+import brut.zip.ZipUtils;
 import com.android.tools.smali.baksmali.Baksmali;
 import com.android.tools.smali.baksmali.BaksmaliOptions;
 import com.android.tools.smali.dexlib2.analysis.InlineMethodResolver;
@@ -101,7 +102,8 @@ public class SmaliDecoder {
 
                 String dirName = "smali";
                 if (dexNum > 1 || !dexName.equals("classes.dex")) {
-                    dirName += "_" + dexName.substring(0, dexName.lastIndexOf('.')).replace('/', '@');
+                    String escapedName = dexName.substring(0, dexName.lastIndexOf('.')).replace('/', '@');
+                    dirName += "_" + ZipUtils.normalizeForFs(escapedName);
                     if (dexNum > 1) {
                         dirName += dexNum;
                     }
