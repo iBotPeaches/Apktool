@@ -62,10 +62,6 @@ public final class IOUtils {
         return (tail != null ? real.resolve(tail) : real).normalize();
     }
 
-    public static String getFileExtension(String path) {
-        return getFileExtension(Paths.get(path));
-    }
-
     public static String getFileExtension(Path path) {
         Path name = path.getFileName();
         if (name == null) {
@@ -76,8 +72,10 @@ public final class IOUtils {
         return lastDot != -1 ? fileName.substring(lastDot + 1) : "";
     }
 
-    public static String getNameWithoutExtension(String path) {
-        return getNameWithoutExtension(Paths.get(path));
+    public static String getFileExtension(String path, char separator) {
+        int lastSep = path.lastIndexOf(separator);
+        int lastDot = path.lastIndexOf('.');
+        return lastDot > lastSep ? path.substring(lastDot + 1) : "";
     }
 
     public static String getNameWithoutExtension(Path path) {
@@ -88,6 +86,12 @@ public final class IOUtils {
         String fileName = name.toString();
         int lastDot = fileName.lastIndexOf('.');
         return lastDot != -1 ? fileName.substring(0, lastDot) : fileName;
+    }
+
+    public static String getNameWithoutExtension(String path, char separator) {
+        int lastSep = path.lastIndexOf(separator);
+        int lastDot = path.lastIndexOf('.');
+        return lastDot > lastSep ? path.substring(lastSep + 1, lastDot) : path.substring(lastSep + 1);
     }
 
     public static Path createParentDirectories(Path path, FileAttribute<?>... attrs) throws IOException {

@@ -98,7 +98,7 @@ public class ResTable {
     }
 
     private void loadPackagesFromApk(ApkFile apkFile, boolean isMainPackage) throws AndrolibException {
-        try (InputStream in = apkFile.getFile("resources.arsc").getInputStream()) {
+        try (InputStream in = apkFile.getEntry("resources.arsc").getInputStream()) {
             BinaryResourceParser parser = isMainPackage
                 ? new BinaryResourceParser(this, mConfig.isKeepBrokenResources(), mConfig.isDecodeResolveGreedy())
                 : new BinaryResourceParser(this, true, true);

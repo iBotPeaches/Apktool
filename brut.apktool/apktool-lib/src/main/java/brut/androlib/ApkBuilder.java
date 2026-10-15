@@ -30,6 +30,7 @@ import brut.util.BackgroundWorker;
 import brut.util.BinaryDataInputStream;
 import brut.util.IOUtils;
 import brut.zip.ZipArchive;
+import brut.zip.ZipArchiveEntry;
 import brut.zip.ZipUtils;
 
 import java.io.IOException;
@@ -116,7 +117,7 @@ public class ApkBuilder {
             while (it.hasNext()) {
                 String fileName = it.next().getFileName().toString();
                 if (fileName.endsWith(".dex")) {
-                    copySourcesRaw(fileName);
+                    copyRawFile(mApkDir.resolve(fileName));
                     dexFiles.add(fileName);
                 }
             }
@@ -147,18 +148,6 @@ public class ApkBuilder {
                 }
             }
         }
-    }
-
-    private void copySourcesRaw(String fileName) throws IOException {
-        Path dexFile = mApkDir.resolve(fileName);
-        Path outDexFile = mOutDir.resolve(fileName);
-        if (!isFileNewer(dexFile, outDexFile)) {
-            Log.i(TAG, fileName + " has not changed.");
-            return;
-        }
-
-        Log.i(TAG, "Copying raw " + fileName + "...");
-        Files.copy(dexFile, outDexFile, StandardCopyOption.REPLACE_EXISTING);
     }
 
     private void buildSourcesSmali(String dirName, String fileName) throws AndrolibException, IOException {
@@ -204,13 +193,13 @@ public class ApkBuilder {
 
         // Copy raw manifest if it's binary XML.
         if (isBinaryManifest) {
-            copyManifestRaw(manifest);
+            copyRawFile(manifest);
         }
 
         // Copy raw resources if possible.
         Path arscFile = mApkDir.resolve("resources.arsc");
         if (Files.isRegularFile(arscFile)) {
-            copyResourcesRaw(arscFile);
+            copyRawFile(arscFile);
             return;
         }
 
@@ -228,28 +217,6 @@ public class ApkBuilder {
 
         // Build manifest and resources.
         buildResourcesFully(manifest, arscFile, resDir);
-    }
-
-    private void copyManifestRaw(Path manifest) throws IOException {
-        Path outManifest = mOutDir.resolve(mApkDir.relativize(manifest));
-        if (!isFileNewer(manifest, outManifest)) {
-            Log.i(TAG, "AndroidManifest.xml has not changed.");
-            return;
-        }
-
-        Log.i(TAG, "Copying raw AndroidManifest.xml...");
-        Files.copy(manifest, outManifest, StandardCopyOption.REPLACE_EXISTING);
-    }
-
-    private void copyResourcesRaw(Path arscFile) throws IOException {
-        Path outArscFile = mOutDir.resolve(mApkDir.relativize(arscFile));
-        if (!isFileNewer(arscFile, outArscFile)) {
-            Log.i(TAG, "resources.arsc has not changed.");
-            return;
-        }
-
-        Log.i(TAG, "Copying raw resources.arsc...");
-        Files.copy(arscFile, outArscFile, StandardCopyOption.REPLACE_EXISTING);
     }
 
     private void buildManifestOnly(Path manifest) throws AndrolibException, IOException {
@@ -279,7 +246,7 @@ public class ApkBuilder {
             mAaptInvoker.invoke(tmpFile, tmpManifest, null);
 
             try (ZipArchive tmpZip = new ZipArchive(tmpFile)) {
-                tmpZip.extract(mOutDir, mOutDir.relativize(outManifest).toString());
+                tmpZip.getEntry("AndroidManifest.xml").extract(outManifest);
             }
         } finally {
             Files.deleteIfExists(tmpFile);
@@ -326,12 +293,33 @@ public class ApkBuilder {
             mAaptInvoker.invoke(tmpFile, tmpManifest, resDir);
 
             try (ZipArchive tmpZip = new ZipArchive(tmpFile)) {
-                tmpZip.extract(mOutDir, mOutDir.relativize(outManifest).toString(),
-                    mOutDir.relativize(outArscFile).toString(), mOutDir.relativize(outResDir).toString());
+                tmpZip.getEntry("AndroidManifest.xml").extract(outManifest);
+
+                if (tmpZip.hasEntry("resources.arsc")) {
+                    tmpZip.getEntry("resources.arsc").extract(outArscFile);
+                }
+
+                Iterator<ZipArchiveEntry> it = tmpZip.entries("res/").iterator();
+                while (it.hasNext()) {
+                    ZipArchiveEntry entry = it.next();
+                    entry.extract(outResDir.resolve(entry.getName().substring(4)));
+                }
             }
         } finally {
             Files.deleteIfExists(tmpFile);
         }
+    }
+
+    private void copyRawFile(Path file) throws IOException {
+        Path fileName = mApkDir.relativize(file);
+        Path outFile = mOutDir.resolve(fileName);
+        if (!isFileNewer(file, outFile)) {
+            Log.i(TAG, fileName + " has not changed.");
+            return;
+        }
+
+        Log.i(TAG, "Copying raw " + fileName + "...");
+        Files.copy(file, outFile, StandardCopyOption.REPLACE_EXISTING);
     }
 
     private void copyOriginalFiles() throws IOException {
@@ -348,7 +336,7 @@ public class ApkBuilder {
         IOUtils.copyDirectory(originalDir, mOutDir);
     }
 
-    private void buildApkFile(Path outFile) throws AndrolibException, IOException {
+    private void buildApkFile(Path outFile) throws IOException {
         if (mConfig.isNoApk()) {
             return;
         }
@@ -368,7 +356,7 @@ public class ApkBuilder {
             // Convert to set for fast lookup.
             Set<String> doNotCompress = new HashSet<>(mApkInfo.getDoNotCompress());
             shouldCompress = entryName -> !doNotCompress.contains(entryName)
-                && !doNotCompress.contains(IOUtils.getFileExtension(entryName));
+                && !doNotCompress.contains(IOUtils.getFileExtension(entryName, '/'));
         }
 
         Log.i(TAG, "Building apk file...");
@@ -417,10 +405,10 @@ public class ApkBuilder {
     private static void zipFile(Path baseDir, String fileName, ZipOutputStream out, Predicate<String> shouldCompress)
             throws IOException {
         Path file = baseDir.resolve(fileName);
-        String entryName = ZipUtils.normalize(fileName);
-        ZipEntry entry = new ZipEntry(entryName);
+        String name = ZipUtils.normalizeForZip(fileName);
+        ZipEntry entry = new ZipEntry(name);
         entry.setTime(ApkFile.TIME_MILLIS);
-        if (shouldCompress.test(entryName)) {
+        if (shouldCompress.test(name)) {
             entry.setMethod(ZipEntry.DEFLATED);
         } else {
             entry.setMethod(ZipEntry.STORED);

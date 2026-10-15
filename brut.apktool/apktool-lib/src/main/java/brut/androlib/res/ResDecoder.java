@@ -34,7 +34,7 @@ import brut.androlib.res.xml.ValuesXmlSerializable;
 import brut.common.Log;
 import brut.util.IOUtils;
 import brut.util.Pair;
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableList;
 
 import java.io.InputStream;
 import java.io.IOException;
@@ -43,6 +43,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -74,7 +75,7 @@ public class ResDecoder {
     }
 
     public void decodeResources(Path outDir) throws AndrolibException {
-        if (!mApkFile.containsFile("resources.arsc")) {
+        if (!mApkFile.hasEntry("resources.arsc")) {
             return;
         }
 
@@ -83,7 +84,7 @@ public class ResDecoder {
         ApkInfo apkInfo = mApkFile.getApkInfo();
         ResPackage pkg = mTable.getMainPackage();
 
-        Map<ResFileDecoder.Type, ResStreamDecoder> decoders = new HashMap<>();
+        Map<ResFileDecoder.Type, ResStreamDecoder> decoders = new EnumMap<>(ResFileDecoder.Type.class);
         decoders.put(ResFileDecoder.Type.UNKNOWN, new ResRawStreamDecoder());
         decoders.put(ResFileDecoder.Type.PNG_9PATCH, new ResNinePatchStreamDecoder());
 
@@ -96,14 +97,14 @@ public class ResDecoder {
         ResFileDecoder fileDecoder = new ResFileDecoder(mApkFile, decoders);
 
         Log.i(TAG, "Decoding value resources...");
-        for (ResEntry entry : Lists.newArrayList(listEntries(pkg))) {
+        for (ResEntry entry : ImmutableList.copyOf(listEntries(pkg))) {
             if (entry.getValue() instanceof ResBag) {
                 ((ResBag) entry.getValue()).resolveKeys();
             }
         }
 
         Log.i(TAG, "Decoding file resources...");
-        for (ResEntry entry : Lists.newArrayList(listEntries(pkg))) {
+        for (ResEntry entry : ImmutableList.copyOf(listEntries(pkg))) {
             if (entry.getValue() instanceof ResFileReference) {
                 fileDecoder.decode(entry, outDir, mResFileMap);
             }
@@ -188,7 +189,7 @@ public class ResDecoder {
     }
 
     private void generatePublicXml(ResPackage pkg, Path outDir, ResXmlSerializer serial) throws AndrolibException {
-        List<ResEntrySpec> specs = Lists.newArrayList(pkg.listEntrySpecs());
+        List<ResEntrySpec> specs = new ArrayList<>(pkg.listEntrySpecs());
         specs.sort(Comparator.comparing(ResEntrySpec::getResId));
 
         Path outFile = outDir.resolve("res/values/public.xml");
@@ -333,7 +334,7 @@ public class ResDecoder {
             return;
         }
 
-        List<ResOverlayable> overlayables = Lists.newArrayList(pkg.listOverlayables());
+        List<ResOverlayable> overlayables = new ArrayList<>(pkg.listOverlayables());
         overlayables.sort(Comparator.comparing(ResOverlayable::getName));
 
         Path outFile = outDir.resolve("res/values/overlayable.xml");
@@ -354,7 +355,7 @@ public class ResDecoder {
     }
 
     public void decodeManifest(Path outDir) throws AndrolibException {
-        if (!mApkFile.containsFile("AndroidManifest.xml")) {
+        if (!mApkFile.hasEntry("AndroidManifest.xml")) {
             return;
         }
 
@@ -369,7 +370,7 @@ public class ResDecoder {
 
         Log.i(TAG, "Decoding AndroidManifest.xml with " + (pkg == null ? "only framework " : "") + "resources...");
         try (
-            InputStream in = mApkFile.getFile("AndroidManifest.xml").getInputStream();
+            InputStream in = mApkFile.getEntry("AndroidManifest.xml").getInputStream();
             OutputStream out = createOutputStream(outDir.resolve("AndroidManifest.xml"))
         ) {
             decoder.decode(in, out);
@@ -438,7 +439,7 @@ public class ResDecoder {
             }
 
             // Record framework package IDs used by the resource table.
-            List<Integer> framePackageIds = Lists.newArrayList(mTable.getFramePackageIds());
+            List<Integer> framePackageIds = new ArrayList<>(mTable.getFramePackageIds());
             if (!framePackageIds.isEmpty()) {
                 UsesFramework usesFramework = apkInfo.getUsesFramework();
                 List<Integer> frameworkIds = usesFramework.getIds();
@@ -450,7 +451,7 @@ public class ResDecoder {
             }
 
             // Record library package names used by the resource table.
-            List<Integer> libPackageIds = Lists.newArrayList(mTable.getLibPackageIds());
+            List<Integer> libPackageIds = new ArrayList<>(mTable.getLibPackageIds());
             if (!libPackageIds.isEmpty()) {
                 List<String> usesLibrary = apkInfo.getUsesLibrary();
                 libPackageIds.sort(null);

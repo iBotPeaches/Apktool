@@ -301,7 +301,7 @@ public class Main {
     }
 
     public static void main(String[] args) throws AndrolibException {
-        if (!SystemUtils.is64Bit()) {
+        if (!SystemUtils.IS_64BIT) {
             System.err.println("Warning: Apktool no longer supports 32-bit platforms.");
         }
 

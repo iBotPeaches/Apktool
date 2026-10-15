@@ -37,23 +37,23 @@ public final class AaptManager {
     public static Path getBinaryFile() throws AndrolibException {
         String binName = getBinaryName();
 
-        if (!SystemUtils.is64Bit()) {
+        if (!SystemUtils.IS_64BIT) {
             throw new AndrolibException(binName + " binaries are not available for 32-bit platforms.");
         }
 
         StringBuilder binPath = new StringBuilder("/prebuilt/");
-        if (SystemUtils.isUnix()) {
+        if (SystemUtils.IS_OS_LINUX) {
             binPath.append("linux"); // ELF 64-bit LSB executable, x86-64
-        } else if (SystemUtils.isMac()) {
+        } else if (SystemUtils.IS_OS_MAC_OSX) {
             binPath.append("macosx"); // fat binary x86_64 + arm64
-        } else if (SystemUtils.isWindows()) {
+        } else if (SystemUtils.IS_OS_WINDOWS) {
             binPath.append("windows"); // x86_64
         } else {
-            throw new AndrolibException("Could not identify platform: " + SystemUtils.getOSName());
+            throw new AndrolibException("Could not identify platform: " + SystemUtils.OS_NAME);
         }
         binPath.append('/');
         binPath.append(binName);
-        if (SystemUtils.isWindows()) {
+        if (SystemUtils.IS_OS_WINDOWS) {
             binPath.append(".exe");
         }
 

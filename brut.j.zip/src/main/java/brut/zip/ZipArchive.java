@@ -17,13 +17,16 @@
 package brut.zip;
 
 import brut.common.Log;
+import com.google.common.collect.Maps;
 
 import java.io.Closeable;
 import java.io.InputStream;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Enumeration;
+import java.util.Map;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -31,7 +34,8 @@ import java.util.zip.ZipFile;
 public class ZipArchive implements Closeable {
     private final Path mPath;
     private final ZipFile mZip;
-    private ZipDirEntry mRoot;
+    private Map<String, ZipArchiveEntry> mEntries;
+    private ZipArchiveEntry[] mSortedEntries;
     private boolean mClosed;
 
     public ZipArchive(Path path) throws IOException {
@@ -54,9 +58,9 @@ public class ZipArchive implements Closeable {
     @Override
     public void close() throws IOException {
         if (!mClosed) {
-            mZip.close();
-            mRoot = null;
             mClosed = true;
+            mEntries = null;
+            mZip.close();
         }
     }
 
@@ -64,96 +68,135 @@ public class ZipArchive implements Closeable {
         if (mClosed) {
             throw new IllegalStateException();
         }
-        if (mRoot != null) {
+        if (mEntries != null) {
             return;
         }
-        ZipDirEntry root = new ZipDirEntry(this, null, "");
-        Enumeration<? extends ZipEntry> entries = mZip.entries();
-        while (entries.hasMoreElements()) {
-            ZipEntry entry = entries.nextElement();
-            String name;
-            try {
-                name = ZipUtils.normalize(entry.getName());
-                Paths.get(name); // throws InvalidPathException if the name is invalid on this file system
-            } catch (IllegalArgumentException ex) {
-                Log.w(Log.ROOT, "Skipping invalid ZIP entry: %s (%s)", entry.getName(), ex.getMessage());
-                continue;
-            }
-            ZipDirEntry dir = root;
-            for (int i = 0, segEnd;; i = segEnd + 1) {
-                segEnd = name.indexOf(ZipUtils.SEPARATOR_CHAR, i);
-                boolean lastSeg = segEnd == -1;
-                if (lastSeg) {
-                    segEnd = name.length();
+        Map<String, ZipArchiveEntry> entries = Maps.newHashMapWithExpectedSize(mZip.size());
+        Enumeration<? extends ZipEntry> zipEntries = mZip.entries();
+        while (zipEntries.hasMoreElements()) {
+            ZipEntry entry = zipEntries.nextElement();
+            if (!entry.isDirectory()) {
+                String name = entry.getName();
+                if (entries.put(name, new ZipArchiveEntry(this, name, entry)) != null) {
+                    Log.w(Log.ROOT, "Duplicate ZIP entry: %s", name);
                 }
-                String key = name.substring(i, segEnd);
-                if (lastSeg) {
-                    if (entry.isDirectory()) {
-                        dir.getOrCreateDir(key, name);
-                    } else {
-                        dir.putFile(key, name, entry);
-                    }
-                    break;
-                }
-                dir = dir.getOrCreateDir(key, name.substring(0, segEnd));
             }
         }
-        mRoot = root;
+        mEntries = entries;
     }
 
-    public Stream<ZipDirEntry> listDirs() {
-        ensureLoaded();
-        return mRoot.listDirs();
+    private ZipArchiveEntry[] sortedEntries() {
+        if (mSortedEntries == null) {
+            ZipArchiveEntry[] sorted = mEntries.values().toArray(new ZipArchiveEntry[0]);
+            Arrays.sort(sorted, Comparator.comparing(ZipArchiveEntry::getName));
+            mSortedEntries = sorted;
+        }
+        return mSortedEntries;
     }
 
-    public Stream<ZipDirEntry> walkDirs() {
-        ensureLoaded();
-        return mRoot.walkDirs();
+    private static int lowerBound(ZipArchiveEntry[] sorted, String key) {
+        int low = 0, high = sorted.length;
+        while (low < high) {
+            int mid = (low + high) >>> 1;
+            if (sorted[mid].getName().compareTo(key) < 0) {
+                low = mid + 1;
+            } else {
+                high = mid;
+            }
+        }
+        return low;
     }
 
-    public boolean containsDir(String name) {
-        ensureLoaded();
-        return mRoot.containsDir(name);
+    public boolean hasEntries() {
+        return hasEntries(null);
     }
 
-    public ZipDirEntry getDir(String name) throws ZipNoSuchEntryException {
+    public boolean hasEntries(String prefix) {
         ensureLoaded();
-        return mRoot.getDir(name);
+        if (prefix == null || prefix.isEmpty()) {
+            return !mEntries.isEmpty();
+        }
+        ZipArchiveEntry[] sorted = sortedEntries();
+        int i = lowerBound(sorted, prefix);
+        return i < sorted.length && sorted[i].getName().startsWith(prefix);
     }
 
-    public Stream<ZipFileEntry> listFiles() {
-        ensureLoaded();
-        return mRoot.listFiles();
+    public Stream<ZipArchiveEntry> entries() {
+        return entries(null);
     }
 
-    public Stream<ZipFileEntry> walkFiles() {
+    public Stream<ZipArchiveEntry> entries(String prefix) {
         ensureLoaded();
-        return mRoot.walkFiles();
+        ZipArchiveEntry[] sorted = sortedEntries();
+        if (prefix == null || prefix.isEmpty()) {
+            return Arrays.stream(sorted);
+        }
+        char[] chars = prefix.toCharArray();
+        // End bound would wrap if incremented past \uffff.
+        if (chars[chars.length - 1] == '\uffff') {
+            throw new IllegalArgumentException("Prefix cannot end with \\uffff.");
+        }
+        chars[chars.length - 1]++;
+        int from = lowerBound(sorted, prefix);
+        int to = lowerBound(sorted, new String(chars));
+        return Arrays.stream(sorted, from, to);
     }
 
-    public boolean containsFile(String name) {
+    public boolean hasEntry(String name) {
         ensureLoaded();
-        return mRoot.containsFile(name);
+        return mEntries.containsKey(name);
     }
 
-    public ZipFileEntry getFile(String name) throws ZipNoSuchEntryException {
+    public ZipArchiveEntry getEntry(String name) throws ZipNoSuchEntryException {
         ensureLoaded();
-        return mRoot.getFile(name);
+        ZipArchiveEntry entry = mEntries.get(name);
+        if (entry == null) {
+            throw new ZipNoSuchEntryException(name);
+        }
+        return entry;
     }
 
     public void extract(Path dest) throws IOException {
         ensureLoaded();
-        mRoot.extract(dest);
+        for (ZipArchiveEntry entry : mEntries.values()) {
+            extractEntry(entry, dest);
+        }
     }
 
     public void extract(Path dest, String name) throws IOException {
         ensureLoaded();
-        mRoot.extract(dest, name);
+        ZipArchiveEntry entry = mEntries.get(name);
+        if (entry == null) {
+            throw new ZipNoSuchEntryException(name);
+        }
+        extractEntry(entry, dest);
     }
 
     public void extract(Path dest, String... names) throws IOException {
         ensureLoaded();
-        mRoot.extract(dest, names);
+        ZipArchiveEntry[] entries = new ZipArchiveEntry[names.length];
+        for (int i = 0; i < names.length; i++) {
+            String name = names[i];
+            ZipArchiveEntry entry = mEntries.get(name);
+            if (entry == null) {
+                throw new ZipNoSuchEntryException(name);
+            }
+            entries[i] = entry;
+        }
+        for (ZipArchiveEntry entry : entries) {
+            extractEntry(entry, dest);
+        }
+    }
+
+    private void extractEntry(ZipArchiveEntry entry, Path dest) throws IOException {
+        String name;
+        try {
+            name = ZipUtils.normalizeForFs(entry.getName());
+        } catch (IllegalArgumentException ex) {
+            Log.w(Log.ROOT, "Could not extract ZIP entry: %s (%s)", entry.getName(), ex.getMessage());
+            return;
+        }
+        entry.extract(dest.resolve(name));
     }
 
     @Override

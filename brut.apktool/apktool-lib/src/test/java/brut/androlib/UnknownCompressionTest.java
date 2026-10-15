@@ -54,8 +54,8 @@ public class UnknownCompressionTest extends BaseTest {
     @Test
     public void pkmExtensionDeflatedTest() throws Exception {
         String name = "assets/bin/Data/test.pkm";
-        int control = sTestApk.getFile(name).getMethod();
-        int rebuilt = sNewApk.getFile(name).getMethod();
+        int control = sTestApk.getEntry(name).getMethod();
+        int rebuilt = sNewApk.getEntry(name).getMethod();
 
         // Check that control = rebuilt (both deflated)
         // Add extra check for checking not equal to 0, just in case control gets broken
@@ -66,8 +66,8 @@ public class UnknownCompressionTest extends BaseTest {
     @Test
     public void doubleExtensionStoredTest() throws Exception {
         String name = "assets/bin/Data/two.extension.file";
-        int control = sTestApk.getFile(name).getMethod();
-        int rebuilt = sNewApk.getFile(name).getMethod();
+        int control = sTestApk.getEntry(name).getMethod();
+        int rebuilt = sNewApk.getEntry(name).getMethod();
 
         // Check that control = rebuilt (both stored)
         // Add extra check for checking = 0 to enforce check for stored just in case control breaks
@@ -78,8 +78,8 @@ public class UnknownCompressionTest extends BaseTest {
     @Test
     public void confirmJsonFileIsDeflatedTest() throws Exception {
         String name = "test.json";
-        int control = sTestApk.getFile(name).getMethod();
-        int rebuilt = sNewApk.getFile(name).getMethod();
+        int control = sTestApk.getEntry(name).getMethod();
+        int rebuilt = sNewApk.getEntry(name).getMethod();
 
         assertEquals(control, rebuilt);
         assertEquals(8, rebuilt);
@@ -88,8 +88,8 @@ public class UnknownCompressionTest extends BaseTest {
     @Test
     public void confirmPngFileIsStoredTest() throws Exception {
         String name = "950x150.png";
-        int control = sTestApk.getFile(name).getMethod();
-        int rebuilt = sNewApk.getFile(name).getMethod();
+        int control = sTestApk.getEntry(name).getMethod();
+        int rebuilt = sNewApk.getEntry(name).getMethod();
 
         assertNotEquals(control, rebuilt);
         assertEquals(0, rebuilt);

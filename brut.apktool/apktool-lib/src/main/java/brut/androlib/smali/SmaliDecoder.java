@@ -73,12 +73,8 @@ public class SmaliDecoder {
             dexFiles.put(1, dexEntry.getDexFile());
 
             // Add additional dex files if it's a multi-dex container.
+            String prefix = dexName + "/";
             for (String dexEntryName : mDexContainer.getDexEntryNames()) {
-                if (dexEntryName.equals(dexName)) {
-                    continue;
-                }
-
-                String prefix = dexName + "/";
                 if (!dexEntryName.startsWith(prefix)) {
                     continue;
                 }

@@ -17,6 +17,7 @@
 package brut.zip;
 
 import brut.util.IOUtils;
+import com.google.common.io.ByteStreams;
 
 import java.io.InputStream;
 import java.io.IOException;
@@ -26,28 +27,22 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.FileTime;
 import java.util.zip.ZipEntry;
 
-public final class ZipFileEntry implements Comparable<ZipFileEntry> {
+public final class ZipArchiveEntry implements Comparable<ZipArchiveEntry> {
     public static final int STORED = ZipEntry.STORED;
     public static final int DEFLATED = ZipEntry.DEFLATED;
 
     private final ZipArchive mArchive;
-    private final ZipDirEntry mParent;
     private final String mName;
     private final ZipEntry mEntry;
 
-    ZipFileEntry(ZipArchive archive, ZipDirEntry parent, String name, ZipEntry entry) {
+    ZipArchiveEntry(ZipArchive archive, String name, ZipEntry entry) {
         mArchive = archive;
-        mParent = parent;
         mName = name;
         mEntry = entry;
     }
 
     public ZipArchive getArchive() {
         return mArchive;
-    }
-
-    public ZipDirEntry getParent() {
-        return mParent;
     }
 
     public String getName() {
@@ -110,6 +105,12 @@ public final class ZipFileEntry implements Comparable<ZipFileEntry> {
         return mArchive.getInputStream(mEntry);
     }
 
+    public byte[] getData() throws IOException {
+        try (InputStream in = getInputStream()) {
+            return ByteStreams.toByteArray(in);
+        }
+    }
+
     public void extract(Path dest) throws IOException {
         IOUtils.createParentDirectories(dest);
         try (InputStream in = getInputStream()) {
@@ -119,7 +120,7 @@ public final class ZipFileEntry implements Comparable<ZipFileEntry> {
 
     @Override
     public String toString() {
-        return String.format("ZipFileEntry{archive=%s, name=%s}", mParent, mName);
+        return String.format("ZipArchiveEntry{archive=%s, name=%s}", mArchive, mName);
     }
 
     @Override
@@ -130,18 +131,18 @@ public final class ZipFileEntry implements Comparable<ZipFileEntry> {
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        ZipFileEntry other = (ZipFileEntry) obj;
-        return mParent.equals(other.mParent)
+        ZipArchiveEntry other = (ZipArchiveEntry) obj;
+        return mArchive.equals(other.mArchive)
             && mName.equals(other.mName);
     }
 
     @Override
     public int hashCode() {
-        return 31 * mParent.hashCode() + mName.hashCode();
+        return 31 * mArchive.hashCode() + mName.hashCode();
     }
 
     @Override
-    public int compareTo(ZipFileEntry other) {
+    public int compareTo(ZipArchiveEntry other) {
         int result = mArchive.getPath().compareTo(other.mArchive.getPath());
         if (result != 0) {
             return result;

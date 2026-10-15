@@ -24,7 +24,6 @@ import java.io.InputStreamReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeoutException;
@@ -33,10 +32,22 @@ import java.util.function.Consumer;
 import com.google.common.io.ByteStreams;
 
 public final class SystemUtils {
-    private static final String OS_NAME = System.getProperty("os.name").toLowerCase(Locale.ROOT);
-    private static final boolean IS_64BIT;
+
+    private SystemUtils() {}
+
+    public static final String OS_NAME = System.getProperty("os.name");
+
+    private static boolean isOsNameMatch(String prefix) {
+        return OS_NAME.regionMatches(true, 0, prefix, 0, prefix.length());
+    }
+
+    public static final boolean IS_OS_LINUX = isOsNameMatch("Linux");
+    public static final boolean IS_OS_MAC_OSX = isOsNameMatch("Mac OS X");
+    public static final boolean IS_OS_WINDOWS = isOsNameMatch("Windows");
+
+    public static final boolean IS_64BIT;
     static {
-        if (isWindows()) {
+        if (IS_OS_WINDOWS) {
             String arch = System.getenv("PROCESSOR_ARCHITEW6432");
             if (arch == null || arch.isEmpty()) {
                 arch = System.getenv("PROCESSOR_ARCHITECTURE");
@@ -46,29 +57,6 @@ public final class SystemUtils {
             String bitness = System.getProperty("sun.arch.data.model");
             IS_64BIT = bitness != null && bitness.equals("64");
         }
-    }
-
-    private SystemUtils() {}
-
-    public static String getOSName() {
-        return OS_NAME;
-    }
-
-    public static boolean isWindows() {
-        return OS_NAME.contains("win");
-    }
-
-    public static boolean isMac() {
-        return OS_NAME.contains("mac");
-    }
-
-    public static boolean isUnix() {
-        return OS_NAME.contains("nix") || OS_NAME.contains("nux")
-            || OS_NAME.contains("aix") || OS_NAME.contains("sunos");
-    }
-
-    public static boolean is64Bit() {
-        return IS_64BIT;
     }
 
     public static void execute(String[] cmd) throws IOException, InterruptedException {

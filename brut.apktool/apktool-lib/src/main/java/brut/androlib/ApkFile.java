@@ -19,8 +19,7 @@ package brut.androlib;
 import brut.androlib.exceptions.AndrolibException;
 import brut.androlib.meta.ApkInfo;
 import brut.zip.ZipArchive;
-import brut.zip.ZipDirEntry;
-import brut.zip.ZipFileEntry;
+import brut.zip.ZipArchiveEntry;
 import brut.zip.ZipNoSuchEntryException;
 
 import java.io.Closeable;
@@ -79,44 +78,34 @@ public class ApkFile implements Closeable {
         }
     }
 
-    public Stream<ZipDirEntry> listDirs() throws AndrolibException {
+    public boolean hasEntries() throws AndrolibException {
         ensureOpen();
-        return mArchive.listDirs();
+        return mArchive.hasEntries();
     }
 
-    public Stream<ZipDirEntry> walkDirs() throws AndrolibException {
+    public boolean hasEntries(String prefix) throws AndrolibException {
         ensureOpen();
-        return mArchive.walkDirs();
+        return mArchive.hasEntries(prefix);
     }
 
-    public boolean containsDir(String name) throws AndrolibException {
+    public Stream<ZipArchiveEntry> entries() throws AndrolibException {
         ensureOpen();
-        return mArchive.containsDir(name);
+        return mArchive.entries();
     }
 
-    public ZipDirEntry getDir(String name) throws AndrolibException, ZipNoSuchEntryException {
+    public Stream<ZipArchiveEntry> entries(String prefix) throws AndrolibException {
         ensureOpen();
-        return mArchive.getDir(name);
+        return mArchive.entries(prefix);
     }
 
-    public Stream<ZipFileEntry> listFiles() throws AndrolibException {
+    public boolean hasEntry(String name) throws AndrolibException {
         ensureOpen();
-        return mArchive.listFiles();
+        return mArchive.hasEntry(name);
     }
 
-    public Stream<ZipFileEntry> walkFiles() throws AndrolibException {
+    public ZipArchiveEntry getEntry(String name) throws AndrolibException, ZipNoSuchEntryException {
         ensureOpen();
-        return mArchive.walkFiles();
-    }
-
-    public boolean containsFile(String name) throws AndrolibException {
-        ensureOpen();
-        return mArchive.containsFile(name);
-    }
-
-    public ZipFileEntry getFile(String name) throws AndrolibException, ZipNoSuchEntryException {
-        ensureOpen();
-        return mArchive.getFile(name);
+        return mArchive.getEntry(name);
     }
 
     public void extract(Path dest) throws AndrolibException, IOException {

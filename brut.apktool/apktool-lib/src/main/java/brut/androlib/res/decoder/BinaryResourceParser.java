@@ -40,7 +40,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
 public class BinaryResourceParser {
     private static final String TAG = BinaryResourceParser.class.getName();
@@ -418,10 +417,10 @@ public class BinaryResourceParser {
             mHasSparseEntries = true;
         }
 
-        // #3778 - In some apps the res entries are unordered and might have to jump backwards.
-        // We simply pre-sort them by offset.
-        Map<Integer, List<Integer>> entryOffsets = new TreeMap<>();
-        for (int i = 0; i < entryCount; i++) {
+        // Pack each entry into a long as (offset << 32 | index).
+        long[] entries = new long[entryCount];
+        entryCount = 0;
+        for (int i = 0; i < entries.length; i++) {
             int index, offset;
 
             // #3372 - 16-bit offsets should be stored as real offsets (* 4u).
@@ -439,42 +438,38 @@ public class BinaryResourceParser {
                 }
             }
 
-            List<Integer> indexes = entryOffsets.get(offset);
-            if (indexes == null) {
-                indexes = new ArrayList<>();
-                entryOffsets.put(offset, indexes);
-            }
-            indexes.add(index);
-        }
-
-        // Exclude NO_ENTRY indexes.
-        List<Integer> indexes = entryOffsets.get(NO_ENTRY);
-        if (indexes != null) {
-            if (type != null) {
-                for (int index : indexes) {
-                    if (!mPackage.hasEntrySpec(id, index)) {
-                        mMissingEntrySpecs.add(ResId.of(mPackage.getId(), id, index));
-                    }
+            // Exclude NO_ENTRY indexes.
+            if (offset == NO_ENTRY) {
+                if (type != null && !mPackage.hasEntrySpec(id, index)) {
+                    mMissingEntrySpecs.add(ResId.of(mPackage.getId(), id, index));
                 }
+                continue;
             }
 
-            entryOffsets.remove(NO_ENTRY);
-            // Update the entry count for logging.
-            entryCount -= indexes.size();
+            entries[entryCount++] = ((long) offset << 32) | (index & 0xFFFFFFFFL);
         }
 
-        // Parse the remaining entries.
-        for (Map.Entry<Integer, List<Integer>> entryOffset : entryOffsets.entrySet()) {
-            int offset = entryOffset.getKey();
-            indexes = entryOffset.getValue();
+        // #3778 - In some apps the entries are unordered and might have to jump backwards.
+        // Sorting orders them by offset, then by index, and entries sharing an offset end up adjacent.
+        Arrays.sort(entries, 0, entryCount);
 
-            // #3428 - In some apps the res entries are padded for alignment, but in #3778 it made sense to align
+        // Parse each offset group once and apply the result to all its entries.
+        for (int i = 0, groupEnd; i < entryCount; i = groupEnd) {
+            int offset = (int) (entries[i] >>> 32);
+
+            // Find the end of the group of entries sharing this offset (exclusive).
+            groupEnd = i + 1;
+            while (groupEnd < entryCount && (int) (entries[groupEnd] >>> 32) == offset) {
+                groupEnd++;
+            }
+
+            // #3428 - In some apps the entries are padded for alignment, but in #3778 it made sense to align
             // to the start of the entries to handle all cases.
             long entryStart = parser.chunkStart() + entriesStart + offset;
 
             // As seen in some recent APKs - there are more entries reported than can fit in the chunk.
             if (entryStart >= parser.chunkEnd()) {
-                Log.w(TAG, "End of chunk hit. Skipping remaining %s entries in type: %s", entryCount, typeName);
+                Log.w(TAG, "End of chunk hit. Skipping remaining %s entries in type: %s", entryCount - i, typeName);
                 break;
             }
 
@@ -485,36 +480,37 @@ public class BinaryResourceParser {
             int key = entry.getLeft();
             ResValue value = entry.getRight();
 
-            // Add all entries with the parsed value, or discard them if the config was invalid.
-            if (type != null) {
-                for (int index : indexes) {
-                    ResId resId = ResId.of(mPackage.getId(), id, index);
-
-                    // #2824 - In some apps the res entries are duplicated with the 2nd being malformed.
-                    // AOSP skips this, so we will do the same.
-                    if (value == null) {
-                        if (!mPackage.hasEntrySpec(id, index)) {
-                            mMissingEntrySpecs.add(resId);
-                        }
-                        continue;
-                    }
-
-                    // The same entry can never be added more than once.
-                    if (mPackage.hasEntry(id, index, config, mFlag)) {
-                        Log.w(TAG, "Ignoring repeated entry: id=%s, config=%s, flag=%s", resId, config, mFlag);
-                        continue;
-                    }
-
-                    if (!mPackage.hasEntrySpec(id, index)) {
-                        mPackage.addEntrySpec(id, index, mKeyStringPool.getString(key));
-                        mMissingEntrySpecs.remove(resId);
-                    }
-                    mPackage.addEntry(id, index, config, mFlag, value);
-                }
+            // Discard all entries sharing this offset if the config was invalid.
+            if (type == null) {
+                continue;
             }
 
-            // Update the entry count for logging.
-            entryCount -= indexes.size();
+            // Add all entries sharing this offset with the parsed value.
+            for (int j = i; j < groupEnd; j++) {
+                int index = (int) entries[j];
+                ResId resId = ResId.of(mPackage.getId(), id, index);
+
+                // #2824 - In some apps the entries are duplicated with the 2nd being malformed.
+                // AOSP skips this, so we will do the same.
+                if (value == null) {
+                    if (!mPackage.hasEntrySpec(id, index)) {
+                        mMissingEntrySpecs.add(resId);
+                    }
+                    continue;
+                }
+
+                // The same entry can never be added more than once.
+                if (mPackage.hasEntry(id, index, config, mFlag)) {
+                    Log.w(TAG, "Ignoring repeated entry: id=%s, config=%s, flag=%s", resId, config, mFlag);
+                    continue;
+                }
+
+                if (!mPackage.hasEntrySpec(id, index)) {
+                    mPackage.addEntrySpec(id, index, mKeyStringPool.getString(key));
+                    mMissingEntrySpecs.remove(resId);
+                }
+                mPackage.addEntry(id, index, config, mFlag, value);
+            }
         }
     }
 
@@ -693,7 +689,7 @@ public class BinaryResourceParser {
             int name = mIn.readInt();
             ResItem value = (ResItem) parseItem(typeName, true);
 
-            // #2824 - In some apps the res entries are duplicated with the 2nd being malformed.
+            // #2824 - In some apps the entries are duplicated with the 2nd being malformed.
             // AOSP skips this, so we will do the same.
             if (value == null) {
                 continue;
