@@ -113,7 +113,7 @@ public class SmaliDecoder {
             }
 
             mDexFiles.add(dexName);
-        } catch (IOException ex) {
+        } catch (IllegalArgumentException | IOException ex) {
             throw new AndrolibException("Could not baksmali file: " + dexName, ex);
         }
     }
