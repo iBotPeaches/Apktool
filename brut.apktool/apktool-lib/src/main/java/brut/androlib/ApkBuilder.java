@@ -302,7 +302,12 @@ public class ApkBuilder {
                 Iterator<ZipArchiveEntry> it = tmpZip.entries("res/").iterator();
                 while (it.hasNext()) {
                     ZipArchiveEntry entry = it.next();
-                    entry.extract(outResDir.resolve(entry.getName().substring(4)));
+                    String name = entry.getName();
+                    try {
+                        entry.extract(outResDir.resolve(ZipUtils.normalizeForFs(name.substring(4))));
+                    } catch (IllegalArgumentException | IOException ex) {
+                        Log.w(TAG, "Could not extract ZIP entry: %s (%s)", name, ex.getMessage());
+                    }
                 }
             }
         } finally {
