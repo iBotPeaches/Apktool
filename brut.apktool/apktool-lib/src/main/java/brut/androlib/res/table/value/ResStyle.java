@@ -24,11 +24,11 @@ import brut.androlib.res.table.ResId;
 import brut.androlib.res.table.ResPackage;
 import brut.androlib.res.xml.ResXmlUtils;
 import brut.common.Log;
+import com.google.common.collect.Sets;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Set;
 
 public class ResStyle extends ResBag {
@@ -129,7 +129,7 @@ public class ResStyle extends ResBag {
 
         ResPackage pkg = mParent.getPackage();
         boolean skipDuplicates = !pkg.getTable().getConfig().isAnalysisMode();
-        Set<ResId> processedKeys = new HashSet<>();
+        Set<ResId> processedKeys = Sets.newHashSetWithExpectedSize(mItems.length);
         for (Item item : mItems) {
             ResReference key = item.getKey();
             ResEntry keyEntry = key.resolveEntry();

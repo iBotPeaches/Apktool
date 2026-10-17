@@ -17,23 +17,22 @@
 package brut.androlib.res.table;
 
 import brut.androlib.res.table.value.ResItem;
-import com.google.common.collect.Sets;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 public class ResTypeSpec {
-    private static final Map<String, Set<String>> STANDARD_TYPE_FORMATS = new HashMap<>();
-    static {
-        STANDARD_TYPE_FORMATS.put("bool", Sets.newHashSet("boolean"));
-        STANDARD_TYPE_FORMATS.put("color", Sets.newHashSet("color"));
-        STANDARD_TYPE_FORMATS.put("dimen", Sets.newHashSet("float", "fraction", "dimension"));
-        STANDARD_TYPE_FORMATS.put("drawable", Sets.newHashSet("color"));
-        STANDARD_TYPE_FORMATS.put("fraction", Sets.newHashSet("float", "fraction", "dimension"));
-        STANDARD_TYPE_FORMATS.put("integer", Sets.newHashSet("integer"));
-        STANDARD_TYPE_FORMATS.put("string", Sets.newHashSet("string"));
-    }
+    private static final Map<String, Set<String>> STANDARD_TYPE_FORMATS = ImmutableMap.<String, Set<String>>builder()
+        .put("bool", ImmutableSet.of("boolean"))
+        .put("color", ImmutableSet.of("color"))
+        .put("dimen", ImmutableSet.of("float", "fraction", "dimension"))
+        .put("drawable", ImmutableSet.of("color"))
+        .put("fraction", ImmutableSet.of("float", "fraction", "dimension"))
+        .put("integer", ImmutableSet.of("integer"))
+        .put("string", ImmutableSet.of("string"))
+        .build();
 
     private final ResPackage mPackage;
     private final int mId;

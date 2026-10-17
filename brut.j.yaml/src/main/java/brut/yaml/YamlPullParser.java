@@ -46,8 +46,8 @@ public class YamlPullParser implements Closeable {
     @Override
     public void close() throws IOException {
         if (!mClosed) {
-            mReader.close();
             mClosed = true;
+            mReader.close();
         }
     }
 

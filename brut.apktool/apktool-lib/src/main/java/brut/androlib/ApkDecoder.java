@@ -25,8 +25,9 @@ import brut.androlib.smali.SmaliDecoder;
 import brut.common.Log;
 import brut.util.BackgroundWorker;
 import brut.util.IOUtils;
-import brut.zip.ZipFileEntry;
-import com.google.common.collect.Sets;
+import brut.zip.ZipArchiveEntry;
+import brut.zip.ZipUtils;
+import com.google.common.collect.ImmutableSet;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -52,7 +53,7 @@ public class ApkDecoder {
     private static final Pattern STANDARD_FILES_PATTERN = Pattern.compile(
         "resources\\.arsc|(" + String.join("|", RAW_DIRS) + ")/.*|"
       + CLASSES_FILES_PATTERN.pattern() + "|" + ORIGINAL_FILES_PATTERN.pattern());
-    private static final Set<String> NO_COMPRESS_EXTS = Sets.newHashSet(
+    private static final Set<String> NO_COMPRESS_EXTS = ImmutableSet.of(
         "dex", "arsc", "so", "jpg", "jpeg", "png", "gif", "wav", "mp2", "mp3", "ogg", "aac", "mpg", "mpeg", "mid",
         "midi", "smf", "jet", "rtttl", "imy", "xmf", "mp4", "m4a", "m4v", "3gp", "3gpp", "3g2", "3gpp2", "amr", "awb",
         "wma", "wmv", "webm", "webp", "mkv");
@@ -138,89 +139,81 @@ public class ApkDecoder {
         boolean allSrc = mConfig.isDecodeSourcesFull();
         boolean noSrc = mConfig.isDecodeSourcesNone();
 
-        Iterator<ZipFileEntry> it = (allSrc ? mApkFile.walkFiles() : mApkFile.listFiles()).iterator();
+        Iterator<ZipArchiveEntry> it = mApkFile.entries().iterator();
         while (it.hasNext()) {
-            String fileName = it.next().getName();
-            if (allSrc ? fileName.endsWith(".dex") : CLASSES_FILES_PATTERN.matcher(fileName).matches()) {
+            String name = it.next().getName();
+            if (allSrc ? name.endsWith(".dex") : CLASSES_FILES_PATTERN.matcher(name).matches()) {
                 if (noSrc) {
-                    copySourcesRaw(outDir, fileName);
+                    copyRawFile(outDir, name);
                 } else {
-                    decodeSourcesSmali(outDir, fileName);
+                    decodeSourcesSmali(outDir, name);
                 }
             }
         }
     }
 
-    private void copySourcesRaw(Path outDir, String fileName) throws AndrolibException, IOException {
-        Log.i(TAG, "Copying raw " + fileName + "...");
-        mApkFile.extract(outDir, fileName);
-    }
-
-    private void decodeSourcesSmali(Path outDir, String fileName) throws AndrolibException {
+    private void decodeSourcesSmali(Path outDir, String name) throws AndrolibException {
         if (mWorker != null) {
             mWorker.submit(() -> {
                 if (mFirstError.get() == null) {
                     try {
-                        decodeSourcesSmaliJob(outDir, fileName);
+                        decodeSourcesSmaliJob(outDir, name);
                     } catch (Exception ex) {
                         mFirstError.compareAndSet(null, ex);
                     }
                 }
             });
         } else {
-            decodeSourcesSmaliJob(outDir, fileName);
+            decodeSourcesSmaliJob(outDir, name);
         }
     }
 
-    private void decodeSourcesSmaliJob(Path outDir, String fileName) throws AndrolibException {
-        Log.i(TAG, "Baksmaling " + fileName + "...");
-        mSmaliDecoder.decode(fileName, outDir);
+    private void decodeSourcesSmaliJob(Path outDir, String name) throws AndrolibException {
+        Log.i(TAG, "Baksmaling " + name + "...");
+        mSmaliDecoder.decode(name, outDir);
     }
 
     private void decodeResources(Path outDir) throws AndrolibException, IOException {
-        if (!mApkFile.containsFile("resources.arsc")) {
+        String name = "resources.arsc";
+        if (!mApkFile.hasEntry(name)) {
             return;
         }
 
-        if (mConfig.isDecodeResourcesFull()) {
-            mResDecoder.decodeResources(outDir);
+        if (!mConfig.isDecodeResourcesFull()) {
+            copyRawFile(outDir, name);
         } else {
-            copyResourcesRaw(outDir);
+            mResDecoder.decodeResources(outDir);
         }
-    }
-
-    private void copyResourcesRaw(Path outDir) throws AndrolibException, IOException {
-        Log.i(TAG, "Copying raw resources.arsc...");
-        mApkFile.extract(outDir, "resources.arsc");
     }
 
     private void decodeManifest(Path outDir) throws AndrolibException, IOException {
-        if (!mApkFile.containsFile("AndroidManifest.xml")) {
+        String name = "AndroidManifest.xml";
+        if (!mApkFile.hasEntry(name)) {
             return;
         }
 
-        if (!mConfig.isDecodeResourcesNone()) {
-            mResDecoder.decodeManifest(outDir);
+        if (mConfig.isDecodeResourcesNone()) {
+            copyRawFile(outDir, name);
         } else {
-            copyManifestRaw(outDir);
+            mResDecoder.decodeManifest(outDir);
         }
     }
 
-    private void copyManifestRaw(Path outDir) throws AndrolibException, IOException {
-        Log.i(TAG, "Copying raw AndroidManifest.xml...");
-        mApkFile.extract(outDir, "AndroidManifest.xml");
+    private void copyRawFile(Path outDir, String name) throws AndrolibException, IOException {
+        Log.i(TAG, "Copying raw " + name + "...");
+        extractZipEntry(mApkFile.getEntry(name), outDir, name);
     }
 
     private void copyOriginalFiles(Path outDir) throws AndrolibException, IOException {
         Path originalDir = outDir.resolve("original");
 
         Log.i(TAG, "Copying original files...");
-        Iterator<ZipFileEntry> it = mApkFile.walkFiles().iterator();
+        Iterator<ZipArchiveEntry> it = mApkFile.entries().iterator();
         while (it.hasNext()) {
-            ZipFileEntry file = it.next();
-            String fileName = file.getName();
-            if (ORIGINAL_FILES_PATTERN.matcher(fileName).matches()) {
-                file.extract(originalDir.resolve(fileName));
+            ZipArchiveEntry entry = it.next();
+            String name = entry.getName();
+            if (ORIGINAL_FILES_PATTERN.matcher(name).matches()) {
+                extractZipEntry(entry, originalDir, name);
             }
         }
     }
@@ -231,18 +224,19 @@ public class ApkDecoder {
         boolean noAssets = mConfig.isDecodeAssetsNone();
 
         for (String dirName : RAW_DIRS) {
-            if (!mApkFile.containsDir(dirName) || (noAssets && dirName.equals("assets"))) {
+            String prefix = dirName + "/";
+            if (!mApkFile.hasEntries(prefix) || (noAssets && dirName.equals("assets"))) {
                 continue;
             }
 
             Log.i(TAG, "Copying " + dirName + "...");
-            Iterator<ZipFileEntry> it = mApkFile.getDir(dirName).walkFiles().iterator();
+            Iterator<ZipArchiveEntry> it = mApkFile.entries(prefix).iterator();
             while (it.hasNext()) {
-                ZipFileEntry file = it.next();
-                String fileName = file.getName();
-                if (!ORIGINAL_FILES_PATTERN.matcher(fileName).matches()
-                        && !dexFiles.contains(fileName) && !resFileMap.containsKey(fileName)) {
-                    file.extract(outDir.resolve(fileName));
+                ZipArchiveEntry entry = it.next();
+                String name = entry.getName();
+                if (!ORIGINAL_FILES_PATTERN.matcher(name).matches() && !dexFiles.contains(name)
+                        && !resFileMap.containsKey(name)) {
+                    extractZipEntry(entry, outDir, name);
                 }
             }
         }
@@ -254,14 +248,22 @@ public class ApkDecoder {
         Path unknownDir = outDir.resolve("unknown");
 
         Log.i(TAG, "Copying unknown files...");
-        Iterator<ZipFileEntry> it = mApkFile.walkFiles().iterator();
+        Iterator<ZipArchiveEntry> it = mApkFile.entries().iterator();
         while (it.hasNext()) {
-            ZipFileEntry file = it.next();
-            String fileName = file.getName();
-            if (!STANDARD_FILES_PATTERN.matcher(fileName).matches() && !dexFiles.contains(fileName)
-                    && !resFileMap.containsKey(fileName)) {
-                file.extract(unknownDir.resolve(fileName));
+            ZipArchiveEntry entry = it.next();
+            String name = entry.getName();
+            if (!STANDARD_FILES_PATTERN.matcher(name).matches() && !dexFiles.contains(name)
+                    && !resFileMap.containsKey(name)) {
+                extractZipEntry(entry, unknownDir, name);
             }
+        }
+    }
+
+    private void extractZipEntry(ZipArchiveEntry entry, Path outDir, String outName) throws IOException {
+        try {
+            entry.extract(outDir.resolve(ZipUtils.normalizeForFs(outName)));
+        } catch (IllegalArgumentException | IOException ex) {
+            Log.w(TAG, "Could not extract ZIP entry: %s (%s)", entry.getName(), ex.getMessage());
         }
     }
 
@@ -270,7 +272,7 @@ public class ApkDecoder {
         apkInfo.setVersion(mConfig.getVersion());
 
         // If we did not decode the manifest, store the inferred dex opcode API level.
-        if (mConfig.isDecodeResourcesNone() || !mApkFile.containsFile("AndroidManifest.xml")) {
+        if (mConfig.isDecodeResourcesNone() || !mApkFile.hasEntry("AndroidManifest.xml")) {
             int apiLevel = mSmaliDecoder != null ? mSmaliDecoder.getInferredApiLevel() : 0;
             if (apiLevel > 0) {
                 apkInfo.getSdkInfo().setMinSdkVersion(Integer.toString(apiLevel));
@@ -282,23 +284,23 @@ public class ApkDecoder {
         Set<String> uncompressedExts = new HashSet<>();
         Set<String> uncompressedFiles = new HashSet<>();
 
-        Iterator<ZipFileEntry> it = mApkFile.walkFiles().filter(ZipFileEntry::isStored).iterator();
+        Iterator<ZipArchiveEntry> it = mApkFile.entries().filter(ZipArchiveEntry::isStored).iterator();
         while (it.hasNext()) {
-            ZipFileEntry file = it.next();
-            String fileName = file.getName();
-            fileName = resFileMap.getOrDefault(fileName, fileName);
+            ZipArchiveEntry entry = it.next();
+            String name = entry.getName();
+            name = resFileMap.getOrDefault(name, name);
             String ext;
-            if (file.getSize() > 0 && !(ext = IOUtils.getFileExtension(fileName)).isEmpty()
+            if (entry.getSize() > 0 && !(ext = IOUtils.getFileExtension(name, '/')).isEmpty()
                     && NO_COMPRESS_EXTS.contains(ext)) {
                 uncompressedExts.add(ext);
             } else {
-                uncompressedFiles.add(fileName);
+                uncompressedFiles.add(name);
             }
         }
 
         // Exclude files with an already recorded extension.
         if (!uncompressedExts.isEmpty() && !uncompressedFiles.isEmpty()) {
-            uncompressedFiles.removeIf(fileName -> uncompressedExts.contains(IOUtils.getFileExtension(fileName)));
+            uncompressedFiles.removeIf(name -> uncompressedExts.contains(IOUtils.getFileExtension(name, '/')));
         }
 
         // Update apk info.

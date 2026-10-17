@@ -20,6 +20,7 @@ import brut.androlib.res.decoder.ResChunkPullParser;
 import brut.common.Log;
 import brut.util.BinaryDataInputStream;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Maps;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -28,7 +29,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 
 public class ResStringPool {
@@ -246,7 +246,7 @@ public class ResStringPool {
         }
 
         if (mStringToIndex == null) {
-            Map<String, Integer> stringToIndex = new HashMap<>(mStringOffsets.length, 1f);
+            Map<String, Integer> stringToIndex = Maps.newHashMapWithExpectedSize(mStringOffsets.length);
             for (int i = 0; i < mStringOffsets.length; i++) {
                 String value = getString(i);
                 if (value != null) {

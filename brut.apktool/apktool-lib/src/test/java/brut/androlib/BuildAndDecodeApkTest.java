@@ -579,7 +579,7 @@ public class BuildAndDecodeApkTest extends BaseTest {
 
     @Test
     public void storedMp3FilesAreNotCompressedTest() throws Exception {
-        assertEquals(0, sTestApk.getFile("res/raw/rain.mp3").getMethod());
+        assertEquals(0, sTestApk.getEntry("res/raw/rain.mp3").getMethod());
     }
 
     @Test
@@ -594,7 +594,7 @@ public class BuildAndDecodeApkTest extends BaseTest {
 
     @Test
     public void unicodeAssetTest() throws Exception {
-        assumeTrue(!SystemUtils.isWindows());
+        assumeTrue(!SystemUtils.IS_OS_WINDOWS);
         compareBinaryFolder("assets/unicode-txt");
     }
 

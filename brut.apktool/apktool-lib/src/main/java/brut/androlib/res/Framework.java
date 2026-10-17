@@ -28,9 +28,7 @@ import brut.util.JarUtils;
 import brut.util.Pair;
 import brut.util.SystemUtils;
 import brut.zip.ZipArchive;
-import brut.zip.ZipFileEntry;
 import brut.zip.ZipUtils;
-import com.google.common.io.ByteStreams;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -54,9 +52,9 @@ public class Framework {
     static {
         String home = System.getProperty("user.home");
         Path basePath;
-        if (SystemUtils.isWindows()) {
+        if (SystemUtils.IS_OS_WINDOWS) {
             basePath = Paths.get(home, "AppData", "Local");
-        } else if (SystemUtils.isMac()) {
+        } else if (SystemUtils.IS_OS_MAC_OSX) {
             basePath = Paths.get(home, "Library");
         } else {
             // A valid XDG_DATA_HOME environment variable must be an absolute path.
@@ -83,11 +81,7 @@ public class Framework {
             throw new InFileNotFoundException(apkFile);
         }
         try (ZipArchive zip = new ZipArchive(apkFile)) {
-            ZipFileEntry file = zip.getFile("resources.arsc");
-            byte[] data;
-            try (InputStream in = file.getInputStream()) {
-                data = ByteStreams.toByteArray(in);
-            }
+            byte[] data = zip.getEntry("resources.arsc").getData();
             ResTable table = parseAndPublicizeResources(data);
             int pkgId = table.listPackageGroups().iterator().next().getId();
             Path outFile = getDirectory().resolve(pkgId + getFileSuffix());
@@ -103,11 +97,8 @@ public class Framework {
                 out.closeEntry();
 
                 // Copy AndroidManifest.xml, if available.
-                if (zip.containsFile("AndroidManifest.xml")) {
-                    file = zip.getFile("AndroidManifest.xml");
-                    try (InputStream in = file.getInputStream()) {
-                        data = ByteStreams.toByteArray(in);
-                    }
+                if (zip.hasEntry("AndroidManifest.xml")) {
+                    data = zip.getEntry("AndroidManifest.xml").getData();
                     entry = new ZipEntry("AndroidManifest.xml");
                     entry.setTime(ApkFile.TIME_MILLIS);
                     entry.setSize(data.length);

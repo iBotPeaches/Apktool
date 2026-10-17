@@ -26,7 +26,6 @@ import brut.androlib.res.table.value.ResPrimitive;
 import brut.androlib.res.table.value.ResString;
 import brut.common.Log;
 import brut.util.IOUtils;
-import brut.zip.ZipUtils;
 
 import java.io.InputStream;
 import java.io.IOException;
@@ -50,24 +49,17 @@ public class ResFileDecoder {
     }
 
     public void decode(ResEntry entry, Path outDir, Map<String, String> resFileMap) throws AndrolibException {
-        String value = ((ResFileReference) entry.getValue()).getPath();
+        String name = ((ResFileReference) entry.getValue()).getPath();
 
         // Some apps have string values where they shouldn't be.
         // We assumed that they are file references, but if no such file then fall back to a string value.
-        String fileName;
-        try {
-            fileName = ZipUtils.normalize(value);
-        } catch (IllegalArgumentException ignored) {
-            fileName = null;
-        }
-        if (fileName == null || !mApkFile.containsFile(fileName)) {
-            entry.setValue(new ResString(value));
+        if (!mApkFile.hasEntry(name)) {
+            entry.setValue(new ResString(name));
             return;
         }
 
         // Get input file extension.
-        String ext = fileName.endsWith(".9.png") ? "9.png"
-            : IOUtils.getFileExtension(fileName).toLowerCase(Locale.ROOT);
+        String ext = name.endsWith(".9.png") ? "9.png" : IOUtils.getFileExtension(name, '/').toLowerCase(Locale.ROOT);
 
         // Use aapt2-like logic to determine which decoder to use.
         // TODO: Determine by magic bytes and fill in stripped extensions?
@@ -89,35 +81,35 @@ public class ResFileDecoder {
                            + "/" + entry.getName() + (ext.isEmpty() ? "" : "." + ext);
 
         // Map input file name to output file name.
-        resFileMap.put(fileName, outFileName);
+        resFileMap.put(name, outFileName);
 
-        Log.d(TAG, "Decoding file " + fileName + " to " + outFileName);
+        Log.d(TAG, "Decoding file " + name + " to " + outFileName);
         try {
             Path outFile = outDir.resolve(outFileName);
 
             if (type != Type.UNKNOWN) {
                 try {
-                    decode(type, fileName, outFile);
+                    decode(type, name, outFile);
                     return;
                 } catch (RawXmlEncounteredException ignored) {
                     // Assume the file is a raw XML.
-                    Log.d(TAG, "Could not decode binary XML file: " + fileName);
+                    Log.d(TAG, "Could not decode binary XML file: " + name);
                 } catch (NinePatchNotFoundException ignored) {
                     // Assume the file is a raw PNG.
                     // Some apps contain unprocessed dummy 3x3 9-patch PNGs.
                     // Extract them as-is, let aapt2 process them properly later.
-                    Log.d(TAG, "Could not find 9-patch chunk in file: " + fileName);
+                    Log.d(TAG, "Could not find 9-patch chunk in file: " + name);
                 }
             }
 
-            decode(Type.UNKNOWN, fileName, outFile);
+            decode(Type.UNKNOWN, name, outFile);
         } catch (AndrolibException | IOException ignored) {
-            Log.w(TAG, "Could not decode file, replacing with NULL value: " + fileName);
+            Log.w(TAG, "Could not decode file, replacing with NULL value: " + name);
             entry.setValue(ResPrimitive.NULL);
         }
     }
 
-    private void decode(Type type, String fileName, Path outFile) throws AndrolibException, IOException {
+    private void decode(Type type, String name, Path outFile) throws AndrolibException, IOException {
         ResStreamDecoder decoder = mDecoders.get(type);
         if (decoder == null) {
             throw new IllegalStateException("Undefined decoder for file type: " + type);
@@ -127,7 +119,7 @@ public class ResFileDecoder {
             IOUtils.createParentDirectories(outFile);
         }
         try (
-            InputStream in = mApkFile.getFile(fileName).getInputStream();
+            InputStream in = mApkFile.getEntry(name).getInputStream();
             OutputStream out = Files.newOutputStream(outFile)
         ) {
             decoder.decode(in, out);
