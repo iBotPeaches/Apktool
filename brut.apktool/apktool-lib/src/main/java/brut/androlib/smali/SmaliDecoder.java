@@ -63,31 +63,33 @@ public class SmaliDecoder {
 
     public void decode(String dexName, Path outDir) throws AndrolibException {
         try {
+            Map<Integer, DexBackedDexFile> dexFiles = new TreeMap<>();
+
             // Fetch the requested dex file from the dex container.
             ZipDexContainer.DexEntry<DexBackedDexFile> dexEntry = mDexContainer.getEntry(dexName);
-            if (dexEntry == null) {
-                throw new AndrolibException("Could not find file: " + dexName);
-            }
+            if (dexEntry != null) {
+                // Exact match: a standalone dex file.
+                dexFiles.put(0, dexEntry.getDexFile());
+            } else {
+                // No exact match: look for numbered entries of a multi-dex container.
+                String prefix = dexName + "/";
+                for (String dexEntryName : mDexContainer.getDexEntryNames()) {
+                    if (!dexEntryName.startsWith(prefix)) {
+                        continue;
+                    }
 
-            // Add the requested dex file.
-            Map<Integer, DexBackedDexFile> dexFiles = new TreeMap<>();
-            dexFiles.put(1, dexEntry.getDexFile());
-
-            // Add additional dex files if it's a multi-dex container.
-            String prefix = dexName + "/";
-            for (String dexEntryName : mDexContainer.getDexEntryNames()) {
-                if (!dexEntryName.startsWith(prefix)) {
-                    continue;
+                    int dexNum;
+                    try {
+                        dexNum = Integer.parseInt(dexEntryName.substring(prefix.length()));
+                    } catch (NumberFormatException ignored) {
+                        continue;
+                    }
+                    if (dexNum >= 0) {
+                        dexFiles.put(dexNum, mDexContainer.getEntry(dexEntryName).getDexFile());
+                    }
                 }
-
-                int dexNum;
-                try {
-                    dexNum = Integer.parseInt(dexEntryName.substring(prefix.length()));
-                } catch (NumberFormatException ignored) {
-                    continue;
-                }
-                if (dexNum > 1) {
-                    dexFiles.put(dexNum, mDexContainer.getEntry(dexEntryName).getDexFile());
+                if (dexFiles.isEmpty()) {
+                    throw new AndrolibException("Could not find file: " + dexName);
                 }
             }
 
@@ -101,11 +103,11 @@ public class SmaliDecoder {
                 }
 
                 String dirName = "smali";
-                if (dexNum > 1 || !dexName.equals("classes.dex")) {
+                if (dexNum > 0 || !dexName.equals("classes.dex")) {
                     String escapedName = dexName.substring(0, dexName.lastIndexOf('.')).replace('/', '@');
                     dirName += "_" + ZipUtils.normalizeForFs(escapedName);
-                    if (dexNum > 1) {
-                        dirName += dexNum;
+                    if (dexNum > 0) {
+                        dirName += (dexNum + 1);
                     }
                 }
 
