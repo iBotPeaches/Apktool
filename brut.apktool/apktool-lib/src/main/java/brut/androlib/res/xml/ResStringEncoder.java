@@ -21,12 +21,12 @@ import brut.androlib.res.table.value.ResAttribute;
 import brut.util.TextUtils;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
-import java.util.regex.Pattern;
+import java.util.List;
 
 public final class ResStringEncoder {
-    private static final Pattern TAG_SPLIT_PATTERN = Pattern.compile(";(?=[\\p{L}_][\\p{L}\\p{N}_.-]*=)");
 
     private ResStringEncoder() {}
 
@@ -119,7 +119,7 @@ public final class ResStringEncoder {
 
             // Append the attributes.
             if (tagEnd < tag.length()) {
-                for (String attr : TAG_SPLIT_PATTERN.split(tag.substring(tagEnd + 1))) {
+                for (String attr : splitTagAttributes(tag.substring(tagEnd + 1))) {
                     int attrLen = attr.length();
                     if (attrLen == 0) {
                         continue;
@@ -352,6 +352,89 @@ public final class ResStringEncoder {
                 out.append(ch);
             }
         }
+    }
+
+    private static String[] splitTagAttributes(String str) {
+        List<String> attributes = new ArrayList<>();
+        int start = 0;
+        int len = str.length();
+        for (int i = 0; i < len; i++) {
+            if (str.charAt(i) != ';' || isEntityTerminator(str, i) || !isAttributeStart(str, i + 1)) {
+                continue;
+            }
+            attributes.add(str.substring(start, i));
+            start = i + 1;
+        }
+        attributes.add(str.substring(start));
+        return attributes.toArray(new String[0]);
+    }
+
+    private static boolean isAttributeStart(String str, int offset) {
+        int len = str.length();
+        if (offset >= len) {
+            return false;
+        }
+        char ch = str.charAt(offset);
+        if (!Character.isLetter(ch) && ch != '_') {
+            return false;
+        }
+        for (int i = offset + 1; i < len; i++) {
+            ch = str.charAt(i);
+            if (ch == '=') {
+                return true;
+            }
+            if (!Character.isLetterOrDigit(ch) && ch != '_' && ch != '.' && ch != '-') {
+                return false;
+            }
+        }
+        return false;
+    }
+
+    private static boolean isEntityTerminator(String str, int semi) {
+        int amp = str.lastIndexOf('&', semi - 1);
+        if (amp < 0) {
+            return false;
+        }
+        for (int i = amp + 1; i < semi; i++) {
+            char ch = str.charAt(i);
+            if (Character.isWhitespace(ch) || ch == ';' || ch == '&') {
+                return false;
+            }
+        }
+        String entity = str.substring(amp + 1, semi);
+        if (entity.startsWith("#x") || entity.startsWith("#X")) {
+            if (entity.length() == 2) {
+                return false;
+            }
+            for (int i = 2; i < entity.length(); i++) {
+                if (Character.digit(entity.charAt(i), 16) == -1) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        if (entity.startsWith("#")) {
+            if (entity.length() == 1) {
+                return false;
+            }
+            for (int i = 1; i < entity.length(); i++) {
+                char ch = entity.charAt(i);
+                if (ch < '0' || ch > '9') {
+                    return false;
+                }
+            }
+            return true;
+        }
+        if (entity.isEmpty()) {
+            return false;
+        }
+        for (int i = 0; i < entity.length(); i++) {
+            char ch = entity.charAt(i);
+            if (i == 0 ? !Character.isLetter(ch) : !Character.isLetterOrDigit(ch)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public static String normalizeFormatSpecifiers(String str) {
