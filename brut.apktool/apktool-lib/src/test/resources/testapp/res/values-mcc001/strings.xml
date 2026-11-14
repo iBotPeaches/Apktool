@@ -47,4 +47,5 @@ bar"</string>
     <string name="test_string42">🔆</string>
     <string name="test_string43"><br/></string>
     <string name="test_string44"><ul> <li><b>aaaaa aa aaaaa</b> – aaaaaaa aaaaaaaaaa aa aaaaaaaa aaaaaa aaaaa (aaaa) aaaa aaaaaaaaa aaaaa aa aaaaaaaaa aaaaaaa aaaa</li> <li><b>aaaaaaaaa aaaaaaaaaaaaaaa aaaaaaaa</b> – aaaaaaa aaaaaaaaaa aaaaaaaaa aaaa aaaaaa aa aaaa aaaa aaaa aaaa aaaaaaa aaaaaaaaaaaaa, aaaaaa aaa aaaaaaaaaa (aaa) aaaaaaaaaaaaaaa</li> <li><b>aaaaaaaaaaa aaaaaa aaaaaaaaaa</b> – aaaaaaaaaa aaaa aaaaaa aa a aaa aa aaaaaa aaa aaaaaaa (aaaaa aaaaaaaa) aaaaaaaa aa aaaaaa aaaaa aaa aaaa</li> </ul></string>
+    <string name="test_string45">Click <a href="https://example.com/help/?solutionId=FAQ957&amp;amp;topicID=abc&amp;amp;m=ARA">here</a> now.</string>
 </resources>
