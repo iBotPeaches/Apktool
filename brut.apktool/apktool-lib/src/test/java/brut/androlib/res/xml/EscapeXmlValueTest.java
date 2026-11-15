@@ -17,11 +17,25 @@
 package brut.androlib.res.xml;
 
 import brut.androlib.BaseTest;
+import brut.androlib.res.data.StyledString;
 
 import org.junit.*;
 import static org.junit.Assert.*;
 
 public class EscapeXmlValueTest extends BaseTest {
+
+    @Test
+    public void escapeStyledStringAttributesTest() {
+        String value = "link";
+        StyledString styled = new StyledString(value, new StyledString.Span[] {
+            new StyledString.Span(
+                "a;href=https://example.com/?solutionId=FAQ957&amp;topicID=abc&amp;m=ARA", 0, value.length() - 1)
+        });
+
+        assertEquals(
+            "<a href=\"https://example.com/?solutionId=FAQ957&amp;amp;topicID=abc&amp;amp;m=ARA\">link</a>",
+            ResStringEncoder.encodeTextValue(styled));
+    }
 
     @Test
     public void escapeXmlValueTest() {
